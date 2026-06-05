@@ -1,0 +1,155 @@
+module MinimumConsecutiveCardsToPickUp_List_Stage3_Imperative
+
+  use int.Int
+  use list.List
+  use list.Length
+  use list.Mem
+  use list.NthNoOpt
+  use ref.Ref
+
+  predicate card_values_in_range (cards: list int) =
+    forall x: int. mem x cards -> 0 <= x /\ x <= 1000000
+
+  predicate valid_matching_pair (cards: list int) (i: int) (j: int) =
+    0 <= i /\ i < j /\ j < length cards /\
+    nth i cards = nth j cards
+
+  predicate matching_window (cards: list int) (span: int) =
+    span >= 2 /\
+    exists i: int. exists j: int.
+      valid_matching_pair cards i j /\ span = j - i + 1
+
+  predicate minimum_pickup_result (cards: list int) (result: int) =
+    (result = -1 /\
+     (forall span: int. not (matching_window cards span))) \/
+    (result >= 2 /\
+     matching_window cards result /\
+     (forall span: int. matching_window cards span -> result <= span))
+
+  predicate suffix_at (cards: list int) (suffix: list int) (start: int) =
+    0 <= start /\ start <= length cards /\
+    length suffix = length cards - start /\
+    (forall k: int. 0 <= k /\ k < length suffix ->
+       nth k suffix = nth (start + k) cards)
+
+  predicate pair_processed_outer (cards: list int) (limit: int) (p: int) (q: int) =
+    valid_matching_pair cards p q /\ p < limit
+
+  predicate pair_processed_inner (cards: list int) (i: int) (j: int) (p: int) (q: int) =
+    valid_matching_pair cards p q /\ (p < i \/ (p = i /\ q < j))
+
+  predicate best_over_outer (cards: list int) (limit: int) (best: int) =
+    (best = -1 /\
+     (forall p: int. forall q: int.
+        not (pair_processed_outer cards limit p q))) \/
+    (best >= 2 /\
+     (exists p: int. exists q: int.
+        pair_processed_outer cards limit p q /\ best = q - p + 1) /\
+     (forall p: int. forall q: int.
+        pair_processed_outer cards limit p q -> best <= q - p + 1))
+
+  predicate best_over_inner (cards: list int) (i: int) (j: int) (best: int) =
+    (best = -1 /\
+     (forall p: int. forall q: int.
+        not (pair_processed_inner cards i j p q))) \/
+    (best >= 2 /\
+     (exists p: int. exists q: int.
+        pair_processed_inner cards i j p q /\ best = q - p + 1) /\
+     (forall p: int. forall q: int.
+        pair_processed_inner cards i j p q -> best <= q - p + 1))
+
+  let lemma suffix_at_cons_tail (cards: list int) (x: int) (xs: list int) (start: int)
+    requires { suffix_at cards (Cons x xs) start }
+    ensures  { x = nth start cards }
+    ensures  { suffix_at cards xs (start + 1) }
+  =
+    assert { 0 <= start };
+    assert { start < length cards };
+    assert { length xs = length cards - (start + 1) };
+    assert { forall k: int. 0 <= k /\ k < length xs ->
+      nth k xs = nth (k + 1) (Cons x xs) };
+    assert { forall k: int. 0 <= k /\ k < length xs ->
+      nth k xs = nth (start + 1 + k) cards }
+
+  let minimum_consecutive_cards_to_pick_up_list (cards: list int) : int
+    requires { 1 <= length cards }
+    requires { length cards <= 100000 }
+    requires { card_values_in_range cards }
+    ensures  { minimum_pickup_result cards result }
+  =
+    let best = ref (-1) in
+    let outer = ref cards in
+    let i = ref 0 in
+    assert { suffix_at cards cards 0 };
+    assert { best_over_outer cards 0 !best };
+    while (match !outer with Nil -> false | Cons _ _ -> true end) do
+      invariant { 0 <= !i /\ !i <= length cards }
+      invariant { suffix_at cards !outer !i }
+      invariant { best_over_outer cards !i !best }
+      variant   { length !outer }
+
+      match !outer with
+      | Nil ->
+          assert { false }
+      | Cons x xs ->
+          assert { !i < length cards };
+          assert { length !outer = length cards - !i };
+          assert { x = nth !i cards };
+          let inner = ref xs in
+          let j = ref (!i + 1) in
+          suffix_at_cons_tail cards x xs !i;
+          assert { suffix_at cards !inner !j };
+          assert { best_over_inner cards !i !j !best };
+          while (match !inner with Nil -> false | Cons _ _ -> true end) do
+            invariant { !i + 1 <= !j /\ !j <= length cards }
+            invariant { suffix_at cards !inner !j }
+            invariant { best_over_inner cards !i !j !best }
+            variant   { length !inner }
+
+            match !inner with
+            | Nil ->
+                assert { false }
+            | Cons y ys ->
+                assert { !j < length cards };
+                assert { length !inner = length cards - !j };
+                assert { y = nth !j cards };
+                if x = y then begin
+                  let span = !j - !i + 1 in
+                  assert { 0 <= !i };
+                  assert { !i < !j };
+                  assert { !j < length cards };
+                  assert { nth !i cards = nth !j cards };
+                  assert { valid_matching_pair cards !i !j };
+                  assert { span = !j - !i + 1 };
+                  assert { matching_window cards span };
+                  if !best = -1 then
+                    best := span
+                  else if span < !best then
+                    best := span
+                  else ();
+                  assert { best_over_inner cards !i (!j + 1) !best }
+                end else begin
+                  assert { nth !i cards <> nth !j cards };
+                  assert { not (valid_matching_pair cards !i !j) };
+                  assert { best_over_inner cards !i (!j + 1) !best }
+                end;
+                suffix_at_cons_tail cards y ys !j;
+                assert { suffix_at cards ys (!j + 1) };
+                inner := ys;
+                j := !j + 1
+            end
+          done;
+          assert { !inner = Nil };
+          assert { !j = length cards };
+          assert { best_over_outer cards (!i + 1) !best };
+          outer := xs;
+          i := !i + 1
+      end
+    done;
+    assert { !outer = Nil };
+    assert { !i = length cards };
+    assert { best_over_outer cards (length cards) !best };
+    assert { minimum_pickup_result cards !best };
+    !best
+
+end

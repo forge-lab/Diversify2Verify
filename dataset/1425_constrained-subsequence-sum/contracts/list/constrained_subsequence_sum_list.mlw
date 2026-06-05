@@ -1,0 +1,123 @@
+module ConstrainedSubsequenceSum_List_Spec
+
+  use int.Int
+  use list.List
+  use list.Length
+
+  let rec predicate constrained_tail_sum (nums: list int) (k: int) (gap: int) (s: int)
+    variant { nums }
+  =
+    match nums with
+    | Nil -> s = 0
+    | Cons x xs ->
+        s = 0 ||
+        (gap > 0 && constrained_tail_sum xs k k (s - x)) ||
+        (gap > 0 && constrained_tail_sum xs k (gap - 1) s)
+    end
+
+  let rec predicate constrained_nonempty_sum (nums: list int) (k: int) (s: int)
+    variant { nums }
+  =
+    match nums with
+    | Nil -> false
+    | Cons x xs ->
+        constrained_tail_sum xs k k (s - x) ||
+        constrained_nonempty_sum xs k s
+    end
+
+  predicate is_constrained_max_sum (nums: list int) (k: int) (m: int) =
+    constrained_nonempty_sum nums k m /\
+    (forall s: int. constrained_nonempty_sum nums k s -> s <= m)
+
+  val constrained_subsequence_sum_list (nums: list int) (k: int) : int
+    requires { nums <> Nil }
+    requires { 1 <= k <= length nums }
+    ensures  { is_constrained_max_sum nums k result }
+
+  let lemma check_test_000 () =
+    let l4 = Cons 5 Nil in
+    let l3 = Cons (-3) l4 in
+    let l2 = Cons 7 l3 in
+    let l1 = Cons 5 l2 in
+    assert { constrained_tail_sum l4 1 1 5 };
+    assert { constrained_tail_sum l3 1 1 2 };
+    assert { constrained_tail_sum l2 1 1 9 };
+    assert { constrained_nonempty_sum l1 1 14 };
+    assert { forall s: int. constrained_nonempty_sum l1 1 s -> s <= 14 };
+    assert { is_constrained_max_sum l1 1 14 }
+
+  let lemma check_test_001 () =
+    let l5 = Cons 20 Nil in
+    let l4 = Cons 5 l5 in
+    let l3 = Cons (-10) l4 in
+    let l2 = Cons 2 l3 in
+    let l1 = Cons 10 l2 in
+    assert { constrained_tail_sum l5 2 2 20 };
+    assert { constrained_tail_sum l4 2 1 25 };
+    assert { constrained_tail_sum l3 2 2 25 };
+    assert { constrained_tail_sum l2 2 2 27 };
+    assert { constrained_nonempty_sum l1 2 37 };
+    assert { forall s: int. constrained_nonempty_sum l1 2 s -> s <= 37 };
+    assert { is_constrained_max_sum l1 2 37 }
+
+  let lemma check_test_002 () =
+    let l5 = Cons 5 Nil in
+    let l4 = Cons 4 l5 in
+    let l3 = Cons 3 l4 in
+    let l2 = Cons 2 l3 in
+    let l1 = Cons 1 l2 in
+    assert { constrained_tail_sum l5 3 3 5 };
+    assert { constrained_tail_sum l4 3 3 9 };
+    assert { constrained_tail_sum l3 3 3 12 };
+    assert { constrained_tail_sum l2 3 3 14 };
+    assert { constrained_nonempty_sum l1 3 15 };
+    assert { forall s: int. constrained_nonempty_sum l1 3 s -> s <= 15 };
+    assert { is_constrained_max_sum l1 3 15 }
+
+  let lemma check_test_003 () =
+    let l6 = Cons 1 Nil in
+    let l5 = Cons 2 l6 in
+    let l4 = Cons (-2) l5 in
+    let l3 = Cons 4 l4 in
+    let l2 = Cons (-1) l3 in
+    let l1 = Cons 3 l2 in
+    assert { constrained_tail_sum l6 2 2 1 };
+    assert { constrained_tail_sum l5 2 2 3 };
+    assert { constrained_tail_sum l4 2 1 3 };
+    assert { constrained_tail_sum l3 2 2 7 };
+    assert { constrained_tail_sum l2 2 2 7 };
+    assert { constrained_nonempty_sum l1 2 10 };
+    assert { forall s: int. constrained_nonempty_sum l1 2 s -> s <= 10 };
+    assert { is_constrained_max_sum l1 2 10 }
+
+  let lemma check_test_004 () =
+    let l5 = Cons (-5) Nil in
+    let l4 = Cons (-4) l5 in
+    let l3 = Cons (-3) l4 in
+    let l2 = Cons (-2) l3 in
+    let l1 = Cons (-1) l2 in
+    assert { constrained_tail_sum l2 4 4 0 };
+    assert { constrained_nonempty_sum l1 4 (-1) };
+    assert { forall s: int. constrained_nonempty_sum l1 4 s -> s <= (-1) };
+    assert { is_constrained_max_sum l1 4 (-1) }
+
+  let lemma check_test_005 () =
+    let l3 = Cons 5 Nil in
+    let l2 = Cons (-1) l3 in
+    let l1 = Cons 5 l2 in
+    assert { constrained_tail_sum l3 2 1 5 };
+    assert { constrained_tail_sum l2 2 2 5 };
+    assert { constrained_nonempty_sum l1 2 10 };
+    assert { forall s: int. constrained_nonempty_sum l1 2 s -> s <= 10 };
+    assert { is_constrained_max_sum l1 2 10 }
+
+  let lemma check_test_006 () =
+    let l3 = Cons (-3) Nil in
+    let l2 = Cons (-2) l3 in
+    let l1 = Cons (-1) l2 in
+    assert { constrained_tail_sum l2 1 1 0 };
+    assert { constrained_nonempty_sum l1 1 (-1) };
+    assert { forall s: int. constrained_nonempty_sum l1 1 s -> s <= (-1) };
+    assert { is_constrained_max_sum l1 1 (-1) }
+
+end

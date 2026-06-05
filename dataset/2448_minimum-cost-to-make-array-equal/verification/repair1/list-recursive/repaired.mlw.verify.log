@@ -1,0 +1,116 @@
+== Stage 1: first prover on whole file ==
+Running in /Users/rubenm/Desktop/Diversify2Verify/codex-runs/dataset-merge-verification/stage3a-repair/2448_minimum-cost-to-make-array-equal/list-recursive/minimum_cost_to_make_array_equal_list_stage3_47ba103f_stage3/generated/why3: why3 session create -o /Users/rubenm/Desktop/Diversify2Verify/codex-runs/dataset-merge-verification/stage3a-repair/2448_minimum-cost-to-make-array-equal/list-recursive/minimum_cost_to_make_array_equal_list_stage3_47ba103f_stage3/generated/why3/.why3_sessions/repaired_stage1 -P Z3,4.8.6 -t 10 -m 8192 repaired.mlw
+Session created successfully
+Running in /Users/rubenm/Desktop/Diversify2Verify/codex-runs/dataset-merge-verification/stage3a-repair/2448_minimum-cost-to-make-array-equal/list-recursive/minimum_cost_to_make_array_equal_list_stage3_47ba103f_stage3/generated/why3: why3 bench /Users/rubenm/Desktop/Diversify2Verify/codex-runs/dataset-merge-verification/stage3a-repair/2448_minimum-cost-to-make-array-equal/list-recursive/minimum_cost_to_make_array_equal_list_stage3_47ba103f_stage3/generated/why3/.why3_sessions/repaired_stage1
+Progress: 6/1/0                       Progress: 5/2/0                       Progress: 4/3/0                       Progress: 3/4/0                       Progress: 2/5/0                       Progress: 1/6/0                       Progress: 1/2/2                       Progress: 0/3/2                       Progress: 0/2/2                       Progress: 0/1/2                       Progress: 0/0/2                       Progress: 0/0/1                       
+Replay completed, saving session... done
+== Stage 1 stats ==
+= Statistics for session /Users/rubenm/Desktop/Diversify2Verify/codex-runs/dataset-merge-verification/stage3a-repair/2448_minimum-cost-to-make-array-equal/list-recursive/minimum_cost_to_make_array_equal_list_stage3_47ba103f_stage3/generated/why3/.why3_sessions/repaired_stage1
+
+== Number of root goals ==
+  total: 7  proved: 3
+
+== Number of sub goals ==
+  total: 0  proved: 0
+
+== Goals not proved ==
+  +-- file [../../repaired.mlw]
+    +-- theory MinimumCostToMakeArrayEqual_List_Stage3_Recursive
+      +-- goal weighted_cost_to_exec'vc
+      +-- goal minimum_cost_from_targets'vc
+      +-- goal candidate_minimum_is_global'vc
+      +-- goal minimum_cost_to_make_array_equal_list'vc
+  
+== Goals proved by only one prover ==
+  +-- file [../../repaired.mlw]
+    +-- theory MinimumCostToMakeArrayEqual_List_Stage3_Recursive
+      +-- goal positive_list'vc: Z3 4.8.6
+      +-- goal weighted_cost_to'vc: Z3 4.8.6
+      +-- goal weighted_cost_nonnegative'vc: Z3 4.8.6
+  
+1 session(s) read, with a total of 7 proof goals.
+== Unproved root goals after first prover ==
+MinimumCostToMakeArrayEqual_List_Stage3_Recursive	weighted_cost_to_exec'vc
+MinimumCostToMakeArrayEqual_List_Stage3_Recursive	minimum_cost_from_targets'vc
+MinimumCostToMakeArrayEqual_List_Stage3_Recursive	candidate_minimum_is_global'vc
+MinimumCostToMakeArrayEqual_List_Stage3_Recursive	minimum_cost_to_make_array_equal_list'vc
+== Stage 1: trying remaining goals with prover Alt-Ergo,2.4.0 ==
+---- stage1 | prover: Alt-Ergo,2.4.0 | theory: MinimumCostToMakeArrayEqual_List_Stage3_Recursive | goal: weighted_cost_to_exec'vc ----
+File repaired.mlw:
+Goal weighted_cost_to_exec'vc.
+Prover result is: Valid (0.01s, 209 steps).
+Solved in stage 1 using prover: Alt-Ergo,2.4.0
+---- stage1 | prover: Alt-Ergo,2.4.0 | theory: MinimumCostToMakeArrayEqual_List_Stage3_Recursive | goal: minimum_cost_from_targets'vc ----
+File repaired.mlw:
+Goal minimum_cost_from_targets'vc.
+Prover result is: Valid (0.02s, 447 steps).
+Solved in stage 1 using prover: Alt-Ergo,2.4.0
+---- stage1 | prover: Alt-Ergo,2.4.0 | theory: MinimumCostToMakeArrayEqual_List_Stage3_Recursive | goal: candidate_minimum_is_global'vc ----
+File repaired.mlw:
+Goal candidate_minimum_is_global'vc.
+Prover result is: Timeout (10.00s, 36935 steps).
+---- stage1 | prover: Alt-Ergo,2.4.0 | theory: MinimumCostToMakeArrayEqual_List_Stage3_Recursive | goal: minimum_cost_to_make_array_equal_list'vc ----
+File repaired.mlw:
+Goal minimum_cost_to_make_array_equal_list'vc.
+Prover result is: Valid (0.02s, 374 steps).
+Solved in stage 1 using prover: Alt-Ergo,2.4.0
+Remaining after prover Alt-Ergo,2.4.0: 1
+== Stage 1: trying remaining goals with prover CVC4,1.8 ==
+---- stage1 | prover: CVC4,1.8 | theory: MinimumCostToMakeArrayEqual_List_Stage3_Recursive | goal: candidate_minimum_is_global'vc ----
+File repaired.mlw:
+Goal candidate_minimum_is_global'vc.
+Prover result is: Unknown (unknown + incomplete) (0.02s, 4275 steps).
+Remaining after prover CVC4,1.8: 1
+== Goals still unproved after stage 1 ==
+MinimumCostToMakeArrayEqual_List_Stage3_Recursive	candidate_minimum_is_global'vc
+== Stage 2: split_vc on unproved goal ==
+Target theory: MinimumCostToMakeArrayEqual_List_Stage3_Recursive
+Target goal  : candidate_minimum_is_global'vc
+---- stage2 | prover: Z3,4.8.6 | theory: MinimumCostToMakeArrayEqual_List_Stage3_Recursive | goal: candidate_minimum_is_global'vc ----
+Transforms: split_vc
+File "repaired.mlw", line 124, characters 35-76:
+Sub-goal Postcondition of goal candidate_minimum_is_global'vc.
+Prover result is: Timeout (10.00s, 238343001 steps).
+---- stage2 | prover: Alt-Ergo,2.4.0 | theory: MinimumCostToMakeArrayEqual_List_Stage3_Recursive | goal: candidate_minimum_is_global'vc ----
+Transforms: split_vc
+File "repaired.mlw", line 124, characters 35-76:
+Sub-goal Postcondition of goal candidate_minimum_is_global'vc.
+Prover result is: Timeout (10.00s, 36562 steps).
+---- stage2 | prover: CVC4,1.8 | theory: MinimumCostToMakeArrayEqual_List_Stage3_Recursive | goal: candidate_minimum_is_global'vc ----
+Transforms: split_vc
+File "repaired.mlw", line 124, characters 35-76:
+Sub-goal Postcondition of goal candidate_minimum_is_global'vc.
+Prover result is: Unknown (unknown + incomplete) (0.02s, 4101 steps).
+== Goals still unproved after stage 2 (split_vc) ==
+MinimumCostToMakeArrayEqual_List_Stage3_Recursive	candidate_minimum_is_global'vc
+== Stage 3: split_vc + inline_all on still-unproved goal ==
+Target theory: MinimumCostToMakeArrayEqual_List_Stage3_Recursive
+Target goal  : candidate_minimum_is_global'vc
+---- stage3 | prover: Z3,4.8.6 | theory: MinimumCostToMakeArrayEqual_List_Stage3_Recursive | goal: candidate_minimum_is_global'vc ----
+Transforms: split_vc inline_all
+File "repaired.mlw", line 124, characters 35-76:
+Sub-goal Postcondition of goal candidate_minimum_is_global'vc.
+Prover result is: Timeout (10.00s, 84683391 steps).
+---- stage3 | prover: Alt-Ergo,2.4.0 | theory: MinimumCostToMakeArrayEqual_List_Stage3_Recursive | goal: candidate_minimum_is_global'vc ----
+Transforms: split_vc inline_all
+File "repaired.mlw", line 124, characters 35-76:
+Sub-goal Postcondition of goal candidate_minimum_is_global'vc.
+Prover result is: Timeout (10.00s, 34326 steps).
+---- stage3 | prover: CVC4,1.8 | theory: MinimumCostToMakeArrayEqual_List_Stage3_Recursive | goal: candidate_minimum_is_global'vc ----
+Transforms: split_vc inline_all
+File "repaired.mlw", line 124, characters 35-76:
+Sub-goal Postcondition of goal candidate_minimum_is_global'vc.
+Prover result is: Unknown (unknown + incomplete) (0.02s, 4027 steps).
+== Final summary ==
+Unproved root goals after first prover : 1
+Remaining failures after split_vc      : 1
+Remaining failures after stage 3       : 1
+Detailed logs stored in                : /Users/rubenm/Desktop/Diversify2Verify/codex-runs/dataset-merge-verification/stage3a-repair/2448_minimum-cost-to-make-array-equal/list-recursive/minimum_cost_to_make_array_equal_list_stage3_47ba103f_stage3/generated/why3/.why3_sessions/repaired_logs
+Still unproved goals:
+MinimumCostToMakeArrayEqual_List_Stage3_Recursive	candidate_minimum_is_global'vc
+VERIFY_RESULT: FAILURE
+VERIFY_REASON: unproved_goals_remain
+VERIFY_STAGE: stage3
+VERIFY_ROOT_TOTAL: 7
+VERIFY_ROOT_PROVED: 6
+VERIFY_ROOT_REMAINING: 1

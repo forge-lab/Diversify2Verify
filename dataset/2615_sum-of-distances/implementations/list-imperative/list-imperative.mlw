@@ -1,0 +1,248 @@
+module SumOfDistances_List_Imperative_Implementation
+
+  use int.Int
+  use int.Abs
+  use list.List
+  use ref.Ref
+
+  exception Different
+
+  let reverse_list (l: list int) : list int =
+    let acc = ref Nil in
+    let cur = ref l in
+    while (match !cur with Nil -> false | Cons _ _ -> true end) do
+      match !cur with
+      | Nil -> ()
+      | Cons x xs ->
+          acc := Cons x !acc;
+          cur := xs
+      end
+    done;
+    !acc
+
+  let sum_of_distances_list (nums: list int) : list int =
+    let rev_result = ref Nil in
+    let outer = ref nums in
+    let target_index = ref 0 in
+    while (match !outer with Nil -> false | Cons _ _ -> true end) do
+      match !outer with
+      | Nil -> ()
+      | Cons target rest_outer ->
+          let total = ref 0 in
+          let inner = ref nums in
+          let current_index = ref 0 in
+          while (match !inner with Nil -> false | Cons _ _ -> true end) do
+            match !inner with
+            | Nil -> ()
+            | Cons x xs ->
+                if x = target then
+                  if !current_index = !target_index then ()
+                  else total := !total + abs (!target_index - !current_index);
+                inner := xs;
+                current_index := !current_index + 1
+            end
+          done;
+          rev_result := Cons !total !rev_result;
+          outer := rest_outer;
+          target_index := !target_index + 1
+      end
+    done;
+    reverse_list !rev_result
+
+  let equal_list (xs: list int) (ys: list int) : bool =
+    try
+      let cur_x = ref xs in
+      let cur_y = ref ys in
+      while (match !cur_x, !cur_y with Cons _ _, Cons _ _ -> true | _, _ -> false end) do
+        match !cur_x, !cur_y with
+        | Cons x xt, Cons y yt ->
+            if x <> y then raise Different;
+            cur_x := xt;
+            cur_y := yt
+        | _, _ -> ()
+        end
+      done;
+      match !cur_x, !cur_y with
+      | Nil, Nil -> true
+      | _, _ -> false
+      end
+    with Different ->
+      false
+    end
+
+  let check_case (nums: list int) (expected: list int) : bool =
+    let r = sum_of_distances_list nums in
+    equal_list r expected
+
+  let test_000 () : bool =
+    let nums = Cons 0 (Cons 5 (Cons 3 Nil)) in
+    let expected = Cons 0 (Cons 0 (Cons 0 Nil)) in
+    check_case nums expected
+
+  let test_001 () : bool =
+    let nums =
+      Cons 1 (Cons 2 (Cons 3 (Cons 4 (Cons 5
+        (Cons 1 (Cons 2 (Cons 3 (Cons 4 (Cons 5 Nil))))))))) in
+    let expected =
+      Cons 5 (Cons 5 (Cons 5 (Cons 5 (Cons 5
+        (Cons 5 (Cons 5 (Cons 5 (Cons 5 (Cons 5 Nil))))))))) in
+    check_case nums expected
+
+  let test_002 () : bool =
+    let nums = Cons 1 Nil in
+    let expected = Cons 0 Nil in
+    check_case nums expected
+
+  let test_003 () : bool =
+    let nums = Cons 10 (Cons 10 (Cons 10 (Cons 10 Nil))) in
+    let expected = Cons 6 (Cons 4 (Cons 4 (Cons 6 Nil))) in
+    check_case nums expected
+
+  let test_004 () : bool =
+    let nums = Cons 5 (Cons 4 (Cons 3 (Cons 2 (Cons 1 Nil)))) in
+    let expected = Cons 0 (Cons 0 (Cons 0 (Cons 0 (Cons 0 Nil)))) in
+    check_case nums expected
+
+  let test_005 () : bool =
+    let nums =
+      Cons 10 (Cons 20 (Cons 10 (Cons 30 (Cons 10 (Cons 40 (Cons 10 Nil)))))) in
+    let expected =
+      Cons 12 (Cons 0 (Cons 8 (Cons 0 (Cons 8 (Cons 0 (Cons 12 Nil)))))) in
+    check_case nums expected
+
+  let test_006 () : bool =
+    let nums =
+      Cons 9 (Cons 9 (Cons 9 (Cons 9 (Cons 9
+        (Cons 9 (Cons 9 (Cons 9 (Cons 9 (Cons 9 Nil))))))))) in
+    let expected =
+      Cons 45 (Cons 37 (Cons 31 (Cons 27 (Cons 25
+        (Cons 25 (Cons 27 (Cons 31 (Cons 37 (Cons 45 Nil))))))))) in
+    check_case nums expected
+
+  let test_007 () : bool =
+    let nums = Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 Nil)))) in
+    let expected = Cons 10 (Cons 7 (Cons 6 (Cons 7 (Cons 10 Nil)))) in
+    check_case nums expected
+
+  let test_008 () : bool =
+    let nums =
+      Cons 10 (Cons 20 (Cons 10 (Cons 10 (Cons 30 (Cons 20 (Cons 10 Nil)))))) in
+    let expected =
+      Cons 11 (Cons 4 (Cons 7 (Cons 7 (Cons 0 (Cons 4 (Cons 13 Nil)))))) in
+    check_case nums expected
+
+  let test_009 () : bool =
+    let nums =
+      Cons 1 (Cons 2 (Cons 3 (Cons 4 (Cons 5
+        (Cons 6 (Cons 7 (Cons 8 (Cons 9 (Cons 1 Nil))))))))) in
+    let expected =
+      Cons 9 (Cons 0 (Cons 0 (Cons 0 (Cons 0
+        (Cons 0 (Cons 0 (Cons 0 (Cons 0 (Cons 9 Nil))))))))) in
+    check_case nums expected
+
+  let test_010 () : bool =
+    let nums =
+      Cons 5 (Cons 5 (Cons 5 (Cons 5 (Cons 5
+        (Cons 5 (Cons 5 (Cons 5 (Cons 5 (Cons 5 Nil))))))))) in
+    let expected =
+      Cons 45 (Cons 37 (Cons 31 (Cons 27 (Cons 25
+        (Cons 25 (Cons 27 (Cons 31 (Cons 37 (Cons 45 Nil))))))))) in
+    check_case nums expected
+
+  let test_011 () : bool =
+    let nums = Cons 10 (Cons 20 (Cons 30 (Cons 40 (Cons 50 Nil)))) in
+    let expected = Cons 0 (Cons 0 (Cons 0 (Cons 0 (Cons 0 Nil)))) in
+    check_case nums expected
+
+  let test_012 () : bool =
+    let nums = Cons 1 (Cons 3 (Cons 1 (Cons 1 (Cons 2 Nil)))) in
+    let expected = Cons 5 (Cons 0 (Cons 3 (Cons 4 (Cons 0 Nil)))) in
+    check_case nums expected
+
+  let test_013 () : bool =
+    let nums =
+      Cons 1 (Cons 2 (Cons 3 (Cons 2 (Cons 1
+        (Cons 4 (Cons 5 (Cons 4 (Cons 3 (Cons 2 (Cons 1 Nil)))))))))) in
+    let expected =
+      Cons 14 (Cons 10 (Cons 6 (Cons 8 (Cons 10
+        (Cons 2 (Cons 0 (Cons 2 (Cons 6 (Cons 14 (Cons 16 Nil)))))))))) in
+    check_case nums expected
+
+  let test_014 () : bool =
+    let nums = Cons 2 (Cons 1 (Cons 3 (Cons 1 (Cons 2 (Cons 3 (Cons 3 Nil)))))) in
+    let expected = Cons 4 (Cons 2 (Cons 7 (Cons 2 (Cons 4 (Cons 4 (Cons 5 Nil)))))) in
+    check_case nums expected
+
+  let test_015 () : bool =
+    let nums = Cons 2 (Cons 2 (Cons 2 (Cons 2 Nil))) in
+    let expected = Cons 6 (Cons 4 (Cons 4 (Cons 6 Nil))) in
+    check_case nums expected
+
+  let test_016 () : bool =
+    let nums = Cons 1 (Cons 2 (Cons 3 (Cons 4 (Cons 5 Nil)))) in
+    let expected = Cons 0 (Cons 0 (Cons 0 (Cons 0 (Cons 0 Nil)))) in
+    check_case nums expected
+
+  let test_017 () : bool =
+    let nums =
+      Cons 1 (Cons 2 (Cons 3 (Cons 4 (Cons 5
+        (Cons 6 (Cons 7 (Cons 8 (Cons 9 (Cons 10 Nil))))))))) in
+    let expected =
+      Cons 0 (Cons 0 (Cons 0 (Cons 0 (Cons 0
+        (Cons 0 (Cons 0 (Cons 0 (Cons 0 (Cons 0 Nil))))))))) in
+    check_case nums expected
+
+  let test_018 () : bool =
+    let nums = Cons 9 (Cons 8 (Cons 7 (Cons 6 (Cons 5 (Cons 4 (Cons 3 (Cons 2 (Cons 1 (Cons 9 (Cons 8 (Cons 7 (Cons 6 (Cons 5 (Cons 4 (Cons 3 (Cons 2 (Cons 1 (Cons 9 (Cons 8 (Cons 7 (Cons 6 (Cons 5 (Cons 4 (Cons 3 (Cons 2 (Cons 1 (Nil))))))))))))))))))))))))))) in
+    let expected = Cons 27 (Cons 27 (Cons 27 (Cons 27 (Cons 27 (Cons 27 (Cons 27 (Cons 27 (Cons 27 (Cons 18 (Cons 18 (Cons 18 (Cons 18 (Cons 18 (Cons 18 (Cons 18 (Cons 18 (Cons 18 (Cons 27 (Cons 27 (Cons 27 (Cons 27 (Cons 27 (Cons 27 (Cons 27 (Cons 27 (Cons 27 (Nil))))))))))))))))))))))))))) in
+    check_case nums expected
+
+  let test_019 () : bool =
+    let nums = Cons 50 (Cons 50 (Cons 40 (Cons 40 (Cons 40 (Cons 30 (Cons 30 (Cons 30 (Cons 30 (Cons 20 (Cons 20 (Cons 20 (Cons 20 (Cons 20 (Cons 10 (Cons 10 (Cons 10 (Cons 10 (Cons 10 (Cons 10 (Nil)))))))))))))))))))) in
+    let expected = Cons 1 (Cons 1 (Cons 3 (Cons 2 (Cons 3 (Cons 6 (Cons 4 (Cons 4 (Cons 6 (Cons 10 (Cons 7 (Cons 6 (Cons 7 (Cons 10 (Cons 15 (Cons 11 (Cons 9 (Cons 9 (Cons 11 (Cons 15 (Nil)))))))))))))))))))) in
+    check_case nums expected
+
+  let run_tests () : bool =
+    if test_000 () then
+    if test_001 () then
+    if test_002 () then
+    if test_003 () then
+    if test_004 () then
+    if test_005 () then
+    if test_006 () then
+    if test_007 () then
+    if test_008 () then
+    if test_009 () then
+    if test_010 () then
+    if test_011 () then
+    if test_012 () then
+    if test_013 () then
+    if test_014 () then
+    if test_015 () then
+    if test_016 () then
+    if test_017 () then
+    if test_018 () then
+    if test_019 () then
+      true
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+
+end

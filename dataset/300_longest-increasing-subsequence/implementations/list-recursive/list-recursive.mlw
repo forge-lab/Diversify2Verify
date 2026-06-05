@@ -1,0 +1,180 @@
+module LongestIncreasingSubsequence_List_Recursive_Implementation
+
+  use int.Int
+  use list.List
+  use list.Length
+  use list.Mem
+
+  predicate valid_input (nums: list int) =
+    1 <= length nums <= 2500 /\
+    (forall x: int. mem x nums -> -10000 <= x <= 10000)
+
+  let rec update_tails (tails: list int) (x: int) : list int
+    variant { tails }
+  =
+    match tails with
+    | Nil -> Cons x Nil
+    | Cons y ys ->
+        if x <= y then
+          Cons x ys
+        else
+          Cons y (update_tails ys x)
+    end
+
+  let rec build_tails (nums: list int) (tails: list int) : list int
+    variant { nums }
+  =
+    match nums with
+    | Nil -> tails
+    | Cons x xs -> build_tails xs (update_tails tails x)
+    end
+
+  let longest_increasing_subsequence_list (nums: list int) : int
+    requires { valid_input nums }
+  =
+    length (build_tails nums Nil)
+
+  let test_000 () : bool =
+    let nums = Cons 5 (Cons 4 (Cons 3 (Cons 2 (Cons 1 Nil)))) in
+    let r = longest_increasing_subsequence_list nums in
+    r = 1
+
+  let test_001 () : bool =
+    let nums = Cons 1 Nil in
+    let r = longest_increasing_subsequence_list nums in
+    r = 1
+
+  let test_002 () : bool =
+    let nums = Cons 7 (Cons 7 (Cons 7 (Cons 7 (Cons 7 (Cons 7 (Cons 7 Nil)))))) in
+    let r = longest_increasing_subsequence_list nums in
+    r = 1
+
+  let test_003 () : bool =
+    let nums = Cons 1 (Cons 2 (Cons 2 (Cons 4 (Cons 5 (Cons 3 Nil))))) in
+    let r = longest_increasing_subsequence_list nums in
+    r = 4
+
+  let test_004 () : bool =
+    let nums = Cons 0 (Cons (-1) (Cons 1 Nil)) in
+    let r = longest_increasing_subsequence_list nums in
+    r = 2
+
+  let test_005 () : bool =
+    let nums = Cons 0 (Cons 1 (Cons 0 (Cons 3 (Cons 2 (Cons 3 Nil))))) in
+    let r = longest_increasing_subsequence_list nums in
+    r = 4
+
+  let test_006 () : bool =
+    let nums = Cons 1 (Cons 3 (Cons 5 (Cons 4 (Cons 7 Nil)))) in
+    let r = longest_increasing_subsequence_list nums in
+    r = 4
+
+  let test_007 () : bool =
+    let nums = Cons 1 (Cons 3 (Cons 6 (Cons 7 (Cons 9 (Cons 4 (Cons 10 (Cons 5 (Cons 6 Nil)))))))) in
+    let r = longest_increasing_subsequence_list nums in
+    r = 6
+
+  let test_008 () : bool =
+    let nums = Cons 10 (Cons 9 (Cons 2 (Cons 5 (Cons 3 (Cons 7 (Cons 101 (Cons 18 Nil))))))) in
+    let r = longest_increasing_subsequence_list nums in
+    r = 4
+
+  let test_009 () : bool =
+    let nums = Cons 1 (Cons 2 (Cons 2 (Cons 2 (Cons 2 (Cons 3 (Cons 4 (Cons 5 Nil))))))) in
+    let r = longest_increasing_subsequence_list nums in
+    r = 5
+
+  let test_010 () : bool =
+    let nums = Cons 1 (Cons 2 (Cons 2 (Cons 2 (Cons 2 (Cons 2 (Cons 2 (Cons 3 Nil))))))) in
+    let r = longest_increasing_subsequence_list nums in
+    r = 3
+
+  let test_011 () : bool =
+    let nums = Cons 10 (Cons 22 (Cons 9 (Cons 33 (Cons 21 (Cons 50 (Cons 41 (Cons 60 (Cons 80 Nil)))))))) in
+    let r = longest_increasing_subsequence_list nums in
+    r = 6
+
+  let test_012 () : bool =
+    let nums = Cons 3 (Cons 4 (Cons (-1) (Cons 0 (Cons 6 (Cons 2 (Cons 3 Nil)))))) in
+    let r = longest_increasing_subsequence_list nums in
+    r = 4
+
+  let test_013 () : bool =
+    let nums = Cons 9 (Cons 8 (Cons 7 (Cons 6 (Cons 5 (Cons 4 (Cons 3 (Cons 2 (Cons 1 Nil)))))))) in
+    let r = longest_increasing_subsequence_list nums in
+    r = 1
+
+  let test_014 () : bool =
+    let nums = Cons 1 (Cons 2 (Cons 3 (Cons 4 (Cons 5 Nil)))) in
+    let r = longest_increasing_subsequence_list nums in
+    r = 5
+
+  let test_015 () : bool =
+    let nums = Cons 1 (Cons 3 (Cons 5 (Cons 7 (Cons 9 Nil)))) in
+    let r = longest_increasing_subsequence_list nums in
+    r = 5
+
+  let test_016 () : bool =
+    let nums = Cons 1 (Cons 2 (Cons 3 (Cons 4 (Cons 5 (Cons 6 (Cons 7 (Cons 8 (Cons 9 (Cons 10 Nil))))))))) in
+    let r = longest_increasing_subsequence_list nums in
+    r = 10
+
+  let test_017 () : bool =
+    let nums = Cons 4 (Cons 10 (Cons 4 (Cons 3 (Cons 8 (Cons 9 Nil))))) in
+    let r = longest_increasing_subsequence_list nums in
+    r = 3
+
+  let test_020 () : bool =
+    let nums = Cons 100 (Cons 101 (Cons 102 (Cons 103 (Cons 104 (Cons 105 (Cons 106 (Cons 107 (Cons 108 (Cons 109 (Cons 110 Nil)))))))))) in
+    let r = longest_increasing_subsequence_list nums in
+    r = 11
+
+  let test_019 () : bool =
+    let nums = Cons 3 (Cons 1 (Cons 2 (Cons 4 (Cons 5 (Cons 7 (Cons 6 (Cons 8 (Cons 9 (Cons 10 (Cons 12 (Cons 11 Nil))))))))))) in
+    let r = longest_increasing_subsequence_list nums in
+    r = 9
+
+  let run_tests () : bool =
+    if test_000 () then
+    if test_001 () then
+    if test_002 () then
+    if test_003 () then
+    if test_004 () then
+    if test_005 () then
+    if test_006 () then
+    if test_007 () then
+    if test_008 () then
+    if test_009 () then
+    if test_010 () then
+    if test_011 () then
+    if test_012 () then
+    if test_013 () then
+    if test_014 () then
+    if test_015 () then
+    if test_016 () then
+    if test_017 () then
+    if test_019 () then
+    if test_020 () then
+      true
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+
+end

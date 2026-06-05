@@ -1,0 +1,200 @@
+module EliminateMaximumNumberOfMonsters_Array_Imperative
+
+  use int.Int
+  use int.EuclideanDivision
+  use array.Array
+  use array.Init
+  use ref.Ref
+
+  let sort_int_array (a: array int) : unit =
+    let n = length a in
+    for i = 1 to n - 1 do
+      let key = a[i] in
+      let j = ref (i - 1) in
+      while !j >= 0 && a[!j] > key do
+        variant { !j + 1 }
+        a[!j + 1] <- a[!j];
+        j := !j - 1
+      done;
+      a[!j + 1] <- key
+    done
+
+  let eliminate_maximum_number_of_monsters_array
+    (dist: array int) (speed: array int) : int =
+    let n = length dist in
+    let deadlines = copy dist in
+    for i = 0 to n - 1 do
+      deadlines[i] <- div (dist[i] - 1) speed[i]
+    done;
+    sort_int_array deadlines;
+    let killed = ref 0 in
+    while !killed < n && deadlines[!killed] >= !killed do
+      variant { n - !killed }
+      killed := !killed + 1
+    done;
+    !killed
+
+  let test_000 () : bool =
+    let dist = init 3 [|6; 7; 8|] in
+    let speed = init 3 [|2; 2; 2|] in
+    let r = eliminate_maximum_number_of_monsters_array dist speed in
+    r = 3
+
+  let test_001 () : bool =
+    let dist = init 3 [|1; 2; 3|] in
+    let speed = init 3 [|3; 2; 1|] in
+    let r = eliminate_maximum_number_of_monsters_array dist speed in
+    r = 1
+
+  let test_002 () : bool =
+    let dist = init 3 [|100; 200; 300|] in
+    let speed = init 3 [|1; 1; 1|] in
+    let r = eliminate_maximum_number_of_monsters_array dist speed in
+    r = 3
+
+  let test_003 () : bool =
+    let dist = init 3 [|7; 14; 21|] in
+    let speed = init 3 [|1; 2; 3|] in
+    let r = eliminate_maximum_number_of_monsters_array dist speed in
+    r = 3
+
+  let test_004 () : bool =
+    let dist = init 10 [|1; 2; 3; 4; 5; 6; 7; 8; 9; 10|] in
+    let speed = init 10 [|1; 1; 1; 1; 1; 1; 1; 1; 1; 1|] in
+    let r = eliminate_maximum_number_of_monsters_array dist speed in
+    r = 10
+
+  let test_005 () : bool =
+    let dist = init 4 [|3; 5; 7; 9|] in
+    let speed = init 4 [|1; 2; 3; 4|] in
+    let r = eliminate_maximum_number_of_monsters_array dist speed in
+    r = 3
+
+  let test_006 () : bool =
+    let dist = init 4 [|1; 1; 2; 3|] in
+    let speed = init 4 [|1; 1; 1; 1|] in
+    let r = eliminate_maximum_number_of_monsters_array dist speed in
+    r = 1
+
+  let test_007 () : bool =
+    let dist = init 5 [|100; 200; 300; 400; 500|] in
+    let speed = init 5 [|50; 40; 30; 20; 10|] in
+    let r = eliminate_maximum_number_of_monsters_array dist speed in
+    r = 5
+
+  let test_008 () : bool =
+    let dist = init 3 [|6; 4; 5|] in
+    let speed = init 3 [|1; 2; 1|] in
+    let r = eliminate_maximum_number_of_monsters_array dist speed in
+    r = 3
+
+  let test_009 () : bool =
+    let dist = init 5 [|1; 2; 3; 4; 5|] in
+    let speed = init 5 [|1; 2; 3; 4; 5|] in
+    let r = eliminate_maximum_number_of_monsters_array dist speed in
+    r = 1
+
+  let test_010 () : bool =
+    let dist = init 10 [|1; 1; 1; 1; 1; 1; 1; 1; 1; 1|] in
+    let speed = init 10 [|1; 1; 1; 1; 1; 1; 1; 1; 1; 1|] in
+    let r = eliminate_maximum_number_of_monsters_array dist speed in
+    r = 1
+
+  let test_011 () : bool =
+    let dist = init 3 [|1; 3; 4|] in
+    let speed = init 3 [|1; 1; 1|] in
+    let r = eliminate_maximum_number_of_monsters_array dist speed in
+    r = 3
+
+  let test_012 () : bool =
+    let dist = init 3 [|10; 20; 30|] in
+    let speed = init 3 [|1; 2; 3|] in
+    let r = eliminate_maximum_number_of_monsters_array dist speed in
+    r = 3
+
+  let test_013 () : bool =
+    let dist = init 4 [|5; 10; 15; 20|] in
+    let speed = init 4 [|5; 4; 3; 2|] in
+    let r = eliminate_maximum_number_of_monsters_array dist speed in
+    r = 4
+
+  let test_014 () : bool =
+    let dist = init 3 [|3; 2; 4|] in
+    let speed = init 3 [|5; 3; 2|] in
+    let r = eliminate_maximum_number_of_monsters_array dist speed in
+    r = 1
+
+  let test_015 () : bool =
+    let dist = init 5 [|1; 2; 3; 4; 5|] in
+    let speed = init 5 [|1; 1; 1; 1; 1|] in
+    let r = eliminate_maximum_number_of_monsters_array dist speed in
+    r = 5
+
+  let test_016 () : bool =
+    let dist = init 5 [|10; 5; 6; 12; 3|] in
+    let speed = init 5 [|2; 1; 1; 1; 1|] in
+    let r = eliminate_maximum_number_of_monsters_array dist speed in
+    r = 5
+
+  let test_017 () : bool =
+    let dist = init 3 [|5; 5; 5|] in
+    let speed = init 3 [|1; 1; 1|] in
+    let r = eliminate_maximum_number_of_monsters_array dist speed in
+    r = 3
+
+  let test_018 () : bool =
+    let dist = init 3 [|2; 4; 6|] in
+    let speed = init 3 [|2; 2; 2|] in
+    let r = eliminate_maximum_number_of_monsters_array dist speed in
+    r = 3
+
+  let test_019 () : bool =
+    let dist = init 1 [|1|] in
+    let speed = init 1 [|1|] in
+    let r = eliminate_maximum_number_of_monsters_array dist speed in
+    r = 1
+
+  let run_tests () : bool =
+    if test_000 () then
+    if test_001 () then
+    if test_002 () then
+    if test_003 () then
+    if test_004 () then
+    if test_005 () then
+    if test_006 () then
+    if test_007 () then
+    if test_008 () then
+    if test_009 () then
+    if test_010 () then
+    if test_011 () then
+    if test_012 () then
+    if test_013 () then
+    if test_014 () then
+    if test_015 () then
+    if test_016 () then
+    if test_017 () then
+    if test_018 () then
+    if test_019 () then
+      true
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+
+end

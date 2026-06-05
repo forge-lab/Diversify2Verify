@@ -1,0 +1,465 @@
+== Stage 1: first prover on whole file ==
+Running in /Users/rubenm/Desktop/Diversify2Verify/codex-runs/stage1a-array/2615_sum-of-distances-20260523-034328/generated/why3/array: why3 session create -o /Users/rubenm/Desktop/Diversify2Verify/codex-runs/stage1a-array/2615_sum-of-distances-20260523-034328/generated/why3/array/.why3_sessions/sum_of_distances_array_stage1 -P Z3,4.8.6 -t 10 -m 8192 sum_of_distances_array.mlw
+Session created successfully
+Running in /Users/rubenm/Desktop/Diversify2Verify/codex-runs/stage1a-array/2615_sum-of-distances-20260523-034328/generated/why3/array: why3 bench /Users/rubenm/Desktop/Diversify2Verify/codex-runs/stage1a-array/2615_sum-of-distances-20260523-034328/generated/why3/array/.why3_sessions/sum_of_distances_array_stage1
+Progress: 6/1/0                       Progress: 5/2/0                       Progress: 4/3/0                       Progress: 3/4/0                       Progress: 2/5/0                       Progress: 1/6/0                       Progress: 1/2/2                       Progress: 0/3/2                       Progress: 0/2/2                       Progress: 0/1/2                       Progress: 0/0/2                       Progress: 0/0/1                       
+Replay completed, saving session... done
+== Stage 1 stats ==
+= Statistics for session /Users/rubenm/Desktop/Diversify2Verify/codex-runs/stage1a-array/2615_sum-of-distances-20260523-034328/generated/why3/array/.why3_sessions/sum_of_distances_array_stage1
+
+== Number of root goals ==
+  total: 7  proved: 4
+
+== Number of sub goals ==
+  total: 0  proved: 0
+
+== Goals not proved ==
+  +-- file [../../sum_of_distances_array.mlw]
+    +-- theory SumOfDistances_Array_Spec
+      +-- goal test_005'vc
+      +-- goal test_007'vc
+      +-- goal test_008'vc
+  
+== Goals proved by only one prover ==
+  +-- file [../../sum_of_distances_array.mlw]
+    +-- theory SumOfDistances_Array_Spec
+      +-- goal test_000'vc: Z3 4.8.6
+      +-- goal test_002'vc: Z3 4.8.6
+      +-- goal test_003'vc: Z3 4.8.6
+      +-- goal test_004'vc: Z3 4.8.6
+  
+1 session(s) read, with a total of 7 proof goals.
+== Unproved root goals after first prover ==
+SumOfDistances_Array_Spec	test_005'vc
+SumOfDistances_Array_Spec	test_007'vc
+SumOfDistances_Array_Spec	test_008'vc
+== Stage 1: trying remaining goals with prover Alt-Ergo,2.4.0 ==
+---- stage1 | prover: Alt-Ergo,2.4.0 | theory: SumOfDistances_Array_Spec | goal: test_005'vc ----
+File sum_of_distances_array.mlw:
+Goal test_005'vc.
+Prover result is: Timeout (10.00s, 197094 steps).
+---- stage1 | prover: Alt-Ergo,2.4.0 | theory: SumOfDistances_Array_Spec | goal: test_007'vc ----
+File sum_of_distances_array.mlw:
+Goal test_007'vc.
+Prover result is: Timeout (10.00s, 201358 steps).
+---- stage1 | prover: Alt-Ergo,2.4.0 | theory: SumOfDistances_Array_Spec | goal: test_008'vc ----
+File sum_of_distances_array.mlw:
+Goal test_008'vc.
+Prover result is: Timeout (10.00s, 184270 steps).
+Remaining after prover Alt-Ergo,2.4.0: 3
+== Stage 1: trying remaining goals with prover CVC4,1.8 ==
+---- stage1 | prover: CVC4,1.8 | theory: SumOfDistances_Array_Spec | goal: test_005'vc ----
+File sum_of_distances_array.mlw:
+Goal test_005'vc.
+Prover result is: Timeout (10.00s, 1471916 steps).
+---- stage1 | prover: CVC4,1.8 | theory: SumOfDistances_Array_Spec | goal: test_007'vc ----
+File sum_of_distances_array.mlw:
+Goal test_007'vc.
+Prover result is: Timeout (10.00s, 1377884 steps).
+---- stage1 | prover: CVC4,1.8 | theory: SumOfDistances_Array_Spec | goal: test_008'vc ----
+File sum_of_distances_array.mlw:
+Goal test_008'vc.
+Prover result is: Timeout (10.00s, 1495031 steps).
+Remaining after prover CVC4,1.8: 3
+== Goals still unproved after stage 1 ==
+SumOfDistances_Array_Spec	test_005'vc
+SumOfDistances_Array_Spec	test_007'vc
+SumOfDistances_Array_Spec	test_008'vc
+== Stage 2: split_vc on unproved goal ==
+Target theory: SumOfDistances_Array_Spec
+Target goal  : test_005'vc
+---- stage2 | prover: Z3,4.8.6 | theory: SumOfDistances_Array_Spec | goal: test_005'vc ----
+Transforms: split_vc
+File "sum_of_distances_array.mlw", line 131, characters 15-52:
+Sub-goal Array creation size of goal test_005'vc.
+Prover result is: Valid (0.01s, 921 steps).
+
+File "sum_of_distances_array.mlw", line 132, characters 19-51:
+Sub-goal Array creation size of goal test_005'vc.
+Prover result is: Valid (0.01s, 1124 steps).
+
+File "sum_of_distances_array.mlw", line 133, characters 13-28:
+Sub-goal Assertion of goal test_005'vc.
+Prover result is: Valid (0.01s, 1247 steps).
+
+File "sum_of_distances_array.mlw", line 134, characters 13-32:
+Sub-goal Assertion of goal test_005'vc.
+Prover result is: Valid (0.01s, 1256 steps).
+
+File "sum_of_distances_array.mlw", line 135, characters 13-25:
+Sub-goal Assertion of goal test_005'vc.
+Prover result is: Valid (0.01s, 16843 steps).
+
+File "sum_of_distances_array.mlw", line 136, characters 13-25:
+Sub-goal Assertion of goal test_005'vc.
+Prover result is: Valid (0.01s, 17100 steps).
+
+File "sum_of_distances_array.mlw", line 137, characters 13-25:
+Sub-goal Assertion of goal test_005'vc.
+Prover result is: Valid (0.01s, 17359 steps).
+
+File "sum_of_distances_array.mlw", line 138, characters 13-25:
+Sub-goal Assertion of goal test_005'vc.
+Prover result is: Valid (0.01s, 17622 steps).
+
+File "sum_of_distances_array.mlw", line 139, characters 13-25:
+Sub-goal Assertion of goal test_005'vc.
+Prover result is: Valid (0.01s, 17889 steps).
+
+File "sum_of_distances_array.mlw", line 140, characters 13-25:
+Sub-goal Assertion of goal test_005'vc.
+Prover result is: Valid (0.01s, 18160 steps).
+
+File "sum_of_distances_array.mlw", line 141, characters 13-25:
+Sub-goal Assertion of goal test_005'vc.
+Prover result is: Valid (0.01s, 18431 steps).
+
+File "sum_of_distances_array.mlw", line 142, characters 13-29:
+Sub-goal Assertion of goal test_005'vc.
+Prover result is: Valid (0.01s, 18720 steps).
+
+File "sum_of_distances_array.mlw", line 143, characters 13-28:
+Sub-goal Assertion of goal test_005'vc.
+Prover result is: Valid (0.01s, 18965 steps).
+
+File "sum_of_distances_array.mlw", line 144, characters 13-28:
+Sub-goal Assertion of goal test_005'vc.
+Prover result is: Valid (0.01s, 19210 steps).
+
+File "sum_of_distances_array.mlw", line 145, characters 13-28:
+Sub-goal Assertion of goal test_005'vc.
+Prover result is: Valid (0.01s, 19457 steps).
+
+File "sum_of_distances_array.mlw", line 146, characters 13-28:
+Sub-goal Assertion of goal test_005'vc.
+Prover result is: Valid (0.01s, 19706 steps).
+
+File "sum_of_distances_array.mlw", line 147, characters 13-28:
+Sub-goal Assertion of goal test_005'vc.
+Prover result is: Valid (0.01s, 19957 steps).
+
+File "sum_of_distances_array.mlw", line 148, characters 13-29:
+Sub-goal Assertion of goal test_005'vc.
+Prover result is: Valid (0.01s, 20208 steps).
+
+File "sum_of_distances_array.mlw", line 149, characters 13-29:
+Sub-goal Assertion of goal test_005'vc.
+Prover result is: Valid (0.01s, 24917 steps).
+
+File "sum_of_distances_array.mlw", line 150, characters 13-38:
+Sub-goal Assertion of goal test_005'vc.
+Prover result is: Valid (0.01s, 24098 steps).
+
+File "sum_of_distances_array.mlw", line 151, characters 13-38:
+Sub-goal Assertion of goal test_005'vc.
+Prover result is: Valid (0.01s, 24250 steps).
+
+File "sum_of_distances_array.mlw", line 152, characters 13-38:
+Sub-goal Assertion of goal test_005'vc.
+Prover result is: Valid (0.01s, 24403 steps).
+
+File "sum_of_distances_array.mlw", line 153, characters 13-38:
+Sub-goal Assertion of goal test_005'vc.
+Prover result is: Valid (0.01s, 22872 steps).
+
+File "sum_of_distances_array.mlw", line 154, characters 13-38:
+Sub-goal Assertion of goal test_005'vc.
+Prover result is: Valid (0.01s, 24694 steps).
+
+File "sum_of_distances_array.mlw", line 155, characters 13-38:
+Sub-goal Assertion of goal test_005'vc.
+Prover result is: Valid (0.01s, 24842 steps).
+
+File "sum_of_distances_array.mlw", line 156, characters 13-50:
+Sub-goal Assertion of goal test_005'vc.
+Prover result is: Valid (0.03s, 237166 steps).
+
+File "sum_of_distances_array.mlw", line 157, characters 13-50:
+Sub-goal Assertion of goal test_005'vc.
+Prover result is: Valid (0.05s, 497110 steps).
+
+File "sum_of_distances_array.mlw", line 158, characters 13-50:
+Sub-goal Assertion of goal test_005'vc.
+Prover result is: Valid (1.05s, 5765782 steps).
+
+File "sum_of_distances_array.mlw", line 159, characters 13-50:
+Sub-goal Assertion of goal test_005'vc.
+Prover result is: Valid (0.17s, 1806966 steps).
+
+File "sum_of_distances_array.mlw", line 160, characters 13-50:
+Sub-goal Assertion of goal test_005'vc.
+Prover result is: Valid (0.97s, 6014699 steps).
+
+File "sum_of_distances_array.mlw", line 161, characters 13-50:
+Sub-goal Assertion of goal test_005'vc.
+Prover result is: Valid (0.41s, 3950512 steps).
+
+File "sum_of_distances_array.mlw", line 162, characters 13-50:
+Sub-goal Assertion of goal test_005'vc.
+Prover result is: Valid (0.49s, 4763082 steps).
+
+File "sum_of_distances_array.mlw", line 165, characters 8-67:
+Sub-goal Assertion of goal test_005'vc.
+Prover result is: Valid (0.01s, 30820 steps).
+
+File "sum_of_distances_array.mlw", line 167, characters 13-41:
+Sub-goal Assertion of goal test_005'vc.
+Prover result is: Valid (2.00s, 11873789 steps).
+Solved with split_vc using prover: Z3,4.8.6
+== Stage 2: split_vc on unproved goal ==
+Target theory: SumOfDistances_Array_Spec
+Target goal  : test_007'vc
+---- stage2 | prover: Z3,4.8.6 | theory: SumOfDistances_Array_Spec | goal: test_007'vc ----
+Transforms: split_vc
+File "sum_of_distances_array.mlw", line 170, characters 15-39:
+Sub-goal Array creation size of goal test_007'vc.
+Prover result is: Valid (0.01s, 921 steps).
+
+File "sum_of_distances_array.mlw", line 171, characters 19-45:
+Sub-goal Array creation size of goal test_007'vc.
+Prover result is: Valid (0.01s, 1108 steps).
+
+File "sum_of_distances_array.mlw", line 172, characters 13-28:
+Sub-goal Assertion of goal test_007'vc.
+Prover result is: Valid (0.01s, 1215 steps).
+
+File "sum_of_distances_array.mlw", line 173, characters 13-32:
+Sub-goal Assertion of goal test_007'vc.
+Prover result is: Valid (0.01s, 1224 steps).
+
+File "sum_of_distances_array.mlw", line 174, characters 13-24:
+Sub-goal Assertion of goal test_007'vc.
+Prover result is: Valid (0.01s, 15781 steps).
+
+File "sum_of_distances_array.mlw", line 175, characters 13-24:
+Sub-goal Assertion of goal test_007'vc.
+Prover result is: Valid (0.01s, 16000 steps).
+
+File "sum_of_distances_array.mlw", line 176, characters 13-24:
+Sub-goal Assertion of goal test_007'vc.
+Prover result is: Valid (0.01s, 16217 steps).
+
+File "sum_of_distances_array.mlw", line 177, characters 13-24:
+Sub-goal Assertion of goal test_007'vc.
+Prover result is: Valid (0.01s, 16434 steps).
+
+File "sum_of_distances_array.mlw", line 178, characters 13-24:
+Sub-goal Assertion of goal test_007'vc.
+Prover result is: Valid (0.01s, 16651 steps).
+
+File "sum_of_distances_array.mlw", line 179, characters 13-29:
+Sub-goal Assertion of goal test_007'vc.
+Prover result is: Valid (0.01s, 16934 steps).
+
+File "sum_of_distances_array.mlw", line 180, characters 13-28:
+Sub-goal Assertion of goal test_007'vc.
+Prover result is: Valid (0.01s, 17175 steps).
+
+File "sum_of_distances_array.mlw", line 181, characters 13-28:
+Sub-goal Assertion of goal test_007'vc.
+Prover result is: Valid (0.01s, 17418 steps).
+
+File "sum_of_distances_array.mlw", line 182, characters 13-28:
+Sub-goal Assertion of goal test_007'vc.
+Prover result is: Valid (0.01s, 17665 steps).
+
+File "sum_of_distances_array.mlw", line 183, characters 13-29:
+Sub-goal Assertion of goal test_007'vc.
+Prover result is: Valid (0.01s, 17912 steps).
+
+File "sum_of_distances_array.mlw", line 184, characters 13-29:
+Sub-goal Assertion of goal test_007'vc.
+Prover result is: Valid (0.01s, 20570 steps).
+
+File "sum_of_distances_array.mlw", line 185, characters 13-38:
+Sub-goal Assertion of goal test_007'vc.
+Prover result is: Valid (0.01s, 21712 steps).
+
+File "sum_of_distances_array.mlw", line 186, characters 13-38:
+Sub-goal Assertion of goal test_007'vc.
+Prover result is: Valid (0.01s, 21864 steps).
+
+File "sum_of_distances_array.mlw", line 187, characters 13-38:
+Sub-goal Assertion of goal test_007'vc.
+Prover result is: Valid (0.01s, 22017 steps).
+
+File "sum_of_distances_array.mlw", line 188, characters 13-38:
+Sub-goal Assertion of goal test_007'vc.
+Prover result is: Valid (0.01s, 22170 steps).
+
+File "sum_of_distances_array.mlw", line 189, characters 13-50:
+Sub-goal Assertion of goal test_007'vc.
+Prover result is: Valid (0.02s, 109248 steps).
+
+File "sum_of_distances_array.mlw", line 190, characters 13-50:
+Sub-goal Assertion of goal test_007'vc.
+Prover result is: Valid (0.03s, 236660 steps).
+
+File "sum_of_distances_array.mlw", line 191, characters 13-50:
+Sub-goal Assertion of goal test_007'vc.
+Prover result is: Valid (0.04s, 447560 steps).
+
+File "sum_of_distances_array.mlw", line 192, characters 13-50:
+Sub-goal Assertion of goal test_007'vc.
+Prover result is: Valid (0.06s, 743128 steps).
+
+File "sum_of_distances_array.mlw", line 193, characters 13-50:
+Sub-goal Assertion of goal test_007'vc.
+Prover result is: Valid (0.10s, 1129688 steps).
+
+File "sum_of_distances_array.mlw", line 196, characters 8-49:
+Sub-goal Assertion of goal test_007'vc.
+Prover result is: Valid (0.01s, 28191 steps).
+
+File "sum_of_distances_array.mlw", line 198, characters 13-41:
+Sub-goal Assertion of goal test_007'vc.
+Prover result is: Valid (0.43s, 3511303 steps).
+Solved with split_vc using prover: Z3,4.8.6
+== Stage 2: split_vc on unproved goal ==
+Target theory: SumOfDistances_Array_Spec
+Target goal  : test_008'vc
+---- stage2 | prover: Z3,4.8.6 | theory: SumOfDistances_Array_Spec | goal: test_008'vc ----
+Transforms: split_vc
+File "sum_of_distances_array.mlw", line 201, characters 15-52:
+Sub-goal Array creation size of goal test_008'vc.
+Prover result is: Valid (0.01s, 921 steps).
+
+File "sum_of_distances_array.mlw", line 202, characters 19-51:
+Sub-goal Array creation size of goal test_008'vc.
+Prover result is: Valid (0.01s, 1124 steps).
+
+File "sum_of_distances_array.mlw", line 203, characters 13-28:
+Sub-goal Assertion of goal test_008'vc.
+Prover result is: Valid (0.01s, 1247 steps).
+
+File "sum_of_distances_array.mlw", line 204, characters 13-32:
+Sub-goal Assertion of goal test_008'vc.
+Prover result is: Valid (0.01s, 1256 steps).
+
+File "sum_of_distances_array.mlw", line 205, characters 13-25:
+Sub-goal Assertion of goal test_008'vc.
+Prover result is: Valid (0.01s, 16866 steps).
+
+File "sum_of_distances_array.mlw", line 206, characters 13-25:
+Sub-goal Assertion of goal test_008'vc.
+Prover result is: Valid (0.01s, 17121 steps).
+
+File "sum_of_distances_array.mlw", line 207, characters 13-25:
+Sub-goal Assertion of goal test_008'vc.
+Prover result is: Valid (0.01s, 17378 steps).
+
+File "sum_of_distances_array.mlw", line 208, characters 13-25:
+Sub-goal Assertion of goal test_008'vc.
+Prover result is: Valid (0.01s, 17639 steps).
+
+File "sum_of_distances_array.mlw", line 209, characters 13-25:
+Sub-goal Assertion of goal test_008'vc.
+Prover result is: Valid (0.01s, 17904 steps).
+
+File "sum_of_distances_array.mlw", line 210, characters 13-25:
+Sub-goal Assertion of goal test_008'vc.
+Prover result is: Valid (0.01s, 18173 steps).
+
+File "sum_of_distances_array.mlw", line 211, characters 13-25:
+Sub-goal Assertion of goal test_008'vc.
+Prover result is: Valid (0.01s, 18442 steps).
+
+File "sum_of_distances_array.mlw", line 212, characters 13-29:
+Sub-goal Assertion of goal test_008'vc.
+Prover result is: Valid (0.01s, 18735 steps).
+
+File "sum_of_distances_array.mlw", line 213, characters 13-28:
+Sub-goal Assertion of goal test_008'vc.
+Prover result is: Valid (0.01s, 18984 steps).
+
+File "sum_of_distances_array.mlw", line 214, characters 13-28:
+Sub-goal Assertion of goal test_008'vc.
+Prover result is: Valid (0.01s, 19233 steps).
+
+File "sum_of_distances_array.mlw", line 215, characters 13-28:
+Sub-goal Assertion of goal test_008'vc.
+Prover result is: Valid (0.01s, 19484 steps).
+
+File "sum_of_distances_array.mlw", line 216, characters 13-28:
+Sub-goal Assertion of goal test_008'vc.
+Prover result is: Valid (0.01s, 19737 steps).
+
+File "sum_of_distances_array.mlw", line 217, characters 13-28:
+Sub-goal Assertion of goal test_008'vc.
+Prover result is: Valid (0.01s, 19992 steps).
+
+File "sum_of_distances_array.mlw", line 218, characters 13-29:
+Sub-goal Assertion of goal test_008'vc.
+Prover result is: Valid (0.01s, 20247 steps).
+
+File "sum_of_distances_array.mlw", line 219, characters 13-29:
+Sub-goal Assertion of goal test_008'vc.
+Prover result is: Valid (0.01s, 24246 steps).
+
+File "sum_of_distances_array.mlw", line 220, characters 13-38:
+Sub-goal Assertion of goal test_008'vc.
+Prover result is: Valid (0.01s, 24161 steps).
+
+File "sum_of_distances_array.mlw", line 221, characters 13-38:
+Sub-goal Assertion of goal test_008'vc.
+Prover result is: Valid (0.01s, 24313 steps).
+
+File "sum_of_distances_array.mlw", line 222, characters 13-38:
+Sub-goal Assertion of goal test_008'vc.
+Prover result is: Valid (0.01s, 24466 steps).
+
+File "sum_of_distances_array.mlw", line 223, characters 13-38:
+Sub-goal Assertion of goal test_008'vc.
+Prover result is: Valid (0.01s, 24619 steps).
+
+File "sum_of_distances_array.mlw", line 224, characters 13-38:
+Sub-goal Assertion of goal test_008'vc.
+Prover result is: Valid (0.01s, 23047 steps).
+
+File "sum_of_distances_array.mlw", line 225, characters 13-50:
+Sub-goal Assertion of goal test_008'vc.
+Prover result is: Valid (0.04s, 324301 steps).
+
+File "sum_of_distances_array.mlw", line 226, characters 13-50:
+Sub-goal Assertion of goal test_008'vc.
+Prover result is: Valid (0.07s, 663473 steps).
+
+File "sum_of_distances_array.mlw", line 227, characters 13-50:
+Sub-goal Assertion of goal test_008'vc.
+Prover result is: Valid (0.20s, 1761920 steps).
+
+File "sum_of_distances_array.mlw", line 228, characters 13-50:
+Sub-goal Assertion of goal test_008'vc.
+Prover result is: Valid (0.18s, 1936569 steps).
+
+File "sum_of_distances_array.mlw", line 229, characters 13-50:
+Sub-goal Assertion of goal test_008'vc.
+Prover result is: Valid (0.28s, 2883261 steps).
+
+File "sum_of_distances_array.mlw", line 230, characters 13-50:
+Sub-goal Assertion of goal test_008'vc.
+Prover result is: Valid (1.66s, 9320277 steps).
+
+File "sum_of_distances_array.mlw", line 231, characters 13-50:
+Sub-goal Assertion of goal test_008'vc.
+Prover result is: Valid (0.50s, 4913033 steps).
+
+File "sum_of_distances_array.mlw", line 234, characters 8-67:
+Sub-goal Assertion of goal test_008'vc.
+Prover result is: Valid (0.01s, 30715 steps).
+
+File "sum_of_distances_array.mlw", line 236, characters 13-41:
+Sub-goal Assertion of goal test_008'vc.
+Prover result is: Valid (2.41s, 14392753 steps).
+Solved with split_vc using prover: Z3,4.8.6
+== Final summary ==
+Unproved root goals after first prover : 3
+Remaining failures after split_vc      : 0
+Remaining failures after stage 3       : 0
+Detailed logs stored in                : /Users/rubenm/Desktop/Diversify2Verify/codex-runs/stage1a-array/2615_sum-of-distances-20260523-034328/generated/why3/array/.why3_sessions/sum_of_distances_array_logs
+VERIFY_RESULT: SUCCESS
+VERIFY_REASON: proved_after_stage2
+VERIFY_STAGE: stage2
+VERIFY_ROOT_TOTAL: 7
+VERIFY_ROOT_PROVED: 7
+VERIFY_ROOT_REMAINING: 0

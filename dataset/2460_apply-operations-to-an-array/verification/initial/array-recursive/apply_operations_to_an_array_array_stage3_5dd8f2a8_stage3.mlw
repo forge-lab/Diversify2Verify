@@ -1,0 +1,184 @@
+module ApplyOperationsToAnArray_Array_Stage3_Recursive
+
+  use int.Int
+  use array.Array
+  use array.Init
+
+  predicate input_constraints (nums: array int) =
+    2 <= length nums <= 2000 /\
+    forall i: int. 0 <= i < length nums -> 0 <= nums[i] <= 1000
+
+  let rec function after_operations_at (nums: array int) (k: int) (j: int) : int
+    requires { 0 <= k < length nums }
+    requires { 0 <= j < length nums }
+    variant { k }
+  =
+    if k <= 0 then nums[j]
+    else
+      let op = k - 1 in
+      let left = after_operations_at nums (k - 1) op in
+      let right = after_operations_at nums (k - 1) (op + 1) in
+      if j = op then
+        if left = right then left + right else left
+      else if j = op + 1 then
+        if left = right then 0 else right
+      else
+        after_operations_at nums (k - 1) j
+
+  let rec function nonzero_count_before (nums: array int) (j: int) : int
+    requires { 1 <= length nums }
+    requires { 0 <= j <= length nums }
+    ensures { 0 <= result <= j }
+    variant { j }
+  =
+    if j <= 0 then 0
+    else
+      nonzero_count_before nums (j - 1) +
+      (if after_operations_at nums (length nums - 1) (j - 1) = 0 then 0 else 1)
+
+  predicate zero_shifted_after_operations (nums: array int) (result: array int) =
+    length result = length nums /\
+    (forall i: int.
+      0 <= i < length nums /\
+      after_operations_at nums (length nums - 1) i <> 0 ->
+        0 <= nonzero_count_before nums i < length result /\
+        result[nonzero_count_before nums i] =
+          after_operations_at nums (length nums - 1) i) /\
+    (forall p: int.
+      0 <= p < nonzero_count_before nums (length nums) ->
+        exists i: int.
+          0 <= i < length nums /\
+          after_operations_at nums (length nums - 1) i <> 0 /\
+          nonzero_count_before nums i = p /\
+          result[p] = after_operations_at nums (length nums - 1) i) /\
+    (forall p: int.
+      nonzero_count_before nums (length nums) <= p < length result ->
+        result[p] = 0)
+
+  predicate same_array_values (a: array int) (b: array int) =
+    length a = length b /\
+    forall i: int. 0 <= i < length a -> b[i] = a[i]
+
+  predicate operation_state (orig: array int) (work: array int) (k: int) =
+    length work = length orig /\
+    0 <= k < length orig /\
+    forall j: int. 0 <= j < length orig -> work[j] = after_operations_at orig k j
+
+  predicate final_operations_array (orig: array int) (work: array int) =
+    length work = length orig /\
+    1 <= length orig /\
+    forall j: int.
+      0 <= j < length orig ->
+        work[j] = after_operations_at orig (length orig - 1) j
+
+  predicate packed_prefix (orig: array int) (dst: array int) (i: int) =
+    length dst = length orig /\
+    1 <= length orig /\
+    0 <= i <= length orig /\
+    (forall j: int.
+      0 <= j < i /\
+      after_operations_at orig (length orig - 1) j <> 0 ->
+        0 <= nonzero_count_before orig j < length dst /\
+        dst[nonzero_count_before orig j] =
+          after_operations_at orig (length orig - 1) j) /\
+    (forall p: int.
+      0 <= p < nonzero_count_before orig i ->
+        exists j: int.
+          0 <= j < i /\
+          after_operations_at orig (length orig - 1) j <> 0 /\
+          nonzero_count_before orig j = p /\
+          dst[p] = after_operations_at orig (length orig - 1) j)
+
+  let rec copy_array_into (src: array int) (dst: array int) (i: int) : unit
+    requires { length dst = length src }
+    requires { 0 <= i <= length src }
+    requires { forall j: int. 0 <= j < i -> dst[j] = src[j] }
+    ensures  { same_array_values src dst }
+    variant { length src - i }
+  =
+    if i >= length src then
+      ()
+    else begin
+      dst[i] <- src[i];
+      assert { forall j: int. 0 <= j < i + 1 -> dst[j] = src[j] };
+      copy_array_into src dst (i + 1)
+    end
+
+  let clone_array (src: array int) : array int
+    ensures { same_array_values src result }
+  =
+    let dst = make (length src) 0 in
+    assert { length dst = length src };
+    copy_array_into src dst 0;
+    dst
+
+  let rec apply_operations_from (orig: array int) (nums: array int) (i: int) : unit
+    requires { input_constraints orig }
+    requires { operation_state orig nums i }
+    ensures  { final_operations_array orig nums }
+    variant { length nums - i }
+  =
+    if i + 1 >= length nums then begin
+      assert { i = length orig - 1 };
+      assert { final_operations_array orig nums }
+    end else if nums[i] = nums[i + 1] then begin
+      let merged = nums[i] + nums[i + 1] in
+      nums[i] <- merged;
+      nums[i + 1] <- 0;
+      assert { operation_state orig nums (i + 1) };
+      apply_operations_from orig nums (i + 1)
+    end else begin
+      assert { operation_state orig nums (i + 1) };
+      apply_operations_from orig nums (i + 1)
+    end
+
+  let rec pack_nonzero_from
+    (orig: array int) (src: array int) (dst: array int) (i: int) (out: int) : unit
+    requires { input_constraints orig }
+    requires { final_operations_array orig src }
+    requires { length dst = length orig }
+    requires { 0 <= i <= length src }
+    requires { out = nonzero_count_before orig i }
+    requires { packed_prefix orig dst i }
+    requires { forall p: int. out <= p < length dst -> dst[p] = 0 }
+    ensures  { zero_shifted_after_operations orig dst }
+    variant { length src - i }
+  =
+    if i >= length src then begin
+      assert { i = length orig };
+      assert { out = nonzero_count_before orig (length orig) };
+      assert { zero_shifted_after_operations orig dst }
+    end else if src[i] <> 0 then begin
+      assert { src[i] = after_operations_at orig (length orig - 1) i };
+      assert { after_operations_at orig (length orig - 1) i <> 0 };
+      dst[out] <- src[i];
+      assert { out + 1 = nonzero_count_before orig (i + 1) };
+      assert { packed_prefix orig dst (i + 1) };
+      assert { forall p: int. out + 1 <= p < length dst -> dst[p] = 0 };
+      pack_nonzero_from orig src dst (i + 1) (out + 1)
+    end else begin
+      assert { src[i] = after_operations_at orig (length orig - 1) i };
+      assert { after_operations_at orig (length orig - 1) i = 0 };
+      assert { out = nonzero_count_before orig (i + 1) };
+      assert { packed_prefix orig dst (i + 1) };
+      pack_nonzero_from orig src dst (i + 1) out
+    end
+
+  let apply_operations_to_an_array_array (nums: array int) : array int
+    requires { input_constraints nums }
+    ensures  { zero_shifted_after_operations nums result }
+  =
+    let work = clone_array nums in
+    assert { operation_state nums work 0 };
+    let result = make (length nums) 0 in
+    assert { length result = length nums };
+    apply_operations_from nums work 0;
+    assert { final_operations_array nums work };
+    assert { packed_prefix nums result 0 };
+    assert { nonzero_count_before nums 0 = 0 };
+    assert { forall p: int. 0 <= p < length result -> result[p] = 0 };
+    pack_nonzero_from nums work result 0 0;
+    assert { zero_shifted_after_operations nums result };
+    result
+
+end

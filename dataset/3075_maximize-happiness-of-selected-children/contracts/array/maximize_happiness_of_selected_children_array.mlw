@@ -1,0 +1,216 @@
+module MaximizeHappinessOfSelectedChildren_Array_Spec
+
+  use int.Int
+  use int.MinMax
+  use int.Sum
+  use array.Array
+  use array.Init
+
+  predicate all_positive (happiness: array int) =
+    forall i: int. 0 <= i < length happiness -> 1 <= happiness[i]
+
+  function adjusted_happiness (h: int) (turn: int) : int =
+    max (h - turn) 0
+
+  predicate valid_pick_order (happiness: array int) (k: int) (picks: array int) =
+    0 <= k <= length happiness /\
+    length picks = k /\
+    (forall t: int. 0 <= t < k -> 0 <= picks[t] < length happiness) /\
+    (forall i j: int. 0 <= i < j < k -> picks[i] <> picks[j])
+
+  function order_score (happiness: array int) (picks: array int) (k: int) : int =
+    sum (fun t -> adjusted_happiness happiness[picks[t]] t) 0 k
+
+  predicate maximized_happiness_score (happiness: array int) (k: int) (score: int) =
+    0 <= k <= length happiness /\
+    (exists picks: array int.
+       valid_pick_order happiness k picks /\
+       score = order_score happiness picks k) /\
+    (forall picks: array int.
+       valid_pick_order happiness k picks ->
+       order_score happiness picks k <= score)
+
+  val maximize_happiness_of_selected_children_array (happiness: array int) (k: int) : int
+    requires { 1 <= length happiness }
+    requires { 1 <= k <= length happiness }
+    requires { all_positive happiness }
+    ensures  { maximized_happiness_score happiness k result }
+
+  let lemma test_005_single_child () =
+    let happiness = init 1 [|1|] in
+    let picks = init 1 [|0|] in
+    assert { length happiness = 1 };
+    assert { happiness[0] = 1 };
+    assert { length picks = 1 };
+    assert { picks[0] = 0 };
+    assert { all_positive happiness };
+    assert { adjusted_happiness happiness[picks[0]] 0 = 1 };
+    assert { valid_pick_order happiness 1 picks };
+    assert { order_score happiness picks 1 = 1 };
+    assert {
+      forall other: array int.
+        valid_pick_order happiness 1 other ->
+        order_score happiness other 1 <= 1
+    };
+    assert { maximized_happiness_score happiness 1 1 }
+
+  let lemma test_010_all_ones_clip_to_zero () =
+    let happiness = init 4 [|1; 1; 1; 1|] in
+    let picks = init 2 [|0; 1|] in
+    assert { length happiness = 4 };
+    assert { happiness[0] = 1 };
+    assert { happiness[1] = 1 };
+    assert { happiness[2] = 1 };
+    assert { happiness[3] = 1 };
+    assert { length picks = 2 };
+    assert { picks[0] = 0 };
+    assert { picks[1] = 1 };
+    assert { all_positive happiness };
+    assert { adjusted_happiness happiness[picks[0]] 0 = 1 };
+    assert { adjusted_happiness happiness[picks[1]] 1 = 0 };
+    assert { valid_pick_order happiness 2 picks };
+    assert { order_score happiness picks 2 = 1 };
+    assert {
+      forall other: array int.
+        valid_pick_order happiness 2 other ->
+        order_score happiness other 2 <= 1
+    };
+    assert { maximized_happiness_score happiness 2 1 }
+
+  let lemma test_012_small_increasing_example () =
+    let happiness = init 3 [|1; 2; 3|] in
+    let picks = init 2 [|2; 1|] in
+    assert { length happiness = 3 };
+    assert { happiness[0] = 1 };
+    assert { happiness[1] = 2 };
+    assert { happiness[2] = 3 };
+    assert { length picks = 2 };
+    assert { picks[0] = 2 };
+    assert { picks[1] = 1 };
+    assert { all_positive happiness };
+    assert { adjusted_happiness happiness[picks[0]] 0 = 3 };
+    assert { adjusted_happiness happiness[picks[1]] 1 = 1 };
+    assert { valid_pick_order happiness 2 picks };
+    assert { order_score happiness picks 2 = 4 };
+    assert {
+      forall other: array int.
+        valid_pick_order happiness 2 other ->
+        order_score happiness other 2 <= 4
+    };
+    assert { maximized_happiness_score happiness 2 4 }
+
+  let lemma test_013_single_pick_maximum () =
+    let happiness = init 4 [|2; 3; 4; 5|] in
+    let picks = init 1 [|3|] in
+    assert { length happiness = 4 };
+    assert { happiness[0] = 2 };
+    assert { happiness[1] = 3 };
+    assert { happiness[2] = 4 };
+    assert { happiness[3] = 5 };
+    assert { length picks = 1 };
+    assert { picks[0] = 3 };
+    assert { all_positive happiness };
+    assert { adjusted_happiness happiness[picks[0]] 0 = 5 };
+    assert { valid_pick_order happiness 1 picks };
+    assert { order_score happiness picks 1 = 5 };
+    assert {
+      forall other: array int.
+        valid_pick_order happiness 1 other ->
+        order_score happiness other 1 <= 5
+    };
+    assert { maximized_happiness_score happiness 1 5 }
+
+  let lemma test_015_descending_three_picks () =
+    let happiness = init 5 [|5; 4; 3; 2; 1|] in
+    let picks = init 3 [|0; 1; 2|] in
+    assert { length happiness = 5 };
+    assert { happiness[0] = 5 };
+    assert { happiness[1] = 4 };
+    assert { happiness[2] = 3 };
+    assert { happiness[3] = 2 };
+    assert { happiness[4] = 1 };
+    assert { length picks = 3 };
+    assert { picks[0] = 0 };
+    assert { picks[1] = 1 };
+    assert { picks[2] = 2 };
+    assert { all_positive happiness };
+    assert { adjusted_happiness happiness[picks[0]] 0 = 5 };
+    assert { adjusted_happiness happiness[picks[1]] 1 = 3 };
+    assert { adjusted_happiness happiness[picks[2]] 2 = 1 };
+    assert { valid_pick_order happiness 3 picks };
+    assert { order_score happiness picks 3 = 9 };
+    assert {
+      forall other: array int.
+        valid_pick_order happiness 3 other ->
+        order_score happiness other 3 <= 9
+    };
+    assert { maximized_happiness_score happiness 3 9 }
+
+  let lemma test_025_large_increasing_three_picks () =
+    let happiness = init 5 [|10; 20; 30; 40; 50|] in
+    let picks = init 3 [|4; 3; 2|] in
+    assert { length happiness = 5 };
+    assert { happiness[0] = 10 };
+    assert { happiness[1] = 20 };
+    assert { happiness[2] = 30 };
+    assert { happiness[3] = 40 };
+    assert { happiness[4] = 50 };
+    assert { length picks = 3 };
+    assert { picks[0] = 4 };
+    assert { picks[1] = 3 };
+    assert { picks[2] = 2 };
+    assert { all_positive happiness };
+    assert { adjusted_happiness happiness[picks[0]] 0 = 50 };
+    assert { adjusted_happiness happiness[picks[1]] 1 = 39 };
+    assert { adjusted_happiness happiness[picks[2]] 2 = 28 };
+    assert { valid_pick_order happiness 3 picks };
+    assert { order_score happiness picks 3 = 117 };
+    assert {
+      forall other: array int.
+        valid_pick_order happiness 3 other ->
+        order_score happiness other 3 <= 117
+    };
+    assert { maximized_happiness_score happiness 3 117 }
+
+  let lemma test_026_mixed_repeated_values () =
+    let happiness = init 12 [|3; 1; 4; 1; 5; 9; 2; 6; 5; 3; 5; 9|] in
+    let picks = init 7 [|5; 11; 7; 4; 8; 10; 2|] in
+    assert { length happiness = 12 };
+    assert { happiness[0] = 3 };
+    assert { happiness[1] = 1 };
+    assert { happiness[2] = 4 };
+    assert { happiness[3] = 1 };
+    assert { happiness[4] = 5 };
+    assert { happiness[5] = 9 };
+    assert { happiness[6] = 2 };
+    assert { happiness[7] = 6 };
+    assert { happiness[8] = 5 };
+    assert { happiness[9] = 3 };
+    assert { happiness[10] = 5 };
+    assert { happiness[11] = 9 };
+    assert { length picks = 7 };
+    assert { picks[0] = 5 };
+    assert { picks[1] = 11 };
+    assert { picks[2] = 7 };
+    assert { picks[3] = 4 };
+    assert { picks[4] = 8 };
+    assert { picks[5] = 10 };
+    assert { picks[6] = 2 };
+    assert { all_positive happiness };
+    assert { adjusted_happiness happiness[picks[0]] 0 = 9 };
+    assert { adjusted_happiness happiness[picks[1]] 1 = 8 };
+    assert { adjusted_happiness happiness[picks[2]] 2 = 4 };
+    assert { adjusted_happiness happiness[picks[3]] 3 = 2 };
+    assert { adjusted_happiness happiness[picks[4]] 4 = 1 };
+    assert { adjusted_happiness happiness[picks[5]] 5 = 0 };
+    assert { adjusted_happiness happiness[picks[6]] 6 = 0 };
+    assert { valid_pick_order happiness 7 picks };
+    assert { order_score happiness picks 7 = 24 };
+    assert {
+      forall other: array int.
+        valid_pick_order happiness 7 other ->
+        order_score happiness other 7 <= 24
+    };
+    assert { maximized_happiness_score happiness 7 24 }
+
+end

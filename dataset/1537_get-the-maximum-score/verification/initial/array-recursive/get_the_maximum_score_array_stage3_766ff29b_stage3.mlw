@@ -1,0 +1,59 @@
+module GetTheMaximumScore_Array_Stage3_Recursive
+
+  use int.Int
+  use int.MinMax
+  use int.EuclideanDivision
+  use array.Array
+
+  function score_modulus : int = 1000000007
+
+  predicate strictly_increasing (nums: array int) =
+    forall i j: int. 0 <= i < j < length nums -> nums[i] < nums[j]
+
+  predicate valid_input (nums: array int) =
+    1 <= length nums <= 100000 /\
+    (forall i: int. 0 <= i < length nums -> 1 <= nums[i] <= 10000000) /\
+    strictly_increasing nums
+
+  let rec function suffix_sum (nums: array int) (i: int) : int
+    requires { 0 <= i <= length nums }
+    variant  { length nums - i }
+  =
+    if i = length nums then 0
+    else nums[i] + suffix_sum nums (i + 1)
+
+  let rec function max_score_scan
+      (nums1: array int) (nums2: array int)
+      (i: int) (j: int) (acc1: int) (acc2: int) : int
+    requires { 0 <= i <= length nums1 }
+    requires { 0 <= j <= length nums2 }
+    variant  { (length nums1 - i) + (length nums2 - j) }
+  =
+    if i = length nums1 then
+      max acc1 (acc2 + suffix_sum nums2 j)
+    else if j = length nums2 then
+      max (acc1 + suffix_sum nums1 i) acc2
+    else if nums1[i] < nums2[j] then
+      max_score_scan nums1 nums2 (i + 1) j (acc1 + nums1[i]) acc2
+    else if nums1[i] > nums2[j] then
+      max_score_scan nums1 nums2 i (j + 1) acc1 (acc2 + nums2[j])
+    else
+      max acc1 acc2 + nums1[i] +
+      max_score_scan nums1 nums2 (i + 1) (j + 1) 0 0
+
+  let function maximum_path_score (nums1: array int) (nums2: array int) : int =
+    max_score_scan nums1 nums2 0 0 0 0
+
+  predicate get_the_maximum_score_array_spec
+      (nums1: array int) (nums2: array int) (res: int) =
+    res = mod (maximum_path_score nums1 nums2) score_modulus
+
+  let get_the_maximum_score_array (nums1: array int) (nums2: array int) : int
+    requires { valid_input nums1 }
+    requires { valid_input nums2 }
+    ensures  { get_the_maximum_score_array_spec nums1 nums2 result }
+    ensures  { 0 <= result < score_modulus }
+  =
+    mod (maximum_path_score nums1 nums2) 1000000007
+
+end

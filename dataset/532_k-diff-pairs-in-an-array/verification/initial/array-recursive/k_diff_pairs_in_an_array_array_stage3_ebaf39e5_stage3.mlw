@@ -1,0 +1,109 @@
+module KDiffPairsInAnArray_Array_Stage3_Recursive
+
+  use int.Int
+  use int.NumOf as IntNumOf
+  use array.Array
+
+  predicate value_occurs (nums: array int) (x: int) =
+    exists i: int. 0 <= i < length nums /\ nums[i] = x
+
+  predicate duplicate_value (nums: array int) (x: int) =
+    exists i j: int.
+      0 <= i < j < length nums /\
+      nums[i] = x /\
+      nums[j] = x
+
+  predicate kdiff_base_value (nums: array int) (k: int) (x: int) =
+    (k = 0 /\ duplicate_value nums x) \/
+    (k > 0 /\ value_occurs nums x /\ value_occurs nums (x + k))
+
+  function kdiff_pair_count (nums: array int) (k: int) : int =
+    IntNumOf.numof (fun x -> kdiff_base_value nums k x) (-10000000) 10000001
+
+  predicate first_occurrence_index (nums: array int) (i: int) =
+    0 <= i < length nums /\
+    forall j: int. 0 <= j < i -> nums[j] <> nums[i]
+
+  predicate contributes_index (nums: array int) (k: int) (i: int) =
+    first_occurrence_index nums i /\
+    ((k = 0 /\ exists j: int. i < j < length nums /\ nums[j] = nums[i]) \/
+     (k > 0 /\ exists j: int. 0 <= j < length nums /\ nums[j] = nums[i] + k))
+
+  let rec occurs_from (nums: array int) (x: int) (i: int) : bool
+    requires { 0 <= i <= length nums }
+    ensures  { result = true -> exists j: int. i <= j < length nums /\ nums[j] = x }
+    ensures  { (exists j: int. i <= j < length nums /\ nums[j] = x) -> result = true }
+    variant  { length nums - i }
+  =
+    if i >= length nums then
+      false
+    else if nums[i] = x then
+      true
+    else
+      occurs_from nums x (i + 1)
+
+  let rec seen_before_from (nums: array int) (x: int) (i: int) (stop: int) : bool
+    requires { 0 <= i <= stop <= length nums }
+    ensures  { result = true -> exists j: int. i <= j < stop /\ nums[j] = x }
+    ensures  { (exists j: int. i <= j < stop /\ nums[j] = x) -> result = true }
+    variant  { stop - i }
+  =
+    if i >= stop then
+      false
+    else if nums[i] = x then
+      true
+    else
+      seen_before_from nums x (i + 1) stop
+
+  let rec duplicate_after (nums: array int) (x: int) (i: int) : bool
+    requires { 0 <= i <= length nums }
+    ensures  { result = true -> exists j: int. i <= j < length nums /\ nums[j] = x }
+    ensures  { (exists j: int. i <= j < length nums /\ nums[j] = x) -> result = true }
+    variant  { length nums - i }
+  =
+    if i >= length nums then
+      false
+    else if nums[i] = x then
+      true
+    else
+      duplicate_after nums x (i + 1)
+
+  let rec count_pairs_from (nums: array int) (k: int) (i: int) : int
+    requires { 0 <= i <= length nums }
+    requires { 0 <= k }
+    ensures  { result = IntNumOf.numof (fun j -> contributes_index nums k j) i (length nums) }
+    ensures  { result >= 0 }
+    variant  { length nums - i }
+  =
+    if i >= length nums then
+      0
+    else
+      let x = nums[i] in
+      if seen_before_from nums x 0 i then
+        count_pairs_from nums k (i + 1)
+      else
+        let contributes =
+          if k = 0 then
+            if duplicate_after nums x (i + 1) then 1 else 0
+          else if occurs_from nums (x + k) 0 then
+            1
+          else
+            0
+        in
+        contributes + count_pairs_from nums k (i + 1)
+
+  let k_diff_pairs_in_an_array_array (nums: array int) (k: int) : int
+    requires { 1 <= length nums <= 10000 }
+    requires { 0 <= k <= 10000000 }
+    requires { forall i: int. 0 <= i < length nums -> -10000000 <= nums[i] <= 10000000 }
+    ensures  { result = kdiff_pair_count nums k }
+    ensures  { result >= 0 }
+  =
+    let r = count_pairs_from nums k 0 in
+    assert { r = IntNumOf.numof (fun i -> contributes_index nums k i) 0 (length nums) };
+    assert { IntNumOf.numof (fun i -> contributes_index nums k i) 0 (length nums) =
+             kdiff_pair_count nums k };
+    assert { r >= 0 };
+    r
+
+end

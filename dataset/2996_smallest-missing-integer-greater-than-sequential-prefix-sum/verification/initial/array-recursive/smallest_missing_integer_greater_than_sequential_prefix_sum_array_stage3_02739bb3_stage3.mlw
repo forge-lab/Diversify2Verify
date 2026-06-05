@@ -1,0 +1,115 @@
+module SmallestMissingIntegerGreaterThanSequentialPrefixSum_Array_Stage3_Recursive
+
+  use int.Int
+  use array.Array
+  use array.ArraySum
+
+  predicate valid_input (nums: array int) =
+    1 <= length nums <= 50 /\
+    forall i: int. 0 <= i < length nums -> 1 <= nums[i] <= 50
+
+  predicate present (nums: array int) (x: int) =
+    exists i: int. 0 <= i < length nums /\ nums[i] = x
+
+  predicate missing (nums: array int) (x: int) =
+    not (present nums x)
+
+  predicate sequential_prefix (nums: array int) (len: int) =
+    1 <= len <= length nums /\
+    forall j: int. 1 <= j < len -> nums[j] = nums[j - 1] + 1
+
+  predicate longest_sequential_prefix (nums: array int) (len: int) =
+    sequential_prefix nums len /\
+    forall k: int. len < k <= length nums -> not (sequential_prefix nums k)
+
+  function prefix_sum (nums: array int) (len: int) : int =
+    sum nums 0 len
+
+  predicate valid_answer_for_prefix (nums: array int) (len: int) (x: int) =
+    longest_sequential_prefix nums len /\
+    prefix_sum nums len <= x /\
+    missing nums x /\
+    forall y: int. prefix_sum nums len <= y < x -> present nums y
+
+  predicate result_spec (nums: array int) (x: int) =
+    exists len: int. valid_answer_for_prefix nums len x
+
+  predicate present_from_spec (nums: array int) (x: int) (i: int) =
+    exists k: int. i <= k < length nums /\ nums[k] = x
+
+  predicate first_missing_from_spec (nums: array int) (candidate: int) (x: int) =
+    candidate <= x /\
+    missing nums x /\
+    forall y: int. candidate <= y < x -> present nums y
+
+  let rec present_from (nums: array int) (x: int) (i: int) : bool
+    requires { 0 <= i }
+    variant { length nums - i }
+    ensures { result <-> present_from_spec nums x i }
+  =
+    if i >= length nums then
+      false
+    else if nums[i] = x then
+      true
+    else
+      present_from nums x (i + 1)
+
+  let rec longest_sequential_prefix_len_from (nums: array int) (i: int) : int
+    requires { 1 <= i <= length nums }
+    requires { sequential_prefix nums i }
+    variant { length nums - i }
+    ensures { i <= result <= length nums }
+    ensures { longest_sequential_prefix nums result }
+  =
+    if i >= length nums then
+      length nums
+    else if nums[i] = nums[i - 1] + 1 then
+      longest_sequential_prefix_len_from nums (i + 1)
+    else
+      i
+
+  let longest_sequential_prefix_len (nums: array int) : int
+    requires { 1 <= length nums }
+    ensures { longest_sequential_prefix nums result }
+  =
+    if length nums <= 1 then
+      length nums
+    else
+      longest_sequential_prefix_len_from nums 1
+
+  let rec prefix_sum_len_from (nums: array int) (i: int) (len: int) : int
+    requires { 0 <= i <= len <= length nums }
+    variant { len - i }
+    ensures { result = sum nums i len }
+  =
+    if i >= len then
+      0
+    else
+      nums[i] + prefix_sum_len_from nums (i + 1) len
+
+  let rec first_missing_from_candidate (nums: array int) (candidate: int) : int
+    requires { valid_input nums }
+    variant { 51 - candidate }
+    ensures { first_missing_from_spec nums candidate result }
+  =
+    if candidate > 50 then
+      candidate
+    else if present_from nums candidate 0 then
+      first_missing_from_candidate nums (candidate + 1)
+    else
+      candidate
+
+  let smallest_missing_integer_greater_than_sequential_prefix_sum_array (nums: array int) : int
+    requires { valid_input nums }
+    ensures  { result_spec nums result }
+  =
+    let prefix_len = longest_sequential_prefix_len nums in
+    assert { longest_sequential_prefix nums prefix_len };
+    let prefix_sum = prefix_sum_len_from nums 0 prefix_len in
+    assert { prefix_sum = sum nums 0 prefix_len };
+    let result = first_missing_from_candidate nums prefix_sum in
+    assert { first_missing_from_spec nums prefix_sum result };
+    assert { valid_answer_for_prefix nums prefix_len result };
+    result
+
+end

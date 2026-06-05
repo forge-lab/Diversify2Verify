@@ -1,0 +1,231 @@
+module SubsequenceOfSizeKWithTheLargestEvenSum_List_Stage3_Recursive
+
+  use int.Int
+  use int.EuclideanDivision
+  use list.List
+  use list.Length
+  use list.Mem
+  use list.Sum
+
+  predicate valid_nums (nums: list int) =
+    1 <= length nums <= 100000 /\
+    forall x: int. mem x nums -> 0 <= x <= 100000
+
+  let rec predicate subsequence (chosen: list int) (nums: list int)
+    variant { nums }
+  =
+    match chosen, nums with
+    | Nil, _ -> true
+    | Cons _ _, Nil -> false
+    | Cons y ys, Cons x xs ->
+        (y = x && subsequence ys xs) || subsequence chosen xs
+    end
+
+  predicate even_candidate_sum (nums: list int) (k: int) (s: int) =
+    exists chosen: list int.
+      subsequence chosen nums /\
+      length chosen = k /\
+      s = sum chosen /\
+      mod s 2 = 0
+
+  predicate optimal_even_subsequence_sum
+      (nums: list int) (k: int) (result: int) =
+    (result = -1 /\
+     forall s: int. not (even_candidate_sum nums k s)) \/
+    (even_candidate_sum nums k result /\
+     forall s: int. even_candidate_sum nums k s -> s <= result)
+
+  let rec predicate ge_all (x: int) (l: list int)
+    variant { l }
+  =
+    match l with
+    | Nil -> true
+    | Cons y ys -> x >= y && ge_all x ys
+    end
+
+  let rec predicate sorted_desc_list (l: list int)
+    variant { l }
+  =
+    match l with
+    | Nil -> true
+    | Cons x xs -> ge_all x xs && sorted_desc_list xs
+    end
+
+  let max_int (x: int) (y: int) : int
+    ensures { result = x \/ result = y }
+    ensures { x <= result /\ y <= result }
+  =
+    if x >= y then x else y
+
+  let min_int (x: int) (y: int) : int
+    ensures { result = x \/ result = y }
+    ensures { result <= x /\ result <= y }
+  =
+    if x <= y then x else y
+
+  let rec insert_desc (x: int) (l: list int) : list int
+    variant { l }
+    ensures { length result = length l + 1 }
+    ensures { forall v: int. mem v result <-> v = x \/ mem v l }
+    ensures { sorted_desc_list l -> sorted_desc_list result }
+  =
+    match l with
+    | Nil ->
+        assert { sorted_desc_list (Cons x Nil) };
+        Cons x Nil
+    | Cons y ys ->
+        if x >= y then begin
+          assert { ge_all x l };
+          assert { sorted_desc_list (Cons x l) };
+          Cons x l
+        end else begin
+          let tail_inserted = insert_desc x ys in
+          assert { forall v: int. mem v tail_inserted <-> v = x \/ mem v ys };
+          assert { sorted_desc_list l -> sorted_desc_list tail_inserted };
+          assert { sorted_desc_list l -> ge_all y tail_inserted };
+          Cons y tail_inserted
+        end
+    end
+
+  let rec sort_desc (l: list int) : list int
+    variant { l }
+    ensures { length result = length l }
+    ensures { forall v: int. mem v result <-> mem v l }
+    ensures { sorted_desc_list result }
+  =
+    match l with
+    | Nil ->
+        assert { sorted_desc_list Nil };
+        Nil
+    | Cons x xs ->
+        let sorted_tail = sort_desc xs in
+        assert { forall v: int. mem v sorted_tail <-> mem v xs };
+        insert_desc x sorted_tail
+    end
+
+  let rec sum_first_k (l: list int) (k: int) : int
+    variant { l }
+    ensures { k <= 0 -> result = 0 }
+    ensures { l = Nil -> result = 0 }
+  =
+    if k <= 0 then 0 else
+    match l with
+    | Nil -> 0
+    | Cons x xs -> x + sum_first_k xs (k - 1)
+    end
+
+  let rec min_chosen_odd (l: list int) (k: int) : int
+    variant { l }
+    ensures { result = 1000000000 \/ mem result l }
+    ensures { result <> 1000000000 -> mod result 2 = 1 }
+  =
+    if k <= 0 then 1000000000 else
+    match l with
+    | Nil -> 1000000000
+    | Cons x xs ->
+        let tail_best = min_chosen_odd xs (k - 1) in
+        if mod x 2 = 1 then min_int x tail_best else tail_best
+    end
+
+  let rec min_chosen_even (l: list int) (k: int) : int
+    variant { l }
+    ensures { result = 1000000000 \/ mem result l }
+    ensures { result <> 1000000000 -> mod result 2 = 0 }
+  =
+    if k <= 0 then 1000000000 else
+    match l with
+    | Nil -> 1000000000
+    | Cons x xs ->
+        let tail_best = min_chosen_even xs (k - 1) in
+        if mod x 2 = 0 then min_int x tail_best else tail_best
+    end
+
+  let rec max_rest_even (l: list int) (skip: int) : int
+    variant { l }
+    ensures { result = -1000000000 \/ mem result l }
+    ensures { result <> -1000000000 -> mod result 2 = 0 }
+  =
+    if skip > 0 then
+      match l with
+      | Nil -> -1000000000
+      | Cons _ xs -> max_rest_even xs (skip - 1)
+      end
+    else
+      match l with
+      | Nil -> -1000000000
+      | Cons x xs ->
+          let tail_best = max_rest_even xs 0 in
+          if mod x 2 = 0 then max_int x tail_best else tail_best
+      end
+
+  let rec max_rest_odd (l: list int) (skip: int) : int
+    variant { l }
+    ensures { result = -1000000000 \/ mem result l }
+    ensures { result <> -1000000000 -> mod result 2 = 1 }
+  =
+    if skip > 0 then
+      match l with
+      | Nil -> -1000000000
+      | Cons _ xs -> max_rest_odd xs (skip - 1)
+      end
+    else
+      match l with
+      | Nil -> -1000000000
+      | Cons x xs ->
+          let tail_best = max_rest_odd xs 0 in
+          if mod x 2 = 1 then max_int x tail_best else tail_best
+      end
+
+  let stage2_algorithm (nums: list int) (k: int) : int
+    requires { valid_nums nums }
+    requires { 1 <= k <= length nums }
+    ensures  { optimal_even_subsequence_sum nums k result }
+  =
+    let sorted_nums = sort_desc nums in
+    assert { length sorted_nums = length nums };
+    assert { forall v: int. mem v sorted_nums <-> mem v nums };
+    assert { sorted_desc_list sorted_nums };
+    let top_sum = sum_first_k sorted_nums k in
+    if mod top_sum 2 = 0 then begin
+      assert { even_candidate_sum nums k top_sum };
+      assert { forall s: int. even_candidate_sum nums k s -> s <= top_sum };
+      top_sum
+    end else begin
+      let smallest_odd = min_chosen_odd sorted_nums k in
+      let smallest_even = min_chosen_even sorted_nums k in
+      let largest_rest_even = max_rest_even sorted_nums k in
+      let largest_rest_odd = max_rest_odd sorted_nums k in
+      assert { smallest_odd = 1000000000 \/ mem smallest_odd sorted_nums };
+      assert { smallest_even = 1000000000 \/ mem smallest_even sorted_nums };
+      assert { largest_rest_even = -1000000000 \/ mem largest_rest_even sorted_nums };
+      assert { largest_rest_odd = -1000000000 \/ mem largest_rest_odd sorted_nums };
+      let candidate_replace_odd =
+        if smallest_odd = 1000000000 then -1000000000 else
+        if largest_rest_even = -1000000000 then -1000000000 else
+        top_sum - smallest_odd + largest_rest_even in
+      let candidate_replace_even =
+        if smallest_even = 1000000000 then -1000000000 else
+        if largest_rest_odd = -1000000000 then -1000000000 else
+        top_sum - smallest_even + largest_rest_odd in
+      let best = max_int candidate_replace_odd candidate_replace_even in
+      if best = -1000000000 then begin
+        assert { forall s: int. not (even_candidate_sum nums k s) };
+        -1
+      end else begin
+        assert { even_candidate_sum nums k best };
+        assert { forall s: int. even_candidate_sum nums k s -> s <= best };
+        best
+      end
+    end
+
+  let subsequence_of_size_k_with_the_largest_even_sum_list
+      (nums: list int) (k: int) : int
+    requires { valid_nums nums }
+    requires { 1 <= k <= length nums }
+    ensures  { optimal_even_subsequence_sum nums k result }
+  =
+    let result = stage2_algorithm nums k in
+    assert { optimal_even_subsequence_sum nums k result };
+    result
+
+end

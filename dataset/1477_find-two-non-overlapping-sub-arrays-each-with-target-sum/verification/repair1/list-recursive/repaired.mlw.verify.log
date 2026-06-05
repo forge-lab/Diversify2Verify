@@ -1,0 +1,226 @@
+== Stage 1: first prover on whole file ==
+Running in /Users/rubenm/Desktop/Diversify2Verify/codex-runs/dataset-merge-verification/stage3a-repair/1477_find-two-non-overlapping-sub-arrays-each-with-target-sum/list-recursive/find_two_non_overlapping_sub_arrays_each_with_target_sum_list_stage3_a8ed95da_stage3/generated/why3: why3 session create -o /Users/rubenm/Desktop/Diversify2Verify/codex-runs/dataset-merge-verification/stage3a-repair/1477_find-two-non-overlapping-sub-arrays-each-with-target-sum/list-recursive/find_two_non_overlapping_sub_arrays_each_with_target_sum_list_stage3_a8ed95da_stage3/generated/why3/.why3_sessions/repaired_stage1 -P Z3,4.8.6 -t 10 -m 8192 repaired.mlw
+Session created successfully
+Running in /Users/rubenm/Desktop/Diversify2Verify/codex-runs/dataset-merge-verification/stage3a-repair/1477_find-two-non-overlapping-sub-arrays-each-with-target-sum/list-recursive/find_two_non_overlapping_sub_arrays_each_with_target_sum_list_stage3_a8ed95da_stage3/generated/why3: why3 bench /Users/rubenm/Desktop/Diversify2Verify/codex-runs/dataset-merge-verification/stage3a-repair/1477_find-two-non-overlapping-sub-arrays-each-with-target-sum/list-recursive/find_two_non_overlapping_sub_arrays_each_with_target_sum_list_stage3_a8ed95da_stage3/generated/why3/.why3_sessions/repaired_stage1
+Progress: 8/1/0                       Progress: 7/2/0                       Progress: 6/3/0                       Progress: 5/4/0                       Progress: 4/5/0                       Progress: 3/6/0                       Progress: 3/0/0                       Progress: 2/1/0                       Progress: 1/2/0                       Progress: 0/3/0                       Progress: 0/1/2                       
+Replay completed, saving session... done
+== Stage 1 stats ==
+= Statistics for session /Users/rubenm/Desktop/Diversify2Verify/codex-runs/dataset-merge-verification/stage3a-repair/1477_find-two-non-overlapping-sub-arrays-each-with-target-sum/list-recursive/find_two_non_overlapping_sub_arrays_each_with_target_sum_list_stage3_a8ed95da_stage3/generated/why3/.why3_sessions/repaired_stage1
+
+== Number of root goals ==
+  total: 9  proved: 7
+
+== Number of sub goals ==
+  total: 0  proved: 0
+
+== Goals not proved ==
+  +-- file [../../repaired.mlw]
+    +-- theory FindTwoNonOverlappingSubArraysEachWithTargetSum_List_Spec
+      +-- goal min_single_target_segment'vc
+      +-- goal min_target_segment_pair_total'vc
+  
+== Goals proved by only one prover ==
+  +-- file [../../repaired.mlw]
+    +-- theory FindTwoNonOverlappingSubArraysEachWithTargetSum_List_Spec
+      +-- goal all_between'vc: Z3 4.8.6
+      +-- goal minimum_pair_total_value_to_result'vc: Z3 4.8.6
+      +-- goal min_int'vc: Z3 4.8.6
+      +-- goal prefix_len_from_start'vc: Z3 4.8.6
+      +-- goal prefix_len'vc: Z3 4.8.6
+      +-- goal drop'vc: Z3 4.8.6
+      +-- goal find_two_non_overlapping_sub_arrays_each_with_target_sum_list'vc: Z3 4.8.6
+  
+1 session(s) read, with a total of 9 proof goals.
+== Unproved root goals after first prover ==
+FindTwoNonOverlappingSubArraysEachWithTargetSum_List_Spec	min_single_target_segment'vc
+FindTwoNonOverlappingSubArraysEachWithTargetSum_List_Spec	min_target_segment_pair_total'vc
+== Stage 1: trying remaining goals with prover Alt-Ergo,2.4.0 ==
+---- stage1 | prover: Alt-Ergo,2.4.0 | theory: FindTwoNonOverlappingSubArraysEachWithTargetSum_List_Spec | goal: min_single_target_segment'vc ----
+File repaired.mlw:
+Goal min_single_target_segment'vc.
+Prover result is: Valid (0.01s, 82 steps).
+Solved in stage 1 using prover: Alt-Ergo,2.4.0
+---- stage1 | prover: Alt-Ergo,2.4.0 | theory: FindTwoNonOverlappingSubArraysEachWithTargetSum_List_Spec | goal: min_target_segment_pair_total'vc ----
+File repaired.mlw:
+Goal min_target_segment_pair_total'vc.
+Prover result is: Timeout (10.00s, 238111 steps).
+Remaining after prover Alt-Ergo,2.4.0: 1
+== Stage 1: trying remaining goals with prover CVC4,1.8 ==
+---- stage1 | prover: CVC4,1.8 | theory: FindTwoNonOverlappingSubArraysEachWithTargetSum_List_Spec | goal: min_target_segment_pair_total'vc ----
+File repaired.mlw:
+Goal min_target_segment_pair_total'vc.
+Prover result is: Timeout (10.00s, 2572060 steps).
+Remaining after prover CVC4,1.8: 1
+== Goals still unproved after stage 1 ==
+FindTwoNonOverlappingSubArraysEachWithTargetSum_List_Spec	min_target_segment_pair_total'vc
+== Stage 2: split_vc on unproved goal ==
+Target theory: FindTwoNonOverlappingSubArraysEachWithTargetSum_List_Spec
+Target goal  : min_target_segment_pair_total'vc
+---- stage2 | prover: Z3,4.8.6 | theory: FindTwoNonOverlappingSubArraysEachWithTargetSum_List_Spec | goal: min_target_segment_pair_total'vc ----
+Transforms: split_vc
+File "repaired.mlw", line 138, characters 17-50:
+Sub-goal Assertion of goal min_target_segment_pair_total'vc.
+Prover result is: Valid (0.01s, 52428 steps).
+
+File "repaired.mlw", line 153, characters 27-66:
+Sub-goal Variant decrease of goal min_target_segment_pair_total'vc.
+Prover result is: Valid (0.01s, 34765 steps).
+
+File "repaired.mlw", line 153, characters 27-66:
+Sub-goal Precondition of goal min_target_segment_pair_total'vc.
+Prover result is: Valid (0.01s, 30270 steps).
+
+File "repaired.mlw", line 153, characters 27-66:
+Sub-goal Precondition of goal min_target_segment_pair_total'vc.
+Prover result is: Timeout (10.00s, 24062571 steps).
+
+File "repaired.mlw", line 153, characters 27-66:
+Sub-goal Precondition of goal min_target_segment_pair_total'vc.
+Prover result is: Valid (0.01s, 2844 steps).
+
+File "repaired.mlw", line 133, characters 15-57:
+Sub-goal Postcondition of goal min_target_segment_pair_total'vc.
+Prover result is: Timeout (10.00s, 41033249 steps).
+---- stage2 | prover: Alt-Ergo,2.4.0 | theory: FindTwoNonOverlappingSubArraysEachWithTargetSum_List_Spec | goal: min_target_segment_pair_total'vc ----
+Transforms: split_vc
+File "repaired.mlw", line 138, characters 17-50:
+Sub-goal Assertion of goal min_target_segment_pair_total'vc.
+Prover result is: Valid (0.01s, 122 steps).
+
+File "repaired.mlw", line 153, characters 27-66:
+Sub-goal Variant decrease of goal min_target_segment_pair_total'vc.
+Prover result is: Valid (0.01s, 89 steps).
+
+File "repaired.mlw", line 153, characters 27-66:
+Sub-goal Precondition of goal min_target_segment_pair_total'vc.
+Prover result is: Valid (0.01s, 43 steps).
+
+File "repaired.mlw", line 153, characters 27-66:
+Sub-goal Precondition of goal min_target_segment_pair_total'vc.
+Prover result is: Valid (0.01s, 39 steps).
+
+File "repaired.mlw", line 153, characters 27-66:
+Sub-goal Precondition of goal min_target_segment_pair_total'vc.
+Prover result is: Valid (0.01s, 21 steps).
+
+File "repaired.mlw", line 133, characters 15-57:
+Sub-goal Postcondition of goal min_target_segment_pair_total'vc.
+Prover result is: Timeout (10.00s, 282915 steps).
+---- stage2 | prover: CVC4,1.8 | theory: FindTwoNonOverlappingSubArraysEachWithTargetSum_List_Spec | goal: min_target_segment_pair_total'vc ----
+Transforms: split_vc
+File "repaired.mlw", line 138, characters 17-50:
+Sub-goal Assertion of goal min_target_segment_pair_total'vc.
+Prover result is: Valid (0.04s, 13793 steps).
+
+File "repaired.mlw", line 153, characters 27-66:
+Sub-goal Variant decrease of goal min_target_segment_pair_total'vc.
+Prover result is: Valid (0.02s, 6119 steps).
+
+File "repaired.mlw", line 153, characters 27-66:
+Sub-goal Precondition of goal min_target_segment_pair_total'vc.
+Prover result is: Valid (0.02s, 5683 steps).
+
+File "repaired.mlw", line 153, characters 27-66:
+Sub-goal Precondition of goal min_target_segment_pair_total'vc.
+Prover result is: Valid (0.02s, 5663 steps).
+
+File "repaired.mlw", line 153, characters 27-66:
+Sub-goal Precondition of goal min_target_segment_pair_total'vc.
+Prover result is: Valid (0.02s, 4964 steps).
+
+File "repaired.mlw", line 133, characters 15-57:
+Sub-goal Postcondition of goal min_target_segment_pair_total'vc.
+Prover result is: Timeout (10.00s, 1222905 steps).
+== Goals still unproved after stage 2 (split_vc) ==
+FindTwoNonOverlappingSubArraysEachWithTargetSum_List_Spec	min_target_segment_pair_total'vc
+== Stage 3: split_vc + inline_all on still-unproved goal ==
+Target theory: FindTwoNonOverlappingSubArraysEachWithTargetSum_List_Spec
+Target goal  : min_target_segment_pair_total'vc
+---- stage3 | prover: Z3,4.8.6 | theory: FindTwoNonOverlappingSubArraysEachWithTargetSum_List_Spec | goal: min_target_segment_pair_total'vc ----
+Transforms: split_vc inline_all
+File "repaired.mlw", line 138, characters 17-50:
+Sub-goal Assertion of goal min_target_segment_pair_total'vc.
+Prover result is: Valid (0.01s, 40576 steps).
+
+File "repaired.mlw", line 153, characters 27-66:
+Sub-goal Variant decrease of goal min_target_segment_pair_total'vc.
+Prover result is: Valid (0.51s, 2530310 steps).
+
+File "repaired.mlw", line 153, characters 27-66:
+Sub-goal Precondition of goal min_target_segment_pair_total'vc.
+Prover result is: Valid (0.06s, 398784 steps).
+
+File "repaired.mlw", line 153, characters 27-66:
+Sub-goal Precondition of goal min_target_segment_pair_total'vc.
+Prover result is: Timeout (10.00s, 26599268 steps).
+
+File "repaired.mlw", line 153, characters 27-66:
+Sub-goal Precondition of goal min_target_segment_pair_total'vc.
+Prover result is: Valid (0.01s, 3900 steps).
+
+File "repaired.mlw", line 133, characters 15-57:
+Sub-goal Postcondition of goal min_target_segment_pair_total'vc.
+Prover result is: Timeout (10.00s, 59763644 steps).
+---- stage3 | prover: Alt-Ergo,2.4.0 | theory: FindTwoNonOverlappingSubArraysEachWithTargetSum_List_Spec | goal: min_target_segment_pair_total'vc ----
+Transforms: split_vc inline_all
+File "repaired.mlw", line 138, characters 17-50:
+Sub-goal Assertion of goal min_target_segment_pair_total'vc.
+Prover result is: Valid (0.01s, 169 steps).
+
+File "repaired.mlw", line 153, characters 27-66:
+Sub-goal Variant decrease of goal min_target_segment_pair_total'vc.
+Prover result is: Valid (0.01s, 81 steps).
+
+File "repaired.mlw", line 153, characters 27-66:
+Sub-goal Precondition of goal min_target_segment_pair_total'vc.
+Prover result is: Valid (0.01s, 127 steps).
+
+File "repaired.mlw", line 153, characters 27-66:
+Sub-goal Precondition of goal min_target_segment_pair_total'vc.
+Prover result is: Valid (0.01s, 41 steps).
+
+File "repaired.mlw", line 153, characters 27-66:
+Sub-goal Precondition of goal min_target_segment_pair_total'vc.
+Prover result is: Valid (0.01s, 20 steps).
+
+File "repaired.mlw", line 133, characters 15-57:
+Sub-goal Postcondition of goal min_target_segment_pair_total'vc.
+Prover result is: Timeout (10.00s, 394391 steps).
+---- stage3 | prover: CVC4,1.8 | theory: FindTwoNonOverlappingSubArraysEachWithTargetSum_List_Spec | goal: min_target_segment_pair_total'vc ----
+Transforms: split_vc inline_all
+File "repaired.mlw", line 138, characters 17-50:
+Sub-goal Assertion of goal min_target_segment_pair_total'vc.
+Prover result is: Valid (0.03s, 9047 steps).
+
+File "repaired.mlw", line 153, characters 27-66:
+Sub-goal Variant decrease of goal min_target_segment_pair_total'vc.
+Prover result is: Valid (0.03s, 8860 steps).
+
+File "repaired.mlw", line 153, characters 27-66:
+Sub-goal Precondition of goal min_target_segment_pair_total'vc.
+Prover result is: Valid (0.03s, 8624 steps).
+
+File "repaired.mlw", line 153, characters 27-66:
+Sub-goal Precondition of goal min_target_segment_pair_total'vc.
+Prover result is: Valid (0.03s, 8563 steps).
+
+File "repaired.mlw", line 153, characters 27-66:
+Sub-goal Precondition of goal min_target_segment_pair_total'vc.
+Prover result is: Valid (0.02s, 7644 steps).
+
+File "repaired.mlw", line 133, characters 15-57:
+Sub-goal Postcondition of goal min_target_segment_pair_total'vc.
+Prover result is: Unknown (unknown + incomplete) (0.04s, 14828 steps).
+== Final summary ==
+Unproved root goals after first prover : 1
+Remaining failures after split_vc      : 1
+Remaining failures after stage 3       : 1
+Detailed logs stored in                : /Users/rubenm/Desktop/Diversify2Verify/codex-runs/dataset-merge-verification/stage3a-repair/1477_find-two-non-overlapping-sub-arrays-each-with-target-sum/list-recursive/find_two_non_overlapping_sub_arrays_each_with_target_sum_list_stage3_a8ed95da_stage3/generated/why3/.why3_sessions/repaired_logs
+Still unproved goals:
+FindTwoNonOverlappingSubArraysEachWithTargetSum_List_Spec	min_target_segment_pair_total'vc
+VERIFY_RESULT: FAILURE
+VERIFY_REASON: unproved_goals_remain
+VERIFY_STAGE: stage3
+VERIFY_ROOT_TOTAL: 9
+VERIFY_ROOT_PROVED: 8
+VERIFY_ROOT_REMAINING: 1

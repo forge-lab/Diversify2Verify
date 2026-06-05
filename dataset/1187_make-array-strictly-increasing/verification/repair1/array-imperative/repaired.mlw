@@ -1,0 +1,298 @@
+module MakeArrayStrictlyIncreasing_Array_Stage3_Imperative
+
+  use int.Int
+  use array.Array
+  use array.Init
+  use ref.Ref
+
+  predicate strictly_increasing (a: array int) =
+    forall i j: int. 0 <= i < j < length a -> a[i] < a[j]
+
+  predicate value_from_arr2 (arr2: array int) (v: int) =
+    exists j: int. 0 <= j < length arr2 /\ arr2[j] = v
+
+  predicate allowed_output_value (arr1: array int) (arr2: array int)
+    (out: array int) (i: int) =
+    0 <= i < length arr1 /\
+    length out = length arr1 /\
+    (out[i] = arr1[i] \/ value_from_arr2 arr2 out[i])
+
+  let rec function changes_from (arr1: array int) (out: array int) (i: int) : int
+    requires { length out = length arr1 }
+    requires { 0 <= i <= length arr1 }
+    variant  { length arr1 - i }
+  =
+    if i = length arr1 then 0
+    else (if arr1[i] = out[i] then 0 else 1) + changes_from arr1 out (i + 1)
+
+  predicate valid_transform (arr1: array int) (arr2: array int) (out: array int) =
+    length out = length arr1 /\
+    strictly_increasing out /\
+    (forall i: int. 0 <= i < length arr1 ->
+      allowed_output_value arr1 arr2 out i)
+
+  predicate feasible_cost (arr1: array int) (arr2: array int) (k: int) =
+    exists out: array int.
+      valid_transform arr1 arr2 out /\ k = changes_from arr1 out 0
+
+  predicate minimal_operations (arr1: array int) (arr2: array int) (k: int) =
+    feasible_cost arr1 arr2 k /\
+    forall m: int. feasible_cost arr1 arr2 m -> k <= m
+
+  predicate no_feasible_transform (arr1: array int) (arr2: array int) =
+    forall k: int. not (feasible_cost arr1 arr2 k)
+
+  let rec function unique_count_prefix (a: array int) (upto: int) : int
+    requires { 0 <= upto <= length a }
+    variant  { upto }
+  =
+    if upto = 0 then 0
+    else if upto = 1 then 1
+    else unique_count_prefix a (upto - 1) +
+      (if a[upto - 1] = a[upto - 2] then 0 else 1)
+
+  let rec lemma unique_count_prefix_bounds (a: array int) (upto: int)
+    requires { 0 <= upto <= length a }
+    ensures  { 0 <= unique_count_prefix a upto <= upto }
+    variant  { upto }
+  =
+    if upto >= 2 then begin
+      unique_count_prefix_bounds a (upto - 1);
+      assert { 0 <= unique_count_prefix a (upto - 1) <= upto - 1 }
+    end
+
+  let rec lemma unique_count_prefix_mono (a: array int) (lo: int) (hi: int)
+    requires { 0 <= lo <= hi <= length a }
+    ensures  { unique_count_prefix a lo <= unique_count_prefix a hi }
+    variant  { hi - lo }
+  =
+    if lo < hi then begin
+      unique_count_prefix_mono a lo (hi - 1);
+      unique_count_prefix_bounds a (hi - 1);
+      assert { unique_count_prefix a (hi - 1) <= unique_count_prefix a hi }
+    end
+
+  let lemma unique_count_prefix_strict_step (a: array int) (i: int) (n: int)
+    requires { 1 <= i < n <= length a }
+    requires { a[i] <> a[i - 1] }
+    ensures  { unique_count_prefix a i < unique_count_prefix a n }
+  =
+    assert { unique_count_prefix a (i + 1) = unique_count_prefix a i + 1 };
+    unique_count_prefix_mono a (i + 1) n
+
+  let copy_array (a: array int) : array int
+    ensures { length result = length a }
+  =
+    let n = length a in
+    let b = make n 0 in
+    for i = 0 to n - 1 do
+      invariant { length b = n }
+      b[i] <- a[i]
+    done;
+    assert { length b = n };
+    b
+
+  let sort_array (a: array int) : array int
+    ensures { length result = length a }
+  =
+    let b = copy_array a in
+    let n = length b in
+    assert { length b = n };
+    if n >= 2 then
+      for i = 0 to n - 2 do
+        invariant { length b = n }
+        invariant { 0 <= i <= n - 1 }
+        let min_idx = ref i in
+        for j = i + 1 to n - 1 do
+          invariant { length b = n }
+          invariant { 0 <= i < n }
+          invariant { i <= !min_idx < j }
+          invariant { i + 1 <= j <= n }
+          assert { 0 <= j < n };
+          assert { 0 <= !min_idx < n };
+          if b[j] < b[!min_idx] then
+            min_idx := j
+        done;
+        assert { 0 <= i < n };
+        assert { i <= !min_idx < n };
+        if !min_idx <> i then
+          (
+            assert { 0 <= i < n };
+            assert { 0 <= !min_idx < n };
+            let tmp = b[i] in
+            b[i] <- b[!min_idx];
+            assert { 0 <= !min_idx < n };
+            b[!min_idx] <- tmp
+          )
+      done;
+    assert { length b = length a };
+    b
+
+  let sort_unique (a: array int) : array int
+    ensures { 0 <= length result <= length a }
+    ensures { length a > 0 -> 1 <= length result }
+  =
+    let n = length a in
+    if n = 0 then
+      make 0 0
+    else
+      let sorted = sort_array a in
+      assert { length sorted = n };
+      let count = ref 1 in
+      for i = 1 to n - 1 do
+        invariant { length sorted = n }
+        invariant { 1 <= i <= n }
+        invariant { !count = unique_count_prefix sorted i }
+        invariant { 1 <= !count <= i }
+        if sorted[i] <> sorted[i - 1] then
+          count := !count + 1
+      done;
+      assert { !count = unique_count_prefix sorted n };
+      unique_count_prefix_bounds sorted n;
+      assert { 1 <= !count <= n };
+      let out = make !count 0 in
+      assert { length out = !count };
+      assert { 0 <= 0 < length out };
+      assert { 0 <= 0 < length sorted };
+      out[0] <- sorted[0];
+      let k = ref 1 in
+      for i = 1 to n - 1 do
+        invariant { length sorted = n }
+        invariant { length out = !count }
+        invariant { !count = unique_count_prefix sorted n }
+        invariant { !k = unique_count_prefix sorted i }
+        invariant { 1 <= i <= n }
+        invariant { 1 <= !k <= !count }
+        if sorted[i] <> sorted[i - 1] then
+          (
+            unique_count_prefix_strict_step sorted i n;
+            assert { !k < !count };
+            assert { 0 <= !k < length out };
+            assert { 0 <= i < length sorted };
+            out[!k] <- sorted[i];
+            k := !k + 1
+          )
+      done;
+      assert { length out = !count };
+      assert { !count <= n };
+      out
+
+  let index_of (a: array int) (x: int) : int
+    requires { 0 < length a }
+    ensures  { 0 <= result < length a }
+  =
+    let idx = ref 0 in
+    for i = 0 to length a - 1 do
+      invariant { 0 <= !idx < length a }
+      if a[i] = x then
+        idx := i
+    done;
+    !idx
+
+  let build_candidate_values (arr1: array int) (arr2u: array int) : array int
+    ensures { 1 <= length result }
+  =
+    let n1 = length arr1 in
+    let n2 = length arr2u in
+    assert { 0 <= n1 };
+    assert { 0 <= n2 };
+    assert { 1 <= 1 + n1 + n2 };
+    let raw = make (1 + n1 + n2) 0 in
+    assert { length raw = 1 + n1 + n2 };
+    assert { 0 <= 0 < length raw };
+    raw[0] <- -1;
+    for i = 0 to n1 - 1 do
+      invariant { length raw = 1 + n1 + n2 }
+      invariant { 0 <= i <= n1 }
+      assert { 0 <= i < n1 };
+      assert { 0 <= i + 1 < length raw };
+      raw[i + 1] <- arr1[i]
+    done;
+    for j = 0 to n2 - 1 do
+      invariant { length raw = 1 + n1 + n2 }
+      invariant { 0 <= j <= n2 }
+      assert { 0 <= j < n2 };
+      assert { 0 <= 1 + n1 + j < length raw };
+      raw[1 + n1 + j] <- arr2u[j]
+    done;
+    assert { 0 < length raw };
+    sort_unique raw
+
+  let make_array_strictly_increasing_array (arr1: array int) (arr2: array int) : int
+    requires { 1 <= length arr1 <= 2000 }
+    requires { 1 <= length arr2 <= 2000 }
+    requires { forall i: int. 0 <= i < length arr1 -> 0 <= arr1[i] <= 1000000000 }
+    requires { forall j: int. 0 <= j < length arr2 -> 0 <= arr2[j] <= 1000000000 }
+    ensures  { result = -1 \/ 0 <= result }
+    ensures  { result = -1 -> no_feasible_transform arr1 arr2 }
+    ensures  { 0 <= result -> minimal_operations arr1 arr2 result }
+  =
+    let n = length arr1 in
+    let arr2u = sort_unique arr2 in
+    let values = build_candidate_values arr1 arr2u in
+    let m = length values in
+    assert { 1 <= m };
+    let inf = n + 1 in
+    let dp_next = make m 0 in
+    let dp_cur = make m 0 in
+    let i = ref (n - 1) in
+    while !i >= 0 do
+      invariant { -1 <= !i < n }
+      invariant { 1 <= m }
+      invariant { length values = m }
+      invariant { length dp_next = m }
+      invariant { length dp_cur = m }
+      variant   { !i + 1 }
+      assert { 0 <= !i < n };
+      let current = arr1[!i] in
+      let current_idx = index_of values current in
+      assert { 0 <= current_idx < m };
+      for prev_idx = 0 to m - 1 do
+        invariant { length values = m }
+        invariant { length dp_next = m }
+        invariant { length dp_cur = m }
+        invariant { 1 <= m }
+        invariant { 0 <= prev_idx <= m }
+        assert { 0 <= prev_idx < m };
+        dp_cur[prev_idx] <- inf;
+        let prev_value = values[prev_idx] in
+        if current > prev_value then
+          assert { 0 <= current_idx < length dp_next };
+          if dp_next[current_idx] < dp_cur[prev_idx] then
+            dp_cur[prev_idx] <- dp_next[current_idx];
+        if length arr2u > 0 then
+          for j = 0 to length arr2u - 1 do
+            invariant { length values = m }
+            invariant { length dp_next = m }
+            invariant { length dp_cur = m }
+            invariant { 1 <= m }
+            invariant { 0 <= prev_idx < m }
+            invariant { 0 <= current_idx < m }
+            invariant { 0 <= j <= length arr2u }
+            assert { 0 <= j < length arr2u };
+            let candidate = arr2u[j] in
+            if candidate > prev_value then
+              let candidate_idx = index_of values candidate in
+              assert { 0 <= candidate_idx < length dp_next };
+              let replace_cost = 1 + dp_next[candidate_idx] in
+              if replace_cost < dp_cur[prev_idx] then
+                dp_cur[prev_idx] <- replace_cost
+          done
+      done;
+      for prev_idx = 0 to m - 1 do
+        invariant { length dp_next = m }
+        invariant { length dp_cur = m }
+        invariant { 1 <= m }
+        invariant { 0 <= prev_idx <= m }
+        assert { 0 <= prev_idx < m };
+        dp_next[prev_idx] <- dp_cur[prev_idx]
+      done;
+      i := !i - 1
+    done;
+    assert { !i = -1 };
+    let start_idx = index_of values (-1) in
+    assert { 0 <= start_idx < length dp_next };
+    let answer = dp_next[start_idx] in
+    if answer > n then -1 else answer
+
+end

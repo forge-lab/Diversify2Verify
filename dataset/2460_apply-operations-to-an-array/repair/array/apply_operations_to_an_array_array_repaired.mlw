@@ -1,0 +1,189 @@
+module ApplyOperationsToAnArray_Array_Spec
+
+  use int.Int
+  use array.Array
+  use array.Init
+
+  predicate input_constraints (nums: array int) =
+    2 <= length nums <= 2000 /\
+    forall i: int. 0 <= i < length nums -> 0 <= nums[i] <= 1000
+
+  let rec function after_operations_at (nums: array int) (k: int) (j: int) : int
+    requires { 0 <= k < length nums }
+    requires { 0 <= j < length nums }
+    variant { k }
+  =
+    if k <= 0 then nums[j]
+    else
+      let op = k - 1 in
+      let left = after_operations_at nums (k - 1) op in
+      let right = after_operations_at nums (k - 1) (op + 1) in
+      if j = op then
+        if left = right then left + right else left
+      else if j = op + 1 then
+        if left = right then 0 else right
+      else
+        after_operations_at nums (k - 1) j
+
+  let rec function nonzero_count_before (nums: array int) (j: int) : int
+    requires { 1 <= length nums }
+    requires { 0 <= j <= length nums }
+    ensures { 0 <= result <= j }
+    variant { j }
+  =
+    if j <= 0 then 0
+    else
+      nonzero_count_before nums (j - 1) +
+      (if after_operations_at nums (length nums - 1) (j - 1) = 0 then 0 else 1)
+
+  predicate zero_shifted_after_operations (nums: array int) (result: array int) =
+    length result = length nums /\
+    (forall i: int.
+      0 <= i < length nums /\
+      after_operations_at nums (length nums - 1) i <> 0 ->
+        0 <= nonzero_count_before nums i < length result /\
+        result[nonzero_count_before nums i] =
+          after_operations_at nums (length nums - 1) i) /\
+    (forall p: int.
+      0 <= p < nonzero_count_before nums (length nums) ->
+        exists i: int.
+          0 <= i < length nums /\
+          after_operations_at nums (length nums - 1) i <> 0 /\
+          nonzero_count_before nums i = p /\
+          result[p] = after_operations_at nums (length nums - 1) i) /\
+    (forall p: int.
+      nonzero_count_before nums (length nums) <= p < length result ->
+        result[p] = 0)
+
+  val apply_operations_to_an_array_array (nums: array int) : array int
+    requires { input_constraints nums }
+    ensures  { zero_shifted_after_operations nums result }
+
+  let lemma test_000 () =
+    let nums = init 6 [|6; 5; 4; 3; 2; 1|] in
+    let expected = init 6 [|6; 5; 4; 3; 2; 1|] in
+    assert { length nums = 6 };
+    assert { length expected = 6 };
+    assert { nums[0] = 6 };
+    assert { nums[5] = 1 };
+    assert { after_operations_at nums 5 0 = 6 };
+    assert { after_operations_at nums 5 5 = 1 };
+    assert { nonzero_count_before nums 6 = 6 };
+    assert { zero_shifted_after_operations nums expected }
+
+  let lemma test_002 () =
+    let nums = init 7 [|2; 2; 0; 0; 1; 1; 1|] in
+    let expected = init 7 [|4; 2; 1; 0; 0; 0; 0|] in
+    assert { length nums = 7 };
+    assert { length expected = 7 };
+    assert { nums[0] = 2 };
+    assert { nums[1] = 2 };
+    assert { after_operations_at nums 6 0 = 4 };
+    assert { after_operations_at nums 6 4 = 2 };
+    assert { after_operations_at nums 6 6 = 1 };
+    assert { nonzero_count_before nums 7 = 3 };
+    assert { expected[0] = 4 };
+    assert { expected[1] = 2 };
+    assert { expected[2] = 1 };
+    assert { zero_shifted_after_operations nums expected }
+
+  let lemma test_004 () =
+    let nums = init 7 [|1; 3; 3; 3; 2; 2; 1|] in
+    let expected = init 7 [|1; 6; 3; 4; 1; 0; 0|] in
+    assert { length nums = 7 };
+    assert { length expected = 7 };
+    assert { nums[1] = 3 };
+    assert { nums[2] = 3 };
+    assert { nums[3] = 3 };
+    assert { after_operations_at nums 6 0 = 1 };
+    assert { after_operations_at nums 6 1 = 6 };
+    assert { after_operations_at nums 6 2 = 0 };
+    assert { after_operations_at nums 6 3 = 3 };
+    assert { after_operations_at nums 6 4 = 4 };
+    assert { after_operations_at nums 6 5 = 0 };
+    assert { after_operations_at nums 6 6 = 1 };
+    assert { nonzero_count_before nums 0 = 0 };
+    assert { nonzero_count_before nums 1 = 1 };
+    assert { nonzero_count_before nums 2 = 2 };
+    assert { nonzero_count_before nums 3 = 2 };
+    assert { nonzero_count_before nums 4 = 3 };
+    assert { nonzero_count_before nums 5 = 4 };
+    assert { nonzero_count_before nums 6 = 4 };
+    assert { nonzero_count_before nums 7 = 5 };
+    assert { expected[0] = 1 };
+    assert { expected[1] = 6 };
+    assert { expected[2] = 3 };
+    assert { expected[3] = 4 };
+    assert { expected[4] = 1 };
+    assert { expected[5] = 0 };
+    assert { expected[6] = 0 };
+    assert {
+      forall i: int. 0 <= i < length nums ->
+        i = 0 \/ i = 1 \/ i = 2 \/ i = 3 \/ i = 4 \/ i = 5 \/ i = 6
+    };
+    assert { zero_shifted_after_operations nums expected }
+
+  let lemma test_009 () =
+    let nums = init 2 [|0; 1|] in
+    let expected = init 2 [|1; 0|] in
+    assert { length nums = 2 };
+    assert { length expected = 2 };
+    assert { nums[0] = 0 };
+    assert { nums[1] = 1 };
+    assert { after_operations_at nums 1 0 = 0 };
+    assert { after_operations_at nums 1 1 = 1 };
+    assert { nonzero_count_before nums 2 = 1 };
+    assert { expected[0] = 1 };
+    assert { expected[1] = 0 };
+    assert { zero_shifted_after_operations nums expected }
+
+  let lemma test_010 () =
+    let nums = init 5 [|0; 0; 0; 0; 0|] in
+    let expected = init 5 [|0; 0; 0; 0; 0|] in
+    assert { length nums = 5 };
+    assert { length expected = 5 };
+    assert { nums[0] = 0 };
+    assert { nums[4] = 0 };
+    assert { after_operations_at nums 4 0 = 0 };
+    assert { after_operations_at nums 4 4 = 0 };
+    assert { nonzero_count_before nums 5 = 0 };
+    assert { expected[4] = 0 };
+    assert { zero_shifted_after_operations nums expected }
+
+  let lemma test_011 () =
+    let nums = init 6 [|2; 2; 2; 2; 2; 2|] in
+    let expected = init 6 [|4; 4; 4; 0; 0; 0|] in
+    assert { length nums = 6 };
+    assert { length expected = 6 };
+    assert { nums[0] = 2 };
+    assert { nums[5] = 2 };
+    assert { after_operations_at nums 5 0 = 4 };
+    assert { after_operations_at nums 5 2 = 4 };
+    assert { after_operations_at nums 5 4 = 4 };
+    assert { nonzero_count_before nums 6 = 3 };
+    assert { expected[2] = 4 };
+    assert { expected[3] = 0 };
+    assert { zero_shifted_after_operations nums expected }
+
+  let lemma test_122 () =
+    let nums = init 11 [|1; 1; 2; 2; 2; 3; 3; 4; 4; 4; 4|] in
+    let expected = init 11 [|2; 4; 2; 6; 8; 8; 0; 0; 0; 0; 0|] in
+    assert { length nums = 11 };
+    assert { length expected = 11 };
+    assert { nums[0] = 1 };
+    assert { nums[1] = 1 };
+    assert { nums[7] = 4 };
+    assert { nums[10] = 4 };
+    assert { after_operations_at nums 10 0 = 2 };
+    assert { after_operations_at nums 10 2 = 4 };
+    assert { after_operations_at nums 10 4 = 2 };
+    assert { after_operations_at nums 10 5 = 6 };
+    assert { after_operations_at nums 10 7 = 8 };
+    assert { after_operations_at nums 10 9 = 8 };
+    assert { nonzero_count_before nums 11 = 6 };
+    assert { expected[0] = 2 };
+    assert { expected[5] = 8 };
+    assert { expected[10] = 0 };
+    assert { zero_shifted_after_operations nums expected }
+
+end

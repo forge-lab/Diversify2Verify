@@ -1,0 +1,247 @@
+module SmallestMissingIntegerGreaterThanSequentialPrefixSum_List_Recursive_Implementation
+
+  use int.Int
+  use list.List
+
+  let rec sequential_prefix_sum_from (prev: int) (rest: list int) (acc: int) : int
+    variant { rest }
+  =
+    match rest with
+    | Nil -> acc
+    | Cons y ys ->
+        if y = prev + 1 then sequential_prefix_sum_from y ys (acc + y)
+        else acc
+    end
+
+  let sequential_prefix_sum (nums: list int) : int =
+    match nums with
+    | Nil -> 0
+    | Cons x xs -> sequential_prefix_sum_from x xs x
+    end
+
+  let rec contains (nums: list int) (target: int) : bool
+    variant { nums }
+  =
+    match nums with
+    | Nil -> false
+    | Cons x xs ->
+        if x = target then true else contains xs target
+    end
+
+  let rec list_length (nums: list int) : int
+    variant { nums }
+  =
+    match nums with
+    | Nil -> 0
+    | Cons _ xs -> 1 + list_length xs
+    end
+
+  let rec find_missing_from (nums: list int) (candidate: int) (fuel: int) : int
+    variant { fuel }
+  =
+    if fuel = 0 then candidate
+    else if contains nums candidate then
+      find_missing_from nums (candidate + 1) (fuel - 1)
+    else
+      candidate
+
+  let smallest_missing_integer_greater_than_sequential_prefix_sum_list
+    (nums: list int) : int
+  =
+    let start = sequential_prefix_sum nums in
+    find_missing_from nums start (list_length nums + 1)
+
+  let test_000 () : bool =
+    let nums = Cons 1 (Cons 3 (Cons 2 (Cons 4 (Cons 5 Nil)))) in
+    let r = smallest_missing_integer_greater_than_sequential_prefix_sum_list nums in
+    r = 6
+
+  let test_001 () : bool =
+    let nums = Cons 10 (Cons 11 (Cons 12 (Cons 8 (Cons 9 (Cons 13 Nil))))) in
+    let r = smallest_missing_integer_greater_than_sequential_prefix_sum_list nums in
+    r = 33
+
+  let test_002 () : bool =
+    let nums = Cons 10 (Cons 11 (Cons 12 (Cons 13 (Cons 14 Nil)))) in
+    let r = smallest_missing_integer_greater_than_sequential_prefix_sum_list nums in
+    r = 60
+
+  let test_003 () : bool =
+    let nums = Cons 1 (Cons 3 (Cons 5 (Cons 7 (Cons 9 Nil)))) in
+    let r = smallest_missing_integer_greater_than_sequential_prefix_sum_list nums in
+    r = 2
+
+  let test_004 () : bool =
+    let nums =
+      Cons 1
+        (Cons 2
+          (Cons 3
+            (Cons 4
+              (Cons 5
+                (Cons 6
+                  (Cons 7
+                    (Cons 8
+                      (Cons 9 (Cons 10 Nil))))))))) in
+    let r = smallest_missing_integer_greater_than_sequential_prefix_sum_list nums in
+    r = 55
+
+  let test_005 () : bool =
+    let nums = Cons 50 (Cons 49 (Cons 48 (Cons 47 (Cons 46 Nil)))) in
+    let r = smallest_missing_integer_greater_than_sequential_prefix_sum_list nums in
+    r = 51
+
+  let test_006 () : bool =
+    let nums =
+      Cons 5
+        (Cons 6
+          (Cons 7
+            (Cons 8
+              (Cons 9
+                (Cons 10
+                  (Cons 11
+                    (Cons 12 (Cons 13 (Cons 14 Nil))))))))) in
+    let r = smallest_missing_integer_greater_than_sequential_prefix_sum_list nums in
+    r = 95
+
+  let test_007 () : bool =
+    let nums = Cons 2 (Cons 3 (Cons 4 (Cons 5 (Cons 6 Nil)))) in
+    let r = smallest_missing_integer_greater_than_sequential_prefix_sum_list nums in
+    r = 20
+
+  let test_008 () : bool =
+    let nums = Cons 1 (Cons 2 (Cons 4 (Cons 3 (Cons 5 Nil)))) in
+    let r = smallest_missing_integer_greater_than_sequential_prefix_sum_list nums in
+    r = 6
+
+  let test_009 () : bool =
+    let nums = Cons 5 (Cons 6 (Cons 7 (Cons 8 (Cons 9 Nil)))) in
+    let r = smallest_missing_integer_greater_than_sequential_prefix_sum_list nums in
+    r = 35
+
+  let test_010 () : bool =
+    let nums =
+      Cons 5
+        (Cons 6
+          (Cons 7
+            (Cons 8
+              (Cons 9
+                (Cons 10
+                  (Cons 11
+                    (Cons 12
+                      (Cons 13 (Cons 14 (Cons 15 Nil)))))))))) in
+    let r = smallest_missing_integer_greater_than_sequential_prefix_sum_list nums in
+    r = 110
+
+  let test_011 () : bool =
+    let nums = Cons 1 (Cons 2 (Cons 3 (Cons 4 (Cons 5 Nil)))) in
+    let r = smallest_missing_integer_greater_than_sequential_prefix_sum_list nums in
+    r = 15
+
+  let test_012 () : bool =
+    let nums =
+      Cons 2
+        (Cons 3
+          (Cons 4
+            (Cons 5
+              (Cons 6
+                (Cons 7
+                  (Cons 8
+                    (Cons 9 (Cons 10 (Cons 1 Nil))))))))) in
+    let r = smallest_missing_integer_greater_than_sequential_prefix_sum_list nums in
+    r = 54
+
+  let test_013 () : bool =
+    let nums = Cons 1 (Cons 2 (Cons 3 (Cons 2 (Cons 5 Nil)))) in
+    let r = smallest_missing_integer_greater_than_sequential_prefix_sum_list nums in
+    r = 6
+
+  let test_014 () : bool =
+    let nums = Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 Nil)))) in
+    let r = smallest_missing_integer_greater_than_sequential_prefix_sum_list nums in
+    r = 2
+
+  let test_015 () : bool =
+    let nums = Cons 3 (Cons 4 (Cons 5 (Cons 1 (Cons 12 (Cons 14 (Cons 13 Nil)))))) in
+    let r = smallest_missing_integer_greater_than_sequential_prefix_sum_list nums in
+    r = 15
+
+  let test_016 () : bool =
+    let nums = Cons 1 (Cons 2 (Cons 2 (Cons 3 (Cons 4 Nil)))) in
+    let r = smallest_missing_integer_greater_than_sequential_prefix_sum_list nums in
+    r = 5
+
+  let test_017 () : bool =
+    let nums = Cons 1 (Cons 2 (Cons 3 (Cons 5 (Cons 6 Nil)))) in
+    let r = smallest_missing_integer_greater_than_sequential_prefix_sum_list nums in
+    r = 7
+
+  let test_018 () : bool =
+    let l17 = Cons 20 Nil in
+    let l16 = Cons 19 l17 in
+    let l15 = Cons 18 l16 in
+    let l14 = Cons 17 l15 in
+    let l13 = Cons 16 l14 in
+    let l12 = Cons 15 l13 in
+    let l11 = Cons 14 l12 in
+    let l10 = Cons 13 l11 in
+    let l9 = Cons 12 l10 in
+    let l8 = Cons 11 l9 in
+    let l7 = Cons 10 l8 in
+    let l6 = Cons 9 l7 in
+    let l5 = Cons 8 l6 in
+    let l4 = Cons 7 l5 in
+    let l3 = Cons 6 l4 in
+    let l2 = Cons 5 l3 in
+    let nums = Cons 4 l2 in
+    let r = smallest_missing_integer_greater_than_sequential_prefix_sum_list nums in
+    r = 204
+
+  let test_019 () : bool =
+    let nums = Cons 1 (Cons 2 (Cons 4 (Cons 5 (Cons 6 Nil)))) in
+    let r = smallest_missing_integer_greater_than_sequential_prefix_sum_list nums in
+    r = 3
+
+  let run_tests () : bool =
+    if test_000 () then
+    if test_001 () then
+    if test_002 () then
+    if test_003 () then
+    if test_004 () then
+    if test_005 () then
+    if test_006 () then
+    if test_007 () then
+    if test_008 () then
+    if test_009 () then
+    if test_010 () then
+    if test_011 () then
+    if test_012 () then
+    if test_013 () then
+    if test_014 () then
+    if test_015 () then
+    if test_016 () then
+    if test_017 () then
+    if test_018 () then
+    if test_019 () then
+      true
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+
+end

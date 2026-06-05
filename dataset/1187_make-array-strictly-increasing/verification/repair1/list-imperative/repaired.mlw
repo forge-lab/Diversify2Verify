@@ -1,0 +1,233 @@
+module MakeArrayStrictlyIncreasing_List_Stage3_Imperative
+
+  use int.Int
+  use list.List
+  use list.Length
+  use list.Mem
+  use ref.Ref
+
+  let rec predicate lt_all (x: int) (l: list int)
+    variant { l }
+  =
+    match l with
+    | Nil -> true
+    | Cons y ys -> (x < y) && lt_all x ys
+    end
+
+  let rec predicate strictly_increasing (l: list int)
+    variant { l }
+  =
+    match l with
+    | Nil -> true
+    | Cons x xs -> lt_all x xs && strictly_increasing xs
+    end
+
+  let rec function contains (x: int) (l: list int) : bool
+    variant { l }
+  =
+    match l with
+    | Nil -> false
+    | Cons y ys -> x = y || contains x ys
+    end
+
+  let rec predicate replacement_plan
+      (arr1: list int) (arr2: list int) (candidate: list int) (k: int)
+    variant { arr1 }
+  =
+    match arr1 with
+    | Nil ->
+        match candidate with
+        | Nil -> k = 0
+        | Cons _ _ -> false
+        end
+    | Cons x xs ->
+        match candidate with
+        | Nil -> false
+        | Cons y ys ->
+            if x = y then
+              replacement_plan xs arr2 ys k
+            else
+              contains y arr2 && k >= 1 &&
+              replacement_plan xs arr2 ys (k - 1)
+        end
+    end
+
+  predicate valid_transformation
+      (arr1: list int) (arr2: list int) (candidate: list int) (k: int) =
+    k >= 0 /\ replacement_plan arr1 arr2 candidate k /\
+    strictly_increasing candidate
+
+  predicate make_strict_result (arr1: list int) (arr2: list int) (r: int) =
+    (r = -1 /\
+     (forall candidate: list int, k: int.
+        not (valid_transformation arr1 arr2 candidate k))) \/
+    (r >= 0 /\
+     (exists candidate: list int.
+        valid_transformation arr1 arr2 candidate r) /\
+     (forall candidate: list int, k: int.
+        valid_transformation arr1 arr2 candidate k -> r <= k))
+
+  type state = State int int
+
+  let reverse_states (states: list state) : list state =
+    let acc = ref (Nil : list state) in
+    let cur = ref states in
+    while (match !cur with Nil -> false | Cons _ _ -> true end) do
+      invariant { 0 <= length !cur }
+      variant { length !cur }
+      match !cur with
+      | Nil -> ()
+      | Cons st rest ->
+          acc := Cons st !acc;
+          cur := rest
+      end
+    done;
+    !acc
+
+  let add_state_min (states: list state) (last: int) (cost: int) : list state =
+    let acc = ref (Nil : list state) in
+    let cur = ref states in
+    let found = ref false in
+    while (match !cur with Nil -> false | Cons _ _ -> true end) do
+      invariant { 0 <= length !cur }
+      variant { length !cur }
+      match !cur with
+      | Nil -> ()
+      | Cons st rest ->
+          begin
+            match st with
+            | State existing_last existing_cost ->
+                if existing_last = last then begin
+                  found := true;
+                  if cost < existing_cost then
+                    acc := Cons (State last cost) !acc
+                  else
+                    acc := Cons st !acc
+                end else
+                  acc := Cons st !acc
+            end;
+            cur := rest
+          end
+      end
+    done;
+    let rebuilt = reverse_states !acc in
+    if !found then rebuilt else Cons (State last cost) rebuilt
+
+  let add_replacements_above
+      (arr2: list int) (last: int) (cost: int) (states: list state) : list state =
+    let next = ref states in
+    let cur = ref arr2 in
+    while (match !cur with Nil -> false | Cons _ _ -> true end) do
+      invariant { 0 <= length !cur }
+      variant { length !cur }
+      match !cur with
+      | Nil -> ()
+      | Cons y ys ->
+          if y > last then
+            next := add_state_min !next y (cost + 1)
+          else ();
+          cur := ys
+      end
+    done;
+    !next
+
+  let add_initial_replacements (arr2: list int) (states: list state) : list state =
+    let next = ref states in
+    let cur = ref arr2 in
+    while (match !cur with Nil -> false | Cons _ _ -> true end) do
+      invariant { 0 <= length !cur }
+      variant { length !cur }
+      match !cur with
+      | Nil -> ()
+      | Cons y ys ->
+          next := add_state_min !next y 1;
+          cur := ys
+      end
+    done;
+    !next
+
+  let step_states (states: list state) (arr2: list int) (x: int) : list state =
+    let next = ref (Nil : list state) in
+    let cur = ref states in
+    while (match !cur with Nil -> false | Cons _ _ -> true end) do
+      invariant { 0 <= length !cur }
+      variant { length !cur }
+      match !cur with
+      | Nil -> ()
+      | Cons st rest ->
+          begin
+            match st with
+            | State last cost ->
+                if x > last then
+                  next := add_state_min !next x cost
+                else ();
+                next := add_replacements_above arr2 last cost !next
+            end;
+            cur := rest
+          end
+      end
+    done;
+    !next
+
+  let min_cost (states: list state) : int =
+    let best = ref (-1) in
+    let cur = ref states in
+    while (match !cur with Nil -> false | Cons _ _ -> true end) do
+      invariant { 0 <= length !cur }
+      variant { length !cur }
+      match !cur with
+      | Nil -> ()
+      | Cons st rest ->
+          begin
+            match st with
+            | State _ cost ->
+                if !best = -1 then
+                  best := cost
+                else if cost < !best then
+                  best := cost
+                else ()
+            end;
+            cur := rest
+          end
+      end
+    done;
+    !best
+
+  let make_array_strictly_increasing_list (arr1: list int) (arr2: list int) : int
+    ensures { make_strict_result arr1 arr2 result }
+  =
+    match arr1 with
+    | Nil ->
+        assert { arr1 = Nil };
+        assert { replacement_plan Nil arr2 Nil 0 };
+        assert { valid_transformation Nil arr2 Nil 0 };
+        assert {
+          forall candidate: list int, k: int.
+            valid_transformation Nil arr2 candidate k -> 0 <= k
+        };
+        assert { make_strict_result arr1 arr2 0 };
+        0
+    | Cons x xs ->
+        assert { arr1 = Cons x xs };
+        let states = ref (Nil : list state) in
+        states := add_state_min !states x 0;
+        states := add_initial_replacements arr2 !states;
+        let cur = ref xs in
+        while (match !cur with Nil -> false | Cons _ _ -> true end) do
+          invariant { 0 <= length !cur }
+          variant { length !cur }
+          match !cur with
+          | Nil -> ()
+          | Cons y ys ->
+              states := step_states !states arr2 y;
+              cur := ys
+          end
+        done;
+        assert { !cur = Nil };
+        let r = min_cost !states in
+        assert { make_strict_result (Cons x xs) arr2 r };
+        assert { make_strict_result arr1 arr2 r };
+        r
+    end
+
+end

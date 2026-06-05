@@ -1,0 +1,363 @@
+== Stage 1: first prover on whole file ==
+Running in /Users/rubenm/Desktop/Diversify2Verify/codex-runs/repair2-split2/stage3a-rerepair/1921_eliminate-maximum-number-of-monsters/array-recursive/eliminate_maximum_number_of_monsters_array_stage3_60208e71_stage3/repaired/generated/why3: why3 session create -o /Users/rubenm/Desktop/Diversify2Verify/codex-runs/repair2-split2/stage3a-rerepair/1921_eliminate-maximum-number-of-monsters/array-recursive/eliminate_maximum_number_of_monsters_array_stage3_60208e71_stage3/repaired/generated/why3/.why3_sessions/repaired_stage1 -P Z3,4.8.6 -t 10 -m 8192 repaired.mlw
+Session created successfully
+Running in /Users/rubenm/Desktop/Diversify2Verify/codex-runs/repair2-split2/stage3a-rerepair/1921_eliminate-maximum-number-of-monsters/array-recursive/eliminate_maximum_number_of_monsters_array_stage3_60208e71_stage3/repaired/generated/why3: why3 bench /Users/rubenm/Desktop/Diversify2Verify/codex-runs/repair2-split2/stage3a-rerepair/1921_eliminate-maximum-number-of-monsters/array-recursive/eliminate_maximum_number_of_monsters_array_stage3_60208e71_stage3/repaired/generated/why3/.why3_sessions/repaired_stage1
+Progress: 10/1/0                       Progress: 9/2/0                       Progress: 8/3/0                       Progress: 7/4/0                       Progress: 6/5/0                       Progress: 5/6/0                       Progress: 5/0/1                       Progress: 4/1/1                       Progress: 3/2/1                       Progress: 2/3/1                       Progress: 1/4/1                       Progress: 0/5/1                       Progress: 0/4/2                       Progress: 0/0/2                       Progress: 0/0/1                       
+Replay completed, saving session... done
+== Stage 1 stats ==
+= Statistics for session /Users/rubenm/Desktop/Diversify2Verify/codex-runs/repair2-split2/stage3a-rerepair/1921_eliminate-maximum-number-of-monsters/array-recursive/eliminate_maximum_number_of_monsters_array_stage3_60208e71_stage3/repaired/generated/why3/.why3_sessions/repaired_stage1
+
+== Number of root goals ==
+  total: 11  proved: 8
+
+== Number of sub goals ==
+  total: 0  proved: 0
+
+== Goals not proved ==
+  +-- file [../../repaired.mlw]
+    +-- theory EliminateMaximumNumberOfMonsters_Array_Spec
+      +-- goal sorted_deadline_greedy_optimal
+      +-- goal shift_for_insertion'vc
+      +-- goal eliminate_maximum_number_of_monsters_array'vc
+  
+== Goals proved by only one prover ==
+  +-- file [../../repaired.mlw]
+    +-- theory EliminateMaximumNumberOfMonsters_Array_Spec
+      +-- goal sorted_prefix_length_zero_or_one'vc: Z3 4.8.6
+      +-- goal permut_all_refl'vc: Z3 4.8.6
+      +-- goal permut_all_trans'vc: Z3 4.8.6
+      +-- goal arrival_deadline'vc: Z3 4.8.6
+      +-- goal fill_deadlines'vc: Z3 4.8.6
+      +-- goal insertion_sort_from'vc: Z3 4.8.6
+      +-- goal sort_deadlines'vc: Z3 4.8.6
+      +-- goal count_eliminated_from'vc: Z3 4.8.6
+  
+1 session(s) read, with a total of 11 proof goals.
+== Unproved root goals after first prover ==
+EliminateMaximumNumberOfMonsters_Array_Spec	sorted_deadline_greedy_optimal
+EliminateMaximumNumberOfMonsters_Array_Spec	shift_for_insertion'vc
+EliminateMaximumNumberOfMonsters_Array_Spec	eliminate_maximum_number_of_monsters_array'vc
+== Stage 1: trying remaining goals with prover Alt-Ergo,2.4.0 ==
+---- stage1 | prover: Alt-Ergo,2.4.0 | theory: EliminateMaximumNumberOfMonsters_Array_Spec | goal: sorted_deadline_greedy_optimal ----
+File "repaired.mlw", line 102, character 4 to line 106, character 44:
+Goal sorted_deadline_greedy_optimal.
+Prover result is: Timeout (10.00s, 781231 steps).
+---- stage1 | prover: Alt-Ergo,2.4.0 | theory: EliminateMaximumNumberOfMonsters_Array_Spec | goal: shift_for_insertion'vc ----
+File repaired.mlw:
+Goal shift_for_insertion'vc.
+Prover result is: Timeout (10.00s, 140037 steps).
+---- stage1 | prover: Alt-Ergo,2.4.0 | theory: EliminateMaximumNumberOfMonsters_Array_Spec | goal: eliminate_maximum_number_of_monsters_array'vc ----
+File repaired.mlw:
+Goal eliminate_maximum_number_of_monsters_array'vc.
+Prover result is: Timeout (10.00s, 71228 steps).
+Remaining after prover Alt-Ergo,2.4.0: 3
+== Stage 1: trying remaining goals with prover CVC4,1.8 ==
+---- stage1 | prover: CVC4,1.8 | theory: EliminateMaximumNumberOfMonsters_Array_Spec | goal: sorted_deadline_greedy_optimal ----
+File "repaired.mlw", line 102, character 4 to line 106, character 44:
+Goal sorted_deadline_greedy_optimal.
+Prover result is: Timeout (10.00s, 1014879 steps).
+---- stage1 | prover: CVC4,1.8 | theory: EliminateMaximumNumberOfMonsters_Array_Spec | goal: shift_for_insertion'vc ----
+File repaired.mlw:
+Goal shift_for_insertion'vc.
+Prover result is: Timeout (10.00s, 1210639 steps).
+---- stage1 | prover: CVC4,1.8 | theory: EliminateMaximumNumberOfMonsters_Array_Spec | goal: eliminate_maximum_number_of_monsters_array'vc ----
+File repaired.mlw:
+Goal eliminate_maximum_number_of_monsters_array'vc.
+Prover result is: Timeout (10.00s, 1221380 steps).
+Remaining after prover CVC4,1.8: 3
+== Goals still unproved after stage 1 ==
+EliminateMaximumNumberOfMonsters_Array_Spec	sorted_deadline_greedy_optimal
+EliminateMaximumNumberOfMonsters_Array_Spec	shift_for_insertion'vc
+EliminateMaximumNumberOfMonsters_Array_Spec	eliminate_maximum_number_of_monsters_array'vc
+== Stage 2: split_vc on unproved goal ==
+Target theory: EliminateMaximumNumberOfMonsters_Array_Spec
+Target goal  : sorted_deadline_greedy_optimal
+---- stage2 | prover: Z3,4.8.6 | theory: EliminateMaximumNumberOfMonsters_Array_Spec | goal: sorted_deadline_greedy_optimal ----
+Transforms: split_vc
+File "repaired.mlw", line 106, characters 6-44:
+Goal sorted_deadline_greedy_optimal.
+Prover result is: Timeout (10.00s, 392399296 steps).
+---- stage2 | prover: Alt-Ergo,2.4.0 | theory: EliminateMaximumNumberOfMonsters_Array_Spec | goal: sorted_deadline_greedy_optimal ----
+Transforms: split_vc
+File "repaired.mlw", line 106, characters 6-44:
+Goal sorted_deadline_greedy_optimal.
+Prover result is: Timeout (10.00s, 772445 steps).
+---- stage2 | prover: CVC4,1.8 | theory: EliminateMaximumNumberOfMonsters_Array_Spec | goal: sorted_deadline_greedy_optimal ----
+Transforms: split_vc
+File "repaired.mlw", line 106, characters 6-44:
+Goal sorted_deadline_greedy_optimal.
+Prover result is: Timeout (10.00s, 999178 steps).
+== Stage 2: split_vc on unproved goal ==
+Target theory: EliminateMaximumNumberOfMonsters_Array_Spec
+Target goal  : shift_for_insertion'vc
+---- stage2 | prover: Z3,4.8.6 | theory: EliminateMaximumNumberOfMonsters_Array_Spec | goal: shift_for_insertion'vc ----
+Transforms: split_vc
+File "repaired.mlw", line 146, characters 6-17:
+Sub-goal Index in array bounds of goal shift_for_insertion'vc.
+Prover result is: Valid (0.01s, 4296 steps).
+
+File "repaired.mlw", line 147, characters 15-40:
+Sub-goal Assertion of goal shift_for_insertion'vc.
+Prover result is: Valid (0.02s, 84945 steps).
+
+File "repaired.mlw", line 149, characters 76-90:
+Sub-goal Assertion of goal shift_for_insertion'vc.
+Prover result is: Valid (0.01s, 38092 steps).
+
+File "repaired.mlw", line 136, characters 15-40:
+Sub-goal Postcondition of goal shift_for_insertion'vc.
+Prover result is: Valid (0.01s, 5568 steps).
+
+File "repaired.mlw", line 137, characters 15-38:
+Sub-goal Postcondition of goal shift_for_insertion'vc.
+Prover result is: Valid (0.02s, 89470 steps).
+
+File "repaired.mlw", line 138, characters 15-51:
+Sub-goal Postcondition of goal shift_for_insertion'vc.
+Prover result is: Valid (0.01s, 38321 steps).
+
+File "repaired.mlw", line 139, characters 76-90:
+Sub-goal Postcondition of goal shift_for_insertion'vc.
+Prover result is: Valid (0.01s, 38411 steps).
+
+File "repaired.mlw", line 140, characters 39-59:
+Sub-goal Postcondition of goal shift_for_insertion'vc.
+Prover result is: Timeout (10.00s, 137973783 steps).
+
+File "repaired.mlw", line 141, characters 84-98:
+Sub-goal Postcondition of goal shift_for_insertion'vc.
+Prover result is: Valid (0.02s, 90835 steps).
+
+File "repaired.mlw", line 151, characters 12-16:
+Sub-goal Index in array bounds of goal shift_for_insertion'vc.
+Prover result is: Valid (0.01s, 60808 steps).
+
+File "repaired.mlw", line 152, characters 15-36:
+Sub-goal Assertion of goal shift_for_insertion'vc.
+Prover result is: Valid (0.01s, 6086 steps).
+
+File "repaired.mlw", line 153, characters 18-22:
+Sub-goal Index in array bounds of goal shift_for_insertion'vc.
+Prover result is: Valid (0.01s, 65286 steps).
+
+File "repaired.mlw", line 153, characters 6-22:
+Sub-goal Index in array bounds of goal shift_for_insertion'vc.
+Prover result is: Valid (0.01s, 6115 steps).
+
+File "repaired.mlw", line 154, characters 6-39:
+Sub-goal Variant decrease of goal shift_for_insertion'vc.
+Prover result is: Valid (0.01s, 5480 steps).
+
+File "repaired.mlw", line 154, characters 6-39:
+Sub-goal Precondition of goal shift_for_insertion'vc.
+Prover result is: Valid (0.02s, 89615 steps).
+
+File "repaired.mlw", line 154, characters 6-39:
+Sub-goal Precondition of goal shift_for_insertion'vc.
+Prover result is: Valid (0.02s, 89872 steps).
+
+File "repaired.mlw", line 154, characters 6-39:
+Sub-goal Precondition of goal shift_for_insertion'vc.
+Prover result is: Valid (0.02s, 94972 steps).
+
+File "repaired.mlw", line 155, characters 15-68:
+Sub-goal Assertion of goal shift_for_insertion'vc.
+Prover result is: Valid (0.01s, 25711 steps).
+
+File "repaired.mlw", line 157, character 8 to line 160, character 19:
+Sub-goal Assertion of goal shift_for_insertion'vc.
+Prover result is: Valid (0.02s, 97647 steps).
+
+File "repaired.mlw", line 162, characters 15-90:
+Sub-goal Assertion of goal shift_for_insertion'vc.
+Prover result is: Valid (0.02s, 85662 steps).
+
+File "repaired.mlw", line 163, characters 15-51:
+Sub-goal Assertion of goal shift_for_insertion'vc.
+Prover result is: Valid (0.02s, 85842 steps).
+
+File "repaired.mlw", line 164, characters 76-90:
+Sub-goal Assertion of goal shift_for_insertion'vc.
+Prover result is: Valid (0.02s, 86139 steps).
+
+File "repaired.mlw", line 165, characters 39-68:
+Sub-goal Assertion of goal shift_for_insertion'vc.
+Prover result is: Timeout (10.00s, 137569475 steps).
+
+File "repaired.mlw", line 166, characters 39-59:
+Sub-goal Assertion of goal shift_for_insertion'vc.
+Prover result is: Valid (0.02s, 90549 steps).
+
+File "repaired.mlw", line 167, characters 84-98:
+Sub-goal Assertion of goal shift_for_insertion'vc.
+Prover result is: Valid (0.02s, 92481 steps).
+
+File "repaired.mlw", line 136, characters 15-40:
+Sub-goal Postcondition of goal shift_for_insertion'vc.
+Prover result is: Valid (0.02s, 87359 steps).
+Infrastructure issue in stage 2 with prover Z3,4.8.6; aborting rest of stage 2.
+== Goals still unproved after stage 2 (split_vc) ==
+EliminateMaximumNumberOfMonsters_Array_Spec	sorted_deadline_greedy_optimal
+EliminateMaximumNumberOfMonsters_Array_Spec	shift_for_insertion'vc
+EliminateMaximumNumberOfMonsters_Array_Spec	eliminate_maximum_number_of_monsters_array'vc
+== Stage 3: split_vc + inline_all on still-unproved goal ==
+Target theory: EliminateMaximumNumberOfMonsters_Array_Spec
+Target goal  : sorted_deadline_greedy_optimal
+---- stage3 | prover: Alt-Ergo,2.4.0 | theory: EliminateMaximumNumberOfMonsters_Array_Spec | goal: sorted_deadline_greedy_optimal ----
+Transforms: split_vc inline_all
+File "repaired.mlw", line 106, characters 6-44:
+Goal sorted_deadline_greedy_optimal.
+Prover result is: Valid (0.01s, 15 steps).
+
+File "repaired.mlw", line 106, characters 6-44:
+Goal sorted_deadline_greedy_optimal.
+Prover result is: Valid (0.01s, 19 steps).
+
+File "repaired.mlw", line 106, characters 6-44:
+Goal sorted_deadline_greedy_optimal.
+Prover result is: Timeout (10.00s, 180899 steps).
+
+File "repaired.mlw", line 106, characters 6-44:
+Goal sorted_deadline_greedy_optimal.
+Prover result is: Timeout (10.00s, 147018 steps).
+---- stage3 | prover: CVC4,1.8 | theory: EliminateMaximumNumberOfMonsters_Array_Spec | goal: sorted_deadline_greedy_optimal ----
+Transforms: split_vc inline_all
+File "repaired.mlw", line 106, characters 6-44:
+Goal sorted_deadline_greedy_optimal.
+Prover result is: Valid (0.05s, 29083 steps).
+
+File "repaired.mlw", line 106, characters 6-44:
+Goal sorted_deadline_greedy_optimal.
+Prover result is: Valid (0.06s, 29796 steps).
+
+File "repaired.mlw", line 106, characters 6-44:
+Goal sorted_deadline_greedy_optimal.
+Prover result is: Unknown (unknown + incomplete) (0.08s, 35847 steps).
+
+File "repaired.mlw", line 106, characters 6-44:
+Goal sorted_deadline_greedy_optimal.
+Prover result is: Unknown (unknown + incomplete) (0.08s, 36422 steps).
+== Stage 3: split_vc + inline_all on still-unproved goal ==
+Target theory: EliminateMaximumNumberOfMonsters_Array_Spec
+Target goal  : shift_for_insertion'vc
+---- stage3 | prover: Alt-Ergo,2.4.0 | theory: EliminateMaximumNumberOfMonsters_Array_Spec | goal: shift_for_insertion'vc ----
+Transforms: split_vc inline_all
+File "repaired.mlw", line 146, characters 6-17:
+Sub-goal Index in array bounds of goal shift_for_insertion'vc.
+Prover result is: Valid (0.01s, 7 steps).
+
+File "repaired.mlw", line 147, characters 15-40:
+Sub-goal Assertion of goal shift_for_insertion'vc.
+Prover result is: Valid (0.01s, 14 steps).
+
+File "repaired.mlw", line 149, characters 76-90:
+Sub-goal Assertion of goal shift_for_insertion'vc.
+Prover result is: Valid (0.03s, 102 steps).
+
+File "repaired.mlw", line 136, characters 15-40:
+Sub-goal Postcondition of goal shift_for_insertion'vc.
+Prover result is: Valid (0.01s, 13 steps).
+
+File "repaired.mlw", line 137, characters 15-38:
+Sub-goal Postcondition of goal shift_for_insertion'vc.
+Prover result is: Valid (0.02s, 52 steps).
+
+File "repaired.mlw", line 138, characters 15-51:
+Sub-goal Postcondition of goal shift_for_insertion'vc.
+Prover result is: Valid (0.01s, 19 steps).
+
+File "repaired.mlw", line 139, characters 76-90:
+Sub-goal Postcondition of goal shift_for_insertion'vc.
+Prover result is: Valid (0.03s, 94 steps).
+
+File "repaired.mlw", line 140, characters 39-59:
+Sub-goal Postcondition of goal shift_for_insertion'vc.
+Prover result is: Valid (1.15s, 17886 steps).
+
+File "repaired.mlw", line 141, characters 84-98:
+Sub-goal Postcondition of goal shift_for_insertion'vc.
+Prover result is: Valid (0.03s, 120 steps).
+
+File "repaired.mlw", line 151, characters 12-16:
+Sub-goal Index in array bounds of goal shift_for_insertion'vc.
+Prover result is: Valid (0.01s, 8 steps).
+
+File "repaired.mlw", line 152, characters 15-36:
+Sub-goal Assertion of goal shift_for_insertion'vc.
+Prover result is: Valid (0.01s, 9 steps).
+
+File "repaired.mlw", line 153, characters 18-22:
+Sub-goal Index in array bounds of goal shift_for_insertion'vc.
+Prover result is: Valid (0.01s, 9 steps).
+
+File "repaired.mlw", line 153, characters 6-22:
+Sub-goal Index in array bounds of goal shift_for_insertion'vc.
+Prover result is: Valid (0.01s, 9 steps).
+
+File "repaired.mlw", line 154, characters 6-39:
+Sub-goal Variant decrease of goal shift_for_insertion'vc.
+Prover result is: Valid (0.01s, 13 steps).
+
+File "repaired.mlw", line 154, characters 6-39:
+Sub-goal Precondition of goal shift_for_insertion'vc.
+Prover result is: Valid (0.01s, 13 steps).
+
+File "repaired.mlw", line 154, characters 6-39:
+Sub-goal Precondition of goal shift_for_insertion'vc.
+Prover result is: Valid (0.01s, 17 steps).
+
+File "repaired.mlw", line 154, characters 6-39:
+Sub-goal Precondition of goal shift_for_insertion'vc.
+Prover result is: Valid (0.12s, 1095 steps).
+
+File "repaired.mlw", line 155, characters 15-68:
+Sub-goal Assertion of goal shift_for_insertion'vc.
+Prover result is: Valid (0.06s, 241 steps).
+
+File "repaired.mlw", line 157, character 8 to line 160, character 19:
+Sub-goal Assertion of goal shift_for_insertion'vc.
+Prover result is: Valid (1.33s, 5889 steps).
+
+File "repaired.mlw", line 162, characters 15-90:
+Sub-goal Assertion of goal shift_for_insertion'vc.
+Prover result is: Valid (8.01s, 84373 steps).
+
+File "repaired.mlw", line 163, characters 15-51:
+Sub-goal Assertion of goal shift_for_insertion'vc.
+Prover result is: Valid (0.19s, 447 steps).
+
+File "repaired.mlw", line 164, characters 76-90:
+Sub-goal Assertion of goal shift_for_insertion'vc.
+Prover result is: Valid (0.24s, 505 steps).
+
+File "repaired.mlw", line 165, characters 39-68:
+Sub-goal Assertion of goal shift_for_insertion'vc.
+Prover result is: Timeout (10.00s, 63345 steps).
+
+File "repaired.mlw", line 166, characters 39-59:
+Sub-goal Assertion of goal shift_for_insertion'vc.
+Prover result is: Valid (0.16s, 433 steps).
+
+File "repaired.mlw", line 167, characters 84-98:
+Sub-goal Assertion of goal shift_for_insertion'vc.
+Prover result is: Valid (0.21s, 505 steps).
+
+File "repaired.mlw", line 136, characters 15-40:
+Sub-goal Postcondition of goal shift_for_insertion'vc.
+Prover result is: Valid (0.02s, 42 steps).
+Infrastructure issue in stage 3 with prover Alt-Ergo,2.4.0; aborting rest of stage 3.
+== Final summary ==
+Unproved root goals after first prover : 3
+Remaining failures after split_vc      : 3
+Remaining failures after stage 3       : 3
+Detailed logs stored in                : /Users/rubenm/Desktop/Diversify2Verify/codex-runs/repair2-split2/stage3a-rerepair/1921_eliminate-maximum-number-of-monsters/array-recursive/eliminate_maximum_number_of_monsters_array_stage3_60208e71_stage3/repaired/generated/why3/.why3_sessions/repaired_logs
+Still unproved goals:
+EliminateMaximumNumberOfMonsters_Array_Spec	sorted_deadline_greedy_optimal
+EliminateMaximumNumberOfMonsters_Array_Spec	shift_for_insertion'vc
+EliminateMaximumNumberOfMonsters_Array_Spec	eliminate_maximum_number_of_monsters_array'vc
+VERIFY_RESULT: FAILURE
+VERIFY_REASON: unproved_goals_remain
+VERIFY_STAGE: stage3
+VERIFY_ROOT_TOTAL: 11
+VERIFY_ROOT_PROVED: 8
+VERIFY_ROOT_REMAINING: 3

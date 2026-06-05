@@ -1,0 +1,116 @@
+module FairCandySwap_List_Spec
+
+  use int.Int
+  use list.List
+  use list.Mem
+  use list.Sum
+
+  let rec predicate positive_sizes (sizes: list int)
+    variant { sizes }
+  =
+    match sizes with
+    | Nil -> true
+    | Cons x xs -> 1 <= x && positive_sizes xs
+    end
+
+  predicate valid_swap_pair
+    (aliceSizes: list int) (bobSizes: list int) (a: int) (b: int) =
+    mem a aliceSizes /\
+    mem b bobSizes /\
+    sum aliceSizes - a + b = sum bobSizes - b + a
+
+  predicate valid_swap_answer
+    (aliceSizes: list int) (bobSizes: list int) (answer: list int) =
+    exists a b: int.
+      answer = Cons a (Cons b Nil) /\
+      valid_swap_pair aliceSizes bobSizes a b
+
+  val fair_candy_swap_list (aliceSizes: list int) (bobSizes: list int) : list int
+    requires { positive_sizes aliceSizes }
+    requires { positive_sizes bobSizes }
+    requires { sum aliceSizes <> sum bobSizes }
+    requires { exists a b: int. valid_swap_pair aliceSizes bobSizes a b }
+    ensures  { valid_swap_answer aliceSizes bobSizes result }
+
+  let lemma check_test_002 () =
+    let aliceSizes = Cons 1 (Cons 1 Nil) in
+    let bobSizes = Cons 2 (Cons 2 Nil) in
+    let expected = Cons 1 (Cons 2 Nil) in
+    assert { sum aliceSizes = 2 };
+    assert { sum bobSizes = 4 };
+    assert { mem 1 aliceSizes };
+    assert { mem 2 bobSizes };
+    assert { valid_swap_pair aliceSizes bobSizes 1 2 };
+    assert { valid_swap_answer aliceSizes bobSizes expected }
+
+  let lemma check_test_003 () =
+    let aliceSizes = Cons 5 (Cons 4 (Cons 3 Nil)) in
+    let bobSizes = Cons 7 (Cons 8 (Cons 9 Nil)) in
+    let expected = Cons 3 (Cons 9 Nil) in
+    assert { sum aliceSizes = 12 };
+    assert { sum bobSizes = 24 };
+    assert { mem 3 aliceSizes };
+    assert { mem 9 bobSizes };
+    assert { valid_swap_pair aliceSizes bobSizes 3 9 };
+    assert { valid_swap_answer aliceSizes bobSizes expected }
+
+  let lemma check_test_006 () =
+    let aliceSizes = Cons 1 (Cons 2 (Cons 5 Nil)) in
+    let bobSizes = Cons 2 (Cons 4 Nil) in
+    let expected = Cons 5 (Cons 4 Nil) in
+    assert { sum aliceSizes = 8 };
+    assert { sum bobSizes = 6 };
+    assert { mem 5 aliceSizes };
+    assert { mem 4 bobSizes };
+    assert { valid_swap_pair aliceSizes bobSizes 5 4 };
+    assert { valid_swap_answer aliceSizes bobSizes expected }
+
+  let lemma check_test_008 () =
+    let aliceSizes = Cons 1 (Cons 2 Nil) in
+    let bobSizes = Cons 2 (Cons 3 Nil) in
+    let expected = Cons 1 (Cons 2 Nil) in
+    assert { sum aliceSizes = 3 };
+    assert { sum bobSizes = 5 };
+    assert { mem 1 aliceSizes };
+    assert { mem 2 bobSizes };
+    assert { valid_swap_pair aliceSizes bobSizes 1 2 };
+    assert { valid_swap_answer aliceSizes bobSizes expected }
+
+  let lemma check_test_010 () =
+    let aliceSizes = Cons 2 Nil in
+    let bobSizes = Cons 1 (Cons 3 Nil) in
+    let expected = Cons 2 (Cons 3 Nil) in
+    assert { sum aliceSizes = 2 };
+    assert { sum bobSizes = 4 };
+    assert { mem 2 aliceSizes };
+    assert { mem 3 bobSizes };
+    assert { valid_swap_pair aliceSizes bobSizes 2 3 };
+    assert { valid_swap_answer aliceSizes bobSizes expected }
+
+  let lemma check_test_011 () =
+    let aliceSizes = Cons 35 (Cons 17 (Cons 4 (Cons 24 (Cons 10 Nil)))) in
+    let bobSizes = Cons 66 (Cons 56 (Cons 5 (Cons 1 (Cons 58 Nil)))) in
+    let expected = Cons 10 (Cons 58 Nil) in
+    assert { sum aliceSizes = 90 };
+    assert { sum bobSizes = 186 };
+    assert { mem 10 aliceSizes };
+    assert { mem 58 bobSizes };
+    assert { valid_swap_pair aliceSizes bobSizes 10 58 };
+    assert { valid_swap_answer aliceSizes bobSizes expected }
+
+  let lemma check_test_015 () =
+    let aliceSizes =
+      Cons 5 (Cons 15 (Cons 25 (Cons 35 (Cons 45
+      (Cons 55 (Cons 65 (Cons 75 (Cons 85 (Cons 95 Nil))))))))) in
+    let bobSizes =
+      Cons 10 (Cons 20 (Cons 30 (Cons 40 (Cons 50
+      (Cons 60 (Cons 70 (Cons 80 (Cons 90 (Cons 100 Nil))))))))) in
+    let expected = Cons 5 (Cons 30 Nil) in
+    assert { sum aliceSizes = 500 };
+    assert { sum bobSizes = 550 };
+    assert { mem 5 aliceSizes };
+    assert { mem 30 bobSizes };
+    assert { valid_swap_pair aliceSizes bobSizes 5 30 };
+    assert { valid_swap_answer aliceSizes bobSizes expected }
+
+end

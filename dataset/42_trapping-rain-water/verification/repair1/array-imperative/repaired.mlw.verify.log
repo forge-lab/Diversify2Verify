@@ -1,0 +1,392 @@
+== Stage 1: first prover on whole file ==
+Running in /Users/rubenm/Desktop/Diversify2Verify/codex-runs/dataset-merge-verification/stage3a-repair/42_trapping-rain-water/array-imperative/trapping_rain_water_array_stage3_14ad86e3_stage3/generated/why3: why3 session create -o /Users/rubenm/Desktop/Diversify2Verify/codex-runs/dataset-merge-verification/stage3a-repair/42_trapping-rain-water/array-imperative/trapping_rain_water_array_stage3_14ad86e3_stage3/generated/why3/.why3_sessions/repaired_stage1 -P Z3,4.8.6 -t 10 -m 8192 repaired.mlw
+Session created successfully
+Running in /Users/rubenm/Desktop/Diversify2Verify/codex-runs/dataset-merge-verification/stage3a-repair/42_trapping-rain-water/array-imperative/trapping_rain_water_array_stage3_14ad86e3_stage3/generated/why3: why3 bench /Users/rubenm/Desktop/Diversify2Verify/codex-runs/dataset-merge-verification/stage3a-repair/42_trapping-rain-water/array-imperative/trapping_rain_water_array_stage3_14ad86e3_stage3/generated/why3/.why3_sessions/repaired_stage1
+Progress: 10/1/0                       Progress: 9/2/0                       Progress: 8/3/0                       Progress: 7/4/0                       Progress: 6/5/0                       Progress: 5/6/0                       Progress: 5/0/0                       Progress: 4/1/0                       Progress: 3/2/0                       Progress: 2/3/0                       Progress: 1/4/0                       Progress: 0/5/0                       Progress: 0/0/2                       Progress: 0/0/1                       
+Replay completed, saving session... done
+== Stage 1 stats ==
+= Statistics for session /Users/rubenm/Desktop/Diversify2Verify/codex-runs/dataset-merge-verification/stage3a-repair/42_trapping-rain-water/array-imperative/trapping_rain_water_array_stage3_14ad86e3_stage3/generated/why3/.why3_sessions/repaired_stage1
+
+== Number of root goals ==
+  total: 11  proved: 10
+
+== Number of sub goals ==
+  total: 0  proved: 0
+
+== Goals not proved ==
+  +-- file [../../repaired.mlw]
+    +-- theory TrappingRainWater_Array_Stage3_Imperative
+      +-- goal trapping_rain_water_array'vc
+  
+== Goals proved by only one prover ==
+  +-- file [../../repaired.mlw]
+    +-- theory TrappingRainWater_Array_Stage3_Imperative
+      +-- goal prefix_max_at'vc: Z3 4.8.6
+      +-- goal suffix_max_at'vc: Z3 4.8.6
+      +-- goal prefix_max_at_spec'vc: Z3 4.8.6
+      +-- goal suffix_max_at_spec'vc: Z3 4.8.6
+      +-- goal prefix_max_value_monotone'vc: Z3 4.8.6
+      +-- goal suffix_max_value_monotone'vc: Z3 4.8.6
+      +-- goal left_endpoint_zero_contribution'vc: Z3 4.8.6
+      +-- goal right_endpoint_zero_contribution'vc: Z3 4.8.6
+      +-- goal profile_sum_gives_total'vc: Z3 4.8.6
+      +-- goal small_input_zero_total'vc: Z3 4.8.6
+  
+1 session(s) read, with a total of 11 proof goals.
+== Unproved root goals after first prover ==
+TrappingRainWater_Array_Stage3_Imperative	trapping_rain_water_array'vc
+== Stage 1: trying remaining goals with prover Alt-Ergo,2.4.0 ==
+---- stage1 | prover: Alt-Ergo,2.4.0 | theory: TrappingRainWater_Array_Stage3_Imperative | goal: trapping_rain_water_array'vc ----
+File repaired.mlw:
+Goal trapping_rain_water_array'vc.
+Prover result is: Timeout (10.00s, 252992 steps).
+Remaining after prover Alt-Ergo,2.4.0: 1
+== Stage 1: trying remaining goals with prover CVC4,1.8 ==
+---- stage1 | prover: CVC4,1.8 | theory: TrappingRainWater_Array_Stage3_Imperative | goal: trapping_rain_water_array'vc ----
+File repaired.mlw:
+Goal trapping_rain_water_array'vc.
+Prover result is: Timeout (10.00s, 1550954 steps).
+Remaining after prover CVC4,1.8: 1
+== Goals still unproved after stage 1 ==
+TrappingRainWater_Array_Stage3_Imperative	trapping_rain_water_array'vc
+== Stage 2: split_vc on unproved goal ==
+Target theory: TrappingRainWater_Array_Stage3_Imperative
+Target goal  : trapping_rain_water_array'vc
+---- stage2 | prover: Z3,4.8.6 | theory: TrappingRainWater_Array_Stage3_Imperative | goal: trapping_rain_water_array'vc ----
+Transforms: split_vc
+File "repaired.mlw", line 197, characters 6-35:
+Sub-goal Precondition of goal trapping_rain_water_array'vc.
+Prover result is: Valid (0.01s, 2269 steps).
+
+File "repaired.mlw", line 197, characters 6-35:
+Sub-goal Precondition of goal trapping_rain_water_array'vc.
+Prover result is: Valid (0.01s, 2278 steps).
+
+File "repaired.mlw", line 193, characters 15-48:
+Sub-goal Postcondition of goal trapping_rain_water_array'vc.
+Prover result is: Valid (0.01s, 2274 steps).
+
+File "repaired.mlw", line 202, characters 25-34:
+Sub-goal Index in array bounds of goal trapping_rain_water_array'vc.
+Prover result is: Valid (0.01s, 32073 steps).
+
+File "repaired.mlw", line 203, characters 26-39:
+Sub-goal Index in array bounds of goal trapping_rain_water_array'vc.
+Prover result is: Valid (0.01s, 32123 steps).
+
+File "repaired.mlw", line 205, characters 24-32:
+Sub-goal Array creation size of goal trapping_rain_water_array'vc.
+Prover result is: Valid (0.01s, 32095 steps).
+
+File "repaired.mlw", line 206, characters 15-25:
+Sub-goal Assertion of goal trapping_rain_water_array'vc.
+Prover result is: Valid (0.01s, 32121 steps).
+
+File "repaired.mlw", line 207, characters 15-29:
+Sub-goal Assertion of goal trapping_rain_water_array'vc.
+Prover result is: Valid (0.01s, 32291 steps).
+
+File "repaired.mlw", line 208, characters 15-50:
+Sub-goal Assertion of goal trapping_rain_water_array'vc.
+Prover result is: Valid (0.01s, 34232 steps).
+
+File "repaired.mlw", line 209, characters 15-57:
+Sub-goal Assertion of goal trapping_rain_water_array'vc.
+Prover result is: Valid (0.01s, 35577 steps).
+
+File "repaired.mlw", line 210, characters 6-44:
+Sub-goal Precondition of goal trapping_rain_water_array'vc.
+Prover result is: Valid (0.01s, 2350 steps).
+
+File "repaired.mlw", line 211, characters 6-45:
+Sub-goal Precondition of goal trapping_rain_water_array'vc.
+Prover result is: Valid (0.01s, 2355 steps).
+
+File "repaired.mlw", line 212, characters 15-53:
+Sub-goal Assertion of goal trapping_rain_water_array'vc.
+Prover result is: Valid (0.01s, 35329 steps).
+
+File "repaired.mlw", line 213, characters 15-63:
+Sub-goal Assertion of goal trapping_rain_water_array'vc.
+Prover result is: Valid (0.01s, 35895 steps).
+
+File "repaired.mlw", line 215, characters 20-44:
+Sub-goal Loop invariant init of goal trapping_rain_water_array'vc.
+Prover result is: Valid (0.01s, 2394 steps).
+
+File "repaired.mlw", line 216, characters 20-59:
+Sub-goal Loop invariant init of goal trapping_rain_water_array'vc.
+Prover result is: Valid (0.01s, 2399 steps).
+
+File "repaired.mlw", line 217, characters 20-61:
+Sub-goal Loop invariant init of goal trapping_rain_water_array'vc.
+Prover result is: Valid (0.01s, 2408 steps).
+
+File "repaired.mlw", line 218, characters 20-36:
+Sub-goal Loop invariant init of goal trapping_rain_water_array'vc.
+Prover result is: Valid (0.01s, 2417 steps).
+
+File "repaired.mlw", line 219, characters 54-92:
+Sub-goal Loop invariant init of goal trapping_rain_water_array'vc.
+Prover result is: Valid (0.01s, 36644 steps).
+
+File "repaired.mlw", line 220, characters 54-92:
+Sub-goal Loop invariant init of goal trapping_rain_water_array'vc.
+Prover result is: Valid (0.01s, 37130 steps).
+
+File "repaired.mlw", line 221, characters 20-91:
+Sub-goal Loop invariant init of goal trapping_rain_water_array'vc.
+Prover result is: Valid (0.02s, 79899 steps).
+
+File "repaired.mlw", line 225, characters 19-33:
+Sub-goal Assertion of goal trapping_rain_water_array'vc.
+Prover result is: Valid (0.01s, 43246 steps).
+
+File "repaired.mlw", line 226, characters 13-26:
+Sub-goal Index in array bounds of goal trapping_rain_water_array'vc.
+Prover result is: Valid (0.01s, 3746 steps).
+
+File "repaired.mlw", line 227, characters 12-29:
+Sub-goal Index in array bounds of goal trapping_rain_water_array'vc.
+Prover result is: Valid (0.01s, 39416 steps).
+
+File "repaired.mlw", line 228, characters 21-64:
+Sub-goal Assertion of goal trapping_rain_water_array'vc.
+Prover result is: Valid (0.56s, 2778077 steps).
+
+File "repaired.mlw", line 229, characters 35-61:
+Sub-goal Precondition of goal trapping_rain_water_array'vc.
+Prover result is: Valid (0.01s, 3786 steps).
+
+File "repaired.mlw", line 230, characters 12-43:
+Sub-goal Precondition of goal trapping_rain_water_array'vc.
+Prover result is: Valid (0.01s, 3786 steps).
+
+File "repaired.mlw", line 231, characters 24-37:
+Sub-goal Index in array bounds of goal trapping_rain_water_array'vc.
+Prover result is: Valid (0.01s, 3803 steps).
+
+File "repaired.mlw", line 232, characters 21-60:
+Sub-goal Assertion of goal trapping_rain_water_array'vc.
+Prover result is: Valid (0.01s, 12779 steps).
+
+File "repaired.mlw", line 233, characters 21-61:
+Sub-goal Assertion of goal trapping_rain_water_array'vc.
+Prover result is: Valid (0.01s, 2605 steps).
+
+File "repaired.mlw", line 234, characters 21-62:
+Sub-goal Assertion of goal trapping_rain_water_array'vc.
+Prover result is: Valid (0.01s, 45659 steps).
+
+File "repaired.mlw", line 235, characters 21-73:
+Sub-goal Assertion of goal trapping_rain_water_array'vc.
+Prover result is: Valid (0.01s, 65410 steps).
+
+File "repaired.mlw", line 236, characters 21-67:
+Sub-goal Assertion of goal trapping_rain_water_array'vc.
+Prover result is: Valid (0.02s, 66321 steps).
+
+File "repaired.mlw", line 222, characters 20-34:
+Sub-goal Loop variant decrease of goal trapping_rain_water_array'vc.
+Prover result is: Valid (0.01s, 19427 steps).
+
+File "repaired.mlw", line 215, characters 20-44:
+Sub-goal Loop invariant preservation of goal trapping_rain_water_array'vc.
+Prover result is: Valid (0.01s, 40108 steps).
+
+File "repaired.mlw", line 216, characters 20-59:
+Sub-goal Loop invariant preservation of goal trapping_rain_water_array'vc.
+Prover result is: Valid (0.01s, 2668 steps).
+
+File "repaired.mlw", line 217, characters 20-61:
+Sub-goal Loop invariant preservation of goal trapping_rain_water_array'vc.
+Prover result is: Valid (0.01s, 2673 steps).
+
+File "repaired.mlw", line 218, characters 20-36:
+Sub-goal Loop invariant preservation of goal trapping_rain_water_array'vc.
+Prover result is: Valid (0.01s, 46217 steps).
+
+File "repaired.mlw", line 219, characters 54-92:
+Sub-goal Loop invariant preservation of goal trapping_rain_water_array'vc.
+Prover result is: Valid (2.10s, 14126993 steps).
+
+File "repaired.mlw", line 220, characters 54-92:
+Sub-goal Loop invariant preservation of goal trapping_rain_water_array'vc.
+Prover result is: Valid (0.52s, 2598792 steps).
+
+File "repaired.mlw", line 221, characters 20-91:
+Sub-goal Loop invariant preservation of goal trapping_rain_water_array'vc.
+Prover result is: Valid (2.79s, 16629659 steps).
+
+File "repaired.mlw", line 238, characters 21-60:
+Sub-goal Assertion of goal trapping_rain_water_array'vc.
+Prover result is: Timeout (10.00s, 38849291 steps).
+
+File "repaired.mlw", line 239, characters 35-61:
+Sub-goal Precondition of goal trapping_rain_water_array'vc.
+Prover result is: Valid (0.01s, 3784 steps).
+
+File "repaired.mlw", line 240, characters 12-43:
+Sub-goal Precondition of goal trapping_rain_water_array'vc.
+Prover result is: Valid (0.01s, 3784 steps).
+
+File "repaired.mlw", line 241, characters 12-79:
+Sub-goal Precondition of goal trapping_rain_water_array'vc.
+Prover result is: Valid (0.01s, 2603 steps).
+
+File "repaired.mlw", line 241, characters 12-79:
+Sub-goal Precondition of goal trapping_rain_water_array'vc.
+Prover result is: Valid (0.01s, 2608 steps).
+
+File "repaired.mlw", line 241, characters 12-79:
+Sub-goal Precondition of goal trapping_rain_water_array'vc.
+Prover result is: Valid (0.01s, 39498 steps).
+
+File "repaired.mlw", line 242, characters 21-44:
+Sub-goal Assertion of goal trapping_rain_water_array'vc.
+Prover result is: Valid (0.01s, 39632 steps).
+
+File "repaired.mlw", line 243, characters 21-57:
+Sub-goal Assertion of goal trapping_rain_water_array'vc.
+Prover result is: Valid (0.01s, 45067 steps).
+
+File "repaired.mlw", line 244, characters 40-53:
+Sub-goal Index in array bounds of goal trapping_rain_water_array'vc.
+Prover result is: Valid (0.01s, 3838 steps).
+
+File "repaired.mlw", line 244, characters 12-53:
+Sub-goal Index in array bounds of goal trapping_rain_water_array'vc.
+Prover result is: Valid (0.01s, 40000 steps).
+
+File "repaired.mlw", line 245, characters 43-56:
+Sub-goal Index in array bounds of goal trapping_rain_water_array'vc.
+Prover result is: Valid (0.01s, 3862 steps).
+
+File "repaired.mlw", line 246, characters 21-67:
+Sub-goal Assertion of goal trapping_rain_water_array'vc.
+Prover result is: Valid (0.86s, 5243626 steps).
+
+File "repaired.mlw", line 222, characters 20-34:
+Sub-goal Loop variant decrease of goal trapping_rain_water_array'vc.
+Prover result is: Valid (0.01s, 19426 steps).
+
+File "repaired.mlw", line 215, characters 20-44:
+Sub-goal Loop invariant preservation of goal trapping_rain_water_array'vc.
+Prover result is: Valid (0.01s, 40133 steps).
+
+File "repaired.mlw", line 216, characters 20-59:
+Sub-goal Loop invariant preservation of goal trapping_rain_water_array'vc.
+Prover result is: Valid (0.01s, 2665 steps).
+
+File "repaired.mlw", line 217, characters 20-61:
+Sub-goal Loop invariant preservation of goal trapping_rain_water_array'vc.
+Prover result is: Valid (0.01s, 2670 steps).
+
+File "repaired.mlw", line 218, characters 20-36:
+Sub-goal Loop invariant preservation of goal trapping_rain_water_array'vc.
+Prover result is: Valid (0.01s, 46171 steps).
+
+File "repaired.mlw", line 219, characters 54-92:
+Sub-goal Loop invariant preservation of goal trapping_rain_water_array'vc.
+Prover result is: Valid (0.06s, 314688 steps).
+
+File "repaired.mlw", line 220, characters 54-92:
+Sub-goal Loop invariant preservation of goal trapping_rain_water_array'vc.
+Prover result is: Valid (0.03s, 148217 steps).
+
+File "repaired.mlw", line 221, characters 20-91:
+Sub-goal Loop invariant preservation of goal trapping_rain_water_array'vc.
+Prover result is: Timeout (10.00s, 65965412 steps).
+
+File "repaired.mlw", line 250, characters 19-34:
+Sub-goal Assertion of goal trapping_rain_water_array'vc.
+Prover result is: Valid (0.01s, 42949 steps).
+
+File "repaired.mlw", line 251, characters 13-27:
+Sub-goal Index in array bounds of goal trapping_rain_water_array'vc.
+Prover result is: Valid (0.01s, 3762 steps).
+
+File "repaired.mlw", line 252, characters 12-30:
+Sub-goal Index in array bounds of goal trapping_rain_water_array'vc.
+Prover result is: Valid (0.01s, 39393 steps).
+
+File "repaired.mlw", line 253, characters 34-61:
+Sub-goal Precondition of goal trapping_rain_water_array'vc.
+Prover result is: Valid (0.01s, 3791 steps).
+
+File "repaired.mlw", line 254, characters 12-44:
+Sub-goal Precondition of goal trapping_rain_water_array'vc.
+Prover result is: Valid (0.01s, 3791 steps).
+Infrastructure issue in stage 2 with prover Z3,4.8.6; aborting rest of stage 2.
+== Goals still unproved after stage 2 (split_vc) ==
+TrappingRainWater_Array_Stage3_Imperative	trapping_rain_water_array'vc
+== Stage 3: split_vc + inline_all on still-unproved goal ==
+Target theory: TrappingRainWater_Array_Stage3_Imperative
+Target goal  : trapping_rain_water_array'vc
+---- stage3 | prover: Alt-Ergo,2.4.0 | theory: TrappingRainWater_Array_Stage3_Imperative | goal: trapping_rain_water_array'vc ----
+Transforms: split_vc inline_all
+File "repaired.mlw", line 197, characters 6-35:
+Sub-goal Precondition of goal trapping_rain_water_array'vc.
+Prover result is: Valid (0.01s, 30 steps).
+
+File "repaired.mlw", line 197, characters 6-35:
+Sub-goal Precondition of goal trapping_rain_water_array'vc.
+Prover result is: Valid (0.01s, 4 steps).
+
+File "repaired.mlw", line 193, characters 15-48:
+Sub-goal Postcondition of goal trapping_rain_water_array'vc.
+Prover result is: Timeout (10.00s, 248007 steps).
+
+File "repaired.mlw", line 202, characters 25-34:
+Sub-goal Index in array bounds of goal trapping_rain_water_array'vc.
+Prover result is: Valid (0.01s, 6 steps).
+
+File "repaired.mlw", line 203, characters 26-39:
+Sub-goal Index in array bounds of goal trapping_rain_water_array'vc.
+Prover result is: Valid (0.01s, 7 steps).
+
+File "repaired.mlw", line 205, characters 24-32:
+Sub-goal Array creation size of goal trapping_rain_water_array'vc.
+Prover result is: Valid (0.01s, 7 steps).
+
+File "repaired.mlw", line 206, characters 15-25:
+Sub-goal Assertion of goal trapping_rain_water_array'vc.
+Prover result is: Valid (0.01s, 10 steps).
+
+File "repaired.mlw", line 207, characters 15-29:
+Sub-goal Assertion of goal trapping_rain_water_array'vc.
+Prover result is: Valid (0.01s, 10 steps).
+
+File "repaired.mlw", line 208, characters 15-50:
+Sub-goal Assertion of goal trapping_rain_water_array'vc.
+Prover result is: Valid (0.02s, 286 steps).
+
+File "repaired.mlw", line 209, characters 15-57:
+Sub-goal Assertion of goal trapping_rain_water_array'vc.
+Prover result is: Valid (0.02s, 384 steps).
+
+File "repaired.mlw", line 210, characters 6-44:
+Sub-goal Precondition of goal trapping_rain_water_array'vc.
+Prover result is: Valid (0.01s, 22 steps).
+
+File "repaired.mlw", line 211, characters 6-45:
+Sub-goal Precondition of goal trapping_rain_water_array'vc.
+Prover result is: Valid (0.01s, 47 steps).
+
+File "repaired.mlw", line 212, characters 15-53:
+Sub-goal Assertion of goal trapping_rain_water_array'vc.
+Prover result is: Timeout (10.00s, 224345 steps).
+Infrastructure issue in stage 3 with prover Alt-Ergo,2.4.0; aborting rest of stage 3.
+== Final summary ==
+Unproved root goals after first prover : 1
+Remaining failures after split_vc      : 1
+Remaining failures after stage 3       : 1
+Detailed logs stored in                : /Users/rubenm/Desktop/Diversify2Verify/codex-runs/dataset-merge-verification/stage3a-repair/42_trapping-rain-water/array-imperative/trapping_rain_water_array_stage3_14ad86e3_stage3/generated/why3/.why3_sessions/repaired_logs
+Still unproved goals:
+TrappingRainWater_Array_Stage3_Imperative	trapping_rain_water_array'vc
+VERIFY_RESULT: FAILURE
+VERIFY_REASON: unproved_goals_remain
+VERIFY_STAGE: stage3
+VERIFY_ROOT_TOTAL: 11
+VERIFY_ROOT_PROVED: 10
+VERIFY_ROOT_REMAINING: 1

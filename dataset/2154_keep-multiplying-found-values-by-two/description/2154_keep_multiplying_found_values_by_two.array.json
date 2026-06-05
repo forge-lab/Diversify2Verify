@@ -1,0 +1,2723 @@
+{
+  "task": {
+    "task_id": "keep-multiplying-found-values-by-two",
+    "question_id": 2154,
+    "difficulty": "Easy",
+    "source_file": "bench1/2154.json"
+  },
+  "target": {
+    "name": "array",
+    "language": "why3",
+    "module_name": "KeepMultiplyingFoundValuesByTwo_Array_Spec",
+    "output_file": "generated/why3/array/keep_multiplying_found_values_by_two_array.mlw",
+    "signature": {
+      "raw": "val keep_multiplying_found_values_by_two_array (nums: array int) (original: int) : int",
+      "function_name": "keep_multiplying_found_values_by_two_array",
+      "parameters": [
+        {
+          "name": "nums",
+          "why3_type": "array int",
+          "semantic_type": "int_sequence"
+        },
+        {
+          "name": "original",
+          "why3_type": "int",
+          "semantic_type": "int"
+        }
+      ],
+      "return": {
+        "why3_type": "int",
+        "semantic_type": "int"
+      }
+    }
+  },
+  "problem": {
+    "description": "You are given an array of integers nums. You are also given an integer original which is the first number that needs to be searched for in nums.\nYou then do the following steps:\n\nIf original is found in nums, multiply it by two (i.e., set original = 2 * original).\nOtherwise, stop the process.\nRepeat this process with the new number as long as you keep finding the number.\n\nReturn the final value of original.\n \nExample 1:\n\nInput: nums = [5,3,6,1,12], original = 3\nOutput: 24\nExplanation: \n- 3 is found in nums. 3 is multiplied by 2 to obtain 6.\n- 6 is found in nums. 6 is multiplied by 2 to obtain 12.\n- 12 is found in nums. 12 is multiplied by 2 to obtain 24.\n- 24 is not found in nums. Thus, 24 is returned.\n\nExample 2:\n\nInput: nums = [2,7,9], original = 4\nOutput: 4\nExplanation:\n- 4 is not found in nums. Thus, 4 is returned.\n\n \nConstraints:\n\n1 <= nums.length <= 1000\n1 <= nums[i], original <= 1000\n\n"
+  },
+  "tests": [
+    {
+      "id": "test_000",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums": [
+          10,
+          20,
+          30,
+          40,
+          50
+        ],
+        "original": 5
+      },
+      "expected": 5,
+      "warnings": []
+    },
+    {
+      "id": "test_001",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums": [
+          1000,
+          500,
+          250,
+          125,
+          625
+        ],
+        "original": 5
+      },
+      "expected": 5,
+      "warnings": []
+    },
+    {
+      "id": "test_002",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums": [
+          3,
+          6,
+          9,
+          12,
+          15
+        ],
+        "original": 3
+      },
+      "expected": 24,
+      "warnings": []
+    },
+    {
+      "id": "test_003",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums": [
+          1,
+          2,
+          4,
+          8
+        ],
+        "original": 1
+      },
+      "expected": 16,
+      "warnings": []
+    },
+    {
+      "id": "test_004",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums": [
+          8,
+          16,
+          32,
+          64,
+          128
+        ],
+        "original": 8
+      },
+      "expected": 256,
+      "warnings": []
+    },
+    {
+      "id": "test_005",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums": [
+          2,
+          7,
+          9
+        ],
+        "original": 4
+      },
+      "expected": 4,
+      "warnings": []
+    },
+    {
+      "id": "test_006",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums": [
+          1000,
+          1000,
+          1000,
+          1000,
+          1000
+        ],
+        "original": 1000
+      },
+      "expected": 2000,
+      "warnings": []
+    },
+    {
+      "id": "test_007",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums": [
+          1,
+          3,
+          5,
+          7,
+          9
+        ],
+        "original": 2
+      },
+      "expected": 2,
+      "warnings": []
+    },
+    {
+      "id": "test_008",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums": [
+          10,
+          20,
+          30,
+          40,
+          50
+        ],
+        "original": 10
+      },
+      "expected": 80,
+      "warnings": []
+    },
+    {
+      "id": "test_009",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums": [
+          2,
+          2,
+          2,
+          2,
+          2
+        ],
+        "original": 2
+      },
+      "expected": 4,
+      "warnings": []
+    },
+    {
+      "id": "test_010",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums": [
+          8,
+          16,
+          32,
+          64,
+          128,
+          256,
+          512
+        ],
+        "original": 4
+      },
+      "expected": 4,
+      "warnings": []
+    },
+    {
+      "id": "test_011",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums": [
+          1000,
+          500,
+          250,
+          125,
+          62,
+          31
+        ],
+        "original": 1
+      },
+      "expected": 1,
+      "warnings": []
+    },
+    {
+      "id": "test_012",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums": [
+          1,
+          1,
+          1,
+          1,
+          1
+        ],
+        "original": 1
+      },
+      "expected": 2,
+      "warnings": []
+    },
+    {
+      "id": "test_013",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums": [
+          1,
+          2,
+          4,
+          8,
+          16
+        ],
+        "original": 1
+      },
+      "expected": 32,
+      "warnings": []
+    },
+    {
+      "id": "test_014",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums": [
+          4,
+          8,
+          16,
+          32,
+          64
+        ],
+        "original": 2
+      },
+      "expected": 2,
+      "warnings": []
+    },
+    {
+      "id": "test_015",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums": [
+          5,
+          3,
+          6,
+          1,
+          12
+        ],
+        "original": 3
+      },
+      "expected": 24,
+      "warnings": []
+    },
+    {
+      "id": "test_016",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums": [
+          1000,
+          500,
+          250,
+          125
+        ],
+        "original": 125
+      },
+      "expected": 2000,
+      "warnings": []
+    },
+    {
+      "id": "test_017",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums": [
+          10,
+          20,
+          40,
+          80,
+          160
+        ],
+        "original": 10
+      },
+      "expected": 320,
+      "warnings": []
+    },
+    {
+      "id": "test_018",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums": [
+          7,
+          14,
+          28,
+          56,
+          112
+        ],
+        "original": 7
+      },
+      "expected": 224,
+      "warnings": []
+    },
+    {
+      "id": "test_019",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums": [
+          1,
+          3,
+          5,
+          7,
+          9
+        ],
+        "original": 1
+      },
+      "expected": 2,
+      "warnings": []
+    },
+    {
+      "id": "test_020",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums": [
+          7,
+          14,
+          28,
+          56,
+          112,
+          224,
+          448
+        ],
+        "original": 7
+      },
+      "expected": 896,
+      "warnings": []
+    },
+    {
+      "id": "test_021",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums": [
+          3,
+          6,
+          9,
+          12,
+          15,
+          18,
+          21
+        ],
+        "original": 3
+      },
+      "expected": 24,
+      "warnings": []
+    },
+    {
+      "id": "test_022",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums": [
+          10,
+          20,
+          30,
+          40,
+          50,
+          60,
+          70,
+          80,
+          90,
+          100,
+          110,
+          120,
+          130,
+          140,
+          150
+        ],
+        "original": 10
+      },
+      "expected": 160,
+      "warnings": []
+    },
+    {
+      "id": "test_023",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums": [
+          13,
+          26,
+          52,
+          104,
+          208,
+          416,
+          832,
+          1664,
+          3328,
+          6656
+        ],
+        "original": 13
+      },
+      "expected": 13312,
+      "warnings": []
+    },
+    {
+      "id": "test_024",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums": [
+          9,
+          18,
+          36,
+          72,
+          144,
+          288,
+          576,
+          1152,
+          2304
+        ],
+        "original": 9
+      },
+      "expected": 4608,
+      "warnings": []
+    },
+    {
+      "id": "test_025",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums": [
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1
+        ],
+        "original": 1
+      },
+      "expected": 2,
+      "warnings": []
+    },
+    {
+      "id": "test_026",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums": [
+          2,
+          3,
+          5,
+          6,
+          7,
+          10,
+          11,
+          13,
+          14,
+          17,
+          19,
+          21,
+          22,
+          23,
+          26,
+          29,
+          31
+        ],
+        "original": 2
+      },
+      "expected": 4,
+      "warnings": []
+    },
+    {
+      "id": "test_027",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums": [
+          9,
+          18,
+          27,
+          36,
+          45,
+          54,
+          63,
+          72,
+          81,
+          90,
+          99,
+          108,
+          117,
+          126,
+          135,
+          144,
+          153,
+          162,
+          171,
+          180
+        ],
+        "original": 9
+      },
+      "expected": 288,
+      "warnings": []
+    },
+    {
+      "id": "test_028",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums": [
+          11,
+          22,
+          44,
+          88,
+          176,
+          352,
+          704,
+          1408,
+          2816,
+          5632
+        ],
+        "original": 11
+      },
+      "expected": 11264,
+      "warnings": []
+    },
+    {
+      "id": "test_029",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums": [
+          4,
+          8,
+          16,
+          32,
+          64,
+          128,
+          256,
+          512,
+          1024
+        ],
+        "original": 4
+      },
+      "expected": 2048,
+      "warnings": []
+    },
+    {
+      "id": "test_030",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums": [
+          2,
+          4,
+          6,
+          8,
+          10,
+          12,
+          14,
+          16,
+          18,
+          20,
+          22,
+          24,
+          26,
+          28,
+          30
+        ],
+        "original": 2
+      },
+      "expected": 32,
+      "warnings": []
+    },
+    {
+      "id": "test_031",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums": [
+          1,
+          3,
+          5,
+          7,
+          9,
+          11,
+          13,
+          15,
+          17,
+          19
+        ],
+        "original": 2
+      },
+      "expected": 2,
+      "warnings": []
+    },
+    {
+      "id": "test_032",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums": [
+          4,
+          8,
+          12,
+          16,
+          20,
+          24,
+          28,
+          32,
+          36,
+          40,
+          44,
+          48,
+          52,
+          56,
+          60,
+          64,
+          68,
+          72,
+          76,
+          80
+        ],
+        "original": 4
+      },
+      "expected": 128,
+      "warnings": []
+    },
+    {
+      "id": "test_033",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums": [
+          1,
+          3,
+          5,
+          7,
+          9,
+          11,
+          13,
+          15,
+          17,
+          19,
+          21,
+          23,
+          25,
+          27,
+          29,
+          31,
+          33,
+          35,
+          37,
+          39,
+          41,
+          43,
+          45,
+          47,
+          49,
+          51,
+          53,
+          55,
+          57,
+          59
+        ],
+        "original": 1
+      },
+      "expected": 2,
+      "warnings": []
+    },
+    {
+      "id": "test_034",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums": [
+          1,
+          3,
+          5,
+          7,
+          9,
+          11,
+          13,
+          15,
+          17,
+          19,
+          21,
+          23,
+          25,
+          27,
+          29,
+          31,
+          33,
+          35,
+          37,
+          39
+        ],
+        "original": 1
+      },
+      "expected": 2,
+      "warnings": []
+    },
+    {
+      "id": "test_035",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums": [
+          1,
+          2,
+          4,
+          8,
+          16,
+          32,
+          64,
+          128,
+          256,
+          512,
+          1024
+        ],
+        "original": 1
+      },
+      "expected": 2048,
+      "warnings": []
+    },
+    {
+      "id": "test_036",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums": [
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1
+        ],
+        "original": 1
+      },
+      "expected": 2,
+      "warnings": []
+    },
+    {
+      "id": "test_037",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums": [
+          2,
+          3,
+          5,
+          7,
+          11,
+          13,
+          17,
+          19,
+          23,
+          29,
+          31,
+          37,
+          41,
+          43,
+          47,
+          53,
+          59,
+          61,
+          67,
+          71
+        ],
+        "original": 2
+      },
+      "expected": 4,
+      "warnings": []
+    },
+    {
+      "id": "test_038",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums": [
+          4,
+          8,
+          16,
+          32,
+          64,
+          128,
+          256,
+          512,
+          1024,
+          2048,
+          4096,
+          8192,
+          16384,
+          32768
+        ],
+        "original": 4
+      },
+      "expected": 65536,
+      "warnings": []
+    },
+    {
+      "id": "test_039",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums": [
+          15,
+          30,
+          45,
+          60,
+          75,
+          90,
+          105,
+          120,
+          135,
+          150,
+          165,
+          180,
+          195,
+          210,
+          225,
+          240,
+          255,
+          270,
+          285,
+          300
+        ],
+        "original": 15
+      },
+      "expected": 480,
+      "warnings": []
+    },
+    {
+      "id": "test_040",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums": [
+          10,
+          20,
+          30,
+          40,
+          50,
+          60,
+          70,
+          80,
+          90,
+          100
+        ],
+        "original": 10
+      },
+      "expected": 160,
+      "warnings": []
+    },
+    {
+      "id": "test_041",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums": [
+          1,
+          2,
+          4,
+          8,
+          16,
+          32,
+          64,
+          128,
+          256,
+          512
+        ],
+        "original": 1
+      },
+      "expected": 1024,
+      "warnings": []
+    },
+    {
+      "id": "test_042",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums": [
+          4,
+          9,
+          16,
+          25,
+          36,
+          49,
+          64,
+          81,
+          100,
+          121,
+          144
+        ],
+        "original": 4
+      },
+      "expected": 8,
+      "warnings": []
+    },
+    {
+      "id": "test_043",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums": [
+          6,
+          12,
+          24,
+          48,
+          96,
+          192,
+          384,
+          768,
+          1536,
+          3072,
+          6144,
+          12288,
+          24576,
+          49152
+        ],
+        "original": 6
+      },
+      "expected": 98304,
+      "warnings": []
+    },
+    {
+      "id": "test_044",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20
+        ],
+        "original": 1
+      },
+      "expected": 32,
+      "warnings": []
+    },
+    {
+      "id": "test_045",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums": [
+          13,
+          26,
+          52,
+          104,
+          208,
+          416,
+          832,
+          1664,
+          3328
+        ],
+        "original": 13
+      },
+      "expected": 6656,
+      "warnings": []
+    },
+    {
+      "id": "test_046",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums": [
+          500,
+          1000,
+          1500,
+          2000,
+          2500,
+          3000,
+          3500,
+          4000,
+          4500,
+          5000
+        ],
+        "original": 500
+      },
+      "expected": 8000,
+      "warnings": []
+    },
+    {
+      "id": "test_047",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums": [
+          10,
+          20,
+          30,
+          40,
+          50,
+          60,
+          70,
+          80,
+          90,
+          100,
+          110,
+          120,
+          130,
+          140,
+          150,
+          160,
+          170,
+          180,
+          190,
+          200,
+          210,
+          220,
+          230,
+          240,
+          250,
+          260,
+          270,
+          280,
+          290,
+          300
+        ],
+        "original": 10
+      },
+      "expected": 320,
+      "warnings": []
+    },
+    {
+      "id": "test_048",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums": [
+          3,
+          9,
+          27,
+          81,
+          243,
+          729
+        ],
+        "original": 3
+      },
+      "expected": 6,
+      "warnings": []
+    },
+    {
+      "id": "test_049",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums": [
+          1,
+          3,
+          5,
+          7,
+          9,
+          11,
+          13,
+          15,
+          17,
+          19,
+          21,
+          23,
+          25,
+          27,
+          29,
+          31,
+          33,
+          35,
+          37,
+          39,
+          41,
+          43,
+          45,
+          47,
+          49
+        ],
+        "original": 1
+      },
+      "expected": 2,
+      "warnings": []
+    },
+    {
+      "id": "test_050",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums": [
+          29,
+          58,
+          116,
+          232,
+          464,
+          928,
+          1856
+        ],
+        "original": 29
+      },
+      "expected": 3712,
+      "warnings": []
+    },
+    {
+      "id": "test_051",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums": [
+          13,
+          26,
+          39,
+          52,
+          65,
+          78,
+          91,
+          104,
+          117,
+          130
+        ],
+        "original": 13
+      },
+      "expected": 208,
+      "warnings": []
+    },
+    {
+      "id": "test_052",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums": [
+          7,
+          14,
+          21,
+          28,
+          35,
+          42,
+          49,
+          56,
+          63,
+          70
+        ],
+        "original": 7
+      },
+      "expected": 112,
+      "warnings": []
+    },
+    {
+      "id": "test_053",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums": [
+          5,
+          10,
+          20,
+          40,
+          80,
+          160,
+          320,
+          640,
+          1280
+        ],
+        "original": 5
+      },
+      "expected": 2560,
+      "warnings": []
+    },
+    {
+      "id": "test_054",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums": [
+          3,
+          9,
+          27,
+          81,
+          243,
+          729,
+          2187,
+          6561
+        ],
+        "original": 3
+      },
+      "expected": 6,
+      "warnings": []
+    },
+    {
+      "id": "test_055",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums": [
+          11,
+          22,
+          44,
+          88,
+          176,
+          352,
+          704,
+          1408,
+          2816,
+          5632,
+          11264,
+          22528,
+          45056,
+          90112
+        ],
+        "original": 11
+      },
+      "expected": 180224,
+      "warnings": []
+    },
+    {
+      "id": "test_056",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums": [
+          10,
+          20,
+          40,
+          80,
+          160,
+          320,
+          640,
+          1280,
+          2560
+        ],
+        "original": 10
+      },
+      "expected": 5120,
+      "warnings": []
+    },
+    {
+      "id": "test_057",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums": [
+          11,
+          22,
+          33,
+          44,
+          55,
+          66,
+          77,
+          88,
+          99,
+          110,
+          121,
+          132,
+          143,
+          154,
+          165,
+          176,
+          187,
+          198,
+          209,
+          220
+        ],
+        "original": 11
+      },
+      "expected": 352,
+      "warnings": []
+    },
+    {
+      "id": "test_058",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums": [
+          10,
+          20,
+          30,
+          40,
+          50,
+          60,
+          70,
+          80,
+          90,
+          100,
+          110,
+          120,
+          130,
+          140,
+          150,
+          160,
+          170,
+          180,
+          190,
+          200
+        ],
+        "original": 10
+      },
+      "expected": 320,
+      "warnings": []
+    },
+    {
+      "id": "test_059",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums": [
+          500,
+          1000,
+          1500,
+          2000,
+          2500,
+          3000,
+          3500,
+          4000,
+          4500,
+          5000
+        ],
+        "original": 500
+      },
+      "expected": 8000,
+      "warnings": []
+    },
+    {
+      "id": "test_060",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums": [
+          5,
+          10,
+          15,
+          20,
+          25,
+          30,
+          35,
+          40,
+          45,
+          50
+        ],
+        "original": 5
+      },
+      "expected": 80,
+      "warnings": []
+    },
+    {
+      "id": "test_061",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums": [
+          7,
+          14,
+          21,
+          28,
+          35,
+          42,
+          49,
+          56,
+          63,
+          70,
+          77,
+          84,
+          91,
+          98,
+          105
+        ],
+        "original": 7
+      },
+      "expected": 112,
+      "warnings": []
+    },
+    {
+      "id": "test_062",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums": [
+          13,
+          26,
+          52,
+          104,
+          208,
+          416,
+          832,
+          1664,
+          3328,
+          6656,
+          13312
+        ],
+        "original": 13
+      },
+      "expected": 26624,
+      "warnings": []
+    },
+    {
+      "id": "test_063",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums": [
+          250,
+          500,
+          1000,
+          2000,
+          4000,
+          8000,
+          16000,
+          32000,
+          64000,
+          128000
+        ],
+        "original": 250
+      },
+      "expected": 256000,
+      "warnings": []
+    },
+    {
+      "id": "test_064",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums": [
+          15,
+          30,
+          60,
+          120,
+          240,
+          480,
+          960,
+          1920,
+          3840
+        ],
+        "original": 15
+      },
+      "expected": 7680,
+      "warnings": []
+    },
+    {
+      "id": "test_065",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums": [
+          19,
+          38,
+          76,
+          152,
+          304,
+          608,
+          1216,
+          2432,
+          4864,
+          9728
+        ],
+        "original": 19
+      },
+      "expected": 19456,
+      "warnings": []
+    },
+    {
+      "id": "test_066",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums": [
+          2,
+          4,
+          6,
+          8,
+          10,
+          12,
+          14,
+          16,
+          18,
+          20
+        ],
+        "original": 1
+      },
+      "expected": 1,
+      "warnings": []
+    },
+    {
+      "id": "test_067",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10
+        ],
+        "original": 1
+      },
+      "expected": 16,
+      "warnings": []
+    },
+    {
+      "id": "test_068",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums": [
+          6,
+          12,
+          18,
+          24,
+          30,
+          36,
+          42,
+          48,
+          54,
+          60,
+          66
+        ],
+        "original": 6
+      },
+      "expected": 96,
+      "warnings": []
+    },
+    {
+      "id": "test_069",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums": [
+          7,
+          14,
+          28,
+          56,
+          112,
+          224,
+          448,
+          896,
+          1792
+        ],
+        "original": 7
+      },
+      "expected": 3584,
+      "warnings": []
+    },
+    {
+      "id": "test_070",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums": [
+          1,
+          3,
+          5,
+          7,
+          9,
+          11,
+          13,
+          15,
+          17,
+          19,
+          21,
+          23,
+          25,
+          27,
+          29,
+          31,
+          33,
+          35,
+          37,
+          39,
+          41,
+          43,
+          45,
+          47,
+          49,
+          51,
+          53,
+          55,
+          57,
+          59,
+          61,
+          63,
+          65,
+          67,
+          69,
+          71,
+          73,
+          75,
+          77,
+          79,
+          81,
+          83,
+          85,
+          87,
+          89,
+          91,
+          93,
+          95,
+          97,
+          99
+        ],
+        "original": 1
+      },
+      "expected": 2,
+      "warnings": []
+    },
+    {
+      "id": "test_071",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums": [
+          6,
+          12,
+          18,
+          24,
+          30,
+          36,
+          42,
+          48,
+          54,
+          60,
+          66,
+          72,
+          78,
+          84,
+          90,
+          96,
+          102,
+          108,
+          114,
+          120,
+          126,
+          132,
+          138,
+          144,
+          150,
+          156,
+          162,
+          168,
+          174,
+          180
+        ],
+        "original": 6
+      },
+      "expected": 192,
+      "warnings": []
+    },
+    {
+      "id": "test_072",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums": [
+          13,
+          26,
+          52,
+          104,
+          208,
+          416,
+          832
+        ],
+        "original": 13
+      },
+      "expected": 1664,
+      "warnings": []
+    },
+    {
+      "id": "test_073",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums": [
+          2,
+          6,
+          18,
+          54,
+          162,
+          486,
+          1458,
+          4374,
+          13122,
+          39366
+        ],
+        "original": 2
+      },
+      "expected": 4,
+      "warnings": []
+    },
+    {
+      "id": "test_074",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums": [
+          1,
+          3,
+          9,
+          27,
+          81,
+          243,
+          729,
+          2187,
+          6561
+        ],
+        "original": 1
+      },
+      "expected": 2,
+      "warnings": []
+    },
+    {
+      "id": "test_075",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums": [
+          11,
+          22,
+          44,
+          88,
+          176,
+          352,
+          704,
+          1408,
+          2816
+        ],
+        "original": 11
+      },
+      "expected": 5632,
+      "warnings": []
+    },
+    {
+      "id": "test_076",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums": [
+          1000,
+          500,
+          250,
+          125,
+          62,
+          31,
+          15,
+          7,
+          3,
+          1
+        ],
+        "original": 1
+      },
+      "expected": 2,
+      "warnings": []
+    },
+    {
+      "id": "test_077",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums": [
+          5,
+          10,
+          15,
+          20,
+          25,
+          30,
+          35,
+          40,
+          45,
+          50
+        ],
+        "original": 5
+      },
+      "expected": 80,
+      "warnings": []
+    },
+    {
+      "id": "test_078",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums": [
+          7,
+          14,
+          28,
+          56,
+          112,
+          224,
+          448,
+          896,
+          1792,
+          3584
+        ],
+        "original": 7
+      },
+      "expected": 7168,
+      "warnings": []
+    },
+    {
+      "id": "test_079",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums": [
+          15,
+          30,
+          45,
+          60,
+          75,
+          90,
+          105,
+          120,
+          135,
+          150
+        ],
+        "original": 15
+      },
+      "expected": 240,
+      "warnings": []
+    },
+    {
+      "id": "test_080",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums": [
+          7,
+          14,
+          21,
+          28,
+          35,
+          42,
+          49,
+          56,
+          63,
+          70,
+          77,
+          84,
+          91,
+          98,
+          105,
+          112,
+          119,
+          126,
+          133,
+          140
+        ],
+        "original": 7
+      },
+      "expected": 224,
+      "warnings": []
+    },
+    {
+      "id": "test_081",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums": [
+          999,
+          998,
+          997,
+          996,
+          995,
+          994,
+          993,
+          992,
+          991,
+          990
+        ],
+        "original": 990
+      },
+      "expected": 1980,
+      "warnings": []
+    },
+    {
+      "id": "test_082",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums": [
+          3,
+          9,
+          27,
+          81,
+          243,
+          729,
+          2187,
+          6561,
+          19683
+        ],
+        "original": 3
+      },
+      "expected": 6,
+      "warnings": []
+    },
+    {
+      "id": "test_083",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums": [
+          13,
+          26,
+          39,
+          52,
+          65,
+          78,
+          91,
+          104,
+          117,
+          130,
+          143,
+          156,
+          169,
+          182,
+          195,
+          208,
+          221,
+          234,
+          247,
+          260
+        ],
+        "original": 13
+      },
+      "expected": 416,
+      "warnings": []
+    },
+    {
+      "id": "test_084",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums": [
+          7,
+          14,
+          28,
+          56,
+          112,
+          224,
+          448,
+          896,
+          1792
+        ],
+        "original": 7
+      },
+      "expected": 3584,
+      "warnings": []
+    },
+    {
+      "id": "test_085",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums": [
+          5,
+          10,
+          15,
+          20,
+          25,
+          30,
+          35,
+          40,
+          45,
+          50,
+          55,
+          60,
+          65,
+          70,
+          75,
+          80,
+          85,
+          90,
+          95,
+          100
+        ],
+        "original": 5
+      },
+      "expected": 160,
+      "warnings": []
+    },
+    {
+      "id": "test_086",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums": [
+          9,
+          18,
+          27,
+          36,
+          45,
+          54,
+          63,
+          72,
+          81,
+          90
+        ],
+        "original": 9
+      },
+      "expected": 144,
+      "warnings": []
+    },
+    {
+      "id": "test_087",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums": [
+          2,
+          4,
+          8,
+          16,
+          32,
+          64,
+          128,
+          256,
+          512,
+          1024
+        ],
+        "original": 2
+      },
+      "expected": 2048,
+      "warnings": []
+    },
+    {
+      "id": "test_088",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums": [
+          17,
+          34,
+          68,
+          136,
+          272,
+          544,
+          1088,
+          2176,
+          4352
+        ],
+        "original": 17
+      },
+      "expected": 8704,
+      "warnings": []
+    },
+    {
+      "id": "test_089",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums": [
+          10,
+          20,
+          40,
+          80,
+          160,
+          320,
+          640,
+          1280,
+          2560,
+          5120
+        ],
+        "original": 10
+      },
+      "expected": 10240,
+      "warnings": []
+    },
+    {
+      "id": "test_090",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums": [
+          500,
+          501,
+          502,
+          503,
+          504,
+          505,
+          506,
+          507,
+          508,
+          509
+        ],
+        "original": 500
+      },
+      "expected": 1000,
+      "warnings": []
+    },
+    {
+      "id": "test_091",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums": [
+          13,
+          26,
+          52,
+          104,
+          208,
+          416,
+          832,
+          1664,
+          3328,
+          6656,
+          13312,
+          26624,
+          53248,
+          106496
+        ],
+        "original": 13
+      },
+      "expected": 212992,
+      "warnings": []
+    },
+    {
+      "id": "test_092",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums": [
+          7,
+          14,
+          21,
+          28,
+          35,
+          42,
+          49,
+          56,
+          63,
+          70,
+          77,
+          84,
+          91,
+          98,
+          105
+        ],
+        "original": 7
+      },
+      "expected": 112,
+      "warnings": []
+    },
+    {
+      "id": "test_093",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums": [
+          17,
+          34,
+          51,
+          68,
+          85,
+          102,
+          119,
+          136,
+          153,
+          170,
+          187,
+          204,
+          221,
+          238,
+          255,
+          272,
+          289,
+          306,
+          323,
+          340
+        ],
+        "original": 17
+      },
+      "expected": 544,
+      "warnings": []
+    },
+    {
+      "id": "test_094",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums": [
+          19,
+          38,
+          76,
+          152,
+          304,
+          608,
+          1216
+        ],
+        "original": 19
+      },
+      "expected": 2432,
+      "warnings": []
+    },
+    {
+      "id": "test_095",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums": [
+          4,
+          8,
+          12,
+          16,
+          20,
+          24,
+          28,
+          32,
+          36,
+          40,
+          44,
+          48,
+          52,
+          56,
+          60,
+          64,
+          68,
+          72,
+          76,
+          80,
+          84,
+          88,
+          92,
+          96,
+          100
+        ],
+        "original": 4
+      },
+      "expected": 128,
+      "warnings": []
+    },
+    {
+      "id": "test_096",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums": [
+          100,
+          200,
+          400,
+          800,
+          1600,
+          3200,
+          6400,
+          12800,
+          25600,
+          51200,
+          102400
+        ],
+        "original": 100
+      },
+      "expected": 204800,
+      "warnings": []
+    },
+    {
+      "id": "test_097",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums": [
+          23,
+          46,
+          92,
+          184,
+          368,
+          736,
+          1472
+        ],
+        "original": 23
+      },
+      "expected": 2944,
+      "warnings": []
+    },
+    {
+      "id": "test_098",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums": [
+          2,
+          3,
+          5,
+          7,
+          11,
+          13,
+          17,
+          19,
+          23,
+          29,
+          31
+        ],
+        "original": 2
+      },
+      "expected": 4,
+      "warnings": []
+    },
+    {
+      "id": "test_099",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums": [
+          1,
+          4,
+          9,
+          16,
+          25,
+          36,
+          49,
+          64,
+          81,
+          100,
+          121,
+          144,
+          169,
+          196,
+          225,
+          256,
+          289,
+          324,
+          361,
+          400
+        ],
+        "original": 1
+      },
+      "expected": 2,
+      "warnings": []
+    },
+    {
+      "id": "test_100",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums": [
+          1,
+          2,
+          4,
+          8,
+          16,
+          32,
+          64,
+          128,
+          256,
+          512,
+          1024
+        ],
+        "original": 1
+      },
+      "expected": 2048,
+      "warnings": []
+    },
+    {
+      "id": "test_101",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums": [
+          999,
+          998,
+          997,
+          996,
+          995,
+          994,
+          993,
+          992,
+          991,
+          990,
+          989,
+          988,
+          987,
+          986,
+          985,
+          984,
+          983,
+          982,
+          981,
+          980
+        ],
+        "original": 980
+      },
+      "expected": 1960,
+      "warnings": []
+    },
+    {
+      "id": "test_102",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums": [
+          3,
+          9,
+          27,
+          81,
+          243,
+          729,
+          2187,
+          6561,
+          19683,
+          59049
+        ],
+        "original": 3
+      },
+      "expected": 6,
+      "warnings": []
+    },
+    {
+      "id": "test_103",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums": [
+          6,
+          12,
+          24,
+          48,
+          96,
+          192,
+          384,
+          768,
+          1536
+        ],
+        "original": 6
+      },
+      "expected": 3072,
+      "warnings": []
+    },
+    {
+      "id": "test_104",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums": [
+          1,
+          2,
+          3,
+          5,
+          6,
+          10,
+          12,
+          15,
+          20,
+          30,
+          60,
+          120,
+          240,
+          480,
+          960
+        ],
+        "original": 1
+      },
+      "expected": 4,
+      "warnings": []
+    },
+    {
+      "id": "test_105",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums": [
+          7,
+          14,
+          28,
+          56,
+          112,
+          224,
+          448,
+          896
+        ],
+        "original": 7
+      },
+      "expected": 1792,
+      "warnings": []
+    },
+    {
+      "id": "test_106",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums": [
+          9,
+          18,
+          36,
+          72,
+          144,
+          288,
+          576,
+          1152,
+          2304
+        ],
+        "original": 9
+      },
+      "expected": 4608,
+      "warnings": []
+    },
+    {
+      "id": "test_107",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums": [
+          5,
+          15,
+          45,
+          135,
+          405,
+          1215,
+          3645,
+          10935,
+          32805
+        ],
+        "original": 5
+      },
+      "expected": 10,
+      "warnings": []
+    },
+    {
+      "id": "test_108",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums": [
+          8,
+          16,
+          24,
+          32,
+          40,
+          48,
+          56,
+          64,
+          72,
+          80,
+          88,
+          96,
+          104,
+          112,
+          120
+        ],
+        "original": 8
+      },
+      "expected": 128,
+      "warnings": []
+    },
+    {
+      "id": "test_109",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums": [
+          10,
+          20,
+          40,
+          80,
+          160,
+          320,
+          640,
+          1280,
+          2560,
+          5120,
+          10240
+        ],
+        "original": 10
+      },
+      "expected": 20480,
+      "warnings": []
+    },
+    {
+      "id": "test_110",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums": [
+          11,
+          22,
+          44,
+          88,
+          176,
+          352,
+          704
+        ],
+        "original": 11
+      },
+      "expected": 1408,
+      "warnings": []
+    },
+    {
+      "id": "test_111",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums": [
+          2,
+          4,
+          8,
+          16,
+          32,
+          64,
+          128,
+          256,
+          512
+        ],
+        "original": 2
+      },
+      "expected": 1024,
+      "warnings": []
+    },
+    {
+      "id": "test_112",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums": [
+          3,
+          3,
+          3,
+          3,
+          3,
+          3,
+          3,
+          3,
+          3,
+          3,
+          3,
+          3,
+          3,
+          3,
+          3,
+          3,
+          3,
+          3,
+          3,
+          3,
+          3,
+          3,
+          3,
+          3,
+          3,
+          3,
+          3,
+          3,
+          3,
+          3,
+          3,
+          3,
+          3,
+          3,
+          3,
+          3,
+          3,
+          3,
+          3,
+          3,
+          3,
+          3,
+          3,
+          3,
+          3,
+          3,
+          3,
+          3,
+          3,
+          3,
+          3,
+          3,
+          3,
+          3,
+          3,
+          3,
+          3,
+          3,
+          3,
+          3,
+          3,
+          3,
+          3,
+          3,
+          3,
+          3,
+          3,
+          3,
+          3
+        ],
+        "original": 3
+      },
+      "expected": 6,
+      "warnings": []
+    },
+    {
+      "id": "test_113",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums": [
+          3,
+          9,
+          27,
+          81,
+          243,
+          729,
+          2187,
+          6561,
+          19683
+        ],
+        "original": 3
+      },
+      "expected": 6,
+      "warnings": []
+    },
+    {
+      "id": "test_114",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums": [
+          14,
+          28,
+          56,
+          112,
+          224,
+          448,
+          896,
+          1792,
+          3584
+        ],
+        "original": 14
+      },
+      "expected": 7168,
+      "warnings": []
+    }
+  ],
+  "normalization": {
+    "test_source": "python_assertions",
+    "test_count": 115,
+    "raw_test_sha256": "89599a6e7ddae589c5f94d5f0cfc5811c0d0ce88e573e8cd7137bd887e89b359",
+    "generated_by": "scripts/d2v-normalize-json.py",
+    "allow_extra_tests": false
+  }
+}

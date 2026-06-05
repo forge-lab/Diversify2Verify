@@ -1,0 +1,195 @@
+module SplitArrayLargestSum_List_Spec
+
+  use int.Int
+  use int.EuclideanDivision
+  use list.List
+  use list.Length
+  use list.Append
+  use list.Sum
+
+  let rec predicate bounded_nonnegative_list (nums: list int)
+    variant { nums }
+  =
+    match nums with
+    | Nil -> true
+    | Cons x xs -> 0 <= x && x <= 1000000 && bounded_nonnegative_list xs
+    end
+
+  let rec function concat_segments (segments: list (list int)) : list int
+    variant { segments }
+  =
+    match segments with
+    | Nil -> Nil
+    | Cons segment rest -> segment ++ concat_segments rest
+    end
+
+  let rec predicate all_nonempty_segments (segments: list (list int))
+    variant { segments }
+  =
+    match segments with
+    | Nil -> true
+    | Cons segment rest ->
+        match segment with
+        | Nil -> false
+        | Cons _ _ -> all_nonempty_segments rest
+        end
+    end
+
+  let rec predicate all_segment_sums_le (segments: list (list int)) (bound: int)
+    variant { segments }
+  =
+    match segments with
+    | Nil -> true
+    | Cons segment rest -> sum segment <= bound && all_segment_sums_le rest bound
+    end
+
+  predicate partition_with_bound (nums: list int) (k: int) (bound: int) =
+    exists segments: list (list int).
+      length segments = k /\
+      concat_segments segments = nums /\
+      all_nonempty_segments segments /\
+      all_segment_sums_le segments bound
+
+  predicate optimal_largest_sum (nums: list int) (k: int) (answer: int) =
+    partition_with_bound nums k answer /\
+    (forall bound: int. bound < answer -> not (partition_with_bound nums k bound))
+
+  let rec function sum_list (nums: list int) : int
+    variant { nums }
+  =
+    match nums with
+    | Nil -> 0
+    | Cons x xs -> x + sum_list xs
+    end
+
+  let rec function max_from (nums: list int) (current: int) : int
+    variant { nums }
+  =
+    match nums with
+    | Nil -> current
+    | Cons x xs ->
+        if x > current then max_from xs x else max_from xs current
+    end
+
+  let function max_list (nums: list int) : int =
+    match nums with
+    | Nil -> 0
+    | Cons x xs -> max_from xs x
+    end
+
+  let rec function segments_needed_from (nums: list int) (bound: int) (current_sum: int) : int
+    variant { nums }
+  =
+    match nums with
+    | Nil ->
+        if current_sum = 0 then 0 else 1
+    | Cons x xs ->
+        if current_sum + x <= bound then
+          segments_needed_from xs bound (current_sum + x)
+        else
+          1 + segments_needed_from xs bound x
+    end
+
+  let function can_split_with_bound (nums: list int) (k: int) (bound: int) : bool =
+    max_list nums <= bound && segments_needed_from nums bound 0 <= k
+
+  predicate valid_split_instance (nums: list int) (k: int) =
+    1 <= length nums <= 1000 /\
+    bounded_nonnegative_list nums /\
+    1 <= k <= length nums /\
+    k <= 50
+
+  predicate search_window (nums: list int) (k: int) (lo: int) (hi: int) =
+    valid_split_instance nums k /\
+    lo <= hi /\
+    (forall bound: int. bound < lo -> not (partition_with_bound nums k bound)) /\
+    partition_with_bound nums k hi /\
+    (forall bound: int. lo <= bound <= hi ->
+       (can_split_with_bound nums k bound = True <-> partition_with_bound nums k bound))
+
+  lemma max_list_lower_bound:
+    forall nums: list int, k bound: int.
+      valid_split_instance nums k ->
+      bound < max_list nums ->
+      not (partition_with_bound nums k bound)
+
+  lemma sum_list_upper_bound:
+    forall nums: list int, k: int.
+      valid_split_instance nums k ->
+      partition_with_bound nums k (sum_list nums)
+
+  lemma greedy_can_split_partition_equiv:
+    forall nums: list int, k bound: int.
+      valid_split_instance nums k ->
+      max_list nums <= bound ->
+      bound <= sum_list nums ->
+      (can_split_with_bound nums k bound = True <-> partition_with_bound nums k bound)
+
+  lemma initial_search_window:
+    forall nums: list int, k lo hi: int.
+      valid_split_instance nums k ->
+      lo = max_list nums ->
+      hi = sum_list nums ->
+      search_window nums k lo hi
+
+  let rec function search_min_bound (nums: list int) (k: int) (lo: int) (hi: int) : int
+    variant { hi - lo }
+  =
+    if lo >= hi then
+      lo
+    else
+      let mid = lo + div (hi - lo) 2 in
+      if can_split_with_bound nums k mid then
+        search_min_bound nums k lo mid
+      else
+        search_min_bound nums k (mid + 1) hi
+
+  lemma binary_search_window_correct:
+    forall nums: list int, k lo hi: int.
+      search_window nums k lo hi ->
+      optimal_largest_sum nums k (search_min_bound nums k lo hi)
+
+  let search_min_bound_checked
+      (nums: list int) (k: int) (lo: int) (hi: int) : int
+    requires { 1 <= length nums <= 1000 }
+    requires { bounded_nonnegative_list nums }
+    requires { 1 <= k <= length nums }
+    requires { k <= 50 }
+    requires { lo = max_list nums }
+    requires { hi = sum_list nums }
+    ensures  { optimal_largest_sum nums k result }
+  =
+    assert { nums <> Nil };
+    assert { valid_split_instance nums k };
+    assert { lo = max_list nums };
+    assert { hi = sum_list nums };
+    assert { search_window nums k lo hi };
+    let answer = search_min_bound nums k lo hi in
+    assert { optimal_largest_sum nums k answer };
+    answer
+
+  let split_array_largest_sum_list (nums: list int) (k: int) : int
+    requires { 1 <= length nums <= 1000 }
+    requires { bounded_nonnegative_list nums }
+    requires { 1 <= k <= length nums }
+    requires { k <= 50 }
+    ensures  { optimal_largest_sum nums k result }
+  =
+    assert { k > 0 };
+    if k <= 0 then
+      absurd
+    else
+      match nums with
+      | Nil -> absurd
+      | Cons _ _ ->
+          assert { nums <> Nil };
+          let lower = max_list nums in
+          let upper = sum_list nums in
+          assert { lower = max_list nums };
+          assert { upper = sum_list nums };
+          let answer = search_min_bound_checked nums k lower upper in
+          assert { optimal_largest_sum nums k answer };
+          answer
+      end
+
+end

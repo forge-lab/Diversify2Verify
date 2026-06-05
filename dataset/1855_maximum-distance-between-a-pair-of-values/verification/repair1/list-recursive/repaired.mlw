@@ -1,0 +1,174 @@
+module MaximumDistanceBetweenAPairOfValues_List_Stage3_Recursive
+
+  use int.Int
+  use list.List
+  use list.Length
+  use list.Mem
+  use list.NthNoOpt
+
+  predicate values_in_range (l: list int) =
+    forall x: int. mem x l -> 1 <= x /\ x <= 100000
+
+  let rec predicate non_increasing (l: list int)
+    variant { l }
+  =
+    match l with
+    | Nil -> true
+    | Cons x xs ->
+        match xs with
+        | Nil -> true
+        | Cons y _ys -> x >= y && non_increasing xs
+        end
+    end
+
+  predicate valid_pair (nums1: list int) (nums2: list int) (i: int) (j: int) =
+    0 <= i /\ i < length nums1 /\
+    0 <= j /\ j < length nums2 /\
+    i <= j /\
+    nth i nums1 <= nth j nums2
+
+  predicate has_distance (nums1: list int) (nums2: list int) (d: int) =
+    exists i: int. exists j: int.
+      valid_pair nums1 nums2 i j /\ d = j - i
+
+  predicate maximum_distance (nums1: list int) (nums2: list int) (d: int) =
+    0 <= d /\
+    (d = 0 \/ has_distance nums1 nums2 d) /\
+    (forall i: int. forall j: int.
+       valid_pair nums1 nums2 i j -> j - i <= d)
+
+  let rec function drop (n: int) (l: list int) : list int
+    variant { l }
+  =
+    if n <= 0 then l else
+    match l with
+    | Nil -> Nil
+    | Cons _ xs -> drop (n - 1) xs
+    end
+
+  let rec predicate prefix_valid_for (x: int) (ys: list int) (k: int)
+    variant { ys }
+  =
+    if k <= 0 then true else
+    match ys with
+    | Nil -> false
+    | Cons y rest -> x <= y && prefix_valid_for x rest (k - 1)
+    end
+
+  predicate first_row_max_distance (x: int) (ys: list int) (d: int) =
+    0 <= d /\
+    (d = 0 \/ (d < length ys /\ x <= nth d ys)) /\
+    (forall j: int. 0 <= j /\ j < length ys /\ x <= nth j ys -> j <= d)
+
+  predicate aligned_suffixes
+    (nums1: list int) (nums2: list int) (i: int)
+    (xs: list int) (ys: list int) =
+    0 <= i /\
+    xs = drop i nums1 /\
+    ys = drop i nums2
+
+  predicate suffix_max_distance
+    (nums1: list int) (nums2: list int) (i: int) (d: int) =
+    0 <= d /\
+    (d = 0 \/
+      exists p: int. exists q: int.
+        i <= p /\ p < length nums1 /\
+        i <= q /\ q < length nums2 /\
+        p <= q /\
+        nth p nums1 <= nth q nums2 /\
+        d = q - p) /\
+    (forall p: int. forall q: int.
+      i <= p /\ p < length nums1 /\
+      i <= q /\ q < length nums2 /\
+      p <= q /\
+      nth p nums1 <= nth q nums2 ->
+      q - p <= d)
+
+  let rec count_valid_prefix (x: int) (ys: list int) : int
+    requires { non_increasing ys }
+    ensures { result >= 0 }
+    ensures { result <= length ys }
+    ensures { prefix_valid_for x ys result }
+    ensures { result > 0 -> x <= nth (result - 1) ys }
+    ensures { forall j: int. 0 <= j /\ j < length ys /\ x <= nth j ys -> j < result }
+    ensures { first_row_max_distance x ys (if result = 0 then 0 else result - 1) }
+    ensures { result < length ys ->
+      match drop result ys with
+      | Nil -> false
+      | Cons y _ -> x > y
+      end }
+    variant { ys }
+  =
+    match ys with
+    | Nil -> 0
+    | Cons y rest ->
+        if x <= y then begin
+          assert { non_increasing rest };
+          1 + count_valid_prefix x rest
+        end
+        else
+          0
+    end
+
+  let lemma combine_suffix_max_distance
+    (x: int) (xs: list int) (y: int) (ys: list int)
+    (dist: int) (rest: int) (r: int)
+    requires { first_row_max_distance x (Cons y ys) dist }
+    requires { maximum_distance xs ys rest }
+    requires { r = (if dist >= rest then dist else rest) }
+    ensures  { maximum_distance (Cons x xs) (Cons y ys) r }
+  =
+    assert { 0 <= dist };
+    assert { 0 <= rest };
+    assert { 0 <= r };
+    assert { r = 0 \/ has_distance (Cons x xs) (Cons y ys) r };
+    assert { forall i: int. forall j: int.
+      valid_pair (Cons x xs) (Cons y ys) i j -> j - i <= r }
+
+  let rec max_distance_from_suffixes (nums1: list int) (nums2_suffix: list int) : int
+    requires { non_increasing nums1 }
+    requires { non_increasing nums2_suffix }
+    ensures { result >= 0 }
+    ensures { maximum_distance nums1 nums2_suffix result }
+    variant { nums1 }
+  =
+    match nums1 with
+    | Nil -> 0
+    | Cons x xs ->
+        match nums2_suffix with
+        | Nil -> 0
+        | Cons y ys_tail ->
+            assert { non_increasing xs };
+            assert { non_increasing ys_tail };
+            let span = count_valid_prefix x nums2_suffix in
+            assert { 0 <= span };
+            assert { span <= length nums2_suffix };
+            let dist = if span = 0 then 0 else span - 1 in
+            assert { dist >= 0 };
+            assert { first_row_max_distance x nums2_suffix dist };
+            let rest = max_distance_from_suffixes xs ys_tail in
+            assert { rest >= 0 };
+            let r = if dist >= rest then dist else rest in
+            combine_suffix_max_distance x xs y ys_tail dist rest r;
+            assert { maximum_distance nums1 nums2_suffix r };
+            r
+        end
+    end
+
+  let maximum_distance_between_a_pair_of_values_list
+    (nums1: list int) (nums2: list int) : int
+    requires { 1 <= length nums1 }
+    requires { 1 <= length nums2 }
+    requires { length nums1 <= 100000 }
+    requires { length nums2 <= 100000 }
+    requires { values_in_range nums1 }
+    requires { values_in_range nums2 }
+    requires { non_increasing nums1 }
+    requires { non_increasing nums2 }
+    ensures  { maximum_distance nums1 nums2 result }
+  =
+    let r = max_distance_from_suffixes nums1 nums2 in
+    assert { maximum_distance nums1 nums2 r };
+    r
+
+end

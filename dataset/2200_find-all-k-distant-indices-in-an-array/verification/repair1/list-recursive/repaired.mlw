@@ -1,0 +1,197 @@
+module FindAllKDistantIndicesInAnArray_List_Stage3_Recursive
+
+  use int.Int
+  use int.Abs
+  use list.List
+  use list.Length
+  use list.Mem
+
+  let rec predicate value_at_index (nums: list int) (i: int) (v: int)
+    variant { nums }
+  =
+    match nums with
+    | Nil -> false
+    | Cons x xs ->
+        if i = 0 then x = v
+        else 0 < i && value_at_index xs (i - 1) v
+    end
+
+  let rec predicate values_in_range (nums: list int)
+    variant { nums }
+  =
+    match nums with
+    | Nil -> true
+    | Cons x xs -> 1 <= x <= 1000 && values_in_range xs
+    end
+
+  predicate k_distant_index (nums: list int) (key: int) (k: int) (i: int) =
+    0 <= i < length nums /\
+    exists j: int. value_at_index nums j key /\ abs (i - j) <= k
+
+  let rec predicate all_greater_than (x: int) (indices: list int)
+    variant { indices }
+  =
+    match indices with
+    | Nil -> true
+    | Cons y ys -> x < y && all_greater_than x ys
+    end
+
+  let rec predicate strictly_increasing (indices: list int)
+    variant { indices }
+  =
+    match indices with
+    | Nil -> true
+    | Cons x xs -> all_greater_than x xs && strictly_increasing xs
+    end
+
+  predicate valid_result (nums: list int) (key: int) (k: int) (indices: list int) =
+    strictly_increasing indices /\
+    (forall i: int. mem i indices <-> k_distant_index nums key k i)
+
+  let rec lemma value_at_index_bounds (nums: list int) (i: int) (v: int)
+    requires { value_at_index nums i v }
+    ensures  { 0 <= i < length nums }
+    variant  { nums }
+  =
+    match nums with
+    | Nil -> absurd
+    | Cons _ xs ->
+        if i = 0 then ()
+        else value_at_index_bounds xs (i - 1) v
+    end
+
+  let rec lemma all_greater_than_from_mem (x: int) (indices: list int)
+    requires { forall p: int. mem p indices -> x < p }
+    ensures  { all_greater_than x indices }
+    variant  { indices }
+  =
+    match indices with
+    | Nil -> ()
+    | Cons y ys ->
+        assert { mem y indices };
+        assert { x < y };
+        assert { forall p: int. mem p ys -> mem p indices };
+        assert { forall p: int. mem p ys -> x < p };
+        all_greater_than_from_mem x ys
+    end
+
+  let rec nth_or_zero (nums: list int) (i: int) : int
+    ensures { 0 <= i < length nums -> value_at_index nums i result }
+    ensures { forall v: int. value_at_index nums i v -> v = result }
+    variant { nums }
+  =
+    match nums with
+    | Nil -> 0
+    | Cons x xs ->
+        if i = 0 then x else nth_or_zero xs (i - 1)
+    end
+
+  let within_distance (i: int) (j: int) (k: int) : bool
+    ensures { result <-> abs (i - j) <= k }
+  =
+    j <= i + k && i <= j + k
+
+  let rec exists_key_near_from
+    (nums: list int) (key: int) (k: int) (i: int) (j: int) : bool
+    requires { 0 <= j }
+    ensures  { result <-> exists t: int. j <= t < length nums /\
+                 value_at_index nums t key /\ abs (i - t) <= k }
+    variant { length nums - j }
+  =
+    if j >= length nums then begin
+      assert { forall t: int. not (j <= t < length nums) };
+      assert { not (exists t: int. j <= t < length nums /\
+        value_at_index nums t key /\ abs (i - t) <= k) };
+      false
+    end else begin
+      assert { 0 <= j < length nums };
+      let near = within_distance i j k in
+      let current = nth_or_zero nums j in
+      if near && current = key then begin
+        assert { abs (i - j) <= k };
+        assert { value_at_index nums j current };
+        assert { value_at_index nums j key };
+        assert { exists t: int. j <= t < length nums /\
+          value_at_index nums t key /\ abs (i - t) <= k };
+        true
+      end else begin
+        if near then begin
+          assert { current <> key };
+          assert { value_at_index nums j current };
+          assert { not value_at_index nums j key }
+        end else begin
+          assert { not (abs (i - j) <= k) }
+        end;
+        assert { not (value_at_index nums j key /\ abs (i - j) <= k) };
+        let r = exists_key_near_from nums key k i (j + 1) in
+        assert { r <-> exists t: int. j + 1 <= t < length nums /\
+          value_at_index nums t key /\ abs (i - t) <= k };
+        assert { (exists t: int. j <= t < length nums /\
+          value_at_index nums t key /\ abs (i - t) <= k) <->
+          (exists t: int. j + 1 <= t < length nums /\
+          value_at_index nums t key /\ abs (i - t) <= k) };
+        r
+      end
+    end
+
+  let rec collect_indices
+    (nums: list int) (key: int) (k: int) (i: int) (n: int) : list int
+    requires { 0 <= i }
+    requires { n = length nums }
+    ensures  { strictly_increasing result }
+    ensures  { forall p: int. mem p result <-> i <= p < n /\ k_distant_index nums key k p }
+    variant { n - i }
+  =
+    if i >= n then begin
+      assert { forall p: int. not (i <= p < n) };
+      assert { strictly_increasing Nil };
+      assert { forall p: int. mem p Nil <-> i <= p < n /\ k_distant_index nums key k p };
+      Nil
+    end else begin
+      assert { i < n };
+      let has_key_near = exists_key_near_from nums key k i 0 in
+      if has_key_near then begin
+        assert { exists t: int. 0 <= t < length nums /\
+          value_at_index nums t key /\ abs (i - t) <= k };
+        assert { k_distant_index nums key k i };
+        let tail = collect_indices nums key k (i + 1) n in
+        assert { strictly_increasing tail };
+        assert { forall p: int. mem p tail <-> i + 1 <= p < n /\ k_distant_index nums key k p };
+        assert { forall p: int. mem p tail -> i < p };
+        all_greater_than_from_mem i tail;
+        assert { all_greater_than i tail };
+        assert { strictly_increasing (Cons i tail) };
+        assert { forall p: int. mem p (Cons i tail) <->
+          i <= p < n /\ k_distant_index nums key k p };
+        Cons i tail
+      end else begin
+        assert { not (exists t: int. 0 <= t < length nums /\
+          value_at_index nums t key /\ abs (i - t) <= k) };
+        assert { forall t: int. value_at_index nums t key -> 0 <= t < length nums };
+        assert { not k_distant_index nums key k i };
+        let tail = collect_indices nums key k (i + 1) n in
+        assert { strictly_increasing tail };
+        assert { forall p: int. mem p tail <-> i + 1 <= p < n /\ k_distant_index nums key k p };
+        assert { forall p: int. mem p tail <->
+          i <= p < n /\ k_distant_index nums key k p };
+        tail
+      end
+    end
+
+  let find_all_k_distant_indices_in_an_array_list
+    (nums: list int) (key: int) (k: int) : list int
+    requires { 1 <= length nums <= 1000 }
+    requires { values_in_range nums }
+    requires { mem key nums }
+    requires { 1 <= k <= length nums }
+    ensures  { valid_result nums key k result }
+  =
+    let r = collect_indices nums key k 0 (length nums) in
+    assert { strictly_increasing r };
+    assert { forall p: int. mem p r <-> 0 <= p < length nums /\ k_distant_index nums key k p };
+    assert { forall p: int. k_distant_index nums key k p -> 0 <= p < length nums };
+    assert { forall p: int. mem p r <-> k_distant_index nums key k p };
+    assert { valid_result nums key k r };
+    r
+
+end

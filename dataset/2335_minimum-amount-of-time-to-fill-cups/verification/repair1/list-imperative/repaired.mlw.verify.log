@@ -1,0 +1,70 @@
+== Stage 1: first prover on whole file ==
+Running in /Users/rubenm/Desktop/Diversify2Verify/codex-runs/dataset-merge-verification/stage3a-repair/2335_minimum-amount-of-time-to-fill-cups/list-imperative/minimum_amount_of_time_to_fill_cups_list_stage3_920f8497_stage3/generated/why3: why3 session create -o /Users/rubenm/Desktop/Diversify2Verify/codex-runs/dataset-merge-verification/stage3a-repair/2335_minimum-amount-of-time-to-fill-cups/list-imperative/minimum_amount_of_time_to_fill_cups_list_stage3_920f8497_stage3/generated/why3/.why3_sessions/repaired_stage1 -P Z3,4.8.6 -t 10 -m 8192 repaired.mlw
+Session created successfully
+Running in /Users/rubenm/Desktop/Diversify2Verify/codex-runs/dataset-merge-verification/stage3a-repair/2335_minimum-amount-of-time-to-fill-cups/list-imperative/minimum_amount_of_time_to_fill_cups_list_stage3_920f8497_stage3/generated/why3: why3 bench /Users/rubenm/Desktop/Diversify2Verify/codex-runs/dataset-merge-verification/stage3a-repair/2335_minimum-amount-of-time-to-fill-cups/list-imperative/minimum_amount_of_time_to_fill_cups_list_stage3_920f8497_stage3/generated/why3/.why3_sessions/repaired_stage1
+Progress: 11/1/0                       Progress: 10/2/0                       Progress: 9/3/0                       Progress: 8/4/0                       Progress: 7/5/0                       Progress: 6/6/0                       Progress: 6/0/1                       Progress: 5/1/1                       Progress: 4/2/1                       Progress: 3/3/1                       Progress: 2/4/1                       Progress: 1/5/1                       Progress: 1/3/2                       Progress: 0/4/2                       Progress: 0/0/2                       Progress: 0/0/1                       
+Replay completed, saving session... done
+== Stage 1 stats ==
+= Statistics for session /Users/rubenm/Desktop/Diversify2Verify/codex-runs/dataset-merge-verification/stage3a-repair/2335_minimum-amount-of-time-to-fill-cups/list-imperative/minimum_amount_of_time_to_fill_cups_list_stage3_920f8497_stage3/generated/why3/.why3_sessions/repaired_stage1
+
+== Number of root goals ==
+  total: 12  proved: 9
+
+== Number of sub goals ==
+  total: 0  proved: 0
+
+== Goals not proved ==
+  +-- file [../../repaired.mlw]
+    +-- theory MinimumAmountOfTimeToFillCups_List_Stage3_Imperative
+      +-- goal nonnegative_cons_parts'vc
+      +-- goal max_acc_correct'vc
+      +-- goal minimum_amount_of_time_to_fill_cups_list'vc
+  
+== Goals proved by only one prover ==
+  +-- file [../../repaired.mlw]
+    +-- theory MinimumAmountOfTimeToFillCups_List_Stage3_Imperative
+      +-- goal max_amount'vc: Z3 4.8.6
+      +-- goal max_acc'vc: Z3 4.8.6
+      +-- goal max_absorb_smaller_left'vc: Z3 4.8.6
+      +-- goal max_ignore_smaller_middle'vc: Z3 4.8.6
+      +-- goal sum_nonnegative'vc: Z3 4.8.6
+      +-- goal max_amount_nonnegative'vc: Z3 4.8.6
+      +-- goal ceil_half_feasible'vc: Z3 4.8.6
+      +-- goal ceil_half_minimal'vc: Z3 4.8.6
+      +-- goal answer_formula_minimum'vc: Z3 4.8.6
+  
+1 session(s) read, with a total of 12 proof goals.
+== Unproved root goals after first prover ==
+MinimumAmountOfTimeToFillCups_List_Stage3_Imperative	nonnegative_cons_parts'vc
+MinimumAmountOfTimeToFillCups_List_Stage3_Imperative	max_acc_correct'vc
+MinimumAmountOfTimeToFillCups_List_Stage3_Imperative	minimum_amount_of_time_to_fill_cups_list'vc
+== Stage 1: trying remaining goals with prover Alt-Ergo,2.4.0 ==
+---- stage1 | prover: Alt-Ergo,2.4.0 | theory: MinimumAmountOfTimeToFillCups_List_Stage3_Imperative | goal: nonnegative_cons_parts'vc ----
+File repaired.mlw:
+Goal nonnegative_cons_parts'vc.
+Prover result is: Valid (0.01s, 95 steps).
+Solved in stage 1 using prover: Alt-Ergo,2.4.0
+---- stage1 | prover: Alt-Ergo,2.4.0 | theory: MinimumAmountOfTimeToFillCups_List_Stage3_Imperative | goal: max_acc_correct'vc ----
+File repaired.mlw:
+Goal max_acc_correct'vc.
+Prover result is: Valid (0.11s, 3667 steps).
+Solved in stage 1 using prover: Alt-Ergo,2.4.0
+---- stage1 | prover: Alt-Ergo,2.4.0 | theory: MinimumAmountOfTimeToFillCups_List_Stage3_Imperative | goal: minimum_amount_of_time_to_fill_cups_list'vc ----
+File repaired.mlw:
+Goal minimum_amount_of_time_to_fill_cups_list'vc.
+Prover result is: Timeout (10.00s, 293613 steps).
+Remaining after prover Alt-Ergo,2.4.0: 1
+== Stage 1: trying remaining goals with prover CVC4,1.8 ==
+---- stage1 | prover: CVC4,1.8 | theory: MinimumAmountOfTimeToFillCups_List_Stage3_Imperative | goal: minimum_amount_of_time_to_fill_cups_list'vc ----
+File repaired.mlw:
+Goal minimum_amount_of_time_to_fill_cups_list'vc.
+Prover result is: Valid (0.37s, 34640 steps).
+Solved in stage 1 using prover: CVC4,1.8
+Remaining after prover CVC4,1.8: 0
+All goals proved after sequential stage 1. No need to continue.
+VERIFY_RESULT: SUCCESS
+VERIFY_REASON: proved_after_stage1
+VERIFY_STAGE: stage1
+VERIFY_ROOT_TOTAL: 12
+VERIFY_ROOT_PROVED: 12
+VERIFY_ROOT_REMAINING: 0

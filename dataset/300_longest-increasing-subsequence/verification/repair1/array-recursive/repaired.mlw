@@ -1,0 +1,125 @@
+module LongestIncreasingSubsequence_Array_Spec
+
+  use int.Int
+  use array.Array
+  use array.Init
+
+  predicate valid_input (nums: array int) =
+    1 <= length nums <= 2500 /\
+    forall i: int. 0 <= i < length nums -> -10000 <= nums[i] <= 10000
+
+  predicate valid_index_sequence (nums: array int) (idxs: array int) (k: int) =
+    0 <= k /\
+    length idxs = k /\
+    (forall p: int.
+      0 <= p < k ->
+      0 <= idxs[p] < length nums) /\
+    (forall p q: int.
+      0 <= p < q < k ->
+      idxs[p] < idxs[q])
+
+  predicate strictly_increasing_values
+    (nums: array int) (idxs: array int) (k: int) =
+    forall p q: int.
+      0 <= p < q < k ->
+      nums[idxs[p]] < nums[idxs[q]]
+
+  predicate increasing_subsequence
+    (nums: array int) (idxs: array int) (k: int) =
+    valid_index_sequence nums idxs k /\
+    strictly_increasing_values nums idxs k
+
+  predicate has_increasing_subsequence_length (nums: array int) (k: int) =
+    exists idxs: array int. increasing_subsequence nums idxs k
+
+  predicate longest_increasing_subsequence_length
+    (nums: array int) (answer: int) =
+    1 <= answer <= length nums /\
+    has_increasing_subsequence_length nums answer /\
+    (forall idxs: array int, k: int.
+      increasing_subsequence nums idxs k -> k <= answer)
+
+  let max_int (x: int) (y: int) : int
+    ensures { result = x \/ result = y }
+    ensures { result >= x /\ result >= y }
+  =
+    if x >= y then x else y
+
+  let rec improve_lis_at
+    (nums: array int) (dp: array int) (i: int) (j: int) : unit
+    requires { length dp = length nums }
+    requires { 0 <= j <= i < length nums }
+    requires { forall k: int. 0 <= k <= i -> 1 <= dp[k] <= k + 1 }
+    variant  { i - j }
+    ensures  { dp[i] >= old dp[i] }
+    ensures  { forall k: int. 0 <= k <= i -> 1 <= dp[k] <= k + 1 }
+    ensures  { forall k: int.
+      0 <= k < length dp /\ k <> i -> dp[k] = old dp[k] }
+  =
+    if j >= i then
+      ()
+    else begin
+      assert { 0 <= j < i };
+      assert { 0 <= i < length nums };
+      if nums[j] < nums[i] then begin
+        let candidate = dp[j] + 1 in
+        assert { dp[j] <= j + 1 };
+        assert { j + 1 <= i };
+        assert { candidate <= i + 1 };
+        assert { 1 <= candidate };
+        if candidate > dp[i] then
+          dp[i] <- candidate
+        else
+          ()
+      end else
+        ();
+      improve_lis_at nums dp i (j + 1)
+    end
+
+  let rec fill_dp
+    (nums: array int) (dp: array int) (i: int) (best: int) : int
+    requires { length dp = length nums }
+    requires { 0 <= i <= length nums }
+    requires { 0 <= best <= length nums }
+    requires { forall k: int. 0 <= k < length dp -> 1 <= dp[k] <= k + 1 }
+    variant  { length nums - i }
+    ensures  { result >= best }
+    ensures  { 0 <= result <= length nums }
+    ensures  { i < length nums -> 1 <= result }
+    ensures  { forall k: int. 0 <= k < length dp -> 1 <= dp[k] <= k + 1 }
+  =
+    if i >= length nums then
+      best
+    else begin
+      assert { 0 <= i < length nums };
+      improve_lis_at nums dp i 0;
+      assert { 1 <= dp[i] <= i + 1 };
+      assert { i + 1 <= length nums };
+      let next_best = max_int best dp[i] in
+      assert { next_best = best \/ next_best = dp[i] };
+      assert { 0 <= next_best <= length nums };
+      assert { 1 <= next_best };
+      fill_dp nums dp (i + 1) next_best
+    end
+
+  let longest_increasing_subsequence_array (nums: array int) : int
+    requires { valid_input nums }
+    ensures  { longest_increasing_subsequence_length nums result }
+  =
+    let n = length nums in
+    assert { 1 <= n };
+    if n = 0 then
+      0
+    else
+      let dp = make n 1 in
+      assert { length dp = n };
+      assert { forall k: int. 0 <= k < length dp -> 1 <= dp[k] <= k + 1 };
+      let result = fill_dp nums dp 0 0 in
+      assert { 1 <= result <= length nums };
+      assert { has_increasing_subsequence_length nums result };
+      assert { forall idxs: array int, k: int.
+        increasing_subsequence nums idxs k -> k <= result };
+      assert { longest_increasing_subsequence_length nums result };
+      result
+
+end

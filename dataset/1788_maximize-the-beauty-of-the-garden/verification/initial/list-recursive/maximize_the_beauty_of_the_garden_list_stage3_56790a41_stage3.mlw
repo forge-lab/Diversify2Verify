@@ -1,0 +1,119 @@
+module MaximizeTheBeautyOfTheGarden_List_Stage3_Recursive
+
+  use int.Int
+  use list.List
+  use list.Length
+  use list.Sum
+
+  inductive subsequence (kept: list int) (source: list int) =
+    | SubNil:
+        forall source: list int. subsequence Nil source
+    | SubKeep:
+        forall x: int, xs ys: list int.
+          subsequence xs ys ->
+          subsequence (Cons x xs) (Cons x ys)
+    | SubSkip:
+        forall kept: list int, y: int, ys: list int.
+          subsequence kept ys ->
+          subsequence kept (Cons y ys)
+
+  inductive ends_with_value (l: list int) (x: int) =
+    | EndsSingle:
+        forall x: int. ends_with_value (Cons x Nil) x
+    | EndsCons:
+        forall y x: int, ys: list int.
+          ends_with_value ys x ->
+          ends_with_value (Cons y ys) x
+
+  predicate matching_endpoints (kept: list int) =
+    match kept with
+    | Nil -> false
+    | Cons first rest -> ends_with_value rest first
+    end
+
+  predicate valid_remaining (flowers: list int) (kept: list int) =
+    subsequence kept flowers /\
+    length kept >= 2 /\
+    matching_endpoints kept
+
+  predicate best_beauty (flowers: list int) (beauty: int) =
+    (exists kept: list int. valid_remaining flowers kept /\ sum kept = beauty) /\
+    (forall kept: list int. valid_remaining flowers kept -> sum kept <= beauty)
+
+  type search_result = NoMatch | Found int
+
+  predicate result_value (r: search_result) (v: int) =
+    match r with
+    | NoMatch -> false
+    | Found x -> x = v
+    end
+
+  predicate result_le (r: search_result) (bound: int) =
+    match r with
+    | NoMatch -> true
+    | Found x -> x <= bound
+    end
+
+  let positive_part (x: int) : int
+    ensures { result >= 0 }
+    ensures { result = x \/ result = 0 }
+    ensures { if x > 0 then result = x else result = 0 }
+  =
+    if x > 0 then x else 0
+
+  let max_result (left: search_result) (right: search_result) : search_result
+    ensures { match left with
+              | NoMatch -> result = right
+              | Found x ->
+                  match right with
+                  | NoMatch -> result = left
+                  | Found y -> if x >= y then result = left else result = right
+                  end
+              end }
+    ensures { forall v: int. result_value left v -> result_le result v -> result_value result v }
+    ensures { forall b: int. result_le left b -> result_le right b -> result_le result b }
+  =
+    match left with
+    | NoMatch -> right
+    | Found x ->
+        match right with
+        | NoMatch -> left
+        | Found y ->
+            if x >= y then left else right
+        end
+    end
+
+  let rec best_with_start (start: int) (positive_sum: int) (rest: list int) : search_result
+    variant { rest }
+  =
+    match rest with
+    | Nil -> NoMatch
+    | Cons y ys ->
+        let current =
+          if y = start then Found (start + positive_sum + y) else NoMatch in
+        let future =
+          best_with_start start (positive_sum + positive_part y) ys in
+        max_result current future
+    end
+
+  let rec best_over_prefixes (flowers: list int) : search_result
+    variant { flowers }
+  =
+    match flowers with
+    | Nil -> NoMatch
+    | Cons x xs ->
+        let with_head = best_with_start x 0 xs in
+        let without_head = best_over_prefixes xs in
+        max_result with_head without_head
+    end
+
+  let maximize_the_beauty_of_the_garden_list (flowers: list int) : int
+    requires { exists kept: list int. valid_remaining flowers kept }
+    ensures  { best_beauty flowers result }
+  =
+    match best_over_prefixes flowers with
+    | Found best -> best
+    | NoMatch -> 0
+    end
+
+end

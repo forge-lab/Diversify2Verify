@@ -1,0 +1,143 @@
+module MinimumConsecutiveCardsToPickUp_List_Spec
+
+  use int.Int
+  use list.List
+  use list.Length
+  use list.Mem
+  use list.NthNoOpt
+
+  predicate card_values_in_range (cards: list int) =
+    forall x: int. mem x cards -> 0 <= x /\ x <= 1000000
+
+  predicate valid_matching_pair (cards: list int) (i: int) (j: int) =
+    0 <= i /\ i < j /\ j < length cards /\
+    nth i cards = nth j cards
+
+  predicate matching_window (cards: list int) (span: int) =
+    span >= 2 /\
+    exists i: int. exists j: int.
+      valid_matching_pair cards i j /\ span = j - i + 1
+
+  predicate minimum_pickup_result (cards: list int) (result: int) =
+    (result = -1 /\
+     (forall span: int. not (matching_window cards span))) \/
+    (result >= 2 /\
+     matching_window cards result /\
+     (forall span: int. matching_window cards span -> result <= span))
+
+  val minimum_consecutive_cards_to_pick_up_list (cards: list int) : int
+    requires { 1 <= length cards }
+    requires { length cards <= 100000 }
+    requires { card_values_in_range cards }
+    ensures  { minimum_pickup_result cards result }
+
+  let lemma check_test_009 () =
+    let cards = Cons 5 Nil in
+    assert { length cards = 1 };
+    assert { card_values_in_range cards };
+    assert { forall span: int. not (matching_window cards span) };
+    assert { minimum_pickup_result cards (-1) }
+
+  let lemma check_test_013 () =
+    let cards = Cons 1 (Cons 0 (Cons 5 (Cons 3 Nil))) in
+    assert { length cards = 4 };
+    assert { card_values_in_range cards };
+    assert { nth 0 cards = 1 };
+    assert { nth 1 cards = 0 };
+    assert { nth 2 cards = 5 };
+    assert { nth 3 cards = 3 };
+    assert { forall span: int. not (matching_window cards span) };
+    assert { minimum_pickup_result cards (-1) }
+
+  let lemma check_test_005 () =
+    let cards = Cons 0 (Cons 0 Nil) in
+    assert { length cards = 2 };
+    assert { card_values_in_range cards };
+    assert { nth 0 cards = 0 };
+    assert { nth 1 cards = 0 };
+    assert { valid_matching_pair cards 0 1 };
+    assert { matching_window cards 2 };
+    assert { forall span: int. matching_window cards span -> 2 <= span };
+    assert { minimum_pickup_result cards 2 }
+
+  let lemma check_test_004 () =
+    let cards = Cons 3 (Cons 4 (Cons 2 (Cons 3 (Cons 4 (Cons 7 Nil))))) in
+    assert { length cards = 6 };
+    assert { card_values_in_range cards };
+    assert { nth 0 cards = 3 };
+    assert { nth 3 cards = 3 };
+    assert { nth 1 cards = 4 };
+    assert { nth 4 cards = 4 };
+    assert { valid_matching_pair cards 0 3 };
+    assert { valid_matching_pair cards 1 4 };
+    assert { matching_window cards 4 };
+    assert { forall span: int. matching_window cards span -> 4 <= span };
+    assert { minimum_pickup_result cards 4 }
+
+  let lemma check_test_000 () =
+    let t10 = Cons 0 Nil in
+    let t9 = Cons 9 t10 in
+    let t8 = Cons 8 t9 in
+    let t7 = Cons 7 t8 in
+    let t6 = Cons 6 t7 in
+    let t5 = Cons 5 t6 in
+    let t4 = Cons 4 t5 in
+    let t3 = Cons 3 t4 in
+    let t2 = Cons 2 t3 in
+    let t1 = Cons 1 t2 in
+    let cards = Cons 0 t1 in
+    assert { length cards = 11 };
+    assert { card_values_in_range cards };
+    assert { nth 0 cards = 0 };
+    assert { nth 10 cards = 0 };
+    assert { valid_matching_pair cards 0 10 };
+    assert { matching_window cards 11 };
+    assert { forall span: int. matching_window cards span -> 11 <= span };
+    assert { minimum_pickup_result cards 11 }
+
+  let lemma check_test_086 () =
+    let t11 = Cons 1 Nil in
+    let t10 = Cons 2 t11 in
+    let t9 = Cons 3 t10 in
+    let t8 = Cons 0 t9 in
+    let t7 = Cons 1 t8 in
+    let t6 = Cons 5 t7 in
+    let t5 = Cons 2 t6 in
+    let t4 = Cons 2 t5 in
+    let t3 = Cons 3 t4 in
+    let t2 = Cons 5 t3 in
+    let t1 = Cons 0 t2 in
+    let cards = Cons 1 t1 in
+    assert { length cards = 12 };
+    assert { card_values_in_range cards };
+    assert { nth 4 cards = 2 };
+    assert { nth 5 cards = 2 };
+    assert { valid_matching_pair cards 4 5 };
+    assert { matching_window cards 2 };
+    assert { forall span: int. matching_window cards span -> 2 <= span };
+    assert { minimum_pickup_result cards 2 }
+
+  let lemma check_test_108 () =
+    let t9 = Cons 500000 Nil in
+    let t8 = Cons 400000 t9 in
+    let t7 = Cons 300000 t8 in
+    let t6 = Cons 200000 t7 in
+    let t5 = Cons 100000 t6 in
+    let t4 = Cons 500000 t5 in
+    let t3 = Cons 400000 t4 in
+    let t2 = Cons 300000 t3 in
+    let t1 = Cons 200000 t2 in
+    let cards = Cons 100000 t1 in
+    assert { length cards = 10 };
+    assert { card_values_in_range cards };
+    assert { nth 0 cards = 100000 };
+    assert { nth 5 cards = 100000 };
+    assert { nth 1 cards = 200000 };
+    assert { nth 6 cards = 200000 };
+    assert { valid_matching_pair cards 0 5 };
+    assert { valid_matching_pair cards 1 6 };
+    assert { matching_window cards 6 };
+    assert { forall span: int. matching_window cards span -> 6 <= span };
+    assert { minimum_pickup_result cards 6 }
+
+end

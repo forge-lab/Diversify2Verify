@@ -1,0 +1,141 @@
+module CountSubarraysWithMoreOnesThanZeros_Array_Spec
+
+  use int.Int
+  use int.EuclideanDivision
+  use array.Array
+  use array.Init
+  use ref.Ref
+
+  constant modulo_value : int = 1000000007
+
+  predicate binary_array (nums: array int) =
+    forall i: int. 0 <= i < length nums -> nums[i] = 0 \/ nums[i] = 1
+
+  let rec function subarray_balance_from (nums: array int) (i: int) (u: int) : int
+    requires { 0 <= i <= u <= length nums }
+    variant  { u - i }
+  =
+    if i = u then 0
+    else (2 * nums[i] - 1) + subarray_balance_from nums (i + 1) u
+
+  let function subarray_balance (nums: array int) (l: int) (u: int) : int
+    requires { 0 <= l <= u <= length nums }
+  =
+    subarray_balance_from nums l u
+
+  predicate more_ones_than_zeros_subarray (nums: array int) (l: int) (u: int) =
+    0 <= l < u <= length nums /\ subarray_balance nums l u > 0
+
+  let rec function count_good_subarrays_until (nums: array int) (l: int) (u: int) : int
+    requires { 0 <= l < u <= length nums + 1 }
+    variant  { length nums + 1 - u }
+  =
+    if u = length nums + 1 then 0
+    else
+      (if subarray_balance nums l u > 0 then 1 else 0) +
+      count_good_subarrays_until nums l (u + 1)
+
+  let function count_good_subarrays_from (nums: array int) (l: int) : int
+    requires { 0 <= l < length nums }
+  =
+    count_good_subarrays_until nums l (l + 1)
+
+  let rec function total_more_ones_subarrays_from (nums: array int) (l: int) : int
+    requires { 0 <= l <= length nums }
+    variant  { length nums - l }
+  =
+    if l = length nums then 0
+    else count_good_subarrays_from nums l + total_more_ones_subarrays_from nums (l + 1)
+
+  let function total_more_ones_subarrays (nums: array int) : int =
+    total_more_ones_subarrays_from nums 0
+
+  predicate valid_modulo_result (nums: array int) (r: int) =
+    0 <= r < modulo_value /\
+    exists q: int. total_more_ones_subarrays nums = q * modulo_value + r
+
+  let rec function count_good_subarrays_ending_before
+      (nums: array int) (l: int) (u: int) : int
+    requires { 0 <= l < length nums }
+    requires { l + 1 <= u <= length nums + 1 }
+    variant  { u - (l + 1) }
+  =
+    if u = l + 1 then 0
+    else
+      count_good_subarrays_ending_before nums l (u - 1) +
+      (if subarray_balance nums l (u - 1) > 0 then 1 else 0)
+
+  let rec function total_more_ones_subarrays_before
+      (nums: array int) (l: int) : int
+    requires { 0 <= l <= length nums }
+    variant  { l }
+  =
+    if l = 0 then 0
+    else total_more_ones_subarrays_before nums (l - 1) +
+         count_good_subarrays_from nums (l - 1)
+
+  let result_modulus () : int
+    ensures { result = modulo_value }
+    ensures { result > 0 }
+  =
+    1000000007
+
+  let bit_score (x: int) : int
+    requires { x = 0 \/ x = 1 }
+    ensures  { result = 2 * x - 1 }
+  =
+    if x = 1 then 1 else -1
+
+  let count_subarrays_with_more_ones_than_zeros_array (nums: array int) : int
+    requires { 1 <= length nums <= 100000 }
+    requires { binary_array nums }
+    ensures  { valid_modulo_result nums result }
+  =
+    let n = length nums in
+    let total = ref 0 in
+    for start = 0 to n - 1 do
+      invariant { 0 <= start <= n }
+      invariant { !total = total_more_ones_subarrays_before nums start }
+
+      let balance = ref 0 in
+      for finish = start to n - 1 do
+        invariant { start <= finish <= n }
+        invariant { !balance = subarray_balance nums start finish }
+        invariant {
+          !total =
+            total_more_ones_subarrays_before nums start +
+            count_good_subarrays_ending_before nums start (finish + 1)
+        }
+
+        assert { 0 <= finish < length nums };
+        assert { nums[finish] = 0 \/ nums[finish] = 1 };
+        balance := !balance + bit_score (nums[finish]);
+        assert { !balance = subarray_balance nums start (finish + 1) };
+        if !balance > 0 then begin
+          total := !total + 1;
+          assert {
+            !total =
+              total_more_ones_subarrays_before nums start +
+              count_good_subarrays_ending_before nums start (finish + 2)
+          }
+        end else begin
+          assert {
+            !total =
+              total_more_ones_subarrays_before nums start +
+              count_good_subarrays_ending_before nums start (finish + 2)
+          }
+        end
+      done;
+      assert { !balance = subarray_balance nums start n };
+      assert {
+        !total =
+          total_more_ones_subarrays_before nums start +
+          count_good_subarrays_from nums start
+      };
+      assert { !total = total_more_ones_subarrays_before nums (start + 1) }
+    done;
+    assert { !total = total_more_ones_subarrays_before nums n };
+    assert { !total = total_more_ones_subarrays nums };
+    mod !total (result_modulus ())
+
+end

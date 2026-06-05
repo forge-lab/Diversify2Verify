@@ -1,0 +1,171 @@
+module ReducingDishes_Array_Spec
+
+  use int.Int
+  use array.Array
+  use array.Init
+  use array.NumOfEq
+
+  let rec function score_from (prep: array int) (i: int) : int
+    requires { 0 <= i <= length prep }
+    variant  { length prep - i }
+  =
+    if i = length prep then 0
+    else ((i + 1) * prep[i]) + score_from prep (i + 1)
+
+  function like_time_score (prep: array int) : int =
+    score_from prep 0
+
+  predicate valid_preparation (satisfaction: array int) (prep: array int) =
+    length prep <= length satisfaction /\
+    forall x: int.
+      numof prep x 0 (length prep) <= numof satisfaction x 0 (length satisfaction)
+
+  predicate feasible_score (satisfaction: array int) (score: int) =
+    exists prep: array int.
+      valid_preparation satisfaction prep /\ like_time_score prep = score
+
+  predicate optimal_like_time (satisfaction: array int) (result: int) =
+    result >= 0 /\
+    feasible_score satisfaction result /\
+    forall prep: array int.
+      valid_preparation satisfaction prep -> like_time_score prep <= result
+
+  val reducing_dishes_array (satisfaction: array int) : int
+    ensures { optimal_like_time satisfaction result }
+
+  let lemma check_test_000 () =
+    let a = init 6 [|1; -1; 2; -2; 3; -3|] in
+    let prep = init 5 [|-2; -1; 1; 2; 3|] in
+    assert { length a = 6 };
+    assert { a[0] = 1 };
+    assert { a[1] = -1 };
+    assert { a[2] = 2 };
+    assert { a[3] = -2 };
+    assert { a[4] = 3 };
+    assert { a[5] = -3 };
+    assert { length prep = 5 };
+    assert { prep[0] = -2 };
+    assert { prep[1] = -1 };
+    assert { prep[2] = 1 };
+    assert { prep[3] = 2 };
+    assert { prep[4] = 3 };
+    assert { score_from prep 5 = 0 };
+    assert { score_from prep 4 = 15 };
+    assert { score_from prep 3 = 23 };
+    assert { score_from prep 2 = 26 };
+    assert { score_from prep 1 = 24 };
+    assert { score_from prep 0 = 22 };
+    assert { like_time_score prep = 22 };
+    assert { valid_preparation a prep };
+    assert { feasible_score a 22 }
+
+  let lemma check_test_001 () =
+    let a = init 1 [|0|] in
+    let prep = init 1 [|0|] in
+    assert { length a = 1 };
+    assert { a[0] = 0 };
+    assert { length prep = 1 };
+    assert { prep[0] = 0 };
+    assert { score_from prep 1 = 0 };
+    assert { score_from prep 0 = 0 };
+    assert { like_time_score prep = 0 };
+    assert { valid_preparation a prep };
+    assert { feasible_score a 0 }
+
+  let lemma check_test_002 () =
+    let a = init 1 [|-1|] in
+    let prep = make 0 0 in
+    assert { length a = 1 };
+    assert { a[0] = -1 };
+    assert { length prep = 0 };
+    assert { score_from prep 0 = 0 };
+    assert { like_time_score prep = 0 };
+    assert { valid_preparation a prep };
+    assert { feasible_score a 0 }
+
+  let lemma check_test_005 () =
+    let a = init 4 [|-1000; 1000; -500; 500|] in
+    let prep = init 3 [|-500; 500; 1000|] in
+    assert { length a = 4 };
+    assert { a[0] = -1000 };
+    assert { a[1] = 1000 };
+    assert { a[2] = -500 };
+    assert { a[3] = 500 };
+    assert { length prep = 3 };
+    assert { prep[0] = -500 };
+    assert { prep[1] = 500 };
+    assert { prep[2] = 1000 };
+    assert { score_from prep 3 = 0 };
+    assert { score_from prep 2 = 3000 };
+    assert { score_from prep 1 = 4000 };
+    assert { score_from prep 0 = 3500 };
+    assert { like_time_score prep = 3500 };
+    assert { valid_preparation a prep };
+    assert { feasible_score a 3500 }
+
+  let lemma check_test_007 () =
+    let a = init 5 [|1000; -1000; 1000; -1000; 1000|] in
+    let prep = init 5 [|-1000; -1000; 1000; 1000; 1000|] in
+    assert { length a = 5 };
+    assert { a[0] = 1000 };
+    assert { a[1] = -1000 };
+    assert { a[2] = 1000 };
+    assert { a[3] = -1000 };
+    assert { a[4] = 1000 };
+    assert { length prep = 5 };
+    assert { prep[0] = -1000 };
+    assert { prep[1] = -1000 };
+    assert { prep[2] = 1000 };
+    assert { prep[3] = 1000 };
+    assert { prep[4] = 1000 };
+    assert { score_from prep 5 = 0 };
+    assert { score_from prep 4 = 5000 };
+    assert { score_from prep 3 = 9000 };
+    assert { score_from prep 2 = 12000 };
+    assert { score_from prep 1 = 10000 };
+    assert { score_from prep 0 = 9000 };
+    assert { like_time_score prep = 9000 };
+    assert { valid_preparation a prep };
+    assert { feasible_score a 9000 }
+
+  let lemma check_test_008 () =
+    let a = init 5 [|-1; -8; 0; 5; -9|] in
+    let prep = init 3 [|-1; 0; 5|] in
+    assert { length a = 5 };
+    assert { a[0] = -1 };
+    assert { a[1] = -8 };
+    assert { a[2] = 0 };
+    assert { a[3] = 5 };
+    assert { a[4] = -9 };
+    assert { length prep = 3 };
+    assert { prep[0] = -1 };
+    assert { prep[1] = 0 };
+    assert { prep[2] = 5 };
+    assert { score_from prep 3 = 0 };
+    assert { score_from prep 2 = 15 };
+    assert { score_from prep 1 = 15 };
+    assert { score_from prep 0 = 14 };
+    assert { like_time_score prep = 14 };
+    assert { valid_preparation a prep };
+    assert { feasible_score a 14 }
+
+  let lemma check_test_013 () =
+    let a = init 3 [|4; 3; 2|] in
+    let prep = init 3 [|2; 3; 4|] in
+    assert { length a = 3 };
+    assert { a[0] = 4 };
+    assert { a[1] = 3 };
+    assert { a[2] = 2 };
+    assert { length prep = 3 };
+    assert { prep[0] = 2 };
+    assert { prep[1] = 3 };
+    assert { prep[2] = 4 };
+    assert { score_from prep 3 = 0 };
+    assert { score_from prep 2 = 12 };
+    assert { score_from prep 1 = 18 };
+    assert { score_from prep 0 = 20 };
+    assert { like_time_score prep = 20 };
+    assert { valid_preparation a prep };
+    assert { feasible_score a 20 }
+
+end

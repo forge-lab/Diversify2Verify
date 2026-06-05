@@ -1,0 +1,166 @@
+module MaximizeHappinessOfSelectedChildren_Array_Spec
+
+  use int.Int
+  use int.MinMax
+  use int.Sum
+  use array.Array
+  use array.Init
+  use array.NumOf
+  use ref.Ref
+
+  predicate all_positive (happiness: array int) =
+    forall i: int. 0 <= i < length happiness -> 1 <= happiness[i]
+
+  function adjusted_happiness (h: int) (turn: int) : int =
+    max (h - turn) 0
+
+  predicate valid_pick_order (happiness: array int) (k: int) (picks: array int) =
+    0 <= k <= length happiness /\
+    length picks = k /\
+    (forall t: int. 0 <= t < k -> 0 <= picks[t] < length happiness) /\
+    (forall i j: int. 0 <= i < j < k -> picks[i] <> picks[j])
+
+  function order_score (happiness: array int) (picks: array int) (k: int) : int =
+    sum (fun t -> adjusted_happiness happiness[picks[t]] t) 0 k
+
+  predicate maximized_happiness_score (happiness: array int) (k: int) (score: int) =
+    0 <= k <= length happiness /\
+    (exists picks: array int.
+       valid_pick_order happiness k picks /\
+       score = order_score happiness picks k) /\
+    (forall picks: array int.
+       valid_pick_order happiness k picks ->
+       order_score happiness picks k <= score)
+
+  predicate same_elements (a: array int) (b: array int) =
+    length a = length b /\
+    forall v: int. numof (fun _ x -> x = v) a 0 (length a) =
+                   numof (fun _ x -> x = v) b 0 (length b)
+
+  predicate sorted_array (a: array int) =
+    forall i j: int. 0 <= i <= j < length a -> a[i] <= a[j]
+
+  predicate sorted_prefix (a: array int) (hi: int) =
+    0 <= hi <= length a /\
+    forall i j: int. 0 <= i <= j < hi -> a[i] <= a[j]
+
+  function top_k_adjusted_sum (sorted: array int) (limit: int) : int =
+    sum (fun t -> adjusted_happiness sorted[length sorted - 1 - t] t) 0 limit
+
+  let copy_array (a: array int) : array int
+    ensures { length result = length a }
+    ensures { forall i: int. 0 <= i < length a -> result[i] = a[i] }
+    ensures { same_elements a result }
+  =
+    let n = length a in
+    let result = make n 0 in
+    for i = 0 to n - 1 do
+      invariant { n = length a }
+      invariant { length result = n }
+      invariant { forall j: int. 0 <= j < i -> result[j] = a[j] }
+      result[i] <- a[i]
+    done;
+    assert { forall i: int. 0 <= i < length a -> result[i] = a[i] };
+    assert { same_elements a result };
+    result
+
+  let insertion_sort (a: array int) : unit
+    ensures { length a = old (length a) }
+    ensures { same_elements (old a) a }
+    ensures { sorted_array a }
+  =
+    let n = length a in
+    if n >= 2 then
+      for i = 1 to n - 1 do
+        invariant { n = length a }
+        invariant { 1 <= i <= n }
+        invariant { sorted_prefix a i }
+        invariant { same_elements (old a) a }
+
+        let key = a[i] in
+        let j = ref (i - 1) in
+        while !j >= 0 && a[!j] > key do
+          invariant { n = length a }
+          invariant { -1 <= !j < i }
+          invariant { i < n }
+          invariant { sorted_prefix a (!j + 1) }
+          invariant { forall p: int. !j + 1 < p <= i -> key < a[p] }
+          invariant { forall p q: int. !j + 1 < p <= q <= i -> a[p] <= a[q] }
+          variant { !j + 1 }
+          a[!j + 1] <- a[!j];
+          j := !j - 1
+        done;
+        assert { -1 <= !j < i };
+        assert { 0 <= !j + 1 <= i };
+        assert { sorted_prefix a (!j + 1) };
+        assert { !j < 0 \/ a[!j] <= key };
+        a[!j + 1] <- key;
+        assert { a[!j + 1] = key };
+        assert { forall p: int. !j + 1 < p <= i -> a[!j + 1] <= a[p] };
+        assert { forall p q: int. !j + 1 < p <= q <= i -> a[p] <= a[q] };
+        assert { forall p: int. 0 <= p < !j + 1 -> a[p] <= a[!j + 1] };
+        assert { forall p q: int. 0 <= p <= q < i + 1 -> a[p] <= a[q] };
+        assert { sorted_prefix a (i + 1) };
+        assert { length (old a) = length a };
+        assert {
+          forall v: int.
+            numof (fun _ x -> x = v) (old a) 0 (length (old a)) =
+            numof (fun _ x -> x = v) a 0 (length a)
+        };
+        assert { same_elements (old a) a }
+      done;
+    assert { sorted_array a };
+    assert { same_elements (old a) a }
+
+  let executable_adjusted_happiness (h: int) (turn: int) : int
+    ensures { result = adjusted_happiness h turn }
+  =
+    if h > turn then begin
+      assert { max (h - turn) 0 = h - turn };
+      h - turn
+    end else begin
+      assert { max (h - turn) 0 = 0 };
+      0
+    end
+
+  let maximize_happiness_of_selected_children_array
+    (happiness: array int) (k: int) : int
+    requires { 1 <= length happiness }
+    requires { 1 <= k <= length happiness }
+    requires { all_positive happiness }
+    ensures  { maximized_happiness_score happiness k result }
+  =
+    let n = length happiness in
+    if n = 0 || k <= 0 then
+      0
+    else begin
+      let sorted = copy_array happiness in
+      assert { length sorted = n };
+      assert { same_elements happiness sorted };
+      insertion_sort sorted;
+      assert { length sorted = n };
+      assert { sorted_array sorted };
+      assert { same_elements happiness sorted };
+      let total = ref 0 in
+      let limit = if k <= n then k else n in
+      assert { limit = k };
+      for turn = 0 to limit - 1 do
+        invariant { n = length happiness }
+        invariant { n = length sorted }
+        invariant { limit = k }
+        invariant { 0 <= turn <= limit }
+        invariant { 0 <= limit <= n }
+        invariant { sorted_array sorted }
+        invariant { same_elements happiness sorted }
+        invariant { !total = top_k_adjusted_sum sorted turn }
+        let value = sorted[n - 1 - turn] in
+        assert { 0 <= n - 1 - turn < length sorted };
+        total := !total + executable_adjusted_happiness value turn;
+        assert { !total = top_k_adjusted_sum sorted (turn + 1) }
+      done;
+      assert { !total = top_k_adjusted_sum sorted k };
+      assert { maximized_happiness_score happiness k !total };
+      !total
+    end
+
+end

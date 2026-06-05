@@ -1,0 +1,2532 @@
+{
+  "task": {
+    "task_id": "maximize-happiness-of-selected-children",
+    "question_id": 3075,
+    "difficulty": "Medium",
+    "source_file": "bench2/3075.json"
+  },
+  "target": {
+    "name": "array",
+    "language": "why3",
+    "module_name": "MaximizeHappinessOfSelectedChildren_Array_Spec",
+    "output_file": "generated/why3/array/maximize_happiness_of_selected_children_array.mlw",
+    "signature": {
+      "raw": "val maximize_happiness_of_selected_children_array (happiness: array int) (k: int) : int",
+      "function_name": "maximize_happiness_of_selected_children_array",
+      "parameters": [
+        {
+          "name": "happiness",
+          "why3_type": "array int",
+          "semantic_type": "int_sequence"
+        },
+        {
+          "name": "k",
+          "why3_type": "int",
+          "semantic_type": "int"
+        }
+      ],
+      "return": {
+        "why3_type": "int",
+        "semantic_type": "int"
+      }
+    }
+  },
+  "problem": {
+    "description": "You are given an array happiness of length n, and a positive integer k.\nThere are n children standing in a queue, where the ith child has happiness value happiness[i]. You want to select k children from these n children in k turns.\nIn each turn, when you select a child, the happiness value of all the children that have not been selected till now decreases by 1. Note that the happiness value cannot become negative and gets decremented only if it is positive.\nReturn the maximum sum of the happiness values of the selected children you can achieve by selecting k children.\n \nExample 1:\n\nInput: happiness = [1,2,3], k = 2\nOutput: 4\nExplanation: We can pick 2 children in the following way:\n- Pick the child with the happiness value == 3. The happiness value of the remaining children becomes [0,1].\n- Pick the child with the happiness value == 1. The happiness value of the remaining child becomes [0]. Note that the happiness value cannot become less than 0.\nThe sum of the happiness values of the selected children is 3 + 1 = 4.\n\nExample 2:\n\nInput: happiness = [1,1,1,1], k = 2\nOutput: 1\nExplanation: We can pick 2 children in the following way:\n- Pick any child with the happiness value == 1. The happiness value of the remaining children becomes [0,0,0].\n- Pick the child with the happiness value == 0. The happiness value of the remaining child becomes [0,0].\nThe sum of the happiness values of the selected children is 1 + 0 = 1.\n\nExample 3:\n\nInput: happiness = [2,3,4,5], k = 1\nOutput: 5\nExplanation: We can pick 1 child in the following way:\n- Pick the child with the happiness value == 5. The happiness value of the remaining children becomes [1,2,3].\nThe sum of the happiness values of the selected children is 5.\n\n \nConstraints:\n\n1 <= n == happiness.length <= 2 * 105\n1 <= happiness[i] <= 108\n1 <= k <= n\n\n"
+  },
+  "tests": [
+    {
+      "id": "test_000",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "happiness": [
+          10,
+          9,
+          8,
+          7,
+          6,
+          5,
+          4,
+          3,
+          2,
+          1
+        ],
+        "k": 10
+      },
+      "expected": 30,
+      "warnings": []
+    },
+    {
+      "id": "test_001",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "happiness": [
+          10,
+          20,
+          30,
+          40,
+          50
+        ],
+        "k": 5
+      },
+      "expected": 140,
+      "warnings": []
+    },
+    {
+      "id": "test_002",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "happiness": [
+          5,
+          5,
+          5,
+          5,
+          5,
+          5,
+          5,
+          5,
+          5,
+          5
+        ],
+        "k": 5
+      },
+      "expected": 15,
+      "warnings": []
+    },
+    {
+      "id": "test_003",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "happiness": [
+          100000000,
+          100000000,
+          100000000
+        ],
+        "k": 2
+      },
+      "expected": 199999999,
+      "warnings": []
+    },
+    {
+      "id": "test_004",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "happiness": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10
+        ],
+        "k": 5
+      },
+      "expected": 30,
+      "warnings": []
+    },
+    {
+      "id": "test_005",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "happiness": [
+          1
+        ],
+        "k": 1
+      },
+      "expected": 1,
+      "warnings": []
+    },
+    {
+      "id": "test_006",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "happiness": [
+          100000000,
+          100000000,
+          100000000,
+          100000000
+        ],
+        "k": 2
+      },
+      "expected": 199999999,
+      "warnings": []
+    },
+    {
+      "id": "test_007",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "happiness": [
+          9,
+          8,
+          7,
+          6,
+          5,
+          4,
+          3,
+          2,
+          1
+        ],
+        "k": 9
+      },
+      "expected": 25,
+      "warnings": []
+    },
+    {
+      "id": "test_008",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "happiness": [
+          10,
+          9,
+          8,
+          7,
+          6
+        ],
+        "k": 3
+      },
+      "expected": 24,
+      "warnings": []
+    },
+    {
+      "id": "test_009",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "happiness": [
+          100,
+          100,
+          100
+        ],
+        "k": 1
+      },
+      "expected": 100,
+      "warnings": []
+    },
+    {
+      "id": "test_010",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "happiness": [
+          1,
+          1,
+          1,
+          1
+        ],
+        "k": 2
+      },
+      "expected": 1,
+      "warnings": []
+    },
+    {
+      "id": "test_011",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "happiness": [
+          1,
+          1,
+          2,
+          2,
+          3,
+          3,
+          4,
+          4,
+          5,
+          5
+        ],
+        "k": 5
+      },
+      "expected": 12,
+      "warnings": []
+    },
+    {
+      "id": "test_012",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "happiness": [
+          1,
+          2,
+          3
+        ],
+        "k": 2
+      },
+      "expected": 4,
+      "warnings": []
+    },
+    {
+      "id": "test_013",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "happiness": [
+          2,
+          3,
+          4,
+          5
+        ],
+        "k": 1
+      },
+      "expected": 5,
+      "warnings": []
+    },
+    {
+      "id": "test_014",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "happiness": [
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1
+        ],
+        "k": 5
+      },
+      "expected": 1,
+      "warnings": []
+    },
+    {
+      "id": "test_015",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "happiness": [
+          5,
+          4,
+          3,
+          2,
+          1
+        ],
+        "k": 3
+      },
+      "expected": 9,
+      "warnings": []
+    },
+    {
+      "id": "test_016",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "happiness": [
+          5,
+          5,
+          5,
+          5,
+          5,
+          5,
+          5,
+          5,
+          5,
+          5
+        ],
+        "k": 3
+      },
+      "expected": 12,
+      "warnings": []
+    },
+    {
+      "id": "test_017",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "happiness": [
+          1,
+          10,
+          1,
+          10,
+          1,
+          10,
+          1,
+          10,
+          1,
+          10
+        ],
+        "k": 5
+      },
+      "expected": 40,
+      "warnings": []
+    },
+    {
+      "id": "test_018",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "happiness": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10
+        ],
+        "k": 3
+      },
+      "expected": 24,
+      "warnings": []
+    },
+    {
+      "id": "test_019",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "happiness": [
+          1,
+          2,
+          2,
+          3,
+          3,
+          3,
+          4,
+          4,
+          4,
+          4,
+          5,
+          5,
+          5,
+          5,
+          5
+        ],
+        "k": 10
+      },
+      "expected": 15,
+      "warnings": []
+    },
+    {
+      "id": "test_020",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "happiness": [
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1
+        ],
+        "k": 10
+      },
+      "expected": 1,
+      "warnings": []
+    },
+    {
+      "id": "test_021",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "happiness": [
+          10,
+          20,
+          30,
+          40,
+          50,
+          60,
+          70,
+          80,
+          90,
+          100
+        ],
+        "k": 4
+      },
+      "expected": 334,
+      "warnings": []
+    },
+    {
+      "id": "test_022",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "happiness": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20
+        ],
+        "k": 12
+      },
+      "expected": 110,
+      "warnings": []
+    },
+    {
+      "id": "test_023",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "happiness": [
+          5,
+          5,
+          5,
+          5,
+          5,
+          5,
+          5,
+          5,
+          5,
+          5,
+          5,
+          5,
+          5,
+          5,
+          5,
+          5,
+          5,
+          5,
+          5,
+          5
+        ],
+        "k": 15
+      },
+      "expected": 15,
+      "warnings": []
+    },
+    {
+      "id": "test_024",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "happiness": [
+          10,
+          10,
+          10,
+          10,
+          10,
+          10,
+          10,
+          10,
+          10,
+          10,
+          10,
+          10,
+          10,
+          10,
+          10,
+          10,
+          10,
+          10,
+          10,
+          10
+        ],
+        "k": 18
+      },
+      "expected": 55,
+      "warnings": []
+    },
+    {
+      "id": "test_025",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "happiness": [
+          10,
+          20,
+          30,
+          40,
+          50
+        ],
+        "k": 3
+      },
+      "expected": 117,
+      "warnings": []
+    },
+    {
+      "id": "test_026",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "happiness": [
+          3,
+          1,
+          4,
+          1,
+          5,
+          9,
+          2,
+          6,
+          5,
+          3,
+          5,
+          9
+        ],
+        "k": 7
+      },
+      "expected": 24,
+      "warnings": []
+    },
+    {
+      "id": "test_027",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "happiness": [
+          100000000,
+          90000000,
+          80000000,
+          70000000,
+          60000000,
+          50000000,
+          40000000,
+          30000000,
+          20000000,
+          10000000
+        ],
+        "k": 10
+      },
+      "expected": 549999955,
+      "warnings": []
+    },
+    {
+      "id": "test_028",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "happiness": [
+          100,
+          200,
+          300,
+          400,
+          500,
+          600,
+          700,
+          800,
+          900,
+          1000
+        ],
+        "k": 10
+      },
+      "expected": 5455,
+      "warnings": []
+    },
+    {
+      "id": "test_029",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "happiness": [
+          50,
+          40,
+          30,
+          20,
+          10,
+          0,
+          -10,
+          -20,
+          -30,
+          -40
+        ],
+        "k": 6
+      },
+      "expected": 140,
+      "warnings": []
+    },
+    {
+      "id": "test_030",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "happiness": [
+          10,
+          9,
+          8,
+          7,
+          6,
+          5,
+          4,
+          3,
+          2,
+          1,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10
+        ],
+        "k": 15
+      },
+      "expected": 40,
+      "warnings": []
+    },
+    {
+      "id": "test_031",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "happiness": [
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1
+        ],
+        "k": 7
+      },
+      "expected": 1,
+      "warnings": []
+    },
+    {
+      "id": "test_032",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "happiness": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20
+        ],
+        "k": 10
+      },
+      "expected": 110,
+      "warnings": []
+    },
+    {
+      "id": "test_033",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "happiness": [
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2
+        ],
+        "k": 10
+      },
+      "expected": 3,
+      "warnings": []
+    },
+    {
+      "id": "test_034",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "happiness": [
+          100,
+          99,
+          98,
+          97,
+          96,
+          95,
+          94,
+          93,
+          92,
+          91,
+          90,
+          89,
+          88,
+          87,
+          86,
+          85,
+          84,
+          83,
+          82,
+          81
+        ],
+        "k": 10
+      },
+      "expected": 910,
+      "warnings": []
+    },
+    {
+      "id": "test_035",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "happiness": [
+          10,
+          20,
+          30,
+          40,
+          50,
+          60,
+          70,
+          80,
+          90,
+          100
+        ],
+        "k": 8
+      },
+      "expected": 492,
+      "warnings": []
+    },
+    {
+      "id": "test_036",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "happiness": [
+          1,
+          100000000,
+          1,
+          100000000,
+          1,
+          100000000,
+          1,
+          100000000,
+          1,
+          100000000
+        ],
+        "k": 5
+      },
+      "expected": 499999990,
+      "warnings": []
+    },
+    {
+      "id": "test_037",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "happiness": [
+          98,
+          97,
+          96,
+          95,
+          94,
+          93,
+          92,
+          91,
+          90,
+          89,
+          88,
+          87,
+          86,
+          85,
+          84,
+          83,
+          82,
+          81,
+          80,
+          79
+        ],
+        "k": 15
+      },
+      "expected": 1260,
+      "warnings": []
+    },
+    {
+      "id": "test_038",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "happiness": [
+          1,
+          3,
+          5,
+          7,
+          9,
+          11,
+          13,
+          15,
+          17,
+          19,
+          21,
+          23,
+          25,
+          27,
+          29,
+          31,
+          33,
+          35,
+          37,
+          39
+        ],
+        "k": 15
+      },
+      "expected": 273,
+      "warnings": []
+    },
+    {
+      "id": "test_039",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "happiness": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10
+        ],
+        "k": 1
+      },
+      "expected": 10,
+      "warnings": []
+    },
+    {
+      "id": "test_040",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "happiness": [
+          10,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9
+        ],
+        "k": 6
+      },
+      "expected": 30,
+      "warnings": []
+    },
+    {
+      "id": "test_041",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "happiness": [
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1
+        ],
+        "k": 100
+      },
+      "expected": 1,
+      "warnings": []
+    },
+    {
+      "id": "test_042",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "happiness": [
+          2,
+          4,
+          6,
+          8,
+          10,
+          12,
+          14,
+          16,
+          18,
+          20,
+          22,
+          24,
+          26,
+          28,
+          30
+        ],
+        "k": 8
+      },
+      "expected": 156,
+      "warnings": []
+    },
+    {
+      "id": "test_043",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "happiness": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15
+        ],
+        "k": 7
+      },
+      "expected": 63,
+      "warnings": []
+    },
+    {
+      "id": "test_044",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "happiness": [
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1
+        ],
+        "k": 15
+      },
+      "expected": 1,
+      "warnings": []
+    },
+    {
+      "id": "test_045",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "happiness": [
+          100,
+          200,
+          300,
+          400,
+          500,
+          600,
+          700,
+          800,
+          900,
+          1000,
+          100,
+          200,
+          300,
+          400,
+          500,
+          600,
+          700,
+          800,
+          900,
+          1000
+        ],
+        "k": 15
+      },
+      "expected": 9995,
+      "warnings": []
+    },
+    {
+      "id": "test_046",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "happiness": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15
+        ],
+        "k": 7
+      },
+      "expected": 63,
+      "warnings": []
+    },
+    {
+      "id": "test_047",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "happiness": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20
+        ],
+        "k": 20
+      },
+      "expected": 110,
+      "warnings": []
+    },
+    {
+      "id": "test_048",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "happiness": [
+          100000000,
+          90000000,
+          80000000,
+          70000000,
+          60000000,
+          50000000,
+          40000000,
+          30000000,
+          20000000,
+          10000000
+        ],
+        "k": 5
+      },
+      "expected": 399999990,
+      "warnings": []
+    },
+    {
+      "id": "test_049",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "happiness": [
+          2,
+          3,
+          5,
+          7,
+          11,
+          13,
+          17,
+          19,
+          23,
+          29,
+          31,
+          37,
+          41,
+          43,
+          47,
+          53,
+          59,
+          61,
+          67,
+          71
+        ],
+        "k": 10
+      },
+      "expected": 465,
+      "warnings": []
+    },
+    {
+      "id": "test_050",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "happiness": [
+          9,
+          7,
+          5,
+          3,
+          1,
+          8,
+          6,
+          4,
+          2,
+          0,
+          9,
+          7,
+          5,
+          3,
+          1,
+          8,
+          6,
+          4,
+          2,
+          0
+        ],
+        "k": 10
+      },
+      "expected": 33,
+      "warnings": []
+    },
+    {
+      "id": "test_051",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "happiness": [
+          100,
+          99,
+          98,
+          97,
+          96,
+          95,
+          94,
+          93,
+          92,
+          91
+        ],
+        "k": 10
+      },
+      "expected": 910,
+      "warnings": []
+    },
+    {
+      "id": "test_052",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "happiness": [
+          10,
+          9,
+          8,
+          7,
+          6,
+          5,
+          4,
+          3,
+          2,
+          1
+        ],
+        "k": 5
+      },
+      "expected": 30,
+      "warnings": []
+    },
+    {
+      "id": "test_053",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "happiness": [
+          1,
+          1,
+          2,
+          2,
+          3,
+          3,
+          4,
+          4,
+          5,
+          5,
+          6,
+          6,
+          7,
+          7,
+          8,
+          8,
+          9,
+          9,
+          10,
+          10
+        ],
+        "k": 10
+      },
+      "expected": 40,
+      "warnings": []
+    },
+    {
+      "id": "test_054",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "happiness": [
+          100,
+          200,
+          300,
+          400,
+          500,
+          600,
+          700,
+          800,
+          900,
+          1000
+        ],
+        "k": 5
+      },
+      "expected": 3990,
+      "warnings": []
+    },
+    {
+      "id": "test_055",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "happiness": [
+          5,
+          10,
+          15,
+          20,
+          25,
+          30,
+          35,
+          40,
+          45,
+          50
+        ],
+        "k": 3
+      },
+      "expected": 132,
+      "warnings": []
+    },
+    {
+      "id": "test_056",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "happiness": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10
+        ],
+        "k": 7
+      },
+      "expected": 30,
+      "warnings": []
+    },
+    {
+      "id": "test_057",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "happiness": [
+          2,
+          3,
+          5,
+          7,
+          11,
+          13,
+          17,
+          19,
+          23,
+          29,
+          31,
+          37,
+          41,
+          43,
+          47
+        ],
+        "k": 15
+      },
+      "expected": 256,
+      "warnings": []
+    },
+    {
+      "id": "test_058",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "happiness": [
+          1,
+          10,
+          1,
+          10,
+          1,
+          10,
+          1,
+          10,
+          1,
+          10
+        ],
+        "k": 4
+      },
+      "expected": 34,
+      "warnings": []
+    },
+    {
+      "id": "test_059",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "happiness": [
+          1,
+          2,
+          2,
+          3,
+          3,
+          4,
+          4,
+          5,
+          5,
+          6,
+          6,
+          7,
+          7,
+          8,
+          8,
+          9,
+          9,
+          10,
+          10,
+          10
+        ],
+        "k": 15
+      },
+      "expected": 43,
+      "warnings": []
+    },
+    {
+      "id": "test_060",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "happiness": [
+          9,
+          8,
+          7,
+          6,
+          5,
+          4,
+          3,
+          2,
+          1,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "k": 8
+      },
+      "expected": 25,
+      "warnings": []
+    },
+    {
+      "id": "test_061",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "happiness": [
+          5,
+          4,
+          3,
+          2,
+          1
+        ],
+        "k": 3
+      },
+      "expected": 9,
+      "warnings": []
+    },
+    {
+      "id": "test_062",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "happiness": [
+          10,
+          10,
+          10,
+          10,
+          10,
+          10,
+          10,
+          10,
+          10,
+          10,
+          10,
+          10,
+          10,
+          10,
+          10,
+          10,
+          10,
+          10,
+          10,
+          10
+        ],
+        "k": 15
+      },
+      "expected": 55,
+      "warnings": []
+    },
+    {
+      "id": "test_063",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "happiness": [
+          10,
+          20,
+          30,
+          40,
+          50,
+          60,
+          70,
+          80,
+          90,
+          100
+        ],
+        "k": 5
+      },
+      "expected": 390,
+      "warnings": []
+    },
+    {
+      "id": "test_064",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "happiness": [
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1
+        ],
+        "k": 10
+      },
+      "expected": 1,
+      "warnings": []
+    },
+    {
+      "id": "test_065",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "happiness": [
+          3,
+          1,
+          4,
+          1,
+          5,
+          9,
+          2,
+          6,
+          5,
+          3,
+          5
+        ],
+        "k": 6
+      },
+      "expected": 20,
+      "warnings": []
+    },
+    {
+      "id": "test_066",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "happiness": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15
+        ],
+        "k": 15
+      },
+      "expected": 64,
+      "warnings": []
+    },
+    {
+      "id": "test_067",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "happiness": [
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2,
+          2
+        ],
+        "k": 5
+      },
+      "expected": 3,
+      "warnings": []
+    },
+    {
+      "id": "test_068",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "happiness": [
+          9,
+          8,
+          7,
+          6,
+          5,
+          4,
+          3,
+          2,
+          1
+        ],
+        "k": 5
+      },
+      "expected": 25,
+      "warnings": []
+    },
+    {
+      "id": "test_069",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "happiness": [
+          100,
+          50,
+          10,
+          5,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1
+        ],
+        "k": 10
+      },
+      "expected": 159,
+      "warnings": []
+    },
+    {
+      "id": "test_070",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "happiness": [
+          100,
+          100,
+          100,
+          100,
+          100,
+          100,
+          100,
+          100,
+          100,
+          100
+        ],
+        "k": 8
+      },
+      "expected": 772,
+      "warnings": []
+    },
+    {
+      "id": "test_071",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "happiness": [
+          10,
+          20,
+          30,
+          40,
+          50,
+          60,
+          70,
+          80,
+          90,
+          100,
+          110,
+          120,
+          130,
+          140,
+          150,
+          160,
+          170,
+          180,
+          190,
+          200
+        ],
+        "k": 15
+      },
+      "expected": 1845,
+      "warnings": []
+    },
+    {
+      "id": "test_072",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "happiness": [
+          5,
+          5,
+          5,
+          5,
+          5,
+          5,
+          5,
+          5,
+          5,
+          5,
+          5,
+          5,
+          5,
+          5,
+          5,
+          5,
+          5,
+          5,
+          5,
+          5
+        ],
+        "k": 10
+      },
+      "expected": 15,
+      "warnings": []
+    },
+    {
+      "id": "test_073",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "happiness": [
+          10,
+          20,
+          30,
+          40,
+          50,
+          60,
+          70,
+          80,
+          90,
+          100
+        ],
+        "k": 5
+      },
+      "expected": 390,
+      "warnings": []
+    },
+    {
+      "id": "test_074",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "happiness": [
+          1,
+          10,
+          1,
+          10,
+          1,
+          10,
+          1,
+          10,
+          1,
+          10
+        ],
+        "k": 8
+      },
+      "expected": 40,
+      "warnings": []
+    },
+    {
+      "id": "test_075",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "happiness": [
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1
+        ],
+        "k": 20
+      },
+      "expected": 1,
+      "warnings": []
+    },
+    {
+      "id": "test_076",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "happiness": [
+          20,
+          15,
+          10,
+          5,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "k": 4
+      },
+      "expected": 44,
+      "warnings": []
+    },
+    {
+      "id": "test_077",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "happiness": [
+          100,
+          200,
+          300,
+          400,
+          500,
+          600,
+          700,
+          800,
+          900,
+          1000,
+          1100,
+          1200,
+          1300,
+          1400,
+          1500
+        ],
+        "k": 9
+      },
+      "expected": 9864,
+      "warnings": []
+    },
+    {
+      "id": "test_078",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "happiness": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10
+        ],
+        "k": 10
+      },
+      "expected": 30,
+      "warnings": []
+    },
+    {
+      "id": "test_079",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "happiness": [
+          10,
+          9,
+          8,
+          7,
+          6,
+          5,
+          4,
+          3,
+          2,
+          1,
+          0,
+          -1,
+          -2,
+          -3,
+          -4,
+          -5
+        ],
+        "k": 5
+      },
+      "expected": 30,
+      "warnings": []
+    },
+    {
+      "id": "test_080",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "happiness": [
+          30,
+          29,
+          28,
+          27,
+          26,
+          25,
+          24,
+          23,
+          22,
+          21,
+          20,
+          19,
+          18,
+          17,
+          16,
+          15,
+          14,
+          13,
+          12,
+          11,
+          10,
+          9,
+          8,
+          7,
+          6,
+          5,
+          4,
+          3,
+          2,
+          1
+        ],
+        "k": 20
+      },
+      "expected": 240,
+      "warnings": []
+    },
+    {
+      "id": "test_081",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "happiness": [
+          10,
+          9,
+          8,
+          7,
+          6,
+          5,
+          4,
+          3,
+          2,
+          1,
+          0,
+          -1,
+          -2,
+          -3,
+          -4,
+          -5,
+          -6,
+          -7,
+          -8,
+          -9,
+          -10
+        ],
+        "k": 5
+      },
+      "expected": 30,
+      "warnings": []
+    },
+    {
+      "id": "test_082",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "happiness": [
+          5,
+          4,
+          3,
+          2,
+          1,
+          5,
+          4,
+          3,
+          2,
+          1
+        ],
+        "k": 5
+      },
+      "expected": 12,
+      "warnings": []
+    },
+    {
+      "id": "test_083",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "happiness": [
+          5,
+          15,
+          25,
+          35,
+          45,
+          55,
+          65
+        ],
+        "k": 4
+      },
+      "expected": 194,
+      "warnings": []
+    },
+    {
+      "id": "test_084",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "happiness": [
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30
+        ],
+        "k": 15
+      },
+      "expected": 240,
+      "warnings": []
+    },
+    {
+      "id": "test_085",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "happiness": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20
+        ],
+        "k": 15
+      },
+      "expected": 110,
+      "warnings": []
+    },
+    {
+      "id": "test_086",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "happiness": [
+          10,
+          9,
+          8,
+          7,
+          6,
+          5,
+          4,
+          3,
+          2,
+          1
+        ],
+        "k": 10
+      },
+      "expected": 30,
+      "warnings": []
+    },
+    {
+      "id": "test_087",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "happiness": [
+          5,
+          3,
+          8,
+          6,
+          2,
+          7,
+          4,
+          9,
+          1,
+          10
+        ],
+        "k": 6
+      },
+      "expected": 30,
+      "warnings": []
+    },
+    {
+      "id": "test_088",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "happiness": [
+          1,
+          3,
+          2,
+          5,
+          4,
+          7,
+          6,
+          9,
+          8,
+          11,
+          10,
+          13,
+          12,
+          15,
+          14
+        ],
+        "k": 8
+      },
+      "expected": 64,
+      "warnings": []
+    },
+    {
+      "id": "test_089",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "happiness": [
+          5,
+          4,
+          3,
+          2,
+          1,
+          1,
+          2,
+          3,
+          4,
+          5,
+          5,
+          4,
+          3,
+          2,
+          1,
+          1,
+          2,
+          3,
+          4,
+          5
+        ],
+        "k": 10
+      },
+      "expected": 14,
+      "warnings": []
+    },
+    {
+      "id": "test_090",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "happiness": [
+          100000000,
+          90000000,
+          80000000,
+          70000000,
+          60000000
+        ],
+        "k": 3
+      },
+      "expected": 269999997,
+      "warnings": []
+    },
+    {
+      "id": "test_091",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "happiness": [
+          5,
+          15,
+          25,
+          35,
+          45,
+          55
+        ],
+        "k": 4
+      },
+      "expected": 154,
+      "warnings": []
+    },
+    {
+      "id": "test_092",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "happiness": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10
+        ],
+        "k": 5
+      },
+      "expected": 30,
+      "warnings": []
+    },
+    {
+      "id": "test_093",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "happiness": [
+          10,
+          20,
+          30,
+          40,
+          50,
+          60,
+          70,
+          80,
+          90,
+          100
+        ],
+        "k": 10
+      },
+      "expected": 505,
+      "warnings": []
+    },
+    {
+      "id": "test_094",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "happiness": [
+          1,
+          3,
+          5,
+          7,
+          9,
+          11,
+          13,
+          15,
+          17,
+          19,
+          21,
+          23,
+          25,
+          27,
+          29,
+          31,
+          33,
+          35,
+          37,
+          39
+        ],
+        "k": 10
+      },
+      "expected": 255,
+      "warnings": []
+    },
+    {
+      "id": "test_095",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "happiness": [
+          5,
+          3,
+          8,
+          6,
+          2,
+          7,
+          4,
+          1,
+          9
+        ],
+        "k": 4
+      },
+      "expected": 24,
+      "warnings": []
+    },
+    {
+      "id": "test_096",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "happiness": [
+          100,
+          50,
+          25,
+          12,
+          6,
+          3,
+          1,
+          0,
+          0,
+          0
+        ],
+        "k": 5
+      },
+      "expected": 183,
+      "warnings": []
+    },
+    {
+      "id": "test_097",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "happiness": [
+          5,
+          5,
+          5,
+          5,
+          5,
+          5,
+          5,
+          5,
+          5,
+          5,
+          5,
+          5,
+          5,
+          5,
+          5
+        ],
+        "k": 15
+      },
+      "expected": 15,
+      "warnings": []
+    },
+    {
+      "id": "test_098",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "happiness": [
+          10,
+          20,
+          30,
+          40,
+          50,
+          60,
+          70,
+          80,
+          90,
+          100
+        ],
+        "k": 3
+      },
+      "expected": 267,
+      "warnings": []
+    },
+    {
+      "id": "test_099",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "happiness": [
+          1,
+          2,
+          1,
+          3,
+          1,
+          4,
+          1,
+          5,
+          1,
+          6,
+          1,
+          7,
+          1,
+          8,
+          1,
+          9,
+          1,
+          10,
+          1,
+          11
+        ],
+        "k": 5
+      },
+      "expected": 35,
+      "warnings": []
+    }
+  ],
+  "normalization": {
+    "test_source": "python_assertions",
+    "test_count": 100,
+    "raw_test_sha256": "1627f4223592df310c4328b0fb10a272ddec6a789dcc3029b6ba490241b9921d",
+    "generated_by": "scripts/d2v-normalize-json.py",
+    "allow_extra_tests": false
+  }
+}

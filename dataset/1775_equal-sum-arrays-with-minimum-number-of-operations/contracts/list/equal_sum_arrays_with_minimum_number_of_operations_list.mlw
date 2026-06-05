@@ -1,0 +1,198 @@
+module EqualSumArraysWithMinimumNumberOfOperations_List_Spec
+
+  use int.Int
+  use list.List
+  use list.Length
+  use list.NumOcc
+  use list.Sum
+
+  let rec predicate dice_values (nums: list int)
+    variant { nums }
+  =
+    match nums with
+    | Nil -> true
+    | Cons x xs -> 1 <= x && x <= 6 && dice_values xs
+    end
+
+  function count_gain5_inc_first (nums1: list int) (nums2: list int) : int =
+    num_occ 1 nums1 + num_occ 6 nums2
+
+  function count_gain4_inc_first (nums1: list int) (nums2: list int) : int =
+    num_occ 2 nums1 + num_occ 5 nums2
+
+  function count_gain3_inc_first (nums1: list int) (nums2: list int) : int =
+    num_occ 3 nums1 + num_occ 4 nums2
+
+  function count_gain2_inc_first (nums1: list int) (nums2: list int) : int =
+    num_occ 4 nums1 + num_occ 3 nums2
+
+  function count_gain1_inc_first (nums1: list int) (nums2: list int) : int =
+    num_occ 5 nums1 + num_occ 2 nums2
+
+  function count_gain5_dec_first (nums1: list int) (nums2: list int) : int =
+    num_occ 6 nums1 + num_occ 1 nums2
+
+  function count_gain4_dec_first (nums1: list int) (nums2: list int) : int =
+    num_occ 5 nums1 + num_occ 2 nums2
+
+  function count_gain3_dec_first (nums1: list int) (nums2: list int) : int =
+    num_occ 4 nums1 + num_occ 3 nums2
+
+  function count_gain2_dec_first (nums1: list int) (nums2: list int) : int =
+    num_occ 3 nums1 + num_occ 4 nums2
+
+  function count_gain1_dec_first (nums1: list int) (nums2: list int) : int =
+    num_occ 2 nums1 + num_occ 5 nums2
+
+  function max_gain_with_ops (k: int) (c5: int) (c4: int) (c3: int) (c2: int) (c1: int) : int =
+    if k <= 0 then 0
+    else if k <= c5 then 5 * k
+    else if k <= c5 + c4 then 5 * c5 + 4 * (k - c5)
+    else if k <= c5 + c4 + c3 then
+      5 * c5 + 4 * c4 + 3 * (k - c5 - c4)
+    else if k <= c5 + c4 + c3 + c2 then
+      5 * c5 + 4 * c4 + 3 * c3 + 2 * (k - c5 - c4 - c3)
+    else if k <= c5 + c4 + c3 + c2 + c1 then
+      5 * c5 + 4 * c4 + 3 * c3 + 2 * c2 + (k - c5 - c4 - c3 - c2)
+    else
+      5 * c5 + 4 * c4 + 3 * c3 + 2 * c2 + c1
+
+  function best_gain_inc_first (nums1: list int) (nums2: list int) (k: int) : int =
+    max_gain_with_ops k
+      (count_gain5_inc_first nums1 nums2)
+      (count_gain4_inc_first nums1 nums2)
+      (count_gain3_inc_first nums1 nums2)
+      (count_gain2_inc_first nums1 nums2)
+      (count_gain1_inc_first nums1 nums2)
+
+  function best_gain_dec_first (nums1: list int) (nums2: list int) (k: int) : int =
+    max_gain_with_ops k
+      (count_gain5_dec_first nums1 nums2)
+      (count_gain4_dec_first nums1 nums2)
+      (count_gain3_dec_first nums1 nums2)
+      (count_gain2_dec_first nums1 nums2)
+      (count_gain1_dec_first nums1 nums2)
+
+  predicate achievable_in_ops (nums1: list int) (nums2: list int) (k: int) =
+    k >= 0 /\
+    if sum nums1 <= sum nums2 then
+      best_gain_inc_first nums1 nums2 k >= sum nums2 - sum nums1
+    else
+      best_gain_dec_first nums1 nums2 k >= sum nums1 - sum nums2
+
+  predicate impossible_to_equalize (nums1: list int) (nums2: list int) =
+    if sum nums1 <= sum nums2 then
+      best_gain_inc_first nums1 nums2 (length nums1 + length nums2) < sum nums2 - sum nums1
+    else
+      best_gain_dec_first nums1 nums2 (length nums1 + length nums2) < sum nums1 - sum nums2
+
+  predicate is_min_operations (nums1: list int) (nums2: list int) (r: int) =
+    if impossible_to_equalize nums1 nums2 then
+      r = -1
+    else
+      r >= 0 /\
+      achievable_in_ops nums1 nums2 r /\
+      (forall k: int. 0 <= k < r -> not (achievable_in_ops nums1 nums2 k))
+
+  val equal_sum_arrays_with_minimum_number_of_operations_list (nums1: list int) (nums2: list int) : int
+    requires { length nums1 >= 1 }
+    requires { length nums2 >= 1 }
+    requires { dice_values nums1 }
+    requires { dice_values nums2 }
+    ensures  { is_min_operations nums1 nums2 result }
+
+  let lemma check_test_000 () =
+    let nums1 = Cons 6 (Cons 5 (Cons 4 (Cons 3 (Cons 2 (Cons 1 Nil))))) in
+    let nums2 = Cons 1 (Cons 2 (Cons 3 (Cons 4 (Cons 5 (Cons 6 Nil))))) in
+    assert { dice_values nums1 };
+    assert { dice_values nums2 };
+    assert { sum nums1 = 21 };
+    assert { sum nums2 = 21 };
+    assert { achievable_in_ops nums1 nums2 0 };
+    assert { is_min_operations nums1 nums2 0 }
+
+  let lemma check_test_001 () =
+    let nums1 = Cons 3 (Cons 3 (Cons 3 (Cons 3 Nil))) in
+    let nums2 = Cons 2 (Cons 2 (Cons 2 (Cons 2 Nil))) in
+    assert { dice_values nums1 };
+    assert { dice_values nums2 };
+    assert { sum nums1 = 12 };
+    assert { sum nums2 = 8 };
+    assert { count_gain2_dec_first nums1 nums2 = 4 };
+    assert { best_gain_dec_first nums1 nums2 0 = 0 };
+    assert { best_gain_dec_first nums1 nums2 1 = 2 };
+    assert { not (achievable_in_ops nums1 nums2 0) };
+    assert { achievable_in_ops nums1 nums2 1 };
+    assert { is_min_operations nums1 nums2 1 }
+
+  let lemma check_test_003 () =
+    let nums1 = Cons 6 (Cons 6 (Cons 6 Nil)) in
+    let nums2 = Cons 1 (Cons 1 Nil) in
+    assert { dice_values nums1 };
+    assert { dice_values nums2 };
+    assert { sum nums1 = 18 };
+    assert { sum nums2 = 2 };
+    assert { count_gain5_dec_first nums1 nums2 = 5 };
+    assert { best_gain_dec_first nums1 nums2 3 = 15 };
+    assert { best_gain_dec_first nums1 nums2 4 = 20 };
+    assert { not (achievable_in_ops nums1 nums2 3) };
+    assert { achievable_in_ops nums1 nums2 4 };
+    assert { is_min_operations nums1 nums2 4 }
+
+  let lemma check_test_011 () =
+    let nums1 = Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 Nil)))))) in
+    let nums2 = Cons 6 Nil in
+    assert { dice_values nums1 };
+    assert { dice_values nums2 };
+    assert { sum nums1 = 7 };
+    assert { sum nums2 = 6 };
+    assert { best_gain_dec_first nums1 nums2 8 = 0 };
+    assert { impossible_to_equalize nums1 nums2 };
+    assert { is_min_operations nums1 nums2 (-1) }
+
+  let lemma check_test_013 () =
+    let nums1 = Cons 1 (Cons 2 (Cons 3 (Cons 4 (Cons 5 (Cons 6 Nil))))) in
+    let nums2 = Cons 1 (Cons 1 (Cons 2 (Cons 2 (Cons 2 (Cons 2 Nil))))) in
+    assert { dice_values nums1 };
+    assert { dice_values nums2 };
+    assert { sum nums1 = 21 };
+    assert { sum nums2 = 10 };
+    assert { count_gain5_dec_first nums1 nums2 = 3 };
+    assert { count_gain4_dec_first nums1 nums2 = 1 };
+    assert { count_gain1_dec_first nums1 nums2 = 5 };
+    assert { best_gain_dec_first nums1 nums2 2 = 10 };
+    assert { best_gain_dec_first nums1 nums2 3 = 15 };
+    assert { not (achievable_in_ops nums1 nums2 2) };
+    assert { achievable_in_ops nums1 nums2 3 };
+    assert { is_min_operations nums1 nums2 3 }
+
+  let lemma check_test_015 () =
+    let nums1 = Cons 6 (Cons 6 Nil) in
+    let nums2 = Cons 1 Nil in
+    assert { dice_values nums1 };
+    assert { dice_values nums2 };
+    assert { sum nums1 = 12 };
+    assert { sum nums2 = 1 };
+    assert { count_gain5_dec_first nums1 nums2 = 3 };
+    assert { best_gain_dec_first nums1 nums2 2 = 10 };
+    assert { best_gain_dec_first nums1 nums2 3 = 15 };
+    assert { not (achievable_in_ops nums1 nums2 2) };
+    assert { achievable_in_ops nums1 nums2 3 };
+    assert { is_min_operations nums1 nums2 3 }
+
+  let lemma check_test_045 () =
+    let nums1 = Cons 1 Nil in
+    let nums2 =
+      Cons 6 (Cons 6 (Cons 6 (Cons 6 (Cons 6 (Cons 6
+      (Cons 6 (Cons 6 (Cons 6 (Cons 6 (Cons 6 (Cons 6 Nil))))))))))) in
+    assert { dice_values nums1 };
+    assert { dice_values nums2 };
+    assert { length nums1 = 1 };
+    assert { length nums2 = 12 };
+    assert { sum nums1 = 1 };
+    assert { sum nums2 = 72 };
+    assert { best_gain_inc_first nums1 nums2 13 = 65 };
+    assert { impossible_to_equalize nums1 nums2 };
+    assert { is_min_operations nums1 nums2 (-1) }
+
+end

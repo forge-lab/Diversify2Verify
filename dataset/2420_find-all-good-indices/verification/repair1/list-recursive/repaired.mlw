@@ -1,0 +1,193 @@
+module FindAllGoodIndices_List_Stage3_Recursive
+
+  use int.Int
+  use list.List
+  use list.Length
+  use list.Mem
+  use list.Nth
+  use option.Option
+
+  predicate nth_is (nums: list int) (i: int) (v: int) =
+    nth i nums = Some v
+
+  predicate value_in_constraints (nums: list int) =
+    forall x: int. mem x nums -> 1 <= x <= 1000000
+
+  predicate valid_center (nums: list int) (k: int) (i: int) =
+    k <= i /\ i + k < length nums
+
+  predicate adjacent_nonincreasing (nums: list int) (lo: int) (hi: int) =
+    forall j x y: int.
+      lo <= j < hi ->
+      nth_is nums j x ->
+      nth_is nums (j + 1) y ->
+      x >= y
+
+  predicate adjacent_nondecreasing (nums: list int) (lo: int) (hi: int) =
+    forall j x y: int.
+      lo <= j < hi ->
+      nth_is nums j x ->
+      nth_is nums (j + 1) y ->
+      x <= y
+
+  predicate good_index (nums: list int) (k: int) (i: int) =
+    valid_center nums k i /\
+    adjacent_nonincreasing nums (i - k) (i - 1) /\
+    adjacent_nondecreasing nums (i + 1) (i + k)
+
+  let rec predicate all_greater_than (x: int) (indices: list int)
+    variant { indices }
+  =
+    match indices with
+    | Nil -> true
+    | Cons y ys -> x < y && all_greater_than x ys
+    end
+
+  let rec predicate strictly_increasing (indices: list int)
+    variant { indices }
+  =
+    match indices with
+    | Nil -> true
+    | Cons x xs -> all_greater_than x xs && strictly_increasing xs
+    end
+
+  predicate exact_good_indices (nums: list int) (k: int) (indices: list int) =
+    strictly_increasing indices /\
+    (forall i: int. mem i indices <-> good_index nums k i)
+
+  predicate exact_good_indices_range
+    (nums: list int) (k: int) (lo: int) (hi: int) (indices: list int) =
+    strictly_increasing indices /\
+    (forall i: int. mem i indices <-> lo <= i < hi /\ good_index nums k i)
+
+  let rec lemma all_greater_from_lower_bound (x: int) (indices: list int)
+    requires { forall y: int. mem y indices -> x < y }
+    ensures  { all_greater_than x indices }
+    variant  { indices }
+  =
+    match indices with
+    | Nil -> ()
+    | Cons y ys ->
+        assert { x < y };
+        assert { forall z: int. mem z ys -> x < z };
+        all_greater_from_lower_bound x ys
+    end
+
+  let lemma valid_center_iff_range (nums: list int) (k: int) (i: int) (limit: int)
+    requires { limit = length nums - k }
+    ensures  { valid_center nums k i <-> k <= i < limit }
+  =
+    assert { valid_center nums k i <-> k <= i /\ i + k < length nums };
+    assert { i + k < length nums <-> i < length nums - k }
+
+  let rec list_length (l: list int) : int
+    ensures { result = length l }
+    variant { l }
+  =
+    match l with
+    | Nil -> 0
+    | Cons _ xs -> 1 + list_length xs
+    end
+
+  let rec drop (l: list int) (n: int) : list int
+    ensures { n <= 0 -> result = l }
+    variant { l }
+  =
+    if n <= 0 then l else
+    match l with
+    | Nil -> Nil
+    | Cons _ xs -> drop xs (n - 1)
+    end
+
+  let rec take (l: list int) (n: int) : list int
+    ensures { n <= 0 -> result = Nil }
+    variant { l }
+  =
+    if n <= 0 then Nil else
+    match l with
+    | Nil -> Nil
+    | Cons x xs -> Cons x (take xs (n - 1))
+    end
+
+  let rec is_nonincreasing (l: list int) : bool
+    variant { l }
+  =
+    match l with
+    | Nil -> true
+    | Cons _ Nil -> true
+    | Cons x (Cons y ys) ->
+        if x >= y then is_nonincreasing (Cons y ys) else false
+    end
+
+  let rec is_nondecreasing (l: list int) : bool
+    variant { l }
+  =
+    match l with
+    | Nil -> true
+    | Cons _ Nil -> true
+    | Cons x (Cons y ys) ->
+        if x <= y then is_nondecreasing (Cons y ys) else false
+    end
+
+  let good_index_at (nums: list int) (k: int) (i: int) : bool
+    requires { 1 <= k }
+    requires { valid_center nums k i }
+    ensures  { result <-> good_index nums k i }
+  =
+    let left = take (drop nums (i - k)) k in
+    let right = take (drop nums (i + 1)) k in
+    if is_nonincreasing left then is_nondecreasing right else false
+
+  let rec collect_good_indices (nums: list int) (k: int) (i: int) (limit: int) : list int
+    requires { 1 <= k }
+    requires { limit = length nums - k }
+    requires { k <= i <= limit }
+    ensures  { exact_good_indices_range nums k i limit result }
+    variant { limit - i }
+  =
+    if i >= limit then begin
+      assert { forall j: int. not (i <= j < limit) };
+      assert { strictly_increasing Nil };
+      Nil
+    end else begin
+      valid_center_iff_range nums k i limit;
+      assert { valid_center nums k i };
+      let tail = collect_good_indices nums k (i + 1) limit in
+      assert { exact_good_indices_range nums k (i + 1) limit tail };
+      if good_index_at nums k i then begin
+        assert { good_index nums k i };
+        assert { forall y: int. mem y tail -> i < y };
+        all_greater_from_lower_bound i tail;
+        assert { all_greater_than i tail };
+        assert { strictly_increasing (Cons i tail) };
+        assert { forall j: int.
+          mem j (Cons i tail) <-> i <= j < limit /\ good_index nums k j };
+        Cons i tail
+      end else begin
+        assert { not (good_index nums k i) };
+        assert { forall j: int.
+          mem j tail <-> i <= j < limit /\ good_index nums k j };
+        tail
+      end
+    end
+
+  let find_all_good_indices_list (nums: list int) (k: int) : list int
+    requires { 3 <= length nums }
+    requires { 1 <= k }
+    requires { 2 * k <= length nums }
+    requires { value_in_constraints nums }
+    ensures  { exact_good_indices nums k result }
+  =
+    let n = list_length nums in
+    let limit = n - k in
+    assert { n = length nums };
+    assert { limit = length nums - k };
+    assert { k <= limit };
+    let result = collect_good_indices nums k k limit in
+    assert { exact_good_indices_range nums k k limit result };
+    assert { forall i: int. valid_center nums k i <-> k <= i < limit };
+    assert { forall i: int. mem i result <-> good_index nums k i };
+    assert { exact_good_indices nums k result };
+    result
+
+end

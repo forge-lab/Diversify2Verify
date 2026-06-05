@@ -1,0 +1,331 @@
+module NumberOfUniqueFlavorsAfterSharingKCandies_List_Spec
+
+  use int.Int
+  use list.List
+  use list.Length
+  use list.Append
+  use list.Elements
+  use list.Reverse
+  use set.Fset
+
+  let rec predicate flavors_in_range (candies: list int)
+    variant { candies }
+  =
+    match candies with
+    | Nil -> true
+    | Cons flavor rest ->
+        1 <= flavor &&
+        flavor <= 100000 &&
+        flavors_in_range rest
+    end
+
+  function unique_flavor_count (candies: list int) : int =
+    cardinal (elements candies)
+
+  predicate valid_kept_after_sharing
+      (candies: list int) (k: int) (kept: list int) =
+    exists left shared right: list int.
+      candies = left ++ (shared ++ right) /\
+      length shared = k /\
+      kept = left ++ right
+
+  predicate no_better_share
+      (candies: list int) (k: int) (result: int) =
+    forall kept: list int.
+      valid_kept_after_sharing candies k kept ->
+      unique_flavor_count kept <= result
+
+  predicate maximum_unique_flavors_after_sharing
+      (candies: list int) (k: int) (result: int) =
+    exists kept: list int.
+      valid_kept_after_sharing candies k kept /\
+      result = unique_flavor_count kept /\
+      no_better_share candies k result
+
+  predicate valid_kept_from_state
+      (prefix_rev: list int) (suffix: list int) (k: int) (kept: list int) =
+    exists before shared right: list int.
+      suffix = before ++ (shared ++ right) /\
+      length shared = k /\
+      kept = (reverse prefix_rev ++ before) ++ right
+
+  predicate no_better_share_from_state
+      (prefix_rev: list int) (suffix: list int) (k: int) (result: int) =
+    forall kept: list int.
+      valid_kept_from_state prefix_rev suffix k kept ->
+      unique_flavor_count kept <= result
+
+  predicate maximum_unique_from_state
+      (prefix_rev: list int) (suffix: list int) (k: int) (result: int) =
+    exists kept: list int.
+      valid_kept_from_state prefix_rev suffix k kept /\
+      result = unique_flavor_count kept /\
+      no_better_share_from_state prefix_rev suffix k result
+
+  let lemma valid_kept_from_dropped_suffix
+      (prefix_rev suffix dropped kept: list int) (k: int)
+    requires { exists shared: list int.
+      length shared = k /\ suffix = shared ++ dropped }
+    requires { kept = reverse prefix_rev ++ dropped }
+    ensures  { valid_kept_from_state prefix_rev suffix k kept }
+  =
+    assert { exists before shared right: list int.
+      suffix = before ++ (shared ++ right) /\
+      length shared = k /\
+      kept = (reverse prefix_rev ++ before) ++ right }
+
+  let lemma maximum_unique_from_state_no_better
+      (prefix_rev suffix: list int) (k result_value: int)
+    requires { maximum_unique_from_state prefix_rev suffix k result_value }
+    ensures  { no_better_share_from_state prefix_rev suffix k result_value }
+  =
+    assert { exists kept: list int.
+      valid_kept_from_state prefix_rev suffix k kept /\
+      result_value = unique_flavor_count kept /\
+      no_better_share_from_state prefix_rev suffix k result_value }
+
+  let lemma parent_state_candidate_decomposition
+      (prefix_rev: list int) (flavor: int) (rest: list int)
+      (k: int) (front_kept kept: list int)
+    requires { valid_kept_from_state prefix_rev (Cons flavor rest) k kept }
+    requires { exists shared dropped: list int.
+      length shared = k /\
+      Cons flavor rest = shared ++ dropped /\
+      front_kept = reverse prefix_rev ++ dropped }
+    ensures  {
+      kept = front_kept \/
+      valid_kept_from_state (Cons flavor prefix_rev) rest k kept
+    }
+  =
+    assert {
+      exists before shared right: list int.
+        Cons flavor rest = before ++ (shared ++ right) /\
+        length shared = k /\
+        kept = (reverse prefix_rev ++ before) ++ right
+    }
+
+  let lemma no_better_parent_when_current_dominates_tail
+      (prefix_rev: list int) (flavor: int) (rest: list int) (k: int)
+      (front_kept: list int) (current next_best: int)
+    requires { exists shared dropped: list int.
+      length shared = k /\
+      Cons flavor rest = shared ++ dropped /\
+      front_kept = reverse prefix_rev ++ dropped }
+    requires { current = unique_flavor_count front_kept }
+    requires { maximum_unique_from_state (Cons flavor prefix_rev) rest k next_best }
+    requires { current >= next_best }
+    ensures  { no_better_share_from_state prefix_rev (Cons flavor rest) k current }
+  =
+    maximum_unique_from_state_no_better (Cons flavor prefix_rev) rest k next_best;
+    assert { no_better_share_from_state (Cons flavor prefix_rev) rest k next_best };
+    assert { forall kept: list int.
+      valid_kept_from_state (Cons flavor prefix_rev) rest k kept ->
+      unique_flavor_count kept <= current };
+    assert { forall kept: list int.
+      valid_kept_from_state prefix_rev (Cons flavor rest) k kept ->
+      kept = front_kept \/
+      valid_kept_from_state (Cons flavor prefix_rev) rest k kept };
+    assert { no_better_share_from_state prefix_rev (Cons flavor rest) k current }
+
+  let lemma valid_kept_from_top
+      (candies: list int) (k: int) (kept: list int)
+    requires { valid_kept_from_state Nil candies k kept }
+    ensures  { valid_kept_after_sharing candies k kept }
+  =
+    assert { exists before shared right: list int.
+      candies = before ++ (shared ++ right) /\
+      length shared = k /\
+      kept = (reverse Nil ++ before) ++ right };
+    assert { reverse (Nil: list int) = (Nil: list int) };
+    assert { exists left shared right: list int.
+      candies = left ++ (shared ++ right) /\
+      length shared = k /\
+      kept = left ++ right }
+
+  let lemma valid_kept_to_top
+      (candies: list int) (k: int) (kept: list int)
+    requires { valid_kept_after_sharing candies k kept }
+    ensures  { valid_kept_from_state Nil candies k kept }
+  =
+    assert { exists left shared right: list int.
+      candies = left ++ (shared ++ right) /\
+      length shared = k /\
+      kept = left ++ right };
+    assert { reverse (Nil: list int) = (Nil: list int) };
+    assert { exists before shared right: list int.
+      candies = before ++ (shared ++ right) /\
+      length shared = k /\
+      kept = (reverse Nil ++ before) ++ right }
+
+  let rec lemma unique_flavor_count_le_length (candies: list int)
+    ensures { unique_flavor_count candies <= length candies }
+    variant { candies }
+  =
+    match candies with
+    | Nil -> ()
+    | Cons _ rest -> unique_flavor_count_le_length rest
+    end
+
+  let lemma valid_kept_after_sharing_length
+      (candies: list int) (k: int) (kept: list int)
+    requires { valid_kept_after_sharing candies k kept }
+    ensures  { length kept = length candies - k }
+  =
+    assert { exists left shared right: list int.
+      candies = left ++ (shared ++ right) /\
+      length shared = k /\
+      kept = left ++ right }
+
+  let lemma valid_kept_after_sharing_unique_bound
+      (candies: list int) (k: int) (kept: list int)
+    requires { valid_kept_after_sharing candies k kept }
+    ensures  { unique_flavor_count kept <= unique_flavor_count candies }
+  =
+    assert { exists left shared right: list int.
+      candies = left ++ (shared ++ right) /\
+      length shared = k /\
+      kept = left ++ right };
+    assert { subset (elements kept) (elements candies) }
+
+  let rec mem_int (x: int) (candies: list int) : bool
+    ensures { result <-> mem x (elements candies) }
+    variant { candies }
+  =
+    match candies with
+    | Nil -> false
+    | Cons y ys ->
+        if x = y then begin
+          assert { mem x (elements (Cons y ys)) };
+          true
+        end else begin
+          let found = mem_int x ys in
+          assert { found <-> mem x (elements ys) };
+          assert { found <-> mem x (elements (Cons y ys)) };
+          found
+        end
+    end
+
+  let rec unique_count (candies: list int) : int
+    ensures { result = unique_flavor_count candies }
+    ensures { 0 <= result }
+    variant { candies }
+  =
+    match candies with
+    | Nil -> 0
+    | Cons flavor rest ->
+        let tail_count = unique_count rest in
+        assert { tail_count = unique_flavor_count rest };
+        assert { elements candies == add flavor (elements rest) };
+        if mem_int flavor rest then begin
+          assert { mem flavor (elements rest) };
+          assert { add flavor (elements rest) == elements rest };
+          assert { cardinal (elements candies) = cardinal (elements rest) };
+          tail_count
+        end else begin
+          assert { not mem flavor (elements rest) };
+          assert { cardinal (elements candies) = cardinal (elements rest) + 1 };
+          tail_count + 1
+        end
+    end
+
+  let rec list_length (candies: list int) : int
+    ensures { result = length candies }
+    ensures { 0 <= result }
+    variant { candies }
+  =
+    match candies with
+    | Nil -> 0
+    | Cons _ rest -> 1 + list_length rest
+    end
+
+  let rec drop_k (candies: list int) (k: int) : list int
+    ensures { k <= 0 -> result = candies }
+    ensures { 0 <= k <= length candies ->
+      exists shared: list int. length shared = k /\ candies = shared ++ result }
+    variant { candies }
+  =
+    if k <= 0 then candies else
+    match candies with
+    | Nil -> Nil
+    | Cons _ rest -> drop_k rest (k - 1)
+    end
+
+  let rec reverse_append (rev_prefix: list int) (suffix: list int) : list int
+    ensures { result = reverse rev_prefix ++ suffix }
+    variant { rev_prefix }
+  =
+    match rev_prefix with
+    | Nil -> suffix
+    | Cons x xs -> reverse_append xs (Cons x suffix)
+    end
+
+  let rec max_unique_after_each_share
+      (prefix_rev: list int) (suffix: list int) (remaining: int) (k: int) : int
+    requires { 0 <= k <= length suffix }
+    requires { remaining = length suffix - k + 1 }
+    ensures  { maximum_unique_from_state prefix_rev suffix k result }
+    variant { remaining }
+  =
+    if remaining <= 0 then begin
+      absurd
+    end else
+      let dropped = drop_k suffix k in
+      let kept = reverse_append prefix_rev dropped in
+      assert { kept = reverse prefix_rev ++ dropped };
+      assert { exists shared: list int.
+        length shared = k /\ suffix = shared ++ dropped };
+      valid_kept_from_dropped_suffix prefix_rev suffix dropped kept k;
+      assert { valid_kept_from_state prefix_rev suffix k kept };
+      let current = unique_count kept in
+      assert { current = unique_flavor_count kept };
+      match suffix with
+      | Nil ->
+          assert { k = 0 };
+          assert { no_better_share_from_state prefix_rev suffix k current };
+          assert { maximum_unique_from_state prefix_rev suffix k current };
+          current
+      | Cons flavor rest ->
+          if remaining = 1 then begin
+            assert { k = length suffix };
+            assert { no_better_share_from_state prefix_rev suffix k current };
+            assert { maximum_unique_from_state prefix_rev suffix k current };
+            current
+          end else
+            let next_best =
+              max_unique_after_each_share (Cons flavor prefix_rev) rest (remaining - 1) k
+            in
+            assert { maximum_unique_from_state (Cons flavor prefix_rev) rest k next_best };
+            if current >= next_best then begin
+              no_better_parent_when_current_dominates_tail
+                prefix_rev flavor rest k kept current next_best;
+              assert { no_better_share_from_state prefix_rev suffix k current };
+              assert { maximum_unique_from_state prefix_rev suffix k current };
+              current
+            end else begin
+              assert { no_better_share_from_state prefix_rev suffix k next_best };
+              assert { maximum_unique_from_state prefix_rev suffix k next_best };
+              next_best
+            end
+      end
+
+  let number_of_unique_flavors_after_sharing_k_candies_list
+      (candies: list int) (k: int) : int
+    requires { 0 <= k <= length candies }
+    requires { length candies <= 100000 }
+    requires { flavors_in_range candies }
+    ensures  { maximum_unique_flavors_after_sharing candies k result }
+  =
+    let n = list_length candies in
+    assert { n = length candies };
+    let result = max_unique_after_each_share Nil candies (n - k + 1) k in
+    assert { maximum_unique_from_state Nil candies k result };
+    assert { forall kept: list int.
+      valid_kept_after_sharing candies k kept ->
+      valid_kept_from_state Nil candies k kept };
+    assert { forall kept: list int.
+      valid_kept_from_state Nil candies k kept ->
+      valid_kept_after_sharing candies k kept };
+    assert { maximum_unique_flavors_after_sharing candies k result };
+    result
+
+end

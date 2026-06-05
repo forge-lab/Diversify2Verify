@@ -1,0 +1,68 @@
+module FindTheStudentThatWillReplaceTheChalk_Array_Spec
+
+  use int.Int
+  use int.EuclideanDivision
+  use array.Array
+  use array.ArraySum
+  use ref.Ref
+
+  predicate valid_input (chalk: array int) (k: int) =
+    1 <= length chalk <= 100000 /\
+    1 <= k <= 1000000000 /\
+    forall i: int. 0 <= i < length chalk -> 1 <= chalk[i] <= 100000
+
+  function total_chalk (chalk: array int) : int =
+    sum chalk 0 (length chalk)
+
+  function remaining_after_full_rounds (chalk: array int) (k: int) : int =
+    mod k (total_chalk chalk)
+
+  predicate replacement_student (chalk: array int) (k: int) (res: int) =
+    valid_input chalk k /\
+    0 <= res < length chalk /\
+    sum chalk 0 res <= remaining_after_full_rounds chalk k /\
+    remaining_after_full_rounds chalk k < sum chalk 0 (res + 1)
+
+  exception Found
+
+  let find_the_student_that_will_replace_the_chalk_array (chalk: array int) (k: int) : int
+    requires { valid_input chalk k }
+    ensures  { replacement_student chalk k result }
+  =
+    let total = ref 0 in
+    for i = 0 to length chalk - 1 do
+      invariant { 0 <= i <= length chalk }
+      invariant { !total = sum chalk 0 i }
+      invariant { forall j: int. 0 <= j < i -> 1 <= chalk[j] <= 100000 }
+      total := !total + chalk[i]
+    done;
+    assert { !total = total_chalk chalk };
+    assert { 0 < !total };
+    let initial_remaining = mod k !total in
+    assert { initial_remaining = remaining_after_full_rounds chalk k };
+    let remaining = ref initial_remaining in
+    let answer = ref 0 in
+    try
+      for i = 0 to length chalk - 1 do
+        invariant { 0 <= i <= length chalk }
+        invariant { 0 <= !answer < length chalk }
+        invariant { !remaining = initial_remaining - sum chalk 0 i }
+        invariant { sum chalk 0 i <= initial_remaining }
+        invariant { forall j: int. 0 <= j < i -> sum chalk 0 (j + 1) <= initial_remaining }
+        if !remaining < chalk[i] then begin
+          answer := i;
+          assert { sum chalk 0 i <= initial_remaining };
+          assert { initial_remaining < sum chalk 0 (i + 1) };
+          assert { replacement_student chalk k !answer };
+          raise Found
+        end else begin
+          assert { sum chalk 0 (i + 1) <= initial_remaining };
+          remaining := !remaining - chalk[i]
+        end
+      done;
+      !answer
+    with Found ->
+      !answer
+    end
+
+end

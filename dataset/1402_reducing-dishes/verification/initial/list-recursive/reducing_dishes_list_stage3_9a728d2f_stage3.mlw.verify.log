@@ -1,0 +1,330 @@
+== Stage 1: first prover on whole file ==
+Running in /Users/rubenm/Desktop/Diversify2Verify/codex-runs/dataset-merge/1402_reducing-dishes/stage3a/list-recursive/reducing_dishes_list_stage3_9a728d2f/generated/why3/list: why3 session create -o /Users/rubenm/Desktop/Diversify2Verify/codex-runs/dataset-merge/1402_reducing-dishes/stage3a/list-recursive/reducing_dishes_list_stage3_9a728d2f/generated/why3/list/.why3_sessions/reducing_dishes_list_stage3_9a728d2f_stage3_stage1 -P Z3,4.8.6 -t 10 -m 8192 reducing_dishes_list_stage3_9a728d2f_stage3.mlw
+Session created successfully
+Running in /Users/rubenm/Desktop/Diversify2Verify/codex-runs/dataset-merge/1402_reducing-dishes/stage3a/list-recursive/reducing_dishes_list_stage3_9a728d2f/generated/why3/list: why3 bench /Users/rubenm/Desktop/Diversify2Verify/codex-runs/dataset-merge/1402_reducing-dishes/stage3a/list-recursive/reducing_dishes_list_stage3_9a728d2f/generated/why3/list/.why3_sessions/reducing_dishes_list_stage3_9a728d2f_stage3_stage1
+Progress: 10/1/0                       Progress: 9/2/0                       Progress: 8/3/0                       Progress: 7/4/0                       Progress: 6/5/0                       Progress: 5/6/0                       Progress: 5/0/1                       Progress: 4/1/1                       Progress: 3/2/1                       Progress: 2/3/1                       Progress: 1/4/1                       Progress: 0/5/1                       Progress: 0/4/2                       Progress: 0/3/2                       Progress: 0/0/2                       
+Replay completed, saving session... done
+== Stage 1 stats ==
+= Statistics for session /Users/rubenm/Desktop/Diversify2Verify/codex-runs/dataset-merge/1402_reducing-dishes/stage3a/list-recursive/reducing_dishes_list_stage3_9a728d2f/generated/why3/list/.why3_sessions/reducing_dishes_list_stage3_9a728d2f_stage3_stage1
+
+== Number of root goals ==
+  total: 11  proved: 7
+
+== Number of sub goals ==
+  total: 0  proved: 0
+
+== Goals not proved ==
+  +-- file [../../reducing_dishes_list_stage3_9a728d2f_stage3.mlw]
+    +-- theory ReducingDishes_List_Spec
+      +-- goal insert_sorted'vc
+      +-- goal sort_asc'vc
+      +-- goal reverse_acc'vc
+      +-- goal reducing_dishes_list'vc
+  
+== Goals proved by only one prover ==
+  +-- file [../../reducing_dishes_list_stage3_9a728d2f_stage3.mlw]
+    +-- theory ReducingDishes_List_Spec
+      +-- goal like_time_from'vc: Z3 4.8.6
+      +-- goal le_all'vc: Z3 4.8.6
+      +-- goal ge_all'vc: Z3 4.8.6
+      +-- goal sorted_asc'vc: Z3 4.8.6
+      +-- goal sorted_desc'vc: Z3 4.8.6
+      +-- goal reverse'vc: Z3 4.8.6
+      +-- goal best_total_desc'vc: Z3 4.8.6
+  
+1 session(s) read, with a total of 11 proof goals.
+== Unproved root goals after first prover ==
+ReducingDishes_List_Spec	insert_sorted'vc
+ReducingDishes_List_Spec	sort_asc'vc
+ReducingDishes_List_Spec	reverse_acc'vc
+ReducingDishes_List_Spec	reducing_dishes_list'vc
+== Stage 1: trying remaining goals with prover Alt-Ergo,2.4.0 ==
+---- stage1 | prover: Alt-Ergo,2.4.0 | theory: ReducingDishes_List_Spec | goal: insert_sorted'vc ----
+File reducing_dishes_list_stage3_9a728d2f_stage3.mlw:
+Goal insert_sorted'vc.
+Prover result is: Timeout (10.00s, 354243 steps).
+---- stage1 | prover: Alt-Ergo,2.4.0 | theory: ReducingDishes_List_Spec | goal: sort_asc'vc ----
+File reducing_dishes_list_stage3_9a728d2f_stage3.mlw:
+Goal sort_asc'vc.
+Prover result is: Valid (0.01s, 218 steps).
+Solved in stage 1 using prover: Alt-Ergo,2.4.0
+---- stage1 | prover: Alt-Ergo,2.4.0 | theory: ReducingDishes_List_Spec | goal: reverse_acc'vc ----
+File reducing_dishes_list_stage3_9a728d2f_stage3.mlw:
+Goal reverse_acc'vc.
+Prover result is: Valid (0.07s, 1878 steps).
+Solved in stage 1 using prover: Alt-Ergo,2.4.0
+---- stage1 | prover: Alt-Ergo,2.4.0 | theory: ReducingDishes_List_Spec | goal: reducing_dishes_list'vc ----
+File reducing_dishes_list_stage3_9a728d2f_stage3.mlw:
+Goal reducing_dishes_list'vc.
+Prover result is: Timeout (10.00s, 125442 steps).
+Remaining after prover Alt-Ergo,2.4.0: 2
+== Stage 1: trying remaining goals with prover CVC4,1.8 ==
+---- stage1 | prover: CVC4,1.8 | theory: ReducingDishes_List_Spec | goal: insert_sorted'vc ----
+File reducing_dishes_list_stage3_9a728d2f_stage3.mlw:
+Goal insert_sorted'vc.
+Prover result is: Timeout (10.00s, 4315221 steps).
+---- stage1 | prover: CVC4,1.8 | theory: ReducingDishes_List_Spec | goal: reducing_dishes_list'vc ----
+File reducing_dishes_list_stage3_9a728d2f_stage3.mlw:
+Goal reducing_dishes_list'vc.
+Prover result is: Unknown (unknown + incomplete) (0.02s, 5691 steps).
+Remaining after prover CVC4,1.8: 2
+== Goals still unproved after stage 1 ==
+ReducingDishes_List_Spec	insert_sorted'vc
+ReducingDishes_List_Spec	reducing_dishes_list'vc
+== Stage 2: split_vc on unproved goal ==
+Target theory: ReducingDishes_List_Spec
+Target goal  : insert_sorted'vc
+---- stage2 | prover: Z3,4.8.6 | theory: ReducingDishes_List_Spec | goal: insert_sorted'vc ----
+Transforms: split_vc
+File "reducing_dishes_list_stage3_9a728d2f_stage3.mlw", line 76, characters 17-37:
+Sub-goal Variant decrease of goal insert_sorted'vc.
+Prover result is: Valid (0.02s, 32967 steps).
+
+File "reducing_dishes_list_stage3_9a728d2f_stage3.mlw", line 65, characters 6-63:
+Sub-goal Postcondition of goal insert_sorted'vc.
+Prover result is: Timeout (10.00s, 39332971 steps).
+
+File "reducing_dishes_list_stage3_9a728d2f_stage3.mlw", line 66, characters 30-47:
+Sub-goal Postcondition of goal insert_sorted'vc.
+Prover result is: Timeout (10.00s, 17673776 steps).
+---- stage2 | prover: Alt-Ergo,2.4.0 | theory: ReducingDishes_List_Spec | goal: insert_sorted'vc ----
+Transforms: split_vc
+File "reducing_dishes_list_stage3_9a728d2f_stage3.mlw", line 76, characters 17-37:
+Sub-goal Variant decrease of goal insert_sorted'vc.
+Prover result is: Valid (0.01s, 40 steps).
+
+File "reducing_dishes_list_stage3_9a728d2f_stage3.mlw", line 65, characters 6-63:
+Sub-goal Postcondition of goal insert_sorted'vc.
+Prover result is: Timeout (10.00s, 175641 steps).
+
+File "reducing_dishes_list_stage3_9a728d2f_stage3.mlw", line 66, characters 30-47:
+Sub-goal Postcondition of goal insert_sorted'vc.
+Prover result is: Timeout (10.00s, 229905 steps).
+---- stage2 | prover: CVC4,1.8 | theory: ReducingDishes_List_Spec | goal: insert_sorted'vc ----
+Transforms: split_vc
+File "reducing_dishes_list_stage3_9a728d2f_stage3.mlw", line 76, characters 17-37:
+Sub-goal Variant decrease of goal insert_sorted'vc.
+Prover result is: Valid (0.02s, 5835 steps).
+
+File "reducing_dishes_list_stage3_9a728d2f_stage3.mlw", line 65, characters 6-63:
+Sub-goal Postcondition of goal insert_sorted'vc.
+Prover result is: Valid (0.09s, 26374 steps).
+
+File "reducing_dishes_list_stage3_9a728d2f_stage3.mlw", line 66, characters 30-47:
+Sub-goal Postcondition of goal insert_sorted'vc.
+Prover result is: Unknown (unknown + incomplete) (0.03s, 8023 steps).
+== Stage 2: split_vc on unproved goal ==
+Target theory: ReducingDishes_List_Spec
+Target goal  : reducing_dishes_list'vc
+---- stage2 | prover: Z3,4.8.6 | theory: ReducingDishes_List_Spec | goal: reducing_dishes_list'vc ----
+Transforms: split_vc
+File "reducing_dishes_list_stage3_9a728d2f_stage3.mlw", line 129, characters 13-51:
+Sub-goal Assertion of goal reducing_dishes_list'vc.
+Prover result is: Valid (0.02s, 21753 steps).
+
+File "reducing_dishes_list_stage3_9a728d2f_stage3.mlw", line 130, characters 12-43:
+Sub-goal Precondition of goal reducing_dishes_list'vc.
+Prover result is: Valid (0.01s, 1419 steps).
+
+File "reducing_dishes_list_stage3_9a728d2f_stage3.mlw", line 130, characters 12-43:
+Sub-goal Precondition of goal reducing_dishes_list'vc.
+Prover result is: Valid (0.01s, 1424 steps).
+
+File "reducing_dishes_list_stage3_9a728d2f_stage3.mlw", line 131, characters 13-19:
+Sub-goal Assertion of goal reducing_dishes_list'vc.
+Prover result is: Valid (0.01s, 1424 steps).
+
+File "reducing_dishes_list_stage3_9a728d2f_stage3.mlw", line 132, characters 13-41:
+Sub-goal Assertion of goal reducing_dishes_list'vc.
+Prover result is: Timeout (10.00s, 128633899 steps).
+
+File "reducing_dishes_list_stage3_9a728d2f_stage3.mlw", line 126, characters 14-47:
+Sub-goal Postcondition of goal reducing_dishes_list'vc.
+Prover result is: Valid (0.01s, 1634 steps).
+---- stage2 | prover: Alt-Ergo,2.4.0 | theory: ReducingDishes_List_Spec | goal: reducing_dishes_list'vc ----
+Transforms: split_vc
+File "reducing_dishes_list_stage3_9a728d2f_stage3.mlw", line 129, characters 13-51:
+Sub-goal Assertion of goal reducing_dishes_list'vc.
+Prover result is: Valid (0.01s, 25 steps).
+
+File "reducing_dishes_list_stage3_9a728d2f_stage3.mlw", line 130, characters 12-43:
+Sub-goal Precondition of goal reducing_dishes_list'vc.
+Prover result is: Valid (0.01s, 10 steps).
+
+File "reducing_dishes_list_stage3_9a728d2f_stage3.mlw", line 130, characters 12-43:
+Sub-goal Precondition of goal reducing_dishes_list'vc.
+Prover result is: Valid (0.01s, 11 steps).
+
+File "reducing_dishes_list_stage3_9a728d2f_stage3.mlw", line 131, characters 13-19:
+Sub-goal Assertion of goal reducing_dishes_list'vc.
+Prover result is: Valid (0.01s, 12 steps).
+
+File "reducing_dishes_list_stage3_9a728d2f_stage3.mlw", line 132, characters 13-41:
+Sub-goal Assertion of goal reducing_dishes_list'vc.
+Prover result is: Timeout (10.00s, 310327 steps).
+
+File "reducing_dishes_list_stage3_9a728d2f_stage3.mlw", line 126, characters 14-47:
+Sub-goal Postcondition of goal reducing_dishes_list'vc.
+Prover result is: Valid (0.01s, 14 steps).
+---- stage2 | prover: CVC4,1.8 | theory: ReducingDishes_List_Spec | goal: reducing_dishes_list'vc ----
+Transforms: split_vc
+File "reducing_dishes_list_stage3_9a728d2f_stage3.mlw", line 129, characters 13-51:
+Sub-goal Assertion of goal reducing_dishes_list'vc.
+Prover result is: Valid (0.02s, 4478 steps).
+
+File "reducing_dishes_list_stage3_9a728d2f_stage3.mlw", line 130, characters 12-43:
+Sub-goal Precondition of goal reducing_dishes_list'vc.
+Prover result is: Valid (0.01s, 3702 steps).
+
+File "reducing_dishes_list_stage3_9a728d2f_stage3.mlw", line 130, characters 12-43:
+Sub-goal Precondition of goal reducing_dishes_list'vc.
+Prover result is: Valid (0.01s, 3706 steps).
+
+File "reducing_dishes_list_stage3_9a728d2f_stage3.mlw", line 131, characters 13-19:
+Sub-goal Assertion of goal reducing_dishes_list'vc.
+Prover result is: Valid (0.01s, 3714 steps).
+
+File "reducing_dishes_list_stage3_9a728d2f_stage3.mlw", line 132, characters 13-41:
+Sub-goal Assertion of goal reducing_dishes_list'vc.
+Prover result is: Unknown (unknown + incomplete) (0.02s, 4858 steps).
+
+File "reducing_dishes_list_stage3_9a728d2f_stage3.mlw", line 126, characters 14-47:
+Sub-goal Postcondition of goal reducing_dishes_list'vc.
+Prover result is: Valid (0.01s, 4205 steps).
+== Goals still unproved after stage 2 (split_vc) ==
+ReducingDishes_List_Spec	insert_sorted'vc
+ReducingDishes_List_Spec	reducing_dishes_list'vc
+== Stage 3: split_vc + inline_all on still-unproved goal ==
+Target theory: ReducingDishes_List_Spec
+Target goal  : insert_sorted'vc
+---- stage3 | prover: Z3,4.8.6 | theory: ReducingDishes_List_Spec | goal: insert_sorted'vc ----
+Transforms: split_vc inline_all
+File "reducing_dishes_list_stage3_9a728d2f_stage3.mlw", line 76, characters 17-37:
+Sub-goal Variant decrease of goal insert_sorted'vc.
+Prover result is: Valid (0.02s, 30553 steps).
+
+File "reducing_dishes_list_stage3_9a728d2f_stage3.mlw", line 65, characters 6-63:
+Sub-goal Postcondition of goal insert_sorted'vc.
+Prover result is: Timeout (10.00s, 38977362 steps).
+
+File "reducing_dishes_list_stage3_9a728d2f_stage3.mlw", line 66, characters 30-47:
+Sub-goal Postcondition of goal insert_sorted'vc.
+Prover result is: Timeout (10.00s, 28247998 steps).
+---- stage3 | prover: Alt-Ergo,2.4.0 | theory: ReducingDishes_List_Spec | goal: insert_sorted'vc ----
+Transforms: split_vc inline_all
+File "reducing_dishes_list_stage3_9a728d2f_stage3.mlw", line 76, characters 17-37:
+Sub-goal Variant decrease of goal insert_sorted'vc.
+Prover result is: Valid (0.01s, 44 steps).
+
+File "reducing_dishes_list_stage3_9a728d2f_stage3.mlw", line 65, characters 6-63:
+Sub-goal Postcondition of goal insert_sorted'vc.
+Prover result is: Timeout (10.00s, 173506 steps).
+
+File "reducing_dishes_list_stage3_9a728d2f_stage3.mlw", line 66, characters 30-47:
+Sub-goal Postcondition of goal insert_sorted'vc.
+Prover result is: Timeout (10.00s, 252808 steps).
+---- stage3 | prover: CVC4,1.8 | theory: ReducingDishes_List_Spec | goal: insert_sorted'vc ----
+Transforms: split_vc inline_all
+File "reducing_dishes_list_stage3_9a728d2f_stage3.mlw", line 76, characters 17-37:
+Sub-goal Variant decrease of goal insert_sorted'vc.
+Prover result is: Valid (0.03s, 5919 steps).
+
+File "reducing_dishes_list_stage3_9a728d2f_stage3.mlw", line 65, characters 6-63:
+Sub-goal Postcondition of goal insert_sorted'vc.
+Prover result is: Valid (0.10s, 31041 steps).
+
+File "reducing_dishes_list_stage3_9a728d2f_stage3.mlw", line 66, characters 30-47:
+Sub-goal Postcondition of goal insert_sorted'vc.
+Prover result is: Unknown (unknown + incomplete) (0.03s, 8139 steps).
+== Stage 3: split_vc + inline_all on still-unproved goal ==
+Target theory: ReducingDishes_List_Spec
+Target goal  : reducing_dishes_list'vc
+---- stage3 | prover: Z3,4.8.6 | theory: ReducingDishes_List_Spec | goal: reducing_dishes_list'vc ----
+Transforms: split_vc inline_all
+File "reducing_dishes_list_stage3_9a728d2f_stage3.mlw", line 129, characters 13-51:
+Sub-goal Assertion of goal reducing_dishes_list'vc.
+Prover result is: Valid (0.02s, 23897 steps).
+
+File "reducing_dishes_list_stage3_9a728d2f_stage3.mlw", line 130, characters 12-43:
+Sub-goal Precondition of goal reducing_dishes_list'vc.
+Prover result is: Valid (0.01s, 1663 steps).
+
+File "reducing_dishes_list_stage3_9a728d2f_stage3.mlw", line 130, characters 12-43:
+Sub-goal Precondition of goal reducing_dishes_list'vc.
+Prover result is: Valid (0.01s, 1665 steps).
+
+File "reducing_dishes_list_stage3_9a728d2f_stage3.mlw", line 131, characters 13-19:
+Sub-goal Assertion of goal reducing_dishes_list'vc.
+Prover result is: Valid (0.01s, 2450 steps).
+
+File "reducing_dishes_list_stage3_9a728d2f_stage3.mlw", line 132, characters 13-41:
+Sub-goal Assertion of goal reducing_dishes_list'vc.
+Prover result is: Timeout (10.00s, 81580794 steps).
+
+File "reducing_dishes_list_stage3_9a728d2f_stage3.mlw", line 126, characters 14-47:
+Sub-goal Postcondition of goal reducing_dishes_list'vc.
+Prover result is: Valid (0.01s, 3026 steps).
+---- stage3 | prover: Alt-Ergo,2.4.0 | theory: ReducingDishes_List_Spec | goal: reducing_dishes_list'vc ----
+Transforms: split_vc inline_all
+File "reducing_dishes_list_stage3_9a728d2f_stage3.mlw", line 129, characters 13-51:
+Sub-goal Assertion of goal reducing_dishes_list'vc.
+Prover result is: Valid (0.01s, 14 steps).
+
+File "reducing_dishes_list_stage3_9a728d2f_stage3.mlw", line 130, characters 12-43:
+Sub-goal Precondition of goal reducing_dishes_list'vc.
+Prover result is: Valid (0.01s, 4 steps).
+
+File "reducing_dishes_list_stage3_9a728d2f_stage3.mlw", line 130, characters 12-43:
+Sub-goal Precondition of goal reducing_dishes_list'vc.
+Prover result is: Valid (0.01s, 4 steps).
+
+File "reducing_dishes_list_stage3_9a728d2f_stage3.mlw", line 131, characters 13-19:
+Sub-goal Assertion of goal reducing_dishes_list'vc.
+Prover result is: Valid (0.01s, 4 steps).
+
+File "reducing_dishes_list_stage3_9a728d2f_stage3.mlw", line 132, characters 13-41:
+Sub-goal Assertion of goal reducing_dishes_list'vc.
+Prover result is: Timeout (10.00s, 134278 steps).
+
+File "reducing_dishes_list_stage3_9a728d2f_stage3.mlw", line 126, characters 14-47:
+Sub-goal Postcondition of goal reducing_dishes_list'vc.
+Prover result is: Valid (0.01s, 62 steps).
+---- stage3 | prover: CVC4,1.8 | theory: ReducingDishes_List_Spec | goal: reducing_dishes_list'vc ----
+Transforms: split_vc inline_all
+File "reducing_dishes_list_stage3_9a728d2f_stage3.mlw", line 129, characters 13-51:
+Sub-goal Assertion of goal reducing_dishes_list'vc.
+Prover result is: Valid (0.02s, 4805 steps).
+
+File "reducing_dishes_list_stage3_9a728d2f_stage3.mlw", line 130, characters 12-43:
+Sub-goal Precondition of goal reducing_dishes_list'vc.
+Prover result is: Valid (0.01s, 4240 steps).
+
+File "reducing_dishes_list_stage3_9a728d2f_stage3.mlw", line 130, characters 12-43:
+Sub-goal Precondition of goal reducing_dishes_list'vc.
+Prover result is: Valid (0.01s, 4241 steps).
+
+File "reducing_dishes_list_stage3_9a728d2f_stage3.mlw", line 131, characters 13-19:
+Sub-goal Assertion of goal reducing_dishes_list'vc.
+Prover result is: Valid (0.01s, 4289 steps).
+
+File "reducing_dishes_list_stage3_9a728d2f_stage3.mlw", line 132, characters 13-41:
+Sub-goal Assertion of goal reducing_dishes_list'vc.
+Prover result is: Unknown (unknown + incomplete) (0.02s, 5294 steps).
+
+File "reducing_dishes_list_stage3_9a728d2f_stage3.mlw", line 126, characters 14-47:
+Sub-goal Postcondition of goal reducing_dishes_list'vc.
+Prover result is: Valid (0.02s, 5184 steps).
+== Final summary ==
+Unproved root goals after first prover : 2
+Remaining failures after split_vc      : 2
+Remaining failures after stage 3       : 2
+Detailed logs stored in                : /Users/rubenm/Desktop/Diversify2Verify/codex-runs/dataset-merge/1402_reducing-dishes/stage3a/list-recursive/reducing_dishes_list_stage3_9a728d2f/generated/why3/list/.why3_sessions/reducing_dishes_list_stage3_9a728d2f_stage3_logs
+Still unproved goals:
+ReducingDishes_List_Spec	insert_sorted'vc
+ReducingDishes_List_Spec	reducing_dishes_list'vc
+VERIFY_RESULT: FAILURE
+VERIFY_REASON: unproved_goals_remain
+VERIFY_STAGE: stage3
+VERIFY_ROOT_TOTAL: 11
+VERIFY_ROOT_PROVED: 9
+VERIFY_ROOT_REMAINING: 2

@@ -1,0 +1,442 @@
+== Stage 1: first prover on whole file ==
+Running in /Users/rubenm/Desktop/Diversify2Verify/codex-runs/dataset-merge-verification/stage3a-repair/3086_minimum-moves-to-pick-k-ones/list-imperative/minimum_moves_to_pick_k_ones_list_stage3_5b0171ff_stage3/generated/why3: why3 session create -o /Users/rubenm/Desktop/Diversify2Verify/codex-runs/dataset-merge-verification/stage3a-repair/3086_minimum-moves-to-pick-k-ones/list-imperative/minimum_moves_to_pick_k_ones_list_stage3_5b0171ff_stage3/generated/why3/.why3_sessions/repaired_stage1 -P Z3,4.8.6 -t 10 -m 8192 repaired.mlw
+Session created successfully
+Running in /Users/rubenm/Desktop/Diversify2Verify/codex-runs/dataset-merge-verification/stage3a-repair/3086_minimum-moves-to-pick-k-ones/list-imperative/minimum_moves_to_pick_k_ones_list_stage3_5b0171ff_stage3/generated/why3: why3 bench /Users/rubenm/Desktop/Diversify2Verify/codex-runs/dataset-merge-verification/stage3a-repair/3086_minimum-moves-to-pick-k-ones/list-imperative/minimum_moves_to_pick_k_ones_list_stage3_5b0171ff_stage3/generated/why3/.why3_sessions/repaired_stage1
+Progress: 4/1/0                       Progress: 3/2/0                       Progress: 2/3/0                       Progress: 1/4/0                       Progress: 0/5/0                       Progress: 0/0/2                       
+Replay completed, saving session... done
+== Stage 1 stats ==
+= Statistics for session /Users/rubenm/Desktop/Diversify2Verify/codex-runs/dataset-merge-verification/stage3a-repair/3086_minimum-moves-to-pick-k-ones/list-imperative/minimum_moves_to_pick_k_ones_list_stage3_5b0171ff_stage3/generated/why3/.why3_sessions/repaired_stage1
+
+== Number of root goals ==
+  total: 5  proved: 3
+
+== Number of sub goals ==
+  total: 0  proved: 0
+
+== Goals not proved ==
+  +-- file [../../repaired.mlw]
+    +-- theory MinimumMovesToPickKOnes_List_Stage3_Imperative
+      +-- goal insert_sorted'vc
+      +-- goal minimum_moves_to_pick_k_ones_list'vc
+  
+== Goals proved by only one prover ==
+  +-- file [../../repaired.mlw]
+    +-- theory MinimumMovesToPickKOnes_List_Stage3_Imperative
+      +-- goal binary_list'vc: Z3 4.8.6
+      +-- goal sum_distances'vc: Z3 4.8.6
+      +-- goal distance'vc: Z3 4.8.6
+  
+1 session(s) read, with a total of 5 proof goals.
+== Unproved root goals after first prover ==
+MinimumMovesToPickKOnes_List_Stage3_Imperative	insert_sorted'vc
+MinimumMovesToPickKOnes_List_Stage3_Imperative	minimum_moves_to_pick_k_ones_list'vc
+== Stage 1: trying remaining goals with prover Alt-Ergo,2.4.0 ==
+---- stage1 | prover: Alt-Ergo,2.4.0 | theory: MinimumMovesToPickKOnes_List_Stage3_Imperative | goal: insert_sorted'vc ----
+File repaired.mlw:
+Goal insert_sorted'vc.
+Prover result is: Valid (0.01s, 159 steps).
+Solved in stage 1 using prover: Alt-Ergo,2.4.0
+---- stage1 | prover: Alt-Ergo,2.4.0 | theory: MinimumMovesToPickKOnes_List_Stage3_Imperative | goal: minimum_moves_to_pick_k_ones_list'vc ----
+File repaired.mlw:
+Goal minimum_moves_to_pick_k_ones_list'vc.
+Prover result is: Timeout (10.00s, 158617 steps).
+Remaining after prover Alt-Ergo,2.4.0: 1
+== Stage 1: trying remaining goals with prover CVC4,1.8 ==
+---- stage1 | prover: CVC4,1.8 | theory: MinimumMovesToPickKOnes_List_Stage3_Imperative | goal: minimum_moves_to_pick_k_ones_list'vc ----
+File repaired.mlw:
+Goal minimum_moves_to_pick_k_ones_list'vc.
+Prover result is: Timeout (10.00s, 4993813 steps).
+Remaining after prover CVC4,1.8: 1
+== Goals still unproved after stage 1 ==
+MinimumMovesToPickKOnes_List_Stage3_Imperative	minimum_moves_to_pick_k_ones_list'vc
+== Stage 2: split_vc on unproved goal ==
+Target theory: MinimumMovesToPickKOnes_List_Stage3_Imperative
+Target goal  : minimum_moves_to_pick_k_ones_list'vc
+---- stage2 | prover: Z3,4.8.6 | theory: MinimumMovesToPickKOnes_List_Stage3_Imperative | goal: minimum_moves_to_pick_k_ones_list'vc ----
+Transforms: split_vc
+File "repaired.mlw", line 94, characters 18-29:
+Sub-goal Loop invariant init of goal minimum_moves_to_pick_k_ones_list'vc.
+Prover result is: Valid (0.01s, 1502 steps).
+
+File "repaired.mlw", line 95, characters 18-52:
+Sub-goal Loop invariant init of goal minimum_moves_to_pick_k_ones_list'vc.
+Prover result is: Valid (0.01s, 1678 steps).
+
+File "repaired.mlw", line 96, characters 18-34:
+Sub-goal Loop invariant init of goal minimum_moves_to_pick_k_ones_list'vc.
+Prover result is: Valid (0.01s, 1683 steps).
+
+File "repaired.mlw", line 97, characters 18-39:
+Sub-goal Loop invariant init of goal minimum_moves_to_pick_k_ones_list'vc.
+Prover result is: Valid (0.01s, 1688 steps).
+
+File "repaired.mlw", line 98, characters 16-27:
+Sub-goal Loop variant decrease of goal minimum_moves_to_pick_k_ones_list'vc.
+Prover result is: Valid (0.01s, 2185 steps).
+
+File "repaired.mlw", line 94, characters 18-29:
+Sub-goal Loop invariant preservation of goal
+minimum_moves_to_pick_k_ones_list'vc.
+Prover result is: Valid (0.01s, 2167 steps).
+
+File "repaired.mlw", line 95, characters 18-52:
+Sub-goal Loop invariant preservation of goal
+minimum_moves_to_pick_k_ones_list'vc.
+Prover result is: Valid (0.01s, 2180 steps).
+
+File "repaired.mlw", line 96, characters 18-34:
+Sub-goal Loop invariant preservation of goal
+minimum_moves_to_pick_k_ones_list'vc.
+Prover result is: Valid (0.01s, 2185 steps).
+
+File "repaired.mlw", line 97, characters 18-39:
+Sub-goal Loop invariant preservation of goal
+minimum_moves_to_pick_k_ones_list'vc.
+Prover result is: Valid (0.01s, 2190 steps).
+
+File "repaired.mlw", line 102, characters 19-46:
+Sub-goal Assertion of goal minimum_moves_to_pick_k_ones_list'vc.
+Prover result is: Valid (0.01s, 34373 steps).
+
+File "repaired.mlw", line 98, characters 16-27:
+Sub-goal Loop variant decrease of goal minimum_moves_to_pick_k_ones_list'vc.
+Prover result is: Valid (0.01s, 35953 steps).
+
+File "repaired.mlw", line 94, characters 18-29:
+Sub-goal Loop invariant preservation of goal
+minimum_moves_to_pick_k_ones_list'vc.
+Prover result is: Valid (0.01s, 33896 steps).
+
+File "repaired.mlw", line 95, characters 18-52:
+Sub-goal Loop invariant preservation of goal
+minimum_moves_to_pick_k_ones_list'vc.
+Prover result is: Valid (0.01s, 14382 steps).
+
+File "repaired.mlw", line 96, characters 18-34:
+Sub-goal Loop invariant preservation of goal
+minimum_moves_to_pick_k_ones_list'vc.
+Prover result is: Valid (0.01s, 34052 steps).
+
+File "repaired.mlw", line 97, characters 18-39:
+Sub-goal Loop invariant preservation of goal
+minimum_moves_to_pick_k_ones_list'vc.
+Prover result is: Valid (0.01s, 14458 steps).
+
+File "repaired.mlw", line 98, characters 16-27:
+Sub-goal Loop variant decrease of goal minimum_moves_to_pick_k_ones_list'vc.
+Prover result is: Valid (0.01s, 36004 steps).
+
+File "repaired.mlw", line 94, characters 18-29:
+Sub-goal Loop invariant preservation of goal
+minimum_moves_to_pick_k_ones_list'vc.
+Prover result is: Valid (0.01s, 33942 steps).
+
+File "repaired.mlw", line 95, characters 18-52:
+Sub-goal Loop invariant preservation of goal
+minimum_moves_to_pick_k_ones_list'vc.
+Prover result is: Valid (0.01s, 14360 steps).
+
+File "repaired.mlw", line 96, characters 18-34:
+Sub-goal Loop invariant preservation of goal
+minimum_moves_to_pick_k_ones_list'vc.
+Prover result is: Valid (0.01s, 2500 steps).
+
+File "repaired.mlw", line 97, characters 18-39:
+Sub-goal Loop invariant preservation of goal
+minimum_moves_to_pick_k_ones_list'vc.
+Prover result is: Valid (0.01s, 34109 steps).
+
+File "repaired.mlw", line 113, characters 18-24:
+Sub-goal Unreachable point of goal minimum_moves_to_pick_k_ones_list'vc.
+Prover result is: Valid (0.01s, 35416 steps).
+
+File "repaired.mlw", line 115, characters 13-23:
+Sub-goal Assertion of goal minimum_moves_to_pick_k_ones_list'vc.
+Prover result is: Timeout (10.00s, 34173965 steps).
+
+File "repaired.mlw", line 116, characters 13-33:
+Sub-goal Assertion of goal minimum_moves_to_pick_k_ones_list'vc.
+Prover result is: Valid (0.01s, 16391 steps).
+
+File "repaired.mlw", line 123, characters 18-30:
+Sub-goal Loop invariant init of goal minimum_moves_to_pick_k_ones_list'vc.
+Prover result is: Valid (0.01s, 2650 steps).
+
+File "repaired.mlw", line 124, characters 18-30:
+Sub-goal Loop invariant init of goal minimum_moves_to_pick_k_ones_list'vc.
+Prover result is: Valid (0.01s, 2655 steps).
+
+File "repaired.mlw", line 125, characters 18-33:
+Sub-goal Loop invariant init of goal minimum_moves_to_pick_k_ones_list'vc.
+Prover result is: Valid (0.01s, 2660 steps).
+
+File "repaired.mlw", line 126, characters 18-35:
+Sub-goal Loop invariant init of goal minimum_moves_to_pick_k_ones_list'vc.
+Prover result is: Timeout (10.00s, 35893975 steps).
+Infrastructure issue in stage 2 with prover Z3,4.8.6; aborting rest of stage 2.
+== Goals still unproved after stage 2 (split_vc) ==
+MinimumMovesToPickKOnes_List_Stage3_Imperative	minimum_moves_to_pick_k_ones_list'vc
+== Stage 3: split_vc + inline_all on still-unproved goal ==
+Target theory: MinimumMovesToPickKOnes_List_Stage3_Imperative
+Target goal  : minimum_moves_to_pick_k_ones_list'vc
+---- stage3 | prover: Alt-Ergo,2.4.0 | theory: MinimumMovesToPickKOnes_List_Stage3_Imperative | goal: minimum_moves_to_pick_k_ones_list'vc ----
+Transforms: split_vc inline_all
+File "repaired.mlw", line 94, characters 18-29:
+Sub-goal Loop invariant init of goal minimum_moves_to_pick_k_ones_list'vc.
+Prover result is: Valid (0.01s, 10 steps).
+
+File "repaired.mlw", line 95, characters 18-52:
+Sub-goal Loop invariant init of goal minimum_moves_to_pick_k_ones_list'vc.
+Prover result is: Valid (0.01s, 10 steps).
+
+File "repaired.mlw", line 96, characters 18-34:
+Sub-goal Loop invariant init of goal minimum_moves_to_pick_k_ones_list'vc.
+Prover result is: Valid (0.01s, 10 steps).
+
+File "repaired.mlw", line 97, characters 18-39:
+Sub-goal Loop invariant init of goal minimum_moves_to_pick_k_ones_list'vc.
+Prover result is: Valid (0.01s, 10 steps).
+
+File "repaired.mlw", line 98, characters 16-27:
+Sub-goal Loop variant decrease of goal minimum_moves_to_pick_k_ones_list'vc.
+Prover result is: Valid (0.01s, 17 steps).
+
+File "repaired.mlw", line 94, characters 18-29:
+Sub-goal Loop invariant preservation of goal
+minimum_moves_to_pick_k_ones_list'vc.
+Prover result is: Valid (0.01s, 17 steps).
+
+File "repaired.mlw", line 95, characters 18-52:
+Sub-goal Loop invariant preservation of goal
+minimum_moves_to_pick_k_ones_list'vc.
+Prover result is: Valid (0.01s, 17 steps).
+
+File "repaired.mlw", line 96, characters 18-34:
+Sub-goal Loop invariant preservation of goal
+minimum_moves_to_pick_k_ones_list'vc.
+Prover result is: Valid (0.01s, 17 steps).
+
+File "repaired.mlw", line 97, characters 18-39:
+Sub-goal Loop invariant preservation of goal
+minimum_moves_to_pick_k_ones_list'vc.
+Prover result is: Valid (0.01s, 17 steps).
+
+File "repaired.mlw", line 102, characters 19-46:
+Sub-goal Assertion of goal minimum_moves_to_pick_k_ones_list'vc.
+Prover result is: Valid (0.01s, 54 steps).
+
+File "repaired.mlw", line 98, characters 16-27:
+Sub-goal Loop variant decrease of goal minimum_moves_to_pick_k_ones_list'vc.
+Prover result is: Valid (0.01s, 67 steps).
+
+File "repaired.mlw", line 94, characters 18-29:
+Sub-goal Loop invariant preservation of goal
+minimum_moves_to_pick_k_ones_list'vc.
+Prover result is: Valid (0.01s, 40 steps).
+
+File "repaired.mlw", line 95, characters 18-52:
+Sub-goal Loop invariant preservation of goal
+minimum_moves_to_pick_k_ones_list'vc.
+Prover result is: Valid (0.01s, 29 steps).
+
+File "repaired.mlw", line 96, characters 18-34:
+Sub-goal Loop invariant preservation of goal
+minimum_moves_to_pick_k_ones_list'vc.
+Prover result is: Valid (0.01s, 36 steps).
+
+File "repaired.mlw", line 97, characters 18-39:
+Sub-goal Loop invariant preservation of goal
+minimum_moves_to_pick_k_ones_list'vc.
+Prover result is: Valid (0.01s, 36 steps).
+
+File "repaired.mlw", line 98, characters 16-27:
+Sub-goal Loop variant decrease of goal minimum_moves_to_pick_k_ones_list'vc.
+Prover result is: Valid (0.01s, 64 steps).
+
+File "repaired.mlw", line 94, characters 18-29:
+Sub-goal Loop invariant preservation of goal
+minimum_moves_to_pick_k_ones_list'vc.
+Prover result is: Valid (0.01s, 37 steps).
+
+File "repaired.mlw", line 95, characters 18-52:
+Sub-goal Loop invariant preservation of goal
+minimum_moves_to_pick_k_ones_list'vc.
+Prover result is: Valid (0.01s, 27 steps).
+
+File "repaired.mlw", line 96, characters 18-34:
+Sub-goal Loop invariant preservation of goal
+minimum_moves_to_pick_k_ones_list'vc.
+Prover result is: Valid (0.01s, 27 steps).
+
+File "repaired.mlw", line 97, characters 18-39:
+Sub-goal Loop invariant preservation of goal
+minimum_moves_to_pick_k_ones_list'vc.
+Prover result is: Valid (0.01s, 34 steps).
+
+File "repaired.mlw", line 113, characters 18-24:
+Sub-goal Unreachable point of goal minimum_moves_to_pick_k_ones_list'vc.
+Prover result is: Valid (0.01s, 47 steps).
+
+File "repaired.mlw", line 115, characters 13-23:
+Sub-goal Assertion of goal minimum_moves_to_pick_k_ones_list'vc.
+Prover result is: Timeout (10.00s, 189948 steps).
+
+File "repaired.mlw", line 116, characters 13-33:
+Sub-goal Assertion of goal minimum_moves_to_pick_k_ones_list'vc.
+Prover result is: Valid (0.01s, 48 steps).
+
+File "repaired.mlw", line 123, characters 18-30:
+Sub-goal Loop invariant init of goal minimum_moves_to_pick_k_ones_list'vc.
+Prover result is: Valid (0.01s, 30 steps).
+
+File "repaired.mlw", line 124, characters 18-30:
+Sub-goal Loop invariant init of goal minimum_moves_to_pick_k_ones_list'vc.
+Prover result is: Valid (0.01s, 30 steps).
+
+File "repaired.mlw", line 125, characters 18-33:
+Sub-goal Loop invariant init of goal minimum_moves_to_pick_k_ones_list'vc.
+Prover result is: Valid (0.01s, 30 steps).
+
+File "repaired.mlw", line 126, characters 18-35:
+Sub-goal Loop invariant init of goal minimum_moves_to_pick_k_ones_list'vc.
+Prover result is: Valid (0.01s, 40 steps).
+
+File "repaired.mlw", line 127, characters 18-35:
+Sub-goal Loop invariant init of goal minimum_moves_to_pick_k_ones_list'vc.
+Prover result is: Valid (0.01s, 99 steps).
+
+File "repaired.mlw", line 128, characters 18-35:
+Sub-goal Loop invariant init of goal minimum_moves_to_pick_k_ones_list'vc.
+Prover result is: Valid (0.01s, 81 steps).
+
+File "repaired.mlw", line 129, characters 18-35:
+Sub-goal Loop invariant init of goal minimum_moves_to_pick_k_ones_list'vc.
+Prover result is: Valid (0.01s, 35 steps).
+
+File "repaired.mlw", line 130, characters 18-28:
+Sub-goal Loop invariant init of goal minimum_moves_to_pick_k_ones_list'vc.
+Prover result is: Valid (0.01s, 189 steps).
+
+File "repaired.mlw", line 135, characters 20-40:
+Sub-goal Loop invariant init of goal minimum_moves_to_pick_k_ones_list'vc.
+Prover result is: Valid (0.01s, 93 steps).
+
+File "repaired.mlw", line 136, characters 20-78:
+Sub-goal Loop invariant init of goal minimum_moves_to_pick_k_ones_list'vc.
+Prover result is: Valid (0.01s, 40 steps).
+
+File "repaired.mlw", line 137, characters 18-33:
+Sub-goal Loop variant decrease of goal minimum_moves_to_pick_k_ones_list'vc.
+Prover result is: Valid (0.01s, 43 steps).
+
+File "repaired.mlw", line 135, characters 20-40:
+Sub-goal Loop invariant preservation of goal
+minimum_moves_to_pick_k_ones_list'vc.
+Prover result is: Valid (0.01s, 43 steps).
+
+File "repaired.mlw", line 136, characters 20-78:
+Sub-goal Loop invariant preservation of goal
+minimum_moves_to_pick_k_ones_list'vc.
+Prover result is: Valid (0.01s, 43 steps).
+
+File "repaired.mlw", line 141, characters 21-52:
+Sub-goal Assertion of goal minimum_moves_to_pick_k_ones_list'vc.
+Prover result is: Valid (0.01s, 105 steps).
+
+File "repaired.mlw", line 137, characters 18-33:
+Sub-goal Loop variant decrease of goal minimum_moves_to_pick_k_ones_list'vc.
+Prover result is: Valid (0.01s, 55 steps).
+
+File "repaired.mlw", line 135, characters 20-40:
+Sub-goal Loop invariant preservation of goal
+minimum_moves_to_pick_k_ones_list'vc.
+Prover result is: Valid (0.01s, 135 steps).
+
+File "repaired.mlw", line 136, characters 20-78:
+Sub-goal Loop invariant preservation of goal
+minimum_moves_to_pick_k_ones_list'vc.
+Prover result is: Valid (0.01s, 56 steps).
+
+File "repaired.mlw", line 148, characters 20-26:
+Sub-goal Unreachable point of goal minimum_moves_to_pick_k_ones_list'vc.
+Prover result is: Valid (0.01s, 101 steps).
+
+File "repaired.mlw", line 150, characters 15-29:
+Sub-goal Assertion of goal minimum_moves_to_pick_k_ones_list'vc.
+Prover result is: Timeout (10.00s, 357431 steps).
+
+File "repaired.mlw", line 151, characters 15-55:
+Sub-goal Assertion of goal minimum_moves_to_pick_k_ones_list'vc.
+Prover result is: Valid (0.01s, 47 steps).
+
+File "repaired.mlw", line 156, characters 20-31:
+Sub-goal Loop invariant init of goal minimum_moves_to_pick_k_ones_list'vc.
+Prover result is: Valid (0.01s, 47 steps).
+
+File "repaired.mlw", line 157, characters 20-42:
+Sub-goal Loop invariant init of goal minimum_moves_to_pick_k_ones_list'vc.
+Prover result is: Valid (0.01s, 47 steps).
+
+File "repaired.mlw", line 158, characters 20-34:
+Sub-goal Loop invariant init of goal minimum_moves_to_pick_k_ones_list'vc.
+Prover result is: Valid (0.01s, 47 steps).
+
+File "repaired.mlw", line 159, characters 20-41:
+Sub-goal Loop invariant init of goal minimum_moves_to_pick_k_ones_list'vc.
+Prover result is: Valid (0.01s, 102 steps).
+
+File "repaired.mlw", line 160, characters 18-34:
+Sub-goal Loop variant decrease of goal minimum_moves_to_pick_k_ones_list'vc.
+Prover result is: Valid (0.01s, 52 steps).
+
+File "repaired.mlw", line 156, characters 20-31:
+Sub-goal Loop invariant preservation of goal
+minimum_moves_to_pick_k_ones_list'vc.
+Prover result is: Valid (0.01s, 52 steps).
+
+File "repaired.mlw", line 157, characters 20-42:
+Sub-goal Loop invariant preservation of goal
+minimum_moves_to_pick_k_ones_list'vc.
+Prover result is: Valid (0.01s, 52 steps).
+
+File "repaired.mlw", line 158, characters 20-34:
+Sub-goal Loop invariant preservation of goal
+minimum_moves_to_pick_k_ones_list'vc.
+Prover result is: Valid (0.01s, 52 steps).
+
+File "repaired.mlw", line 159, characters 20-41:
+Sub-goal Loop invariant preservation of goal
+minimum_moves_to_pick_k_ones_list'vc.
+Prover result is: Valid (0.01s, 52 steps).
+
+File "repaired.mlw", line 164, characters 21-53:
+Sub-goal Assertion of goal minimum_moves_to_pick_k_ones_list'vc.
+Prover result is: Valid (0.01s, 118 steps).
+
+File "repaired.mlw", line 160, characters 18-34:
+Sub-goal Loop variant decrease of goal minimum_moves_to_pick_k_ones_list'vc.
+Prover result is: Valid (0.01s, 69 steps).
+
+File "repaired.mlw", line 156, characters 20-31:
+Sub-goal Loop invariant preservation of goal
+minimum_moves_to_pick_k_ones_list'vc.
+Prover result is: Valid (0.01s, 78 steps).
+
+File "repaired.mlw", line 157, characters 20-42:
+Sub-goal Loop invariant preservation of goal
+minimum_moves_to_pick_k_ones_list'vc.
+Prover result is: Valid (0.01s, 72 steps).
+Infrastructure issue in stage 3 with prover Alt-Ergo,2.4.0; aborting rest of stage 3.
+== Final summary ==
+Unproved root goals after first prover : 1
+Remaining failures after split_vc      : 1
+Remaining failures after stage 3       : 1
+Detailed logs stored in                : /Users/rubenm/Desktop/Diversify2Verify/codex-runs/dataset-merge-verification/stage3a-repair/3086_minimum-moves-to-pick-k-ones/list-imperative/minimum_moves_to_pick_k_ones_list_stage3_5b0171ff_stage3/generated/why3/.why3_sessions/repaired_logs
+Still unproved goals:
+MinimumMovesToPickKOnes_List_Stage3_Imperative	minimum_moves_to_pick_k_ones_list'vc
+VERIFY_RESULT: FAILURE
+VERIFY_REASON: unproved_goals_remain
+VERIFY_STAGE: stage3
+VERIFY_ROOT_TOTAL: 5
+VERIFY_ROOT_PROVED: 4
+VERIFY_ROOT_REMAINING: 1

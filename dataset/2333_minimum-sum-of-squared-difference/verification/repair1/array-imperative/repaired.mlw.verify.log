@@ -1,0 +1,140 @@
+== Stage 1: first prover on whole file ==
+Running in /Users/rubenm/Desktop/Diversify2Verify/codex-runs/dataset-merge-verification/stage3a-repair/2333_minimum-sum-of-squared-difference/array-imperative/minimum_sum_of_squared_difference_array_stage3_1f3d34ed_stage3/generated/why3: why3 session create -o /Users/rubenm/Desktop/Diversify2Verify/codex-runs/dataset-merge-verification/stage3a-repair/2333_minimum-sum-of-squared-difference/array-imperative/minimum_sum_of_squared_difference_array_stage3_1f3d34ed_stage3/generated/why3/.why3_sessions/repaired_stage1 -P Z3,4.8.6 -t 10 -m 8192 repaired.mlw
+Session created successfully
+Running in /Users/rubenm/Desktop/Diversify2Verify/codex-runs/dataset-merge-verification/stage3a-repair/2333_minimum-sum-of-squared-difference/array-imperative/minimum_sum_of_squared_difference_array_stage3_1f3d34ed_stage3/generated/why3: why3 bench /Users/rubenm/Desktop/Diversify2Verify/codex-runs/dataset-merge-verification/stage3a-repair/2333_minimum-sum-of-squared-difference/array-imperative/minimum_sum_of_squared_difference_array_stage3_1f3d34ed_stage3/generated/why3/.why3_sessions/repaired_stage1
+Progress: 12/1/0                       Progress: 11/2/0                       Progress: 10/3/0                       Progress: 9/4/0                       Progress: 8/5/0                       Progress: 7/6/0                       Progress: 7/0/0                       Progress: 6/1/0                       Progress: 5/2/0                       Progress: 4/3/0                       Progress: 3/4/0                       Progress: 2/5/0                       Progress: 1/6/0                       Progress: 1/0/2                       Progress: 0/1/2                       Progress: 0/0/1                       
+Replay completed, saving session... done
+== Stage 1 stats ==
+= Statistics for session /Users/rubenm/Desktop/Diversify2Verify/codex-runs/dataset-merge-verification/stage3a-repair/2333_minimum-sum-of-squared-difference/array-imperative/minimum_sum_of_squared_difference_array_stage3_1f3d34ed_stage3/generated/why3/.why3_sessions/repaired_stage1
+
+== Number of root goals ==
+  total: 13  proved: 11
+
+== Number of sub goals ==
+  total: 0  proved: 0
+
+== Goals not proved ==
+  +-- file [../../repaired.mlw]
+    +-- theory MinimumSumOfSquaredDifference_Array_Stage3_Imperative
+      +-- goal zero_result_when_total_diff_within_ops'vc
+      +-- goal greedy_frequency_result_minimal'vc
+  
+== Goals proved by only one prover ==
+  +-- file [../../repaired.mlw]
+    +-- theory MinimumSumOfSquaredDifference_Array_Stage3_Imperative
+      +-- goal abs_diff_at'vc: Z3 4.8.6
+      +-- goal total_abs_diff_from'vc: Z3 4.8.6
+      +-- goal total_abs_diff'vc: Z3 4.8.6
+      +-- goal residual_sum_from'vc: Z3 4.8.6
+      +-- goal residual_sum'vc: Z3 4.8.6
+      +-- goal squared_residual_sum_from'vc: Z3 4.8.6
+      +-- goal squared_residual_sum'vc: Z3 4.8.6
+      +-- goal square_nonnegative'vc: Z3 4.8.6
+      +-- goal squared_residual_sum_from_nonnegative'vc: Z3 4.8.6
+      +-- goal valid_residual_squared_sum_nonnegative'vc: Z3 4.8.6
+      +-- goal minimum_sum_of_squared_difference_array'vc: Z3 4.8.6
+  
+1 session(s) read, with a total of 13 proof goals.
+== Unproved root goals after first prover ==
+MinimumSumOfSquaredDifference_Array_Stage3_Imperative	zero_result_when_total_diff_within_ops'vc
+MinimumSumOfSquaredDifference_Array_Stage3_Imperative	greedy_frequency_result_minimal'vc
+== Stage 1: trying remaining goals with prover Alt-Ergo,2.4.0 ==
+---- stage1 | prover: Alt-Ergo,2.4.0 | theory: MinimumSumOfSquaredDifference_Array_Stage3_Imperative | goal: zero_result_when_total_diff_within_ops'vc ----
+File repaired.mlw:
+Goal zero_result_when_total_diff_within_ops'vc.
+Prover result is: Timeout (10.00s, 12193 steps).
+---- stage1 | prover: Alt-Ergo,2.4.0 | theory: MinimumSumOfSquaredDifference_Array_Stage3_Imperative | goal: greedy_frequency_result_minimal'vc ----
+File repaired.mlw:
+Goal greedy_frequency_result_minimal'vc.
+Prover result is: Timeout (10.00s, 60367 steps).
+Remaining after prover Alt-Ergo,2.4.0: 2
+== Stage 1: trying remaining goals with prover CVC4,1.8 ==
+---- stage1 | prover: CVC4,1.8 | theory: MinimumSumOfSquaredDifference_Array_Stage3_Imperative | goal: zero_result_when_total_diff_within_ops'vc ----
+File repaired.mlw:
+Goal zero_result_when_total_diff_within_ops'vc.
+Prover result is: Timeout (10.00s, 1742962 steps).
+---- stage1 | prover: CVC4,1.8 | theory: MinimumSumOfSquaredDifference_Array_Stage3_Imperative | goal: greedy_frequency_result_minimal'vc ----
+File repaired.mlw:
+Goal greedy_frequency_result_minimal'vc.
+Prover result is: Timeout (10.00s, 659330 steps).
+Remaining after prover CVC4,1.8: 2
+== Goals still unproved after stage 1 ==
+MinimumSumOfSquaredDifference_Array_Stage3_Imperative	zero_result_when_total_diff_within_ops'vc
+MinimumSumOfSquaredDifference_Array_Stage3_Imperative	greedy_frequency_result_minimal'vc
+== Stage 2: split_vc on unproved goal ==
+Target theory: MinimumSumOfSquaredDifference_Array_Stage3_Imperative
+Target goal  : zero_result_when_total_diff_within_ops'vc
+---- stage2 | prover: Z3,4.8.6 | theory: MinimumSumOfSquaredDifference_Array_Stage3_Imperative | goal: zero_result_when_total_diff_within_ops'vc ----
+Transforms: split_vc
+File "repaired.mlw", line 142, characters 19-27:
+Sub-goal Array creation size of goal
+zero_result_when_total_diff_within_ops'vc.
+Prover result is: Valid (0.01s, 19480 steps).
+
+File "repaired.mlw", line 143, characters 13-43:
+Sub-goal Assertion of goal zero_result_when_total_diff_within_ops'vc.
+Prover result is: Valid (0.01s, 1475 steps).
+
+File "repaired.mlw", line 144, characters 56-71:
+Sub-goal Assertion of goal zero_result_when_total_diff_within_ops'vc.
+Prover result is: Valid (0.01s, 20858 steps).
+
+File "repaired.mlw", line 147, characters 6-51:
+Sub-goal Assertion of goal zero_result_when_total_diff_within_ops'vc.
+Prover result is: Valid (0.01s, 22921 steps).
+
+File "repaired.mlw", line 148, characters 13-38:
+Sub-goal Assertion of goal zero_result_when_total_diff_within_ops'vc.
+Prover result is: Timeout (10.00s, 406537424 steps).
+
+File "repaired.mlw", line 149, characters 13-54:
+Sub-goal Assertion of goal zero_result_when_total_diff_within_ops'vc.
+Prover result is: Timeout (10.00s, 500094431 steps).
+Infrastructure issue in stage 2 with prover Z3,4.8.6; aborting rest of stage 2.
+== Goals still unproved after stage 2 (split_vc) ==
+MinimumSumOfSquaredDifference_Array_Stage3_Imperative	zero_result_when_total_diff_within_ops'vc
+MinimumSumOfSquaredDifference_Array_Stage3_Imperative	greedy_frequency_result_minimal'vc
+== Stage 3: split_vc + inline_all on still-unproved goal ==
+Target theory: MinimumSumOfSquaredDifference_Array_Stage3_Imperative
+Target goal  : zero_result_when_total_diff_within_ops'vc
+---- stage3 | prover: Alt-Ergo,2.4.0 | theory: MinimumSumOfSquaredDifference_Array_Stage3_Imperative | goal: zero_result_when_total_diff_within_ops'vc ----
+Transforms: split_vc inline_all
+File "repaired.mlw", line 142, characters 19-27:
+Sub-goal Array creation size of goal
+zero_result_when_total_diff_within_ops'vc.
+Prover result is: Valid (0.01s, 22 steps).
+
+File "repaired.mlw", line 143, characters 13-43:
+Sub-goal Assertion of goal zero_result_when_total_diff_within_ops'vc.
+Prover result is: Valid (0.01s, 13 steps).
+
+File "repaired.mlw", line 144, characters 56-71:
+Sub-goal Assertion of goal zero_result_when_total_diff_within_ops'vc.
+Prover result is: Valid (0.01s, 40 steps).
+
+File "repaired.mlw", line 147, characters 6-51:
+Sub-goal Assertion of goal zero_result_when_total_diff_within_ops'vc.
+Prover result is: Valid (0.01s, 92 steps).
+
+File "repaired.mlw", line 148, characters 13-38:
+Sub-goal Assertion of goal zero_result_when_total_diff_within_ops'vc.
+Prover result is: Timeout (10.00s, 32684 steps).
+
+File "repaired.mlw", line 149, characters 13-54:
+Sub-goal Assertion of goal zero_result_when_total_diff_within_ops'vc.
+Prover result is: Timeout (10.00s, 6270 steps).
+Infrastructure issue in stage 3 with prover Alt-Ergo,2.4.0; aborting rest of stage 3.
+== Final summary ==
+Unproved root goals after first prover : 2
+Remaining failures after split_vc      : 2
+Remaining failures after stage 3       : 2
+Detailed logs stored in                : /Users/rubenm/Desktop/Diversify2Verify/codex-runs/dataset-merge-verification/stage3a-repair/2333_minimum-sum-of-squared-difference/array-imperative/minimum_sum_of_squared_difference_array_stage3_1f3d34ed_stage3/generated/why3/.why3_sessions/repaired_logs
+Still unproved goals:
+MinimumSumOfSquaredDifference_Array_Stage3_Imperative	zero_result_when_total_diff_within_ops'vc
+MinimumSumOfSquaredDifference_Array_Stage3_Imperative	greedy_frequency_result_minimal'vc
+VERIFY_RESULT: FAILURE
+VERIFY_REASON: unproved_goals_remain
+VERIFY_STAGE: stage3
+VERIFY_ROOT_TOTAL: 13
+VERIFY_ROOT_PROVED: 11
+VERIFY_ROOT_REMAINING: 2

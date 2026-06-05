@@ -1,0 +1,317 @@
+module SubsequenceOfSizeKWithTheLargestEvenSum_Array_Stage3
+
+  use int.Int
+  use int.EuclideanDivision
+  use int.Sum as IntSum
+  use array.Array
+  use array.Init
+  use array.ArrayPermut as ArrayPermut
+
+  predicate valid_nums (nums: array int) =
+    1 <= length nums <= 100000 /\
+    forall i: int. 0 <= i < length nums -> 0 <= nums[i] <= 100000
+
+  predicate valid_choice (nums: array int) (k: int) (choice: array int) =
+    length choice = k /\
+    (forall t: int. 0 <= t < k -> 0 <= choice[t] < length nums) /\
+    (forall i j: int. 0 <= i < j < k -> choice[i] < choice[j])
+
+  function subsequence_sum (nums: array int) (choice: array int) : int =
+    IntSum.sum (fun t -> nums[choice[t]]) 0 (length choice)
+
+  predicate even_candidate_sum (nums: array int) (k: int) (s: int) =
+    exists choice: array int.
+      valid_choice nums k choice /\
+      s = subsequence_sum nums choice /\
+      mod s 2 = 0
+
+  predicate optimal_even_subsequence_sum
+      (nums: array int) (k: int) (result: int) =
+    (result = -1 /\
+     forall s: int. not (even_candidate_sum nums k s)) \/
+    (even_candidate_sum nums k result /\
+     forall s: int. even_candidate_sum nums k s -> s <= result)
+
+  predicate nonnegative_array (a: array int) =
+    forall i: int. 0 <= i < length a -> 0 <= a[i]
+
+  predicate sorted_desc (a: array int) =
+    forall i j: int. 0 <= i <= j < length a -> a[i] >= a[j]
+
+  predicate prefix_parity_min
+      (a: array int) (limit: int) (parity: int) (v: int) =
+    v <> -1 ->
+      (exists i: int. 0 <= i < limit /\ a[i] = v /\ mod v 2 = parity) /\
+      (forall i: int. 0 <= i < limit /\ mod a[i] 2 = parity -> v <= a[i])
+
+  predicate suffix_parity_max
+      (a: array int) (start: int) (parity: int) (v: int) =
+    v <> -1 ->
+      (exists i: int. start <= i < length a /\ a[i] = v /\ mod v 2 = parity) /\
+      (forall i: int. start <= i < length a /\ mod a[i] 2 = parity -> a[i] <= v)
+
+  let lemma clone_array_permut_all (src dst: array int)
+    requires { length dst = length src }
+    requires { forall i: int. 0 <= i < length src -> dst[i] = src[i] }
+    ensures  { ArrayPermut.permut_all src dst }
+  = ()
+
+  let lemma permut_all_trans
+      (a b c: array int)
+    requires { ArrayPermut.permut_all a b }
+    requires { ArrayPermut.permut_all b c }
+    ensures  { ArrayPermut.permut_all a c }
+  = ()
+
+  let lemma even_sorted_prefix_optimal
+      (nums sorted: array int) (k top_sum: int)
+    requires { valid_nums nums }
+    requires { 1 <= k <= length nums }
+    requires { length sorted = length nums }
+    requires { nonnegative_array sorted }
+    requires { sorted_desc sorted }
+    requires { ArrayPermut.permut_all nums sorted }
+    requires { top_sum = IntSum.sum (fun j -> sorted[j]) 0 k }
+    requires { mod top_sum 2 = 0 }
+    ensures  { optimal_even_subsequence_sum nums k top_sum }
+  = ()
+
+  let lemma odd_sorted_replacement_optimal
+      (nums sorted: array int) (k top_sum: int)
+      (smallest_odd smallest_even largest_odd largest_even: int)
+      (replace_odd replace_even final_result: int)
+    requires { valid_nums nums }
+    requires { 1 <= k <= length nums }
+    requires { length sorted = length nums }
+    requires { nonnegative_array sorted }
+    requires { sorted_desc sorted }
+    requires { ArrayPermut.permut_all nums sorted }
+    requires { top_sum = IntSum.sum (fun j -> sorted[j]) 0 k }
+    requires { mod top_sum 2 <> 0 }
+    requires { prefix_parity_min sorted k 1 smallest_odd }
+    requires { prefix_parity_min sorted k 0 smallest_even }
+    requires { suffix_parity_max sorted k 1 largest_odd }
+    requires { suffix_parity_max sorted k 0 largest_even }
+    requires { replace_odd =
+      (if smallest_odd = -1 \/ largest_even = -1 then
+         -1
+       else
+         top_sum - smallest_odd + largest_even) }
+    requires { replace_even =
+      (if smallest_even = -1 \/ largest_odd = -1 then
+         -1
+       else
+         top_sum - smallest_even + largest_odd) }
+    requires { final_result =
+      (if replace_odd >= replace_even then replace_odd else replace_even) }
+    ensures  { optimal_even_subsequence_sum nums k final_result }
+  = ()
+
+  let rec copy_into (src: array int) (dst: array int) (i: int) : unit
+    requires { length dst = length src }
+    requires { 0 <= i <= length src }
+    ensures  { forall j: int. i <= j < length src -> dst[j] = src[j] }
+    ensures  { forall j: int. 0 <= j < i -> dst[j] = (old dst)[j] }
+    variant  { length src - i }
+  =
+    if i >= length src then
+      ()
+    else
+      begin
+      dst[i] <- src[i];
+      assert { dst[i] = src[i] };
+      copy_into src dst (i + 1);
+      assert { dst[i] = src[i] };
+      assert { forall j: int. i + 1 <= j < length src -> dst[j] = src[j] };
+      assert { forall j: int. i <= j < length src -> dst[j] = src[j] }
+      end
+
+  let clone_array (src: array int) : array int
+    ensures { length result = length src }
+    ensures { forall i: int. 0 <= i < length src -> result[i] = src[i] }
+  =
+    let dst = make (length src) 0 in
+    copy_into src dst 0;
+    dst
+
+  let swap (a: array int) (i: int) (j: int) : unit
+    requires { 0 <= i < length a }
+    requires { 0 <= j < length a }
+    ensures  { length a = length (old a) }
+    ensures  { nonnegative_array (old a) -> nonnegative_array a }
+  =
+    if i = j then
+      ()
+    else
+      begin
+      let tmp = a[i] in
+      a[i] <- a[j];
+      a[j] <- tmp;
+      assert { forall p: int. 0 <= p < length a ->
+        p = i \/ p = j \/ a[p] = (old a)[p] };
+      assert { nonnegative_array (old a) -> nonnegative_array a }
+      end
+
+  let rec max_index_from (a: array int) (best: int) (i: int) : int
+    requires { 0 <= best < length a }
+    requires { 0 <= i <= length a }
+    ensures  { 0 <= result < length a }
+    ensures  { forall j: int. i <= j < length a -> a[j] <= a[result] }
+    ensures  { forall j: int. 0 <= j < i -> a[j] = a[j] }
+    variant  { length a - i }
+  =
+    if i >= length a then
+      best
+    else if a[i] > a[best] then
+      max_index_from a i (i + 1)
+    else
+      max_index_from a best (i + 1)
+
+  let rec sort_desc_from (a: array int) (start: int) : unit
+    requires { 0 <= start <= length a }
+    requires { nonnegative_array a }
+    ensures  { nonnegative_array a }
+    ensures  { start = 0 -> sorted_desc a }
+    ensures  { ArrayPermut.permut_all (old a) a }
+    variant  { length a - start }
+  =
+    if start >= length a then
+      ()
+    else
+      begin
+      let best = max_index_from a start (start + 1) in
+      swap a start best;
+      assert { nonnegative_array a };
+      assert { forall j: int. start + 1 <= j < length a -> a[j] <= a[start] };
+      sort_desc_from a (start + 1)
+      end
+
+  let rec sum_prefix (a: array int) (limit: int) (i: int) : int
+    requires { 0 <= i <= limit <= length a }
+    ensures  { result = IntSum.sum (fun j -> a[j]) i limit }
+    variant  { limit - i }
+  =
+    if i >= limit then
+      0
+    else
+      a[i] + sum_prefix a limit (i + 1)
+
+  let rec smallest_with_parity_in_prefix
+      (a: array int) (limit: int) (i: int) (parity: int) (best: int) : int
+    requires { 0 <= i <= limit <= length a }
+    requires { parity = 0 \/ parity = 1 }
+    requires { best = -1 \/ 0 <= best }
+    requires { best = -1 \/ mod best 2 = parity }
+    requires { forall j: int. 0 <= j < limit -> 0 <= a[j] }
+    ensures  { result = -1 \/ 0 <= result }
+    ensures  { result <> -1 -> mod result 2 = parity }
+    ensures  { best = -1 /\ result <> -1 ->
+      exists j: int. i <= j < limit /\ a[j] = result /\ mod result 2 = parity }
+    ensures  { forall j: int. i <= j < limit /\ mod a[j] 2 = parity ->
+      result <> -1 /\ result <= a[j] }
+    variant  { limit - i }
+  =
+    if i >= limit then
+      best
+    else
+      let v = a[i] in
+      assert { 0 <= v };
+      let next_best =
+        if mod v 2 = parity && (best = -1 || v < best) then v else best
+      in
+      assert { next_best = -1 \/ 0 <= next_best };
+      assert { next_best = -1 \/ mod next_best 2 = parity };
+      smallest_with_parity_in_prefix a limit (i + 1) parity next_best
+
+  let rec largest_with_parity_in_suffix
+      (a: array int) (start: int) (parity: int) (best: int) : int
+    requires { 0 <= start <= length a }
+    requires { parity = 0 \/ parity = 1 }
+    requires { best = -1 \/ 0 <= best }
+    requires { best = -1 \/ mod best 2 = parity }
+    requires { forall j: int. start <= j < length a -> 0 <= a[j] }
+    ensures  { result = -1 \/ 0 <= result }
+    ensures  { result <> -1 -> mod result 2 = parity }
+    ensures  { best = -1 /\ result <> -1 ->
+      exists j: int. start <= j < length a /\ a[j] = result /\ mod result 2 = parity }
+    ensures  { forall j: int. start <= j < length a /\ mod a[j] 2 = parity ->
+      result <> -1 /\ a[j] <= result }
+    variant  { length a - start }
+  =
+    if start >= length a then
+      best
+    else
+      let v = a[start] in
+      let next_best =
+        if mod v 2 = parity && v > best then v else best
+      in
+      assert { next_best = -1 \/ mod next_best 2 = parity };
+      largest_with_parity_in_suffix a (start + 1) parity next_best
+
+  let subsequence_of_size_k_with_the_largest_even_sum_array
+      (nums: array int) (k: int) : int
+    requires { valid_nums nums }
+    requires { 1 <= k <= length nums }
+    ensures  { optimal_even_subsequence_sum nums k result }
+  =
+    let sorted = clone_array nums in
+    assert { nonnegative_array sorted };
+    clone_array_permut_all nums sorted;
+    sort_desc_from sorted 0;
+    assert { nonnegative_array sorted };
+    assert { sorted_desc sorted };
+    assert { ArrayPermut.permut_all nums sorted };
+    let top_sum = sum_prefix sorted k 0 in
+    assert { top_sum = IntSum.sum (fun j -> sorted[j]) 0 k };
+    if mod top_sum 2 = 0 then
+      begin
+      even_sorted_prefix_optimal nums sorted k top_sum;
+      assert { optimal_even_subsequence_sum nums k top_sum };
+      top_sum
+      end
+    else
+      let smallest_odd = smallest_with_parity_in_prefix sorted k 0 1 (-1) in
+      let smallest_even = smallest_with_parity_in_prefix sorted k 0 0 (-1) in
+      let largest_odd = largest_with_parity_in_suffix sorted k 1 (-1) in
+      let largest_even = largest_with_parity_in_suffix sorted k 0 (-1) in
+      let replace_odd =
+        if smallest_odd = -1 || largest_even = -1 then
+          -1
+        else
+          top_sum - smallest_odd + largest_even
+      in
+      let replace_even =
+        if smallest_even = -1 || largest_odd = -1 then
+          -1
+        else
+          top_sum - smallest_even + largest_odd
+      in
+      let result =
+        if replace_odd >= replace_even then
+        replace_odd
+      else
+        replace_even
+      in
+      assert { prefix_parity_min sorted k 1 smallest_odd };
+      assert { prefix_parity_min sorted k 0 smallest_even };
+      assert { suffix_parity_max sorted k 1 largest_odd };
+      assert { suffix_parity_max sorted k 0 largest_even };
+      assert { replace_odd =
+        (if smallest_odd = -1 \/ largest_even = -1 then
+           -1
+         else
+           top_sum - smallest_odd + largest_even) };
+      assert { replace_even =
+        (if smallest_even = -1 \/ largest_odd = -1 then
+           -1
+         else
+           top_sum - smallest_even + largest_odd) };
+      assert { result =
+        (if replace_odd >= replace_even then replace_odd else replace_even) };
+      odd_sorted_replacement_optimal nums sorted k top_sum
+        smallest_odd smallest_even largest_odd largest_even
+        replace_odd replace_even result;
+      assert { optimal_even_subsequence_sum nums k result };
+      result
+
+end

@@ -1,0 +1,117 @@
+module FairCandySwap_List_Spec
+
+  use int.Int
+  use list.List
+  use list.Mem
+  use list.Sum
+  use list.Length
+  use ref.Ref
+
+  exception Found
+
+  let rec predicate positive_sizes (sizes: list int)
+    variant { sizes }
+  =
+    match sizes with
+    | Nil -> true
+    | Cons x xs -> 1 <= x && positive_sizes xs
+    end
+
+  predicate valid_swap_pair
+    (aliceSizes: list int) (bobSizes: list int) (a: int) (b: int) =
+    mem a aliceSizes /\
+    mem b bobSizes /\
+    sum aliceSizes - a + b = sum bobSizes - b + a
+
+  predicate valid_swap_answer
+    (aliceSizes: list int) (bobSizes: list int) (answer: list int) =
+    exists a b: int.
+      answer = Cons a (Cons b Nil) /\
+      valid_swap_pair aliceSizes bobSizes a b
+
+  let sum_list (sizes: list int) : int
+    ensures { result = sum sizes }
+  =
+    let total = ref 0 in
+    let cur = ref sizes in
+    while (match !cur with Nil -> false | Cons _ _ -> true end) do
+      invariant { sum !cur + !total = sum sizes }
+      invariant { 0 <= length !cur }
+      variant { length !cur }
+
+      match !cur with
+      | Nil -> ()
+      | Cons x xs ->
+          assert { sum !cur = x + sum xs };
+          total := !total + x;
+          cur := xs
+      end
+    done;
+    assert { !cur = Nil };
+    assert { sum !cur = 0 };
+    !total
+
+  let fair_candy_swap_list (aliceSizes: list int) (bobSizes: list int) : list int
+    requires { positive_sizes aliceSizes }
+    requires { positive_sizes bobSizes }
+    requires { sum aliceSizes <> sum bobSizes }
+    requires { exists a b: int. valid_swap_pair aliceSizes bobSizes a b }
+    ensures  { valid_swap_answer aliceSizes bobSizes result }
+  =
+    let alice_total = sum_list aliceSizes in
+    let bob_total = sum_list bobSizes in
+    assert { alice_total = sum aliceSizes };
+    assert { bob_total = sum bobSizes };
+
+    let answer = ref (Cons 0 (Cons 0 Nil)) in
+    try
+      let alice_cur = ref aliceSizes in
+      while (match !alice_cur with Nil -> false | Cons _ _ -> true end) do
+        invariant { alice_total = sum aliceSizes }
+        invariant { bob_total = sum bobSizes }
+        invariant { 0 <= length !alice_cur }
+        invariant { forall x: int. mem x !alice_cur -> mem x aliceSizes }
+        variant { length !alice_cur }
+
+        match !alice_cur with
+        | Nil -> ()
+        | Cons a rest_a ->
+            assert { mem a !alice_cur };
+            assert { mem a aliceSizes };
+            let bob_cur = ref bobSizes in
+            while (match !bob_cur with Nil -> false | Cons _ _ -> true end) do
+              invariant { alice_total = sum aliceSizes }
+              invariant { bob_total = sum bobSizes }
+              invariant { mem a aliceSizes }
+              invariant { 0 <= length !bob_cur }
+              invariant { forall y: int. mem y !bob_cur -> mem y bobSizes }
+              variant { length !bob_cur }
+
+              match !bob_cur with
+              | Nil -> ()
+              | Cons b rest_b ->
+                  assert { mem b !bob_cur };
+                  assert { mem b bobSizes };
+                  if alice_total - a + b = bob_total - b + a then begin
+                    assert { sum aliceSizes - a + b = sum bobSizes - b + a };
+                    assert { valid_swap_pair aliceSizes bobSizes a b };
+                    answer := Cons a (Cons b Nil);
+                    assert { valid_swap_answer aliceSizes bobSizes !answer };
+                    raise Found
+                  end;
+                  assert { forall y: int. mem y rest_b -> mem y !bob_cur };
+                  bob_cur := rest_b
+              end
+            done;
+            assert { forall x: int. mem x rest_a -> mem x !alice_cur };
+            alice_cur := rest_a
+        end
+      done;
+      assert { false };
+      !answer
+    with Found ->
+      assert { valid_swap_answer aliceSizes bobSizes !answer };
+      !answer
+    end
+
+end

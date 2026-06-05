@@ -1,0 +1,211 @@
+module SumOfMutatedArrayClosestToTarget_Array_Stage3_Imperative
+
+  use int.Int
+  use int.Abs
+  use int.MinMax
+  use int.Sum
+  use int.EuclideanDivision
+  use array.Array
+  use array.Init
+  use ref.Ref
+
+  function mutated_sum (arr: array int) (value: int) : int =
+    sum (fun i -> min arr[i] value) 0 (length arr)
+
+  function mutation_distance (arr: array int) (target: int) (value: int) : int =
+    abs (mutated_sum arr value - target)
+
+  predicate value_is_optimal (arr: array int) (target: int) (value: int) =
+    value >= 0 /\
+    (forall candidate: int.
+       candidate >= 0 ->
+       mutation_distance arr target value <= mutation_distance arr target candidate) /\
+    (forall candidate: int.
+       candidate >= 0 ->
+       mutation_distance arr target candidate = mutation_distance arr target value ->
+       value <= candidate)
+
+  predicate array_max (arr: array int) (m: int) =
+    (forall i: int. 0 <= i < length arr -> arr[i] <= m) /\
+    (exists i: int. 0 <= i < length arr /\ arr[i] = m)
+
+  lemma min_monotone_right:
+    forall x y z: int. x <= y -> min z x <= min z y
+
+  lemma min_at_upper_bound:
+    forall z x: int. z <= x -> min z x = z
+
+  lemma mutated_sum_monotone:
+    forall arr: array int, x y: int.
+      x <= y ->
+      mutated_sum arr x <= mutated_sum arr y
+
+  lemma mutated_sum_saturated_above_max:
+    forall arr: array int, max_value value: int.
+      array_max arr max_value ->
+      max_value <= value ->
+      mutated_sum arr value = mutated_sum arr max_value
+
+  lemma mutated_sum_zero_nonnegative:
+    forall arr: array int.
+      (forall i: int. 0 <= i < length arr -> 0 <= arr[i]) ->
+      mutated_sum arr 0 = 0
+
+  lemma sum_singleton:
+    forall f: int -> int, k: int.
+      sum f k (k + 1) = f k
+
+  let lemma mutated_sum_strict_below_max (arr: array int) (max_value x y: int)
+    requires { array_max arr max_value }
+    requires { x < y <= max_value }
+    ensures  { mutated_sum arr x < mutated_sum arr y }
+  =
+    let ghost k = any int
+      ensures { 0 <= result < length arr /\ arr[result] = max_value } in
+    assert { forall i: int. 0 <= i < length arr -> min arr[i] x <= min arr[i] y };
+    assert { min arr[k] x = x };
+    assert { min arr[k] y = y };
+    assert { min arr[k] x < min arr[k] y };
+    assert { 0 <= k <= length arr };
+    assert { 0 <= k + 1 <= length arr };
+    assert { sum (fun i -> min arr[i] x) 0 (length arr) =
+             sum (fun i -> min arr[i] x) 0 k +
+             sum (fun i -> min arr[i] x) k (length arr) };
+    assert { sum (fun i -> min arr[i] x) k (length arr) =
+             sum (fun i -> min arr[i] x) k (k + 1) +
+             sum (fun i -> min arr[i] x) (k + 1) (length arr) };
+    assert { sum (fun i -> min arr[i] x) k (k + 1) = min arr[k] x };
+    assert { sum (fun i -> min arr[i] x) 0 (length arr) =
+             sum (fun i -> min arr[i] x) 0 k +
+             min arr[k] x +
+             sum (fun i -> min arr[i] x) (k + 1) (length arr) };
+    assert { sum (fun i -> min arr[i] y) 0 (length arr) =
+             sum (fun i -> min arr[i] y) 0 k +
+             sum (fun i -> min arr[i] y) k (length arr) };
+    assert { sum (fun i -> min arr[i] y) k (length arr) =
+             sum (fun i -> min arr[i] y) k (k + 1) +
+             sum (fun i -> min arr[i] y) (k + 1) (length arr) };
+    assert { sum (fun i -> min arr[i] y) k (k + 1) = min arr[k] y };
+    assert { sum (fun i -> min arr[i] y) 0 (length arr) =
+             sum (fun i -> min arr[i] y) 0 k +
+             min arr[k] y +
+             sum (fun i -> min arr[i] y) (k + 1) (length arr) };
+    assert { forall i: int. 0 <= i < k -> min arr[i] x <= min arr[i] y };
+    assert { sum (fun i -> min arr[i] x) 0 k <=
+             sum (fun i -> min arr[i] y) 0 k };
+    assert { forall i: int. k + 1 <= i < length arr -> min arr[i] x <= min arr[i] y };
+    assert { sum (fun i -> min arr[i] x) (k + 1) (length arr) <=
+             sum (fun i -> min arr[i] y) (k + 1) (length arr) }
+
+  let mutated_sum_exec (arr: array int) (value: int) : int
+    ensures { result = mutated_sum arr value }
+  =
+    let total = ref 0 in
+    for i = 0 to length arr - 1 do
+      invariant { 0 <= i <= length arr }
+      invariant { !total = sum (fun j -> min arr[j] value) 0 i }
+      if arr[i] <= value then
+        total := !total + arr[i]
+      else
+        total := !total + value
+    done;
+    !total
+
+  let max_array_value (arr: array int) : int
+    requires { 1 <= length arr }
+    ensures  { array_max arr result }
+  =
+    let current = ref (arr[0]) in
+    for i = 1 to length arr - 1 do
+      invariant { 1 <= i <= length arr }
+      invariant { forall j: int. 0 <= j < i -> arr[j] <= !current }
+      invariant { exists j: int. 0 <= j < i /\ arr[j] = !current }
+      if arr[i] > !current then
+        current := arr[i]
+    done;
+    !current
+
+  let sum_of_mutated_array_closest_to_target_array (arr: array int) (target: int) : int
+    requires { 1 <= length arr <= 10000 }
+    requires { 1 <= target <= 100000 }
+    requires { forall i: int. 0 <= i < length arr -> 1 <= arr[i] <= 100000 }
+    ensures  { value_is_optimal arr target result }
+  =
+    let max_value = max_array_value arr in
+    assert { array_max arr max_value };
+    assert { 1 <= max_value };
+    let total = mutated_sum_exec arr max_value in
+    assert { total = mutated_sum arr max_value };
+    if total <= target then begin
+      assert { max_value >= 0 };
+      max_value
+    end else begin
+      let lo = ref 0 in
+      let hi = ref max_value in
+      while !lo < !hi do
+        invariant { 0 <= !lo <= !hi <= max_value }
+        invariant { forall v: int. 0 <= v < !lo -> mutated_sum arr v < target }
+        invariant { forall v: int. !hi <= v <= max_value -> target <= mutated_sum arr v }
+        variant { !hi - !lo }
+        let mid = !lo + div (!hi - !lo) 2 in
+        assert { !lo <= mid < !hi };
+        let current = mutated_sum_exec arr mid in
+        assert { current = mutated_sum arr mid };
+        if current < target then begin
+          assert { forall v: int. !lo <= v <= mid -> mutated_sum arr v <= mutated_sum arr mid };
+          assert { forall v: int. 0 <= v < mid + 1 -> mutated_sum arr v < target };
+          lo := mid + 1
+        end else begin
+          assert { forall v: int. mid <= v <= max_value -> mutated_sum arr mid <= mutated_sum arr v };
+          assert { forall v: int. mid <= v <= max_value -> target <= mutated_sum arr v };
+          hi := mid
+        end
+      done;
+      assert { !lo = !hi };
+      assert { 0 <= !lo <= max_value };
+      let candidate = !lo in
+      assert { forall v: int. 0 <= v < candidate -> mutated_sum arr v < target };
+      assert { forall v: int. candidate <= v <= max_value -> target <= mutated_sum arr v };
+      assert { forall v: int. max_value <= v -> mutated_sum arr v = mutated_sum arr max_value };
+      assert { forall v: int. max_value <= v -> target <= mutated_sum arr v };
+      if candidate = 0 then begin
+        assert { candidate >= 0 };
+        assert { target <= mutated_sum arr 0 };
+        assert { mutated_sum arr 0 = 0 };
+        assert { false };
+        0
+      end else begin
+        let prev = candidate - 1 in
+        assert { 0 <= prev < candidate };
+        assert { mutated_sum arr prev < target };
+        assert { target <= mutated_sum arr candidate };
+        let candidate_sum = mutated_sum_exec arr candidate in
+        let prev_sum = mutated_sum_exec arr prev in
+        assert { candidate_sum = mutated_sum arr candidate };
+        assert { prev_sum = mutated_sum arr prev };
+        let candidate_dist = abs (candidate_sum - target) in
+        let prev_dist = abs (prev_sum - target) in
+        assert { candidate_dist = mutation_distance arr target candidate };
+        assert { prev_dist = mutation_distance arr target prev };
+        if prev_dist <= candidate_dist then begin
+          assert { prev >= 0 };
+          assert { forall v: int. 0 <= v < prev -> mutation_distance arr target prev < mutation_distance arr target v };
+          assert { forall v: int. prev <= v < candidate -> mutation_distance arr target prev <= mutation_distance arr target v };
+          assert { forall v: int. candidate <= v -> mutation_distance arr target prev <= mutation_distance arr target v };
+          assert { forall v: int. v >= 0 -> mutation_distance arr target prev <= mutation_distance arr target v };
+          assert { forall v: int. v >= 0 -> mutation_distance arr target v = mutation_distance arr target prev -> prev <= v };
+          assert { value_is_optimal arr target prev };
+          prev
+        end else begin
+          assert { candidate >= 0 };
+          assert { forall v: int. 0 <= v < candidate -> mutation_distance arr target candidate < mutation_distance arr target v };
+          assert { forall v: int. candidate <= v -> mutation_distance arr target candidate <= mutation_distance arr target v };
+          assert { forall v: int. v >= 0 -> mutation_distance arr target candidate <= mutation_distance arr target v };
+          assert { forall v: int. v >= 0 -> mutation_distance arr target v = mutation_distance arr target candidate -> candidate <= v };
+          assert { value_is_optimal arr target candidate };
+          candidate
+        end
+      end
+    end
+
+end

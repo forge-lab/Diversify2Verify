@@ -1,0 +1,211 @@
+module CountOfSmallerNumbersAfterSelf_Array_Recursive_Implementation
+
+  use int.Int
+  use array.Array
+  use array.Init
+
+  let rec count_smaller_after_from (nums: array int) (pivot: int) (j: int) : int
+    variant { length nums - j }
+  =
+    if j >= length nums then
+      0
+    else
+      (if nums[j] < nums[pivot] then 1 else 0) +
+      count_smaller_after_from nums pivot (j + 1)
+
+  let count_smaller_after (nums: array int) (i: int) : int =
+    count_smaller_after_from nums i (i + 1)
+
+  let count_of_smaller_numbers_after_self_array (nums: array int) : array int =
+    let result = make (length nums) 0 in
+    let rec fill_result (i: int) : unit
+      variant { length nums - i }
+    =
+      if i < length nums then begin
+        result[i] <- count_smaller_after nums i;
+        fill_result (i + 1)
+      end
+    in
+    fill_result 0;
+    result
+
+  let rec arrays_equal_from (a: array int) (b: array int) (i: int) : bool
+    variant { length a - i }
+  =
+    if i >= length a then
+      true
+    else if a[i] = b[i] then
+      arrays_equal_from a b (i + 1)
+    else
+      false
+
+  let arrays_equal (a: array int) (b: array int) : bool =
+    if length a <> length b then
+      false
+    else
+      arrays_equal_from a b 0
+
+  let test_000 () : bool =
+    let nums = init 2 [|-1; -1|] in
+    let expected = init 2 [|0; 0|] in
+    let r = count_of_smaller_numbers_after_self_array nums in
+    arrays_equal r expected
+
+  let test_001 () : bool =
+    let nums = init 5 [|10000; -10000; 5000; 0; 5000|] in
+    let expected = init 5 [|4; 0; 1; 0; 0|] in
+    let r = count_of_smaller_numbers_after_self_array nums in
+    arrays_equal r expected
+
+  let test_002 () : bool =
+    let nums = init 7 [|4; 5; 6; 7; 8; 9; 10|] in
+    let expected = init 7 [|0; 0; 0; 0; 0; 0; 0|] in
+    let r = count_of_smaller_numbers_after_self_array nums in
+    arrays_equal r expected
+
+  let test_003 () : bool =
+    let nums = init 6 [|0; 1; 0; 1; 0; 1|] in
+    let expected = init 6 [|0; 2; 0; 1; 0; 0|] in
+    let r = count_of_smaller_numbers_after_self_array nums in
+    arrays_equal r expected
+
+  let test_004 () : bool =
+    let nums = init 5 [|0; -1; 1; -2; 2|] in
+    let expected = init 5 [|2; 1; 1; 0; 0|] in
+    let r = count_of_smaller_numbers_after_self_array nums in
+    arrays_equal r expected
+
+  let test_005 () : bool =
+    let nums = init 4 [|100; 200; 150; 100|] in
+    let expected = init 4 [|0; 2; 1; 0|] in
+    let r = count_of_smaller_numbers_after_self_array nums in
+    arrays_equal r expected
+
+  let test_006 () : bool =
+    let nums = init 5 [|100; 99; 98; 97; 96|] in
+    let expected = init 5 [|4; 3; 2; 1; 0|] in
+    let r = count_of_smaller_numbers_after_self_array nums in
+    arrays_equal r expected
+
+  let test_007 () : bool =
+    let nums = init 7 [|10; 9; 8; 7; 6; 5; 4|] in
+    let expected = init 7 [|6; 5; 4; 3; 2; 1; 0|] in
+    let r = count_of_smaller_numbers_after_self_array nums in
+    arrays_equal r expected
+
+  let test_008 () : bool =
+    let nums = init 5 [|10000; -10000; 5000; 0; -5000|] in
+    let expected = init 5 [|4; 0; 2; 1; 0|] in
+    let r = count_of_smaller_numbers_after_self_array nums in
+    arrays_equal r expected
+
+  let test_009 () : bool =
+    let nums = init 1 [|-1|] in
+    let expected = init 1 [|0|] in
+    let r = count_of_smaller_numbers_after_self_array nums in
+    arrays_equal r expected
+
+  let test_010 () : bool =
+    let nums = init 10 [|10; 9; 8; 7; 6; 5; 4; 3; 2; 1|] in
+    let expected = init 10 [|9; 8; 7; 6; 5; 4; 3; 2; 1; 0|] in
+    let r = count_of_smaller_numbers_after_self_array nums in
+    arrays_equal r expected
+
+  let test_011 () : bool =
+    let nums = init 10 [|1; 2; 3; 4; 5; 6; 7; 8; 9; 10|] in
+    let expected = init 10 [|0; 0; 0; 0; 0; 0; 0; 0; 0; 0|] in
+    let r = count_of_smaller_numbers_after_self_array nums in
+    arrays_equal r expected
+
+  let test_012 () : bool =
+    let nums = init 1 [|1|] in
+    let expected = init 1 [|0|] in
+    let r = count_of_smaller_numbers_after_self_array nums in
+    arrays_equal r expected
+
+  let test_013 () : bool =
+    let nums = init 6 [|100; 99; 98; 97; 96; 95|] in
+    let expected = init 6 [|5; 4; 3; 2; 1; 0|] in
+    let r = count_of_smaller_numbers_after_self_array nums in
+    arrays_equal r expected
+
+  let test_014 () : bool =
+    let nums = init 8 [|5; 2; 6; 1; 8; 7; 4; 9|] in
+    let expected = init 8 [|3; 1; 2; 0; 2; 1; 0; 0|] in
+    let r = count_of_smaller_numbers_after_self_array nums in
+    arrays_equal r expected
+
+  let test_015 () : bool =
+    let nums = init 5 [|-5; -4; -3; -2; -1|] in
+    let expected = init 5 [|0; 0; 0; 0; 0|] in
+    let r = count_of_smaller_numbers_after_self_array nums in
+    arrays_equal r expected
+
+  let test_016 () : bool =
+    let nums = init 10 [|1; 3; 5; 7; 9; 11; 13; 15; 17; 19|] in
+    let expected = init 10 [|0; 0; 0; 0; 0; 0; 0; 0; 0; 0|] in
+    let r = count_of_smaller_numbers_after_self_array nums in
+    arrays_equal r expected
+
+  let test_017 () : bool =
+    let nums = init 5 [|1; 2; 3; 4; 5|] in
+    let expected = init 5 [|0; 0; 0; 0; 0|] in
+    let r = count_of_smaller_numbers_after_self_array nums in
+    arrays_equal r expected
+
+  let test_018 () : bool =
+    let nums = init 5 [|0; 1; 2; 3; 4|] in
+    let expected = init 5 [|0; 0; 0; 0; 0|] in
+    let r = count_of_smaller_numbers_after_self_array nums in
+    arrays_equal r expected
+
+  let test_019 () : bool =
+    let nums = init 4 [|5; 2; 6; 1|] in
+    let expected = init 4 [|2; 1; 1; 0|] in
+    let r = count_of_smaller_numbers_after_self_array nums in
+    arrays_equal r expected
+
+  let run_tests () : bool =
+    if test_000 () then
+    if test_001 () then
+    if test_002 () then
+    if test_003 () then
+    if test_004 () then
+    if test_005 () then
+    if test_006 () then
+    if test_007 () then
+    if test_008 () then
+    if test_009 () then
+    if test_010 () then
+    if test_011 () then
+    if test_012 () then
+    if test_013 () then
+    if test_014 () then
+    if test_015 () then
+    if test_016 () then
+    if test_017 () then
+    if test_018 () then
+    if test_019 () then
+      true
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+
+end

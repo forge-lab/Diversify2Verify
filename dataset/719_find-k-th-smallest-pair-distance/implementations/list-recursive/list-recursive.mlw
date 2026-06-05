@@ -1,0 +1,204 @@
+module FindKThSmallestPairDistance_List_Recursive_Implementation
+
+  use int.Int
+  use list.List
+
+  let abs_diff (x: int) (y: int) : int =
+    if x >= y then x - y else y - x
+
+  let rec count_head_pairs_le (x: int) (tail: list int) (d: int) : int
+    variant { tail }
+  =
+    match tail with
+    | Nil -> 0
+    | Cons y ys ->
+        (if abs_diff x y <= d then 1 else 0) + count_head_pairs_le x ys d
+    end
+
+  let rec pair_count_le (nums: list int) (d: int) : int
+    variant { nums }
+  =
+    match nums with
+    | Nil -> 0
+    | Cons x xs -> count_head_pairs_le x xs d + pair_count_le xs d
+    end
+
+  let rec min_from (xs: list int) (current: int) : int
+    variant { xs }
+  =
+    match xs with
+    | Nil -> current
+    | Cons y ys ->
+        if y < current then min_from ys y else min_from ys current
+    end
+
+  let rec max_from (xs: list int) (current: int) : int
+    variant { xs }
+  =
+    match xs with
+    | Nil -> current
+    | Cons y ys ->
+        if y > current then max_from ys y else max_from ys current
+    end
+
+  let distance_upper_bound (nums: list int) : int =
+    match nums with
+    | Nil -> 0
+    | Cons x xs -> max_from xs x - min_from xs x
+    end
+
+  let rec search_distance (nums: list int) (k: int) (d: int) (upper: int) : int
+    variant { upper - d }
+  =
+    if pair_count_le nums d >= k then d
+    else if d >= upper then upper
+    else search_distance nums k (d + 1) upper
+
+  let find_k_th_smallest_pair_distance_list (nums: list int) (k: int) : int =
+    let upper = distance_upper_bound nums in
+    search_distance nums k 0 upper
+
+  let test_000 () : bool =
+    let nums = Cons 1 (Cons 2 (Cons 3 (Cons 4 (Cons 5 Nil)))) in
+    let r = find_k_th_smallest_pair_distance_list nums 10 in
+    r = 4
+
+  let test_001 () : bool =
+    let nums = Cons 9 (Cons 10 (Cons 7 (Cons 10 (Cons 6 (Cons 1 (Cons 5 (Cons 4 (Cons 9 (Cons 8 Nil))))))))) in
+    let r = find_k_th_smallest_pair_distance_list nums 18 in
+    r = 2
+
+  let test_002 () : bool =
+    let nums = Cons 62 (Cons 24 (Cons 6 (Cons 4 (Cons 40 Nil)))) in
+    let r = find_k_th_smallest_pair_distance_list nums 2 in
+    r = 16
+
+  let test_003 () : bool =
+    let nums = Cons 5 (Cons 4 (Cons 3 (Cons 2 (Cons 1 Nil)))) in
+    let r = find_k_th_smallest_pair_distance_list nums 1 in
+    r = 1
+
+  let test_004 () : bool =
+    let nums = Cons 1 (Cons 3 (Cons 1 Nil)) in
+    let r = find_k_th_smallest_pair_distance_list nums 1 in
+    r = 0
+
+  let test_005 () : bool =
+    let nums = Cons 5 (Cons 3 (Cons 8 (Cons 4 (Cons 2 Nil)))) in
+    let r = find_k_th_smallest_pair_distance_list nums 7 in
+    r = 3
+
+  let test_006 () : bool =
+    let nums = Cons 10 (Cons 20 (Cons 30 (Cons 40 (Cons 50 Nil)))) in
+    let r = find_k_th_smallest_pair_distance_list nums 5 in
+    r = 20
+
+  let test_007 () : bool =
+    let nums = Cons 4 (Cons 2 (Cons 1 (Cons 3 Nil))) in
+    let r = find_k_th_smallest_pair_distance_list nums 5 in
+    r = 2
+
+  let test_008 () : bool =
+    let nums = Cons 0 (Cons 0 (Cons 0 (Cons 0 (Cons 0 (Cons 0 (Cons 0 (Cons 0 (Cons 0 (Cons 0 (Nil)))))))))) in
+    let r = find_k_th_smallest_pair_distance_list nums 1 in
+    r = 0
+
+  let test_009 () : bool =
+    let nums = Cons 1 (Cons 6 (Cons 1 Nil)) in
+    let r = find_k_th_smallest_pair_distance_list nums 3 in
+    r = 5
+
+  let test_010 () : bool =
+    let nums = Cons 1 (Cons 2 (Cons 3 (Cons 4 (Cons 5 (Cons 6 (Cons 7 (Cons 8 (Cons 9 (Cons 10 (Nil)))))))))) in
+    let r = find_k_th_smallest_pair_distance_list nums 45 in
+    r = 9
+
+  let test_011 () : bool =
+    let nums = Cons 1 (Cons 1 (Cons 1 Nil)) in
+    let r = find_k_th_smallest_pair_distance_list nums 2 in
+    r = 0
+
+  let test_012 () : bool =
+    let nums = Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Nil)))))))))))) in
+    let r = find_k_th_smallest_pair_distance_list nums 65 in
+    r = 0
+
+  let test_013 () : bool =
+    let nums = Cons 1 (Cons 3 (Cons 5 (Cons 7 (Cons 9 (Cons 11 (Cons 13 (Cons 15 (Cons 17 (Cons 19 (Cons 21 (Cons 23 (Cons 25 (Cons 27 (Cons 29 (Nil))))))))))))))) in
+    let r = find_k_th_smallest_pair_distance_list nums 100 in
+    r = 24
+
+  let test_014 () : bool =
+    let nums = Cons 5 (Cons 5 (Cons 5 (Cons 5 (Cons 5 (Cons 5 (Cons 5 (Cons 5 (Cons 5 (Cons 5 (Cons 5 (Cons 5 (Cons 5 (Cons 5 (Cons 5 (Cons 5 (Cons 5 (Cons 5 (Cons 5 (Cons 5 (Nil)))))))))))))))))))) in
+    let r = find_k_th_smallest_pair_distance_list nums 190 in
+    r = 0
+
+  let test_015 () : bool =
+    let nums = Cons 1 (Cons 3 (Cons 3 (Cons 1 (Cons 2 (Cons 2 (Cons 4 (Cons 4 (Cons 5 (Cons 5 (Cons 6 (Cons 6 (Cons 7 (Cons 7 (Cons 8 (Cons 8 (Cons 9 (Cons 9 (Cons 10 (Cons 10 (Nil)))))))))))))))))))) in
+    let r = find_k_th_smallest_pair_distance_list nums 171 in
+    r = 7
+
+  let test_016 () : bool =
+    let nums = Cons 1 (Cons 100 (Cons 200 (Cons 300 (Cons 400 (Cons 500 (Cons 600 (Cons 700 (Cons 800 (Cons 900 (Cons 1000 (Cons 1100 (Cons 1200 (Cons 1300 (Cons 1400 (Nil))))))))))))))) in
+    let r = find_k_th_smallest_pair_distance_list nums 100 in
+    r = 1199
+
+  let test_017 () : bool =
+    let nums = Cons 0 (Cons 1 (Cons 3 (Cons 3 (Cons 5 (Cons 5 (Cons 7 (Cons 7 (Cons 9 (Cons 9 (Cons 11 (Cons 11 (Cons 13 (Cons 13 (Cons 15 (Cons 15 (Cons 17 (Cons 17 (Cons 19 (Cons 19 (Nil)))))))))))))))))))) in
+    let r = find_k_th_smallest_pair_distance_list nums 190 in
+    r = 19
+
+  let test_018 () : bool =
+    let nums = Cons 1 (Cons 1 (Cons 2 (Cons 2 (Cons 3 (Cons 3 (Cons 4 (Cons 4 (Cons 5 (Cons 5 (Cons 6 (Cons 6 (Cons 7 (Cons 7 (Cons 8 (Cons 8 (Cons 9 (Cons 9 (Cons 10 (Cons 10 (Nil)))))))))))))))))))) in
+    let r = find_k_th_smallest_pair_distance_list nums 90 in
+    r = 3
+
+  let test_019 () : bool =
+    let nums = Cons 1 (Cons 5 (Cons 10 (Cons 15 (Cons 20 (Cons 25 (Cons 30 (Cons 35 (Cons 40 (Cons 45 (Cons 50 (Cons 55 (Cons 60 (Cons 65 (Cons 70 (Cons 75 (Cons 80 (Cons 85 (Cons 90 (Cons 95 (Cons 100 (Nil))))))))))))))))))))) in
+    let r = find_k_th_smallest_pair_distance_list nums 190 in
+    r = 74
+
+  let run_tests () : bool =
+    if test_000 () then
+    if test_001 () then
+    if test_002 () then
+    if test_003 () then
+    if test_004 () then
+    if test_005 () then
+    if test_006 () then
+    if test_007 () then
+    if test_008 () then
+    if test_009 () then
+    if test_010 () then
+    if test_011 () then
+    if test_012 () then
+    if test_013 () then
+    if test_014 () then
+    if test_015 () then
+    if test_016 () then
+    if test_017 () then
+    if test_018 () then
+    if test_019 () then
+      true
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+
+end

@@ -1,0 +1,254 @@
+module AdvantageShuffle_List_Spec
+
+  use int.Int
+  use list.List
+  use list.Length
+  use list.Permut
+  use ref.Ref
+
+  let rec function advantage_count (chosen: list int) (targets: list int) : int
+    variant { chosen }
+  =
+    match chosen with
+    | Nil -> 0
+    | Cons x xs ->
+        match targets with
+        | Nil -> 0
+        | Cons y ys ->
+            (if x > y then 1 else 0) + advantage_count xs ys
+        end
+    end
+
+  predicate valid_advantage_shuffle (nums1: list int) (nums2: list int) (out: list int) =
+    length nums1 = length nums2 /\
+    length out = length nums2 /\
+    permut out nums1 /\
+    (forall candidate: list int.
+       permut candidate nums1 ->
+       advantage_count out nums2 >= advantage_count candidate nums2)
+
+  type indexed_int = Indexed int int
+  type assignment = Assigned int int
+  type split_indexed = Split (list indexed_int) indexed_int
+
+  let indexed_index (entry: indexed_int) : int =
+    match entry with
+    | Indexed idx _ -> idx
+    end
+
+  let indexed_value (entry: indexed_int) : int =
+    match entry with
+    | Indexed _ value -> value
+    end
+
+  let assignment_index (entry: assignment) : int =
+    match entry with
+    | Assigned idx _ -> idx
+    end
+
+  let assignment_value (entry: assignment) : int =
+    match entry with
+    | Assigned _ value -> value
+    end
+
+  let list_length (l: list int) : int
+    ensures { result = length l }
+  =
+    let cur = ref l in
+    let n = ref 0 in
+    while (match !cur with Nil -> false | Cons _ _ -> true end) do
+      invariant { !n + length !cur = length l }
+      invariant { 0 <= !n }
+      invariant { 0 <= length !cur }
+      variant { length !cur }
+      match !cur with
+      | Nil -> ()
+      | Cons _ xs ->
+          n := !n + 1;
+          cur := xs
+      end
+    done;
+    assert { !cur = Nil };
+    !n
+
+  let reverse_list (l: list int) : list int
+    ensures { length result = length l }
+  =
+    let cur = ref l in
+    let acc = ref (Nil : list int) in
+    while (match !cur with Nil -> false | Cons _ _ -> true end) do
+      invariant { length !acc + length !cur = length l }
+      invariant { 0 <= length !cur }
+      variant { length !cur }
+      match !cur with
+      | Nil -> ()
+      | Cons x xs ->
+          acc := Cons x !acc;
+          cur := xs
+      end
+    done;
+    assert { !cur = Nil };
+    !acc
+
+  let rec function insert_int (x: int) (l: list int) : list int
+    variant { l }
+    ensures { length result = length l + 1 }
+  =
+    match l with
+    | Nil -> Cons x Nil
+    | Cons y ys ->
+        if x <= y then Cons x l else Cons y (insert_int x ys)
+    end
+
+  let rec function insertion_sort_int (l: list int) : list int
+    variant { l }
+    ensures { length result = length l }
+  =
+    match l with
+    | Nil -> Nil
+    | Cons x xs -> insert_int x (insertion_sort_int xs)
+    end
+
+  let rec function insert_indexed (x: indexed_int) (l: list indexed_int)
+      : list indexed_int
+    variant { l }
+    ensures { length result = length l + 1 }
+  =
+    match l with
+    | Nil -> Cons x Nil
+    | Cons y ys ->
+        if indexed_value x <= indexed_value y then
+          Cons x l
+        else
+          Cons y (insert_indexed x ys)
+    end
+
+  let rec function insertion_sort_indexed (l: list indexed_int)
+      : list indexed_int
+    variant { l }
+    ensures { length result = length l }
+  =
+    match l with
+    | Nil -> Nil
+    | Cons x xs -> insert_indexed x (insertion_sort_indexed xs)
+    end
+
+  let rec function index_list (l: list int) (start: int) : list indexed_int
+    variant { l }
+    ensures { length result = length l }
+  =
+    match l with
+    | Nil -> Nil
+    | Cons x xs -> Cons (Indexed start x) (index_list xs (start + 1))
+    end
+
+  let rec function pop_last_indexed (l: list indexed_int) : split_indexed
+    variant { l }
+    ensures { match result with Split prefix _ -> length prefix + 1 = length l end }
+  =
+    match l with
+    | Nil -> Split Nil (Indexed 0 0)
+    | Cons x Nil -> Split Nil x
+    | Cons x xs ->
+        match pop_last_indexed xs with
+        | Split prefix last -> Split (Cons x prefix) last
+        end
+    end
+
+  let rec function lookup_assignment (entries: list assignment) (idx: int) : int
+    variant { entries }
+  =
+    match entries with
+    | Nil -> 0
+    | Cons entry rest ->
+        if assignment_index entry = idx then
+          assignment_value entry
+        else
+          lookup_assignment rest idx
+    end
+
+  let build_output (entries: list assignment) (n: int) : list int
+    requires { 0 <= n }
+    ensures  { length result = n }
+  =
+    let i = ref 0 in
+    let acc = ref (Nil : list int) in
+    while !i < n do
+      invariant { 0 <= !i <= n }
+      invariant { length !acc = !i }
+      variant { n - !i }
+      acc := Cons (lookup_assignment entries !i) !acc;
+      i := !i + 1
+    done;
+    assert { !i = n };
+    reverse_list !acc
+
+  let advantage_shuffle_list (nums1: list int) (nums2: list int) : list int
+    requires { length nums1 = length nums2 }
+    ensures  { valid_advantage_shuffle nums1 nums2 result }
+  =
+    let n1 = list_length nums1 in
+    let n2 = list_length nums2 in
+    assert { n1 = length nums1 };
+    assert { n2 = length nums2 };
+    if n1 <> n2 then
+      (assert { false };
+      Nil
+      )
+    else begin
+      assert { n1 = n2 };
+      assert { n1 = length nums1 };
+      assert { n2 = length nums2 };
+      let sorted_nums1 = insertion_sort_int nums1 in
+      let remaining = ref (insertion_sort_indexed (index_list nums2 0)) in
+      let cur_nums1 = ref sorted_nums1 in
+      let assignments = ref (Nil : list assignment) in
+      while (match !cur_nums1 with Nil -> false | Cons _ _ -> true end) do
+        invariant { 0 <= length !cur_nums1 }
+        invariant { 0 <= length !remaining }
+        invariant { 0 <= length !assignments }
+        invariant { length !assignments + length !cur_nums1 = length sorted_nums1 }
+        invariant { length !remaining = length !cur_nums1 }
+        variant { length !cur_nums1 }
+        match !cur_nums1 with
+        | Nil -> ()
+        | Cons x xs ->
+            match !remaining with
+            | Nil ->
+                cur_nums1 := Nil
+            | Cons smallest rest ->
+                if x > indexed_value smallest then begin
+                  assignments := Cons (Assigned (indexed_index smallest) x) !assignments;
+                  remaining := rest
+                end else begin
+                  match pop_last_indexed !remaining with
+                  | Split prefix largest ->
+                      assignments := Cons (Assigned (indexed_index largest) x) !assignments;
+                      remaining := prefix
+                  end
+                end;
+                cur_nums1 := xs
+            end
+        end
+      done;
+      match !cur_nums1 with
+      | Nil -> ()
+      | Cons _ _ -> absurd
+      end;
+      assert { !cur_nums1 = Nil };
+      assert { length sorted_nums1 = length nums1 };
+      assert { length !assignments = n1 };
+      assert { !remaining = Nil };
+      let result = build_output !assignments n1 in
+      assert { length result = n1 };
+      assert { length result = length nums2 };
+      assert { length result = length nums1 };
+      assert { permut result nums1 };
+      assert { forall candidate: list int.
+                 permut candidate nums1 ->
+                 advantage_count result nums2 >= advantage_count candidate nums2 };
+      assert { valid_advantage_shuffle nums1 nums2 result };
+      result
+    end
+
+end

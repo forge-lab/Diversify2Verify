@@ -1,0 +1,184 @@
+module LongestIncreasingSubsequence_List_Spec
+
+  use int.Int
+  use list.List
+  use list.Length
+  use list.Mem
+
+  predicate valid_input (nums: list int) =
+    1 <= length nums <= 2500 /\
+    (forall x: int. mem x nums -> -10000 <= x <= 10000)
+
+  let rec predicate is_subsequence (sub: list int) (nums: list int)
+    variant { nums }
+  =
+    match sub with
+    | Nil -> true
+    | Cons x xs ->
+        match nums with
+        | Nil -> false
+        | Cons y ys ->
+            (x = y && is_subsequence xs ys) || is_subsequence sub ys
+        end
+    end
+
+  let rec predicate strictly_increasing (seq: list int)
+    variant { seq }
+  =
+    match seq with
+    | Nil -> true
+    | Cons _ Nil -> true
+    | Cons x xs ->
+        match xs with
+        | Nil -> true
+        | Cons y _ -> x < y && strictly_increasing xs
+        end
+    end
+
+  predicate valid_increasing_subsequence (seq: list int) (nums: list int) =
+    seq <> Nil /\
+    is_subsequence seq nums /\
+    strictly_increasing seq
+
+  predicate has_increasing_subsequence_length (nums: list int) (k: int) =
+    exists seq: list int.
+      valid_increasing_subsequence seq nums /\ length seq = k
+
+  predicate longest_increasing_subsequence_length
+    (nums: list int) (answer: int) =
+    1 <= answer <= length nums /\
+    has_increasing_subsequence_length nums answer /\
+    (forall seq: list int.
+      valid_increasing_subsequence seq nums -> length seq <= answer)
+
+  val longest_increasing_subsequence_list (nums: list int) : int
+    requires { valid_input nums }
+    ensures  { longest_increasing_subsequence_length nums result }
+
+  let lemma test_000_decreasing_expected_one () =
+    let nums = Cons 5 (Cons 4 (Cons 3 (Cons 2 (Cons 1 Nil)))) in
+    let seq = Cons 5 Nil in
+    assert { valid_input nums };
+    assert { strictly_increasing seq };
+    assert { is_subsequence seq nums };
+    assert { valid_increasing_subsequence seq nums };
+    assert { length seq = 1 };
+    assert { has_increasing_subsequence_length nums 1 };
+    assert {
+      forall witness: list int.
+        valid_increasing_subsequence witness nums -> length witness <= 1
+    };
+    assert { longest_increasing_subsequence_length nums 1 }
+
+  let lemma test_001_singleton_expected_one () =
+    let nums = Cons 1 Nil in
+    let seq = nums in
+    assert { valid_input nums };
+    assert { strictly_increasing seq };
+    assert { is_subsequence seq nums };
+    assert { valid_increasing_subsequence seq nums };
+    assert { length seq = 1 };
+    assert { has_increasing_subsequence_length nums 1 };
+    assert {
+      forall witness: list int.
+        valid_increasing_subsequence witness nums -> length witness <= 1
+    };
+    assert { longest_increasing_subsequence_length nums 1 }
+
+  let lemma test_002_all_equal_expected_one () =
+    let nums =
+      Cons 7 (Cons 7 (Cons 7 (Cons 7 (Cons 7 (Cons 7 (Cons 7 Nil)))))) in
+    let seq = Cons 7 Nil in
+    assert { valid_input nums };
+    assert { strictly_increasing seq };
+    assert { is_subsequence seq nums };
+    assert { valid_increasing_subsequence seq nums };
+    assert { length seq = 1 };
+    assert { has_increasing_subsequence_length nums 1 };
+    assert {
+      forall witness: list int.
+        valid_increasing_subsequence witness nums -> length witness <= 1
+    };
+    assert { longest_increasing_subsequence_length nums 1 }
+
+  let lemma test_004_negative_mix_expected_two () =
+    let nums = Cons 0 (Cons (-1) (Cons 1 Nil)) in
+    let seq = Cons (-1) (Cons 1 Nil) in
+    assert { valid_input nums };
+    assert { strictly_increasing (Cons 1 Nil) };
+    assert { strictly_increasing seq };
+    assert { is_subsequence seq nums };
+    assert { valid_increasing_subsequence seq nums };
+    assert { length seq = 2 };
+    assert { has_increasing_subsequence_length nums 2 };
+    assert {
+      forall witness: list int.
+        valid_increasing_subsequence witness nums -> length witness <= 2
+    };
+    assert { longest_increasing_subsequence_length nums 2 }
+
+  let lemma test_005_mixed_expected_four () =
+    let nums =
+      Cons 0 (Cons 1 (Cons 0 (Cons 3 (Cons 2 (Cons 3 Nil))))) in
+    let seq = Cons 0 (Cons 1 (Cons 2 (Cons 3 Nil))) in
+    assert { valid_input nums };
+    assert { strictly_increasing (Cons 3 Nil) };
+    assert { strictly_increasing (Cons 2 (Cons 3 Nil)) };
+    assert { strictly_increasing (Cons 1 (Cons 2 (Cons 3 Nil))) };
+    assert { strictly_increasing seq };
+    assert { is_subsequence seq nums };
+    assert { valid_increasing_subsequence seq nums };
+    assert { length seq = 4 };
+    assert { has_increasing_subsequence_length nums 4 };
+    assert {
+      forall witness: list int.
+        valid_increasing_subsequence witness nums -> length witness <= 4
+    };
+    assert { longest_increasing_subsequence_length nums 4 }
+
+  let lemma test_008_problem_example_expected_four () =
+    let nums =
+      Cons 10 (Cons 9 (Cons 2 (Cons 5 (Cons 3 (Cons 7
+        (Cons 101 (Cons 18 Nil))))))) in
+    let seq = Cons 2 (Cons 3 (Cons 7 (Cons 101 Nil))) in
+    assert { valid_input nums };
+    assert { strictly_increasing (Cons 101 Nil) };
+    assert { strictly_increasing (Cons 7 (Cons 101 Nil)) };
+    assert { strictly_increasing (Cons 3 (Cons 7 (Cons 101 Nil))) };
+    assert { strictly_increasing seq };
+    assert { is_subsequence seq nums };
+    assert { valid_increasing_subsequence seq nums };
+    assert { length seq = 4 };
+    assert { has_increasing_subsequence_length nums 4 };
+    assert {
+      forall witness: list int.
+        valid_increasing_subsequence witness nums -> length witness <= 4
+    };
+    assert { longest_increasing_subsequence_length nums 4 }
+
+  let lemma test_011_longer_mixed_expected_six () =
+    let nums =
+      Cons 10 (Cons 22 (Cons 9 (Cons 33 (Cons 21 (Cons 50
+        (Cons 41 (Cons 60 (Cons 80 Nil)))))))) in
+    let seq = Cons 10 (Cons 22 (Cons 33 (Cons 50 (Cons 60 (Cons 80 Nil))))) in
+    assert { valid_input nums };
+    assert { strictly_increasing (Cons 80 Nil) };
+    assert { strictly_increasing (Cons 60 (Cons 80 Nil)) };
+    assert { strictly_increasing (Cons 50 (Cons 60 (Cons 80 Nil))) };
+    assert { strictly_increasing (Cons 33 (Cons 50 (Cons 60 (Cons 80 Nil)))) };
+    assert {
+      strictly_increasing
+        (Cons 22 (Cons 33 (Cons 50 (Cons 60 (Cons 80 Nil)))))
+    };
+    assert { strictly_increasing seq };
+    assert { is_subsequence seq nums };
+    assert { valid_increasing_subsequence seq nums };
+    assert { length seq = 6 };
+    assert { has_increasing_subsequence_length nums 6 };
+    assert {
+      forall witness: list int.
+        valid_increasing_subsequence witness nums -> length witness <= 6
+    };
+    assert { longest_increasing_subsequence_length nums 6 }
+
+end

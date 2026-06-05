@@ -1,0 +1,154 @@
+module CountSubarraysWithMoreOnesThanZeros_Array_Spec
+
+  use int.Int
+  use int.Sum
+  use int.NumOf
+  use array.Array
+  use array.Init
+
+  constant modulo_value : int = 1000000007
+
+  predicate binary_array (nums: array int) =
+    forall i: int. 0 <= i < length nums -> nums[i] = 0 \/ nums[i] = 1
+
+  function subarray_balance (nums: array int) (l: int) (u: int) : int =
+    sum (fun k -> 2 * nums[k] - 1) l u
+
+  predicate more_ones_than_zeros_subarray (nums: array int) (l: int) (u: int) =
+    0 <= l < u <= length nums /\ subarray_balance nums l u > 0
+
+  function count_good_subarrays_from (nums: array int) (l: int) : int =
+    numof (fun u -> more_ones_than_zeros_subarray nums l u)
+      (l + 1) (length nums + 1)
+
+  function total_more_ones_subarrays (nums: array int) : int =
+    sum (fun l -> count_good_subarrays_from nums l) 0 (length nums)
+
+  predicate valid_modulo_result (nums: array int) (r: int) =
+    0 <= r < modulo_value /\
+    exists q: int. total_more_ones_subarrays nums = q * modulo_value + r
+
+  val count_subarrays_with_more_ones_than_zeros_array (nums: array int) : int
+    requires { 1 <= length nums <= 100000 }
+    requires { binary_array nums }
+    ensures  { valid_modulo_result nums result }
+
+  let lemma test_000 () =
+    let a = init 6 [|1; 1; 1; 1; 1; 0|] in
+    assert { length a = 6 };
+    assert { a[0] = 1 };
+    assert { a[1] = 1 };
+    assert { a[2] = 1 };
+    assert { a[3] = 1 };
+    assert { a[4] = 1 };
+    assert { a[5] = 0 };
+    assert { binary_array a };
+    assert { more_ones_than_zeros_subarray a 0 1 };
+    assert { more_ones_than_zeros_subarray a 0 6 };
+    assert { more_ones_than_zeros_subarray a 4 6 };
+    assert { not (more_ones_than_zeros_subarray a 5 6) };
+    assert { total_more_ones_subarrays a = 19 };
+    assert { valid_modulo_result a 19 }
+
+  let lemma test_001 () =
+    let a = init 5 [|1; 0; 1; 0; 1|] in
+    assert { length a = 5 };
+    assert { a[0] = 1 };
+    assert { a[1] = 0 };
+    assert { a[2] = 1 };
+    assert { a[3] = 0 };
+    assert { a[4] = 1 };
+    assert { binary_array a };
+    assert { more_ones_than_zeros_subarray a 0 1 };
+    assert { not (more_ones_than_zeros_subarray a 0 2) };
+    assert { more_ones_than_zeros_subarray a 0 3 };
+    assert { more_ones_than_zeros_subarray a 2 5 };
+    assert { total_more_ones_subarrays a = 6 };
+    assert { valid_modulo_result a 6 }
+
+  let lemma test_002 () =
+    let a = init 8 [|1; 0; 0; 1; 0; 1; 1; 0|] in
+    assert { length a = 8 };
+    assert { a[0] = 1 };
+    assert { a[1] = 0 };
+    assert { a[2] = 0 };
+    assert { a[3] = 1 };
+    assert { a[4] = 0 };
+    assert { a[5] = 1 };
+    assert { a[6] = 1 };
+    assert { a[7] = 0 };
+    assert { binary_array a };
+    assert { more_ones_than_zeros_subarray a 0 1 };
+    assert { not (more_ones_than_zeros_subarray a 0 3) };
+    assert { more_ones_than_zeros_subarray a 3 7 };
+    assert { more_ones_than_zeros_subarray a 5 7 };
+    assert { total_more_ones_subarrays a = 12 };
+    assert { valid_modulo_result a 12 }
+
+  let lemma test_003 () =
+    let a = init 1 [|1|] in
+    assert { length a = 1 };
+    assert { a[0] = 1 };
+    assert { binary_array a };
+    assert { more_ones_than_zeros_subarray a 0 1 };
+    assert { total_more_ones_subarrays a = 1 };
+    assert { valid_modulo_result a 1 }
+
+  let lemma test_004 () =
+    let a = init 8 [|1; 1; 0; 0; 1; 1; 0; 0|] in
+    assert { length a = 8 };
+    assert { a[0] = 1 };
+    assert { a[1] = 1 };
+    assert { a[2] = 0 };
+    assert { a[3] = 0 };
+    assert { a[4] = 1 };
+    assert { a[5] = 1 };
+    assert { a[6] = 0 };
+    assert { a[7] = 0 };
+    assert { binary_array a };
+    assert { more_ones_than_zeros_subarray a 0 1 };
+    assert { more_ones_than_zeros_subarray a 0 2 };
+    assert { not (more_ones_than_zeros_subarray a 0 4) };
+    assert { more_ones_than_zeros_subarray a 4 6 };
+    assert { total_more_ones_subarrays a = 13 };
+    assert { valid_modulo_result a 13 }
+
+  let lemma test_005 () =
+    let a = init 6 [|0; 0; 0; 1; 1; 1|] in
+    assert { length a = 6 };
+    assert { a[0] = 0 };
+    assert { a[1] = 0 };
+    assert { a[2] = 0 };
+    assert { a[3] = 1 };
+    assert { a[4] = 1 };
+    assert { a[5] = 1 };
+    assert { binary_array a };
+    assert { not (more_ones_than_zeros_subarray a 0 1) };
+    assert { more_ones_than_zeros_subarray a 3 4 };
+    assert { more_ones_than_zeros_subarray a 2 6 };
+    assert { more_ones_than_zeros_subarray a 1 6 };
+    assert { total_more_ones_subarrays a = 9 };
+    assert { valid_modulo_result a 9 }
+
+  let lemma test_006 () =
+    let a = init 10 [|1; 0; 1; 0; 1; 0; 1; 0; 1; 0|] in
+    assert { length a = 10 };
+    assert { a[0] = 1 };
+    assert { a[1] = 0 };
+    assert { a[2] = 1 };
+    assert { a[3] = 0 };
+    assert { a[4] = 1 };
+    assert { a[5] = 0 };
+    assert { a[6] = 1 };
+    assert { a[7] = 0 };
+    assert { a[8] = 1 };
+    assert { a[9] = 0 };
+    assert { binary_array a };
+    assert { more_ones_than_zeros_subarray a 0 1 };
+    assert { not (more_ones_than_zeros_subarray a 0 2) };
+    assert { more_ones_than_zeros_subarray a 0 3 };
+    assert { not (more_ones_than_zeros_subarray a 0 10) };
+    assert { total_more_ones_subarrays a = 15 };
+    assert { valid_modulo_result a 15 }
+
+end

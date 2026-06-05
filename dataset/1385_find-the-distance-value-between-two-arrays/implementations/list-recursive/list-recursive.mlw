@@ -1,0 +1,179 @@
+module FindTheDistanceValueBetweenTwoArrays_List_Recursive_Implementation
+
+  use int.Int
+  use int.Abs
+  use list.List
+
+  let rec far_from_all (arr2: list int) (x: int) (d: int) : bool
+    variant { arr2 }
+  =
+    match arr2 with
+    | Nil -> true
+    | Cons y ys ->
+        if abs (x - y) > d then far_from_all ys x d else false
+    end
+
+  let rec find_the_distance_value_between_two_arrays_list
+    (arr1: list int) (arr2: list int) (d: int) : int
+    variant { arr1 }
+  =
+    match arr1 with
+    | Nil -> 0
+    | Cons x xs ->
+        (if far_from_all arr2 x d then 1 else 0) +
+        find_the_distance_value_between_two_arrays_list xs arr2 d
+    end
+
+  let check_case (arr1: list int) (arr2: list int) (d: int) (expected: int) : bool =
+    let r = find_the_distance_value_between_two_arrays_list arr1 arr2 d in
+    r = expected
+
+  let test_000 () : bool =
+    let arr1 = Cons 10 (Cons 20 (Cons 30 Nil)) in
+    let arr2 = Cons 5 (Cons 15 (Cons 25 Nil)) in
+    check_case arr1 arr2 4 3
+
+  let test_001 () : bool =
+    let arr1 = Cons (-1000) (Cons 1000 Nil) in
+    let arr2 = Cons (-500) (Cons 500 Nil) in
+    check_case arr1 arr2 499 2
+
+  let test_002 () : bool =
+    let arr1 = Cons 4 (Cons 5 (Cons 8 Nil)) in
+    let arr2 = Cons 10 (Cons 9 (Cons 1 (Cons 8 Nil))) in
+    check_case arr1 arr2 2 2
+
+  let test_003 () : bool =
+    let arr1 = Cons 1 (Cons 4 (Cons 2 (Cons 3 Nil))) in
+    let arr2 = Cons (-4) (Cons (-3) (Cons 6 (Cons 10 (Cons 20 (Cons 30 Nil))))) in
+    check_case arr1 arr2 3 2
+
+  let test_004 () : bool =
+    let arr1 = Cons (-1) (Cons (-2) (Cons (-3) Nil)) in
+    let arr2 = Cons 1 (Cons 2 (Cons 3 Nil)) in
+    check_case arr1 arr2 2 2
+
+  let test_005 () : bool =
+    let arr1 = Cons 0 (Cons 0 (Cons 0 (Cons 0 Nil))) in
+    let arr2 = Cons 1 (Cons 2 (Cons 3 (Cons 4 Nil))) in
+    check_case arr1 arr2 0 4
+
+  let test_006 () : bool =
+    let arr1 = Cons 1000 Nil in
+    let arr2 = Cons (-1000) Nil in
+    check_case arr1 arr2 1999 1
+
+  let test_007 () : bool =
+    let arr1 = Cons 1 Nil in
+    let arr2 = Cons 1 Nil in
+    check_case arr1 arr2 0 0
+
+  let test_008 () : bool =
+    let arr1 = Cons 2 (Cons 1 (Cons 100 (Cons 3 Nil))) in
+    let arr2 = Cons (-5) (Cons (-2) (Cons 10 (Cons (-3) (Cons 7 Nil)))) in
+    check_case arr1 arr2 6 1
+
+  let test_009 () : bool =
+    let arr1 = Cons 1 (Cons 2 (Cons 3 Nil)) in
+    let arr2 = Cons 4 (Cons 5 (Cons 6 Nil)) in
+    check_case arr1 arr2 0 3
+
+  let test_010 () : bool =
+    let arr1 = Cons 1 (Cons 2 (Cons 3 (Cons 4 (Cons 5 Nil)))) in
+    let arr2 = Cons 6 (Cons 7 (Cons 8 (Cons 9 (Cons 10 Nil)))) in
+    check_case arr1 arr2 1 4
+
+  let test_011 () : bool =
+    let arr1 = Cons 100 (Cons 200 (Cons 300 (Cons 400 (Cons 500 Nil)))) in
+    let arr2 =
+      Cons 50
+        (Cons 100
+          (Cons 150
+            (Cons 200
+              (Cons 250 (Cons 300 (Cons 350 (Cons 400 (Cons 450 (Cons 500 Nil))))))))) in
+    check_case arr1 arr2 49 0
+
+  let test_012 () : bool =
+    let arr1 = Cons (-1000) (Cons (-900) (Cons (-800) (Cons (-700) (Cons (-600) Nil)))) in
+    let arr2 = Cons 600 (Cons 700 (Cons 800 (Cons 900 (Cons 1000 Nil)))) in
+    check_case arr1 arr2 100 5
+
+  let test_013 () : bool =
+    let arr1 = Cons (-100) (Cons (-200) (Cons (-300) Nil)) in
+    let arr2 = Cons (-50) (Cons (-150) (Cons (-250) Nil)) in
+    check_case arr1 arr2 49 3
+
+  let test_014 () : bool =
+    let arr1 = Cons 500 (Cons 500 (Cons 500 (Cons 500 (Cons 500 Nil)))) in
+    let arr2 = Cons 500 (Cons 500 (Cons 500 (Cons 500 (Cons 500 Nil)))) in
+    check_case arr1 arr2 0 0
+
+  let test_015 () : bool =
+    let arr1 = Cons 10 (Cons 20 (Cons 30 (Cons 40 (Cons 50 Nil)))) in
+    let arr2 = Cons 1 (Cons 2 (Cons 3 (Cons 4 (Cons 5 Nil)))) in
+    check_case arr1 arr2 5 4
+
+  let test_016 () : bool =
+    let arr1 = Cons 1 (Cons 2 (Cons 3 (Cons 4 (Cons 5 Nil)))) in
+    let arr2 = Cons 10 (Cons 20 (Cons 30 (Cons 40 (Cons 50 Nil)))) in
+    check_case arr1 arr2 10 0
+
+  let test_017 () : bool =
+    let arr1 = Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 Nil)))) in
+    let arr2 = Cons 2 (Cons 4 (Cons 6 (Cons 8 (Cons 10 Nil)))) in
+    check_case arr1 arr2 1 0
+
+  let test_018 () : bool =
+    let arr1 = Cons 500 (Cons 1000 (Cons 1500 (Cons 2000 Nil))) in
+    let arr2 = Cons 400 (Cons 900 (Cons 1400 (Cons 1900 Nil))) in
+    check_case arr1 arr2 100 0
+
+  let test_019 () : bool =
+    let arr1 = Cons 0 (Cons 100 (Cons 200 (Cons 300 (Cons 400 Nil)))) in
+    let arr2 = Cons 50 (Cons 150 (Cons 250 (Cons 350 (Cons 450 Nil)))) in
+    check_case arr1 arr2 50 0
+
+  let run_tests () : bool =
+    if test_000 () then
+    if test_001 () then
+    if test_002 () then
+    if test_003 () then
+    if test_004 () then
+    if test_005 () then
+    if test_006 () then
+    if test_007 () then
+    if test_008 () then
+    if test_009 () then
+    if test_010 () then
+    if test_011 () then
+    if test_012 () then
+    if test_013 () then
+    if test_014 () then
+    if test_015 () then
+    if test_016 () then
+    if test_017 () then
+    if test_018 () then
+    if test_019 () then
+      true
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+
+end

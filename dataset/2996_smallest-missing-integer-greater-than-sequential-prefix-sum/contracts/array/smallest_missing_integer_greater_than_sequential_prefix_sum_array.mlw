@@ -1,0 +1,181 @@
+module SmallestMissingIntegerGreaterThanSequentialPrefixSum_Array_Spec
+
+  use int.Int
+  use array.Array
+  use array.Init
+  use array.ArraySum
+
+  predicate valid_input (nums: array int) =
+    1 <= length nums <= 50 /\
+    forall i: int. 0 <= i < length nums -> 1 <= nums[i] <= 50
+
+  predicate present (nums: array int) (x: int) =
+    exists i: int. 0 <= i < length nums /\ nums[i] = x
+
+  predicate missing (nums: array int) (x: int) =
+    not (present nums x)
+
+  predicate sequential_prefix (nums: array int) (len: int) =
+    1 <= len <= length nums /\
+    forall j: int. 1 <= j < len -> nums[j] = nums[j - 1] + 1
+
+  predicate longest_sequential_prefix (nums: array int) (len: int) =
+    sequential_prefix nums len /\
+    forall k: int. len < k <= length nums -> not (sequential_prefix nums k)
+
+  function prefix_sum (nums: array int) (len: int) : int =
+    sum nums 0 len
+
+  predicate valid_answer_for_prefix (nums: array int) (len: int) (x: int) =
+    longest_sequential_prefix nums len /\
+    prefix_sum nums len <= x /\
+    missing nums x /\
+    forall y: int. prefix_sum nums len <= y < x -> present nums y
+
+  predicate result_spec (nums: array int) (x: int) =
+    exists len: int. valid_answer_for_prefix nums len x
+
+  val smallest_missing_integer_greater_than_sequential_prefix_sum_array (nums: array int) : int
+    requires { valid_input nums }
+    ensures  { result_spec nums result }
+
+  let lemma test_000_single_prefix_missing_after_present_run () =
+    let nums = init 5 [|1; 3; 2; 4; 5|] in
+    assert { length nums = 5 };
+    assert { nums[0] = 1 };
+    assert { nums[1] = 3 };
+    assert { nums[2] = 2 };
+    assert { nums[3] = 4 };
+    assert { nums[4] = 5 };
+    assert { forall i: int. 0 <= i < length nums -> i = 0 \/ i = 1 \/ i = 2 \/ i = 3 \/ i = 4 };
+    assert { sequential_prefix nums 1 };
+    assert { not (sequential_prefix nums 2) };
+    assert { longest_sequential_prefix nums 1 };
+    assert { prefix_sum nums 1 = 1 };
+    assert { present nums 1 };
+    assert { present nums 2 };
+    assert { present nums 3 };
+    assert { present nums 4 };
+    assert { present nums 5 };
+    assert { missing nums 6 };
+    assert { valid_answer_for_prefix nums 1 6 };
+    assert { result_spec nums 6 }
+
+  let lemma test_002_full_sequential_prefix () =
+    let nums = init 5 [|10; 11; 12; 13; 14|] in
+    assert { length nums = 5 };
+    assert { nums[0] = 10 };
+    assert { nums[1] = 11 };
+    assert { nums[2] = 12 };
+    assert { nums[3] = 13 };
+    assert { nums[4] = 14 };
+    assert { forall i: int. 0 <= i < length nums -> i = 0 \/ i = 1 \/ i = 2 \/ i = 3 \/ i = 4 };
+    assert { sequential_prefix nums 1 };
+    assert { sequential_prefix nums 2 };
+    assert { sequential_prefix nums 3 };
+    assert { sequential_prefix nums 4 };
+    assert { sequential_prefix nums 5 };
+    assert { longest_sequential_prefix nums 5 };
+    assert { prefix_sum nums 5 = 60 };
+    assert { missing nums 60 };
+    assert { valid_answer_for_prefix nums 5 60 };
+    assert { result_spec nums 60 }
+
+  let lemma test_003_single_prefix_missing_two () =
+    let nums = init 5 [|1; 3; 5; 7; 9|] in
+    assert { length nums = 5 };
+    assert { nums[0] = 1 };
+    assert { nums[1] = 3 };
+    assert { nums[2] = 5 };
+    assert { nums[3] = 7 };
+    assert { nums[4] = 9 };
+    assert { forall i: int. 0 <= i < length nums -> i = 0 \/ i = 1 \/ i = 2 \/ i = 3 \/ i = 4 };
+    assert { sequential_prefix nums 1 };
+    assert { not (sequential_prefix nums 2) };
+    assert { longest_sequential_prefix nums 1 };
+    assert { prefix_sum nums 1 = 1 };
+    assert { present nums 1 };
+    assert { missing nums 2 };
+    assert { valid_answer_for_prefix nums 1 2 };
+    assert { result_spec nums 2 }
+
+  let lemma test_005_single_prefix_at_upper_constraint () =
+    let nums = init 5 [|50; 49; 48; 47; 46|] in
+    assert { length nums = 5 };
+    assert { nums[0] = 50 };
+    assert { nums[1] = 49 };
+    assert { nums[2] = 48 };
+    assert { nums[3] = 47 };
+    assert { nums[4] = 46 };
+    assert { forall i: int. 0 <= i < length nums -> i = 0 \/ i = 1 \/ i = 2 \/ i = 3 \/ i = 4 };
+    assert { sequential_prefix nums 1 };
+    assert { not (sequential_prefix nums 2) };
+    assert { longest_sequential_prefix nums 1 };
+    assert { prefix_sum nums 1 = 50 };
+    assert { present nums 50 };
+    assert { missing nums 51 };
+    assert { valid_answer_for_prefix nums 1 51 };
+    assert { result_spec nums 51 }
+
+  let lemma test_013_three_value_prefix_threshold_missing () =
+    let nums = init 5 [|1; 2; 3; 2; 5|] in
+    assert { length nums = 5 };
+    assert { nums[0] = 1 };
+    assert { nums[1] = 2 };
+    assert { nums[2] = 3 };
+    assert { nums[3] = 2 };
+    assert { nums[4] = 5 };
+    assert { forall i: int. 0 <= i < length nums -> i = 0 \/ i = 1 \/ i = 2 \/ i = 3 \/ i = 4 };
+    assert { sequential_prefix nums 1 };
+    assert { sequential_prefix nums 2 };
+    assert { sequential_prefix nums 3 };
+    assert { not (sequential_prefix nums 4) };
+    assert { longest_sequential_prefix nums 3 };
+    assert { prefix_sum nums 3 = 6 };
+    assert { missing nums 6 };
+    assert { valid_answer_for_prefix nums 3 6 };
+    assert { result_spec nums 6 }
+
+  let lemma test_015_three_value_prefix_skip_present_values () =
+    let nums = init 7 [|3; 4; 5; 1; 12; 14; 13|] in
+    assert { length nums = 7 };
+    assert { nums[0] = 3 };
+    assert { nums[1] = 4 };
+    assert { nums[2] = 5 };
+    assert { nums[3] = 1 };
+    assert { nums[4] = 12 };
+    assert { nums[5] = 14 };
+    assert { nums[6] = 13 };
+    assert { forall i: int. 0 <= i < length nums -> i = 0 \/ i = 1 \/ i = 2 \/ i = 3 \/ i = 4 \/ i = 5 \/ i = 6 };
+    assert { sequential_prefix nums 1 };
+    assert { sequential_prefix nums 2 };
+    assert { sequential_prefix nums 3 };
+    assert { not (sequential_prefix nums 4) };
+    assert { longest_sequential_prefix nums 3 };
+    assert { prefix_sum nums 3 = 12 };
+    assert { present nums 12 };
+    assert { present nums 13 };
+    assert { present nums 14 };
+    assert { missing nums 15 };
+    assert { valid_answer_for_prefix nums 3 15 };
+    assert { result_spec nums 15 }
+
+  let lemma test_019_two_value_prefix_threshold_missing () =
+    let nums = init 5 [|1; 2; 4; 5; 6|] in
+    assert { length nums = 5 };
+    assert { nums[0] = 1 };
+    assert { nums[1] = 2 };
+    assert { nums[2] = 4 };
+    assert { nums[3] = 5 };
+    assert { nums[4] = 6 };
+    assert { forall i: int. 0 <= i < length nums -> i = 0 \/ i = 1 \/ i = 2 \/ i = 3 \/ i = 4 };
+    assert { sequential_prefix nums 1 };
+    assert { sequential_prefix nums 2 };
+    assert { not (sequential_prefix nums 3) };
+    assert { longest_sequential_prefix nums 2 };
+    assert { prefix_sum nums 2 = 3 };
+    assert { missing nums 3 };
+    assert { valid_answer_for_prefix nums 2 3 };
+    assert { result_spec nums 3 }
+
+end

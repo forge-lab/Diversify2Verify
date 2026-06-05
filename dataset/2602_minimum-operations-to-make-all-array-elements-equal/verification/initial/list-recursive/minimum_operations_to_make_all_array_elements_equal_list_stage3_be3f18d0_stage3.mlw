@@ -1,0 +1,41 @@
+module MinimumOperationsToMakeAllArrayElementsEqual_List_Stage3_Recursive
+
+  use int.Int
+  use int.Abs
+  use list.List
+  use list.Length
+
+  let rec function operations_for_query (nums: list int) (q: int) : int
+    variant { nums }
+  =
+    match nums with
+    | Nil -> 0
+    | Cons x xs -> abs (x - q) + operations_for_query xs q
+    end
+
+  let rec function operation_results (nums: list int) (queries: list int) : list int
+    variant { queries }
+  =
+    match queries with
+    | Nil -> Nil
+    | Cons q qs -> Cons (operations_for_query nums q) (operation_results nums qs)
+    end
+
+  let rec lemma operation_results_length (nums: list int) (queries: list int)
+    ensures { length (operation_results nums queries) = length queries }
+    variant { queries }
+  =
+    match queries with
+    | Nil -> ()
+    | Cons _ qs -> operation_results_length nums qs
+    end
+
+  let minimum_operations_to_make_all_array_elements_equal_list
+    (nums: list int) (queries: list int) : list int
+    ensures { result = operation_results nums queries }
+    ensures { length result = length queries }
+  =
+    operation_results_length nums queries;
+    operation_results nums queries
+
+end

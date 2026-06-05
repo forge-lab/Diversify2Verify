@@ -1,0 +1,237 @@
+module FairCandySwap_Array_Recursive_Implementation
+
+  use int.Int
+  use int.EuclideanDivision
+  use array.Array
+  use array.Init
+
+  let make_pair (x: int) (y: int) : array int =
+    init 2 [|x; y|]
+
+  let pair_matches (r: array int) (x: int) (y: int) : bool =
+    if length r <> 2 then
+      false
+    else if r[0] <> x then
+      false
+    else
+      r[1] = y
+
+  let rec sum_from (a: array int) (i: int) : int
+    variant { length a - i }
+  =
+    if i = length a then
+      0
+    else
+      a[i] + sum_from a (i + 1)
+
+  let sum_array (a: array int) : int =
+    sum_from a 0
+
+  let rec bob_contains_from (bobSizes: array int) (target: int) (j: int) : bool
+    variant { length bobSizes - j }
+  =
+    if j = length bobSizes then
+      false
+    else if bobSizes[j] = target then
+      true
+    else
+      bob_contains_from bobSizes target (j + 1)
+
+  let rec find_swap_from
+    (aliceSizes: array int) (bobSizes: array int) (delta: int) (i: int) : array int
+    variant { length aliceSizes - i }
+  =
+    if i = length aliceSizes then
+      make 2 0
+    else
+      let aliceBox = aliceSizes[i] in
+      let bobBox = aliceBox - delta in
+      if bob_contains_from bobSizes bobBox 0 then
+        make_pair aliceBox bobBox
+      else
+        find_swap_from aliceSizes bobSizes delta (i + 1)
+
+  let fair_candy_swap_array (aliceSizes: array int) (bobSizes: array int) : array int =
+    let delta = div (sum_array aliceSizes - sum_array bobSizes) 2 in
+    find_swap_from aliceSizes bobSizes delta 0
+
+  let test_002 () : bool =
+    let aliceSizes = init 2 [|1; 1|] in
+    let bobSizes = init 2 [|2; 2|] in
+    let result = fair_candy_swap_array aliceSizes bobSizes in
+    pair_matches result 1 2
+
+  let test_003 () : bool =
+    let aliceSizes = init 3 [|5; 4; 3|] in
+    let bobSizes = init 3 [|7; 8; 9|] in
+    let result = fair_candy_swap_array aliceSizes bobSizes in
+    pair_matches result 3 9
+
+  let test_006 () : bool =
+    let aliceSizes = init 3 [|1; 2; 5|] in
+    let bobSizes = init 2 [|2; 4|] in
+    let result = fair_candy_swap_array aliceSizes bobSizes in
+    pair_matches result 5 4
+
+  let test_008 () : bool =
+    let aliceSizes = init 2 [|1; 2|] in
+    let bobSizes = init 2 [|2; 3|] in
+    let result = fair_candy_swap_array aliceSizes bobSizes in
+    pair_matches result 1 2
+
+  let test_010 () : bool =
+    let aliceSizes = init 1 [|2|] in
+    let bobSizes = init 2 [|1; 3|] in
+    let result = fair_candy_swap_array aliceSizes bobSizes in
+    pair_matches result 2 3
+
+  let test_011 () : bool =
+    let aliceSizes = init 5 [|35; 17; 4; 24; 10|] in
+    let bobSizes = init 5 [|66; 56; 5; 1; 58|] in
+    let result = fair_candy_swap_array aliceSizes bobSizes in
+    pair_matches result 10 58
+
+  let test_012 () : bool =
+    let aliceSizes = init 4 [|4; 1; 2; 1|] in
+    let bobSizes = init 4 [|1; 2; 2; 3|] in
+    let result = fair_candy_swap_array aliceSizes bobSizes in
+    pair_matches result 1 1
+
+  let test_015 () : bool =
+    let aliceSizes = init 10 [|5; 15; 25; 35; 45; 55; 65; 75; 85; 95|] in
+    let bobSizes = init 10 [|10; 20; 30; 40; 50; 60; 70; 80; 90; 100|] in
+    let result = fair_candy_swap_array aliceSizes bobSizes in
+    pair_matches result 5 30
+
+  let test_030 () : bool =
+    let aliceSizes = init 4 [|100000; 1; 2; 3|] in
+    let bobSizes = init 4 [|99999; 4; 5; 6|] in
+    let result = fair_candy_swap_array aliceSizes bobSizes in
+    pair_matches result 1 5
+
+  let test_031 () : bool =
+    let aliceSizes = init 10 [|100; 200; 300; 400; 500; 600; 700; 800; 900; 1000|] in
+    let bobSizes = init 10 [|50; 150; 250; 350; 450; 550; 650; 750; 850; 950|] in
+    let result = fair_candy_swap_array aliceSizes bobSizes in
+    pair_matches result 300 50
+
+  let test_043 () : bool =
+    let aliceSizes = init 10 [|1; 3; 5; 7; 9; 11; 13; 15; 17; 19|] in
+    let bobSizes = init 10 [|2; 4; 6; 8; 10; 12; 14; 16; 18; 20|] in
+    let result = fair_candy_swap_array aliceSizes bobSizes in
+    pair_matches result 1 6
+
+  let test_044 () : bool =
+    let aliceSizes = init 5 [|99999; 88888; 77777; 66666; 55555|] in
+    let bobSizes = init 7 [|11111; 22222; 33333; 44444; 66666; 77777; 88888|] in
+    let result = fair_candy_swap_array aliceSizes bobSizes in
+    pair_matches result 99999 77777
+
+  let test_045 () : bool =
+    let aliceSizes = init 10 [|1000; 2000; 3000; 4000; 5000; 6000; 7000; 8000; 9000; 10000|] in
+    let bobSizes = init 10 [|1500; 2500; 3500; 4500; 5500; 6500; 7500; 8500; 9500; 10500|] in
+    let result = fair_candy_swap_array aliceSizes bobSizes in
+    pair_matches result 1000 3500
+
+  let test_052 () : bool =
+    let aliceSizes = init 9 [|88; 44; 22; 11; 55; 33; 66; 99; 77|] in
+    let bobSizes = init 9 [|132; 66; 33; 22; 110; 44; 88; 11; 77|] in
+    let result = fair_candy_swap_array aliceSizes bobSizes in
+    pair_matches result 88 132
+
+  let test_054 () : bool =
+    let aliceSizes = init 6 [|10000; 20000; 30000; 40000; 50000; 60000|] in
+    let bobSizes = init 6 [|15000; 25000; 35000; 45000; 55000; 65000|] in
+    let result = fair_candy_swap_array aliceSizes bobSizes in
+    pair_matches result 10000 25000
+
+  let test_055 () : bool =
+    let aliceSizes = init 5 [|1000; 2000; 3000; 4000; 5000|] in
+    let bobSizes = init 4 [|5500; 6500; 7500; 8500|] in
+    let result = fair_candy_swap_array aliceSizes bobSizes in
+    pair_matches result 1000 7500
+
+  let test_065 () : bool =
+    let aliceSizes = init 5 [|10000; 20000; 30000; 40000; 50000|] in
+    let bobSizes = init 6 [|5000; 15000; 25000; 35000; 45000; 55000|] in
+    let result = fair_candy_swap_array aliceSizes bobSizes in
+    pair_matches result 10000 25000
+
+  let test_066 () : bool =
+    let aliceSizes = init 10 [|5; 7; 9; 11; 13; 15; 17; 19; 21; 23|] in
+    let bobSizes = init 10 [|2; 4; 6; 8; 10; 12; 14; 16; 18; 20|] in
+    let result = fair_candy_swap_array aliceSizes bobSizes in
+    pair_matches result 17 2
+
+  let test_070 () : bool =
+    let aliceSizes = init 6 [|1; 3; 5; 7; 9; 11|] in
+    let bobSizes = init 6 [|2; 4; 6; 8; 10; 12|] in
+    let result = fair_candy_swap_array aliceSizes bobSizes in
+    pair_matches result 1 4
+
+  let test_076 () : bool =
+    let aliceSizes = init 10 [|1; 3; 5; 7; 9; 11; 13; 15; 17; 19|] in
+    let bobSizes = init 10 [|2; 4; 6; 8; 10; 12; 14; 16; 18; 20|] in
+    let result = fair_candy_swap_array aliceSizes bobSizes in
+    pair_matches result 1 6
+
+  let test_081 () : bool =
+    let aliceSizes = init 14 [|1000; 2000; 3000; 4000; 5000; 6000; 7000; 8000; 9000; 10000; 11000; 12000; 13000; 14000|] in
+    let bobSizes = init 14 [|500; 1500; 2500; 3500; 4500; 5500; 6500; 7500; 8500; 9500; 10500; 11500; 12500; 13500|] in
+    let result = fair_candy_swap_array aliceSizes bobSizes in
+    pair_matches result 4000 500
+
+  let test_083 () : bool =
+    let aliceSizes = init 10 [|10; 20; 30; 40; 50; 60; 70; 80; 90; 100|] in
+    let bobSizes = init 10 [|5; 15; 25; 35; 45; 55; 65; 75; 85; 95|] in
+    let result = fair_candy_swap_array aliceSizes bobSizes in
+    pair_matches result 30 5
+
+  let run_tests () : bool =
+    if test_002 () then
+    if test_003 () then
+    if test_006 () then
+    if test_008 () then
+    if test_010 () then
+    if test_011 () then
+    if test_012 () then
+    if test_015 () then
+    if test_030 () then
+    if test_031 () then
+    if test_043 () then
+    if test_044 () then
+    if test_045 () then
+    if test_052 () then
+    if test_054 () then
+    if test_055 () then
+    if test_065 () then
+    if test_066 () then
+    if test_070 () then
+    if test_076 () then
+    if test_081 () then
+    if test_083 () then
+      true
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+
+end

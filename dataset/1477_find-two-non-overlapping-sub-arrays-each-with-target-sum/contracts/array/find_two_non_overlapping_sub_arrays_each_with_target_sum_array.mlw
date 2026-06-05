@@ -1,0 +1,191 @@
+module FindTwoNonOverlappingSubArraysEachWithTargetSum_Array_Spec
+
+  use int.Int
+  use array.Array
+  use array.Init
+  use array.ArraySum
+
+  predicate target_segment (arr: array int) (target: int) (l: int) (u: int) =
+    0 <= l < u <= length arr /\ sum arr l u = target
+
+  predicate non_overlapping (l1: int) (u1: int) (l2: int) (u2: int) =
+    u1 <= l2 \/ u2 <= l1
+
+  function pair_total_length (l1: int) (u1: int) (l2: int) (u2: int) : int =
+    (u1 - l1) + (u2 - l2)
+
+  predicate valid_pair (arr: array int) (target: int)
+      (l1: int) (u1: int) (l2: int) (u2: int) =
+    target_segment arr target l1 u1 /\
+    target_segment arr target l2 u2 /\
+    non_overlapping l1 u1 l2 u2
+
+  predicate no_valid_pair (arr: array int) (target: int) =
+    forall l1 u1 l2 u2: int.
+      not (valid_pair arr target l1 u1 l2 u2)
+
+  predicate minimal_total_length (arr: array int) (target: int) (k: int) =
+    (exists l1 u1 l2 u2: int.
+      valid_pair arr target l1 u1 l2 u2 /\
+      k = pair_total_length l1 u1 l2 u2) /\
+    (forall l1 u1 l2 u2: int.
+      valid_pair arr target l1 u1 l2 u2 ->
+      k <= pair_total_length l1 u1 l2 u2)
+
+  predicate correct_result (arr: array int) (target: int) (result: int) =
+    (result = (-1) /\ no_valid_pair arr target) \/
+    (result >= 2 /\ minimal_total_length arr target result)
+
+  val find_two_non_overlapping_sub_arrays_each_with_target_sum_array
+      (arr: array int) (target: int) : int
+    requires { 1 <= length arr <= 100000 }
+    requires { forall i: int. 0 <= i < length arr -> 1 <= arr[i] <= 1000 }
+    requires { 1 <= target <= 100000000 }
+    ensures  { correct_result arr target result }
+
+  let lemma test_000_repeated_fives () =
+    let a = init 5 [|5; 5; 5; 5; 5|] in
+    assert { length a = 5 };
+    assert { a[0] = 5 };
+    assert { a[1] = 5 };
+    assert { a[2] = 5 };
+    assert { a[3] = 5 };
+    assert { a[4] = 5 };
+    assert { sum a 0 2 = 10 };
+    assert { sum a 2 4 = 10 };
+    assert { target_segment a 10 0 2 };
+    assert { target_segment a 10 2 4 };
+    assert { non_overlapping 0 2 2 4 };
+    assert { valid_pair a 10 0 2 2 4 };
+    assert {
+      forall l1 u1 l2 u2: int.
+        valid_pair a 10 l1 u1 l2 u2 ->
+        4 <= pair_total_length l1 u1 l2 u2
+    };
+    assert { minimal_total_length a 10 4 };
+    assert { correct_result a 10 4 }
+
+  let lemma test_004_overlapping_only () =
+    let a = init 5 [|1; 2; 3; 4; 5|] in
+    assert { length a = 5 };
+    assert { a[0] = 1 };
+    assert { a[1] = 2 };
+    assert { a[2] = 3 };
+    assert { a[3] = 4 };
+    assert { a[4] = 5 };
+    assert { sum a 1 4 = 9 };
+    assert { sum a 3 5 = 9 };
+    assert { target_segment a 9 1 4 };
+    assert { target_segment a 9 3 5 };
+    assert { not (non_overlapping 1 4 3 5) };
+    assert { no_valid_pair a 9 };
+    assert { correct_result a 9 (-1) }
+
+  let lemma test_005_example_singletons () =
+    let a = init 5 [|3; 2; 2; 4; 3|] in
+    assert { length a = 5 };
+    assert { a[0] = 3 };
+    assert { a[1] = 2 };
+    assert { a[2] = 2 };
+    assert { a[3] = 4 };
+    assert { a[4] = 3 };
+    assert { sum a 0 1 = 3 };
+    assert { sum a 4 5 = 3 };
+    assert { target_segment a 3 0 1 };
+    assert { target_segment a 3 4 5 };
+    assert { non_overlapping 0 1 4 5 };
+    assert { valid_pair a 3 0 1 4 5 };
+    assert {
+      forall l1 u1 l2 u2: int.
+        valid_pair a 3 l1 u1 l2 u2 ->
+        2 <= pair_total_length l1 u1 l2 u2
+    };
+    assert { minimal_total_length a 3 2 };
+    assert { correct_result a 3 2 }
+
+  let lemma test_008_overlapping_large_values () =
+    let a = init 3 [|1000; 1000; 1000|] in
+    assert { length a = 3 };
+    assert { a[0] = 1000 };
+    assert { a[1] = 1000 };
+    assert { a[2] = 1000 };
+    assert { sum a 0 2 = 2000 };
+    assert { sum a 1 3 = 2000 };
+    assert { target_segment a 2000 0 2 };
+    assert { target_segment a 2000 1 3 };
+    assert { not (non_overlapping 0 2 1 3) };
+    assert { no_valid_pair a 2000 };
+    assert { correct_result a 2000 (-1) }
+
+  let lemma test_009_example_choose_singletons () =
+    let a = init 4 [|7; 3; 4; 7|] in
+    assert { length a = 4 };
+    assert { a[0] = 7 };
+    assert { a[1] = 3 };
+    assert { a[2] = 4 };
+    assert { a[3] = 7 };
+    assert { sum a 0 1 = 7 };
+    assert { sum a 1 3 = 7 };
+    assert { sum a 3 4 = 7 };
+    assert { target_segment a 7 0 1 };
+    assert { target_segment a 7 1 3 };
+    assert { target_segment a 7 3 4 };
+    assert { non_overlapping 0 1 3 4 };
+    assert { valid_pair a 7 0 1 3 4 };
+    assert {
+      forall l1 u1 l2 u2: int.
+        valid_pair a 7 l1 u1 l2 u2 ->
+        2 <= pair_total_length l1 u1 l2 u2
+    };
+    assert { minimal_total_length a 7 2 };
+    assert { correct_result a 7 2 }
+
+  let lemma test_010_adjacent_large_pairs () =
+    let a = init 5 [|1000; 1000; 1000; 1000; 1000|] in
+    assert { length a = 5 };
+    assert { a[0] = 1000 };
+    assert { a[1] = 1000 };
+    assert { a[2] = 1000 };
+    assert { a[3] = 1000 };
+    assert { a[4] = 1000 };
+    assert { sum a 0 2 = 2000 };
+    assert { sum a 2 4 = 2000 };
+    assert { target_segment a 2000 0 2 };
+    assert { target_segment a 2000 2 4 };
+    assert { non_overlapping 0 2 2 4 };
+    assert { valid_pair a 2000 0 2 2 4 };
+    assert {
+      forall l1 u1 l2 u2: int.
+        valid_pair a 2000 l1 u1 l2 u2 ->
+        4 <= pair_total_length l1 u1 l2 u2
+    };
+    assert { minimal_total_length a 2000 4 };
+    assert { correct_result a 2000 4 }
+
+  let lemma test_011_singleton_threes () =
+    let a = init 9 [|1; 1; 1; 2; 2; 2; 3; 3; 3|] in
+    assert { length a = 9 };
+    assert { a[0] = 1 };
+    assert { a[1] = 1 };
+    assert { a[2] = 1 };
+    assert { a[3] = 2 };
+    assert { a[4] = 2 };
+    assert { a[5] = 2 };
+    assert { a[6] = 3 };
+    assert { a[7] = 3 };
+    assert { a[8] = 3 };
+    assert { sum a 6 7 = 3 };
+    assert { sum a 7 8 = 3 };
+    assert { target_segment a 3 6 7 };
+    assert { target_segment a 3 7 8 };
+    assert { non_overlapping 6 7 7 8 };
+    assert { valid_pair a 3 6 7 7 8 };
+    assert {
+      forall l1 u1 l2 u2: int.
+        valid_pair a 3 l1 u1 l2 u2 ->
+        2 <= pair_total_length l1 u1 l2 u2
+    };
+    assert { minimal_total_length a 3 2 };
+    assert { correct_result a 3 2 }
+
+end

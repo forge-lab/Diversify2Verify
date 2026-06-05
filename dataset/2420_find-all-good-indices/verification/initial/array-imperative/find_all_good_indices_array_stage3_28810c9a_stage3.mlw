@@ -1,0 +1,155 @@
+module FindAllGoodIndices_Array_Stage3_Imperative
+
+  use int.Int
+  use array.Array
+  use array.Init
+  use ref.Ref
+
+  predicate non_increasing_on (nums: array int) (lo: int) (hi: int) =
+    0 <= lo /\ lo <= hi /\ hi < length nums /\
+    forall j: int. lo <= j < hi -> nums[j] >= nums[j + 1]
+
+  predicate non_decreasing_on (nums: array int) (lo: int) (hi: int) =
+    0 <= lo /\ lo <= hi /\ hi < length nums /\
+    forall j: int. lo <= j < hi -> nums[j] <= nums[j + 1]
+
+  predicate good_index (nums: array int) (k: int) (i: int) =
+    k <= i < length nums - k /\
+    non_increasing_on nums (i - k) (i - 1) /\
+    non_decreasing_on nums (i + 1) (i + k)
+
+  predicate strictly_increasing_indices (a: array int) =
+    forall p q: int. 0 <= p < q < length a -> a[p] < a[q]
+
+  predicate result_is_good_indices
+    (nums: array int) (k: int) (result: array int) =
+    strictly_increasing_indices result /\
+    (forall p: int. 0 <= p < length result ->
+      good_index nums k result[p]) /\
+    (forall i: int. good_index nums k i ->
+      exists p: int. 0 <= p < length result /\ result[p] = i)
+
+  predicate prefix_noninc_runs
+    (nums: array int) (noninc: array int) (upto: int) =
+    length noninc = length nums /\
+    0 <= upto <= length nums /\
+    (forall i: int. 0 <= i < upto -> 1 <= noninc[i]) /\
+    (forall i len: int.
+      0 <= i < upto /\ 1 <= len <= noninc[i] /\ len <= i + 1 ->
+      non_increasing_on nums (i - len + 1) i)
+
+  predicate suffix_nondec_runs
+    (nums: array int) (nondec: array int) (from_: int) =
+    length nondec = length nums /\
+    0 <= from_ <= length nums /\
+    (forall i: int. from_ <= i < length nums -> 1 <= nondec[i]) /\
+    (forall i len: int.
+      from_ <= i < length nums /\ 1 <= len <= nondec[i] /\
+      i + len <= length nums ->
+      non_decreasing_on nums i (i + len - 1))
+
+  predicate strictly_increasing_prefix (a: array int) (m: int) =
+    0 <= m <= length a /\
+    forall p q: int. 0 <= p < q < m -> a[p] < a[q]
+
+  predicate result_prefix_represents_range
+    (nums: array int) (k: int) (result: array int) (filled: int) (upto: int) =
+    0 <= filled <= length result /\
+    k <= upto <= length nums - k /\
+    strictly_increasing_prefix result filled /\
+    (forall p: int. 0 <= p < filled -> good_index nums k result[p]) /\
+    (forall i: int. k <= i < upto /\ good_index nums k i ->
+      exists p: int. 0 <= p < filled /\ result[p] = i)
+
+  let find_all_good_indices_array (nums: array int) (k: int) : array int
+    requires { 1 <= k }
+    requires { 2 * k <= length nums }
+    ensures  { result_is_good_indices nums k result }
+  =
+    let n = length nums in
+    let noninc = make n 1 in
+    let nondec = make n 1 in
+    assert { n = length nums };
+    assert { length noninc = n };
+    assert { length nondec = n };
+    for i = 1 to n - 1 do
+      invariant { n = length nums }
+      invariant { length noninc = n }
+      invariant { length nondec = n }
+      invariant { 1 <= i <= n }
+      invariant { prefix_noninc_runs nums noninc i }
+      if nums[i - 1] >= nums[i] then
+        noninc[i] <- noninc[i - 1] + 1
+      else
+        noninc[i] <- 1
+    done;
+    assert { prefix_noninc_runs nums noninc n };
+    for i = n - 2 downto 0 do
+      invariant { n = length nums }
+      invariant { length noninc = n }
+      invariant { length nondec = n }
+      invariant { -1 <= i < n }
+      invariant { suffix_nondec_runs nums nondec (i + 1) }
+      if nums[i] <= nums[i + 1] then
+        nondec[i] <- nondec[i + 1] + 1
+      else
+        nondec[i] <- 1
+    done;
+    assert { suffix_nondec_runs nums nondec 0 };
+    let count = ref 0 in
+    for i = k to n - k - 1 do
+      invariant { n = length nums }
+      invariant { length noninc = n }
+      invariant { length nondec = n }
+      invariant { k <= i <= n - k }
+      invariant { 0 <= !count }
+      invariant { prefix_noninc_runs nums noninc n }
+      invariant { suffix_nondec_runs nums nondec 0 }
+      invariant {
+        forall j: int.
+          k <= j < i /\ noninc[j - 1] >= k /\ nondec[j + 1] >= k ->
+          good_index nums k j
+      }
+      if noninc[i - 1] >= k then
+        if nondec[i + 1] >= k then begin
+          assert { good_index nums k i };
+          count := !count + 1
+        end else
+          ()
+      else
+        ()
+    done;
+    assert { 0 <= !count };
+    let result = make !count 0 in
+    let pos = ref 0 in
+    for i = k to n - k - 1 do
+      invariant { n = length nums }
+      invariant { length noninc = n }
+      invariant { length nondec = n }
+      invariant { k <= i <= n - k }
+      invariant { 0 <= !pos <= length result }
+      invariant { !pos <= !count }
+      invariant { prefix_noninc_runs nums noninc n }
+      invariant { suffix_nondec_runs nums nondec 0 }
+      invariant { result_prefix_represents_range nums k result !pos i }
+      invariant {
+        forall j: int.
+          k <= j < i /\ noninc[j - 1] >= k /\ nondec[j + 1] >= k ->
+          good_index nums k j
+      }
+      if noninc[i - 1] >= k then
+        if nondec[i + 1] >= k then begin
+          assert { good_index nums k i };
+          result[!pos] <- i;
+          pos := !pos + 1
+        end else
+          ()
+      else
+        ()
+    done;
+    assert { !pos = length result };
+    assert { result_prefix_represents_range nums k result (length result) (n - k) };
+    assert { result_is_good_indices nums k result };
+    result
+
+end

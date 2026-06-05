@@ -1,0 +1,156 @@
+module MinimizeTheMaximumDifferenceOfPairs_List_Stage3_Imperative
+
+  use int.Int
+  use int.Abs
+  use int.EuclideanDivision
+  use list.List
+  use list.Length
+  use list.NumOcc
+  use ref.Ref
+
+  type int_pair = Pair int int
+
+  let rec function endpoint_occ_pairs (x: int) (pairs: list int_pair) : int
+    variant { pairs }
+  =
+    match pairs with
+    | Nil -> 0
+    | Cons (Pair a b) rest ->
+        (if x = a then 1 else 0) + (if x = b then 1 else 0) +
+        endpoint_occ_pairs x rest
+    end
+
+  let rec predicate pair_diffs_at_most (pairs: list int_pair) (d: int)
+    variant { pairs }
+  =
+    match pairs with
+    | Nil -> true
+    | Cons (Pair a b) rest ->
+        abs (a - b) <= d && pair_diffs_at_most rest d
+    end
+
+  predicate valid_pairing_with_bound
+    (nums: list int) (p: int) (d: int) (pairs: list int_pair) =
+    0 <= d /\
+    length pairs = p /\
+    pair_diffs_at_most pairs d /\
+    (forall x: int. endpoint_occ_pairs x pairs <= num_occ x nums)
+
+  predicate minimized_max_difference (nums: list int) (p: int) (answer: int) =
+    0 <= answer /\
+    (exists pairs: list int_pair. valid_pairing_with_bound nums p answer pairs) /\
+    (forall d: int.
+       0 <= d < answer ->
+       not (exists pairs: list int_pair. valid_pairing_with_bound nums p d pairs))
+
+  let reverse_onto (rev_prefix: list int) (suffix: list int) : list int =
+    let result = ref suffix in
+    let cur = ref rev_prefix in
+    while (match !cur with Nil -> false | Cons _ _ -> true end) do
+      invariant { 0 <= length !cur }
+      variant { length !cur }
+      match !cur with
+      | Nil -> ()
+      | Cons x xs ->
+          result := Cons x !result;
+          cur := xs
+      end
+    done;
+    !result
+
+  let insert_sorted (sorted_nums: list int) (x: int) : list int =
+    let rev_prefix = ref (Nil : list int) in
+    let cur = ref sorted_nums in
+    while (match !cur with Cons y _ -> y < x | Nil -> false end) do
+      invariant { 0 <= length !cur }
+      variant { length !cur }
+      match !cur with
+      | Nil -> ()
+      | Cons y ys ->
+          rev_prefix := Cons y !rev_prefix;
+          cur := ys
+      end
+    done;
+    reverse_onto !rev_prefix (Cons x !cur)
+
+  let sort_list (nums: list int) : list int =
+    let sorted = ref (Nil : list int) in
+    let cur = ref nums in
+    while (match !cur with Nil -> false | Cons _ _ -> true end) do
+      invariant { 0 <= length !cur }
+      variant { length !cur }
+      match !cur with
+      | Nil -> ()
+      | Cons x xs ->
+          sorted := insert_sorted !sorted x;
+          cur := xs
+      end
+    done;
+    !sorted
+
+  let last_of_sorted (sorted_nums: list int) : int =
+    match sorted_nums with
+    | Nil -> 0
+    | Cons first rest ->
+        let last = ref first in
+        let cur = ref rest in
+        while (match !cur with Nil -> false | Cons _ _ -> true end) do
+          invariant { 0 <= length !cur }
+          variant { length !cur }
+          match !cur with
+          | Nil -> ()
+          | Cons x xs ->
+              last := x;
+              cur := xs
+          end
+        done;
+        !last
+    end
+
+  let count_pairs_with_bound (sorted_nums: list int) (d: int) : int =
+    let count = ref 0 in
+    let cur = ref sorted_nums in
+    while (match !cur with Cons _ (Cons _ _) -> true | _ -> false end) do
+      invariant { 0 <= length !cur }
+      invariant { 0 <= !count }
+      variant { length !cur }
+      match !cur with
+      | Cons x (Cons y ys) ->
+          if y - x <= d then begin
+            count := !count + 1;
+            cur := ys
+          end else
+            cur := Cons y ys
+      | _ -> ()
+      end
+    done;
+    !count
+
+  let minimize_the_maximum_difference_of_pairs_list (nums: list int) (p: int) : int
+    requires { 0 <= p }
+    requires { 2 * p <= length nums }
+    ensures  { minimized_max_difference nums p result }
+  =
+    if p <= 0 then
+      0
+    else
+      let sorted_nums = sort_list nums in
+      match sorted_nums with
+      | Nil -> 0
+      | Cons first _ ->
+          let low = ref 0 in
+          let high = ref (last_of_sorted sorted_nums - first) in
+          while !low < !high do
+            invariant { 0 <= !low }
+            invariant { !low <= !high }
+            variant { !high - !low }
+            let mid = !low + div (!high - !low) 2 in
+            if count_pairs_with_bound sorted_nums mid >= p then
+              high := mid
+            else
+              low := mid + 1
+          done;
+          !low
+      end
+
+end

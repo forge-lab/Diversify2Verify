@@ -1,0 +1,164 @@
+module MinimizeTheMaximumDifferenceOfPairs_Array_Stage3_Imperative
+
+  use int.Int
+  use int.Abs
+  use int.EuclideanDivision
+  use array.Array
+  use array.Init
+  use ref.Ref
+
+  predicate pair_within_threshold (nums: array int) (d: int) (i: int) (j: int) =
+    0 <= i < j < length nums /\ abs (nums[i] - nums[j]) <= d
+
+  predicate pair_arrays_disjoint (lefts: array int) (rights: array int) (p: int) =
+    forall k l: int.
+      0 <= k < p -> 0 <= l < p -> k <> l ->
+        lefts[k] <> lefts[l] /\
+        lefts[k] <> rights[l] /\
+        rights[k] <> lefts[l] /\
+        rights[k] <> rights[l]
+
+  predicate valid_pair_selection
+    (nums: array int) (p: int) (d: int) (lefts: array int) (rights: array int) =
+    0 <= p /\
+    0 <= d /\
+    length lefts = p /\
+    length rights = p /\
+    (forall k: int. 0 <= k < p -> pair_within_threshold nums d lefts[k] rights[k]) /\
+    pair_arrays_disjoint lefts rights p
+
+  predicate feasible_threshold (nums: array int) (p: int) (d: int) =
+    0 <= p /\
+    0 <= d /\
+    (p = 0 \/
+     exists lefts rights: array int. valid_pair_selection nums p d lefts rights)
+
+  predicate optimal_max_difference (nums: array int) (p: int) (r: int) =
+    0 <= r /\
+    feasible_threshold nums p r /\
+    (forall d: int. feasible_threshold nums p d -> r <= d)
+
+  predicate same_values (src: array int) (dst: array int) =
+    length src = length dst /\
+    forall i: int. 0 <= i < length src -> dst[i] = src[i]
+
+  predicate sorted_non_decreasing (a: array int) =
+    forall i j: int. 0 <= i <= j < length a -> a[i] <= a[j]
+
+  exception InsertionPoint
+
+  let copy_array (nums: array int) : array int
+    ensures { length result = length nums }
+    ensures { same_values nums result }
+  =
+    let n = length nums in
+    let result = make n 0 in
+    for i = 0 to n - 1 do
+      invariant { length result = n }
+      invariant { forall k: int. 0 <= k < i -> result[k] = nums[k] }
+      result[i] <- nums[i]
+    done;
+    result
+
+  let insertion_sort (nums: array int) : unit
+    ensures { length nums = old (length nums) }
+    ensures { sorted_non_decreasing nums }
+  =
+    let n = length nums in
+    if n >= 2 then
+      for i = 1 to n - 1 do
+        invariant { 1 <= i <= n }
+        invariant { length nums = n }
+        invariant { forall k l: int. 0 <= k <= l < i -> nums[k] <= nums[l] }
+        let key = nums[i] in
+        let j = ref (i - 1) in
+        try
+          while !j >= 0 do
+            invariant { -1 <= !j < i }
+            invariant { length nums = n }
+            variant { !j + 1 }
+            if nums[!j] > key then begin
+              nums[!j + 1] <- nums[!j];
+              j := !j - 1
+            end else
+              raise InsertionPoint
+          done
+        with InsertionPoint ->
+          ()
+        end;
+        assert { -1 <= !j < i };
+        nums[!j + 1] <- key
+      done
+    else
+      assert { sorted_non_decreasing nums }
+
+  let sort_array (nums: array int) : array int
+    ensures { length result = length nums }
+    ensures { sorted_non_decreasing result }
+  =
+    let sorted = copy_array nums in
+    insertion_sort sorted;
+    sorted
+
+  let count_pairs_with_bound (sorted_nums: array int) (d: int) : int
+    requires { sorted_non_decreasing sorted_nums }
+    requires { 0 <= d }
+    ensures  { 0 <= result }
+    ensures  { result <= div (length sorted_nums) 2 }
+  =
+    let n = length sorted_nums in
+    let count = ref 0 in
+    let i = ref 0 in
+    while !i + 1 < n do
+      invariant { 0 <= !i <= n }
+      invariant { 0 <= !count }
+      invariant { 2 * !count <= !i }
+      invariant { !count <= div n 2 }
+      variant { n - !i }
+      if sorted_nums[!i + 1] - sorted_nums[!i] <= d then begin
+        count := !count + 1;
+        i := !i + 2
+      end else
+        i := !i + 1
+    done;
+    !count
+
+  let minimize_the_maximum_difference_of_pairs_array (nums: array int) (p: int) : int
+    requires { 1 <= length nums }
+    requires { 0 <= p }
+    requires { 2 * p <= length nums }
+    requires { forall i: int. 0 <= i < length nums -> 0 <= nums[i] <= 1000000000 }
+    ensures  { optimal_max_difference nums p result }
+  =
+    if p <= 0 then begin
+      assert { p = 0 };
+      assert { feasible_threshold nums p 0 };
+      assert { forall d: int. feasible_threshold nums p d -> 0 <= d };
+      0
+    end else begin
+      assert { 0 < p };
+      let sorted_nums = sort_array nums in
+      let n = length sorted_nums in
+      assert { n = length nums };
+      assert { 1 <= n };
+      let low = ref 0 in
+      let high = ref (sorted_nums[n - 1] - sorted_nums[0]) in
+      assert { 0 <= !low };
+      while !low < !high do
+        invariant { 0 <= !low <= !high }
+        invariant { sorted_non_decreasing sorted_nums }
+        invariant { length sorted_nums = n }
+        variant { !high - !low }
+        let mid = !low + div (!high - !low) 2 in
+        assert { !low <= mid <= !high };
+        if count_pairs_with_bound sorted_nums mid >= p then
+          high := mid
+        else
+          low := mid + 1
+      done;
+      assert { !low = !high };
+      assert { 0 <= !low };
+      !low
+    end
+
+end

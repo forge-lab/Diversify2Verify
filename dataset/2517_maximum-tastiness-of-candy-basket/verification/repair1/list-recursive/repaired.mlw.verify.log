@@ -1,0 +1,177 @@
+== Stage 1: first prover on whole file ==
+Running in /Users/rubenm/Desktop/Diversify2Verify/codex-runs/dataset-merge-verification/stage3a-repair/2517_maximum-tastiness-of-candy-basket/list-recursive/maximum_tastiness_of_candy_basket_list_stage3_c60ac5e8_stage3/generated/why3: why3 session create -o /Users/rubenm/Desktop/Diversify2Verify/codex-runs/dataset-merge-verification/stage3a-repair/2517_maximum-tastiness-of-candy-basket/list-recursive/maximum_tastiness_of_candy_basket_list_stage3_c60ac5e8_stage3/generated/why3/.why3_sessions/repaired_stage1 -P Z3,4.8.6 -t 10 -m 8192 repaired.mlw
+Session created successfully
+Running in /Users/rubenm/Desktop/Diversify2Verify/codex-runs/dataset-merge-verification/stage3a-repair/2517_maximum-tastiness-of-candy-basket/list-recursive/maximum_tastiness_of_candy_basket_list_stage3_c60ac5e8_stage3/generated/why3: why3 bench /Users/rubenm/Desktop/Diversify2Verify/codex-runs/dataset-merge-verification/stage3a-repair/2517_maximum-tastiness-of-candy-basket/list-recursive/maximum_tastiness_of_candy_basket_list_stage3_c60ac5e8_stage3/generated/why3/.why3_sessions/repaired_stage1
+Progress: 8/1/0                       Progress: 7/2/0                       Progress: 6/3/0                       Progress: 5/4/0                       Progress: 4/5/0                       Progress: 3/6/0                       Progress: 3/0/0                       Progress: 2/1/0                       Progress: 1/2/0                       Progress: 0/3/0                       Progress: 0/0/2                       
+Replay completed, saving session... done
+== Stage 1 stats ==
+= Statistics for session /Users/rubenm/Desktop/Diversify2Verify/codex-runs/dataset-merge-verification/stage3a-repair/2517_maximum-tastiness-of-candy-basket/list-recursive/maximum_tastiness_of_candy_basket_list_stage3_c60ac5e8_stage3/generated/why3/.why3_sessions/repaired_stage1
+
+== Number of root goals ==
+  total: 9  proved: 7
+
+== Number of sub goals ==
+  total: 0  proved: 0
+
+== Goals not proved ==
+  +-- file [../../repaired.mlw]
+    +-- theory MaximumTastinessOfCandyBasket_List_Spec
+      +-- goal maximum_tastiness_search_spec'vc
+      +-- goal maximum_tastiness_of_candy_basket_list'vc
+  
+== Goals proved by only one prover ==
+  +-- file [../../repaired.mlw]
+    +-- theory MaximumTastinessOfCandyBasket_List_Spec
+      +-- goal spaced_from'vc: Z3 4.8.6
+      +-- goal pairwise_spaced'vc: Z3 4.8.6
+      +-- goal insert_sorted'vc: Z3 4.8.6
+      +-- goal sort_list'vc: Z3 4.8.6
+      +-- goal last_value_from'vc: Z3 4.8.6
+      +-- goal can_pick_from'vc: Z3 4.8.6
+      +-- goal search_best'vc: Z3 4.8.6
+  
+1 session(s) read, with a total of 9 proof goals.
+== Unproved root goals after first prover ==
+MaximumTastinessOfCandyBasket_List_Spec	maximum_tastiness_search_spec'vc
+MaximumTastinessOfCandyBasket_List_Spec	maximum_tastiness_of_candy_basket_list'vc
+== Stage 1: trying remaining goals with prover Alt-Ergo,2.4.0 ==
+---- stage1 | prover: Alt-Ergo,2.4.0 | theory: MaximumTastinessOfCandyBasket_List_Spec | goal: maximum_tastiness_search_spec'vc ----
+File repaired.mlw:
+Goal maximum_tastiness_search_spec'vc.
+Prover result is: Timeout (10.00s, 114178 steps).
+---- stage1 | prover: Alt-Ergo,2.4.0 | theory: MaximumTastinessOfCandyBasket_List_Spec | goal: maximum_tastiness_of_candy_basket_list'vc ----
+File repaired.mlw:
+Goal maximum_tastiness_of_candy_basket_list'vc.
+Prover result is: Timeout (10.00s, 848141 steps).
+Remaining after prover Alt-Ergo,2.4.0: 2
+== Stage 1: trying remaining goals with prover CVC4,1.8 ==
+---- stage1 | prover: CVC4,1.8 | theory: MaximumTastinessOfCandyBasket_List_Spec | goal: maximum_tastiness_search_spec'vc ----
+File repaired.mlw:
+Goal maximum_tastiness_search_spec'vc.
+Prover result is: Timeout (10.00s, 427013 steps).
+---- stage1 | prover: CVC4,1.8 | theory: MaximumTastinessOfCandyBasket_List_Spec | goal: maximum_tastiness_of_candy_basket_list'vc ----
+File repaired.mlw:
+Goal maximum_tastiness_of_candy_basket_list'vc.
+Prover result is: Valid (9.69s, 504009 steps).
+Solved in stage 1 using prover: CVC4,1.8
+Remaining after prover CVC4,1.8: 1
+== Goals still unproved after stage 1 ==
+MaximumTastinessOfCandyBasket_List_Spec	maximum_tastiness_search_spec'vc
+== Stage 2: split_vc on unproved goal ==
+Target theory: MaximumTastinessOfCandyBasket_List_Spec
+Target goal  : maximum_tastiness_search_spec'vc
+---- stage2 | prover: Z3,4.8.6 | theory: MaximumTastinessOfCandyBasket_List_Spec | goal: maximum_tastiness_search_spec'vc ----
+Transforms: split_vc
+File "repaired.mlw", line 114, characters 13-19:
+Sub-goal Unreachable point of goal maximum_tastiness_search_spec'vc.
+Prover result is: Valid (0.01s, 2808 steps).
+
+File "repaired.mlw", line 116, characters 17-48:
+Sub-goal Assertion of goal maximum_tastiness_search_spec'vc.
+Prover result is: Valid (0.01s, 2875 steps).
+
+File "repaired.mlw", line 118, character 10 to line 119, character 84:
+Sub-goal Assertion of goal maximum_tastiness_search_spec'vc.
+Prover result is: Timeout (10.00s, 35342120 steps).
+
+File "repaired.mlw", line 123, characters 12-87:
+Sub-goal Assertion of goal maximum_tastiness_search_spec'vc.
+Prover result is: Timeout (10.00s, 34941860 steps).
+
+File "repaired.mlw", line 126, character 10 to line 127, character 84:
+Sub-goal Assertion of goal maximum_tastiness_search_spec'vc.
+Prover result is: Valid (0.01s, 49385 steps).
+
+File "repaired.mlw", line 105, character 6 to line 110, character 9:
+Sub-goal Postcondition of goal maximum_tastiness_search_spec'vc.
+Prover result is: Valid (0.01s, 46450 steps).
+---- stage2 | prover: Alt-Ergo,2.4.0 | theory: MaximumTastinessOfCandyBasket_List_Spec | goal: maximum_tastiness_search_spec'vc ----
+Transforms: split_vc
+File "repaired.mlw", line 114, characters 13-19:
+Sub-goal Unreachable point of goal maximum_tastiness_search_spec'vc.
+Prover result is: Valid (0.01s, 10 steps).
+
+File "repaired.mlw", line 116, characters 17-48:
+Sub-goal Assertion of goal maximum_tastiness_search_spec'vc.
+Prover result is: Valid (0.01s, 12 steps).
+
+File "repaired.mlw", line 118, character 10 to line 119, character 84:
+Sub-goal Assertion of goal maximum_tastiness_search_spec'vc.
+Prover result is: Timeout (10.00s, 123638 steps).
+
+File "repaired.mlw", line 123, characters 12-87:
+Sub-goal Assertion of goal maximum_tastiness_search_spec'vc.
+Prover result is: Timeout (10.00s, 166250 steps).
+
+File "repaired.mlw", line 126, character 10 to line 127, character 84:
+Sub-goal Assertion of goal maximum_tastiness_search_spec'vc.
+Prover result is: Valid (0.01s, 141 steps).
+
+File "repaired.mlw", line 105, character 6 to line 110, character 9:
+Sub-goal Postcondition of goal maximum_tastiness_search_spec'vc.
+Prover result is: Valid (0.01s, 31 steps).
+---- stage2 | prover: CVC4,1.8 | theory: MaximumTastinessOfCandyBasket_List_Spec | goal: maximum_tastiness_search_spec'vc ----
+Transforms: split_vc
+File "repaired.mlw", line 114, characters 13-19:
+Sub-goal Unreachable point of goal maximum_tastiness_search_spec'vc.
+Prover result is: Valid (0.03s, 8966 steps).
+
+File "repaired.mlw", line 116, characters 17-48:
+Sub-goal Assertion of goal maximum_tastiness_search_spec'vc.
+Prover result is: Valid (0.02s, 9170 steps).
+
+File "repaired.mlw", line 118, character 10 to line 119, character 84:
+Sub-goal Assertion of goal maximum_tastiness_search_spec'vc.
+Prover result is: Timeout (10.00s, 327958 steps).
+
+File "repaired.mlw", line 123, characters 12-87:
+Sub-goal Assertion of goal maximum_tastiness_search_spec'vc.
+Prover result is: Timeout (10.00s, 1016816 steps).
+
+File "repaired.mlw", line 126, character 10 to line 127, character 84:
+Sub-goal Assertion of goal maximum_tastiness_search_spec'vc.
+Prover result is: Valid (0.04s, 12956 steps).
+
+File "repaired.mlw", line 105, character 6 to line 110, character 9:
+Sub-goal Postcondition of goal maximum_tastiness_search_spec'vc.
+Prover result is: Valid (0.04s, 14908 steps).
+== Goals still unproved after stage 2 (split_vc) ==
+MaximumTastinessOfCandyBasket_List_Spec	maximum_tastiness_search_spec'vc
+== Stage 3: split_vc + inline_all on still-unproved goal ==
+Target theory: MaximumTastinessOfCandyBasket_List_Spec
+Target goal  : maximum_tastiness_search_spec'vc
+---- stage3 | prover: Z3,4.8.6 | theory: MaximumTastinessOfCandyBasket_List_Spec | goal: maximum_tastiness_search_spec'vc ----
+Transforms: split_vc inline_all
+File "repaired.mlw", line 114, characters 13-19:
+Sub-goal Unreachable point of goal maximum_tastiness_search_spec'vc.
+Prover result is: Valid (0.01s, 3162 steps).
+
+File "repaired.mlw", line 116, characters 17-48:
+Sub-goal Assertion of goal maximum_tastiness_search_spec'vc.
+Prover result is: Valid (0.01s, 3241 steps).
+
+File "repaired.mlw", line 118, character 10 to line 119, character 84:
+Sub-goal Assertion of goal maximum_tastiness_search_spec'vc.
+Prover result is: Timeout (10.00s, 34944314 steps).
+
+File "repaired.mlw", line 123, characters 12-87:
+Sub-goal Assertion of goal maximum_tastiness_search_spec'vc.
+Prover result is: Timeout (10.00s, 35074988 steps).
+
+File "repaired.mlw", line 126, character 10 to line 127, character 84:
+Sub-goal Assertion of goal maximum_tastiness_search_spec'vc.
+Prover result is: Valid (0.01s, 5838 steps).
+Infrastructure issue in stage 3 with prover Z3,4.8.6; aborting rest of stage 3.
+== Final summary ==
+Unproved root goals after first prover : 1
+Remaining failures after split_vc      : 1
+Remaining failures after stage 3       : 1
+Detailed logs stored in                : /Users/rubenm/Desktop/Diversify2Verify/codex-runs/dataset-merge-verification/stage3a-repair/2517_maximum-tastiness-of-candy-basket/list-recursive/maximum_tastiness_of_candy_basket_list_stage3_c60ac5e8_stage3/generated/why3/.why3_sessions/repaired_logs
+Still unproved goals:
+MaximumTastinessOfCandyBasket_List_Spec	maximum_tastiness_search_spec'vc
+VERIFY_RESULT: FAILURE
+VERIFY_REASON: unproved_goals_remain
+VERIFY_STAGE: stage3
+VERIFY_ROOT_TOTAL: 9
+VERIFY_ROOT_PROVED: 8
+VERIFY_ROOT_REMAINING: 1

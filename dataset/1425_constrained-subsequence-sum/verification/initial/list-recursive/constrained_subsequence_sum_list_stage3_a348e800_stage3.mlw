@@ -1,0 +1,64 @@
+module ConstrainedSubsequenceSum_List_Spec
+
+  use int.Int
+  use list.List
+  use list.Length
+
+  let rec predicate constrained_tail_sum (nums: list int) (k: int) (gap: int) (s: int)
+    variant { nums }
+  =
+    match nums with
+    | Nil -> s = 0
+    | Cons x xs ->
+        s = 0 ||
+        (gap > 0 && constrained_tail_sum xs k k (s - x)) ||
+        (gap > 0 && constrained_tail_sum xs k (gap - 1) s)
+    end
+
+  let rec predicate constrained_nonempty_sum (nums: list int) (k: int) (s: int)
+    variant { nums }
+  =
+    match nums with
+    | Nil -> false
+    | Cons x xs ->
+        constrained_tail_sum xs k k (s - x) ||
+        constrained_nonempty_sum xs k s
+    end
+
+  predicate is_constrained_max_sum (nums: list int) (k: int) (m: int) =
+    constrained_nonempty_sum nums k m /\
+    (forall s: int. constrained_nonempty_sum nums k s -> s <= m)
+
+  let rec max_recent_or_zero (recent: list int) (remaining: int) : int
+    variant { recent }
+  =
+    if remaining <= 0 then 0 else
+    match recent with
+    | Nil -> 0
+    | Cons x xs ->
+        let tail_best = max_recent_or_zero xs (remaining - 1) in
+        if x > tail_best then x else tail_best
+    end
+
+  let rec solve (nums: list int) (k: int) (recent: list int) (best: int) : int
+    variant { nums }
+  =
+    match nums with
+    | Nil -> best
+    | Cons x xs ->
+        let candidate = x + max_recent_or_zero recent k in
+        let next_best = if candidate > best then candidate else best in
+        solve xs k (Cons candidate recent) next_best
+    end
+
+  let constrained_subsequence_sum_list (nums: list int) (k: int) : int
+    requires { nums <> Nil }
+    requires { 1 <= k <= length nums }
+    ensures  { is_constrained_max_sum nums k result }
+  =
+    match nums with
+    | Nil -> absurd
+    | Cons x xs -> solve xs k (Cons x Nil) x
+    end
+
+end

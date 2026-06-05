@@ -1,0 +1,156 @@
+module WaysToSplitArrayIntoThreeSubarrays_Array_Imperative
+
+  use int.Int
+  use int.EuclideanDivision
+  use array.Array
+  use array.Init
+  use ref.Ref
+
+  let ways_to_split_array_into_three_subarrays_array (nums: array int) : int =
+    let n = length nums in
+    if n < 3 then 0 else
+    let prefix = make (n + 1) 0 in
+    for i = 0 to n - 1 do
+      prefix[i + 1] <- prefix[i] + nums[i]
+    done;
+    let count = ref 0 in
+    for i = 1 to n - 2 do
+      for j = i + 1 to n - 1 do
+        let left_sum = prefix[i] in
+        let mid_sum = prefix[j] - prefix[i] in
+        let right_sum = prefix[n] - prefix[j] in
+        if left_sum <= mid_sum then
+          if mid_sum <= right_sum then
+            count := !count + 1
+      done
+    done;
+    mod (!count) 1000000007
+
+  let check_case (nums: array int) (expected: int) : bool =
+    let r = ways_to_split_array_into_three_subarrays_array nums in
+    r = expected
+
+  let test_000 () : bool =
+    let nums = init 3 [|10000; 10000; 10000|] in
+    check_case nums 1
+
+  let test_001 () : bool =
+    let nums = init 9 [|1; 2; 3; 4; 5; 6; 7; 8; 9|] in
+    check_case nums 12
+
+  let test_002 () : bool =
+    let nums = init 10 [|1; 3; 2; 3; 1; 1; 1; 3; 2; 3|] in
+    check_case nums 9
+
+  let test_003 () : bool =
+    let nums = init 5 [|9; 4; 2; 5; 1|] in
+    check_case nums 0
+
+  let test_004 () : bool =
+    let nums = init 10 [|10; 10; 10; 10; 10; 10; 10; 10; 10; 10|] in
+    check_case nums 8
+
+  let test_005 () : bool =
+    let nums = init 10 [|1; 1; 2; 2; 3; 3; 4; 4; 5; 5|] in
+    check_case nums 15
+
+  let test_006 () : bool =
+    let nums = init 8 [|1; 3; 2; 4; 1; 2; 3; 4|] in
+    check_case nums 6
+
+  let test_007 () : bool =
+    let nums = init 3 [|1; 1; 1|] in
+    check_case nums 1
+
+  let test_008 () : bool =
+    let nums = init 10 [|5; 5; 5; 5; 5; 5; 5; 5; 5; 5|] in
+    check_case nums 8
+
+  let test_009 () : bool =
+    let nums = init 4 [|10; 4; -8; 7|] in
+    check_case nums 0
+
+  let test_010 () : bool =
+    let nums = init 5 [|10; 10; 10; 10; 10|] in
+    check_case nums 2
+
+  let test_011 () : bool =
+    let nums = init 5 [|1; 3; 1; 1; 2|] in
+    check_case nums 1
+
+  let test_012 () : bool =
+    let nums = init 3 [|3; 2; 1|] in
+    check_case nums 0
+
+  let test_013 () : bool =
+    let nums = init 5 [|0; 0; 0; 0; 0|] in
+    check_case nums 6
+
+  let test_014 () : bool =
+    let nums = init 6 [|1; 2; 2; 2; 5; 0|] in
+    check_case nums 3
+
+  let test_015 () : bool =
+    let nums = init 9 [|9; 8; 7; 6; 5; 4; 3; 2; 1|] in
+    check_case nums 1
+
+  let test_016 () : bool =
+    let nums = init 10 [|1; 0; 0; 0; 0; 0; 0; 0; 0; 2|] in
+    check_case nums 0
+
+  let test_017 () : bool =
+    let nums = init 6 [|1; 3; 2; 2; 1; 1|] in
+    check_case nums 1
+
+  let test_018 () : bool =
+    let nums = init 30 [|1; 1; 2; 2; 3; 3; 4; 4; 5; 5; 6; 6; 7; 7; 8; 8; 9; 9; 10; 10; 11; 11; 12; 12; 13; 13; 14; 14; 15; 15|] in
+    check_case nums 160
+
+  let test_019 () : bool =
+    let nums = init 30 [|10; 9; 8; 7; 6; 5; 4; 3; 2; 1; 1; 2; 3; 4; 5; 6; 7; 8; 9; 10; 1; 2; 3; 4; 5; 6; 7; 8; 9; 10|] in
+    check_case nums 50
+
+  let run_tests () : bool =
+    if test_000 () then
+    if test_001 () then
+    if test_002 () then
+    if test_003 () then
+    if test_004 () then
+    if test_005 () then
+    if test_006 () then
+    if test_007 () then
+    if test_008 () then
+    if test_009 () then
+    if test_010 () then
+    if test_011 () then
+    if test_012 () then
+    if test_013 () then
+    if test_014 () then
+    if test_015 () then
+    if test_016 () then
+    if test_017 () then
+    if test_018 () then
+    if test_019 () then
+      true
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+
+end

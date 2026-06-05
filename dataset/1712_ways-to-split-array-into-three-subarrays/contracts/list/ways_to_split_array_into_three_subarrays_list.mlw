@@ -1,0 +1,141 @@
+module WaysToSplitArrayIntoThreeSubarrays_List_Spec
+
+  use int.Int
+  use int.EuclideanDivision
+  use list.List
+  use list.Length
+  use list.Append
+  use list.Sum
+
+  function split_modulus : int = 1000000007
+
+  let rec predicate nonnegative_list (nums: list int)
+    variant { nums }
+  =
+    match nums with
+    | Nil -> true
+    | Cons x xs -> 0 <= x && nonnegative_list xs
+    end
+
+  predicate good_split_parts (left: list int) (mid: list int) (right: list int) =
+    left <> Nil /\
+    mid <> Nil /\
+    right <> Nil /\
+    sum left <= sum mid /\
+    sum mid <= sum right
+
+  let function good_split_indicator (left: list int) (mid: list int) (right: list int) : int =
+    if sum left <= sum mid && sum mid <= sum right then 1 else 0
+
+  let rec function count_mid_splits (left: list int) (mid: list int) (right: list int) : int
+    variant { right }
+  =
+    match right with
+    | Nil -> 0
+    | Cons x xs ->
+        good_split_indicator left mid right +
+        count_mid_splits left (mid ++ Cons x Nil) xs
+    end
+
+  let rec function count_left_splits (left: list int) (remaining: list int) : int
+    variant { remaining }
+  =
+    match remaining with
+    | Nil -> 0
+    | Cons x xs ->
+        count_mid_splits left (Cons x Nil) xs +
+        count_left_splits (left ++ Cons x Nil) xs
+    end
+
+  let function count_good_splits (nums: list int) : int =
+    match nums with
+    | Nil -> 0
+    | Cons x xs -> count_left_splits (Cons x Nil) xs
+    end
+
+  val ways_to_split_array_into_three_subarrays_list (nums: list int) : int
+    requires { length nums >= 3 }
+    requires { nonnegative_list nums }
+    ensures  { result = mod (count_good_splits nums) split_modulus }
+
+  let lemma check_test_000 () =
+    let l = Cons 10000 (Cons 10000 (Cons 10000 Nil)) in
+    assert { nonnegative_list l };
+    assert { good_split_parts (Cons 10000 Nil) (Cons 10000 Nil) (Cons 10000 Nil) };
+    assert { good_split_indicator (Cons 10000 Nil) (Cons 10000 Nil) (Cons 10000 Nil) = 1 };
+    assert { count_mid_splits (Cons 10000 Nil) (Cons 10000 Nil) (Cons 10000 Nil) = 1 };
+    assert { count_left_splits (Cons 10000 Nil) (Cons 10000 (Cons 10000 Nil)) = 1 };
+    assert { count_good_splits l = 1 };
+    assert { mod (count_good_splits l) split_modulus = 1 }
+
+  let lemma check_test_004 () =
+    let l =
+      Cons 10 (Cons 10 (Cons 10 (Cons 10 (Cons 10
+        (Cons 10 (Cons 10 (Cons 10 (Cons 10 (Cons 10 Nil))))))))) in
+    assert { nonnegative_list l };
+    assert { good_split_parts (Cons 10 Nil) (Cons 10 Nil)
+      (Cons 10 (Cons 10 (Cons 10 (Cons 10 (Cons 10 (Cons 10 (Cons 10 (Cons 10 Nil)))))))) };
+    assert { count_mid_splits
+      (Cons 10 Nil)
+      (Cons 10 Nil)
+      (Cons 10 (Cons 10 (Cons 10 (Cons 10 (Cons 10 (Cons 10 (Cons 10 (Cons 10 Nil)))))))) = 4 };
+    assert { count_left_splits
+      (Cons 10 Nil)
+      (Cons 10 (Cons 10 (Cons 10 (Cons 10 (Cons 10 (Cons 10 (Cons 10 (Cons 10 (Cons 10 Nil))))))))) = 8 };
+    assert { count_good_splits l = 8 };
+    assert { mod (count_good_splits l) split_modulus = 8 }
+
+  let lemma check_test_007 () =
+    let l = Cons 1 (Cons 1 (Cons 1 Nil)) in
+    assert { nonnegative_list l };
+    assert { good_split_parts (Cons 1 Nil) (Cons 1 Nil) (Cons 1 Nil) };
+    assert { count_mid_splits (Cons 1 Nil) (Cons 1 Nil) (Cons 1 Nil) = 1 };
+    assert { count_left_splits (Cons 1 Nil) (Cons 1 (Cons 1 Nil)) = 1 };
+    assert { count_good_splits l = 1 };
+    assert { mod (count_good_splits l) split_modulus = 1 }
+
+  let lemma check_test_011 () =
+    let l = Cons 1 (Cons 3 (Cons 1 (Cons 1 (Cons 2 Nil)))) in
+    assert { nonnegative_list l };
+    assert { good_split_parts (Cons 1 Nil) (Cons 3 Nil) (Cons 1 (Cons 1 (Cons 2 Nil))) };
+    assert { not (good_split_parts (Cons 1 Nil) (Cons 3 (Cons 1 Nil)) (Cons 1 (Cons 2 Nil))) };
+    assert { count_mid_splits (Cons 1 Nil) (Cons 3 Nil) (Cons 1 (Cons 1 (Cons 2 Nil))) = 1 };
+    assert { count_left_splits (Cons 1 Nil) (Cons 3 (Cons 1 (Cons 1 (Cons 2 Nil)))) = 1 };
+    assert { count_good_splits l = 1 };
+    assert { mod (count_good_splits l) split_modulus = 1 }
+
+  let lemma check_test_012 () =
+    let l = Cons 3 (Cons 2 (Cons 1 Nil)) in
+    assert { nonnegative_list l };
+    assert { not (good_split_parts (Cons 3 Nil) (Cons 2 Nil) (Cons 1 Nil)) };
+    assert { good_split_indicator (Cons 3 Nil) (Cons 2 Nil) (Cons 1 Nil) = 0 };
+    assert { count_mid_splits (Cons 3 Nil) (Cons 2 Nil) (Cons 1 Nil) = 0 };
+    assert { count_left_splits (Cons 3 Nil) (Cons 2 (Cons 1 Nil)) = 0 };
+    assert { count_good_splits l = 0 };
+    assert { mod (count_good_splits l) split_modulus = 0 }
+
+  let lemma check_test_013 () =
+    let l = Cons 0 (Cons 0 (Cons 0 (Cons 0 (Cons 0 Nil)))) in
+    assert { nonnegative_list l };
+    assert { good_split_parts (Cons 0 Nil) (Cons 0 Nil) (Cons 0 (Cons 0 (Cons 0 Nil))) };
+    assert { good_split_parts (Cons 0 (Cons 0 Nil)) (Cons 0 Nil) (Cons 0 (Cons 0 Nil)) };
+    assert { good_split_parts (Cons 0 (Cons 0 (Cons 0 Nil))) (Cons 0 Nil) (Cons 0 Nil) };
+    assert { count_mid_splits (Cons 0 Nil) (Cons 0 Nil) (Cons 0 (Cons 0 (Cons 0 Nil))) = 3 };
+    assert { count_mid_splits (Cons 0 (Cons 0 Nil)) (Cons 0 Nil) (Cons 0 (Cons 0 Nil)) = 2 };
+    assert { count_mid_splits (Cons 0 (Cons 0 (Cons 0 Nil))) (Cons 0 Nil) (Cons 0 Nil) = 1 };
+    assert { count_good_splits l = 6 };
+    assert { mod (count_good_splits l) split_modulus = 6 }
+
+  let lemma check_test_014 () =
+    let l = Cons 1 (Cons 2 (Cons 2 (Cons 2 (Cons 5 (Cons 0 Nil))))) in
+    assert { nonnegative_list l };
+    assert { good_split_parts (Cons 1 Nil) (Cons 2 Nil) (Cons 2 (Cons 2 (Cons 5 (Cons 0 Nil)))) };
+    assert { good_split_parts (Cons 1 Nil) (Cons 2 (Cons 2 Nil)) (Cons 2 (Cons 5 (Cons 0 Nil))) };
+    assert { good_split_parts (Cons 1 (Cons 2 Nil)) (Cons 2 (Cons 2 Nil)) (Cons 5 (Cons 0 Nil)) };
+    assert { count_mid_splits (Cons 1 Nil) (Cons 2 Nil) (Cons 2 (Cons 2 (Cons 5 (Cons 0 Nil)))) = 2 };
+    assert { count_mid_splits (Cons 1 (Cons 2 Nil)) (Cons 2 Nil) (Cons 2 (Cons 5 (Cons 0 Nil))) = 1 };
+    assert { count_left_splits (Cons 1 Nil) (Cons 2 (Cons 2 (Cons 2 (Cons 5 (Cons 0 Nil))))) = 3 };
+    assert { count_good_splits l = 3 };
+    assert { mod (count_good_splits l) split_modulus = 3 }
+
+end

@@ -1,0 +1,171 @@
+module SumOfDistances_Array_Imperative_Implementation
+
+  use int.Int
+  use int.Abs
+  use array.Array
+  use array.Init
+  use ref.Ref
+
+  exception ArraysDiffer
+
+  let sum_of_distances_array (nums: array int) : array int =
+    let n = length nums in
+    let result = make n 0 in
+    if n > 0 then
+      for i = 0 to n - 1 do
+        let total = ref 0 in
+        for j = 0 to n - 1 do
+          if i <> j then
+            if nums[j] = nums[i] then
+              total := !total + abs (i - j)
+        done;
+        result[i] <- !total
+      done;
+    result
+
+  let arrays_equal (a: array int) (b: array int) : bool =
+    let n = length a in
+    if n <> length b then
+      false
+    else if n = 0 then
+      true
+    else
+      try
+        for i = 0 to n - 1 do
+          if a[i] <> b[i] then
+            raise ArraysDiffer
+        done;
+        true
+      with ArraysDiffer ->
+        false
+      end
+
+  let check_case (nums: array int) (expected: array int) : bool =
+    let result = sum_of_distances_array nums in
+    arrays_equal result expected
+
+  let test_000 () : bool =
+    let nums = init 3 [|0; 5; 3|] in
+    let expected = init 3 [|0; 0; 0|] in
+    check_case nums expected
+
+  let test_001 () : bool =
+    let nums = init 10 [|1; 2; 3; 4; 5; 1; 2; 3; 4; 5|] in
+    let expected = init 10 [|5; 5; 5; 5; 5; 5; 5; 5; 5; 5|] in
+    check_case nums expected
+
+  let test_002 () : bool =
+    let nums = init 1 [|1|] in
+    let expected = init 1 [|0|] in
+    check_case nums expected
+
+  let test_003 () : bool =
+    let nums = init 4 [|10; 10; 10; 10|] in
+    let expected = init 4 [|6; 4; 4; 6|] in
+    check_case nums expected
+
+  let test_004 () : bool =
+    let nums = init 5 [|5; 4; 3; 2; 1|] in
+    let expected = init 5 [|0; 0; 0; 0; 0|] in
+    check_case nums expected
+
+  let test_005 () : bool =
+    let nums = init 7 [|10; 20; 10; 30; 10; 40; 10|] in
+    let expected = init 7 [|12; 0; 8; 0; 8; 0; 12|] in
+    check_case nums expected
+
+  let test_006 () : bool =
+    let nums = init 10 [|9; 9; 9; 9; 9; 9; 9; 9; 9; 9|] in
+    let expected = init 10 [|45; 37; 31; 27; 25; 25; 27; 31; 37; 45|] in
+    check_case nums expected
+
+  let test_007 () : bool =
+    let nums = init 5 [|1; 1; 1; 1; 1|] in
+    let expected = init 5 [|10; 7; 6; 7; 10|] in
+    check_case nums expected
+
+  let test_008 () : bool =
+    let nums = init 7 [|10; 20; 10; 10; 30; 20; 10|] in
+    let expected = init 7 [|11; 4; 7; 7; 0; 4; 13|] in
+    check_case nums expected
+
+  let test_009 () : bool =
+    let nums = init 10 [|1; 2; 3; 4; 5; 6; 7; 8; 9; 1|] in
+    let expected = init 10 [|9; 0; 0; 0; 0; 0; 0; 0; 0; 9|] in
+    check_case nums expected
+
+  let test_010 () : bool =
+    let nums = init 10 [|5; 5; 5; 5; 5; 5; 5; 5; 5; 5|] in
+    let expected = init 10 [|45; 37; 31; 27; 25; 25; 27; 31; 37; 45|] in
+    check_case nums expected
+
+  let test_011 () : bool =
+    let nums = init 5 [|10; 20; 30; 40; 50|] in
+    let expected = init 5 [|0; 0; 0; 0; 0|] in
+    check_case nums expected
+
+  let test_012 () : bool =
+    let nums = init 5 [|1; 3; 1; 1; 2|] in
+    let expected = init 5 [|5; 0; 3; 4; 0|] in
+    check_case nums expected
+
+  let test_013 () : bool =
+    let nums = init 11 [|1; 2; 3; 2; 1; 4; 5; 4; 3; 2; 1|] in
+    let expected = init 11 [|14; 10; 6; 8; 10; 2; 0; 2; 6; 14; 16|] in
+    check_case nums expected
+
+  let test_014 () : bool =
+    let nums = init 7 [|2; 1; 3; 1; 2; 3; 3|] in
+    let expected = init 7 [|4; 2; 7; 2; 4; 4; 5|] in
+    check_case nums expected
+
+  let test_015 () : bool =
+    let nums = init 4 [|2; 2; 2; 2|] in
+    let expected = init 4 [|6; 4; 4; 6|] in
+    check_case nums expected
+
+  let test_016 () : bool =
+    let nums = init 5 [|1; 2; 3; 4; 5|] in
+    let expected = init 5 [|0; 0; 0; 0; 0|] in
+    check_case nums expected
+
+  let test_017 () : bool =
+    let nums = init 10 [|1; 2; 3; 4; 5; 6; 7; 8; 9; 10|] in
+    let expected = init 10 [|0; 0; 0; 0; 0; 0; 0; 0; 0; 0|] in
+    check_case nums expected
+
+  let test_018 () : bool =
+    let nums = init 27 [|9; 8; 7; 6; 5; 4; 3; 2; 1; 9; 8; 7; 6; 5; 4; 3; 2; 1; 9; 8; 7; 6; 5; 4; 3; 2; 1|] in
+    let expected = init 27 [|27; 27; 27; 27; 27; 27; 27; 27; 27; 18; 18; 18; 18; 18; 18; 18; 18; 18; 27; 27; 27; 27; 27; 27; 27; 27; 27|] in
+    check_case nums expected
+
+  let test_019 () : bool =
+    let nums = init 20 [|50; 50; 40; 40; 40; 30; 30; 30; 30; 20; 20; 20; 20; 20; 10; 10; 10; 10; 10; 10|] in
+    let expected = init 20 [|1; 1; 3; 2; 3; 6; 4; 4; 6; 10; 7; 6; 7; 10; 15; 11; 9; 9; 11; 15|] in
+    check_case nums expected
+
+  let run_tests () : bool =
+    let ok = ref true in
+    if !ok then ok := test_000 ();
+    if !ok then ok := test_001 ();
+    if !ok then ok := test_002 ();
+    if !ok then ok := test_003 ();
+    if !ok then ok := test_004 ();
+    if !ok then ok := test_005 ();
+    if !ok then ok := test_006 ();
+    if !ok then ok := test_007 ();
+    if !ok then ok := test_008 ();
+    if !ok then ok := test_009 ();
+    if !ok then ok := test_010 ();
+    if !ok then ok := test_011 ();
+    if !ok then ok := test_012 ();
+    if !ok then ok := test_013 ();
+    if !ok then ok := test_014 ();
+    if !ok then ok := test_015 ();
+    if !ok then ok := test_016 ();
+    if !ok then ok := test_017 ();
+    if !ok then ok := test_018 ();
+    if !ok then ok := test_019 ();
+    !ok
+
+end

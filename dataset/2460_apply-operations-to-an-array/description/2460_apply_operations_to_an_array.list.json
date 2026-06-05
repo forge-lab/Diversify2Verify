@@ -1,0 +1,4064 @@
+{
+  "task": {
+    "task_id": "apply-operations-to-an-array",
+    "question_id": 2460,
+    "difficulty": "Easy",
+    "source_file": "bench1/2460.json"
+  },
+  "target": {
+    "name": "list",
+    "language": "why3",
+    "module_name": "ApplyOperationsToAnArray_List_Spec",
+    "output_file": "generated/why3/list/apply_operations_to_an_array_list.mlw",
+    "signature": {
+      "raw": "val apply_operations_to_an_array_list (nums: list int) : list int",
+      "function_name": "apply_operations_to_an_array_list",
+      "parameters": [
+        {
+          "name": "nums",
+          "why3_type": "list int",
+          "semantic_type": "int_sequence"
+        }
+      ],
+      "return": {
+        "why3_type": "list int",
+        "semantic_type": "int_sequence"
+      }
+    }
+  },
+  "problem": {
+    "description": "You are given a 0-indexed array nums of size n consisting of non-negative integers.\nYou need to apply n - 1 operations to this array where, in the ith operation (0-indexed), you will apply the following on the ith element of nums:\n\nIf nums[i] == nums[i + 1], then multiply nums[i] by 2 and set nums[i + 1] to 0. Otherwise, you skip this operation.\n\nAfter performing all the operations, shift all the 0's to the end of the array.\n\nFor example, the array [1,0,2,0,0,1] after shifting all its 0's to the end, is [1,2,1,0,0,0].\n\nReturn the resulting array.\nNote that the operations are applied sequentially, not all at once.\n \nExample 1:\n\nInput: nums = [1,2,2,1,1,0]\nOutput: [1,4,2,0,0,0]\nExplanation: We do the following operations:\n- i = 0: nums[0] and nums[1] are not equal, so we skip this operation.\n- i = 1: nums[1] and nums[2] are equal, we multiply nums[1] by 2 and change nums[2] to 0. The array becomes [1,4,0,1,1,0].\n- i = 2: nums[2] and nums[3] are not equal, so we skip this operation.\n- i = 3: nums[3] and nums[4] are equal, we multiply nums[3] by 2 and change nums[4] to 0. The array becomes [1,4,0,2,0,0].\n- i = 4: nums[4] and nums[5] are equal, we multiply nums[4] by 2 and change nums[5] to 0. The array becomes [1,4,0,2,0,0].\nAfter that, we shift the 0's to the end, which gives the array [1,4,2,0,0,0].\n\nExample 2:\n\nInput: nums = [0,1]\nOutput: [1,0]\nExplanation: No operation can be applied, we just shift the 0 to the end.\n\n \nConstraints:\n\n2 <= nums.length <= 2000\n0 <= nums[i] <= 1000\n\n"
+  },
+  "tests": [
+    {
+      "id": "test_000",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums": [
+          6,
+          5,
+          4,
+          3,
+          2,
+          1
+        ]
+      },
+      "expected": [
+        6,
+        5,
+        4,
+        3,
+        2,
+        1
+      ],
+      "warnings": []
+    },
+    {
+      "id": "test_001",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums": [
+          1,
+          2,
+          3,
+          2,
+          3,
+          2
+        ]
+      },
+      "expected": [
+        1,
+        2,
+        3,
+        2,
+        3,
+        2
+      ],
+      "warnings": []
+    },
+    {
+      "id": "test_002",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums": [
+          2,
+          2,
+          0,
+          0,
+          1,
+          1,
+          1
+        ]
+      },
+      "expected": [
+        4,
+        2,
+        1,
+        0,
+        0,
+        0,
+        0
+      ],
+      "warnings": []
+    },
+    {
+      "id": "test_003",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums": [
+          10,
+          10,
+          0,
+          0,
+          10,
+          10,
+          10
+        ]
+      },
+      "expected": [
+        20,
+        20,
+        10,
+        0,
+        0,
+        0,
+        0
+      ],
+      "warnings": []
+    },
+    {
+      "id": "test_004",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums": [
+          1,
+          3,
+          3,
+          3,
+          2,
+          2,
+          1
+        ]
+      },
+      "expected": [
+        1,
+        6,
+        3,
+        4,
+        1,
+        0,
+        0
+      ],
+      "warnings": []
+    },
+    {
+      "id": "test_005",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums": [
+          1,
+          2,
+          3,
+          2,
+          1,
+          2
+        ]
+      },
+      "expected": [
+        1,
+        2,
+        3,
+        2,
+        1,
+        2
+      ],
+      "warnings": []
+    },
+    {
+      "id": "test_006",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          0
+        ]
+      },
+      "expected": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        0
+      ],
+      "warnings": []
+    },
+    {
+      "id": "test_007",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums": [
+          10,
+          10,
+          0,
+          0,
+          10,
+          10,
+          0,
+          0,
+          10,
+          10
+        ]
+      },
+      "expected": [
+        20,
+        20,
+        20,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "warnings": []
+    },
+    {
+      "id": "test_008",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums": [
+          1,
+          3,
+          3,
+          3,
+          2,
+          2,
+          1,
+          1,
+          0,
+          0
+        ]
+      },
+      "expected": [
+        1,
+        6,
+        3,
+        4,
+        2,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "warnings": []
+    },
+    {
+      "id": "test_009",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums": [
+          0,
+          1
+        ]
+      },
+      "expected": [
+        1,
+        0
+      ],
+      "warnings": []
+    },
+    {
+      "id": "test_010",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums": [
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "expected": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "warnings": []
+    },
+    {
+      "id": "test_011",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums": [
+          2,
+          2,
+          2,
+          2,
+          2,
+          2
+        ]
+      },
+      "expected": [
+        4,
+        4,
+        4,
+        0,
+        0,
+        0
+      ],
+      "warnings": []
+    },
+    {
+      "id": "test_012",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums": [
+          1,
+          0,
+          1,
+          0,
+          1,
+          0
+        ]
+      },
+      "expected": [
+        1,
+        1,
+        1,
+        0,
+        0,
+        0
+      ],
+      "warnings": []
+    },
+    {
+      "id": "test_013",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6
+        ]
+      },
+      "expected": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6
+      ],
+      "warnings": []
+    },
+    {
+      "id": "test_014",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums": [
+          10,
+          10,
+          20,
+          20,
+          30,
+          30
+        ]
+      },
+      "expected": [
+        20,
+        40,
+        60,
+        0,
+        0,
+        0
+      ],
+      "warnings": []
+    },
+    {
+      "id": "test_015",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "expected": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "warnings": []
+    },
+    {
+      "id": "test_016",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums": [
+          1000,
+          1000,
+          0,
+          0,
+          1000,
+          1000
+        ]
+      },
+      "expected": [
+        2000,
+        2000,
+        0,
+        0,
+        0,
+        0
+      ],
+      "warnings": []
+    },
+    {
+      "id": "test_017",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums": [
+          1,
+          0,
+          2,
+          0,
+          0,
+          1
+        ]
+      },
+      "expected": [
+        1,
+        2,
+        1,
+        0,
+        0,
+        0
+      ],
+      "warnings": []
+    },
+    {
+      "id": "test_018",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums": [
+          1,
+          1,
+          0,
+          0,
+          1,
+          1
+        ]
+      },
+      "expected": [
+        2,
+        2,
+        0,
+        0,
+        0,
+        0
+      ],
+      "warnings": []
+    },
+    {
+      "id": "test_019",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums": [
+          5,
+          5,
+          5,
+          5,
+          5,
+          5
+        ]
+      },
+      "expected": [
+        10,
+        10,
+        10,
+        0,
+        0,
+        0
+      ],
+      "warnings": []
+    },
+    {
+      "id": "test_020",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums": [
+          5,
+          5,
+          5,
+          5,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "expected": [
+        10,
+        10,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "warnings": []
+    },
+    {
+      "id": "test_021",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums": [
+          1,
+          2,
+          2,
+          1,
+          1,
+          0
+        ]
+      },
+      "expected": [
+        1,
+        4,
+        2,
+        0,
+        0,
+        0
+      ],
+      "warnings": []
+    },
+    {
+      "id": "test_022",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums": [
+          6,
+          6,
+          5,
+          5,
+          4,
+          4
+        ]
+      },
+      "expected": [
+        12,
+        10,
+        8,
+        0,
+        0,
+        0
+      ],
+      "warnings": []
+    },
+    {
+      "id": "test_023",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums": [
+          2,
+          2,
+          0,
+          0,
+          1,
+          1
+        ]
+      },
+      "expected": [
+        4,
+        2,
+        0,
+        0,
+        0,
+        0
+      ],
+      "warnings": []
+    },
+    {
+      "id": "test_024",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums": [
+          1,
+          2,
+          2,
+          3,
+          3,
+          4,
+          4,
+          5,
+          5
+        ]
+      },
+      "expected": [
+        1,
+        4,
+        6,
+        8,
+        10,
+        0,
+        0,
+        0,
+        0
+      ],
+      "warnings": []
+    },
+    {
+      "id": "test_025",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums": [
+          1,
+          1,
+          1,
+          1,
+          1,
+          1
+        ]
+      },
+      "expected": [
+        2,
+        2,
+        2,
+        0,
+        0,
+        0
+      ],
+      "warnings": []
+    },
+    {
+      "id": "test_026",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums": [
+          0,
+          2,
+          2,
+          0,
+          0,
+          3,
+          3,
+          0,
+          0,
+          4,
+          4
+        ]
+      },
+      "expected": [
+        4,
+        6,
+        8,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "warnings": []
+    },
+    {
+      "id": "test_027",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums": [
+          2,
+          2,
+          2,
+          2,
+          2
+        ]
+      },
+      "expected": [
+        4,
+        4,
+        2,
+        0,
+        0
+      ],
+      "warnings": []
+    },
+    {
+      "id": "test_028",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums": [
+          2,
+          2,
+          0,
+          0,
+          2,
+          2
+        ]
+      },
+      "expected": [
+        4,
+        4,
+        0,
+        0,
+        0,
+        0
+      ],
+      "warnings": []
+    },
+    {
+      "id": "test_029",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums": [
+          10,
+          10,
+          10,
+          10,
+          10,
+          10,
+          0,
+          0,
+          0
+        ]
+      },
+      "expected": [
+        20,
+        20,
+        20,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "warnings": []
+    },
+    {
+      "id": "test_030",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums": [
+          9,
+          9,
+          8,
+          8,
+          7,
+          7,
+          6,
+          6,
+          5,
+          5,
+          4,
+          4,
+          3,
+          3,
+          2,
+          2,
+          1,
+          1
+        ]
+      },
+      "expected": [
+        18,
+        16,
+        14,
+        12,
+        10,
+        8,
+        6,
+        4,
+        2,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "warnings": []
+    },
+    {
+      "id": "test_031",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums": [
+          0,
+          1,
+          0,
+          1,
+          0,
+          1,
+          0,
+          1,
+          0,
+          1,
+          0
+        ]
+      },
+      "expected": [
+        1,
+        1,
+        1,
+        1,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "warnings": []
+    },
+    {
+      "id": "test_032",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums": [
+          50,
+          45,
+          40,
+          35,
+          30,
+          25,
+          20,
+          15,
+          10,
+          5
+        ]
+      },
+      "expected": [
+        50,
+        45,
+        40,
+        35,
+        30,
+        25,
+        20,
+        15,
+        10,
+        5
+      ],
+      "warnings": []
+    },
+    {
+      "id": "test_033",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums": [
+          10,
+          10,
+          10,
+          10,
+          10,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "expected": [
+        20,
+        20,
+        10,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "warnings": []
+    },
+    {
+      "id": "test_034",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums": [
+          1,
+          1,
+          2,
+          2,
+          2,
+          2,
+          3,
+          3,
+          3,
+          3,
+          3
+        ]
+      },
+      "expected": [
+        2,
+        4,
+        4,
+        6,
+        6,
+        3,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "warnings": []
+    },
+    {
+      "id": "test_035",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10
+        ]
+      },
+      "expected": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10
+      ],
+      "warnings": []
+    },
+    {
+      "id": "test_036",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums": [
+          100,
+          0,
+          100,
+          0,
+          100,
+          0,
+          100,
+          0,
+          100,
+          0
+        ]
+      },
+      "expected": [
+        100,
+        100,
+        100,
+        100,
+        100,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "warnings": []
+    },
+    {
+      "id": "test_037",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums": [
+          10,
+          20,
+          20,
+          10,
+          10,
+          20,
+          20
+        ]
+      },
+      "expected": [
+        10,
+        40,
+        20,
+        40,
+        0,
+        0,
+        0
+      ],
+      "warnings": []
+    },
+    {
+      "id": "test_038",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9
+        ]
+      },
+      "expected": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        0
+      ],
+      "warnings": []
+    },
+    {
+      "id": "test_039",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums": [
+          999,
+          999,
+          0,
+          999,
+          999,
+          999,
+          0,
+          0,
+          999,
+          999,
+          999
+        ]
+      },
+      "expected": [
+        1998,
+        1998,
+        999,
+        1998,
+        999,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "warnings": []
+    },
+    {
+      "id": "test_040",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums": [
+          6,
+          6,
+          0,
+          6,
+          0,
+          6,
+          0,
+          6,
+          6,
+          6,
+          0,
+          6,
+          6,
+          0
+        ]
+      },
+      "expected": [
+        12,
+        6,
+        6,
+        12,
+        6,
+        12,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "warnings": []
+    },
+    {
+      "id": "test_041",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums": [
+          1,
+          0,
+          2,
+          0,
+          3,
+          0,
+          4,
+          0,
+          5,
+          0,
+          6,
+          0,
+          7,
+          0,
+          8,
+          0,
+          9,
+          0,
+          10,
+          0
+        ]
+      },
+      "expected": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "warnings": []
+    },
+    {
+      "id": "test_042",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums": [
+          1,
+          2,
+          2,
+          1,
+          3,
+          3,
+          2,
+          2,
+          1,
+          1
+        ]
+      },
+      "expected": [
+        1,
+        4,
+        1,
+        6,
+        4,
+        2,
+        0,
+        0,
+        0,
+        0
+      ],
+      "warnings": []
+    },
+    {
+      "id": "test_043",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums": [
+          1,
+          1,
+          1,
+          1,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "expected": [
+        2,
+        2,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "warnings": []
+    },
+    {
+      "id": "test_044",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums": [
+          500,
+          500,
+          1000,
+          1000,
+          500,
+          500,
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "expected": [
+        1000,
+        2000,
+        1000,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "warnings": []
+    },
+    {
+      "id": "test_045",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums": [
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1
+        ]
+      },
+      "expected": [
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        2,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "warnings": []
+    },
+    {
+      "id": "test_046",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums": [
+          1,
+          0,
+          0,
+          0,
+          1,
+          0,
+          0,
+          0,
+          1,
+          0
+        ]
+      },
+      "expected": [
+        1,
+        1,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "warnings": []
+    },
+    {
+      "id": "test_047",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums": [
+          5,
+          0,
+          5,
+          5,
+          0,
+          0,
+          5,
+          5,
+          5,
+          0
+        ]
+      },
+      "expected": [
+        5,
+        10,
+        10,
+        5,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "warnings": []
+    },
+    {
+      "id": "test_048",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums": [
+          10,
+          10,
+          20,
+          20,
+          30,
+          30,
+          40,
+          40,
+          50,
+          50
+        ]
+      },
+      "expected": [
+        20,
+        40,
+        60,
+        80,
+        100,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "warnings": []
+    },
+    {
+      "id": "test_049",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums": [
+          2,
+          2,
+          0,
+          0,
+          2,
+          2,
+          0,
+          0,
+          2,
+          2
+        ]
+      },
+      "expected": [
+        4,
+        4,
+        4,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "warnings": []
+    },
+    {
+      "id": "test_050",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          4,
+          3,
+          2,
+          1
+        ]
+      },
+      "expected": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        4,
+        3,
+        2,
+        1
+      ],
+      "warnings": []
+    },
+    {
+      "id": "test_051",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums": [
+          1000,
+          1000,
+          999,
+          999,
+          888,
+          888,
+          777,
+          777
+        ]
+      },
+      "expected": [
+        2000,
+        1998,
+        1776,
+        1554,
+        0,
+        0,
+        0,
+        0
+      ],
+      "warnings": []
+    },
+    {
+      "id": "test_052",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums": [
+          2,
+          2,
+          0,
+          2,
+          2,
+          0,
+          2,
+          2,
+          0,
+          2
+        ]
+      },
+      "expected": [
+        4,
+        4,
+        4,
+        2,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "warnings": []
+    },
+    {
+      "id": "test_053",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums": [
+          1,
+          2,
+          2,
+          3,
+          3,
+          3,
+          4,
+          4,
+          4,
+          4
+        ]
+      },
+      "expected": [
+        1,
+        4,
+        6,
+        3,
+        8,
+        8,
+        0,
+        0,
+        0,
+        0
+      ],
+      "warnings": []
+    },
+    {
+      "id": "test_054",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums": [
+          5,
+          10,
+          15,
+          20,
+          25,
+          30,
+          35,
+          40,
+          45,
+          50
+        ]
+      },
+      "expected": [
+        5,
+        10,
+        15,
+        20,
+        25,
+        30,
+        35,
+        40,
+        45,
+        50
+      ],
+      "warnings": []
+    },
+    {
+      "id": "test_055",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums": [
+          1,
+          0,
+          2,
+          0,
+          3,
+          0,
+          4,
+          0,
+          5,
+          0,
+          6,
+          0,
+          7,
+          0,
+          8,
+          0,
+          9,
+          0
+        ]
+      },
+      "expected": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "warnings": []
+    },
+    {
+      "id": "test_056",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums": [
+          1,
+          2,
+          3,
+          3,
+          2,
+          1,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "expected": [
+        1,
+        2,
+        6,
+        2,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "warnings": []
+    },
+    {
+      "id": "test_057",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums": [
+          3,
+          3,
+          3,
+          0,
+          3,
+          3,
+          0,
+          0,
+          3,
+          3,
+          3,
+          0
+        ]
+      },
+      "expected": [
+        6,
+        3,
+        6,
+        6,
+        3,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "warnings": []
+    },
+    {
+      "id": "test_058",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums": [
+          1,
+          1,
+          1,
+          2,
+          2,
+          2,
+          3,
+          3,
+          3
+        ]
+      },
+      "expected": [
+        2,
+        1,
+        4,
+        2,
+        6,
+        3,
+        0,
+        0,
+        0
+      ],
+      "warnings": []
+    },
+    {
+      "id": "test_059",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          1,
+          2,
+          3,
+          4,
+          5
+        ]
+      },
+      "expected": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "warnings": []
+    },
+    {
+      "id": "test_060",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums": [
+          5,
+          5,
+          5,
+          2,
+          2,
+          2,
+          2,
+          2,
+          5,
+          5
+        ]
+      },
+      "expected": [
+        10,
+        5,
+        4,
+        4,
+        2,
+        10,
+        0,
+        0,
+        0,
+        0
+      ],
+      "warnings": []
+    },
+    {
+      "id": "test_061",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums": [
+          6,
+          6,
+          6,
+          6,
+          0,
+          0,
+          0,
+          0,
+          6,
+          6
+        ]
+      },
+      "expected": [
+        12,
+        12,
+        12,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "warnings": []
+    },
+    {
+      "id": "test_062",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums": [
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "expected": [
+        2,
+        2,
+        2,
+        2,
+        2,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "warnings": []
+    },
+    {
+      "id": "test_063",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums": [
+          3,
+          3,
+          3,
+          0,
+          3,
+          3,
+          0,
+          0,
+          3,
+          3,
+          3,
+          0,
+          3,
+          0,
+          3
+        ]
+      },
+      "expected": [
+        6,
+        3,
+        6,
+        6,
+        3,
+        3,
+        3,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "warnings": []
+    },
+    {
+      "id": "test_064",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums": [
+          0,
+          1,
+          1,
+          0,
+          0,
+          1,
+          1,
+          0,
+          0,
+          1,
+          1
+        ]
+      },
+      "expected": [
+        2,
+        2,
+        2,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "warnings": []
+    },
+    {
+      "id": "test_065",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums": [
+          1000,
+          1000,
+          1000,
+          1000,
+          1000,
+          1000,
+          1000,
+          1000,
+          1000,
+          1000
+        ]
+      },
+      "expected": [
+        2000,
+        2000,
+        2000,
+        2000,
+        2000,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "warnings": []
+    },
+    {
+      "id": "test_066",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums": [
+          0,
+          1,
+          1,
+          2,
+          2,
+          3,
+          3,
+          4,
+          4,
+          5,
+          5,
+          6,
+          6,
+          7,
+          7,
+          8,
+          8,
+          9,
+          9,
+          10,
+          10
+        ]
+      },
+      "expected": [
+        2,
+        4,
+        6,
+        8,
+        10,
+        12,
+        14,
+        16,
+        18,
+        20,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "warnings": []
+    },
+    {
+      "id": "test_067",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums": [
+          1,
+          1,
+          2,
+          2,
+          3,
+          3,
+          4,
+          4,
+          5,
+          5
+        ]
+      },
+      "expected": [
+        2,
+        4,
+        6,
+        8,
+        10,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "warnings": []
+    },
+    {
+      "id": "test_068",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums": [
+          9,
+          10,
+          9,
+          10,
+          9,
+          10,
+          9,
+          10,
+          9,
+          10
+        ]
+      },
+      "expected": [
+        9,
+        10,
+        9,
+        10,
+        9,
+        10,
+        9,
+        10,
+        9,
+        10
+      ],
+      "warnings": []
+    },
+    {
+      "id": "test_069",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums": [
+          999,
+          0,
+          999,
+          0,
+          999,
+          0,
+          999,
+          0,
+          999,
+          0
+        ]
+      },
+      "expected": [
+        999,
+        999,
+        999,
+        999,
+        999,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "warnings": []
+    },
+    {
+      "id": "test_070",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums": [
+          1,
+          1,
+          2,
+          2,
+          3,
+          3,
+          4,
+          4,
+          5,
+          5,
+          6,
+          6,
+          7,
+          7,
+          8,
+          8,
+          9,
+          9,
+          10,
+          10
+        ]
+      },
+      "expected": [
+        2,
+        4,
+        6,
+        8,
+        10,
+        12,
+        14,
+        16,
+        18,
+        20,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "warnings": []
+    },
+    {
+      "id": "test_071",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums": [
+          2,
+          2,
+          2,
+          0,
+          2,
+          2,
+          2,
+          0,
+          2,
+          2,
+          2
+        ]
+      },
+      "expected": [
+        4,
+        2,
+        4,
+        2,
+        4,
+        2,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "warnings": []
+    },
+    {
+      "id": "test_072",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums": [
+          10,
+          0,
+          10,
+          10,
+          0,
+          10,
+          0,
+          10,
+          10,
+          10
+        ]
+      },
+      "expected": [
+        10,
+        20,
+        10,
+        20,
+        10,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "warnings": []
+    },
+    {
+      "id": "test_073",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums": [
+          1,
+          2,
+          1,
+          2,
+          1,
+          2,
+          1,
+          2,
+          1,
+          2
+        ]
+      },
+      "expected": [
+        1,
+        2,
+        1,
+        2,
+        1,
+        2,
+        1,
+        2,
+        1,
+        2
+      ],
+      "warnings": []
+    },
+    {
+      "id": "test_074",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums": [
+          1,
+          2,
+          2,
+          1,
+          1,
+          0,
+          0,
+          0,
+          0,
+          0,
+          1,
+          1,
+          2,
+          2,
+          1,
+          1,
+          0,
+          0,
+          0
+        ]
+      },
+      "expected": [
+        1,
+        4,
+        2,
+        2,
+        4,
+        2,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "warnings": []
+    },
+    {
+      "id": "test_075",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums": [
+          1,
+          2,
+          3,
+          2,
+          1,
+          2,
+          3,
+          2,
+          1
+        ]
+      },
+      "expected": [
+        1,
+        2,
+        3,
+        2,
+        1,
+        2,
+        3,
+        2,
+        1
+      ],
+      "warnings": []
+    },
+    {
+      "id": "test_076",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums": [
+          9,
+          9,
+          9,
+          9,
+          9,
+          9,
+          9,
+          9,
+          9,
+          9
+        ]
+      },
+      "expected": [
+        18,
+        18,
+        18,
+        18,
+        18,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "warnings": []
+    },
+    {
+      "id": "test_077",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums": [
+          5,
+          5,
+          0,
+          0,
+          5,
+          5,
+          5,
+          0
+        ]
+      },
+      "expected": [
+        10,
+        10,
+        5,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "warnings": []
+    },
+    {
+      "id": "test_078",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums": [
+          1,
+          1,
+          0,
+          1,
+          1,
+          0,
+          1,
+          1
+        ]
+      },
+      "expected": [
+        2,
+        2,
+        2,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "warnings": []
+    },
+    {
+      "id": "test_079",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19
+        ]
+      },
+      "expected": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        0
+      ],
+      "warnings": []
+    },
+    {
+      "id": "test_080",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums": [
+          9,
+          9,
+          9,
+          9,
+          9,
+          9,
+          9,
+          9,
+          9,
+          9,
+          9,
+          9,
+          9,
+          9,
+          9,
+          9,
+          9,
+          9,
+          9,
+          9
+        ]
+      },
+      "expected": [
+        18,
+        18,
+        18,
+        18,
+        18,
+        18,
+        18,
+        18,
+        18,
+        18,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "warnings": []
+    },
+    {
+      "id": "test_081",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums": [
+          0,
+          0,
+          1,
+          0,
+          1,
+          1,
+          0,
+          1,
+          0,
+          0,
+          1,
+          0
+        ]
+      },
+      "expected": [
+        1,
+        2,
+        1,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "warnings": []
+    },
+    {
+      "id": "test_082",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums": [
+          1,
+          2,
+          2,
+          4,
+          4,
+          8,
+          8,
+          16,
+          16,
+          32
+        ]
+      },
+      "expected": [
+        1,
+        4,
+        8,
+        16,
+        32,
+        32,
+        0,
+        0,
+        0,
+        0
+      ],
+      "warnings": []
+    },
+    {
+      "id": "test_083",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums": [
+          10,
+          9,
+          8,
+          7,
+          6,
+          5,
+          4,
+          3,
+          2,
+          1
+        ]
+      },
+      "expected": [
+        10,
+        9,
+        8,
+        7,
+        6,
+        5,
+        4,
+        3,
+        2,
+        1
+      ],
+      "warnings": []
+    },
+    {
+      "id": "test_084",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums": [
+          3,
+          0,
+          3,
+          3,
+          0,
+          0,
+          3,
+          3,
+          0,
+          3
+        ]
+      },
+      "expected": [
+        3,
+        6,
+        6,
+        3,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "warnings": []
+    },
+    {
+      "id": "test_085",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums": [
+          1,
+          0,
+          1,
+          0,
+          1,
+          0,
+          1,
+          0,
+          1,
+          0,
+          1,
+          0,
+          1,
+          0,
+          1,
+          0,
+          1,
+          0,
+          1,
+          0
+        ]
+      },
+      "expected": [
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "warnings": []
+    },
+    {
+      "id": "test_086",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums": [
+          1,
+          0,
+          2,
+          0,
+          3,
+          0,
+          4,
+          0,
+          5,
+          0
+        ]
+      },
+      "expected": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "warnings": []
+    },
+    {
+      "id": "test_087",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums": [
+          0,
+          1,
+          0,
+          2,
+          0,
+          3,
+          0,
+          4,
+          0,
+          5,
+          0,
+          6,
+          0,
+          7,
+          0,
+          8,
+          0,
+          9,
+          0,
+          10
+        ]
+      },
+      "expected": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "warnings": []
+    },
+    {
+      "id": "test_088",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums": [
+          1,
+          0,
+          1,
+          0,
+          1,
+          0,
+          1,
+          0,
+          1,
+          0
+        ]
+      },
+      "expected": [
+        1,
+        1,
+        1,
+        1,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "warnings": []
+    },
+    {
+      "id": "test_089",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums": [
+          1,
+          1,
+          1,
+          1,
+          1,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "expected": [
+        2,
+        2,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "warnings": []
+    },
+    {
+      "id": "test_090",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums": [
+          0,
+          1,
+          0,
+          2,
+          0,
+          3,
+          0,
+          4,
+          0,
+          5
+        ]
+      },
+      "expected": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "warnings": []
+    },
+    {
+      "id": "test_091",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums": [
+          1000,
+          1000,
+          1000,
+          1000,
+          1000,
+          1000,
+          1000,
+          1000
+        ]
+      },
+      "expected": [
+        2000,
+        2000,
+        2000,
+        2000,
+        0,
+        0,
+        0,
+        0
+      ],
+      "warnings": []
+    },
+    {
+      "id": "test_092",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums": [
+          9,
+          8,
+          7,
+          6,
+          5,
+          4,
+          3,
+          2,
+          1,
+          0
+        ]
+      },
+      "expected": [
+        9,
+        8,
+        7,
+        6,
+        5,
+        4,
+        3,
+        2,
+        1,
+        0
+      ],
+      "warnings": []
+    },
+    {
+      "id": "test_093",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums": [
+          1,
+          0,
+          0,
+          1,
+          0,
+          1,
+          0,
+          0,
+          1,
+          0
+        ]
+      },
+      "expected": [
+        1,
+        1,
+        1,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "warnings": []
+    },
+    {
+      "id": "test_094",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums": [
+          5,
+          0,
+          5,
+          0,
+          5,
+          0,
+          5,
+          0,
+          5,
+          0,
+          5,
+          0,
+          5,
+          0,
+          5,
+          0,
+          5,
+          0,
+          5,
+          0
+        ]
+      },
+      "expected": [
+        5,
+        5,
+        5,
+        5,
+        5,
+        5,
+        5,
+        5,
+        5,
+        5,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "warnings": []
+    },
+    {
+      "id": "test_095",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums": [
+          1000,
+          1000,
+          0,
+          0,
+          1000,
+          1000,
+          1000,
+          0,
+          0,
+          1000
+        ]
+      },
+      "expected": [
+        2000,
+        2000,
+        1000,
+        1000,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "warnings": []
+    },
+    {
+      "id": "test_096",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums": [
+          9,
+          8,
+          7,
+          6,
+          5,
+          4,
+          3,
+          2,
+          1,
+          0,
+          9,
+          8,
+          7,
+          6,
+          5,
+          4,
+          3,
+          2,
+          1,
+          0
+        ]
+      },
+      "expected": [
+        9,
+        8,
+        7,
+        6,
+        5,
+        4,
+        3,
+        2,
+        1,
+        9,
+        8,
+        7,
+        6,
+        5,
+        4,
+        3,
+        2,
+        1,
+        0,
+        0
+      ],
+      "warnings": []
+    },
+    {
+      "id": "test_097",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums": [
+          5,
+          5,
+          0,
+          0,
+          5,
+          5,
+          0,
+          0,
+          5,
+          5
+        ]
+      },
+      "expected": [
+        10,
+        10,
+        10,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "warnings": []
+    },
+    {
+      "id": "test_098",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums": [
+          1,
+          1,
+          0,
+          0,
+          1,
+          1,
+          0,
+          0,
+          1,
+          1
+        ]
+      },
+      "expected": [
+        2,
+        2,
+        2,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "warnings": []
+    },
+    {
+      "id": "test_099",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums": [
+          1,
+          2,
+          3,
+          2,
+          1,
+          3,
+          2,
+          1,
+          3,
+          2,
+          1,
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "expected": [
+        1,
+        2,
+        3,
+        2,
+        1,
+        3,
+        2,
+        1,
+        3,
+        2,
+        1,
+        0,
+        0,
+        0,
+        0
+      ],
+      "warnings": []
+    },
+    {
+      "id": "test_100",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums": [
+          9,
+          9,
+          0,
+          0,
+          9,
+          0,
+          9,
+          9,
+          9,
+          0,
+          9,
+          9,
+          0,
+          9,
+          9,
+          9,
+          0,
+          9,
+          9,
+          9
+        ]
+      },
+      "expected": [
+        18,
+        9,
+        18,
+        9,
+        18,
+        18,
+        9,
+        18,
+        9,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "warnings": []
+    },
+    {
+      "id": "test_101",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums": [
+          1,
+          2,
+          2,
+          2,
+          1,
+          1,
+          1,
+          2,
+          2,
+          1,
+          1,
+          1,
+          1,
+          2,
+          2,
+          2,
+          2,
+          1,
+          1,
+          1
+        ]
+      },
+      "expected": [
+        1,
+        4,
+        2,
+        2,
+        1,
+        4,
+        2,
+        2,
+        4,
+        4,
+        2,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "warnings": []
+    },
+    {
+      "id": "test_102",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums": [
+          1,
+          0,
+          0,
+          1,
+          0,
+          0,
+          1,
+          0,
+          0,
+          1
+        ]
+      },
+      "expected": [
+        1,
+        1,
+        1,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "warnings": []
+    },
+    {
+      "id": "test_103",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums": [
+          10,
+          10,
+          20,
+          20,
+          30,
+          30,
+          40,
+          40
+        ]
+      },
+      "expected": [
+        20,
+        40,
+        60,
+        80,
+        0,
+        0,
+        0,
+        0
+      ],
+      "warnings": []
+    },
+    {
+      "id": "test_104",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums": [
+          0,
+          1,
+          1,
+          2,
+          2,
+          0,
+          3,
+          3,
+          0,
+          4,
+          4,
+          0
+        ]
+      },
+      "expected": [
+        2,
+        4,
+        6,
+        8,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "warnings": []
+    },
+    {
+      "id": "test_105",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10
+        ]
+      },
+      "expected": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10
+      ],
+      "warnings": []
+    },
+    {
+      "id": "test_106",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums": [
+          1,
+          1,
+          1,
+          2,
+          2,
+          2,
+          3,
+          3,
+          3,
+          4,
+          4,
+          4,
+          5,
+          5,
+          5,
+          0,
+          0,
+          0
+        ]
+      },
+      "expected": [
+        2,
+        1,
+        4,
+        2,
+        6,
+        3,
+        8,
+        4,
+        10,
+        5,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "warnings": []
+    },
+    {
+      "id": "test_107",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums": [
+          7,
+          0,
+          7,
+          0,
+          7,
+          0,
+          7,
+          0,
+          7,
+          0
+        ]
+      },
+      "expected": [
+        7,
+        7,
+        7,
+        7,
+        7,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "warnings": []
+    },
+    {
+      "id": "test_108",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums": [
+          1,
+          1,
+          1,
+          1,
+          1,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "expected": [
+        2,
+        2,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "warnings": []
+    },
+    {
+      "id": "test_109",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums": [
+          10,
+          0,
+          10,
+          0,
+          10,
+          0,
+          10,
+          0,
+          10
+        ]
+      },
+      "expected": [
+        10,
+        10,
+        10,
+        10,
+        10,
+        0,
+        0,
+        0,
+        0
+      ],
+      "warnings": []
+    },
+    {
+      "id": "test_110",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums": [
+          5,
+          5,
+          5,
+          0,
+          5,
+          5,
+          0,
+          0,
+          5,
+          5
+        ]
+      },
+      "expected": [
+        10,
+        5,
+        10,
+        10,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "warnings": []
+    },
+    {
+      "id": "test_111",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums": [
+          5,
+          5,
+          5,
+          5,
+          0,
+          0,
+          5,
+          5,
+          5,
+          5
+        ]
+      },
+      "expected": [
+        10,
+        10,
+        10,
+        10,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "warnings": []
+    },
+    {
+      "id": "test_112",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums": [
+          8,
+          8,
+          8,
+          0,
+          8,
+          8,
+          0,
+          8,
+          8,
+          8
+        ]
+      },
+      "expected": [
+        16,
+        8,
+        16,
+        16,
+        8,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "warnings": []
+    },
+    {
+      "id": "test_113",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums": [
+          7,
+          7,
+          7,
+          7,
+          0,
+          0,
+          0,
+          0,
+          7,
+          7
+        ]
+      },
+      "expected": [
+        14,
+        14,
+        14,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "warnings": []
+    },
+    {
+      "id": "test_114",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums": [
+          0,
+          1,
+          0,
+          1,
+          0,
+          1,
+          0,
+          1,
+          0,
+          1
+        ]
+      },
+      "expected": [
+        1,
+        1,
+        1,
+        1,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "warnings": []
+    },
+    {
+      "id": "test_115",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums": [
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1
+        ]
+      },
+      "expected": [
+        2,
+        2,
+        2,
+        2,
+        2,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "warnings": []
+    },
+    {
+      "id": "test_116",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums": [
+          1,
+          2,
+          1,
+          2,
+          1,
+          2,
+          1,
+          2,
+          1,
+          2,
+          1,
+          2,
+          1,
+          2,
+          1,
+          2,
+          1,
+          2,
+          1,
+          2
+        ]
+      },
+      "expected": [
+        1,
+        2,
+        1,
+        2,
+        1,
+        2,
+        1,
+        2,
+        1,
+        2,
+        1,
+        2,
+        1,
+        2,
+        1,
+        2,
+        1,
+        2,
+        1,
+        2
+      ],
+      "warnings": []
+    },
+    {
+      "id": "test_117",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums": [
+          100,
+          200,
+          200,
+          100,
+          100,
+          200,
+          200,
+          100
+        ]
+      },
+      "expected": [
+        100,
+        400,
+        200,
+        400,
+        100,
+        0,
+        0,
+        0
+      ],
+      "warnings": []
+    },
+    {
+      "id": "test_118",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums": [
+          5,
+          5,
+          0,
+          5,
+          5,
+          5,
+          0,
+          0,
+          5,
+          5
+        ]
+      },
+      "expected": [
+        10,
+        10,
+        5,
+        10,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "warnings": []
+    },
+    {
+      "id": "test_119",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums": [
+          1,
+          1,
+          1,
+          1,
+          0,
+          0,
+          0,
+          0,
+          1,
+          1,
+          1,
+          1,
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "expected": [
+        2,
+        2,
+        2,
+        2,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "warnings": []
+    },
+    {
+      "id": "test_120",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums": [
+          1000,
+          1000,
+          0,
+          500,
+          500,
+          0,
+          250,
+          250,
+          0
+        ]
+      },
+      "expected": [
+        2000,
+        1000,
+        500,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "warnings": []
+    },
+    {
+      "id": "test_121",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums": [
+          0,
+          0,
+          1,
+          1,
+          0,
+          0,
+          1,
+          1,
+          0,
+          0
+        ]
+      },
+      "expected": [
+        2,
+        2,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "warnings": []
+    },
+    {
+      "id": "test_122",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums": [
+          1,
+          1,
+          2,
+          2,
+          2,
+          3,
+          3,
+          4,
+          4,
+          4,
+          4
+        ]
+      },
+      "expected": [
+        2,
+        4,
+        2,
+        6,
+        8,
+        8,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "warnings": []
+    }
+  ],
+  "normalization": {
+    "test_source": "python_assertions",
+    "test_count": 123,
+    "raw_test_sha256": "f65dc44c73242486759df492f97ef9bbb2be9ae8d8e8155c1b43fca0eb25983d",
+    "generated_by": "scripts/d2v-normalize-json.py",
+    "allow_extra_tests": false
+  }
+}

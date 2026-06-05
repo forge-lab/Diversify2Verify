@@ -1,0 +1,588 @@
+== Stage 1: first prover on whole file ==
+Running in /Users/rubenm/Desktop/Diversify2Verify/codex-runs/dataset-merge-verification/stage3a-repair/888_fair-candy-swap/list-imperative/fair_candy_swap_list_stage3_8b54a1e2_stage3/generated/why3: why3 session create -o /Users/rubenm/Desktop/Diversify2Verify/codex-runs/dataset-merge-verification/stage3a-repair/888_fair-candy-swap/list-imperative/fair_candy_swap_list_stage3_8b54a1e2_stage3/generated/why3/.why3_sessions/repaired_stage1 -P Z3,4.8.6 -t 10 -m 8192 repaired.mlw
+Session created successfully
+Running in /Users/rubenm/Desktop/Diversify2Verify/codex-runs/dataset-merge-verification/stage3a-repair/888_fair-candy-swap/list-imperative/fair_candy_swap_list_stage3_8b54a1e2_stage3/generated/why3: why3 bench /Users/rubenm/Desktop/Diversify2Verify/codex-runs/dataset-merge-verification/stage3a-repair/888_fair-candy-swap/list-imperative/fair_candy_swap_list_stage3_8b54a1e2_stage3/generated/why3/.why3_sessions/repaired_stage1
+Progress: 2/1/0                       Progress: 1/2/0                       Progress: 0/3/0                       Progress: 0/0/1                       
+Replay completed, saving session... done
+== Stage 1 stats ==
+= Statistics for session /Users/rubenm/Desktop/Diversify2Verify/codex-runs/dataset-merge-verification/stage3a-repair/888_fair-candy-swap/list-imperative/fair_candy_swap_list_stage3_8b54a1e2_stage3/generated/why3/.why3_sessions/repaired_stage1
+
+== Number of root goals ==
+  total: 3  proved: 2
+
+== Number of sub goals ==
+  total: 0  proved: 0
+
+== Goals not proved ==
+  +-- file [../../repaired.mlw]
+    +-- theory FairCandySwap_List_Spec
+      +-- goal fair_candy_swap_list'vc
+  
+== Goals proved by only one prover ==
+  +-- file [../../repaired.mlw]
+    +-- theory FairCandySwap_List_Spec
+      +-- goal positive_sizes'vc: Z3 4.8.6
+      +-- goal sum_list'vc: Z3 4.8.6
+  
+1 session(s) read, with a total of 3 proof goals.
+== Unproved root goals after first prover ==
+FairCandySwap_List_Spec	fair_candy_swap_list'vc
+== Stage 1: trying remaining goals with prover Alt-Ergo,2.4.0 ==
+---- stage1 | prover: Alt-Ergo,2.4.0 | theory: FairCandySwap_List_Spec | goal: fair_candy_swap_list'vc ----
+File repaired.mlw:
+Goal fair_candy_swap_list'vc.
+Prover result is: Timeout (10.00s, 43796 steps).
+Remaining after prover Alt-Ergo,2.4.0: 1
+== Stage 1: trying remaining goals with prover CVC4,1.8 ==
+---- stage1 | prover: CVC4,1.8 | theory: FairCandySwap_List_Spec | goal: fair_candy_swap_list'vc ----
+File repaired.mlw:
+Goal fair_candy_swap_list'vc.
+Prover result is: Unknown (unknown + incomplete) (0.06s, 19046 steps).
+Remaining after prover CVC4,1.8: 1
+== Goals still unproved after stage 1 ==
+FairCandySwap_List_Spec	fair_candy_swap_list'vc
+== Stage 2: split_vc on unproved goal ==
+Target theory: FairCandySwap_List_Spec
+Target goal  : fair_candy_swap_list'vc
+---- stage2 | prover: Z3,4.8.6 | theory: FairCandySwap_List_Spec | goal: fair_candy_swap_list'vc ----
+Transforms: split_vc
+File "repaired.mlw", line 63, characters 13-41:
+Sub-goal Assertion of goal fair_candy_swap_list'vc.
+Prover result is: Valid (0.01s, 797 steps).
+
+File "repaired.mlw", line 64, characters 13-37:
+Sub-goal Assertion of goal fair_candy_swap_list'vc.
+Prover result is: Valid (0.01s, 799 steps).
+
+File "repaired.mlw", line 70, characters 20-48:
+Sub-goal Loop invariant init of goal fair_candy_swap_list'vc.
+Prover result is: Valid (0.01s, 801 steps).
+
+File "repaired.mlw", line 71, characters 20-44:
+Sub-goal Loop invariant init of goal fair_candy_swap_list'vc.
+Prover result is: Valid (0.01s, 803 steps).
+
+File "repaired.mlw", line 72, characters 20-42:
+Sub-goal Loop invariant init of goal fair_candy_swap_list'vc.
+Prover result is: Valid (0.01s, 10168 steps).
+
+File "repaired.mlw", line 73, characters 55-71:
+Sub-goal Loop invariant init of goal fair_candy_swap_list'vc.
+Prover result is: Valid (0.01s, 957 steps).
+
+File "repaired.mlw", line 74, characters 18-35:
+Sub-goal Loop variant decrease of goal fair_candy_swap_list'vc.
+Prover result is: Valid (0.01s, 1060 steps).
+
+File "repaired.mlw", line 70, characters 20-48:
+Sub-goal Loop invariant preservation of goal fair_candy_swap_list'vc.
+Prover result is: Valid (0.01s, 1038 steps).
+
+File "repaired.mlw", line 71, characters 20-44:
+Sub-goal Loop invariant preservation of goal fair_candy_swap_list'vc.
+Prover result is: Valid (0.01s, 1040 steps).
+
+File "repaired.mlw", line 72, characters 20-42:
+Sub-goal Loop invariant preservation of goal fair_candy_swap_list'vc.
+Prover result is: Valid (0.01s, 1048 steps).
+
+File "repaired.mlw", line 73, characters 55-71:
+Sub-goal Loop invariant preservation of goal fair_candy_swap_list'vc.
+Prover result is: Valid (0.01s, 1058 steps).
+
+File "repaired.mlw", line 79, characters 21-37:
+Sub-goal Assertion of goal fair_candy_swap_list'vc.
+Prover result is: Timeout (10.00s, 185767816 steps).
+
+File "repaired.mlw", line 80, characters 21-37:
+Sub-goal Assertion of goal fair_candy_swap_list'vc.
+Prover result is: Valid (0.01s, 15553 steps).
+
+File "repaired.mlw", line 83, characters 26-54:
+Sub-goal Loop invariant init of goal fair_candy_swap_list'vc.
+Prover result is: Valid (0.01s, 1114 steps).
+
+File "repaired.mlw", line 84, characters 26-50:
+Sub-goal Loop invariant init of goal fair_candy_swap_list'vc.
+Prover result is: Valid (0.01s, 1116 steps).
+
+File "repaired.mlw", line 85, characters 26-42:
+Sub-goal Loop invariant init of goal fair_candy_swap_list'vc.
+Prover result is: Valid (0.01s, 1122 steps).
+
+File "repaired.mlw", line 86, characters 26-46:
+Sub-goal Loop invariant init of goal fair_candy_swap_list'vc.
+Prover result is: Valid (0.01s, 15699 steps).
+
+File "repaired.mlw", line 87, characters 59-73:
+Sub-goal Loop invariant init of goal fair_candy_swap_list'vc.
+Prover result is: Valid (0.01s, 1141 steps).
+
+File "repaired.mlw", line 88, characters 24-39:
+Sub-goal Loop variant decrease of goal fair_candy_swap_list'vc.
+Prover result is: Valid (0.01s, 1187 steps).
+
+File "repaired.mlw", line 83, characters 26-54:
+Sub-goal Loop invariant preservation of goal fair_candy_swap_list'vc.
+Prover result is: Valid (0.01s, 1165 steps).
+
+File "repaired.mlw", line 84, characters 26-50:
+Sub-goal Loop invariant preservation of goal fair_candy_swap_list'vc.
+Prover result is: Valid (0.01s, 1167 steps).
+
+File "repaired.mlw", line 85, characters 26-42:
+Sub-goal Loop invariant preservation of goal fair_candy_swap_list'vc.
+Prover result is: Valid (0.01s, 1173 steps).
+
+File "repaired.mlw", line 86, characters 26-46:
+Sub-goal Loop invariant preservation of goal fair_candy_swap_list'vc.
+Prover result is: Valid (0.01s, 1180 steps).
+
+File "repaired.mlw", line 87, characters 59-73:
+Sub-goal Loop invariant preservation of goal fair_candy_swap_list'vc.
+Prover result is: Valid (0.01s, 1190 steps).
+
+File "repaired.mlw", line 93, characters 27-41:
+Sub-goal Assertion of goal fair_candy_swap_list'vc.
+Prover result is: Valid (0.04s, 384510 steps).
+
+File "repaired.mlw", line 94, characters 27-41:
+Sub-goal Assertion of goal fair_candy_swap_list'vc.
+Prover result is: Valid (0.01s, 16549 steps).
+
+File "repaired.mlw", line 96, characters 29-74:
+Sub-goal Assertion of goal fair_candy_swap_list'vc.
+Prover result is: Valid (0.01s, 1240 steps).
+
+File "repaired.mlw", line 97, characters 29-68:
+Sub-goal Assertion of goal fair_candy_swap_list'vc.
+Prover result is: Valid (0.01s, 16969 steps).
+
+File "repaired.mlw", line 99, characters 29-74:
+Sub-goal Assertion of goal fair_candy_swap_list'vc.
+Prover result is: Valid (0.01s, 19464 steps).
+
+File "repaired.mlw", line 113, characters 15-60:
+Sub-goal Assertion of goal fair_candy_swap_list'vc.
+Prover result is: Valid (0.01s, 1305 steps).
+
+File "repaired.mlw", line 59, characters 15-59:
+Sub-goal Postcondition of goal fair_candy_swap_list'vc.
+Prover result is: Valid (0.01s, 1310 steps).
+
+File "repaired.mlw", line 102, characters 58-72:
+Sub-goal Assertion of goal fair_candy_swap_list'vc.
+Prover result is: Timeout (10.00s, 182774967 steps).
+
+File "repaired.mlw", line 88, characters 24-39:
+Sub-goal Loop variant decrease of goal fair_candy_swap_list'vc.
+Prover result is: Valid (0.01s, 17412 steps).
+
+File "repaired.mlw", line 83, characters 26-54:
+Sub-goal Loop invariant preservation of goal fair_candy_swap_list'vc.
+Prover result is: Valid (0.01s, 1241 steps).
+
+File "repaired.mlw", line 84, characters 26-50:
+Sub-goal Loop invariant preservation of goal fair_candy_swap_list'vc.
+Prover result is: Valid (0.01s, 1243 steps).
+
+File "repaired.mlw", line 85, characters 26-42:
+Sub-goal Loop invariant preservation of goal fair_candy_swap_list'vc.
+Prover result is: Valid (0.01s, 1249 steps).
+
+File "repaired.mlw", line 86, characters 26-46:
+Sub-goal Loop invariant preservation of goal fair_candy_swap_list'vc.
+Prover result is: Valid (0.01s, 17336 steps).
+
+File "repaired.mlw", line 87, characters 59-73:
+Sub-goal Loop invariant preservation of goal fair_candy_swap_list'vc.
+Prover result is: Valid (0.01s, 17527 steps).
+Infrastructure issue in stage 2 with prover Z3,4.8.6; aborting rest of stage 2.
+== Goals still unproved after stage 2 (split_vc) ==
+FairCandySwap_List_Spec	fair_candy_swap_list'vc
+== Stage 3: split_vc + inline_all on still-unproved goal ==
+Target theory: FairCandySwap_List_Spec
+Target goal  : fair_candy_swap_list'vc
+---- stage3 | prover: Alt-Ergo,2.4.0 | theory: FairCandySwap_List_Spec | goal: fair_candy_swap_list'vc ----
+Transforms: split_vc inline_all
+File "repaired.mlw", line 63, characters 13-41:
+Sub-goal Assertion of goal fair_candy_swap_list'vc.
+Prover result is: Valid (0.01s, 18 steps).
+
+File "repaired.mlw", line 64, characters 13-37:
+Sub-goal Assertion of goal fair_candy_swap_list'vc.
+Prover result is: Valid (0.01s, 18 steps).
+
+File "repaired.mlw", line 70, characters 20-48:
+Sub-goal Loop invariant init of goal fair_candy_swap_list'vc.
+Prover result is: Valid (0.01s, 18 steps).
+
+File "repaired.mlw", line 71, characters 20-44:
+Sub-goal Loop invariant init of goal fair_candy_swap_list'vc.
+Prover result is: Valid (0.01s, 18 steps).
+
+File "repaired.mlw", line 72, characters 20-42:
+Sub-goal Loop invariant init of goal fair_candy_swap_list'vc.
+Prover result is: Valid (0.01s, 22 steps).
+
+File "repaired.mlw", line 73, characters 55-71:
+Sub-goal Loop invariant init of goal fair_candy_swap_list'vc.
+Prover result is: Valid (0.01s, 20 steps).
+
+File "repaired.mlw", line 74, characters 18-35:
+Sub-goal Loop variant decrease of goal fair_candy_swap_list'vc.
+Prover result is: Valid (0.01s, 20 steps).
+
+File "repaired.mlw", line 70, characters 20-48:
+Sub-goal Loop invariant preservation of goal fair_candy_swap_list'vc.
+Prover result is: Valid (0.01s, 20 steps).
+
+File "repaired.mlw", line 71, characters 20-44:
+Sub-goal Loop invariant preservation of goal fair_candy_swap_list'vc.
+Prover result is: Valid (0.01s, 20 steps).
+
+File "repaired.mlw", line 72, characters 20-42:
+Sub-goal Loop invariant preservation of goal fair_candy_swap_list'vc.
+Prover result is: Valid (0.01s, 20 steps).
+
+File "repaired.mlw", line 73, characters 55-71:
+Sub-goal Loop invariant preservation of goal fair_candy_swap_list'vc.
+Prover result is: Valid (0.01s, 20 steps).
+
+File "repaired.mlw", line 79, characters 21-37:
+Sub-goal Assertion of goal fair_candy_swap_list'vc.
+Prover result is: Valid (0.01s, 29 steps).
+
+File "repaired.mlw", line 80, characters 21-37:
+Sub-goal Assertion of goal fair_candy_swap_list'vc.
+Prover result is: Valid (0.01s, 29 steps).
+
+File "repaired.mlw", line 83, characters 26-54:
+Sub-goal Loop invariant init of goal fair_candy_swap_list'vc.
+Prover result is: Valid (0.01s, 26 steps).
+
+File "repaired.mlw", line 84, characters 26-50:
+Sub-goal Loop invariant init of goal fair_candy_swap_list'vc.
+Prover result is: Valid (0.01s, 26 steps).
+
+File "repaired.mlw", line 85, characters 26-42:
+Sub-goal Loop invariant init of goal fair_candy_swap_list'vc.
+Prover result is: Valid (0.01s, 26 steps).
+
+File "repaired.mlw", line 86, characters 26-46:
+Sub-goal Loop invariant init of goal fair_candy_swap_list'vc.
+Prover result is: Valid (0.01s, 33 steps).
+
+File "repaired.mlw", line 87, characters 59-73:
+Sub-goal Loop invariant init of goal fair_candy_swap_list'vc.
+Prover result is: Valid (0.01s, 28 steps).
+
+File "repaired.mlw", line 88, characters 24-39:
+Sub-goal Loop variant decrease of goal fair_candy_swap_list'vc.
+Prover result is: Valid (0.01s, 28 steps).
+
+File "repaired.mlw", line 83, characters 26-54:
+Sub-goal Loop invariant preservation of goal fair_candy_swap_list'vc.
+Prover result is: Valid (0.01s, 28 steps).
+
+File "repaired.mlw", line 84, characters 26-50:
+Sub-goal Loop invariant preservation of goal fair_candy_swap_list'vc.
+Prover result is: Valid (0.01s, 28 steps).
+
+File "repaired.mlw", line 85, characters 26-42:
+Sub-goal Loop invariant preservation of goal fair_candy_swap_list'vc.
+Prover result is: Valid (0.01s, 28 steps).
+
+File "repaired.mlw", line 86, characters 26-46:
+Sub-goal Loop invariant preservation of goal fair_candy_swap_list'vc.
+Prover result is: Valid (0.01s, 28 steps).
+
+File "repaired.mlw", line 87, characters 59-73:
+Sub-goal Loop invariant preservation of goal fair_candy_swap_list'vc.
+Prover result is: Valid (0.01s, 28 steps).
+
+File "repaired.mlw", line 93, characters 27-41:
+Sub-goal Assertion of goal fair_candy_swap_list'vc.
+Prover result is: Valid (0.01s, 39 steps).
+
+File "repaired.mlw", line 94, characters 27-41:
+Sub-goal Assertion of goal fair_candy_swap_list'vc.
+Prover result is: Valid (0.01s, 40 steps).
+
+File "repaired.mlw", line 96, characters 29-74:
+Sub-goal Assertion of goal fair_candy_swap_list'vc.
+Prover result is: Valid (0.01s, 38 steps).
+
+File "repaired.mlw", line 97, characters 29-68:
+Sub-goal Assertion of goal fair_candy_swap_list'vc.
+Prover result is: Valid (0.01s, 38 steps).
+
+File "repaired.mlw", line 99, characters 29-74:
+Sub-goal Assertion of goal fair_candy_swap_list'vc.
+Prover result is: Valid (0.01s, 57 steps).
+
+File "repaired.mlw", line 113, characters 15-60:
+Sub-goal Assertion of goal fair_candy_swap_list'vc.
+Prover result is: Valid (0.01s, 73 steps).
+
+File "repaired.mlw", line 59, characters 15-59:
+Sub-goal Postcondition of goal fair_candy_swap_list'vc.
+Prover result is: Valid (0.01s, 91 steps).
+
+File "repaired.mlw", line 102, characters 58-72:
+Sub-goal Assertion of goal fair_candy_swap_list'vc.
+Prover result is: Valid (0.01s, 48 steps).
+
+File "repaired.mlw", line 88, characters 24-39:
+Sub-goal Loop variant decrease of goal fair_candy_swap_list'vc.
+Prover result is: Valid (0.01s, 58 steps).
+
+File "repaired.mlw", line 83, characters 26-54:
+Sub-goal Loop invariant preservation of goal fair_candy_swap_list'vc.
+Prover result is: Valid (0.01s, 36 steps).
+
+File "repaired.mlw", line 84, characters 26-50:
+Sub-goal Loop invariant preservation of goal fair_candy_swap_list'vc.
+Prover result is: Valid (0.01s, 36 steps).
+
+File "repaired.mlw", line 85, characters 26-42:
+Sub-goal Loop invariant preservation of goal fair_candy_swap_list'vc.
+Prover result is: Valid (0.01s, 36 steps).
+
+File "repaired.mlw", line 86, characters 26-46:
+Sub-goal Loop invariant preservation of goal fair_candy_swap_list'vc.
+Prover result is: Valid (0.01s, 47 steps).
+
+File "repaired.mlw", line 87, characters 59-73:
+Sub-goal Loop invariant preservation of goal fair_candy_swap_list'vc.
+Prover result is: Valid (0.01s, 49 steps).
+
+File "repaired.mlw", line 106, characters 52-68:
+Sub-goal Assertion of goal fair_candy_swap_list'vc.
+Prover result is: Valid (0.01s, 36 steps).
+
+File "repaired.mlw", line 74, characters 18-35:
+Sub-goal Loop variant decrease of goal fair_candy_swap_list'vc.
+Prover result is: Valid (0.01s, 43 steps).
+
+File "repaired.mlw", line 70, characters 20-48:
+Sub-goal Loop invariant preservation of goal fair_candy_swap_list'vc.
+Prover result is: Valid (0.01s, 28 steps).
+
+File "repaired.mlw", line 71, characters 20-44:
+Sub-goal Loop invariant preservation of goal fair_candy_swap_list'vc.
+Prover result is: Valid (0.01s, 28 steps).
+
+File "repaired.mlw", line 72, characters 20-42:
+Sub-goal Loop invariant preservation of goal fair_candy_swap_list'vc.
+Prover result is: Valid (0.01s, 36 steps).
+
+File "repaired.mlw", line 73, characters 55-71:
+Sub-goal Loop invariant preservation of goal fair_candy_swap_list'vc.
+Prover result is: Valid (0.01s, 37 steps).
+
+File "repaired.mlw", line 110, characters 15-20:
+Sub-goal Assertion of goal fair_candy_swap_list'vc.
+Prover result is: Timeout (10.00s, 93578 steps).
+
+File "repaired.mlw", line 59, characters 15-59:
+Sub-goal Postcondition of goal fair_candy_swap_list'vc.
+Prover result is: Valid (0.01s, 20 steps).
+---- stage3 | prover: CVC4,1.8 | theory: FairCandySwap_List_Spec | goal: fair_candy_swap_list'vc ----
+Transforms: split_vc inline_all
+File "repaired.mlw", line 63, characters 13-41:
+Sub-goal Assertion of goal fair_candy_swap_list'vc.
+Prover result is: Valid (0.01s, 2150 steps).
+
+File "repaired.mlw", line 64, characters 13-37:
+Sub-goal Assertion of goal fair_candy_swap_list'vc.
+Prover result is: Valid (0.01s, 2151 steps).
+
+File "repaired.mlw", line 70, characters 20-48:
+Sub-goal Loop invariant init of goal fair_candy_swap_list'vc.
+Prover result is: Valid (0.01s, 2152 steps).
+
+File "repaired.mlw", line 71, characters 20-44:
+Sub-goal Loop invariant init of goal fair_candy_swap_list'vc.
+Prover result is: Valid (0.01s, 2153 steps).
+
+File "repaired.mlw", line 72, characters 20-42:
+Sub-goal Loop invariant init of goal fair_candy_swap_list'vc.
+Prover result is: Valid (0.01s, 2774 steps).
+
+File "repaired.mlw", line 73, characters 55-71:
+Sub-goal Loop invariant init of goal fair_candy_swap_list'vc.
+Prover result is: Valid (0.01s, 2413 steps).
+
+File "repaired.mlw", line 74, characters 18-35:
+Sub-goal Loop variant decrease of goal fair_candy_swap_list'vc.
+Prover result is: Valid (0.01s, 2673 steps).
+
+File "repaired.mlw", line 70, characters 20-48:
+Sub-goal Loop invariant preservation of goal fair_candy_swap_list'vc.
+Prover result is: Valid (0.01s, 2654 steps).
+
+File "repaired.mlw", line 71, characters 20-44:
+Sub-goal Loop invariant preservation of goal fair_candy_swap_list'vc.
+Prover result is: Valid (0.01s, 2655 steps).
+
+File "repaired.mlw", line 72, characters 20-42:
+Sub-goal Loop invariant preservation of goal fair_candy_swap_list'vc.
+Prover result is: Valid (0.01s, 2661 steps).
+
+File "repaired.mlw", line 73, characters 55-71:
+Sub-goal Loop invariant preservation of goal fair_candy_swap_list'vc.
+Prover result is: Valid (0.01s, 2680 steps).
+
+File "repaired.mlw", line 79, characters 21-37:
+Sub-goal Assertion of goal fair_candy_swap_list'vc.
+Prover result is: Valid (0.01s, 3178 steps).
+
+File "repaired.mlw", line 80, characters 21-37:
+Sub-goal Assertion of goal fair_candy_swap_list'vc.
+Prover result is: Valid (0.01s, 3175 steps).
+
+File "repaired.mlw", line 83, characters 26-54:
+Sub-goal Loop invariant init of goal fair_candy_swap_list'vc.
+Prover result is: Valid (0.01s, 2895 steps).
+
+File "repaired.mlw", line 84, characters 26-50:
+Sub-goal Loop invariant init of goal fair_candy_swap_list'vc.
+Prover result is: Valid (0.01s, 2896 steps).
+
+File "repaired.mlw", line 85, characters 26-42:
+Sub-goal Loop invariant init of goal fair_candy_swap_list'vc.
+Prover result is: Valid (0.01s, 2899 steps).
+
+File "repaired.mlw", line 86, characters 26-46:
+Sub-goal Loop invariant init of goal fair_candy_swap_list'vc.
+Prover result is: Valid (0.02s, 3531 steps).
+
+File "repaired.mlw", line 87, characters 59-73:
+Sub-goal Loop invariant init of goal fair_candy_swap_list'vc.
+Prover result is: Valid (0.01s, 2961 steps).
+
+File "repaired.mlw", line 88, characters 24-39:
+Sub-goal Loop variant decrease of goal fair_candy_swap_list'vc.
+Prover result is: Valid (0.01s, 3042 steps).
+
+File "repaired.mlw", line 83, characters 26-54:
+Sub-goal Loop invariant preservation of goal fair_candy_swap_list'vc.
+Prover result is: Valid (0.01s, 3023 steps).
+
+File "repaired.mlw", line 84, characters 26-50:
+Sub-goal Loop invariant preservation of goal fair_candy_swap_list'vc.
+Prover result is: Valid (0.01s, 3024 steps).
+
+File "repaired.mlw", line 85, characters 26-42:
+Sub-goal Loop invariant preservation of goal fair_candy_swap_list'vc.
+Prover result is: Valid (0.01s, 3027 steps).
+
+File "repaired.mlw", line 86, characters 26-46:
+Sub-goal Loop invariant preservation of goal fair_candy_swap_list'vc.
+Prover result is: Valid (0.01s, 3033 steps).
+
+File "repaired.mlw", line 87, characters 59-73:
+Sub-goal Loop invariant preservation of goal fair_candy_swap_list'vc.
+Prover result is: Valid (0.01s, 3052 steps).
+
+File "repaired.mlw", line 93, characters 27-41:
+Sub-goal Assertion of goal fair_candy_swap_list'vc.
+Prover result is: Valid (0.02s, 3408 steps).
+
+File "repaired.mlw", line 94, characters 27-41:
+Sub-goal Assertion of goal fair_candy_swap_list'vc.
+Prover result is: Valid (0.02s, 3405 steps).
+
+File "repaired.mlw", line 96, characters 29-74:
+Sub-goal Assertion of goal fair_candy_swap_list'vc.
+Prover result is: Valid (0.01s, 3133 steps).
+
+File "repaired.mlw", line 97, characters 29-68:
+Sub-goal Assertion of goal fair_candy_swap_list'vc.
+Prover result is: Valid (0.01s, 3154 steps).
+
+File "repaired.mlw", line 99, characters 29-74:
+Sub-goal Assertion of goal fair_candy_swap_list'vc.
+Prover result is: Unknown (unknown + incomplete) (0.02s, 6267 steps).
+
+File "repaired.mlw", line 113, characters 15-60:
+Sub-goal Assertion of goal fair_candy_swap_list'vc.
+Prover result is: Valid (0.01s, 3810 steps).
+
+File "repaired.mlw", line 59, characters 15-59:
+Sub-goal Postcondition of goal fair_candy_swap_list'vc.
+Prover result is: Valid (0.02s, 4035 steps).
+
+File "repaired.mlw", line 102, characters 58-72:
+Sub-goal Assertion of goal fair_candy_swap_list'vc.
+Prover result is: Valid (0.01s, 3554 steps).
+
+File "repaired.mlw", line 88, characters 24-39:
+Sub-goal Loop variant decrease of goal fair_candy_swap_list'vc.
+Prover result is: Valid (0.02s, 4122 steps).
+
+File "repaired.mlw", line 83, characters 26-54:
+Sub-goal Loop invariant preservation of goal fair_candy_swap_list'vc.
+Prover result is: Valid (0.01s, 3181 steps).
+
+File "repaired.mlw", line 84, characters 26-50:
+Sub-goal Loop invariant preservation of goal fair_candy_swap_list'vc.
+Prover result is: Valid (0.01s, 3182 steps).
+
+File "repaired.mlw", line 85, characters 26-42:
+Sub-goal Loop invariant preservation of goal fair_candy_swap_list'vc.
+Prover result is: Valid (0.01s, 3185 steps).
+
+File "repaired.mlw", line 86, characters 26-46:
+Sub-goal Loop invariant preservation of goal fair_candy_swap_list'vc.
+Prover result is: Valid (0.02s, 4080 steps).
+
+File "repaired.mlw", line 87, characters 59-73:
+Sub-goal Loop invariant preservation of goal fair_candy_swap_list'vc.
+Prover result is: Valid (0.02s, 4125 steps).
+
+File "repaired.mlw", line 106, characters 52-68:
+Sub-goal Assertion of goal fair_candy_swap_list'vc.
+Prover result is: Valid (0.01s, 3451 steps).
+
+File "repaired.mlw", line 74, characters 18-35:
+Sub-goal Loop variant decrease of goal fair_candy_swap_list'vc.
+Prover result is: Valid (0.02s, 3903 steps).
+
+File "repaired.mlw", line 70, characters 20-48:
+Sub-goal Loop invariant preservation of goal fair_candy_swap_list'vc.
+Prover result is: Valid (0.01s, 3152 steps).
+
+File "repaired.mlw", line 71, characters 20-44:
+Sub-goal Loop invariant preservation of goal fair_candy_swap_list'vc.
+Prover result is: Valid (0.01s, 3153 steps).
+
+File "repaired.mlw", line 72, characters 20-42:
+Sub-goal Loop invariant preservation of goal fair_candy_swap_list'vc.
+Prover result is: Valid (0.02s, 3869 steps).
+
+File "repaired.mlw", line 73, characters 55-71:
+Sub-goal Loop invariant preservation of goal fair_candy_swap_list'vc.
+Prover result is: Valid (0.02s, 3914 steps).
+
+File "repaired.mlw", line 110, characters 15-20:
+Sub-goal Assertion of goal fair_candy_swap_list'vc.
+Prover result is: Unknown (unknown + incomplete) (0.02s, 3551 steps).
+
+File "repaired.mlw", line 59, characters 15-59:
+Sub-goal Postcondition of goal fair_candy_swap_list'vc.
+Prover result is: Valid (0.01s, 3131 steps).
+== Final summary ==
+Unproved root goals after first prover : 1
+Remaining failures after split_vc      : 1
+Remaining failures after stage 3       : 1
+Detailed logs stored in                : /Users/rubenm/Desktop/Diversify2Verify/codex-runs/dataset-merge-verification/stage3a-repair/888_fair-candy-swap/list-imperative/fair_candy_swap_list_stage3_8b54a1e2_stage3/generated/why3/.why3_sessions/repaired_logs
+Still unproved goals:
+FairCandySwap_List_Spec	fair_candy_swap_list'vc
+VERIFY_RESULT: FAILURE
+VERIFY_REASON: unproved_goals_remain
+VERIFY_STAGE: stage3
+VERIFY_ROOT_TOTAL: 3
+VERIFY_ROOT_PROVED: 2
+VERIFY_ROOT_REMAINING: 1

@@ -1,0 +1,218 @@
+module MinimizeTheMaximumDifferenceOfPairs_Array_Imperative_Implementation
+
+  use int.Int
+  use int.EuclideanDivision
+  use array.Array
+  use array.Init
+  use ref.Ref
+
+  exception InsertionPoint
+
+  let copy_array (nums: array int) : array int =
+    let n = length nums in
+    let result = make n 0 in
+    for i = 0 to n - 1 do
+      result[i] <- nums[i]
+    done;
+    result
+
+  let insertion_sort (nums: array int) : unit =
+    let n = length nums in
+    if n >= 2 then
+      for i = 1 to n - 1 do
+        let key = nums[i] in
+        let j = ref (i - 1) in
+        try
+          while !j >= 0 do
+            if nums[!j] > key then begin
+              nums[!j + 1] <- nums[!j];
+              j := !j - 1
+            end else
+              raise InsertionPoint
+          done
+        with InsertionPoint ->
+          ()
+        end;
+        nums[!j + 1] <- key
+      done
+
+  let sort_array (nums: array int) : array int =
+    let sorted = copy_array nums in
+    insertion_sort sorted;
+    sorted
+
+  let count_pairs_with_bound (sorted_nums: array int) (d: int) : int =
+    let n = length sorted_nums in
+    let count = ref 0 in
+    let i = ref 0 in
+    while !i + 1 < n do
+      if sorted_nums[!i + 1] - sorted_nums[!i] <= d then begin
+        count := !count + 1;
+        i := !i + 2
+      end else
+        i := !i + 1
+    done;
+    !count
+
+  let minimize_the_maximum_difference_of_pairs_array (nums: array int) (p: int) : int =
+    if p <= 0 then
+      0
+    else begin
+      let sorted_nums = sort_array nums in
+      let n = length sorted_nums in
+      let low = ref 0 in
+      let high = ref (sorted_nums[n - 1] - sorted_nums[0]) in
+      while !low < !high do
+        let mid = !low + div (!high - !low) 2 in
+        if count_pairs_with_bound sorted_nums mid >= p then
+          high := mid
+        else
+          low := mid + 1
+      done;
+      !low
+    end
+
+  let test_000 () : bool =
+    let nums = init 5 [|1; 3; 6; 8; 10|] in
+    let result = minimize_the_maximum_difference_of_pairs_array nums 2 in
+    result = 2
+
+  let test_001 () : bool =
+    let nums = init 6 [|5; 3; 8; 4; 9; 1|] in
+    let result = minimize_the_maximum_difference_of_pairs_array nums 3 in
+    result = 2
+
+  let test_002 () : bool =
+    let nums = init 5 [|5; 5; 5; 5; 5|] in
+    let result = minimize_the_maximum_difference_of_pairs_array nums 2 in
+    result = 0
+
+  let test_003 () : bool =
+    let nums = init 6 [|7; 1; 3; 4; 2; 5|] in
+    let result = minimize_the_maximum_difference_of_pairs_array nums 0 in
+    result = 0
+
+  let test_004 () : bool =
+    let nums = init 6 [|1; 1; 1; 1; 1; 1|] in
+    let result = minimize_the_maximum_difference_of_pairs_array nums 2 in
+    result = 0
+
+  let test_005 () : bool =
+    let nums = init 8 [|5; 4; 2; 2; 1; 3; 3; 5|] in
+    let result = minimize_the_maximum_difference_of_pairs_array nums 3 in
+    result = 0
+
+  let test_006 () : bool =
+    let nums = init 5 [|1; 3; 5; 7; 9|] in
+    let result = minimize_the_maximum_difference_of_pairs_array nums 2 in
+    result = 2
+
+  let test_007 () : bool =
+    let nums = init 6 [|1; 3; 6; 9; 12; 15|] in
+    let result = minimize_the_maximum_difference_of_pairs_array nums 2 in
+    result = 3
+
+  let test_008 () : bool =
+    let nums = init 8 [|1; 1; 1; 1; 1; 1; 1; 1|] in
+    let result = minimize_the_maximum_difference_of_pairs_array nums 4 in
+    result = 0
+
+  let test_009 () : bool =
+    let nums = init 5 [|1; 3; 6; 19; 20|] in
+    let result = minimize_the_maximum_difference_of_pairs_array nums 2 in
+    result = 2
+
+  let test_010 () : bool =
+    let nums = init 6 [|8; 4; 2; 6; 10; 12|] in
+    let result = minimize_the_maximum_difference_of_pairs_array nums 3 in
+    result = 2
+
+  let test_012 () : bool =
+    let nums = init 10 [|1; 2; 3; 4; 5; 6; 7; 8; 9; 10|] in
+    let result = minimize_the_maximum_difference_of_pairs_array nums 3 in
+    result = 1
+
+  let test_013 () : bool =
+    let nums = init 6 [|10; 1; 2; 7; 1; 3|] in
+    let result = minimize_the_maximum_difference_of_pairs_array nums 2 in
+    result = 1
+
+  let test_014 () : bool =
+    let nums = init 4 [|4; 2; 1; 2|] in
+    let result = minimize_the_maximum_difference_of_pairs_array nums 1 in
+    result = 0
+
+  let test_015 () : bool =
+    let nums = init 5 [|5; 3; 2; 4; 1|] in
+    let result = minimize_the_maximum_difference_of_pairs_array nums 2 in
+    result = 1
+
+  let test_016 () : bool =
+    let nums = init 20 [|1; 3; 2; 4; 5; 7; 6; 8; 9; 11; 10; 12; 13; 15; 14; 16; 17; 19; 18; 20|] in
+    let result = minimize_the_maximum_difference_of_pairs_array nums 10 in
+    result = 1
+
+  let test_017 () : bool =
+    let nums = init 15 [|10; 20; 30; 40; 50; 60; 70; 80; 90; 100; 110; 120; 130; 140; 150|] in
+    let result = minimize_the_maximum_difference_of_pairs_array nums 5 in
+    result = 10
+
+  let test_018 () : bool =
+    let nums = init 10 [|5; 1; 9; 3; 7; 6; 8; 2; 4; 10|] in
+    let result = minimize_the_maximum_difference_of_pairs_array nums 5 in
+    result = 1
+
+  let test_019 () : bool =
+    let nums = init 20 [|3; 3; 3; 3; 3; 3; 3; 3; 3; 3; 3; 3; 3; 3; 3; 3; 3; 3; 3; 3|] in
+    let result = minimize_the_maximum_difference_of_pairs_array nums 9 in
+    result = 0
+
+  let test_022 () : bool =
+    let nums = init 10 [|1; 3; 6; 9; 12; 15; 18; 21; 24; 27|] in
+    let result = minimize_the_maximum_difference_of_pairs_array nums 4 in
+    result = 3
+
+  let run_tests () : bool =
+    if test_000 () then
+    if test_001 () then
+    if test_002 () then
+    if test_003 () then
+    if test_004 () then
+    if test_005 () then
+    if test_006 () then
+    if test_007 () then
+    if test_008 () then
+    if test_009 () then
+    if test_010 () then
+    if test_012 () then
+    if test_013 () then
+    if test_014 () then
+    if test_015 () then
+    if test_016 () then
+    if test_017 () then
+    if test_018 () then
+    if test_019 () then
+    if test_022 () then
+      true
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+
+end

@@ -1,0 +1,205 @@
+module SmallestMissingIntegerGreaterThanSequentialPrefixSum_Array_Recursive_Implementation
+
+  use int.Int
+  use array.Array
+  use array.Init
+
+  predicate valid_input (nums: array int) =
+    1 <= length nums <= 50 /\
+    forall i: int. 0 <= i < length nums -> 1 <= nums[i] <= 50
+
+  let rec present_from (nums: array int) (x: int) (i: int) : bool
+    variant { length nums - i }
+  =
+    if i >= length nums then
+      false
+    else if nums[i] = x then
+      true
+    else
+      present_from nums x (i + 1)
+
+  let rec longest_sequential_prefix_len_from (nums: array int) (i: int) : int
+    variant { length nums - i }
+  =
+    if i >= length nums then
+      length nums
+    else if nums[i] = nums[i - 1] + 1 then
+      longest_sequential_prefix_len_from nums (i + 1)
+    else
+      i
+
+  let longest_sequential_prefix_len (nums: array int) : int =
+    if length nums <= 1 then
+      length nums
+    else
+      longest_sequential_prefix_len_from nums 1
+
+  let rec prefix_sum_len_from (nums: array int) (i: int) (len: int) : int
+    variant { len - i }
+  =
+    if i >= len then
+      0
+    else
+      nums[i] + prefix_sum_len_from nums (i + 1) len
+
+  let rec first_missing_from_candidate (nums: array int) (candidate: int) : int
+    variant { 51 - candidate }
+  =
+    if candidate > 50 then
+      candidate
+    else if present_from nums candidate 0 then
+      first_missing_from_candidate nums (candidate + 1)
+    else
+      candidate
+
+  let smallest_missing_integer_greater_than_sequential_prefix_sum_array (nums: array int) : int
+    requires { valid_input nums }
+  =
+    let prefix_len = longest_sequential_prefix_len nums in
+    let prefix_sum = prefix_sum_len_from nums 0 prefix_len in
+    first_missing_from_candidate nums prefix_sum
+
+  let test_000 () : bool =
+    let nums = init 5 [|1; 3; 2; 4; 5|] in
+    let r = smallest_missing_integer_greater_than_sequential_prefix_sum_array nums in
+    r = 6
+
+  let test_001 () : bool =
+    let nums = init 6 [|10; 11; 12; 8; 9; 13|] in
+    let r = smallest_missing_integer_greater_than_sequential_prefix_sum_array nums in
+    r = 33
+
+  let test_002 () : bool =
+    let nums = init 5 [|10; 11; 12; 13; 14|] in
+    let r = smallest_missing_integer_greater_than_sequential_prefix_sum_array nums in
+    r = 60
+
+  let test_003 () : bool =
+    let nums = init 5 [|1; 3; 5; 7; 9|] in
+    let r = smallest_missing_integer_greater_than_sequential_prefix_sum_array nums in
+    r = 2
+
+  let test_004 () : bool =
+    let nums = init 10 [|1; 2; 3; 4; 5; 6; 7; 8; 9; 10|] in
+    let r = smallest_missing_integer_greater_than_sequential_prefix_sum_array nums in
+    r = 55
+
+  let test_005 () : bool =
+    let nums = init 5 [|50; 49; 48; 47; 46|] in
+    let r = smallest_missing_integer_greater_than_sequential_prefix_sum_array nums in
+    r = 51
+
+  let test_006 () : bool =
+    let nums = init 10 [|5; 6; 7; 8; 9; 10; 11; 12; 13; 14|] in
+    let r = smallest_missing_integer_greater_than_sequential_prefix_sum_array nums in
+    r = 95
+
+  let test_007 () : bool =
+    let nums = init 5 [|2; 3; 4; 5; 6|] in
+    let r = smallest_missing_integer_greater_than_sequential_prefix_sum_array nums in
+    r = 20
+
+  let test_008 () : bool =
+    let nums = init 5 [|1; 2; 4; 3; 5|] in
+    let r = smallest_missing_integer_greater_than_sequential_prefix_sum_array nums in
+    r = 6
+
+  let test_009 () : bool =
+    let nums = init 5 [|5; 6; 7; 8; 9|] in
+    let r = smallest_missing_integer_greater_than_sequential_prefix_sum_array nums in
+    r = 35
+
+  let test_010 () : bool =
+    let nums = init 11 [|5; 6; 7; 8; 9; 10; 11; 12; 13; 14; 15|] in
+    let r = smallest_missing_integer_greater_than_sequential_prefix_sum_array nums in
+    r = 110
+
+  let test_011 () : bool =
+    let nums = init 5 [|1; 2; 3; 4; 5|] in
+    let r = smallest_missing_integer_greater_than_sequential_prefix_sum_array nums in
+    r = 15
+
+  let test_012 () : bool =
+    let nums = init 10 [|2; 3; 4; 5; 6; 7; 8; 9; 10; 1|] in
+    let r = smallest_missing_integer_greater_than_sequential_prefix_sum_array nums in
+    r = 54
+
+  let test_013 () : bool =
+    let nums = init 5 [|1; 2; 3; 2; 5|] in
+    let r = smallest_missing_integer_greater_than_sequential_prefix_sum_array nums in
+    r = 6
+
+  let test_014 () : bool =
+    let nums = init 5 [|1; 1; 1; 1; 1|] in
+    let r = smallest_missing_integer_greater_than_sequential_prefix_sum_array nums in
+    r = 2
+
+  let test_015 () : bool =
+    let nums = init 7 [|3; 4; 5; 1; 12; 14; 13|] in
+    let r = smallest_missing_integer_greater_than_sequential_prefix_sum_array nums in
+    r = 15
+
+  let test_016 () : bool =
+    let nums = init 5 [|1; 2; 2; 3; 4|] in
+    let r = smallest_missing_integer_greater_than_sequential_prefix_sum_array nums in
+    r = 5
+
+  let test_017 () : bool =
+    let nums = init 5 [|1; 2; 3; 5; 6|] in
+    let r = smallest_missing_integer_greater_than_sequential_prefix_sum_array nums in
+    r = 7
+
+  let test_018 () : bool =
+    let nums = init 17 [|4; 5; 6; 7; 8; 9; 10; 11; 12; 13; 14; 15; 16; 17; 18; 19; 20|] in
+    let r = smallest_missing_integer_greater_than_sequential_prefix_sum_array nums in
+    r = 204
+
+  let test_019 () : bool =
+    let nums = init 5 [|1; 2; 4; 5; 6|] in
+    let r = smallest_missing_integer_greater_than_sequential_prefix_sum_array nums in
+    r = 3
+
+  let run_tests () : bool =
+    if test_000 () then
+    if test_001 () then
+    if test_002 () then
+    if test_003 () then
+    if test_004 () then
+    if test_005 () then
+    if test_006 () then
+    if test_007 () then
+    if test_008 () then
+    if test_009 () then
+    if test_010 () then
+    if test_011 () then
+    if test_012 () then
+    if test_013 () then
+    if test_014 () then
+    if test_015 () then
+    if test_016 () then
+    if test_017 () then
+    if test_018 () then
+    if test_019 () then
+      true
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+
+end

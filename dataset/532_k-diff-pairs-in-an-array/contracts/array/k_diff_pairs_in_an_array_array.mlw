@@ -1,0 +1,140 @@
+module KDiffPairsInAnArray_Array_Spec
+
+  use int.Int
+  use int.NumOf as IntNumOf
+  use array.Array
+  use array.Init
+
+  predicate value_occurs (nums: array int) (x: int) =
+    exists i: int. 0 <= i < length nums /\ nums[i] = x
+
+  predicate duplicate_value (nums: array int) (x: int) =
+    exists i j: int.
+      0 <= i < j < length nums /\
+      nums[i] = x /\
+      nums[j] = x
+
+  predicate kdiff_base_value (nums: array int) (k: int) (x: int) =
+    (k = 0 /\ duplicate_value nums x) \/
+    (k > 0 /\ value_occurs nums x /\ value_occurs nums (x + k))
+
+  function kdiff_pair_count (nums: array int) (k: int) : int =
+    IntNumOf.numof (fun x -> kdiff_base_value nums k x) (-10000000) 10000001
+
+  val k_diff_pairs_in_an_array_array (nums: array int) (k: int) : int
+    requires { 1 <= length nums <= 10000 }
+    requires { 0 <= k <= 10000000 }
+    requires { forall i: int. 0 <= i < length nums -> -10000000 <= nums[i] <= 10000000 }
+    ensures  { result = kdiff_pair_count nums k }
+    ensures  { result >= 0 }
+
+  let lemma test_000 () =
+    let nums = init 5 [|1; 2; 3; 4; 5|] in
+    assert { length nums = 5 };
+    assert { nums[0] = 1 };
+    assert { nums[1] = 2 };
+    assert { nums[2] = 3 };
+    assert { nums[3] = 4 };
+    assert { nums[4] = 5 };
+    assert { value_occurs nums 1 };
+    assert { value_occurs nums 4 };
+    assert { value_occurs nums 2 };
+    assert { value_occurs nums 5 };
+    assert { kdiff_base_value nums 3 1 };
+    assert { kdiff_base_value nums 3 2 };
+    assert { not (kdiff_base_value nums 3 3) };
+    assert { not (kdiff_base_value nums 3 4) };
+    assert { not (kdiff_base_value nums 3 5) };
+    assert { kdiff_pair_count nums 3 = 2 }
+
+  let lemma test_004 () =
+    let nums = init 5 [|1; 3; 1; 5; 4|] in
+    assert { length nums = 5 };
+    assert { nums[0] = 1 };
+    assert { nums[1] = 3 };
+    assert { nums[2] = 1 };
+    assert { nums[3] = 5 };
+    assert { nums[4] = 4 };
+    assert { duplicate_value nums 1 };
+    assert { kdiff_base_value nums 0 1 };
+    assert { not (duplicate_value nums 3) };
+    assert { not (duplicate_value nums 4) };
+    assert { not (duplicate_value nums 5) };
+    assert { kdiff_pair_count nums 0 = 1 }
+
+  let lemma test_005 () =
+    let nums = init 5 [|1; 1; 1; 1; 1|] in
+    assert { length nums = 5 };
+    assert { nums[0] = 1 };
+    assert { nums[1] = 1 };
+    assert { nums[2] = 1 };
+    assert { nums[3] = 1 };
+    assert { nums[4] = 1 };
+    assert { duplicate_value nums 1 };
+    assert { kdiff_base_value nums 0 1 };
+    assert { not (kdiff_base_value nums 0 0) };
+    assert { not (kdiff_base_value nums 0 2) };
+    assert { kdiff_pair_count nums 0 = 1 }
+
+  let lemma test_006 () =
+    let nums = init 6 [|(-1); (-1); (-1); 2; 2; 2|] in
+    assert { length nums = 6 };
+    assert { nums[0] = (-1) };
+    assert { nums[1] = (-1) };
+    assert { nums[2] = (-1) };
+    assert { nums[3] = 2 };
+    assert { nums[4] = 2 };
+    assert { nums[5] = 2 };
+    assert { value_occurs nums (-1) };
+    assert { value_occurs nums 2 };
+    assert { kdiff_base_value nums 3 (-1) };
+    assert { not (kdiff_base_value nums 3 2) };
+    assert { kdiff_pair_count nums 3 = 1 }
+
+  let lemma test_007 () =
+    let nums = init 5 [|(-1); (-2); (-3); (-4); (-5)|] in
+    assert { length nums = 5 };
+    assert { nums[0] = (-1) };
+    assert { nums[1] = (-2) };
+    assert { nums[2] = (-3) };
+    assert { nums[3] = (-4) };
+    assert { nums[4] = (-5) };
+    assert { kdiff_base_value nums 1 (-5) };
+    assert { kdiff_base_value nums 1 (-4) };
+    assert { kdiff_base_value nums 1 (-3) };
+    assert { kdiff_base_value nums 1 (-2) };
+    assert { not (kdiff_base_value nums 1 (-1)) };
+    assert { kdiff_pair_count nums 1 = 4 }
+
+  let lemma test_008 () =
+    let nums = init 6 [|1; 1; 2; 2; 3; 3|] in
+    assert { length nums = 6 };
+    assert { nums[0] = 1 };
+    assert { nums[1] = 1 };
+    assert { nums[2] = 2 };
+    assert { nums[3] = 2 };
+    assert { nums[4] = 3 };
+    assert { nums[5] = 3 };
+    assert { kdiff_base_value nums 1 1 };
+    assert { kdiff_base_value nums 1 2 };
+    assert { not (kdiff_base_value nums 1 3) };
+    assert { kdiff_pair_count nums 1 = 2 }
+
+  let lemma test_009 () =
+    let nums = init 5 [|3; 1; 4; 1; 5|] in
+    assert { length nums = 5 };
+    assert { nums[0] = 3 };
+    assert { nums[1] = 1 };
+    assert { nums[2] = 4 };
+    assert { nums[3] = 1 };
+    assert { nums[4] = 5 };
+    assert { value_occurs nums 1 };
+    assert { value_occurs nums 3 };
+    assert { value_occurs nums 5 };
+    assert { kdiff_base_value nums 2 1 };
+    assert { kdiff_base_value nums 2 3 };
+    assert { not (kdiff_base_value nums 2 4) };
+    assert { not (kdiff_base_value nums 2 5) };
+    assert { kdiff_pair_count nums 2 = 2 }
+
+end

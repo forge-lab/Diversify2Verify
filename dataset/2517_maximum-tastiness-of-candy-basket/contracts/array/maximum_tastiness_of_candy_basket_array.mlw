@@ -1,0 +1,168 @@
+module MaximumTastinessOfCandyBasket_Array_Spec
+
+  use int.Int
+  use int.Abs
+  use array.Array
+  use array.Init
+
+  predicate valid_selection (price: array int) (k: int) (pick: array int) =
+    length pick = k /\
+    forall t: int. 0 <= t < k -> 0 <= pick[t] < length price
+
+  predicate distinct_selection (pick: array int) (k: int) =
+    forall x y: int. 0 <= x < y < k -> pick[x] <> pick[y]
+
+  predicate selection_tastiness_at_least
+    (price: array int) (pick: array int) (k: int) (d: int) =
+    forall x y: int. 0 <= x < y < k ->
+      abs (price[pick[x]] - price[pick[y]]) >= d
+
+  predicate basket_witness
+    (price: array int) (k: int) (pick: array int) (d: int) =
+    valid_selection price k pick /\
+    distinct_selection pick k /\
+    selection_tastiness_at_least price pick k d
+
+  predicate feasible_tastiness (price: array int) (k: int) (d: int) =
+    0 <= d /\
+    exists pick: array int. basket_witness price k pick d
+
+  predicate maximum_tastiness_spec (price: array int) (k: int) (m: int) =
+    0 <= m /\
+    feasible_tastiness price k m /\
+    forall d: int. feasible_tastiness price k d -> d <= m
+
+  val maximum_tastiness_of_candy_basket_array (price: array int) (k: int) : int
+    requires { 2 <= k <= length price }
+    ensures  { maximum_tastiness_spec price k result }
+
+  let lemma test_000_maximum_tastiness () =
+    let price = init 6 [|1000000000; 1; 2; 3; 4; 5|] in
+    let pick = init 3 [|1; 5; 0|] in
+    assert { length price = 6 };
+    assert { price[0] = 1000000000 };
+    assert { price[1] = 1 };
+    assert { price[5] = 5 };
+    assert { length pick = 3 };
+    assert { pick[0] = 1 };
+    assert { pick[1] = 5 };
+    assert { pick[2] = 0 };
+    assert { valid_selection price 3 pick };
+    assert { distinct_selection pick 3 };
+    assert { abs (price[pick[0]] - price[pick[1]]) = 4 };
+    assert { selection_tastiness_at_least price pick 3 4 };
+    assert { basket_witness price 3 pick 4 };
+    assert { feasible_tastiness price 3 4 };
+    assert { maximum_tastiness_spec price 3 4 }
+
+  let lemma test_001_maximum_tastiness () =
+    let price = init 5 [|1000000000; 1; 1000000000; 1; 1000000000|] in
+    let pick = init 3 [|0; 1; 2|] in
+    assert { length price = 5 };
+    assert { price[0] = 1000000000 };
+    assert { price[1] = 1 };
+    assert { price[2] = 1000000000 };
+    assert { length pick = 3 };
+    assert { pick[0] = 0 };
+    assert { pick[1] = 1 };
+    assert { pick[2] = 2 };
+    assert { valid_selection price 3 pick };
+    assert { distinct_selection pick 3 };
+    assert { abs (price[pick[0]] - price[pick[2]]) = 0 };
+    assert { selection_tastiness_at_least price pick 3 0 };
+    assert { basket_witness price 3 pick 0 };
+    assert { feasible_tastiness price 3 0 };
+    assert { maximum_tastiness_spec price 3 0 }
+
+  let lemma test_002_maximum_tastiness () =
+    let price = init 5 [|10; 20; 30; 40; 50|] in
+    let pick = init 3 [|0; 2; 4|] in
+    assert { length price = 5 };
+    assert { price[0] = 10 };
+    assert { price[2] = 30 };
+    assert { price[4] = 50 };
+    assert { length pick = 3 };
+    assert { pick[0] = 0 };
+    assert { pick[1] = 2 };
+    assert { pick[2] = 4 };
+    assert { valid_selection price 3 pick };
+    assert { distinct_selection pick 3 };
+    assert { abs (price[pick[0]] - price[pick[1]]) = 20 };
+    assert { abs (price[pick[1]] - price[pick[2]]) = 20 };
+    assert { selection_tastiness_at_least price pick 3 20 };
+    assert { basket_witness price 3 pick 20 };
+    assert { feasible_tastiness price 3 20 };
+    assert { maximum_tastiness_spec price 3 20 }
+
+  let lemma test_003_maximum_tastiness () =
+    let price = init 6 [|13; 5; 1; 8; 21; 2|] in
+    let pick = init 3 [|0; 1; 4|] in
+    assert { length price = 6 };
+    assert { price[0] = 13 };
+    assert { price[1] = 5 };
+    assert { price[4] = 21 };
+    assert { length pick = 3 };
+    assert { pick[0] = 0 };
+    assert { pick[1] = 1 };
+    assert { pick[2] = 4 };
+    assert { valid_selection price 3 pick };
+    assert { distinct_selection pick 3 };
+    assert { abs (price[pick[0]] - price[pick[1]]) = 8 };
+    assert { abs (price[pick[0]] - price[pick[2]]) = 8 };
+    assert { selection_tastiness_at_least price pick 3 8 };
+    assert { basket_witness price 3 pick 8 };
+    assert { feasible_tastiness price 3 8 };
+    assert { maximum_tastiness_spec price 3 8 }
+
+  let lemma test_004_maximum_tastiness () =
+    let price = init 4 [|1; 1000000000; 2; 999999999|] in
+    let pick = init 2 [|0; 1|] in
+    assert { length price = 4 };
+    assert { price[0] = 1 };
+    assert { price[1] = 1000000000 };
+    assert { length pick = 2 };
+    assert { pick[0] = 0 };
+    assert { pick[1] = 1 };
+    assert { valid_selection price 2 pick };
+    assert { distinct_selection pick 2 };
+    assert { abs (price[pick[0]] - price[pick[1]]) = 999999999 };
+    assert { selection_tastiness_at_least price pick 2 999999999 };
+    assert { basket_witness price 2 pick 999999999 };
+    assert { feasible_tastiness price 2 999999999 };
+    assert { maximum_tastiness_spec price 2 999999999 }
+
+  let lemma test_005_maximum_tastiness () =
+    let price = init 4 [|7; 7; 7; 7|] in
+    let pick = init 2 [|0; 1|] in
+    assert { length price = 4 };
+    assert { price[0] = 7 };
+    assert { price[1] = 7 };
+    assert { length pick = 2 };
+    assert { pick[0] = 0 };
+    assert { pick[1] = 1 };
+    assert { valid_selection price 2 pick };
+    assert { distinct_selection pick 2 };
+    assert { abs (price[pick[0]] - price[pick[1]]) = 0 };
+    assert { selection_tastiness_at_least price pick 2 0 };
+    assert { basket_witness price 2 pick 0 };
+    assert { feasible_tastiness price 2 0 };
+    assert { maximum_tastiness_spec price 2 0 }
+
+  let lemma test_007_maximum_tastiness () =
+    let price = init 3 [|1; 3; 1|] in
+    let pick = init 2 [|0; 1|] in
+    assert { length price = 3 };
+    assert { price[0] = 1 };
+    assert { price[1] = 3 };
+    assert { length pick = 2 };
+    assert { pick[0] = 0 };
+    assert { pick[1] = 1 };
+    assert { valid_selection price 2 pick };
+    assert { distinct_selection pick 2 };
+    assert { abs (price[pick[0]] - price[pick[1]]) = 2 };
+    assert { selection_tastiness_at_least price pick 2 2 };
+    assert { basket_witness price 2 pick 2 };
+    assert { feasible_tastiness price 2 2 };
+    assert { maximum_tastiness_spec price 2 2 }
+
+end

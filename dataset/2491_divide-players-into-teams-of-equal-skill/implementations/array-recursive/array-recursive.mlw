@@ -1,0 +1,232 @@
+module DividePlayersIntoTeamsOfEqualSkill_Array_Recursive_Implementation
+
+  use int.Int
+  use int.EuclideanDivision
+  use array.Array
+  use array.Init
+
+  let rec min_skill_from (skill: array int) (i: int) (current: int) : int
+    variant { length skill - i }
+  =
+    if i >= length skill then
+      current
+    else if skill[i] < current then
+      min_skill_from skill (i + 1) skill[i]
+    else
+      min_skill_from skill (i + 1) current
+
+  let rec max_skill_from (skill: array int) (i: int) (current: int) : int
+    variant { length skill - i }
+  =
+    if i >= length skill then
+      current
+    else if skill[i] > current then
+      max_skill_from skill (i + 1) skill[i]
+    else
+      max_skill_from skill (i + 1) current
+
+  let rec fill_counts (skill: array int) (i: int) (counts: array int) : unit
+    variant { length skill - i }
+  =
+    if i >= length skill then
+      ()
+    else
+      let value = skill[i] in
+      counts[value] <- counts[value] + 1;
+      fill_counts skill (i + 1) counts
+
+  let rec chemistry_from_counts (counts: array int) (target: int) (s: int) : int
+    variant { 1001 - s }
+  =
+    if s > 1000 then
+      0
+    else
+      let partner = target - s in
+      if partner < 1 then
+        if counts[s] = 0 then
+          chemistry_from_counts counts target (s + 1)
+        else
+          -1
+      else if partner > 1000 then
+        if counts[s] = 0 then
+          chemistry_from_counts counts target (s + 1)
+        else
+          -1
+      else if s < partner then
+        if counts[s] = counts[partner] then
+          let tail = chemistry_from_counts counts target (s + 1) in
+          if tail = -1 then
+            -1
+          else
+            counts[s] * s * partner + tail
+        else
+          -1
+      else if s = partner then
+        if mod counts[s] 2 = 0 then
+          let tail = chemistry_from_counts counts target (s + 1) in
+          if tail = -1 then
+            -1
+          else
+            div counts[s] 2 * s * partner + tail
+        else
+          -1
+      else
+        chemistry_from_counts counts target (s + 1)
+
+  let divide_players_into_teams_of_equal_skill_array (skill: array int) : int =
+    if length skill < 2 then
+      -1
+    else if mod (length skill) 2 <> 0 then
+      -1
+    else
+      let minimum = min_skill_from skill 1 skill[0] in
+      let maximum = max_skill_from skill 1 skill[0] in
+      let target = minimum + maximum in
+      let counts = make 1001 0 in
+      fill_counts skill 0 counts;
+      chemistry_from_counts counts target 1
+
+  let test_000 () : bool =
+    let skill = init 8 [|1; 1000; 1; 1000; 1; 1000; 1; 1000|] in
+    let r = divide_players_into_teams_of_equal_skill_array skill in
+    r = 4000
+
+  let test_001 () : bool =
+    let skill = init 8 [|1; 1; 2; 2; 3; 3; 4; 4|] in
+    let r = divide_players_into_teams_of_equal_skill_array skill in
+    r = 20
+
+  let test_002 () : bool =
+    let skill = init 4 [|1; 1; 2; 3|] in
+    let r = divide_players_into_teams_of_equal_skill_array skill in
+    r = -1
+
+  let test_003 () : bool =
+    let skill = init 8 [|1; 2; 3; 4; 5; 6; 7; 8|] in
+    let r = divide_players_into_teams_of_equal_skill_array skill in
+    r = 60
+
+  let test_004 () : bool =
+    let skill = init 6 [|5; 5; 5; 5; 5; 5|] in
+    let r = divide_players_into_teams_of_equal_skill_array skill in
+    r = 75
+
+  let test_005 () : bool =
+    let skill = init 8 [|15; 15; 15; 15; 15; 15; 15; 15|] in
+    let r = divide_players_into_teams_of_equal_skill_array skill in
+    r = 900
+
+  let test_006 () : bool =
+    let skill = init 2 [|3; 4|] in
+    let r = divide_players_into_teams_of_equal_skill_array skill in
+    r = 12
+
+  let test_007 () : bool =
+    let skill = init 6 [|2; 3; 3; 2; 2; 3|] in
+    let r = divide_players_into_teams_of_equal_skill_array skill in
+    r = 18
+
+  let test_008 () : bool =
+    let skill = init 4 [|4; 4; 4; 4|] in
+    let r = divide_players_into_teams_of_equal_skill_array skill in
+    r = 32
+
+  let test_009 () : bool =
+    let skill = init 6 [|3; 2; 5; 1; 3; 4|] in
+    let r = divide_players_into_teams_of_equal_skill_array skill in
+    r = 22
+
+  let test_010 () : bool =
+    let skill = init 4 [|10; 10; 10; 10|] in
+    let r = divide_players_into_teams_of_equal_skill_array skill in
+    r = 200
+
+  let test_011 () : bool =
+    let skill = init 6 [|1000; 1000; 1; 1; 2; 2|] in
+    let r = divide_players_into_teams_of_equal_skill_array skill in
+    r = -1
+
+  let test_012 () : bool =
+    let skill = init 6 [|1; 2; 3; 4; 5; 6|] in
+    let r = divide_players_into_teams_of_equal_skill_array skill in
+    r = 28
+
+  let test_013 () : bool =
+    let skill = init 6 [|1; 2; 3; 3; 2; 1|] in
+    let r = divide_players_into_teams_of_equal_skill_array skill in
+    r = 10
+
+  let test_014 () : bool =
+    let skill = init 8 [|1000; 1; 1000; 1; 1000; 1; 1000; 1|] in
+    let r = divide_players_into_teams_of_equal_skill_array skill in
+    r = 4000
+
+  let test_015 () : bool =
+    let skill = init 6 [|10; 20; 30; 40; 50; 60|] in
+    let r = divide_players_into_teams_of_equal_skill_array skill in
+    r = 2800
+
+  let test_016 () : bool =
+    let skill = init 8 [|500; 500; 500; 500; 500; 500; 500; 500|] in
+    let r = divide_players_into_teams_of_equal_skill_array skill in
+    r = 1000000
+
+  let test_017 () : bool =
+    let skill = init 6 [|1; 3; 5; 7; 9; 11|] in
+    let r = divide_players_into_teams_of_equal_skill_array skill in
+    r = 73
+
+  let test_018 () : bool =
+    let skill = init 6 [|1000; 1; 999; 2; 500; 501|] in
+    let r = divide_players_into_teams_of_equal_skill_array skill in
+    r = 253498
+
+  let test_019 () : bool =
+    let skill = init 8 [|500; 500; 1; 999; 2; 998; 3; 997|] in
+    let r = divide_players_into_teams_of_equal_skill_array skill in
+    r = 255986
+
+  let run_tests () : bool =
+    if test_000 () then
+    if test_001 () then
+    if test_002 () then
+    if test_003 () then
+    if test_004 () then
+    if test_005 () then
+    if test_006 () then
+    if test_007 () then
+    if test_008 () then
+    if test_009 () then
+    if test_010 () then
+    if test_011 () then
+    if test_012 () then
+    if test_013 () then
+    if test_014 () then
+    if test_015 () then
+    if test_016 () then
+    if test_017 () then
+    if test_018 () then
+    if test_019 () then
+      true
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+
+end

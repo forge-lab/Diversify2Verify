@@ -1,0 +1,246 @@
+module FindTheScoreOfAllPrefixesOfAnArray_Array_Spec
+
+  use int.Int
+  use int.MinMax
+  use array.Array
+  use array.Init
+
+  predicate valid_input (nums: array int) =
+    length nums >= 1 /\
+    forall i: int. 0 <= i < length nums -> 1 <= nums[i] <= 1000000000
+
+  let rec function prefix_max (nums: array int) (i: int) : int
+    requires { 0 <= i < length nums }
+    variant  { i }
+  =
+    if i = 0 then nums[0]
+    else max (prefix_max nums (i - 1)) nums[i]
+
+  let rec function prefix_score (nums: array int) (i: int) : int
+    requires { 0 <= i < length nums }
+    variant  { i }
+  =
+    if i = 0 then nums[0] + prefix_max nums 0
+    else prefix_score nums (i - 1) + nums[i] + prefix_max nums i
+
+  predicate result_matches (nums: array int) (ans: array int) =
+    valid_input nums /\
+    length ans = length nums /\
+    forall i: int. 0 <= i < length nums -> ans[i] = prefix_score nums i
+
+  val find_the_score_of_all_prefixes_of_an_array_array (nums: array int) : array int
+    requires { valid_input nums }
+    ensures  { result_matches nums result }
+
+  let lemma test_000 () =
+    let nums = init 5 [|5; 4; 3; 2; 1|] in
+    let expected = init 5 [|10; 19; 27; 34; 40|] in
+    assert { length nums = 5 };
+    assert { length expected = 5 };
+    assert { nums[0] = 5 };
+    assert { nums[1] = 4 };
+    assert { nums[2] = 3 };
+    assert { nums[3] = 2 };
+    assert { nums[4] = 1 };
+    assert { expected[0] = 10 };
+    assert { expected[1] = 19 };
+    assert { expected[2] = 27 };
+    assert { expected[3] = 34 };
+    assert { expected[4] = 40 };
+    assert { valid_input nums };
+    assert { prefix_max nums 0 = 5 };
+    assert { prefix_max nums 1 = 5 };
+    assert { prefix_max nums 2 = 5 };
+    assert { prefix_max nums 3 = 5 };
+    assert { prefix_max nums 4 = 5 };
+    assert { prefix_score nums 0 = 10 };
+    assert { prefix_score nums 1 = 19 };
+    assert { prefix_score nums 2 = 27 };
+    assert { prefix_score nums 3 = 34 };
+    assert { prefix_score nums 4 = 40 };
+    assert {
+      forall i: int. 0 <= i < length nums ->
+        i = 0 \/ i = 1 \/ i = 2 \/ i = 3 \/ i = 4
+    };
+    assert { result_matches nums expected }
+
+  let lemma test_001 () =
+    let nums = init 1 [|1|] in
+    let expected = init 1 [|2|] in
+    assert { length nums = 1 };
+    assert { length expected = 1 };
+    assert { nums[0] = 1 };
+    assert { expected[0] = 2 };
+    assert { valid_input nums };
+    assert { prefix_max nums 0 = 1 };
+    assert { prefix_score nums 0 = 2 };
+    assert { forall i: int. 0 <= i < length nums -> i = 0 };
+    assert { result_matches nums expected }
+
+  let lemma test_002 () =
+    let nums = init 1 [|1000000000|] in
+    let expected = init 1 [|2000000000|] in
+    assert { length nums = 1 };
+    assert { length expected = 1 };
+    assert { nums[0] = 1000000000 };
+    assert { expected[0] = 2000000000 };
+    assert { valid_input nums };
+    assert { prefix_max nums 0 = 1000000000 };
+    assert { prefix_score nums 0 = 2000000000 };
+    assert { forall i: int. 0 <= i < length nums -> i = 0 };
+    assert { result_matches nums expected }
+
+  let lemma test_003 () =
+    let nums = init 6 [|1; 1; 2; 4; 8; 16|] in
+    let expected = init 6 [|2; 4; 8; 16; 32; 64|] in
+    assert { length nums = 6 };
+    assert { length expected = 6 };
+    assert { nums[0] = 1 };
+    assert { nums[1] = 1 };
+    assert { nums[2] = 2 };
+    assert { nums[3] = 4 };
+    assert { nums[4] = 8 };
+    assert { nums[5] = 16 };
+    assert { expected[0] = 2 };
+    assert { expected[1] = 4 };
+    assert { expected[2] = 8 };
+    assert { expected[3] = 16 };
+    assert { expected[4] = 32 };
+    assert { expected[5] = 64 };
+    assert { valid_input nums };
+    assert { prefix_max nums 0 = 1 };
+    assert { prefix_max nums 1 = 1 };
+    assert { prefix_max nums 2 = 2 };
+    assert { prefix_max nums 3 = 4 };
+    assert { prefix_max nums 4 = 8 };
+    assert { prefix_max nums 5 = 16 };
+    assert { prefix_score nums 0 = 2 };
+    assert { prefix_score nums 1 = 4 };
+    assert { prefix_score nums 2 = 8 };
+    assert { prefix_score nums 3 = 16 };
+    assert { prefix_score nums 4 = 32 };
+    assert { prefix_score nums 5 = 64 };
+    assert {
+      forall i: int. 0 <= i < length nums ->
+        i = 0 \/ i = 1 \/ i = 2 \/ i = 3 \/ i = 4 \/ i = 5
+    };
+    assert { result_matches nums expected }
+
+  let lemma test_004 () =
+    let nums = init 5 [|2; 3; 7; 5; 10|] in
+    let expected = init 5 [|4; 10; 24; 36; 56|] in
+    assert { length nums = 5 };
+    assert { length expected = 5 };
+    assert { nums[0] = 2 };
+    assert { nums[1] = 3 };
+    assert { nums[2] = 7 };
+    assert { nums[3] = 5 };
+    assert { nums[4] = 10 };
+    assert { expected[0] = 4 };
+    assert { expected[1] = 10 };
+    assert { expected[2] = 24 };
+    assert { expected[3] = 36 };
+    assert { expected[4] = 56 };
+    assert { valid_input nums };
+    assert { prefix_max nums 0 = 2 };
+    assert { prefix_max nums 1 = 3 };
+    assert { prefix_max nums 2 = 7 };
+    assert { prefix_max nums 3 = 7 };
+    assert { prefix_max nums 4 = 10 };
+    assert { prefix_score nums 0 = 4 };
+    assert { prefix_score nums 1 = 10 };
+    assert { prefix_score nums 2 = 24 };
+    assert { prefix_score nums 3 = 36 };
+    assert { prefix_score nums 4 = 56 };
+    assert {
+      forall i: int. 0 <= i < length nums ->
+        i = 0 \/ i = 1 \/ i = 2 \/ i = 3 \/ i = 4
+    };
+    assert { result_matches nums expected }
+
+  let lemma test_005 () =
+    let nums = init 10 [|1; 2; 4; 8; 16; 32; 64; 128; 256; 512|] in
+    let expected = init 10 [|2; 6; 14; 30; 62; 126; 254; 510; 1022; 2046|] in
+    assert { length nums = 10 };
+    assert { length expected = 10 };
+    assert { nums[0] = 1 };
+    assert { nums[1] = 2 };
+    assert { nums[2] = 4 };
+    assert { nums[3] = 8 };
+    assert { nums[4] = 16 };
+    assert { nums[5] = 32 };
+    assert { nums[6] = 64 };
+    assert { nums[7] = 128 };
+    assert { nums[8] = 256 };
+    assert { nums[9] = 512 };
+    assert { expected[0] = 2 };
+    assert { expected[1] = 6 };
+    assert { expected[2] = 14 };
+    assert { expected[3] = 30 };
+    assert { expected[4] = 62 };
+    assert { expected[5] = 126 };
+    assert { expected[6] = 254 };
+    assert { expected[7] = 510 };
+    assert { expected[8] = 1022 };
+    assert { expected[9] = 2046 };
+    assert { valid_input nums };
+    assert { prefix_max nums 0 = 1 };
+    assert { prefix_max nums 1 = 2 };
+    assert { prefix_max nums 2 = 4 };
+    assert { prefix_max nums 3 = 8 };
+    assert { prefix_max nums 4 = 16 };
+    assert { prefix_max nums 5 = 32 };
+    assert { prefix_max nums 6 = 64 };
+    assert { prefix_max nums 7 = 128 };
+    assert { prefix_max nums 8 = 256 };
+    assert { prefix_max nums 9 = 512 };
+    assert { prefix_score nums 0 = 2 };
+    assert { prefix_score nums 1 = 6 };
+    assert { prefix_score nums 2 = 14 };
+    assert { prefix_score nums 3 = 30 };
+    assert { prefix_score nums 4 = 62 };
+    assert { prefix_score nums 5 = 126 };
+    assert { prefix_score nums 6 = 254 };
+    assert { prefix_score nums 7 = 510 };
+    assert { prefix_score nums 8 = 1022 };
+    assert { prefix_score nums 9 = 2046 };
+    assert {
+      forall i: int. 0 <= i < length nums ->
+        i = 0 \/ i = 1 \/ i = 2 \/ i = 3 \/ i = 4 \/
+        i = 5 \/ i = 6 \/ i = 7 \/ i = 8 \/ i = 9
+    };
+    assert { result_matches nums expected }
+
+  let lemma test_006 () =
+    let nums = init 5 [|5; 5; 5; 5; 5|] in
+    let expected = init 5 [|10; 20; 30; 40; 50|] in
+    assert { length nums = 5 };
+    assert { length expected = 5 };
+    assert { nums[0] = 5 };
+    assert { nums[1] = 5 };
+    assert { nums[2] = 5 };
+    assert { nums[3] = 5 };
+    assert { nums[4] = 5 };
+    assert { expected[0] = 10 };
+    assert { expected[1] = 20 };
+    assert { expected[2] = 30 };
+    assert { expected[3] = 40 };
+    assert { expected[4] = 50 };
+    assert { valid_input nums };
+    assert { prefix_max nums 0 = 5 };
+    assert { prefix_max nums 1 = 5 };
+    assert { prefix_max nums 2 = 5 };
+    assert { prefix_max nums 3 = 5 };
+    assert { prefix_max nums 4 = 5 };
+    assert { prefix_score nums 0 = 10 };
+    assert { prefix_score nums 1 = 20 };
+    assert { prefix_score nums 2 = 30 };
+    assert { prefix_score nums 3 = 40 };
+    assert { prefix_score nums 4 = 50 };
+    assert {
+      forall i: int. 0 <= i < length nums ->
+        i = 0 \/ i = 1 \/ i = 2 \/ i = 3 \/ i = 4
+    };
+    assert { result_matches nums expected }
+
+end

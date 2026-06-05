@@ -1,0 +1,98 @@
+module MaximumPointsYouCanObtainFromCards_Array_Stage3_Imperative
+
+  use int.Int
+  use array.Array
+  use array.Init
+  use array.ArraySum
+  use ref.Ref
+
+  predicate valid_input (cardPoints: array int) (k: int) =
+    1 <= k <= length cardPoints
+
+  predicate valid_split (cardPoints: array int) (k: int) (left: int) =
+    valid_input cardPoints k /\ 0 <= left <= k
+
+  function split_score (cardPoints: array int) (k: int) (left: int) : int =
+    ArraySum.sum cardPoints 0 left +
+    ArraySum.sum cardPoints (length cardPoints - (k - left)) (length cardPoints)
+
+  predicate split_upper_bound_at
+    (cardPoints: array int) (k: int) (res: int) (left: int) =
+    valid_split cardPoints k left -> split_score cardPoints k left <= res
+
+  predicate maximum_points_you_can_obtain_from_cards_array_spec
+    (cardPoints: array int) (k: int) (res: int) =
+    valid_input cardPoints k /\
+    (exists left: int.
+       valid_split cardPoints k left /\
+       split_score cardPoints k left = res) /\
+    (forall left: int.
+       valid_split cardPoints k left ->
+       split_score cardPoints k left <= res)
+
+  predicate best_split_range
+    (cardPoints: array int) (k: int) (lo: int) (hi: int) (best: int) =
+    0 <= lo <= hi <= k /\
+    (exists left: int.
+       lo <= left <= hi /\
+       valid_split cardPoints k left /\
+       split_score cardPoints k left = best) /\
+    (forall left: int.
+       lo <= left <= hi ->
+       valid_split cardPoints k left ->
+       split_score cardPoints k left <= best)
+
+  let maximum_points_you_can_obtain_from_cards_array
+    (cardPoints: array int) (k: int) : int
+    requires { valid_input cardPoints k }
+    ensures  { maximum_points_you_can_obtain_from_cards_array_spec cardPoints k result }
+  =
+    let n = length cardPoints in
+    let current = ref 0 in
+    for i = 0 to k - 1 do
+      invariant { 0 <= i <= k }
+      invariant { !current = ArraySum.sum cardPoints 0 i }
+      current := !current + cardPoints[i]
+    done;
+    assert { !current = ArraySum.sum cardPoints 0 k };
+    assert { k - (k - k) = k };
+    assert { n - (k - k) = n };
+    assert { split_score cardPoints k k = !current };
+    let best = ref !current in
+    assert { valid_split cardPoints k k };
+    assert { best_split_range cardPoints k k k !best };
+    for taken_right = 1 to k do
+      invariant { 1 <= taken_right <= k + 1 }
+      invariant { 0 <= k - taken_right + 1 <= k }
+      invariant {
+        !current =
+          split_score cardPoints k (k - taken_right + 1)
+      }
+      invariant {
+        best_split_range cardPoints k (k - taken_right + 1) k !best
+      }
+      assert { 0 <= k - taken_right < k };
+      assert { 0 <= n - taken_right < n };
+      assert { k - taken_right + 1 - 1 = k - taken_right };
+      current := !current - cardPoints[k - taken_right];
+      current := !current + cardPoints[n - taken_right];
+      assert {
+        !current =
+          split_score cardPoints k (k - taken_right)
+      };
+      if !current > !best then begin
+        best := !current;
+        assert {
+          best_split_range cardPoints k (k - taken_right) k !best
+        }
+      end else begin
+        assert {
+          best_split_range cardPoints k (k - taken_right) k !best
+        }
+      end
+    done;
+    assert { best_split_range cardPoints k 0 k !best };
+    assert { maximum_points_you_can_obtain_from_cards_array_spec cardPoints k !best };
+    !best
+
+end

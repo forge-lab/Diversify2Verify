@@ -1,0 +1,206 @@
+module WidestPairOfIndicesWithEqualRangeSum_Array_Spec
+
+  use int.Int
+  use array.Array
+  use array.Init
+  use array.ArraySum
+
+  predicate binary_value (x: int) =
+    x = 0 \/ x = 1
+
+  predicate valid_binary_arrays (nums1: array int) (nums2: array int) =
+    length nums1 = length nums2 /\
+    1 <= length nums1 /\
+    (forall k: int.
+      0 <= k < length nums1 ->
+      binary_value nums1[k] /\ binary_value nums2[k])
+
+  function range_width (i: int) (j: int) : int =
+    j - i + 1
+
+  predicate equal_range_sum (nums1: array int) (nums2: array int) (i: int) (j: int) =
+    length nums1 = length nums2 /\
+    0 <= i <= j < length nums1 /\
+    sum nums1 i (j + 1) = sum nums2 i (j + 1)
+
+  predicate widest_equal_range_distance (nums1: array int) (nums2: array int) (r: int) =
+    length nums1 = length nums2 /\
+    0 <= r <= length nums1 /\
+    (r = 0 \/
+      exists i j: int.
+        equal_range_sum nums1 nums2 i j /\
+        r = range_width i j) /\
+    (forall i j: int.
+      equal_range_sum nums1 nums2 i j ->
+      range_width i j <= r)
+
+  val widest_pair_of_indices_with_equal_range_sum_array (nums1: array int) (nums2: array int) : int
+    requires { valid_binary_arrays nums1 nums2 }
+    ensures  { widest_equal_range_distance nums1 nums2 result }
+
+  let lemma test_000 () =
+    let nums1 = init 2 [|0; 1|] in
+    let nums2 = init 2 [|1; 1|] in
+    assert { length nums1 = 2 };
+    assert { length nums2 = 2 };
+    assert { nums1[0] = 0 };
+    assert { nums1[1] = 1 };
+    assert { nums2[0] = 1 };
+    assert { nums2[1] = 1 };
+    assert { valid_binary_arrays nums1 nums2 };
+    assert { equal_range_sum nums1 nums2 1 1 };
+    assert { range_width 1 1 = 1 };
+    assert { not (equal_range_sum nums1 nums2 0 1) };
+    assert {
+      forall i: int. 0 <= i < length nums1 ->
+        i = 0 \/ i = 1
+    };
+    assert { widest_equal_range_distance nums1 nums2 1 }
+
+  let lemma test_001 () =
+    let nums1 = init 8 [|0; 1; 0; 1; 0; 1; 0; 1|] in
+    let nums2 = init 8 [|1; 0; 1; 0; 1; 0; 1; 0|] in
+    assert { length nums1 = 8 };
+    assert { length nums2 = 8 };
+    assert { nums1[0] = 0 };
+    assert { nums1[1] = 1 };
+    assert { nums1[2] = 0 };
+    assert { nums1[3] = 1 };
+    assert { nums1[4] = 0 };
+    assert { nums1[5] = 1 };
+    assert { nums1[6] = 0 };
+    assert { nums1[7] = 1 };
+    assert { nums2[0] = 1 };
+    assert { nums2[1] = 0 };
+    assert { nums2[2] = 1 };
+    assert { nums2[3] = 0 };
+    assert { nums2[4] = 1 };
+    assert { nums2[5] = 0 };
+    assert { nums2[6] = 1 };
+    assert { nums2[7] = 0 };
+    assert { valid_binary_arrays nums1 nums2 };
+    assert { equal_range_sum nums1 nums2 0 7 };
+    assert { range_width 0 7 = 8 };
+    assert {
+      forall i: int. 0 <= i < length nums1 ->
+        i = 0 \/ i = 1 \/ i = 2 \/ i = 3 \/
+        i = 4 \/ i = 5 \/ i = 6 \/ i = 7
+    };
+    assert { widest_equal_range_distance nums1 nums2 8 }
+
+  let lemma test_002 () =
+    let nums1 = init 5 [|1; 0; 0; 1; 0|] in
+    let nums2 = init 5 [|0; 1; 1; 0; 1|] in
+    assert { length nums1 = 5 };
+    assert { length nums2 = 5 };
+    assert { nums1[0] = 1 };
+    assert { nums1[1] = 0 };
+    assert { nums1[2] = 0 };
+    assert { nums1[3] = 1 };
+    assert { nums1[4] = 0 };
+    assert { nums2[0] = 0 };
+    assert { nums2[1] = 1 };
+    assert { nums2[2] = 1 };
+    assert { nums2[3] = 0 };
+    assert { nums2[4] = 1 };
+    assert { valid_binary_arrays nums1 nums2 };
+    assert { equal_range_sum nums1 nums2 0 3 };
+    assert { range_width 0 3 = 4 };
+    assert { not (equal_range_sum nums1 nums2 0 4) };
+    assert {
+      forall i: int. 0 <= i < length nums1 ->
+        i = 0 \/ i = 1 \/ i = 2 \/ i = 3 \/ i = 4
+    };
+    assert { widest_equal_range_distance nums1 nums2 4 }
+
+  let lemma test_004 () =
+    let nums1 = init 5 [|0; 0; 1; 1; 1|] in
+    let nums2 = init 5 [|1; 1; 1; 0; 0|] in
+    assert { length nums1 = 5 };
+    assert { length nums2 = 5 };
+    assert { nums1[0] = 0 };
+    assert { nums1[1] = 0 };
+    assert { nums1[2] = 1 };
+    assert { nums1[3] = 1 };
+    assert { nums1[4] = 1 };
+    assert { nums2[0] = 1 };
+    assert { nums2[1] = 1 };
+    assert { nums2[2] = 1 };
+    assert { nums2[3] = 0 };
+    assert { nums2[4] = 0 };
+    assert { valid_binary_arrays nums1 nums2 };
+    assert { equal_range_sum nums1 nums2 0 4 };
+    assert { range_width 0 4 = 5 };
+    assert {
+      forall i: int. 0 <= i < length nums1 ->
+        i = 0 \/ i = 1 \/ i = 2 \/ i = 3 \/ i = 4
+    };
+    assert { widest_equal_range_distance nums1 nums2 5 }
+
+  let lemma test_009 () =
+    let nums1 = init 5 [|0; 0; 0; 0; 0|] in
+    let nums2 = init 5 [|0; 0; 0; 0; 0|] in
+    assert { length nums1 = 5 };
+    assert { length nums2 = 5 };
+    assert { nums1[0] = 0 };
+    assert { nums1[1] = 0 };
+    assert { nums1[2] = 0 };
+    assert { nums1[3] = 0 };
+    assert { nums1[4] = 0 };
+    assert { nums2[0] = 0 };
+    assert { nums2[1] = 0 };
+    assert { nums2[2] = 0 };
+    assert { nums2[3] = 0 };
+    assert { nums2[4] = 0 };
+    assert { valid_binary_arrays nums1 nums2 };
+    assert { equal_range_sum nums1 nums2 0 4 };
+    assert { range_width 0 4 = 5 };
+    assert {
+      forall i: int. 0 <= i < length nums1 ->
+        i = 0 \/ i = 1 \/ i = 2 \/ i = 3 \/ i = 4
+    };
+    assert { widest_equal_range_distance nums1 nums2 5 }
+
+  let lemma test_010 () =
+    let nums1 = init 6 [|1; 1; 0; 0; 1; 1|] in
+    let nums2 = init 6 [|1; 0; 1; 1; 0; 0|] in
+    assert { length nums1 = 6 };
+    assert { length nums2 = 6 };
+    assert { nums1[0] = 1 };
+    assert { nums1[1] = 1 };
+    assert { nums1[2] = 0 };
+    assert { nums1[3] = 0 };
+    assert { nums1[4] = 1 };
+    assert { nums1[5] = 1 };
+    assert { nums2[0] = 1 };
+    assert { nums2[1] = 0 };
+    assert { nums2[2] = 1 };
+    assert { nums2[3] = 1 };
+    assert { nums2[4] = 0 };
+    assert { nums2[5] = 0 };
+    assert { valid_binary_arrays nums1 nums2 };
+    assert { equal_range_sum nums1 nums2 0 4 };
+    assert { range_width 0 4 = 5 };
+    assert { not (equal_range_sum nums1 nums2 0 5) };
+    assert {
+      forall i: int. 0 <= i < length nums1 ->
+        i = 0 \/ i = 1 \/ i = 2 \/ i = 3 \/ i = 4 \/ i = 5
+    };
+    assert { widest_equal_range_distance nums1 nums2 5 }
+
+  let lemma test_013 () =
+    let nums1 = init 1 [|0|] in
+    let nums2 = init 1 [|1|] in
+    assert { length nums1 = 1 };
+    assert { length nums2 = 1 };
+    assert { nums1[0] = 0 };
+    assert { nums2[0] = 1 };
+    assert { valid_binary_arrays nums1 nums2 };
+    assert { not (equal_range_sum nums1 nums2 0 0) };
+    assert {
+      forall i: int. 0 <= i < length nums1 ->
+        i = 0
+    };
+    assert { widest_equal_range_distance nums1 nums2 0 }
+
+end

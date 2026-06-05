@@ -1,0 +1,220 @@
+module MinimizeTheMaximumDifferenceOfPairs_List_Recursive_Implementation
+
+  use int.Int
+  use int.EuclideanDivision
+  use list.List
+
+  let rec insert_sorted (x: int) (l: list int) : list int
+    variant { l }
+  =
+    match l with
+    | Nil -> Cons x Nil
+    | Cons y ys ->
+        if x <= y then Cons x (Cons y ys) else Cons y (insert_sorted x ys)
+    end
+
+  let rec sort_list (l: list int) : list int
+    variant { l }
+  =
+    match l with
+    | Nil -> Nil
+    | Cons x xs -> insert_sorted x (sort_list xs)
+    end
+
+  let rec last_of_list (l: list int) : int
+    variant { l }
+  =
+    match l with
+    | Nil -> 0
+    | Cons x Nil -> x
+    | Cons _ xs -> last_of_list xs
+    end
+
+  let rec count_pairs_with_bound (l: list int) (d: int) : int
+    variant { l }
+  =
+    match l with
+    | Nil -> 0
+    | Cons _ Nil -> 0
+    | Cons x (Cons y ys) ->
+        if y - x <= d then
+          1 + count_pairs_with_bound ys d
+        else
+          count_pairs_with_bound (Cons y ys) d
+    end
+
+  let enough_pairs (sorted_nums: list int) (p: int) (d: int) : bool =
+    count_pairs_with_bound sorted_nums d >= p
+
+  let rec search_min_diff (sorted_nums: list int) (p: int) (lo: int) (hi: int) : int
+    variant { hi - lo }
+  =
+    if lo >= hi then
+      lo
+    else
+      let mid = lo + div (hi - lo) 2 in
+      if enough_pairs sorted_nums p mid then
+        search_min_diff sorted_nums p lo mid
+      else
+        search_min_diff sorted_nums p (mid + 1) hi
+
+  let minimize_the_maximum_difference_of_pairs_list (nums: list int) (p: int) : int =
+    if p <= 0 then
+      0
+    else
+      let sorted_nums = sort_list nums in
+      match sorted_nums with
+      | Nil -> 0
+      | Cons first _ ->
+          let upper = (last_of_list sorted_nums) - first in
+          search_min_diff sorted_nums p 0 upper
+      end
+
+  let test_000 () : bool =
+    let nums = Cons 1 (Cons 3 (Cons 6 (Cons 8 (Cons 10 (Nil))))) in
+    let r = minimize_the_maximum_difference_of_pairs_list nums 2 in
+    r = 2
+
+  let test_001 () : bool =
+    let nums = Cons 5 (Cons 3 (Cons 8 (Cons 4 (Cons 9 (Cons 1 (Nil)))))) in
+    let r = minimize_the_maximum_difference_of_pairs_list nums 3 in
+    r = 2
+
+  let test_002 () : bool =
+    let nums = Cons 5 (Cons 5 (Cons 5 (Cons 5 (Cons 5 (Nil))))) in
+    let r = minimize_the_maximum_difference_of_pairs_list nums 2 in
+    r = 0
+
+  let test_003 () : bool =
+    let nums = Cons 7 (Cons 1 (Cons 3 (Cons 4 (Cons 2 (Cons 5 (Nil)))))) in
+    let r = minimize_the_maximum_difference_of_pairs_list nums 0 in
+    r = 0
+
+  let test_004 () : bool =
+    let nums = Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Nil)))))) in
+    let r = minimize_the_maximum_difference_of_pairs_list nums 2 in
+    r = 0
+
+  let test_005 () : bool =
+    let nums = Cons 5 (Cons 4 (Cons 2 (Cons 2 (Cons 1 (Cons 3 (Cons 3 (Cons 5 (Nil)))))))) in
+    let r = minimize_the_maximum_difference_of_pairs_list nums 3 in
+    r = 0
+
+  let test_006 () : bool =
+    let nums = Cons 1 (Cons 3 (Cons 5 (Cons 7 (Cons 9 (Nil))))) in
+    let r = minimize_the_maximum_difference_of_pairs_list nums 2 in
+    r = 2
+
+  let test_007 () : bool =
+    let nums = Cons 1 (Cons 3 (Cons 6 (Cons 9 (Cons 12 (Cons 15 (Nil)))))) in
+    let r = minimize_the_maximum_difference_of_pairs_list nums 2 in
+    r = 3
+
+  let test_008 () : bool =
+    let nums = Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Nil)))))))) in
+    let r = minimize_the_maximum_difference_of_pairs_list nums 4 in
+    r = 0
+
+  let test_009 () : bool =
+    let nums = Cons 1 (Cons 3 (Cons 6 (Cons 19 (Cons 20 (Nil))))) in
+    let r = minimize_the_maximum_difference_of_pairs_list nums 2 in
+    r = 2
+
+  let test_010 () : bool =
+    let nums = Cons 8 (Cons 4 (Cons 2 (Cons 6 (Cons 10 (Cons 12 (Nil)))))) in
+    let r = minimize_the_maximum_difference_of_pairs_list nums 3 in
+    r = 2
+
+  let test_012 () : bool =
+    let nums = Cons 1 (Cons 2 (Cons 3 (Cons 4 (Cons 5 (Cons 6 (Cons 7 (Cons 8 (Cons 9 (Cons 10 (Nil)))))))))) in
+    let r = minimize_the_maximum_difference_of_pairs_list nums 3 in
+    r = 1
+
+  let test_013 () : bool =
+    let nums = Cons 10 (Cons 1 (Cons 2 (Cons 7 (Cons 1 (Cons 3 (Nil)))))) in
+    let r = minimize_the_maximum_difference_of_pairs_list nums 2 in
+    r = 1
+
+  let test_014 () : bool =
+    let nums = Cons 4 (Cons 2 (Cons 1 (Cons 2 (Nil)))) in
+    let r = minimize_the_maximum_difference_of_pairs_list nums 1 in
+    r = 0
+
+  let test_015 () : bool =
+    let nums = Cons 5 (Cons 3 (Cons 2 (Cons 4 (Cons 1 (Nil))))) in
+    let r = minimize_the_maximum_difference_of_pairs_list nums 2 in
+    r = 1
+
+  let test_016 () : bool =
+    let nums =
+      Cons 1 (Cons 3 (Cons 2 (Cons 4 (Cons 5 (Cons 7 (Cons 6 (Cons 8 (Cons 9 (Cons 11 (Cons 10 (Cons 12 (Cons 13 (Cons 15 (Cons 14 (Cons 16 (Cons 17 (Cons 19 (Cons 18 (Cons 20 (Nil)))))))))))))))))))) in
+    let r = minimize_the_maximum_difference_of_pairs_list nums 10 in
+    r = 1
+
+  let test_017 () : bool =
+    let nums =
+      Cons 10 (Cons 20 (Cons 30 (Cons 40 (Cons 50 (Cons 60 (Cons 70 (Cons 80 (Cons 90 (Cons 100 (Cons 110 (Cons 120 (Cons 130 (Cons 140 (Cons 150 (Nil))))))))))))))) in
+    let r = minimize_the_maximum_difference_of_pairs_list nums 5 in
+    r = 10
+
+  let test_018 () : bool =
+    let nums = Cons 5 (Cons 1 (Cons 9 (Cons 3 (Cons 7 (Cons 6 (Cons 8 (Cons 2 (Cons 4 (Cons 10 (Nil)))))))))) in
+    let r = minimize_the_maximum_difference_of_pairs_list nums 5 in
+    r = 1
+
+  let test_019 () : bool =
+    let nums =
+      Cons 3 (Cons 3 (Cons 3 (Cons 3 (Cons 3 (Cons 3 (Cons 3 (Cons 3 (Cons 3 (Cons 3 (Cons 3 (Cons 3 (Cons 3 (Cons 3 (Cons 3 (Cons 3 (Cons 3 (Cons 3 (Cons 3 (Cons 3 (Nil)))))))))))))))))))) in
+    let r = minimize_the_maximum_difference_of_pairs_list nums 9 in
+    r = 0
+
+  let test_023 () : bool =
+    let nums =
+      Cons 9 (Cons 8 (Cons 7 (Cons 6 (Cons 5 (Cons 4 (Cons 3 (Cons 2 (Cons 1 (Cons 0 (Cons (-1) (Cons (-2) (Cons (-3) (Cons (-4) (Cons (-5) (Cons (-6) (Cons (-7) (Cons (-8) (Cons (-9) (Cons (-10) (Nil)))))))))))))))))))) in
+    let r = minimize_the_maximum_difference_of_pairs_list nums 5 in
+    r = 1
+
+  let run_tests () : bool =
+    if test_000 () then
+    if test_001 () then
+    if test_002 () then
+    if test_003 () then
+    if test_004 () then
+    if test_005 () then
+    if test_006 () then
+    if test_007 () then
+    if test_008 () then
+    if test_009 () then
+    if test_010 () then
+    if test_012 () then
+    if test_013 () then
+    if test_014 () then
+    if test_015 () then
+    if test_016 () then
+    if test_017 () then
+    if test_018 () then
+    if test_019 () then
+    if test_023 () then
+      true
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+
+end

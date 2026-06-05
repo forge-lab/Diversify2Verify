@@ -1,0 +1,93 @@
+== Stage 1: first prover on whole file ==
+Running in /Users/rubenm/Desktop/Diversify2Verify/codex-runs/testing6/3155_maximum-number-of-upgradable-servers/stage3a/array-imperative/maximum_number_of_upgradable_servers_array_stage3_634fb59d/generated/why3/array: why3 session create -o /Users/rubenm/Desktop/Diversify2Verify/codex-runs/testing6/3155_maximum-number-of-upgradable-servers/stage3a/array-imperative/maximum_number_of_upgradable_servers_array_stage3_634fb59d/generated/why3/array/.why3_sessions/maximum_number_of_upgradable_servers_array_stage3_634fb59d_stage3_stage1 -P Z3,4.8.6 -t 10 -m 8192 maximum_number_of_upgradable_servers_array_stage3_634fb59d_stage3.mlw
+Session created successfully
+Running in /Users/rubenm/Desktop/Diversify2Verify/codex-runs/testing6/3155_maximum-number-of-upgradable-servers/stage3a/array-imperative/maximum_number_of_upgradable_servers_array_stage3_634fb59d/generated/why3/array: why3 bench /Users/rubenm/Desktop/Diversify2Verify/codex-runs/testing6/3155_maximum-number-of-upgradable-servers/stage3a/array-imperative/maximum_number_of_upgradable_servers_array_stage3_634fb59d/generated/why3/array/.why3_sessions/maximum_number_of_upgradable_servers_array_stage3_634fb59d_stage3_stage1
+Progress: 1/1/0                       Progress: 0/2/0                       Progress: 0/0/1                       
+Replay completed, saving session... done
+== Stage 1 stats ==
+= Statistics for session /Users/rubenm/Desktop/Diversify2Verify/codex-runs/testing6/3155_maximum-number-of-upgradable-servers/stage3a/array-imperative/maximum_number_of_upgradable_servers_array_stage3_634fb59d/generated/why3/array/.why3_sessions/maximum_number_of_upgradable_servers_array_stage3_634fb59d_stage3_stage1
+
+== Number of root goals ==
+  total: 2  proved: 1
+
+== Number of sub goals ==
+  total: 0  proved: 0
+
+== Goals not proved ==
+  +-- file [../../maximum_number_of_upgradable_servers_array_stage3_634fb59d_stage3.mlw]
+    +-- theory MaximumNumberOfUpgradableServers_Array_Spec
+      +-- goal computed_choice_is_optimal'vc
+  
+== Goals proved by only one prover ==
+  +-- file [../../maximum_number_of_upgradable_servers_array_stage3_634fb59d_stage3.mlw]
+    +-- theory MaximumNumberOfUpgradableServers_Array_Spec
+      +-- goal maximum_number_of_upgradable_servers_array'vc: Z3 4.8.6
+  
+1 session(s) read, with a total of 2 proof goals.
+== Unproved root goals after first prover ==
+MaximumNumberOfUpgradableServers_Array_Spec	computed_choice_is_optimal'vc
+== Stage 1: trying remaining goals with prover Alt-Ergo,2.4.0 ==
+---- stage1 | prover: Alt-Ergo,2.4.0 | theory: MaximumNumberOfUpgradableServers_Array_Spec | goal: computed_choice_is_optimal'vc ----
+File maximum_number_of_upgradable_servers_array_stage3_634fb59d_stage3.mlw:
+Goal computed_choice_is_optimal'vc.
+Prover result is: Timeout (10.00s, 410411 steps).
+Remaining after prover Alt-Ergo,2.4.0: 1
+== Stage 1: trying remaining goals with prover CVC4,1.8 ==
+---- stage1 | prover: CVC4,1.8 | theory: MaximumNumberOfUpgradableServers_Array_Spec | goal: computed_choice_is_optimal'vc ----
+File maximum_number_of_upgradable_servers_array_stage3_634fb59d_stage3.mlw:
+Goal computed_choice_is_optimal'vc.
+Prover result is: Timeout (10.00s, 2318749 steps).
+Remaining after prover CVC4,1.8: 1
+== Goals still unproved after stage 1 ==
+MaximumNumberOfUpgradableServers_Array_Spec	computed_choice_is_optimal'vc
+== Stage 2: split_vc on unproved goal ==
+Target theory: MaximumNumberOfUpgradableServers_Array_Spec
+Target goal  : computed_choice_is_optimal'vc
+---- stage2 | prover: Z3,4.8.6 | theory: MaximumNumberOfUpgradableServers_Array_Spec | goal: computed_choice_is_optimal'vc ----
+Transforms: split_vc
+File "maximum_number_of_upgradable_servers_array_stage3_634fb59d_stage3.mlw", line 51, characters 15-70:
+Sub-goal Postcondition of goal computed_choice_is_optimal'vc.
+Prover result is: Timeout (10.00s, 52516502 steps).
+---- stage2 | prover: Alt-Ergo,2.4.0 | theory: MaximumNumberOfUpgradableServers_Array_Spec | goal: computed_choice_is_optimal'vc ----
+Transforms: split_vc
+File "maximum_number_of_upgradable_servers_array_stage3_634fb59d_stage3.mlw", line 51, characters 15-70:
+Sub-goal Postcondition of goal computed_choice_is_optimal'vc.
+Prover result is: Timeout (10.00s, 422989 steps).
+---- stage2 | prover: CVC4,1.8 | theory: MaximumNumberOfUpgradableServers_Array_Spec | goal: computed_choice_is_optimal'vc ----
+Transforms: split_vc
+File "maximum_number_of_upgradable_servers_array_stage3_634fb59d_stage3.mlw", line 51, characters 15-70:
+Sub-goal Postcondition of goal computed_choice_is_optimal'vc.
+Prover result is: Timeout (10.00s, 2426123 steps).
+== Goals still unproved after stage 2 (split_vc) ==
+MaximumNumberOfUpgradableServers_Array_Spec	computed_choice_is_optimal'vc
+== Stage 3: split_vc + inline_all on still-unproved goal ==
+Target theory: MaximumNumberOfUpgradableServers_Array_Spec
+Target goal  : computed_choice_is_optimal'vc
+---- stage3 | prover: Z3,4.8.6 | theory: MaximumNumberOfUpgradableServers_Array_Spec | goal: computed_choice_is_optimal'vc ----
+Transforms: split_vc inline_all
+File "maximum_number_of_upgradable_servers_array_stage3_634fb59d_stage3.mlw", line 51, characters 15-70:
+Sub-goal Postcondition of goal computed_choice_is_optimal'vc.
+Prover result is: Timeout (10.00s, 71549742 steps).
+---- stage3 | prover: Alt-Ergo,2.4.0 | theory: MaximumNumberOfUpgradableServers_Array_Spec | goal: computed_choice_is_optimal'vc ----
+Transforms: split_vc inline_all
+File "maximum_number_of_upgradable_servers_array_stage3_634fb59d_stage3.mlw", line 51, characters 15-70:
+Sub-goal Postcondition of goal computed_choice_is_optimal'vc.
+Prover result is: Timeout (10.00s, 32414 steps).
+---- stage3 | prover: CVC4,1.8 | theory: MaximumNumberOfUpgradableServers_Array_Spec | goal: computed_choice_is_optimal'vc ----
+Transforms: split_vc inline_all
+File "maximum_number_of_upgradable_servers_array_stage3_634fb59d_stage3.mlw", line 51, characters 15-70:
+Sub-goal Postcondition of goal computed_choice_is_optimal'vc.
+Prover result is: Timeout (10.00s, 968619 steps).
+== Final summary ==
+Unproved root goals after first prover : 1
+Remaining failures after split_vc      : 1
+Remaining failures after stage 3       : 1
+Detailed logs stored in                : /Users/rubenm/Desktop/Diversify2Verify/codex-runs/testing6/3155_maximum-number-of-upgradable-servers/stage3a/array-imperative/maximum_number_of_upgradable_servers_array_stage3_634fb59d/generated/why3/array/.why3_sessions/maximum_number_of_upgradable_servers_array_stage3_634fb59d_stage3_logs
+Still unproved goals:
+MaximumNumberOfUpgradableServers_Array_Spec	computed_choice_is_optimal'vc
+VERIFY_RESULT: FAILURE
+VERIFY_REASON: unproved_goals_remain
+VERIFY_STAGE: stage3
+VERIFY_ROOT_TOTAL: 2
+VERIFY_ROOT_PROVED: 1
+VERIFY_ROOT_REMAINING: 1

@@ -1,0 +1,182 @@
+module AppendKIntegersWithMinimalSum_List_Stage3_Recursive
+
+  use int.Int
+  use list.List
+  use list.Length
+  use list.Mem
+  use list.NumOcc
+  use list.Sum
+
+  predicate valid_append_choices (nums: list int) (chosen: list int) (k: int) =
+    length chosen = k /\
+    (forall x: int. mem x chosen ->
+      x > 0 /\ not (mem x nums) /\ num_occ x chosen = 1)
+
+  predicate append_k_minimal_sum (nums: list int) (k: int) (r: int) =
+    exists chosen: list int.
+      valid_append_choices nums chosen k /\
+      r = sum chosen /\
+      (forall other: list int. valid_append_choices nums other k -> r <= sum other)
+
+  let rec function mem_bool (x: int) (xs: list int) : bool
+    variant { xs }
+  =
+    match xs with
+    | Nil -> false
+    | Cons y ys -> if x = y then true else mem_bool x ys
+    end
+
+  let rec lemma mem_bool_spec (x: int) (xs: list int)
+    ensures { mem_bool x xs <-> mem x xs }
+    variant { xs }
+  =
+    match xs with
+    | Nil -> ()
+    | Cons y ys ->
+        if x = y then
+          assert { mem x xs }
+        else
+          mem_bool_spec x ys
+    end
+
+  let rec function missing_choices_in_steps
+      (nums: list int) (remaining: int) (candidate: int) (steps: int) : list int
+    variant { steps }
+  =
+    if remaining <= 0 then
+      Nil
+    else if steps <= 0 then
+      Nil
+    else if mem_bool candidate nums then
+      missing_choices_in_steps nums remaining (candidate + 1) (steps - 1)
+    else
+      Cons candidate
+        (missing_choices_in_steps nums (remaining - 1) (candidate + 1) (steps - 1))
+
+  let rec function count_distinct_positive_seen_model
+      (seen: list int) (nums: list int) : int
+    variant { nums }
+  =
+    match nums with
+    | Nil -> 0
+    | Cons x xs ->
+        if x > 0 then
+          if mem_bool x seen then
+            count_distinct_positive_seen_model seen xs
+          else
+            1 + count_distinct_positive_seen_model (Cons x seen) xs
+        else
+          count_distinct_positive_seen_model seen xs
+    end
+
+  function count_distinct_positive_model (nums: list int) : int =
+    count_distinct_positive_seen_model Nil nums
+
+  let rec mem_int (x: int) (xs: list int) : bool
+    ensures { result <-> mem x xs }
+    variant { xs }
+  =
+    match xs with
+    | Nil -> false
+    | Cons y ys ->
+        if x = y then true else mem_int x ys
+    end
+
+  let rec count_distinct_positive_seen (seen: list int) (nums: list int) : int
+    ensures { result >= 0 }
+    ensures { result = count_distinct_positive_seen_model seen nums }
+    variant { nums }
+  =
+    match nums with
+    | Nil -> 0
+    | Cons x xs ->
+        if x > 0 then
+          if mem_int x seen then
+            count_distinct_positive_seen seen xs
+          else
+            1 + count_distinct_positive_seen (Cons x seen) xs
+        else
+          count_distinct_positive_seen seen xs
+    end
+
+  let count_distinct_positive (nums: list int) : int
+    ensures { result >= 0 }
+    ensures { result = count_distinct_positive_model nums }
+  =
+    count_distinct_positive_seen Nil nums
+
+  let rec sum_missing_in_steps (nums: list int) (remaining: int) (candidate: int) (steps: int) : int
+    requires { remaining >= 0 }
+    requires { candidate > 0 }
+    requires { steps >= 0 }
+    ensures  { result >= 0 }
+    ensures  { remaining = 0 -> result = 0 }
+    ensures  { result = sum (missing_choices_in_steps nums remaining candidate steps) }
+    variant { steps }
+  =
+    if remaining = 0 then begin
+      assert { missing_choices_in_steps nums remaining candidate steps = Nil };
+      0
+    end else if steps = 0 then begin
+      assert { missing_choices_in_steps nums remaining candidate steps = Nil };
+      0
+    end else if mem_int candidate nums then begin
+      assert { mem candidate nums };
+      mem_bool_spec candidate nums;
+      assert { mem_bool candidate nums };
+      assert {
+        missing_choices_in_steps nums remaining candidate steps =
+        missing_choices_in_steps nums remaining (candidate + 1) (steps - 1)
+      };
+      sum_missing_in_steps nums remaining (candidate + 1) (steps - 1)
+    end else begin
+      assert { not (mem candidate nums) };
+      mem_bool_spec candidate nums;
+      assert { not (mem_bool candidate nums) };
+      assert {
+        missing_choices_in_steps nums remaining candidate steps =
+        Cons candidate
+          (missing_choices_in_steps nums (remaining - 1) (candidate + 1) (steps - 1))
+      };
+      candidate + sum_missing_in_steps nums (remaining - 1) (candidate + 1) (steps - 1)
+    end
+
+  let lemma missing_choices_top_correct (nums: list int) (k: int) (blocked_count: int)
+    requires { k >= 0 }
+    requires { blocked_count >= 0 }
+    requires { blocked_count = count_distinct_positive_model nums }
+    ensures  {
+      append_k_minimal_sum nums k
+        (sum (missing_choices_in_steps nums k 1 (k + blocked_count)))
+    }
+  =
+    let steps = k + blocked_count in
+    let chosen = missing_choices_in_steps nums k 1 steps in
+    assert { steps >= 0 };
+    assert { length chosen = k };
+    assert {
+      forall x: int. mem x chosen ->
+        x > 0 /\ not (mem x nums) /\ num_occ x chosen = 1
+    };
+    assert { valid_append_choices nums chosen k };
+    assert {
+      forall other: list int.
+        valid_append_choices nums other k -> sum chosen <= sum other
+    };
+    assert { append_k_minimal_sum nums k (sum chosen) }
+
+  let append_k_integers_with_minimal_sum_list (nums: list int) (k: int) : int
+    requires { k >= 0 }
+    ensures  { append_k_minimal_sum nums k result }
+  =
+    let blocked_count = count_distinct_positive nums in
+    let steps = k + blocked_count in
+    assert { steps >= 0 };
+    assert { blocked_count = count_distinct_positive_model nums };
+    let result = sum_missing_in_steps nums k 1 steps in
+    assert { result = sum (missing_choices_in_steps nums k 1 steps) };
+    missing_choices_top_correct nums k blocked_count;
+    assert { append_k_minimal_sum nums k result };
+    result
+
+end

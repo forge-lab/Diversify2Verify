@@ -1,0 +1,191 @@
+module MaximumElementAfterDecreasingAndRearranging_List_Stage3_Imperative
+
+  use int.Int
+  use list.List
+  use list.Length
+  use list.Mem
+  use ref.Ref
+
+  predicate all_positive (arr: list int) =
+    forall x: int. mem x arr -> 1 <= x
+
+  let rec function count_ge (arr: list int) (threshold: int) : int
+    variant { arr }
+  =
+    match arr with
+    | Nil -> 0
+    | Cons x xs -> (if threshold <= x then 1 else 0) + count_ge xs threshold
+    end
+
+  predicate can_build_height (arr: list int) (height: int) =
+    1 <= height <= length arr /\
+    (forall target: int.
+       1 <= target <= height ->
+       count_ge arr target >= height - target + 1)
+
+  predicate maximum_possible_height (arr: list int) (height: int) =
+    can_build_height arr height /\
+    (forall candidate: int. can_build_height arr candidate -> candidate <= height)
+
+  let rec lemma count_ge_nonnegative (arr: list int) (threshold: int)
+    ensures { 0 <= count_ge arr threshold }
+    variant { arr }
+  =
+    match arr with
+    | Nil -> ()
+    | Cons _ xs -> count_ge_nonnegative xs threshold
+    end
+
+  let rec lemma all_positive_tail (x: int) (xs: list int)
+    requires { all_positive (Cons x xs) }
+    ensures  { all_positive xs }
+    variant  { xs }
+  =
+    match xs with
+    | Nil -> ()
+    | Cons y ys ->
+        assert { mem y (Cons x xs) };
+        all_positive_tail y ys
+    end
+
+  let rec lemma all_positive_count_ge_one (arr: list int)
+    requires { all_positive arr }
+    ensures  { count_ge arr 1 = length arr }
+    variant  { arr }
+  =
+    match arr with
+    | Nil -> ()
+    | Cons x xs ->
+        assert { mem x arr };
+        assert { 1 <= x };
+        all_positive_tail x xs;
+        all_positive_count_ge_one xs
+    end
+
+  let lemma can_build_height_one (arr: list int)
+    requires { arr <> Nil }
+    requires { all_positive arr }
+    ensures  { can_build_height arr 1 }
+  =
+    all_positive_count_ge_one arr;
+    assert { 1 <= length arr };
+    assert { count_ge arr 1 >= 1 }
+
+  let list_length (arr: list int) : int
+    ensures { result = length arr }
+    ensures { 0 <= result }
+  =
+    let len = ref 0 in
+    let cur = ref arr in
+    while (match !cur with Nil -> false | Cons _ _ -> true end) do
+      invariant { 0 <= !len }
+      invariant { !len + length !cur = length arr }
+      variant   { length !cur }
+
+      match !cur with
+      | Nil -> ()
+      | Cons _ xs ->
+          len := !len + 1;
+          cur := xs
+      end
+    done;
+    assert { !cur = Nil };
+    !len
+
+  let count_ge_exec (arr: list int) (threshold: int) : int
+    ensures { result = count_ge arr threshold }
+    ensures { 0 <= result }
+  =
+    let count = ref 0 in
+    let cur = ref arr in
+    while (match !cur with Nil -> false | Cons _ _ -> true end) do
+      invariant { 0 <= !count }
+      invariant { !count + count_ge !cur threshold = count_ge arr threshold }
+      variant   { length !cur }
+
+      match !cur with
+      | Nil -> ()
+      | Cons x xs ->
+          if threshold <= x then begin
+            count := !count + 1
+          end;
+          cur := xs
+      end
+    done;
+    assert { !cur = Nil };
+    assert { count_ge Nil threshold = 0 };
+    !count
+
+  let can_build_height_exec (arr: list int) (height: int) : bool
+    requires { 1 <= height }
+    ensures  { result = true <->
+      (forall target: int.
+         1 <= target <= height ->
+         count_ge arr target >= height - target + 1) }
+    ensures  { height <= length arr ->
+      (result = true <-> can_build_height arr height) }
+  =
+    let ok = ref true in
+    let target = ref 1 in
+    while !ok && !target <= height do
+      invariant { 1 <= !target <= height + 1 }
+      invariant { !ok = true ->
+        forall t: int. 1 <= t < !target ->
+          count_ge arr t >= height - t + 1 }
+      invariant { !ok = false ->
+        exists t: int. 1 <= t < !target /\
+          count_ge arr t < height - t + 1 }
+      variant { height - !target + 1 }
+
+      let needed = height - !target + 1 in
+      assert { 1 <= !target <= height };
+      assert { needed = height - !target + 1 };
+      if count_ge_exec arr !target < needed then begin
+        ok := false
+      end;
+      target := !target + 1
+    done;
+    assert { !ok = true -> !target = height + 1 };
+    assert { !ok = false ->
+      exists t: int. 1 <= t <= height /\
+        count_ge arr t < height - t + 1 };
+    !ok
+
+  let maximum_element_after_decreasing_and_rearranging_list (arr: list int) : int
+    requires { arr <> Nil }
+    requires { all_positive arr }
+    ensures  { maximum_possible_height arr result }
+  =
+    let n = list_length arr in
+    assert { n = length arr };
+    assert { 1 <= n };
+    can_build_height_one arr;
+    let best = ref 0 in
+    let height = ref 1 in
+    while !height <= n do
+      invariant { n = length arr }
+      invariant { 1 <= !height <= n + 1 }
+      invariant { 0 <= !best < !height }
+      invariant { !best = 0 \/ can_build_height arr !best }
+      invariant { forall candidate: int.
+        1 <= candidate < !height ->
+        can_build_height arr candidate ->
+        candidate <= !best }
+      variant { n - !height + 1 }
+
+      assert { 1 <= !height <= length arr };
+      if can_build_height_exec arr !height then begin
+        assert { can_build_height arr !height };
+        best := !height
+      end;
+      height := !height + 1
+    done;
+    assert { !height = n + 1 };
+    assert { can_build_height arr 1 };
+    assert { 1 <= !best };
+    assert { can_build_height arr !best };
+    assert { forall candidate: int.
+      can_build_height arr candidate -> candidate <= !best };
+    !best
+
+end

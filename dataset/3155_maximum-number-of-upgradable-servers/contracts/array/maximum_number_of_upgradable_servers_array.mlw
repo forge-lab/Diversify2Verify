@@ -1,0 +1,239 @@
+module MaximumNumberOfUpgradableServers_Array_Spec
+
+  use int.Int
+  use array.Array
+  use array.Init
+
+  predicate valid_inputs (count: array int) (upgrade: array int)
+      (sell: array int) (money: array int) =
+    1 <= length count /\
+    length upgrade = length count /\
+    length sell = length count /\
+    length money = length count /\
+    (forall i: int. 0 <= i < length count ->
+      1 <= count[i] /\ 1 <= upgrade[i] /\ 1 <= sell[i] /\ 1 <= money[i])
+
+  predicate feasible_upgrade_count (count: array int) (upgrade: array int)
+      (sell: array int) (money: array int) (i: int) (k: int) =
+    0 <= i < length count /\
+    0 <= k <= count[i] /\
+    k * upgrade[i] <= money[i] + (count[i] - k) * sell[i]
+
+  predicate optimal_upgrade_count (count: array int) (upgrade: array int)
+      (sell: array int) (money: array int) (i: int) (k: int) =
+    feasible_upgrade_count count upgrade sell money i k /\
+    (forall candidate: int.
+      feasible_upgrade_count count upgrade sell money i candidate ->
+      candidate <= k)
+
+  predicate answer_spec (count: array int) (upgrade: array int)
+      (sell: array int) (money: array int) (answer: array int) =
+    length answer = length count /\
+    (forall i: int. 0 <= i < length count ->
+      optimal_upgrade_count count upgrade sell money i answer[i])
+
+  val maximum_number_of_upgradable_servers_array
+      (count: array int) (upgrade: array int) (sell: array int) (money: array int)
+      : array int
+    requires { valid_inputs count upgrade sell money }
+    ensures  { answer_spec count upgrade sell money result }
+
+  let lemma test_000_large_single_center () =
+    let count = init 1 [|100000|] in
+    let upgrade = init 1 [|100000|] in
+    let sell = init 1 [|100000|] in
+    let money = init 1 [|1000000000|] in
+    let expected = init 1 [|55000|] in
+    assert { length count = 1 };
+    assert { length upgrade = 1 };
+    assert { length sell = 1 };
+    assert { length money = 1 };
+    assert { length expected = 1 };
+    assert { count[0] = 100000 };
+    assert { upgrade[0] = 100000 };
+    assert { sell[0] = 100000 };
+    assert { money[0] = 1000000000 };
+    assert { expected[0] = 55000 };
+    assert { valid_inputs count upgrade sell money };
+    assert { feasible_upgrade_count count upgrade sell money 0 55000 };
+    assert { not (feasible_upgrade_count count upgrade sell money 0 55001) };
+    assert { optimal_upgrade_count count upgrade sell money 0 expected[0] };
+    assert { answer_spec count upgrade sell money expected }
+
+  let lemma test_001_all_centers_fully_upgradable () =
+    let count = init 3 [|10; 20; 30|] in
+    let upgrade = init 3 [|5; 4; 3|] in
+    let sell = init 3 [|1; 2; 3|] in
+    let money = init 3 [|50; 100; 150|] in
+    let expected = init 3 [|10; 20; 30|] in
+    assert { length count = 3 };
+    assert { length upgrade = 3 };
+    assert { length sell = 3 };
+    assert { length money = 3 };
+    assert { length expected = 3 };
+    assert { count[0] = 10 /\ count[1] = 20 /\ count[2] = 30 };
+    assert { upgrade[0] = 5 /\ upgrade[1] = 4 /\ upgrade[2] = 3 };
+    assert { sell[0] = 1 /\ sell[1] = 2 /\ sell[2] = 3 };
+    assert { money[0] = 50 /\ money[1] = 100 /\ money[2] = 150 };
+    assert { expected[0] = 10 /\ expected[1] = 20 /\ expected[2] = 30 };
+    assert {
+      forall i: int. 0 <= i < length count ->
+        i = 0 \/ i = 1 \/ i = 2
+    };
+    assert { valid_inputs count upgrade sell money };
+    assert { feasible_upgrade_count count upgrade sell money 0 10 };
+    assert { feasible_upgrade_count count upgrade sell money 1 20 };
+    assert { feasible_upgrade_count count upgrade sell money 2 30 };
+    assert { optimal_upgrade_count count upgrade sell money 0 expected[0] };
+    assert { optimal_upgrade_count count upgrade sell money 1 expected[1] };
+    assert { optimal_upgrade_count count upgrade sell money 2 expected[2] };
+    assert { answer_spec count upgrade sell money expected }
+
+  let lemma test_003_problem_example () =
+    let count = init 2 [|4; 3|] in
+    let upgrade = init 2 [|3; 5|] in
+    let sell = init 2 [|4; 2|] in
+    let money = init 2 [|8; 9|] in
+    let expected = init 2 [|3; 2|] in
+    assert { length count = 2 };
+    assert { length upgrade = 2 };
+    assert { length sell = 2 };
+    assert { length money = 2 };
+    assert { length expected = 2 };
+    assert { count[0] = 4 /\ count[1] = 3 };
+    assert { upgrade[0] = 3 /\ upgrade[1] = 5 };
+    assert { sell[0] = 4 /\ sell[1] = 2 };
+    assert { money[0] = 8 /\ money[1] = 9 };
+    assert { expected[0] = 3 /\ expected[1] = 2 };
+    assert {
+      forall i: int. 0 <= i < length count ->
+        i = 0 \/ i = 1
+    };
+    assert { valid_inputs count upgrade sell money };
+    assert { feasible_upgrade_count count upgrade sell money 0 3 };
+    assert { not (feasible_upgrade_count count upgrade sell money 0 4) };
+    assert { feasible_upgrade_count count upgrade sell money 1 2 };
+    assert { not (feasible_upgrade_count count upgrade sell money 1 3) };
+    assert { optimal_upgrade_count count upgrade sell money 0 expected[0] };
+    assert { optimal_upgrade_count count upgrade sell money 1 expected[1] };
+    assert { answer_spec count upgrade sell money expected }
+
+  let lemma test_004_partial_last_center () =
+    let count = init 3 [|5; 5; 5|] in
+    let upgrade = init 3 [|10; 20; 30|] in
+    let sell = init 3 [|5; 10; 15|] in
+    let money = init 3 [|100; 100; 100|] in
+    let expected = init 3 [|5; 5; 3|] in
+    assert { length count = 3 };
+    assert { length upgrade = 3 };
+    assert { length sell = 3 };
+    assert { length money = 3 };
+    assert { length expected = 3 };
+    assert { count[0] = 5 /\ count[1] = 5 /\ count[2] = 5 };
+    assert { upgrade[0] = 10 /\ upgrade[1] = 20 /\ upgrade[2] = 30 };
+    assert { sell[0] = 5 /\ sell[1] = 10 /\ sell[2] = 15 };
+    assert { money[0] = 100 /\ money[1] = 100 /\ money[2] = 100 };
+    assert { expected[0] = 5 /\ expected[1] = 5 /\ expected[2] = 3 };
+    assert {
+      forall i: int. 0 <= i < length count ->
+        i = 0 \/ i = 1 \/ i = 2
+    };
+    assert { valid_inputs count upgrade sell money };
+    assert { feasible_upgrade_count count upgrade sell money 0 5 };
+    assert { feasible_upgrade_count count upgrade sell money 1 5 };
+    assert { feasible_upgrade_count count upgrade sell money 2 3 };
+    assert { not (feasible_upgrade_count count upgrade sell money 2 4) };
+    assert { optimal_upgrade_count count upgrade sell money 0 expected[0] };
+    assert { optimal_upgrade_count count upgrade sell money 1 expected[1] };
+    assert { optimal_upgrade_count count upgrade sell money 2 expected[2] };
+    assert { answer_spec count upgrade sell money expected }
+
+  let lemma test_005_zero_upgradable_edge () =
+    let count = init 1 [|1|] in
+    let upgrade = init 1 [|2|] in
+    let sell = init 1 [|1|] in
+    let money = init 1 [|1|] in
+    let expected = init 1 [|0|] in
+    assert { length count = 1 };
+    assert { length upgrade = 1 };
+    assert { length sell = 1 };
+    assert { length money = 1 };
+    assert { length expected = 1 };
+    assert { count[0] = 1 };
+    assert { upgrade[0] = 2 };
+    assert { sell[0] = 1 };
+    assert { money[0] = 1 };
+    assert { expected[0] = 0 };
+    assert { valid_inputs count upgrade sell money };
+    assert { feasible_upgrade_count count upgrade sell money 0 0 };
+    assert { not (feasible_upgrade_count count upgrade sell money 0 1) };
+    assert { optimal_upgrade_count count upgrade sell money 0 expected[0] };
+    assert { answer_spec count upgrade sell money expected }
+
+  let lemma test_010_repeated_partial_answers () =
+    let count = init 3 [|100; 100; 100|] in
+    let upgrade = init 3 [|1000; 1000; 1000|] in
+    let sell = init 3 [|500; 500; 500|] in
+    let money = init 3 [|50000; 50000; 50000|] in
+    let expected = init 3 [|66; 66; 66|] in
+    assert { length count = 3 };
+    assert { length upgrade = 3 };
+    assert { length sell = 3 };
+    assert { length money = 3 };
+    assert { length expected = 3 };
+    assert { count[0] = 100 /\ count[1] = 100 /\ count[2] = 100 };
+    assert { upgrade[0] = 1000 /\ upgrade[1] = 1000 /\ upgrade[2] = 1000 };
+    assert { sell[0] = 500 /\ sell[1] = 500 /\ sell[2] = 500 };
+    assert { money[0] = 50000 /\ money[1] = 50000 /\ money[2] = 50000 };
+    assert { expected[0] = 66 /\ expected[1] = 66 /\ expected[2] = 66 };
+    assert {
+      forall i: int. 0 <= i < length count ->
+        i = 0 \/ i = 1 \/ i = 2
+    };
+    assert { valid_inputs count upgrade sell money };
+    assert { feasible_upgrade_count count upgrade sell money 0 66 };
+    assert { not (feasible_upgrade_count count upgrade sell money 0 67) };
+    assert { feasible_upgrade_count count upgrade sell money 1 66 };
+    assert { not (feasible_upgrade_count count upgrade sell money 1 67) };
+    assert { feasible_upgrade_count count upgrade sell money 2 66 };
+    assert { not (feasible_upgrade_count count upgrade sell money 2 67) };
+    assert { optimal_upgrade_count count upgrade sell money 0 expected[0] };
+    assert { optimal_upgrade_count count upgrade sell money 1 expected[1] };
+    assert { optimal_upgrade_count count upgrade sell money 2 expected[2] };
+    assert { answer_spec count upgrade sell money expected }
+
+  let lemma test_016_mixed_large_centers () =
+    let count = init 4 [|100; 200; 300; 400|] in
+    let upgrade = init 4 [|5; 10; 15; 20|] in
+    let sell = init 4 [|20; 15; 10; 5|] in
+    let money = init 4 [|500; 1000; 1500; 2000|] in
+    let expected = init 4 [|100; 160; 180; 160|] in
+    assert { length count = 4 };
+    assert { length upgrade = 4 };
+    assert { length sell = 4 };
+    assert { length money = 4 };
+    assert { length expected = 4 };
+    assert { count[0] = 100 /\ count[1] = 200 /\ count[2] = 300 /\ count[3] = 400 };
+    assert { upgrade[0] = 5 /\ upgrade[1] = 10 /\ upgrade[2] = 15 /\ upgrade[3] = 20 };
+    assert { sell[0] = 20 /\ sell[1] = 15 /\ sell[2] = 10 /\ sell[3] = 5 };
+    assert { money[0] = 500 /\ money[1] = 1000 /\ money[2] = 1500 /\ money[3] = 2000 };
+    assert { expected[0] = 100 /\ expected[1] = 160 /\ expected[2] = 180 /\ expected[3] = 160 };
+    assert {
+      forall i: int. 0 <= i < length count ->
+        i = 0 \/ i = 1 \/ i = 2 \/ i = 3
+    };
+    assert { valid_inputs count upgrade sell money };
+    assert { feasible_upgrade_count count upgrade sell money 0 100 };
+    assert { feasible_upgrade_count count upgrade sell money 1 160 };
+    assert { not (feasible_upgrade_count count upgrade sell money 1 161) };
+    assert { feasible_upgrade_count count upgrade sell money 2 180 };
+    assert { not (feasible_upgrade_count count upgrade sell money 2 181) };
+    assert { feasible_upgrade_count count upgrade sell money 3 160 };
+    assert { not (feasible_upgrade_count count upgrade sell money 3 161) };
+    assert { optimal_upgrade_count count upgrade sell money 0 expected[0] };
+    assert { optimal_upgrade_count count upgrade sell money 1 expected[1] };
+    assert { optimal_upgrade_count count upgrade sell money 2 expected[2] };
+    assert { optimal_upgrade_count count upgrade sell money 3 expected[3] };
+    assert { answer_spec count upgrade sell money expected }
+
+end

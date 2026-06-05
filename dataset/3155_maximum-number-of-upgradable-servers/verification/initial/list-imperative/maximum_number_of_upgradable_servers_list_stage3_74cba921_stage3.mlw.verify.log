@@ -1,0 +1,452 @@
+== Stage 1: first prover on whole file ==
+Running in /Users/rubenm/Desktop/Diversify2Verify/codex-runs/testing6/3155_maximum-number-of-upgradable-servers/stage3a/list-imperative/maximum_number_of_upgradable_servers_list_stage3_74cba921/generated/why3/list: why3 session create -o /Users/rubenm/Desktop/Diversify2Verify/codex-runs/testing6/3155_maximum-number-of-upgradable-servers/stage3a/list-imperative/maximum_number_of_upgradable_servers_list_stage3_74cba921/generated/why3/list/.why3_sessions/maximum_number_of_upgradable_servers_list_stage3_74cba921_stage3_stage1 -P Z3,4.8.6 -t 10 -m 8192 maximum_number_of_upgradable_servers_list_stage3_74cba921_stage3.mlw
+Session created successfully
+Running in /Users/rubenm/Desktop/Diversify2Verify/codex-runs/testing6/3155_maximum-number-of-upgradable-servers/stage3a/list-imperative/maximum_number_of_upgradable_servers_list_stage3_74cba921/generated/why3/list: why3 bench /Users/rubenm/Desktop/Diversify2Verify/codex-runs/testing6/3155_maximum-number-of-upgradable-servers/stage3a/list-imperative/maximum_number_of_upgradable_servers_list_stage3_74cba921/generated/why3/list/.why3_sessions/maximum_number_of_upgradable_servers_list_stage3_74cba921_stage3_stage1
+Progress: 4/1/0                       Progress: 3/2/0                       Progress: 2/3/0                       Progress: 1/4/0                       Progress: 0/5/0                       Progress: 0/0/2                       Progress: 0/0/1                       
+Replay completed, saving session... done
+== Stage 1 stats ==
+= Statistics for session /Users/rubenm/Desktop/Diversify2Verify/codex-runs/testing6/3155_maximum-number-of-upgradable-servers/stage3a/list-imperative/maximum_number_of_upgradable_servers_list_stage3_74cba921/generated/why3/list/.why3_sessions/maximum_number_of_upgradable_servers_list_stage3_74cba921_stage3_stage1
+
+== Number of root goals ==
+  total: 5  proved: 3
+
+== Number of sub goals ==
+  total: 0  proved: 0
+
+== Goals not proved ==
+  +-- file [../../maximum_number_of_upgradable_servers_list_stage3_74cba921_stage3.mlw]
+    +-- theory MaximumNumberOfUpgradableServers_List_Spec
+      +-- goal valid_inputs'vc
+      +-- goal maximum_number_of_upgradable_servers_list'vc
+  
+== Goals proved by only one prover ==
+  +-- file [../../maximum_number_of_upgradable_servers_list_stage3_74cba921_stage3.mlw]
+    +-- theory MaximumNumberOfUpgradableServers_List_Spec
+      +-- goal maximum_upgrades_amount'vc: Z3 4.8.6
+      +-- goal expected_answers'vc: Z3 4.8.6
+      +-- goal reverse_list'vc: Z3 4.8.6
+  
+1 session(s) read, with a total of 5 proof goals.
+== Unproved root goals after first prover ==
+MaximumNumberOfUpgradableServers_List_Spec	valid_inputs'vc
+MaximumNumberOfUpgradableServers_List_Spec	maximum_number_of_upgradable_servers_list'vc
+== Stage 1: trying remaining goals with prover Alt-Ergo,2.4.0 ==
+---- stage1 | prover: Alt-Ergo,2.4.0 | theory: MaximumNumberOfUpgradableServers_List_Spec | goal: valid_inputs'vc ----
+File maximum_number_of_upgradable_servers_list_stage3_74cba921_stage3.mlw:
+Goal valid_inputs'vc.
+Prover result is: Valid (0.01s, 104 steps).
+Solved in stage 1 using prover: Alt-Ergo,2.4.0
+---- stage1 | prover: Alt-Ergo,2.4.0 | theory: MaximumNumberOfUpgradableServers_List_Spec | goal: maximum_number_of_upgradable_servers_list'vc ----
+File maximum_number_of_upgradable_servers_list_stage3_74cba921_stage3.mlw:
+Goal maximum_number_of_upgradable_servers_list'vc.
+Prover result is: Timeout (10.00s, 595979 steps).
+Remaining after prover Alt-Ergo,2.4.0: 1
+== Stage 1: trying remaining goals with prover CVC4,1.8 ==
+---- stage1 | prover: CVC4,1.8 | theory: MaximumNumberOfUpgradableServers_List_Spec | goal: maximum_number_of_upgradable_servers_list'vc ----
+File maximum_number_of_upgradable_servers_list_stage3_74cba921_stage3.mlw:
+Goal maximum_number_of_upgradable_servers_list'vc.
+Prover result is: Unknown (unknown + incomplete) (0.50s, 124603 steps).
+Remaining after prover CVC4,1.8: 1
+== Goals still unproved after stage 1 ==
+MaximumNumberOfUpgradableServers_List_Spec	maximum_number_of_upgradable_servers_list'vc
+== Stage 2: split_vc on unproved goal ==
+Target theory: MaximumNumberOfUpgradableServers_List_Spec
+Target goal  : maximum_number_of_upgradable_servers_list'vc
+---- stage2 | prover: Z3,4.8.6 | theory: MaximumNumberOfUpgradableServers_List_Spec | goal: maximum_number_of_upgradable_servers_list'vc ----
+Transforms: split_vc
+File "maximum_number_of_upgradable_servers_list_stage3_74cba921_stage3.mlw", line 117, characters 18-75:
+Sub-goal Loop invariant init of goal
+maximum_number_of_upgradable_servers_list'vc.
+Prover result is: Valid (0.01s, 1725 steps).
+
+File "maximum_number_of_upgradable_servers_list_stage3_74cba921_stage3.mlw", line 119, character 8 to line 121, character 51:
+Sub-goal Loop invariant init of goal
+maximum_number_of_upgradable_servers_list'vc.
+Prover result is: Valid (0.01s, 35521 steps).
+
+File "maximum_number_of_upgradable_servers_list_stage3_74cba921_stage3.mlw", line 127, characters 19-43:
+Sub-goal Assertion of goal maximum_number_of_upgradable_servers_list'vc.
+Prover result is: Timeout (10.00s, 33950233 steps).
+
+File "maximum_number_of_upgradable_servers_list_stage3_74cba921_stage3.mlw", line 129, character 12 to line 131, character 44:
+Sub-goal Assertion of goal maximum_number_of_upgradable_servers_list'vc.
+Prover result is: Timeout (10.00s, 30383391 steps).
+
+File "maximum_number_of_upgradable_servers_list_stage3_74cba921_stage3.mlw", line 134, characters 19-58:
+Sub-goal Assertion of goal maximum_number_of_upgradable_servers_list'vc.
+Prover result is: Valid (0.01s, 3139 steps).
+
+File "maximum_number_of_upgradable_servers_list_stage3_74cba921_stage3.mlw", line 123, characters 16-33:
+Sub-goal Loop variant decrease of goal
+maximum_number_of_upgradable_servers_list'vc.
+Prover result is: Valid (0.01s, 55164 steps).
+
+File "maximum_number_of_upgradable_servers_list_stage3_74cba921_stage3.mlw", line 117, characters 18-75:
+Sub-goal Loop invariant preservation of goal
+maximum_number_of_upgradable_servers_list'vc.
+Prover result is: Valid (0.01s, 3156 steps).
+
+File "maximum_number_of_upgradable_servers_list_stage3_74cba921_stage3.mlw", line 119, character 8 to line 121, character 51:
+Sub-goal Loop invariant preservation of goal
+maximum_number_of_upgradable_servers_list'vc.
+Prover result is: Valid (0.01s, 52981 steps).
+
+File "maximum_number_of_upgradable_servers_list_stage3_74cba921_stage3.mlw", line 141, characters 19-24:
+Sub-goal Assertion of goal maximum_number_of_upgradable_servers_list'vc.
+Prover result is: Valid (0.02s, 75892 steps).
+
+File "maximum_number_of_upgradable_servers_list_stage3_74cba921_stage3.mlw", line 123, characters 16-33:
+Sub-goal Loop variant decrease of goal
+maximum_number_of_upgradable_servers_list'vc.
+Prover result is: Valid (0.01s, 1640 steps).
+
+File "maximum_number_of_upgradable_servers_list_stage3_74cba921_stage3.mlw", line 117, characters 18-75:
+Sub-goal Loop invariant preservation of goal
+maximum_number_of_upgradable_servers_list'vc.
+Prover result is: Valid (0.01s, 1609 steps).
+
+File "maximum_number_of_upgradable_servers_list_stage3_74cba921_stage3.mlw", line 119, character 8 to line 121, character 51:
+Sub-goal Loop invariant preservation of goal
+maximum_number_of_upgradable_servers_list'vc.
+Prover result is: Valid (0.01s, 1610 steps).
+
+File "maximum_number_of_upgradable_servers_list_stage3_74cba921_stage3.mlw", line 141, characters 19-24:
+Sub-goal Assertion of goal maximum_number_of_upgradable_servers_list'vc.
+Prover result is: Valid (0.01s, 48539 steps).
+
+File "maximum_number_of_upgradable_servers_list_stage3_74cba921_stage3.mlw", line 123, characters 16-33:
+Sub-goal Loop variant decrease of goal
+maximum_number_of_upgradable_servers_list'vc.
+Prover result is: Valid (0.01s, 1635 steps).
+
+File "maximum_number_of_upgradable_servers_list_stage3_74cba921_stage3.mlw", line 117, characters 18-75:
+Sub-goal Loop invariant preservation of goal
+maximum_number_of_upgradable_servers_list'vc.
+Prover result is: Valid (0.01s, 1604 steps).
+
+File "maximum_number_of_upgradable_servers_list_stage3_74cba921_stage3.mlw", line 119, character 8 to line 121, character 51:
+Sub-goal Loop invariant preservation of goal
+maximum_number_of_upgradable_servers_list'vc.
+Prover result is: Valid (0.01s, 1605 steps).
+
+File "maximum_number_of_upgradable_servers_list_stage3_74cba921_stage3.mlw", line 141, characters 19-24:
+Sub-goal Assertion of goal maximum_number_of_upgradable_servers_list'vc.
+Prover result is: Valid (0.01s, 44326 steps).
+
+File "maximum_number_of_upgradable_servers_list_stage3_74cba921_stage3.mlw", line 123, characters 16-33:
+Sub-goal Loop variant decrease of goal
+maximum_number_of_upgradable_servers_list'vc.
+Prover result is: Valid (0.01s, 1630 steps).
+
+File "maximum_number_of_upgradable_servers_list_stage3_74cba921_stage3.mlw", line 117, characters 18-75:
+Sub-goal Loop invariant preservation of goal
+maximum_number_of_upgradable_servers_list'vc.
+Prover result is: Valid (0.01s, 1599 steps).
+
+File "maximum_number_of_upgradable_servers_list_stage3_74cba921_stage3.mlw", line 119, character 8 to line 121, character 51:
+Sub-goal Loop invariant preservation of goal
+maximum_number_of_upgradable_servers_list'vc.
+Prover result is: Valid (0.01s, 1600 steps).
+
+File "maximum_number_of_upgradable_servers_list_stage3_74cba921_stage3.mlw", line 141, characters 19-24:
+Sub-goal Assertion of goal maximum_number_of_upgradable_servers_list'vc.
+Prover result is: Valid (0.01s, 3084 steps).
+
+File "maximum_number_of_upgradable_servers_list_stage3_74cba921_stage3.mlw", line 123, characters 16-33:
+Sub-goal Loop variant decrease of goal
+maximum_number_of_upgradable_servers_list'vc.
+Prover result is: Valid (0.01s, 1625 steps).
+
+File "maximum_number_of_upgradable_servers_list_stage3_74cba921_stage3.mlw", line 117, characters 18-75:
+Sub-goal Loop invariant preservation of goal
+maximum_number_of_upgradable_servers_list'vc.
+Prover result is: Valid (0.01s, 1594 steps).
+
+File "maximum_number_of_upgradable_servers_list_stage3_74cba921_stage3.mlw", line 119, character 8 to line 121, character 51:
+Sub-goal Loop invariant preservation of goal
+maximum_number_of_upgradable_servers_list'vc.
+Prover result is: Valid (0.01s, 1595 steps).
+Infrastructure issue in stage 2 with prover Z3,4.8.6; aborting rest of stage 2.
+== Goals still unproved after stage 2 (split_vc) ==
+MaximumNumberOfUpgradableServers_List_Spec	maximum_number_of_upgradable_servers_list'vc
+== Stage 3: split_vc + inline_all on still-unproved goal ==
+Target theory: MaximumNumberOfUpgradableServers_List_Spec
+Target goal  : maximum_number_of_upgradable_servers_list'vc
+---- stage3 | prover: Alt-Ergo,2.4.0 | theory: MaximumNumberOfUpgradableServers_List_Spec | goal: maximum_number_of_upgradable_servers_list'vc ----
+Transforms: split_vc inline_all
+File "maximum_number_of_upgradable_servers_list_stage3_74cba921_stage3.mlw", line 117, characters 18-75:
+Sub-goal Loop invariant init of goal
+maximum_number_of_upgradable_servers_list'vc.
+Prover result is: Valid (0.01s, 4 steps).
+
+File "maximum_number_of_upgradable_servers_list_stage3_74cba921_stage3.mlw", line 119, character 8 to line 121, character 51:
+Sub-goal Loop invariant init of goal
+maximum_number_of_upgradable_servers_list'vc.
+Prover result is: Valid (0.01s, 6 steps).
+
+File "maximum_number_of_upgradable_servers_list_stage3_74cba921_stage3.mlw", line 127, characters 19-43:
+Sub-goal Assertion of goal maximum_number_of_upgradable_servers_list'vc.
+Prover result is: Valid (0.04s, 858 steps).
+
+File "maximum_number_of_upgradable_servers_list_stage3_74cba921_stage3.mlw", line 129, character 12 to line 131, character 44:
+Sub-goal Assertion of goal maximum_number_of_upgradable_servers_list'vc.
+Prover result is: Valid (0.02s, 294 steps).
+
+File "maximum_number_of_upgradable_servers_list_stage3_74cba921_stage3.mlw", line 134, characters 19-58:
+Sub-goal Assertion of goal maximum_number_of_upgradable_servers_list'vc.
+Prover result is: Valid (0.01s, 39 steps).
+
+File "maximum_number_of_upgradable_servers_list_stage3_74cba921_stage3.mlw", line 123, characters 16-33:
+Sub-goal Loop variant decrease of goal
+maximum_number_of_upgradable_servers_list'vc.
+Prover result is: Valid (0.01s, 106 steps).
+
+File "maximum_number_of_upgradable_servers_list_stage3_74cba921_stage3.mlw", line 117, characters 18-75:
+Sub-goal Loop invariant preservation of goal
+maximum_number_of_upgradable_servers_list'vc.
+Prover result is: Valid (0.01s, 32 steps).
+
+File "maximum_number_of_upgradable_servers_list_stage3_74cba921_stage3.mlw", line 119, character 8 to line 121, character 51:
+Sub-goal Loop invariant preservation of goal
+maximum_number_of_upgradable_servers_list'vc.
+Prover result is: Valid (0.02s, 488 steps).
+
+File "maximum_number_of_upgradable_servers_list_stage3_74cba921_stage3.mlw", line 141, characters 19-24:
+Sub-goal Assertion of goal maximum_number_of_upgradable_servers_list'vc.
+Prover result is: Valid (0.01s, 22 steps).
+
+File "maximum_number_of_upgradable_servers_list_stage3_74cba921_stage3.mlw", line 123, characters 16-33:
+Sub-goal Loop variant decrease of goal
+maximum_number_of_upgradable_servers_list'vc.
+Prover result is: Valid (0.01s, 18 steps).
+
+File "maximum_number_of_upgradable_servers_list_stage3_74cba921_stage3.mlw", line 117, characters 18-75:
+Sub-goal Loop invariant preservation of goal
+maximum_number_of_upgradable_servers_list'vc.
+Prover result is: Valid (0.01s, 18 steps).
+
+File "maximum_number_of_upgradable_servers_list_stage3_74cba921_stage3.mlw", line 119, character 8 to line 121, character 51:
+Sub-goal Loop invariant preservation of goal
+maximum_number_of_upgradable_servers_list'vc.
+Prover result is: Valid (0.01s, 18 steps).
+
+File "maximum_number_of_upgradable_servers_list_stage3_74cba921_stage3.mlw", line 141, characters 19-24:
+Sub-goal Assertion of goal maximum_number_of_upgradable_servers_list'vc.
+Prover result is: Valid (0.01s, 64 steps).
+
+File "maximum_number_of_upgradable_servers_list_stage3_74cba921_stage3.mlw", line 123, characters 16-33:
+Sub-goal Loop variant decrease of goal
+maximum_number_of_upgradable_servers_list'vc.
+Prover result is: Valid (0.01s, 16 steps).
+
+File "maximum_number_of_upgradable_servers_list_stage3_74cba921_stage3.mlw", line 117, characters 18-75:
+Sub-goal Loop invariant preservation of goal
+maximum_number_of_upgradable_servers_list'vc.
+Prover result is: Valid (0.01s, 16 steps).
+
+File "maximum_number_of_upgradable_servers_list_stage3_74cba921_stage3.mlw", line 119, character 8 to line 121, character 51:
+Sub-goal Loop invariant preservation of goal
+maximum_number_of_upgradable_servers_list'vc.
+Prover result is: Valid (0.01s, 16 steps).
+
+File "maximum_number_of_upgradable_servers_list_stage3_74cba921_stage3.mlw", line 141, characters 19-24:
+Sub-goal Assertion of goal maximum_number_of_upgradable_servers_list'vc.
+Prover result is: Valid (0.01s, 14 steps).
+
+File "maximum_number_of_upgradable_servers_list_stage3_74cba921_stage3.mlw", line 123, characters 16-33:
+Sub-goal Loop variant decrease of goal
+maximum_number_of_upgradable_servers_list'vc.
+Prover result is: Valid (0.01s, 14 steps).
+
+File "maximum_number_of_upgradable_servers_list_stage3_74cba921_stage3.mlw", line 117, characters 18-75:
+Sub-goal Loop invariant preservation of goal
+maximum_number_of_upgradable_servers_list'vc.
+Prover result is: Valid (0.01s, 14 steps).
+
+File "maximum_number_of_upgradable_servers_list_stage3_74cba921_stage3.mlw", line 119, character 8 to line 121, character 51:
+Sub-goal Loop invariant preservation of goal
+maximum_number_of_upgradable_servers_list'vc.
+Prover result is: Valid (0.01s, 14 steps).
+
+File "maximum_number_of_upgradable_servers_list_stage3_74cba921_stage3.mlw", line 141, characters 19-24:
+Sub-goal Assertion of goal maximum_number_of_upgradable_servers_list'vc.
+Prover result is: Valid (0.01s, 10 steps).
+
+File "maximum_number_of_upgradable_servers_list_stage3_74cba921_stage3.mlw", line 123, characters 16-33:
+Sub-goal Loop variant decrease of goal
+maximum_number_of_upgradable_servers_list'vc.
+Prover result is: Valid (0.01s, 10 steps).
+
+File "maximum_number_of_upgradable_servers_list_stage3_74cba921_stage3.mlw", line 117, characters 18-75:
+Sub-goal Loop invariant preservation of goal
+maximum_number_of_upgradable_servers_list'vc.
+Prover result is: Valid (0.01s, 10 steps).
+
+File "maximum_number_of_upgradable_servers_list_stage3_74cba921_stage3.mlw", line 119, character 8 to line 121, character 51:
+Sub-goal Loop invariant preservation of goal
+maximum_number_of_upgradable_servers_list'vc.
+Prover result is: Valid (0.01s, 10 steps).
+
+File "maximum_number_of_upgradable_servers_list_stage3_74cba921_stage3.mlw", line 144, characters 13-29:
+Sub-goal Assertion of goal maximum_number_of_upgradable_servers_list'vc.
+Prover result is: Timeout (10.00s, 48512 steps).
+
+File "maximum_number_of_upgradable_servers_list_stage3_74cba921_stage3.mlw", line 145, characters 13-31:
+Sub-goal Assertion of goal maximum_number_of_upgradable_servers_list'vc.
+Prover result is: Valid (0.44s, 30570 steps).
+
+File "maximum_number_of_upgradable_servers_list_stage3_74cba921_stage3.mlw", line 146, characters 13-28:
+Sub-goal Assertion of goal maximum_number_of_upgradable_servers_list'vc.
+Prover result is: Valid (0.45s, 30540 steps).
+
+File "maximum_number_of_upgradable_servers_list_stage3_74cba921_stage3.mlw", line 147, characters 13-29:
+Sub-goal Assertion of goal maximum_number_of_upgradable_servers_list'vc.
+Prover result is: Valid (0.44s, 30469 steps).
+
+File "maximum_number_of_upgradable_servers_list_stage3_74cba921_stage3.mlw", line 148, characters 13-80:
+Sub-goal Assertion of goal maximum_number_of_upgradable_servers_list'vc.
+Prover result is: Valid (0.01s, 20 steps).
+
+File "maximum_number_of_upgradable_servers_list_stage3_74cba921_stage3.mlw", line 149, characters 13-83:
+Sub-goal Assertion of goal maximum_number_of_upgradable_servers_list'vc.
+Prover result is: Valid (0.01s, 20 steps).
+
+File "maximum_number_of_upgradable_servers_list_stage3_74cba921_stage3.mlw", line 151, characters 13-63:
+Sub-goal Assertion of goal maximum_number_of_upgradable_servers_list'vc.
+Prover result is: Valid (0.01s, 21 steps).
+
+File "maximum_number_of_upgradable_servers_list_stage3_74cba921_stage3.mlw", line 106, characters 15-64:
+Sub-goal Postcondition of goal maximum_number_of_upgradable_servers_list'vc.
+Prover result is: Valid (0.01s, 21 steps).
+---- stage3 | prover: CVC4,1.8 | theory: MaximumNumberOfUpgradableServers_List_Spec | goal: maximum_number_of_upgradable_servers_list'vc ----
+Transforms: split_vc inline_all
+File "maximum_number_of_upgradable_servers_list_stage3_74cba921_stage3.mlw", line 117, characters 18-75:
+Sub-goal Loop invariant init of goal
+maximum_number_of_upgradable_servers_list'vc.
+Prover result is: Valid (0.02s, 8478 steps).
+
+File "maximum_number_of_upgradable_servers_list_stage3_74cba921_stage3.mlw", line 119, character 8 to line 121, character 51:
+Sub-goal Loop invariant init of goal
+maximum_number_of_upgradable_servers_list'vc.
+Prover result is: Valid (0.04s, 17404 steps).
+
+File "maximum_number_of_upgradable_servers_list_stage3_74cba921_stage3.mlw", line 127, characters 19-43:
+Sub-goal Assertion of goal maximum_number_of_upgradable_servers_list'vc.
+Prover result is: Valid (0.05s, 19562 steps).
+
+File "maximum_number_of_upgradable_servers_list_stage3_74cba921_stage3.mlw", line 129, character 12 to line 131, character 44:
+Sub-goal Assertion of goal maximum_number_of_upgradable_servers_list'vc.
+Prover result is: Timeout (10.00s, 3155028 steps).
+
+File "maximum_number_of_upgradable_servers_list_stage3_74cba921_stage3.mlw", line 134, characters 19-58:
+Sub-goal Assertion of goal maximum_number_of_upgradable_servers_list'vc.
+Prover result is: Valid (0.04s, 17566 steps).
+
+File "maximum_number_of_upgradable_servers_list_stage3_74cba921_stage3.mlw", line 123, characters 16-33:
+Sub-goal Loop variant decrease of goal
+maximum_number_of_upgradable_servers_list'vc.
+Prover result is: Valid (0.05s, 21198 steps).
+
+File "maximum_number_of_upgradable_servers_list_stage3_74cba921_stage3.mlw", line 117, characters 18-75:
+Sub-goal Loop invariant preservation of goal
+maximum_number_of_upgradable_servers_list'vc.
+Prover result is: Valid (0.03s, 15401 steps).
+
+File "maximum_number_of_upgradable_servers_list_stage3_74cba921_stage3.mlw", line 119, character 8 to line 121, character 51:
+Sub-goal Loop invariant preservation of goal
+maximum_number_of_upgradable_servers_list'vc.
+Prover result is: Valid (0.04s, 19027 steps).
+
+File "maximum_number_of_upgradable_servers_list_stage3_74cba921_stage3.mlw", line 141, characters 19-24:
+Sub-goal Assertion of goal maximum_number_of_upgradable_servers_list'vc.
+Prover result is: Valid (0.04s, 18349 steps).
+
+File "maximum_number_of_upgradable_servers_list_stage3_74cba921_stage3.mlw", line 123, characters 16-33:
+Sub-goal Loop variant decrease of goal
+maximum_number_of_upgradable_servers_list'vc.
+Prover result is: Valid (0.03s, 15005 steps).
+
+File "maximum_number_of_upgradable_servers_list_stage3_74cba921_stage3.mlw", line 117, characters 18-75:
+Sub-goal Loop invariant preservation of goal
+maximum_number_of_upgradable_servers_list'vc.
+Prover result is: Valid (0.03s, 14824 steps).
+
+File "maximum_number_of_upgradable_servers_list_stage3_74cba921_stage3.mlw", line 119, character 8 to line 121, character 51:
+Sub-goal Loop invariant preservation of goal
+maximum_number_of_upgradable_servers_list'vc.
+Prover result is: Valid (0.03s, 14827 steps).
+
+File "maximum_number_of_upgradable_servers_list_stage3_74cba921_stage3.mlw", line 141, characters 19-24:
+Sub-goal Assertion of goal maximum_number_of_upgradable_servers_list'vc.
+Prover result is: Valid (0.04s, 18337 steps).
+
+File "maximum_number_of_upgradable_servers_list_stage3_74cba921_stage3.mlw", line 123, characters 16-33:
+Sub-goal Loop variant decrease of goal
+maximum_number_of_upgradable_servers_list'vc.
+Prover result is: Valid (0.03s, 14985 steps).
+
+File "maximum_number_of_upgradable_servers_list_stage3_74cba921_stage3.mlw", line 117, characters 18-75:
+Sub-goal Loop invariant preservation of goal
+maximum_number_of_upgradable_servers_list'vc.
+Prover result is: Valid (0.03s, 14804 steps).
+
+File "maximum_number_of_upgradable_servers_list_stage3_74cba921_stage3.mlw", line 119, character 8 to line 121, character 51:
+Sub-goal Loop invariant preservation of goal
+maximum_number_of_upgradable_servers_list'vc.
+Prover result is: Valid (0.03s, 14807 steps).
+
+File "maximum_number_of_upgradable_servers_list_stage3_74cba921_stage3.mlw", line 141, characters 19-24:
+Sub-goal Assertion of goal maximum_number_of_upgradable_servers_list'vc.
+Prover result is: Valid (0.04s, 18096 steps).
+
+File "maximum_number_of_upgradable_servers_list_stage3_74cba921_stage3.mlw", line 123, characters 16-33:
+Sub-goal Loop variant decrease of goal
+maximum_number_of_upgradable_servers_list'vc.
+Prover result is: Valid (0.03s, 14965 steps).
+
+File "maximum_number_of_upgradable_servers_list_stage3_74cba921_stage3.mlw", line 117, characters 18-75:
+Sub-goal Loop invariant preservation of goal
+maximum_number_of_upgradable_servers_list'vc.
+Prover result is: Valid (0.03s, 14784 steps).
+
+File "maximum_number_of_upgradable_servers_list_stage3_74cba921_stage3.mlw", line 119, character 8 to line 121, character 51:
+Sub-goal Loop invariant preservation of goal
+maximum_number_of_upgradable_servers_list'vc.
+Prover result is: Valid (0.03s, 14787 steps).
+
+File "maximum_number_of_upgradable_servers_list_stage3_74cba921_stage3.mlw", line 141, characters 19-24:
+Sub-goal Assertion of goal maximum_number_of_upgradable_servers_list'vc.
+Prover result is: Valid (0.03s, 14759 steps).
+
+File "maximum_number_of_upgradable_servers_list_stage3_74cba921_stage3.mlw", line 123, characters 16-33:
+Sub-goal Loop variant decrease of goal
+maximum_number_of_upgradable_servers_list'vc.
+Prover result is: Valid (0.03s, 14945 steps).
+
+File "maximum_number_of_upgradable_servers_list_stage3_74cba921_stage3.mlw", line 117, characters 18-75:
+Sub-goal Loop invariant preservation of goal
+maximum_number_of_upgradable_servers_list'vc.
+Prover result is: Valid (0.03s, 14764 steps).
+
+File "maximum_number_of_upgradable_servers_list_stage3_74cba921_stage3.mlw", line 119, character 8 to line 121, character 51:
+Sub-goal Loop invariant preservation of goal
+maximum_number_of_upgradable_servers_list'vc.
+Prover result is: Valid (0.03s, 14767 steps).
+
+File "maximum_number_of_upgradable_servers_list_stage3_74cba921_stage3.mlw", line 144, characters 13-29:
+Sub-goal Assertion of goal maximum_number_of_upgradable_servers_list'vc.
+Prover result is: Timeout (10.00s, 3313611 steps).
+Infrastructure issue in stage 3 with prover CVC4,1.8; aborting rest of stage 3.
+== Final summary ==
+Unproved root goals after first prover : 1
+Remaining failures after split_vc      : 1
+Remaining failures after stage 3       : 1
+Detailed logs stored in                : /Users/rubenm/Desktop/Diversify2Verify/codex-runs/testing6/3155_maximum-number-of-upgradable-servers/stage3a/list-imperative/maximum_number_of_upgradable_servers_list_stage3_74cba921/generated/why3/list/.why3_sessions/maximum_number_of_upgradable_servers_list_stage3_74cba921_stage3_logs
+Still unproved goals:
+MaximumNumberOfUpgradableServers_List_Spec	maximum_number_of_upgradable_servers_list'vc
+VERIFY_RESULT: FAILURE
+VERIFY_REASON: unproved_goals_remain
+VERIFY_STAGE: stage3
+VERIFY_ROOT_TOTAL: 5
+VERIFY_ROOT_PROVED: 4
+VERIFY_ROOT_REMAINING: 1

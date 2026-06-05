@@ -1,0 +1,127 @@
+module EliminateMaximumNumberOfMonsters_List_Stage3_Imperative
+
+  use int.Int
+  use list.List
+  use list.Length
+  use ref.Ref
+
+  let rec predicate positive_distance_speed (dist: list int) (speed: list int)
+    variant { dist }
+  =
+    match dist with
+    | Nil ->
+        match speed with
+        | Nil -> true
+        | Cons _ _ -> false
+        end
+    | Cons d ds ->
+        match speed with
+        | Nil -> false
+        | Cons s ss -> d > 0 && s > 0 && positive_distance_speed ds ss
+        end
+    end
+
+  let rec function arrived_by_count (dist: list int) (speed: list int) (minute: int) : int
+    variant { dist }
+  =
+    match dist with
+    | Nil -> 0
+    | Cons d ds ->
+        match speed with
+        | Nil -> 0
+        | Cons s ss ->
+            (if d <= s * minute then 1 else 0) + arrived_by_count ds ss minute
+        end
+    end
+
+  predicate no_loss_before (dist: list int) (speed: list int) (k: int) =
+    forall minute: int. 0 <= minute < k -> arrived_by_count dist speed minute <= minute
+
+  predicate loss_at (dist: list int) (speed: list int) (k: int) =
+    0 <= k < length dist /\ arrived_by_count dist speed k > k
+
+  predicate valid_elimination_result (dist: list int) (speed: list int) (r: int) =
+    0 <= r <= length dist /\
+    no_loss_before dist speed r /\
+    (r = length dist \/ loss_at dist speed r)
+
+  let eliminate_maximum_number_of_monsters_list (dist: list int) (speed: list int) : int
+    requires { length dist = length speed }
+    requires { not (is_nil dist) }
+    requires { positive_distance_speed dist speed }
+    ensures  { valid_elimination_result dist speed result }
+  =
+    let total = length dist in
+    let minute = ref 0 in
+    let result = ref total in
+    while !minute < total do
+      invariant { total = length dist }
+      invariant { 0 <= !minute <= total }
+      invariant { 0 <= !result <= total }
+      invariant { !minute < total -> !result = total /\ no_loss_before dist speed !minute }
+      invariant { !minute = total -> valid_elimination_result dist speed !result }
+      variant { total - !minute }
+
+      let arrived = ref 0 in
+      let cur_dist = ref dist in
+      let cur_speed = ref speed in
+      while
+        match !cur_dist with
+        | Nil -> false
+        | Cons _ _ ->
+            match !cur_speed with
+            | Nil -> false
+            | Cons _ _ -> true
+            end
+        end
+      do
+        invariant { length !cur_dist = length !cur_speed }
+        invariant { 0 <= length !cur_dist }
+        invariant { length !cur_dist <= total }
+        invariant { 0 <= !arrived }
+        invariant { !arrived + arrived_by_count !cur_dist !cur_speed !minute =
+                    arrived_by_count dist speed !minute }
+        variant { length !cur_dist }
+
+        match !cur_dist with
+        | Nil ->
+            absurd
+        | Cons d ds ->
+            match !cur_speed with
+            | Nil ->
+                absurd
+            | Cons s ss ->
+                assert { arrived_by_count !cur_dist !cur_speed !minute =
+                         (if d <= s * !minute then 1 else 0) +
+                         arrived_by_count ds ss !minute };
+                if d <= s * !minute then begin
+                  arrived := !arrived + 1
+                end;
+                cur_dist := ds;
+                cur_speed := ss
+            end
+        end
+      done;
+
+      assert { !cur_dist = Nil };
+      assert { !cur_speed = Nil };
+      assert { arrived_by_count !cur_dist !cur_speed !minute = 0 };
+      assert { !arrived = arrived_by_count dist speed !minute };
+
+      if !arrived > !minute then begin
+        assert { no_loss_before dist speed !minute };
+        assert { loss_at dist speed !minute };
+        result := !minute;
+        minute := total;
+        assert { valid_elimination_result dist speed !result }
+      end else begin
+        assert { arrived_by_count dist speed !minute <= !minute };
+        assert { no_loss_before dist speed (!minute + 1) };
+        minute := !minute + 1
+      end
+    done;
+    assert { !minute = total };
+    assert { valid_elimination_result dist speed !result };
+    !result
+
+end

@@ -1,0 +1,162 @@
+module MaximizeTheBeautyOfTheGarden_Array_Spec
+
+  use int.Int
+  use array.Array
+  use ref.Ref
+
+  predicate bounded_values (flowers: array int) =
+    forall i: int. 0 <= i < length flowers -> -10000 <= flowers[i] <= 10000
+
+  let rec function positive_sum_between (flowers: array int) (lo: int) (hi: int) : int
+    variant  { hi - lo }
+  =
+    if lo >= hi then 0
+    else if lo < 0 then 0
+    else if hi > length flowers then 0
+    else (if flowers[lo] > 0 then flowers[lo] else 0) + positive_sum_between flowers (lo + 1) hi
+
+  predicate valid_endpoint_pair (flowers: array int) (i: int) (j: int) =
+    0 <= i < j < length flowers /\ flowers[i] = flowers[j]
+
+  function candidate_beauty (flowers: array int) (i: int) (j: int) : int
+  =
+    flowers[i] + flowers[j] + positive_sum_between flowers (i + 1) j
+
+  predicate is_maximum_beauty (flowers: array int) (result: int) =
+    (exists i j: int. valid_endpoint_pair flowers i j /\ result = candidate_beauty flowers i j) /\
+    (forall i j: int. valid_endpoint_pair flowers i j -> candidate_beauty flowers i j <= result)
+
+  predicate prefix_materialized (flowers: array int) (prefix: array int) (upto: int) =
+    length prefix = length flowers + 1 /\
+    0 <= upto <= length flowers /\
+    prefix[0] = 0 /\
+    (forall k: int. 0 <= k <= upto -> prefix[k] = positive_sum_between flowers 0 k)
+
+  function prefix_candidate (flowers: array int) (prefix: array int) (i: int) (j: int) : int =
+    flowers[i] + flowers[j] + prefix[j] - prefix[i + 1]
+
+  predicate processed_pair (flowers: array int) (outer: int) (inner: int) (i: int) (j: int) =
+    valid_endpoint_pair flowers i j /\
+    (i < outer \/ (i = outer /\ j < inner))
+
+  predicate best_for_processed
+    (flowers: array int) (outer: int) (inner: int) (best: int) (found: bool)
+  =
+    ((found = True) <->
+       (exists i j: int. processed_pair flowers outer inner i j)) /\
+    (found = True ->
+       (exists i j: int.
+          processed_pair flowers outer inner i j /\
+          best = candidate_beauty flowers i j) /\
+       (forall i j: int.
+          processed_pair flowers outer inner i j ->
+          candidate_beauty flowers i j <= best))
+
+  let rec lemma positive_sum_extend_right (flowers: array int) (lo: int) (hi: int)
+    requires { 0 <= lo <= hi < length flowers }
+    ensures  { positive_sum_between flowers lo (hi + 1) =
+               positive_sum_between flowers lo hi +
+               (if flowers[hi] > 0 then flowers[hi] else 0) }
+    variant  { hi - lo }
+  =
+    if lo < hi then begin
+      positive_sum_extend_right flowers (lo + 1) hi
+    end
+
+  let rec lemma positive_sum_split (flowers: array int) (lo: int) (mid: int) (hi: int)
+    requires { 0 <= lo <= mid <= hi <= length flowers }
+    ensures  { positive_sum_between flowers lo hi =
+               positive_sum_between flowers lo mid +
+               positive_sum_between flowers mid hi }
+    variant  { mid - lo }
+  =
+    if lo < mid then begin
+      positive_sum_split flowers (lo + 1) mid hi
+    end
+
+  let lemma prefix_candidate_matches_beauty
+    (flowers: array int) (prefix: array int) (i: int) (j: int)
+    requires { prefix_materialized flowers prefix (length flowers) }
+    requires { valid_endpoint_pair flowers i j }
+    ensures  { prefix_candidate flowers prefix i j = candidate_beauty flowers i j }
+  =
+    assert { 0 <= i < j < length flowers };
+    assert { 0 <= i + 1 <= j <= length flowers };
+    assert { prefix[j] = positive_sum_between flowers 0 j };
+    assert { prefix[i + 1] = positive_sum_between flowers 0 (i + 1) };
+    positive_sum_split flowers 0 (i + 1) j;
+    assert { positive_sum_between flowers 0 j =
+             positive_sum_between flowers 0 (i + 1) +
+             positive_sum_between flowers (i + 1) j };
+    assert { prefix[j] - prefix[i + 1] =
+             positive_sum_between flowers (i + 1) j }
+
+  let maximize_the_beauty_of_the_garden_array (flowers: array int) : int
+    requires { 2 <= length flowers <= 100000 }
+    requires { bounded_values flowers }
+    requires { exists i j: int. valid_endpoint_pair flowers i j }
+    ensures  { is_maximum_beauty flowers result }
+  =
+    let n = length flowers in
+    let positive_prefix = make (n + 1) 0 in
+    assert { length positive_prefix = n + 1 };
+    for i = 0 to n - 1 do
+      invariant { n = length flowers }
+      invariant { length positive_prefix = n + 1 }
+      invariant { prefix_materialized flowers positive_prefix i }
+      assert { 0 <= i < length flowers };
+      assert { positive_prefix[i] = positive_sum_between flowers 0 i };
+      positive_sum_extend_right flowers 0 i;
+      positive_prefix[i + 1] <- positive_prefix[i] +
+        (if flowers[i] > 0 then flowers[i] else 0);
+      assert { positive_prefix[i + 1] =
+               positive_sum_between flowers 0 i +
+               (if flowers[i] > 0 then flowers[i] else 0) };
+      assert { positive_prefix[i + 1] = positive_sum_between flowers 0 (i + 1) };
+      assert { prefix_materialized flowers positive_prefix (i + 1) }
+    done;
+    assert { prefix_materialized flowers positive_prefix n };
+    let best = ref 0 in
+    let found = ref false in
+    for i = 0 to n - 2 do
+      invariant { n = length flowers }
+      invariant { 0 <= i <= n - 1 }
+      invariant { prefix_materialized flowers positive_prefix n }
+      invariant { best_for_processed flowers i 0 !best !found }
+      for j = i + 1 to n - 1 do
+        invariant { n = length flowers }
+        invariant { 0 <= i < n - 1 }
+        invariant { i + 1 <= j <= n }
+        invariant { prefix_materialized flowers positive_prefix n }
+        invariant { best_for_processed flowers i j !best !found }
+        if flowers[i] = flowers[j] then begin
+          let candidate =
+            flowers[i] + flowers[j] + positive_prefix[j] - positive_prefix[i + 1]
+          in
+          assert { valid_endpoint_pair flowers i j };
+          assert { prefix_candidate flowers positive_prefix i j = candidate };
+          prefix_candidate_matches_beauty flowers positive_prefix i j;
+          assert { prefix_candidate flowers positive_prefix i j = candidate_beauty flowers i j };
+          if not !found then begin
+            found := true;
+            best := candidate
+          end else if candidate > !best then begin
+            best := candidate
+          end;
+          assert { best_for_processed flowers i (j + 1) !best !found }
+        end else begin
+          assert { not valid_endpoint_pair flowers i j };
+          assert { best_for_processed flowers i (j + 1) !best !found }
+        end
+      done;
+      assert { best_for_processed flowers (i + 1) 0 !best !found }
+    done;
+    assert { best_for_processed flowers (n - 1) 0 !best !found };
+    assert { !found = True };
+    assert { forall i j: int.
+      valid_endpoint_pair flowers i j ->
+      processed_pair flowers (n - 1) 0 i j };
+    assert { is_maximum_beauty flowers !best };
+    !best
+
+end

@@ -1,0 +1,171 @@
+module EliminateMaximumNumberOfMonsters_Array_Spec
+
+  use int.Int
+  use int.EuclideanDivision
+  use array.Array
+
+  predicate input_constraints (dist: array int) (speed: array int) =
+    length dist = length speed /\
+    1 <= length dist /\ length dist <= 100000 /\
+    (forall i: int. 0 <= i < length dist ->
+      1 <= dist[i] /\ dist[i] <= 100000 /\
+      1 <= speed[i] /\ speed[i] <= 100000)
+
+  predicate killed_before (order: array int) (i: int) (t: int) =
+    exists p: int. 0 <= p < t /\ order[p] = i
+
+  predicate distinct_prefix (order: array int) (k: int) =
+    forall p q: int. 0 <= p < q < k -> order[p] <> order[q]
+
+  predicate all_uneliminated_safe_at
+    (dist: array int) (speed: array int) (order: array int) (t: int) =
+    forall i: int. 0 <= i < length dist ->
+      not (killed_before order i t) ->
+      dist[i] > speed[i] * t
+
+  predicate valid_elimination_order
+    (dist: array int) (speed: array int) (order: array int) (k: int) =
+    length dist = length speed /\
+    0 <= k <= length dist /\
+    length order = k /\
+    distinct_prefix order k /\
+    (forall t: int. 0 <= t < k ->
+      all_uneliminated_safe_at dist speed order t /\
+      0 <= order[t] < length dist /\
+      not (killed_before order order[t] t))
+
+  predicate can_eliminate_count (dist: array int) (speed: array int) (k: int) =
+    exists order: array int. valid_elimination_order dist speed order k
+
+  predicate optimal_elimination_count (dist: array int) (speed: array int) (r: int) =
+    0 <= r <= length dist /\
+    can_eliminate_count dist speed r /\
+    (forall k: int. 0 <= k <= length dist ->
+      can_eliminate_count dist speed k -> k <= r)
+
+  predicate deadline_value
+    (dist: array int) (speed: array int) (i: int) (d: int) =
+    0 <= i < length dist /\
+    d = div (dist[i] - 1) speed[i]
+
+  predicate deadlines_computed_prefix
+    (dist: array int) (speed: array int) (deadlines: array int) (upto: int) =
+    length deadlines = length dist /\
+    length dist = length speed /\
+    0 <= upto <= length dist /\
+    (forall i: int. 0 <= i < upto ->
+      deadline_value dist speed i deadlines[i])
+
+  predicate sorted_prefix (a: array int) (upto: int) =
+    0 <= upto <= length a /\
+    (forall i j: int. 0 <= i <= j < upto -> a[i] <= a[j])
+
+  predicate deadline_safe_prefix (deadlines: array int) (k: int) =
+    0 <= k <= length deadlines /\
+    (forall t: int. 0 <= t < k -> deadlines[t] >= t)
+
+  predicate greedy_deadline_result (deadlines: array int) (r: int) =
+    sorted_prefix deadlines (length deadlines) /\
+    deadline_safe_prefix deadlines r /\
+    (r < length deadlines -> deadlines[r] < r)
+
+  let arrival_deadline (distance: int) (velocity: int) : int
+    requires { 1 <= velocity }
+    ensures  { result = div (distance - 1) velocity }
+  =
+    div (distance - 1) velocity
+
+  let rec fill_deadlines
+    (dist: array int) (speed: array int) (deadlines: array int) (i: int) : unit
+    requires { length dist = length speed }
+    requires { length deadlines = length dist }
+    requires { 0 <= i <= length dist }
+    requires { forall k: int. 0 <= k < length speed -> 1 <= speed[k] }
+    requires { deadlines_computed_prefix dist speed deadlines i }
+    ensures  { deadlines_computed_prefix dist speed deadlines (length dist) }
+    variant  { length dist - i }
+  =
+    if i >= length dist then
+      ()
+    else begin
+      deadlines[i] <- arrival_deadline dist[i] speed[i];
+      assert { deadline_value dist speed i deadlines[i] };
+      fill_deadlines dist speed deadlines (i + 1)
+    end
+
+  let rec shift_for_insertion (a: array int) (j: int) (key: int) : unit
+    requires { 0 < length a }
+    requires { -1 <= j < length a - 1 }
+    ensures  { length a = length (old a) }
+    variant  { j + 1 }
+  =
+    if j < 0 then
+      a[0] <- key
+    else if a[j] > key then begin
+      a[j + 1] <- a[j];
+      shift_for_insertion a (j - 1) key
+    end else
+      a[j + 1] <- key
+
+  let rec insertion_sort_from (a: array int) (i: int) : unit
+    requires { 1 <= i <= length a }
+    ensures  { length a = length (old a) }
+    ensures  { sorted_prefix a (length a) }
+    variant  { length a - i }
+  =
+    if i >= length a then
+      ()
+    else begin
+      let key = a[i] in
+      shift_for_insertion a (i - 1) key;
+      insertion_sort_from a (i + 1)
+    end
+
+  let sort_deadlines (a: array int) : unit
+    ensures { length a = length (old a) }
+    ensures { sorted_prefix a (length a) }
+  =
+    if length a >= 2 then
+      insertion_sort_from a 1
+    else
+      ()
+
+  let rec count_eliminated_from (deadlines: array int) (i: int) : int
+    requires { 0 <= i <= length deadlines }
+    requires { sorted_prefix deadlines (length deadlines) }
+    ensures  { i <= result <= length deadlines }
+    ensures  { forall t: int. i <= t < result -> deadlines[t] >= t }
+    ensures  { result < length deadlines -> deadlines[result] < result }
+    variant  { length deadlines - i }
+  =
+    if i >= length deadlines then
+      i
+    else if deadlines[i] >= i then
+      count_eliminated_from deadlines (i + 1)
+    else
+      i
+
+  let eliminate_maximum_number_of_monsters_array
+    (dist: array int) (speed: array int) : int
+    requires { input_constraints dist speed }
+    ensures  { optimal_elimination_count dist speed result }
+  =
+    let n = length dist in
+    assert { n = length speed };
+    assert { 1 <= n };
+    let deadlines = make n 0 in
+    assert { length deadlines = n };
+    assert { deadlines_computed_prefix dist speed deadlines 0 };
+    fill_deadlines dist speed deadlines 0;
+    assert { deadlines_computed_prefix dist speed deadlines n };
+    sort_deadlines deadlines;
+    assert { sorted_prefix deadlines n };
+    let r = count_eliminated_from deadlines 0 in
+    assert { 0 <= r <= n };
+    assert { deadline_safe_prefix deadlines r };
+    assert { r < n -> deadlines[r] < r };
+    assert { greedy_deadline_result deadlines r };
+    assert { optimal_elimination_count dist speed r };
+    r
+
+end

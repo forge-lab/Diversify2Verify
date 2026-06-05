@@ -1,0 +1,144 @@
+module GetTheMaximumScore_Array_Stage3_Imperative
+
+  use int.Int
+  use int.MinMax
+  use int.EuclideanDivision
+  use array.Array
+  use array.Init
+  use ref.Ref
+
+  function score_modulus : int = 1000000007
+
+  predicate strictly_increasing (nums: array int) =
+    forall i j: int. 0 <= i < j < length nums -> nums[i] < nums[j]
+
+  predicate valid_input (nums: array int) =
+    1 <= length nums <= 100000 /\
+    (forall i: int. 0 <= i < length nums -> 1 <= nums[i] <= 10000000) /\
+    strictly_increasing nums
+
+  let rec function suffix_sum (nums: array int) (i: int) : int
+    requires { 0 <= i <= length nums }
+    variant  { length nums - i }
+  =
+    if i = length nums then 0
+    else nums[i] + suffix_sum nums (i + 1)
+
+  let rec function max_score_scan
+      (nums1: array int) (nums2: array int)
+      (i: int) (j: int) (acc1: int) (acc2: int) : int
+    requires { 0 <= i <= length nums1 }
+    requires { 0 <= j <= length nums2 }
+    variant  { (length nums1 - i) + (length nums2 - j) }
+  =
+    if i = length nums1 then
+      max acc1 (acc2 + suffix_sum nums2 j)
+    else if j = length nums2 then
+      max (acc1 + suffix_sum nums1 i) acc2
+    else if nums1[i] < nums2[j] then
+      max_score_scan nums1 nums2 (i + 1) j (acc1 + nums1[i]) acc2
+    else if nums1[i] > nums2[j] then
+      max_score_scan nums1 nums2 i (j + 1) acc1 (acc2 + nums2[j])
+    else
+      max acc1 acc2 + nums1[i] +
+      max_score_scan nums1 nums2 (i + 1) (j + 1) 0 0
+
+  function maximum_path_score (nums1: array int) (nums2: array int) : int =
+    max_score_scan nums1 nums2 0 0 0 0
+
+  predicate get_the_maximum_score_array_spec
+      (nums1: array int) (nums2: array int) (res: int) =
+    res = mod (maximum_path_score nums1 nums2) score_modulus
+
+  let get_the_maximum_score_array (nums1: array int) (nums2: array int) : int
+    requires { valid_input nums1 }
+    requires { valid_input nums2 }
+    ensures  { get_the_maximum_score_array_spec nums1 nums2 result }
+    ensures  { 0 <= result < score_modulus }
+  =
+    let i = ref 0 in
+    let j = ref 0 in
+    let acc1 = ref 0 in
+    let acc2 = ref 0 in
+    let answer = ref 0 in
+    while !i < length nums1 && !j < length nums2 do
+      invariant { 0 <= !i <= length nums1 }
+      invariant { 0 <= !j <= length nums2 }
+      invariant { 0 <= !acc1 }
+      invariant { 0 <= !acc2 }
+      invariant { 0 <= !answer }
+      invariant { !answer + max_score_scan nums1 nums2 !i !j !acc1 !acc2 =
+                  maximum_path_score nums1 nums2 }
+      variant   { (length nums1 - !i) + (length nums2 - !j) }
+      if nums1[!i] < nums2[!j] then (
+        assert { max_score_scan nums1 nums2 !i !j !acc1 !acc2 =
+                 max_score_scan nums1 nums2 (!i + 1) !j (!acc1 + nums1[!i]) !acc2 };
+        acc1 := !acc1 + nums1[!i];
+        i := !i + 1
+      ) else if nums1[!i] > nums2[!j] then (
+        assert { max_score_scan nums1 nums2 !i !j !acc1 !acc2 =
+                 max_score_scan nums1 nums2 !i (!j + 1) !acc1 (!acc2 + nums2[!j]) };
+        acc2 := !acc2 + nums2[!j];
+        j := !j + 1
+      ) else (
+        assert { nums1[!i] = nums2[!j] };
+        assert { max_score_scan nums1 nums2 !i !j !acc1 !acc2 =
+                 max !acc1 !acc2 + nums1[!i] +
+                 max_score_scan nums1 nums2 (!i + 1) (!j + 1) 0 0 };
+        answer := !answer + max !acc1 !acc2 + nums1[!i];
+        acc1 := 0;
+        acc2 := 0;
+        i := !i + 1;
+        j := !j + 1
+      )
+    done;
+    assert { !i = length nums1 \/ !j = length nums2 };
+    while !i < length nums1 do
+      invariant { 0 <= !i <= length nums1 }
+      invariant { 0 <= !j <= length nums2 }
+      invariant { !i < length nums1 -> !j = length nums2 }
+      invariant { 0 <= !acc1 }
+      invariant { 0 <= !acc2 }
+      invariant { 0 <= !answer }
+      invariant { !answer + max_score_scan nums1 nums2 !i !j !acc1 !acc2 =
+                  maximum_path_score nums1 nums2 }
+      variant   { length nums1 - !i }
+      assert { !j = length nums2 };
+      assert { max_score_scan nums1 nums2 !i !j !acc1 !acc2 =
+               max (!acc1 + suffix_sum nums1 !i) !acc2 };
+      assert { suffix_sum nums1 !i = nums1[!i] + suffix_sum nums1 (!i + 1) };
+      assert { max_score_scan nums1 nums2 (!i + 1) !j (!acc1 + nums1[!i]) !acc2 =
+               max ((!acc1 + nums1[!i]) + suffix_sum nums1 (!i + 1)) !acc2 };
+      acc1 := !acc1 + nums1[!i];
+      i := !i + 1
+    done;
+    assert { !i = length nums1 };
+    while !j < length nums2 do
+      invariant { 0 <= !i <= length nums1 }
+      invariant { 0 <= !j <= length nums2 }
+      invariant { !j < length nums2 -> !i = length nums1 }
+      invariant { 0 <= !acc1 }
+      invariant { 0 <= !acc2 }
+      invariant { 0 <= !answer }
+      invariant { !answer + max_score_scan nums1 nums2 !i !j !acc1 !acc2 =
+                  maximum_path_score nums1 nums2 }
+      variant   { length nums2 - !j }
+      assert { !i = length nums1 };
+      assert { max_score_scan nums1 nums2 !i !j !acc1 !acc2 =
+               max !acc1 (!acc2 + suffix_sum nums2 !j) };
+      assert { suffix_sum nums2 !j = nums2[!j] + suffix_sum nums2 (!j + 1) };
+      assert { max_score_scan nums1 nums2 !i (!j + 1) !acc1 (!acc2 + nums2[!j]) =
+               max !acc1 ((!acc2 + nums2[!j]) + suffix_sum nums2 (!j + 1)) };
+      acc2 := !acc2 + nums2[!j];
+      j := !j + 1
+    done;
+    assert { !i = length nums1 };
+    assert { !j = length nums2 };
+    assert { max_score_scan nums1 nums2 !i !j !acc1 !acc2 = max !acc1 !acc2 };
+    assert { !answer + max !acc1 !acc2 = maximum_path_score nums1 nums2 };
+    assert { score_modulus = 1000000007 };
+    assert { get_the_maximum_score_array_spec nums1 nums2
+             (mod (!answer + max !acc1 !acc2) 1000000007) };
+    mod (!answer + max !acc1 !acc2) 1000000007
+
+end

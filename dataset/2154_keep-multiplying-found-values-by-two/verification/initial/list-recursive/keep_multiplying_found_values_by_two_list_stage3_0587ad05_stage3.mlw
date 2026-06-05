@@ -1,0 +1,66 @@
+module KeepMultiplyingFoundValuesByTwo_List_Stage3_Recursive
+
+  use int.Int
+  use int.Power
+  use list.List
+  use list.Length
+  use list.Mem
+
+  predicate valid_input (nums: list int) (original: int) =
+    1 <= length nums <= 1000 /\
+    1 <= original <= 1000 /\
+    forall x: int. mem x nums -> 1 <= x <= 1000
+
+  function doubled_value (original: int) (steps: int) : int =
+    original * power 2 steps
+
+  predicate doubling_prefix_found (nums: list int) (original: int) (steps: int) =
+    forall t: int. 0 <= t < steps -> mem (doubled_value original t) nums
+
+  predicate final_value (nums: list int) (original: int) (res: int) =
+    exists steps: int.
+      0 <= steps <= length nums /\
+      res = doubled_value original steps /\
+      doubling_prefix_found nums original steps /\
+      not (mem res nums)
+
+  let rec contains (nums: list int) (x: int) : bool
+    ensures { result <-> mem x nums }
+    variant { nums }
+  =
+    match nums with
+    | Nil ->
+        false
+    | Cons y ys ->
+        if y = x then
+          true
+        else
+          contains ys x
+    end
+
+  let rec keep_multiplying_from (nums: list int) (current: int) (remaining: int) : int
+    requires { 0 <= remaining }
+    ensures {
+      exists steps: int.
+        0 <= steps <= remaining /\
+        result = doubled_value current steps /\
+        (forall t: int. 0 <= t < steps -> mem (doubled_value current t) nums) /\
+        (steps = remaining \/ not (mem result nums))
+    }
+    variant { remaining }
+  =
+    if remaining <= 0 then
+      current
+    else if contains nums current then
+      keep_multiplying_from nums (current * 2) (remaining - 1)
+    else
+      current
+
+  let keep_multiplying_found_values_by_two_list (nums: list int) (original: int) : int
+    requires { valid_input nums original }
+    ensures  { final_value nums original result }
+  =
+    let r = keep_multiplying_from nums original (length nums) in
+    r
+
+end

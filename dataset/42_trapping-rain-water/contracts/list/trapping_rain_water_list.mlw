@@ -1,0 +1,248 @@
+module TrappingRainWater_List_Spec
+
+  use int.Int
+  use int.MinMax
+  use list.List
+
+  let rec predicate all_nonnegative (height: list int)
+    variant { height }
+  =
+    match height with
+    | Nil -> true
+    | Cons h rest -> 0 <= h && all_nonnegative rest
+    end
+
+  let rec function max_height (height: list int) : int
+    variant { height }
+  =
+    match height with
+    | Nil -> 0
+    | Cons h rest -> max h (max_height rest)
+    end
+
+  let function water_at (left_max: int) (h: int) (right_max: int) : int =
+    max 0 (min (max left_max h) right_max - h)
+
+  let rec function trapped_from (left_max: int) (height: list int) : int
+    variant { height }
+  =
+    match height with
+    | Nil -> 0
+    | Cons h rest ->
+        water_at left_max h (max_height height) +
+        trapped_from (max left_max h) rest
+    end
+
+  function trapped_water (height: list int) : int =
+    trapped_from 0 height
+
+  predicate valid_height (height: list int) =
+    height <> Nil /\ all_nonnegative height
+
+  val trapping_rain_water_list (height: list int) : int
+    requires { valid_height height }
+    ensures  { result = trapped_water height }
+    ensures  { 0 <= result }
+
+  let lemma check_test_003 () =
+    let height = Cons 1 Nil in
+    assert { all_nonnegative height };
+    assert { valid_height height };
+    assert { max_height Nil = 0 };
+    assert { max_height height = 1 };
+    assert { water_at 0 1 1 = 0 };
+    assert { trapped_from 0 height = 0 };
+    assert { trapped_water height = 0 }
+
+  let lemma check_test_004 () =
+    let tail1 = Cons 2 Nil in
+    let tail2 = Cons 0 tail1 in
+    let height = Cons 2 tail2 in
+    assert { all_nonnegative height };
+    assert { valid_height height };
+    assert { max_height Nil = 0 };
+    assert { max_height tail1 = 2 };
+    assert { max_height tail2 = 2 };
+    assert { max_height height = 2 };
+    assert { water_at 0 2 2 = 0 };
+    assert { water_at 2 0 2 = 2 };
+    assert { water_at 2 2 2 = 0 };
+    assert { trapped_from 2 tail1 = 0 };
+    assert { trapped_from 2 tail2 = 2 };
+    assert { trapped_from 0 height = 2 };
+    assert { trapped_water height = 2 }
+
+  let lemma check_test_002 () =
+    let tail1 = Cons 1 Nil in
+    let tail2 = Cons 2 tail1 in
+    let tail3 = Cons 3 tail2 in
+    let tail4 = Cons 4 tail3 in
+    let height = Cons 5 tail4 in
+    assert { all_nonnegative height };
+    assert { valid_height height };
+    assert { max_height tail1 = 1 };
+    assert { max_height tail2 = 2 };
+    assert { max_height tail3 = 3 };
+    assert { max_height tail4 = 4 };
+    assert { max_height height = 5 };
+    assert { water_at 0 5 5 = 0 };
+    assert { water_at 5 4 4 = 0 };
+    assert { water_at 5 3 3 = 0 };
+    assert { water_at 5 2 2 = 0 };
+    assert { water_at 5 1 1 = 0 };
+    assert { trapped_from 5 tail1 = 0 };
+    assert { trapped_from 5 tail2 = 0 };
+    assert { trapped_from 5 tail3 = 0 };
+    assert { trapped_from 5 tail4 = 0 };
+    assert { trapped_from 0 height = 0 };
+    assert { trapped_water height = 0 }
+
+  let lemma check_test_006 () =
+    let tail1 = Cons 1 Nil in
+    let tail2 = Cons 1 tail1 in
+    let tail3 = Cons 1 tail2 in
+    let tail4 = Cons 1 tail3 in
+    let tail5 = Cons 1 tail4 in
+    let height = Cons 1 tail5 in
+    assert { all_nonnegative height };
+    assert { valid_height height };
+    assert { max_height tail1 = 1 };
+    assert { max_height tail2 = 1 };
+    assert { max_height tail3 = 1 };
+    assert { max_height tail4 = 1 };
+    assert { max_height tail5 = 1 };
+    assert { max_height height = 1 };
+    assert { water_at 0 1 1 = 0 };
+    assert { water_at 1 1 1 = 0 };
+    assert { trapped_from 1 tail1 = 0 };
+    assert { trapped_from 1 tail2 = 0 };
+    assert { trapped_from 1 tail3 = 0 };
+    assert { trapped_from 1 tail4 = 0 };
+    assert { trapped_from 1 tail5 = 0 };
+    assert { trapped_from 0 height = 0 };
+    assert { trapped_water height = 0 }
+
+  let lemma check_test_014 () =
+    let tail1 = Cons 5 Nil in
+    let tail2 = Cons 2 tail1 in
+    let tail3 = Cons 3 tail2 in
+    let tail4 = Cons 0 tail3 in
+    let tail5 = Cons 2 tail4 in
+    let height = Cons 4 tail5 in
+    assert { all_nonnegative height };
+    assert { valid_height height };
+    assert { max_height tail1 = 5 };
+    assert { max_height tail2 = 5 };
+    assert { max_height tail3 = 5 };
+    assert { max_height tail4 = 5 };
+    assert { max_height tail5 = 5 };
+    assert { max_height height = 5 };
+    assert { water_at 0 4 5 = 0 };
+    assert { water_at 4 2 5 = 2 };
+    assert { water_at 4 0 5 = 4 };
+    assert { water_at 4 3 5 = 1 };
+    assert { water_at 4 2 5 = 2 };
+    assert { water_at 4 5 5 = 0 };
+    assert { trapped_from 4 tail1 = 0 };
+    assert { trapped_from 4 tail2 = 2 };
+    assert { trapped_from 4 tail3 = 3 };
+    assert { trapped_from 4 tail4 = 7 };
+    assert { trapped_from 4 tail5 = 9 };
+    assert { trapped_from 0 height = 9 };
+    assert { trapped_water height = 9 }
+
+  let lemma check_test_022 () =
+    let tail01 = Cons 1 Nil in
+    let tail02 = Cons 2 tail01 in
+    let tail03 = Cons 1 tail02 in
+    let tail04 = Cons 2 tail03 in
+    let tail05 = Cons 3 tail04 in
+    let tail06 = Cons 1 tail05 in
+    let tail07 = Cons 0 tail06 in
+    let tail08 = Cons 1 tail07 in
+    let tail09 = Cons 2 tail08 in
+    let tail10 = Cons 0 tail09 in
+    let tail11 = Cons 1 tail10 in
+    let height = Cons 0 tail11 in
+    assert { all_nonnegative height };
+    assert { valid_height height };
+    assert { max_height tail01 = 1 };
+    assert { max_height tail02 = 2 };
+    assert { max_height tail03 = 2 };
+    assert { max_height tail04 = 2 };
+    assert { max_height tail05 = 3 };
+    assert { max_height tail06 = 3 };
+    assert { max_height tail07 = 3 };
+    assert { max_height tail08 = 3 };
+    assert { max_height tail09 = 3 };
+    assert { max_height tail10 = 3 };
+    assert { max_height tail11 = 3 };
+    assert { max_height height = 3 };
+    assert { water_at 0 0 3 = 0 };
+    assert { water_at 0 1 3 = 0 };
+    assert { water_at 1 0 3 = 1 };
+    assert { water_at 1 2 3 = 0 };
+    assert { water_at 2 1 3 = 1 };
+    assert { water_at 2 0 3 = 2 };
+    assert { water_at 2 1 3 = 1 };
+    assert { water_at 2 3 3 = 0 };
+    assert { water_at 3 2 2 = 0 };
+    assert { water_at 3 1 2 = 1 };
+    assert { water_at 3 2 2 = 0 };
+    assert { water_at 3 1 1 = 0 };
+    assert { trapped_from 3 tail01 = 0 };
+    assert { trapped_from 3 tail02 = 0 };
+    assert { trapped_from 3 tail03 = 1 };
+    assert { trapped_from 3 tail04 = 1 };
+    assert { trapped_from 2 tail05 = 1 };
+    assert { trapped_from 2 tail06 = 2 };
+    assert { trapped_from 2 tail07 = 4 };
+    assert { trapped_from 2 tail08 = 5 };
+    assert { trapped_from 1 tail09 = 5 };
+    assert { trapped_from 1 tail10 = 6 };
+    assert { trapped_from 0 tail11 = 6 };
+    assert { trapped_from 0 height = 6 };
+    assert { trapped_water height = 6 }
+
+  let lemma check_test_000 () =
+    let tail1 = Cons 5 Nil in
+    let tail2 = Cons 1 tail1 in
+    let tail3 = Cons 2 tail2 in
+    let tail4 = Cons 3 tail3 in
+    let tail5 = Cons 4 tail4 in
+    let tail6 = Cons 1 tail5 in
+    let tail7 = Cons 2 tail6 in
+    let tail8 = Cons 1 tail7 in
+    let height = Cons 3 tail8 in
+    assert { all_nonnegative height };
+    assert { valid_height height };
+    assert { max_height tail1 = 5 };
+    assert { max_height tail2 = 5 };
+    assert { max_height tail3 = 5 };
+    assert { max_height tail4 = 5 };
+    assert { max_height tail5 = 5 };
+    assert { max_height tail6 = 5 };
+    assert { max_height tail7 = 5 };
+    assert { max_height tail8 = 5 };
+    assert { max_height height = 5 };
+    assert { water_at 0 3 5 = 0 };
+    assert { water_at 3 1 5 = 2 };
+    assert { water_at 3 2 5 = 1 };
+    assert { water_at 3 1 5 = 2 };
+    assert { water_at 3 4 5 = 0 };
+    assert { water_at 4 3 5 = 1 };
+    assert { water_at 4 2 5 = 2 };
+    assert { water_at 4 1 5 = 3 };
+    assert { water_at 4 5 5 = 0 };
+    assert { trapped_from 4 tail1 = 0 };
+    assert { trapped_from 4 tail2 = 3 };
+    assert { trapped_from 4 tail3 = 5 };
+    assert { trapped_from 4 tail4 = 6 };
+    assert { trapped_from 3 tail5 = 6 };
+    assert { trapped_from 3 tail6 = 8 };
+    assert { trapped_from 3 tail7 = 9 };
+    assert { trapped_from 3 tail8 = 11 };
+    assert { trapped_from 0 height = 11 };
+    assert { trapped_water height = 11 }
+
+end

@@ -1,0 +1,249 @@
+module MaximumTastinessOfCandyBasket_Array_Recursive_Implementation
+
+  use int.Int
+  use int.EuclideanDivision
+  use array.Array
+  use array.Init
+  use list.List
+
+  let rec array_to_list_from (a: array int) (i: int) : list int
+    variant { length a - i }
+  =
+    if i >= length a then
+      Nil
+    else
+      Cons a[i] (array_to_list_from a (i + 1))
+
+  let rec insert_sorted (x: int) (l: list int) : list int
+    variant { l }
+  =
+    match l with
+    | Nil -> Cons x Nil
+    | Cons y ys ->
+        if x <= y then Cons x l else Cons y (insert_sorted x ys)
+    end
+
+  let rec sort_list (l: list int) : list int
+    variant { l }
+  =
+    match l with
+    | Nil -> Nil
+    | Cons x xs -> insert_sorted x (sort_list xs)
+    end
+
+  let rec last_value_from (l: list int) (current: int) : int
+    variant { l }
+  =
+    match l with
+    | Nil -> current
+    | Cons x xs -> last_value_from xs x
+    end
+
+  let rec can_pick_from (prices: list int) (remaining: int) (last: int) (d: int) : bool
+    variant { prices }
+  =
+    if remaining <= 0 then
+      true
+    else
+      match prices with
+      | Nil -> false
+      | Cons x xs ->
+          if x - last >= d then
+            can_pick_from xs (remaining - 1) x d
+          else
+            can_pick_from xs remaining last d
+      end
+
+  let feasible_tastiness_exec (sorted_prices: list int) (k: int) (d: int) : bool =
+    match sorted_prices with
+    | Nil -> false
+    | Cons x xs ->
+        if k <= 1 then
+          true
+        else
+          can_pick_from xs (k - 1) x d
+    end
+
+  let rec search_best (sorted_prices: list int) (k: int) (low: int) (high: int) : int
+    variant { high - low }
+  =
+    if low + 1 >= high then
+      low
+    else
+      let mid = low + div (high - low) 2 in
+      if feasible_tastiness_exec sorted_prices k mid then
+        search_best sorted_prices k mid high
+      else
+        search_best sorted_prices k low mid
+
+  let maximum_tastiness_of_candy_basket_array (price: array int) (k: int) : int
+    requires { 2 <= k <= length price }
+  =
+    let sorted_prices = sort_list (array_to_list_from price 0) in
+    match sorted_prices with
+    | Nil -> 0
+    | Cons first rest ->
+        let last = last_value_from rest first in
+        search_best sorted_prices k 0 (last - first + 1)
+    end
+
+  let test_000 () : bool =
+    let price = init 6 [|1000000000; 1; 2; 3; 4; 5|] in
+    let r = maximum_tastiness_of_candy_basket_array price 3 in
+    r = 4
+
+  let test_001 () : bool =
+    let price = init 5 [|1000000000; 1; 1000000000; 1; 1000000000|] in
+    let r = maximum_tastiness_of_candy_basket_array price 3 in
+    r = 0
+
+  let test_002 () : bool =
+    let price = init 5 [|10; 20; 30; 40; 50|] in
+    let r = maximum_tastiness_of_candy_basket_array price 3 in
+    r = 20
+
+  let test_003 () : bool =
+    let price = init 6 [|13; 5; 1; 8; 21; 2|] in
+    let r = maximum_tastiness_of_candy_basket_array price 3 in
+    r = 8
+
+  let test_004 () : bool =
+    let price = init 4 [|1; 1000000000; 2; 999999999|] in
+    let r = maximum_tastiness_of_candy_basket_array price 2 in
+    r = 999999999
+
+  let test_005 () : bool =
+    let price = init 4 [|7; 7; 7; 7|] in
+    let r = maximum_tastiness_of_candy_basket_array price 2 in
+    r = 0
+
+  let test_006 () : bool =
+    let price = init 6 [|50; 50; 50; 50; 50; 50|] in
+    let r = maximum_tastiness_of_candy_basket_array price 2 in
+    r = 0
+
+  let test_007 () : bool =
+    let price = init 3 [|1; 3; 1|] in
+    let r = maximum_tastiness_of_candy_basket_array price 2 in
+    r = 2
+
+  let test_008 () : bool =
+    let price = init 5 [|10; 20; 30; 40; 50|] in
+    let r = maximum_tastiness_of_candy_basket_array price 4 in
+    r = 10
+
+  let test_009 () : bool =
+    let price = init 10 [|1; 2; 3; 4; 5; 6; 7; 8; 9; 10|] in
+    let r = maximum_tastiness_of_candy_basket_array price 5 in
+    r = 2
+
+  let test_010 () : bool =
+    let price =
+      init 10
+        [|100000000; 100000001; 100000002; 100000003; 100000004;
+          100000005; 100000006; 100000007; 100000008; 100000009|]
+    in
+    let r = maximum_tastiness_of_candy_basket_array price 5 in
+    r = 2
+
+  let test_011 () : bool =
+    let price =
+      init 20
+        [|10; 10; 10; 10; 10; 10; 10; 10; 10; 10;
+          10; 10; 10; 10; 10; 10; 10; 10; 10; 10|]
+    in
+    let r = maximum_tastiness_of_candy_basket_array price 2 in
+    r = 0
+
+  let test_012 () : bool =
+    let price = init 10 [|500; 400; 300; 200; 100; 90; 80; 70; 60; 50|] in
+    let r = maximum_tastiness_of_candy_basket_array price 3 in
+    r = 200
+
+  let test_013 () : bool =
+    let price =
+      init 20
+        [|2; 2; 2; 2; 2; 2; 2; 2; 2; 2;
+          2; 2; 2; 2; 2; 2; 2; 2; 2; 2|]
+    in
+    let r = maximum_tastiness_of_candy_basket_array price 5 in
+    r = 0
+
+  let test_014 () : bool =
+    let price =
+      init 16
+        [|1; 10; 20; 30; 40; 50; 60; 70;
+          80; 90; 100; 110; 120; 130; 140; 150|]
+    in
+    let r = maximum_tastiness_of_candy_basket_array price 7 in
+    r = 20
+
+  let test_015 () : bool =
+    let price = init 11 [|1; 3; 6; 9; 12; 15; 18; 21; 24; 27; 30|] in
+    let r = maximum_tastiness_of_candy_basket_array price 5 in
+    r = 6
+
+  let test_016 () : bool =
+    let price = init 10 [|100; 200; 300; 400; 500; 600; 700; 800; 900; 1000|] in
+    let r = maximum_tastiness_of_candy_basket_array price 6 in
+    r = 100
+
+  let test_017 () : bool =
+    let price = init 11 [|9; 18; 27; 36; 45; 54; 63; 72; 81; 90; 99|] in
+    let r = maximum_tastiness_of_candy_basket_array price 6 in
+    r = 18
+
+  let test_018 () : bool =
+    let price = init 15 [|2; 4; 6; 8; 10; 12; 14; 16; 18; 20; 22; 24; 26; 28; 30|] in
+    let r = maximum_tastiness_of_candy_basket_array price 10 in
+    r = 2
+
+  let test_019 () : bool =
+    let price = init 10 [|1; 1; 2; 2; 3; 3; 4; 4; 5; 5|] in
+    let r = maximum_tastiness_of_candy_basket_array price 3 in
+    r = 2
+
+  let run_tests () : bool =
+    if test_000 () then
+    if test_001 () then
+    if test_002 () then
+    if test_003 () then
+    if test_004 () then
+    if test_005 () then
+    if test_006 () then
+    if test_007 () then
+    if test_008 () then
+    if test_009 () then
+    if test_010 () then
+    if test_011 () then
+    if test_012 () then
+    if test_013 () then
+    if test_014 () then
+    if test_015 () then
+    if test_016 () then
+    if test_017 () then
+    if test_018 () then
+    if test_019 () then
+      true
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+
+end

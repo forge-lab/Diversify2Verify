@@ -1,0 +1,69 @@
+module MinimizeMaximumOfArray_List_Stage3_Imperative
+
+  use int.Int
+  use int.EuclideanDivision
+  use list.List
+  use list.Length
+  use list.Prefix
+  use list.Sum
+  use ref.Ref
+
+  let rec predicate nonnegative_list (nums: list int)
+    variant { nums }
+  =
+    match nums with
+    | Nil -> true
+    | Cons x xs -> 0 <= x && nonnegative_list xs
+    end
+
+  predicate prefix_capacity_bound (nums: list int) (m: int) =
+    forall k: int. 1 <= k <= length nums ->
+      sum (prefix k nums) <= m * k
+
+  predicate optimal_minimized_maximum (nums: list int) (m: int) =
+    0 <= m /\
+    prefix_capacity_bound nums m /\
+    (forall smaller: int. 0 <= smaller < m ->
+      not (prefix_capacity_bound nums smaller))
+
+  let minimize_maximum_of_array_list (nums: list int) : int
+    requires { 2 <= length nums }
+    requires { nonnegative_list nums }
+    ensures  { optimal_minimized_maximum nums result }
+  =
+    let prefix_sum = ref 0 in
+    let prefix_len = ref 0 in
+    let best = ref 0 in
+    let cur = ref nums in
+    while (match !cur with Nil -> false | Cons _ _ -> true end) do
+      invariant { 0 <= !prefix_len <= length nums }
+      invariant { 0 <= !prefix_sum }
+      invariant { 0 <= !best }
+      invariant { !prefix_len + length !cur = length nums }
+      invariant {
+        forall k: int. 1 <= k <= !prefix_len ->
+          sum (prefix k nums) <= !best * k
+      }
+      invariant {
+        forall smaller: int. 0 <= smaller < !best ->
+          exists k: int. 1 <= k <= !prefix_len /\
+            not (sum (prefix k nums) <= smaller * k)
+      }
+      variant { length !cur }
+
+      match !cur with
+      | Nil -> ()
+      | Cons x xs ->
+          prefix_sum := !prefix_sum + x;
+          prefix_len := !prefix_len + 1;
+          assert { 1 <= !prefix_len };
+          let candidate = div (!prefix_sum + !prefix_len - 1) !prefix_len in
+          if candidate > !best then best := candidate;
+          cur := xs
+      end
+    done;
+    assert { !cur = Nil };
+    assert { !prefix_len = length nums };
+    !best
+
+end

@@ -1,0 +1,142 @@
+module TrappingRainWater_List_Stage3_Imperative
+
+  use int.Int
+  use int.MinMax
+  use list.List
+  use list.Length
+  use ref.Ref
+
+  let rec predicate all_nonnegative (height: list int)
+    variant { height }
+  =
+    match height with
+    | Nil -> true
+    | Cons h rest -> 0 <= h && all_nonnegative rest
+    end
+
+  let rec function max_height (height: list int) : int
+    variant { height }
+  =
+    match height with
+    | Nil -> 0
+    | Cons h rest -> max h (max_height rest)
+    end
+
+  let function water_at (left_max: int) (h: int) (right_max: int) : int =
+    max 0 (min (max left_max h) right_max - h)
+
+  let rec function trapped_from (left_max: int) (height: list int) : int
+    variant { height }
+  =
+    match height with
+    | Nil -> 0
+    | Cons h rest ->
+        water_at left_max h (max_height height) +
+        trapped_from (max left_max h) rest
+    end
+
+  function trapped_water (height: list int) : int =
+    trapped_from 0 height
+
+  predicate valid_height (height: list int) =
+    height <> Nil /\ all_nonnegative height
+
+  let rec function max_height_acc (current: int) (height: list int) : int
+    variant { height }
+  =
+    match height with
+    | Nil -> current
+    | Cons h rest -> max_height_acc (max current h) rest
+    end
+
+  let rec lemma max_height_acc_upper (current: int) (height: list int)
+    ensures { current <= max_height_acc current height }
+    variant { height }
+  =
+    match height with
+    | Nil -> ()
+    | Cons h rest ->
+        max_height_acc_upper (max current h) rest
+    end
+
+  let rec lemma max_height_acc_spec (current: int) (height: list int)
+    ensures { max_height_acc current height = max current (max_height height) }
+    variant { height }
+  =
+    match height with
+    | Nil -> ()
+    | Cons h rest ->
+        max_height_acc_spec (max current h) rest
+    end
+
+  let water_at_exec (left_max: int) (h: int) (right_max: int) : int
+    ensures { result = water_at left_max h right_max }
+    ensures { 0 <= result }
+  =
+    max 0 (min (max left_max h) right_max - h)
+
+  let max_height_list (height: list int) : int
+    ensures { result = max_height height }
+    ensures { 0 <= result }
+  =
+    max_height_acc_spec 0 height;
+    let current_max = ref 0 in
+    let cur = ref height in
+    while (match !cur with Nil -> false | Cons _ _ -> true end) do
+      invariant { max_height_acc !current_max !cur = max_height_acc 0 height }
+      invariant { 0 <= !current_max }
+      variant { length !cur }
+      match !cur with
+      | Nil -> ()
+      | Cons h rest ->
+          if h > !current_max then current_max := h;
+          cur := rest
+      end
+    done;
+    assert { !cur = Nil };
+    assert { max_height_acc !current_max Nil = !current_max };
+    assert { max_height_acc 0 height = max_height height };
+    !current_max
+
+  let trapping_rain_water_list (height: list int) : int
+    requires { valid_height height }
+    ensures  { result = trapped_water height }
+    ensures  { 0 <= result }
+  =
+    let total = ref 0 in
+    let left_max = ref 0 in
+    let cur = ref height in
+    while (match !cur with Nil -> false | Cons _ _ -> true end) do
+      invariant { !total + trapped_from !left_max !cur = trapped_from 0 height }
+      invariant { 0 <= !total }
+      variant { length !cur }
+      match !cur with
+      | Nil -> ()
+      | Cons h rest ->
+          let previous_left = !left_max in
+          let right_max = max_height_list !cur in
+          assert { right_max = max_height !cur };
+          assert { trapped_from !left_max !cur =
+                   water_at !left_max h (max_height !cur) +
+                   trapped_from (max !left_max h) rest };
+          let trapped = water_at_exec !left_max h right_max in
+          assert { trapped = water_at !left_max h (max_height !cur) };
+          if trapped > 0 then begin
+            total := !total + trapped
+          end else begin
+            assert { trapped <= 0 };
+            assert { trapped = 0 }
+          end;
+          assert { !total + trapped_from (max !left_max h) rest =
+                   trapped_from 0 height };
+          if h > !left_max then left_max := h;
+          assert { !left_max = max previous_left h };
+          cur := rest
+      end
+    done;
+    assert { !cur = Nil };
+    assert { trapped_from !left_max Nil = 0 };
+    assert { trapped_water height = trapped_from 0 height };
+    !total
+
+end

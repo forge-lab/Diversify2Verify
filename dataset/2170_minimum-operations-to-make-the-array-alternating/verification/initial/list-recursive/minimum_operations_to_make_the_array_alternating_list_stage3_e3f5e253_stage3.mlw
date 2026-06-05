@@ -1,0 +1,123 @@
+module MinimumOperationsToMakeTheArrayAlternating_List_Stage3_Recursive
+
+  use int.Int
+  use list.List
+  use list.Length
+  use list.NumOcc
+
+  let rec predicate all_positive (nums: list int)
+    variant { nums }
+  =
+    match nums with
+    | Nil -> true
+    | Cons x xs -> x > 0 && all_positive xs
+    end
+
+  let rec function even_positions (nums: list int) : list int
+    variant { nums }
+  =
+    match nums with
+    | Nil -> Nil
+    | Cons x xs -> Cons x (odd_positions_from_tail xs)
+    end
+
+  with function odd_positions_from_tail (nums: list int) : list int
+    variant { nums }
+  =
+    match nums with
+    | Nil -> Nil
+    | Cons _ xs -> even_positions xs
+    end
+
+  function odd_positions (nums: list int) : list int =
+    match nums with
+    | Nil -> Nil
+    | Cons _ xs -> even_positions xs
+    end
+
+  predicate valid_alternating_values (even_value: int) (odd_value: int) =
+    even_value > 0 /\ odd_value > 0 /\ even_value <> odd_value
+
+  function kept_by_values (nums: list int) (even_value: int) (odd_value: int) : int =
+    num_occ even_value (even_positions nums) + num_occ odd_value (odd_positions nums)
+
+  predicate best_kept (nums: list int) (kept: int) =
+    exists even_value odd_value: int.
+      valid_alternating_values even_value odd_value /\
+      kept = kept_by_values nums even_value odd_value /\
+      (forall ev ov: int.
+        valid_alternating_values ev ov ->
+        kept_by_values nums ev ov <= kept)
+
+  predicate minimum_operations_spec (nums: list int) (ops: int) =
+    exists kept: int.
+      best_kept nums kept /\
+      ops = length nums - kept /\
+      0 <= ops <= length nums
+
+  type freq = Freq int int
+  type parity_counts = ParityCounts (list freq) (list freq)
+
+  let rec increment_count (counts: list freq) (x: int) : list freq
+    variant { counts }
+  =
+    match counts with
+    | Nil -> Cons (Freq x 1) Nil
+    | Cons (Freq y c) ys ->
+        if x = y then Cons (Freq y (c + 1)) ys
+        else Cons (Freq y c) (increment_count ys x)
+    end
+
+  let rec collect_even_odd_counts (nums: list int) : parity_counts
+    variant { nums }
+  =
+    match nums with
+    | Nil -> ParityCounts Nil Nil
+    | Cons x xs ->
+        let ParityCounts even_counts odd_counts = collect_odd_even_counts xs in
+        ParityCounts (increment_count even_counts x) odd_counts
+    end
+
+  with collect_odd_even_counts (nums: list int) : parity_counts
+    variant { nums }
+  =
+    match nums with
+    | Nil -> ParityCounts Nil Nil
+    | Cons x xs ->
+        let ParityCounts even_counts odd_counts = collect_even_odd_counts xs in
+        ParityCounts even_counts (increment_count odd_counts x)
+    end
+
+  let rec best_freq_except (counts: list freq) (excluded: int) : freq
+    variant { counts }
+  =
+    match counts with
+    | Nil -> Freq 0 0
+    | Cons (Freq value count) rest ->
+        let Freq best_value best_count = best_freq_except rest excluded in
+        if value = excluded then Freq best_value best_count
+        else if count > best_count then Freq value count
+        else Freq best_value best_count
+    end
+
+  let minimum_operations_to_make_the_array_alternating_list (nums: list int) : int
+    requires { length nums >= 1 }
+    requires { all_positive nums }
+    ensures  { minimum_operations_spec nums result }
+  =
+    let len = length nums in
+    let ParityCounts even_counts odd_counts = collect_even_odd_counts nums in
+    let Freq even_value_1 even_count_1 = best_freq_except even_counts 0 in
+    let Freq _ even_count_2 = best_freq_except even_counts even_value_1 in
+    let Freq odd_value_1 odd_count_1 = best_freq_except odd_counts 0 in
+    let Freq _ odd_count_2 = best_freq_except odd_counts odd_value_1 in
+    let kept =
+      if even_value_1 <> odd_value_1 then even_count_1 + odd_count_1
+      else
+        let keep_even_first = even_count_1 + odd_count_2 in
+        let keep_odd_first = even_count_2 + odd_count_1 in
+        if keep_even_first >= keep_odd_first then keep_even_first else keep_odd_first
+    in
+    len - kept
+
+end

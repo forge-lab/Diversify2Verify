@@ -1,0 +1,144 @@
+module MinimumOperationsToMakeMedianOfArrayEqualToK_Array_Spec
+
+  use int.Int
+  use int.Abs
+  use int.Sum
+  use array.Array
+  use array.Init
+  use array.NumOf
+
+  predicate median_equal_to_k (a: array int) (k: int) =
+    length a > 0 /\
+    exists mid: int.
+      0 <= mid < length a /\
+      2 * mid <= length a < 2 * (mid + 1) /\
+      numof (fun _ v -> v <= k) a 0 (length a) >= mid + 1 /\
+      numof (fun _ v -> k <= v) a 0 (length a) >= length a - mid
+
+  function operation_cost (nums: array int) (target: array int) : int =
+    sum (fun i -> abs (nums[i] - target[i])) 0 (length nums)
+
+  predicate feasible_target (nums: array int) (k: int) (target: array int) =
+    length target = length nums /\ median_equal_to_k target k
+
+  predicate minimum_operations_result (nums: array int) (k: int) (r: int) =
+    0 <= r /\
+    (exists target: array int.
+      feasible_target nums k target /\ operation_cost nums target = r) /\
+    (forall target: array int.
+      feasible_target nums k target -> r <= operation_cost nums target)
+
+  val minimum_operations_to_make_median_of_array_equal_to_k_array
+    (nums: array int) (k: int) : int
+    requires { length nums > 0 }
+    ensures  { minimum_operations_result nums k result }
+
+  let lemma test_000 () =
+    let nums = init 7 [|1; 3; 3; 3; 7; 7; 9|] in
+    let target = init 7 [|1; 3; 3; 3; 7; 7; 9|] in
+    assert { length nums = 7 };
+    assert { length target = 7 };
+    assert { target[0] = 1 };
+    assert { target[1] = 3 };
+    assert { target[2] = 3 };
+    assert { target[3] = 3 };
+    assert { target[4] = 7 };
+    assert { target[5] = 7 };
+    assert { target[6] = 9 };
+    assert { median_equal_to_k target 3 };
+    assert { feasible_target nums 3 target };
+    assert { operation_cost nums target = 0 };
+    assert { minimum_operations_result nums 3 0 }
+
+  let lemma test_001 () =
+    let nums = init 5 [|5; 5; 5; 5; 5|] in
+    let target = init 5 [|5; 5; 5; 5; 5|] in
+    assert { length nums = 5 };
+    assert { length target = 5 };
+    assert { target[0] = 5 };
+    assert { target[1] = 5 };
+    assert { target[2] = 5 };
+    assert { target[3] = 5 };
+    assert { target[4] = 5 };
+    assert { median_equal_to_k target 5 };
+    assert { feasible_target nums 5 target };
+    assert { operation_cost nums target = 0 };
+    assert { minimum_operations_result nums 5 0 }
+
+  let lemma test_002 () =
+    let nums = init 5 [|1; 1000000000; 2; 999999999; 3|] in
+    let target = init 5 [|1; 1000000000; 2; 999999999; 500000000|] in
+    assert { length nums = 5 };
+    assert { length target = 5 };
+    assert { target[0] = 1 };
+    assert { target[1] = 1000000000 };
+    assert { target[2] = 2 };
+    assert { target[3] = 999999999 };
+    assert { target[4] = 500000000 };
+    assert { median_equal_to_k target 500000000 };
+    assert { feasible_target nums 500000000 target };
+    assert { operation_cost nums target = 499999997 };
+    assert { minimum_operations_result nums 500000000 499999997 }
+
+  let lemma test_003 () =
+    let nums = init 5 [|2; 5; 6; 8; 5|] in
+    let target = init 5 [|2; 7; 7; 8; 5|] in
+    assert { length nums = 5 };
+    assert { length target = 5 };
+    assert { target[0] = 2 };
+    assert { target[1] = 7 };
+    assert { target[2] = 7 };
+    assert { target[3] = 8 };
+    assert { target[4] = 5 };
+    assert { median_equal_to_k target 7 };
+    assert { feasible_target nums 7 target };
+    assert { operation_cost nums target = 3 };
+    assert { minimum_operations_result nums 7 3 }
+
+  let lemma test_004 () =
+    let nums = init 5 [|1; 1; 1; 1; 1|] in
+    let target = init 5 [|3; 3; 3; 1; 1|] in
+    assert { length nums = 5 };
+    assert { length target = 5 };
+    assert { target[0] = 3 };
+    assert { target[1] = 3 };
+    assert { target[2] = 3 };
+    assert { target[3] = 1 };
+    assert { target[4] = 1 };
+    assert { median_equal_to_k target 3 };
+    assert { feasible_target nums 3 target };
+    assert { operation_cost nums target = 6 };
+    assert { minimum_operations_result nums 3 6 }
+
+  let lemma test_005 () =
+    let nums = init 6 [|1; 2; 3; 4; 5; 6|] in
+    let target = init 6 [|1; 2; 3; 4; 5; 6|] in
+    assert { length nums = 6 };
+    assert { length target = 6 };
+    assert { target[0] = 1 };
+    assert { target[1] = 2 };
+    assert { target[2] = 3 };
+    assert { target[3] = 4 };
+    assert { target[4] = 5 };
+    assert { target[5] = 6 };
+    assert { median_equal_to_k target 4 };
+    assert { feasible_target nums 4 target };
+    assert { operation_cost nums target = 0 };
+    assert { minimum_operations_result nums 4 0 }
+
+  let lemma test_006 () =
+    let nums = init 5 [|2; 5; 6; 8; 5|] in
+    let target = init 5 [|2; 4; 6; 8; 4|] in
+    assert { length nums = 5 };
+    assert { length target = 5 };
+    assert { target[0] = 2 };
+    assert { target[1] = 4 };
+    assert { target[2] = 6 };
+    assert { target[3] = 8 };
+    assert { target[4] = 4 };
+    assert { median_equal_to_k target 4 };
+    assert { feasible_target nums 4 target };
+    assert { operation_cost nums target = 2 };
+    assert { minimum_operations_result nums 4 2 }
+
+end

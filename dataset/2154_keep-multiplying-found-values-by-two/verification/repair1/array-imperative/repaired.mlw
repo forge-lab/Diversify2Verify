@@ -1,0 +1,190 @@
+module KeepMultiplyingFoundValuesByTwo_Array_Spec
+
+  use int.Int
+  use int.Power
+  use array.Array
+  use array.Init
+  use pigeon.Pigeonhole
+  use ref.Ref
+
+  predicate valid_input (nums: array int) (original: int) =
+    1 <= length nums <= 1000 /\
+    1 <= original <= 1000 /\
+    forall i: int. 0 <= i < length nums -> 1 <= nums[i] <= 1000
+
+  predicate contains_value (nums: array int) (x: int) =
+    exists i: int. 0 <= i < length nums /\ nums[i] = x
+
+  function doubled_value (original: int) (steps: int) : int =
+    original * power 2 steps
+
+  predicate doubling_prefix_found (nums: array int) (original: int) (steps: int) =
+    forall t: int. 0 <= t < steps -> contains_value nums (doubled_value original t)
+
+  predicate final_value (nums: array int) (original: int) (res: int) =
+    exists steps: int.
+      0 <= steps <= length nums /\
+      res = doubled_value original steps /\
+      doubling_prefix_found nums original steps /\
+      not (contains_value nums res)
+
+  let rec lemma doubled_value_positive (original: int) (steps: int)
+    requires { 1 <= original }
+    requires { 0 <= steps }
+    ensures  { 1 <= doubled_value original steps }
+    variant  { steps }
+  =
+    if steps > 0 then begin
+      doubled_value_positive original (steps - 1);
+      assert { power 2 steps = 2 * power 2 (steps - 1) };
+      assert { doubled_value original steps =
+               2 * doubled_value original (steps - 1) }
+    end
+
+  let rec lemma doubled_value_strict_increasing
+      (original: int) (i: int) (j: int)
+    requires { 1 <= original }
+    requires { 0 <= i < j }
+    ensures  { doubled_value original i < doubled_value original j }
+    variant  { j - i }
+  =
+    if i + 1 < j then begin
+      doubled_value_strict_increasing original i (j - 1);
+      doubled_value_positive original (j - 1);
+      assert { power 2 j = 2 * power 2 (j - 1) };
+      assert { doubled_value original j =
+               2 * doubled_value original (j - 1) };
+      assert { doubled_value original (j - 1) < doubled_value original j }
+    end else begin
+      assert { j = i + 1 };
+      doubled_value_positive original i;
+      assert { power 2 j = 2 * power 2 i };
+      assert { doubled_value original j = 2 * doubled_value original i }
+    end
+
+  let lemma doubled_values_distinct (original: int) (i: int) (j: int)
+    requires { 1 <= original }
+    requires { 0 <= i < j }
+    ensures  { doubled_value original i <> doubled_value original j }
+  =
+    doubled_value_strict_increasing original i j
+
+  let lemma prefix_plus_current_fits
+      (nums: array int) (original: int) (steps: int)
+      (witnesses_elts: int -> int) (k: int)
+    requires { 1 <= original }
+    requires { 0 <= steps <= length nums }
+    requires { 0 <= k < length nums }
+    requires { nums[k] = doubled_value original steps }
+    requires {
+      forall t: int. 0 <= t < steps ->
+        0 <= witnesses_elts t < length nums /\
+        nums[witnesses_elts t] = doubled_value original t
+    }
+    requires {
+      forall t u: int. 0 <= t < u < steps -> witnesses_elts t <> witnesses_elts u
+    }
+    ensures  { steps < length nums }
+  =
+    if not (steps < length nums) then begin
+      let function f (t: int) : int =
+        if t = steps then k else witnesses_elts t in
+      assert { 0 <= length nums < steps + 1 };
+      assert {
+        forall t: int. 0 <= t < steps + 1 -> 0 <= f t < length nums
+      };
+      assert {
+        forall i j: int. 0 <= i < j < steps + 1 -> f i <> f j
+      };
+      pigeonhole (steps + 1) (length nums) f;
+      absurd
+    end
+
+  exception FoundValue
+
+  let contains_value_exec (nums: array int) (x: int) : bool
+    ensures { result <-> contains_value nums x }
+  =
+    if length nums = 0 then
+      false
+    else
+      try
+        for i = 0 to length nums - 1 do
+          invariant { 0 <= i <= length nums }
+          invariant { forall j: int. 0 <= j < i -> nums[j] <> x }
+          if nums[i] = x then begin
+            assert { 0 <= i < length nums };
+            assert { contains_value nums x };
+            raise FoundValue
+          end
+        done;
+        assert { forall j: int. 0 <= j < length nums -> nums[j] <> x };
+        assert { not (contains_value nums x) };
+        false
+      with FoundValue ->
+        assert { contains_value nums x };
+        true
+      end
+
+  let keep_multiplying_found_values_by_two_array (nums: array int) (original: int) : int
+    requires { valid_input nums original }
+    ensures  { final_value nums original result }
+  =
+    let current = ref original in
+    let ghost steps = ref 0 in
+    let ghost witnesses = make (length nums) 0 in
+    let keep_searching = ref true in
+    while !keep_searching do
+      invariant { 0 <= !steps <= length nums }
+      invariant { !current = doubled_value original !steps }
+      invariant { doubling_prefix_found nums original !steps }
+      invariant {
+        forall t: int. 0 <= t < !steps ->
+          0 <= witnesses[t] < length nums /\
+          nums[witnesses[t]] = doubled_value original t
+      }
+      invariant {
+        forall t u: int. 0 <= t < u < !steps -> witnesses[t] <> witnesses[u]
+      }
+      invariant { 1 <= !current }
+      variant   { if !current <= 1000 then 1001 - !current else 0 }
+
+      if contains_value_exec nums !current then begin
+        assert { contains_value nums !current };
+        assert { !current = doubled_value original !steps };
+        assert { contains_value nums (doubled_value original !steps) };
+        let ghost old_steps = !steps in
+        let ghost k =
+          any int ensures {
+            0 <= result < length nums /\ nums[result] = !current
+          }
+        in
+        assert { nums[k] = doubled_value original old_steps };
+        prefix_plus_current_fits nums original old_steps witnesses.elts k;
+        assert { !steps < length nums };
+        ghost (witnesses[old_steps] <- k);
+        assert { doubling_prefix_found nums original (!steps + 1) };
+        current := !current * 2;
+        steps := !steps + 1;
+        assert { !steps = old_steps + 1 };
+        assert { !current = doubled_value original !steps };
+        assert { doubling_prefix_found nums original !steps };
+        assert {
+          forall t: int. 0 <= t < !steps ->
+            0 <= witnesses[t] < length nums /\
+            nums[witnesses[t]] = doubled_value original t
+        };
+        assert {
+          forall t u: int. 0 <= t < u < !steps -> witnesses[t] <> witnesses[u]
+        }
+      end else begin
+        assert { not (contains_value nums !current) };
+        keep_searching := false
+      end
+    done;
+
+    assert { not (contains_value nums !current) };
+    assert { final_value nums original !current };
+    !current
+
+end

@@ -1,0 +1,220 @@
+module GetTheMaximumScore_List_Imperative
+
+  use int.Int
+  use int.MinMax
+  use int.EuclideanDivision
+  use list.List
+  use ref.Ref
+
+  let get_the_maximum_score_list (nums1: list int) (nums2: list int) : int =
+    let acc1 = ref 0 in
+    let acc2 = ref 0 in
+    let cur1 = ref nums1 in
+    let cur2 = ref nums2 in
+    while (match !cur1, !cur2 with
+           | Cons _ _, Cons _ _ -> true
+           | _, _ -> false
+           end) do
+      match !cur1, !cur2 with
+      | Cons x xs, Cons y ys ->
+          if x < y then (
+            acc1 := !acc1 + x;
+            cur1 := xs
+          ) else if y < x then (
+            acc2 := !acc2 + y;
+            cur2 := ys
+          ) else (
+            let joined = (max !acc1 !acc2) + x in
+            acc1 := joined;
+            acc2 := joined;
+            cur1 := xs;
+            cur2 := ys
+          )
+      | _, _ -> ()
+      end
+    done;
+    while (match !cur1 with Nil -> false | Cons _ _ -> true end) do
+      match !cur1 with
+      | Nil -> ()
+      | Cons x xs ->
+          acc1 := !acc1 + x;
+          cur1 := xs
+      end
+    done;
+    while (match !cur2 with Nil -> false | Cons _ _ -> true end) do
+      match !cur2 with
+      | Nil -> ()
+      | Cons y ys ->
+          acc2 := !acc2 + y;
+          cur2 := ys
+      end
+    done;
+    let total = max !acc1 !acc2 in
+    mod total 1000000007
+
+  let check_case (nums1: list int) (nums2: list int) (expected: int) : bool =
+    let r = get_the_maximum_score_list nums1 nums2 in
+    r = expected
+
+  let test_000 () : bool =
+    let nums1 = Cons 10000000 Nil in
+    let nums2 = Cons 10000000 Nil in
+    check_case nums1 nums2 10000000
+
+  let test_001 () : bool =
+    let nums1 = Cons 2 (Cons 4 (Cons 5 (Cons 8 (Cons 10 Nil)))) in
+    let nums2 = Cons 4 (Cons 6 (Cons 8 (Cons 9 Nil))) in
+    check_case nums1 nums2 30
+
+  let test_002 () : bool =
+    let nums1 = Cons 1 (Cons 2 (Cons 3 Nil)) in
+    let nums2 = Cons 4 (Cons 5 (Cons 6 (Cons 7 (Cons 8 (Cons 9 (Cons 10 Nil)))))) in
+    check_case nums1 nums2 49
+
+  let test_003 () : bool =
+    let nums1 = Cons 1 (Cons 2 (Cons 3 Nil)) in
+    let nums2 = Cons 3 (Cons 4 (Cons 5 (Cons 6 (Cons 7 (Cons 8 (Cons 9 (Cons 10 Nil))))))) in
+    check_case nums1 nums2 55
+
+  let test_004 () : bool =
+    let nums1 =
+      Cons 1 (Cons 2 (Cons 3 (Cons 4 (Cons 5
+      (Cons 6 (Cons 7 (Cons 8 (Cons 9 (Cons 10 Nil))))))))) in
+    let nums2 =
+      Cons 11 (Cons 12 (Cons 13 (Cons 14 (Cons 15
+      (Cons 16 (Cons 17 (Cons 18 (Cons 19 (Cons 20 Nil))))))))) in
+    check_case nums1 nums2 155
+
+  let test_005 () : bool =
+    let nums1 = Cons 1 (Cons 4 (Cons 6 (Cons 8 (Cons 10 Nil)))) in
+    let nums2 = Cons 2 (Cons 4 (Cons 6 (Cons 8 (Cons 12 Nil)))) in
+    check_case nums1 nums2 32
+
+  let test_006 () : bool =
+    let nums1 = Cons 5 (Cons 10 (Cons 15 (Cons 20 Nil))) in
+    let nums2 =
+      Cons 1 (Cons 2 (Cons 3 (Cons 4 (Cons 5
+      (Cons 6 (Cons 7 (Cons 8 (Cons 9 (Cons 10
+      (Cons 11 (Cons 12 (Cons 13 (Cons 14 (Cons 15
+      (Cons 16 (Cons 17 (Cons 18 (Cons 19 (Cons 20 Nil))))))))))))))))))) in
+    check_case nums1 nums2 210
+
+  let test_007 () : bool =
+    let nums1 = Cons 1 (Cons 3 (Cons 5 (Cons 7 (Cons 9 Nil)))) in
+    let nums2 = Cons 3 (Cons 5 (Cons 100 Nil)) in
+    check_case nums1 nums2 109
+
+  let test_008 () : bool =
+    let nums1 = Cons 1 (Cons 2 (Cons 3 (Cons 4 (Cons 5 Nil)))) in
+    let nums2 = Cons 6 (Cons 7 (Cons 8 (Cons 9 (Cons 10 Nil)))) in
+    check_case nums1 nums2 40
+
+  let test_009 () : bool =
+    let nums1 = Cons 1 (Cons 2 (Cons 3 Nil)) in
+    let nums2 = Cons 3 (Cons 4 (Cons 5 Nil)) in
+    check_case nums1 nums2 15
+
+  let test_010 () : bool =
+    let nums1 = Cons 10 (Cons 20 (Cons 30 (Cons 40 (Cons 50 Nil)))) in
+    let nums2 = Cons 5 (Cons 15 (Cons 25 (Cons 35 (Cons 45 (Cons 55 Nil))))) in
+    check_case nums1 nums2 180
+
+  let test_011 () : bool =
+    let nums1 =
+      Cons 1 (Cons 2 (Cons 3 (Cons 4 (Cons 5
+      (Cons 6 (Cons 7 (Cons 8 (Cons 9 (Cons 10 Nil))))))))) in
+    let nums2 =
+      Cons 1 (Cons 2 (Cons 3 (Cons 4 (Cons 5
+      (Cons 6 (Cons 7 (Cons 8 (Cons 9 (Cons 10 Nil))))))))) in
+    check_case nums1 nums2 55
+
+  let test_012 () : bool =
+    let nums1 = Cons 1 (Cons 2 (Cons 3 (Cons 4 (Cons 5 (Cons 6 Nil))))) in
+    let nums2 = Cons 3 (Cons 4 (Cons 5 (Cons 6 (Cons 7 (Cons 8 Nil))))) in
+    check_case nums1 nums2 36
+
+  let test_013 () : bool =
+    let nums1 = Cons 10 (Cons 20 (Cons 30 (Cons 40 Nil))) in
+    let nums2 = Cons 5 (Cons 15 (Cons 25 (Cons 35 (Cons 45 Nil)))) in
+    check_case nums1 nums2 125
+
+  let test_015 () : bool =
+    let nums1 = Cons 1 (Cons 2 (Cons 3 Nil)) in
+    let nums2 = Cons 4 (Cons 5 (Cons 6 Nil)) in
+    check_case nums1 nums2 15
+
+  let test_016 () : bool =
+    let nums1 = Cons 1 (Cons 10000000 Nil) in
+    let nums2 = Cons 2 (Cons 9999999 Nil) in
+    check_case nums1 nums2 10000001
+
+  let test_017 () : bool =
+    let nums1 = Cons 10 (Cons 20 (Cons 30 (Cons 40 (Cons 50 Nil)))) in
+    let nums2 = Cons 5 (Cons 15 (Cons 25 (Cons 35 (Cons 45 Nil)))) in
+    check_case nums1 nums2 150
+
+  let test_018 () : bool =
+    let nums1 = Cons 1 Nil in
+    let nums2 = Cons 1 Nil in
+    check_case nums1 nums2 1
+
+  let test_019 () : bool =
+    let nums1 = Cons 1 (Cons 4 (Cons 6 (Cons 8 Nil))) in
+    let nums2 = Cons 2 (Cons 3 (Cons 5 (Cons 7 Nil))) in
+    check_case nums1 nums2 19
+
+  let test_020 () : bool =
+    let nums1 =
+      Cons 1 (Cons 2 (Cons 4 (Cons 8 (Cons 16
+      (Cons 32 (Cons 64 (Cons 128 (Cons 256
+      (Cons 512 (Cons 1024 Nil)))))))))) in
+    let nums2 =
+      Cons 2 (Cons 4 (Cons 8 (Cons 16 (Cons 32
+      (Cons 64 (Cons 128 (Cons 256 (Cons 512
+      (Cons 1024 (Cons 2048 Nil)))))))))) in
+    check_case nums1 nums2 4095
+
+  let run_tests () : bool =
+    if test_000 () then
+    if test_001 () then
+    if test_002 () then
+    if test_003 () then
+    if test_004 () then
+    if test_005 () then
+    if test_006 () then
+    if test_007 () then
+    if test_008 () then
+    if test_009 () then
+    if test_010 () then
+    if test_011 () then
+    if test_012 () then
+    if test_013 () then
+    if test_015 () then
+    if test_016 () then
+    if test_017 () then
+    if test_018 () then
+    if test_019 () then
+    if test_020 () then
+      true
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+
+end

@@ -1,0 +1,101 @@
+module FindAllKDistantIndicesInAnArray_List_Stage3_Recursive
+
+  use int.Int
+  use int.Abs
+  use list.List
+  use list.Length
+  use list.Mem
+
+  let rec predicate value_at_index (nums: list int) (i: int) (v: int)
+    variant { nums }
+  =
+    match nums with
+    | Nil -> false
+    | Cons x xs ->
+        if i = 0 then x = v
+        else 0 < i && value_at_index xs (i - 1) v
+    end
+
+  let rec predicate values_in_range (nums: list int)
+    variant { nums }
+  =
+    match nums with
+    | Nil -> true
+    | Cons x xs -> 1 <= x <= 1000 && values_in_range xs
+    end
+
+  predicate k_distant_index (nums: list int) (key: int) (k: int) (i: int) =
+    0 <= i < length nums /\
+    exists j: int. value_at_index nums j key /\ abs (i - j) <= k
+
+  let rec predicate all_greater_than (x: int) (indices: list int)
+    variant { indices }
+  =
+    match indices with
+    | Nil -> true
+    | Cons y ys -> x < y && all_greater_than x ys
+    end
+
+  let rec predicate strictly_increasing (indices: list int)
+    variant { indices }
+  =
+    match indices with
+    | Nil -> true
+    | Cons x xs -> all_greater_than x xs && strictly_increasing xs
+    end
+
+  predicate valid_result (nums: list int) (key: int) (k: int) (indices: list int) =
+    strictly_increasing indices /\
+    (forall i: int. mem i indices <-> k_distant_index nums key k i)
+
+  let rec nth_or_zero (nums: list int) (i: int) : int
+    ensures { 0 <= i < length nums -> value_at_index nums i result }
+    variant { nums }
+  =
+    match nums with
+    | Nil -> 0
+    | Cons x xs ->
+        if i = 0 then x else nth_or_zero xs (i - 1)
+    end
+
+  let within_distance (i: int) (j: int) (k: int) : bool
+    ensures { result <-> abs (i - j) <= k }
+  =
+    j <= i + k && i <= j + k
+
+  let rec exists_key_near_from
+    (nums: list int) (key: int) (k: int) (i: int) (j: int) : bool
+    requires { 0 <= j }
+    ensures  { result <-> exists t: int. j <= t < length nums /\
+                 value_at_index nums t key /\ abs (i - t) <= k }
+    variant { length nums - j }
+  =
+    if j >= length nums then false else
+    if within_distance i j k && nth_or_zero nums j = key then true
+    else exists_key_near_from nums key k i (j + 1)
+
+  let rec collect_indices
+    (nums: list int) (key: int) (k: int) (i: int) (n: int) : list int
+    requires { 0 <= i }
+    requires { n = length nums }
+    ensures  { strictly_increasing result }
+    ensures  { forall p: int. mem p result <-> i <= p < n /\ k_distant_index nums key k p }
+    variant { n - i }
+  =
+    if i >= n then Nil else
+    if exists_key_near_from nums key k i 0 then
+      Cons i (collect_indices nums key k (i + 1) n)
+    else
+      collect_indices nums key k (i + 1) n
+
+  let find_all_k_distant_indices_in_an_array_list
+    (nums: list int) (key: int) (k: int) : list int
+    requires { 1 <= length nums <= 1000 }
+    requires { values_in_range nums }
+    requires { mem key nums }
+    requires { 1 <= k <= length nums }
+    ensures  { valid_result nums key k result }
+  =
+    collect_indices nums key k 0 (length nums)
+
+end

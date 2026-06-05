@@ -1,0 +1,171 @@
+== Stage 1: first prover on whole file ==
+Running in /Users/rubenm/Desktop/Diversify2Verify/codex-runs2/stage1a-array/1425_constrained-subsequence-sum-20260523-235927/generated/why3/array: why3 session create -o /Users/rubenm/Desktop/Diversify2Verify/codex-runs2/stage1a-array/1425_constrained-subsequence-sum-20260523-235927/generated/why3/array/.why3_sessions/constrained_subsequence_sum_array_stage1 -P Z3,4.8.6 -t 10 -m 8192 constrained_subsequence_sum_array.mlw
+Session created successfully
+Running in /Users/rubenm/Desktop/Diversify2Verify/codex-runs2/stage1a-array/1425_constrained-subsequence-sum-20260523-235927/generated/why3/array: why3 bench /Users/rubenm/Desktop/Diversify2Verify/codex-runs2/stage1a-array/1425_constrained-subsequence-sum-20260523-235927/generated/why3/array/.why3_sessions/constrained_subsequence_sum_array_stage1
+Progress: 7/1/0                       Progress: 6/2/0                       Progress: 5/3/0                       Progress: 4/4/0                       Progress: 3/5/0                       Progress: 2/6/0                       Progress: 2/0/0                       Progress: 1/1/0                       Progress: 0/2/0                       
+Replay completed, saving session... done
+== Stage 1 stats ==
+= Statistics for session /Users/rubenm/Desktop/Diversify2Verify/codex-runs2/stage1a-array/1425_constrained-subsequence-sum-20260523-235927/generated/why3/array/.why3_sessions/constrained_subsequence_sum_array_stage1
+
+== Number of root goals ==
+  total: 8  proved: 7
+
+== Number of sub goals ==
+  total: 0  proved: 0
+
+== Goals not proved ==
+  +-- file [../../constrained_subsequence_sum_array.mlw]
+    +-- theory ConstrainedSubsequenceSum_Array_Spec
+      +-- goal selected_sum_from'vc
+  
+== Goals proved by only one prover ==
+  +-- file [../../constrained_subsequence_sum_array.mlw]
+    +-- theory ConstrainedSubsequenceSum_Array_Spec
+      +-- goal test_000_constrained_subsequence_sum'vc: Z3 4.8.6
+      +-- goal test_001_constrained_subsequence_sum'vc: Z3 4.8.6
+      +-- goal test_002_constrained_subsequence_sum'vc: Z3 4.8.6
+      +-- goal test_003_constrained_subsequence_sum'vc: Z3 4.8.6
+      +-- goal test_004_constrained_subsequence_sum'vc: Z3 4.8.6
+      +-- goal test_005_constrained_subsequence_sum'vc: Z3 4.8.6
+      +-- goal test_006_constrained_subsequence_sum'vc: Z3 4.8.6
+  
+1 session(s) read, with a total of 8 proof goals.
+== Unproved root goals after first prover ==
+ConstrainedSubsequenceSum_Array_Spec	selected_sum_from'vc
+== Stage 1: trying remaining goals with prover Alt-Ergo,2.4.0 ==
+---- stage1 | prover: Alt-Ergo,2.4.0 | theory: ConstrainedSubsequenceSum_Array_Spec | goal: selected_sum_from'vc ----
+File constrained_subsequence_sum_array.mlw:
+Goal selected_sum_from'vc.
+Prover result is: Unknown () (0.01s, 21 steps).
+Remaining after prover Alt-Ergo,2.4.0: 1
+== Stage 1: trying remaining goals with prover CVC4,1.8 ==
+---- stage1 | prover: CVC4,1.8 | theory: ConstrainedSubsequenceSum_Array_Spec | goal: selected_sum_from'vc ----
+File constrained_subsequence_sum_array.mlw:
+Goal selected_sum_from'vc.
+Prover result is: Unknown (unknown + incomplete) (0.02s, 2174 steps).
+Remaining after prover CVC4,1.8: 1
+== Goals still unproved after stage 1 ==
+ConstrainedSubsequenceSum_Array_Spec	selected_sum_from'vc
+== Stage 2: split_vc on unproved goal ==
+Target theory: ConstrainedSubsequenceSum_Array_Spec
+Target goal  : selected_sum_from'vc
+---- stage2 | prover: Z3,4.8.6 | theory: ConstrainedSubsequenceSum_Array_Spec | goal: selected_sum_from'vc ----
+Transforms: split_vc
+File "constrained_subsequence_sum_array.mlw", line 23, characters 27-64:
+Sub-goal Variant decrease of goal selected_sum_from'vc.
+Prover result is: Valid (0.01s, 3209 steps).
+
+File "constrained_subsequence_sum_array.mlw", line 23, characters 27-64:
+Sub-goal Precondition of goal selected_sum_from'vc.
+Prover result is: Valid (0.01s, 6235 steps).
+
+File "constrained_subsequence_sum_array.mlw", line 23, characters 14-23:
+Sub-goal Index in array bounds of goal selected_sum_from'vc.
+Prover result is: Valid (0.01s, 6035 steps).
+
+File "constrained_subsequence_sum_array.mlw", line 23, characters 9-24:
+Sub-goal Index in array bounds of goal selected_sum_from'vc.
+Prover result is: Unknown (unknown) (0.01s, 17055 steps).
+---- stage2 | prover: Alt-Ergo,2.4.0 | theory: ConstrainedSubsequenceSum_Array_Spec | goal: selected_sum_from'vc ----
+Transforms: split_vc
+File "constrained_subsequence_sum_array.mlw", line 23, characters 27-64:
+Sub-goal Variant decrease of goal selected_sum_from'vc.
+Prover result is: Valid (0.01s, 6 steps).
+
+File "constrained_subsequence_sum_array.mlw", line 23, characters 27-64:
+Sub-goal Precondition of goal selected_sum_from'vc.
+Prover result is: Valid (0.01s, 6 steps).
+
+File "constrained_subsequence_sum_array.mlw", line 23, characters 14-23:
+Sub-goal Index in array bounds of goal selected_sum_from'vc.
+Prover result is: Valid (0.00s, 6 steps).
+
+File "constrained_subsequence_sum_array.mlw", line 23, characters 9-24:
+Sub-goal Index in array bounds of goal selected_sum_from'vc.
+Prover result is: Unknown () (0.01s, 12 steps).
+---- stage2 | prover: CVC4,1.8 | theory: ConstrainedSubsequenceSum_Array_Spec | goal: selected_sum_from'vc ----
+Transforms: split_vc
+File "constrained_subsequence_sum_array.mlw", line 23, characters 27-64:
+Sub-goal Variant decrease of goal selected_sum_from'vc.
+Prover result is: Valid (0.01s, 1346 steps).
+
+File "constrained_subsequence_sum_array.mlw", line 23, characters 27-64:
+Sub-goal Precondition of goal selected_sum_from'vc.
+Prover result is: Valid (0.01s, 1401 steps).
+
+File "constrained_subsequence_sum_array.mlw", line 23, characters 14-23:
+Sub-goal Index in array bounds of goal selected_sum_from'vc.
+Prover result is: Valid (0.01s, 1374 steps).
+
+File "constrained_subsequence_sum_array.mlw", line 23, characters 9-24:
+Sub-goal Index in array bounds of goal selected_sum_from'vc.
+Prover result is: Unknown (unknown + incomplete) (0.01s, 1905 steps).
+== Goals still unproved after stage 2 (split_vc) ==
+ConstrainedSubsequenceSum_Array_Spec	selected_sum_from'vc
+== Stage 3: split_vc + inline_all on still-unproved goal ==
+Target theory: ConstrainedSubsequenceSum_Array_Spec
+Target goal  : selected_sum_from'vc
+---- stage3 | prover: Z3,4.8.6 | theory: ConstrainedSubsequenceSum_Array_Spec | goal: selected_sum_from'vc ----
+Transforms: split_vc inline_all
+File "constrained_subsequence_sum_array.mlw", line 23, characters 27-64:
+Sub-goal Variant decrease of goal selected_sum_from'vc.
+Prover result is: Valid (0.01s, 3079 steps).
+
+File "constrained_subsequence_sum_array.mlw", line 23, characters 27-64:
+Sub-goal Precondition of goal selected_sum_from'vc.
+Prover result is: Valid (0.01s, 8408 steps).
+
+File "constrained_subsequence_sum_array.mlw", line 23, characters 14-23:
+Sub-goal Index in array bounds of goal selected_sum_from'vc.
+Prover result is: Valid (0.01s, 933 steps).
+
+File "constrained_subsequence_sum_array.mlw", line 23, characters 9-24:
+Sub-goal Index in array bounds of goal selected_sum_from'vc.
+Prover result is: Timeout (10.00s, 175550621 steps).
+---- stage3 | prover: Alt-Ergo,2.4.0 | theory: ConstrainedSubsequenceSum_Array_Spec | goal: selected_sum_from'vc ----
+Transforms: split_vc inline_all
+File "constrained_subsequence_sum_array.mlw", line 23, characters 27-64:
+Sub-goal Variant decrease of goal selected_sum_from'vc.
+Prover result is: Valid (0.01s, 6 steps).
+
+File "constrained_subsequence_sum_array.mlw", line 23, characters 27-64:
+Sub-goal Precondition of goal selected_sum_from'vc.
+Prover result is: Valid (0.01s, 14 steps).
+
+File "constrained_subsequence_sum_array.mlw", line 23, characters 14-23:
+Sub-goal Index in array bounds of goal selected_sum_from'vc.
+Prover result is: Valid (0.00s, 5 steps).
+
+File "constrained_subsequence_sum_array.mlw", line 23, characters 9-24:
+Sub-goal Index in array bounds of goal selected_sum_from'vc.
+Prover result is: Unknown () (0.01s, 13 steps).
+---- stage3 | prover: CVC4,1.8 | theory: ConstrainedSubsequenceSum_Array_Spec | goal: selected_sum_from'vc ----
+Transforms: split_vc inline_all
+File "constrained_subsequence_sum_array.mlw", line 23, characters 27-64:
+Sub-goal Variant decrease of goal selected_sum_from'vc.
+Prover result is: Valid (0.01s, 2059 steps).
+
+File "constrained_subsequence_sum_array.mlw", line 23, characters 27-64:
+Sub-goal Precondition of goal selected_sum_from'vc.
+Prover result is: Valid (0.01s, 2214 steps).
+
+File "constrained_subsequence_sum_array.mlw", line 23, characters 14-23:
+Sub-goal Index in array bounds of goal selected_sum_from'vc.
+Prover result is: Valid (0.01s, 1999 steps).
+
+File "constrained_subsequence_sum_array.mlw", line 23, characters 9-24:
+Sub-goal Index in array bounds of goal selected_sum_from'vc.
+Prover result is: Unknown (unknown + incomplete) (0.01s, 2087 steps).
+== Final summary ==
+Unproved root goals after first prover : 1
+Remaining failures after split_vc      : 1
+Remaining failures after stage 3       : 1
+Detailed logs stored in                : /Users/rubenm/Desktop/Diversify2Verify/codex-runs2/stage1a-array/1425_constrained-subsequence-sum-20260523-235927/generated/why3/array/.why3_sessions/constrained_subsequence_sum_array_logs
+Still unproved goals:
+ConstrainedSubsequenceSum_Array_Spec	selected_sum_from'vc
+VERIFY_RESULT: FAILURE
+VERIFY_REASON: unproved_goals_remain
+VERIFY_STAGE: stage3
+VERIFY_ROOT_TOTAL: 8
+VERIFY_ROOT_PROVED: 7
+VERIFY_ROOT_REMAINING: 1

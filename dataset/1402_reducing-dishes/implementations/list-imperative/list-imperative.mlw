@@ -1,0 +1,206 @@
+module ReducingDishes_List_Imperative_Implementation
+
+  use int.Int
+  use list.List
+  use ref.Ref
+
+  let rec function insert_sorted (x: int) (l: list int) : list int =
+    match l with
+    | Nil -> Cons x Nil
+    | Cons y ys ->
+        if x <= y then
+          Cons x l
+        else
+          Cons y (insert_sorted x ys)
+    end
+
+  let reverse_list (l: list int) : list int =
+    let acc = ref Nil in
+    let cur = ref l in
+    while (match !cur with Nil -> false | Cons _ _ -> true end) do
+      match !cur with
+      | Nil -> ()
+      | Cons x xs ->
+          acc := Cons x !acc;
+          cur := xs
+      end
+    done;
+    !acc
+
+  let sort_list (l: list int) : list int =
+    let sorted = ref Nil in
+    let cur = ref l in
+    while (match !cur with Nil -> false | Cons _ _ -> true end) do
+      match !cur with
+      | Nil -> ()
+      | Cons x xs ->
+          sorted := insert_sorted x !sorted;
+          cur := xs
+      end
+    done;
+    !sorted
+
+  let reducing_dishes_list (satisfaction: list int) : int =
+    let descending = reverse_list (sort_list satisfaction) in
+    let running_sum = ref 0 in
+    let total = ref 0 in
+    let cur = ref descending in
+    while (match !cur with Nil -> false | Cons _ _ -> true end) do
+      match !cur with
+      | Nil -> ()
+      | Cons x xs ->
+          let next_sum = !running_sum + x in
+          if next_sum > 0 then begin
+            running_sum := next_sum;
+            total := !total + !running_sum;
+            cur := xs
+          end else
+            cur := Nil
+      end
+    done;
+    !total
+
+  let test_000 () : bool =
+    let satisfaction = Cons 1 (Cons (-1) (Cons 2 (Cons (-2) (Cons 3 (Cons (-3) Nil))))) in
+    let result = reducing_dishes_list satisfaction in
+    result = 22
+
+  let test_001 () : bool =
+    let satisfaction = Cons 0 Nil in
+    let result = reducing_dishes_list satisfaction in
+    result = 0
+
+  let test_002 () : bool =
+    let satisfaction = Cons (-1) Nil in
+    let result = reducing_dishes_list satisfaction in
+    result = 0
+
+  let test_003 () : bool =
+    let satisfaction = Cons (-500) (Cons (-500) (Cons (-500) (Cons (-500) (Cons (-500) Nil)))) in
+    let result = reducing_dishes_list satisfaction in
+    result = 0
+
+  let test_004 () : bool =
+    let satisfaction = Cons 0 (Cons 0 (Cons 0 (Cons 0 (Cons 0 Nil)))) in
+    let result = reducing_dishes_list satisfaction in
+    result = 0
+
+  let test_005 () : bool =
+    let satisfaction = Cons (-1000) (Cons 1000 (Cons (-500) (Cons 500 Nil))) in
+    let result = reducing_dishes_list satisfaction in
+    result = 3500
+
+  let test_006 () : bool =
+    let satisfaction = Cons 0 (Cons 0 (Cons 0 (Cons 0 Nil))) in
+    let result = reducing_dishes_list satisfaction in
+    result = 0
+
+  let test_007 () : bool =
+    let satisfaction = Cons 1000 (Cons (-1000) (Cons 1000 (Cons (-1000) (Cons 1000 Nil)))) in
+    let result = reducing_dishes_list satisfaction in
+    result = 9000
+
+  let test_008 () : bool =
+    let satisfaction = Cons (-1) (Cons (-8) (Cons 0 (Cons 5 (Cons (-9) Nil)))) in
+    let result = reducing_dishes_list satisfaction in
+    result = 14
+
+  let test_009 () : bool =
+    let satisfaction = Cons (-10) (Cons (-20) (Cons (-30) (Cons 10 (Cons 20 (Cons 30 Nil))))) in
+    let result = reducing_dishes_list satisfaction in
+    result = 220
+
+  let test_010 () : bool =
+    let satisfaction = Cons 1 (Cons 2 (Cons 3 (Cons 4 (Cons 5 Nil)))) in
+    let result = reducing_dishes_list satisfaction in
+    result = 55
+
+  let test_011 () : bool =
+    let satisfaction = Cons 100 (Cons 200 (Cons 300 (Cons 400 (Cons 500 Nil)))) in
+    let result = reducing_dishes_list satisfaction in
+    result = 5500
+
+  let test_012 () : bool =
+    let satisfaction = Cons (-10) (Cons (-20) (Cons (-30) (Cons (-40) (Cons (-50) Nil)))) in
+    let result = reducing_dishes_list satisfaction in
+    result = 0
+
+  let test_013 () : bool =
+    let satisfaction = Cons 4 (Cons 3 (Cons 2 Nil)) in
+    let result = reducing_dishes_list satisfaction in
+    result = 20
+
+  let test_014 () : bool =
+    let satisfaction = Cons 500 (Cons 500 (Cons 500 (Cons 500 (Cons 500 Nil)))) in
+    let result = reducing_dishes_list satisfaction in
+    result = 7500
+
+  let test_015 () : bool =
+    let satisfaction = Cons (-1000) (Cons 1000 Nil) in
+    let result = reducing_dishes_list satisfaction in
+    result = 1000
+
+  let test_016 () : bool =
+    let satisfaction = Cons (-1) (Cons (-4) (Cons (-5) Nil)) in
+    let result = reducing_dishes_list satisfaction in
+    result = 0
+
+  let test_017 () : bool =
+    let satisfaction = Cons (-5) (Cons (-4) (Cons (-3) (Cons (-2) (Cons (-1) Nil)))) in
+    let result = reducing_dishes_list satisfaction in
+    result = 0
+
+  let test_018 () : bool =
+    let satisfaction = Cons (-500) (Cons (-400) (Cons (-300) (Cons (-200) (Cons (-100) Nil)))) in
+    let result = reducing_dishes_list satisfaction in
+    result = 0
+
+  let test_019 () : bool =
+    let satisfaction = Cons 1000 (Cons (-1000) (Cons 1000 (Cons (-1000) (Cons 1000 Nil)))) in
+    let result = reducing_dishes_list satisfaction in
+    result = 9000
+
+  let run_tests () : bool =
+    if test_000 () then
+    if test_001 () then
+    if test_002 () then
+    if test_003 () then
+    if test_004 () then
+    if test_005 () then
+    if test_006 () then
+    if test_007 () then
+    if test_008 () then
+    if test_009 () then
+    if test_010 () then
+    if test_011 () then
+    if test_012 () then
+    if test_013 () then
+    if test_014 () then
+    if test_015 () then
+    if test_016 () then
+    if test_017 () then
+    if test_018 () then
+    if test_019 () then
+      true
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+
+end

@@ -1,0 +1,208 @@
+module FindTheStudentThatWillReplaceTheChalk_List_Recursive_Implementation
+
+  use int.Int
+  use int.EuclideanDivision
+  use list.List
+
+  let rec predicate all_positive (chalk: list int)
+    variant { chalk }
+  =
+    match chalk with
+    | Nil -> true
+    | Cons c rest -> 0 < c && all_positive rest
+    end
+
+  let rec sum_list (chalk: list int) : int
+    variant { chalk }
+  =
+    match chalk with
+    | Nil -> 0
+    | Cons c rest -> c + sum_list rest
+    end
+
+  let rec find_index (chalk: list int) (rem: int) (idx: int) : int
+    requires { 0 <= rem }
+    requires { 0 <= idx }
+    variant { chalk }
+  =
+    match chalk with
+    | Nil -> idx
+    | Cons c rest ->
+        if rem < c then idx else find_index rest (rem - c) (idx + 1)
+    end
+
+  let find_the_student_that_will_replace_the_chalk_list (chalk: list int) (k: int) : int
+    requires { chalk <> Nil }
+    requires { all_positive chalk }
+    requires { 0 <= k }
+  =
+    let total = sum_list chalk in
+    let rem = mod k total in
+    find_index chalk rem 0
+
+  let rec repeat_value (n: int) (value: int) : list int
+    requires { 0 <= n }
+    variant { n }
+  =
+    if n = 0 then Nil else Cons value (repeat_value (n - 1) value)
+
+  let rec descending_list (high: int) (low: int) : list int
+    requires { low <= high + 1 }
+    variant { high - low + 1 }
+  =
+    if high < low then Nil else Cons high (descending_list (high - 1) low)
+
+  let rec ascending_list (low: int) (high: int) : list int
+    requires { low <= high + 1 }
+    variant { high - low + 1 }
+  =
+    if high < low then Nil else Cons low (ascending_list (low + 1) high)
+
+  let test_case_000 () : bool =
+    let chalk = Cons 1 (Cons 2 (Cons 3 (Cons 4 (Cons 5 Nil)))) in
+    let r = find_the_student_that_will_replace_the_chalk_list chalk 15 in
+    r = 0
+
+  let test_case_001 () : bool =
+    let chalk = Cons 1 Nil in
+    let r = find_the_student_that_will_replace_the_chalk_list chalk 1000000000 in
+    r = 0
+
+  let test_case_002 () : bool =
+    let chalk = repeat_value 10 1 in
+    let r = find_the_student_that_will_replace_the_chalk_list chalk 999999999 in
+    r = 9
+
+  let test_case_003 () : bool =
+    let chalk = Cons 10 (Cons 10 (Cons 10 Nil)) in
+    let r = find_the_student_that_will_replace_the_chalk_list chalk 100 in
+    r = 1
+
+  let test_case_004 () : bool =
+    let chalk = Cons 100000 Nil in
+    let r = find_the_student_that_will_replace_the_chalk_list chalk 1000000000 in
+    r = 0
+
+  let test_case_005 () : bool =
+    let chalk = repeat_value 10 1 in
+    let r = find_the_student_that_will_replace_the_chalk_list chalk 1000000000 in
+    r = 0
+
+  let test_case_006 () : bool =
+    let chalk = Cons 3 (Cons 4 (Cons 1 (Cons 2 Nil))) in
+    let r = find_the_student_that_will_replace_the_chalk_list chalk 25 in
+    r = 1
+
+  let test_case_007 () : bool =
+    let chalk = Cons 5 (Cons 1 (Cons 5 Nil)) in
+    let r = find_the_student_that_will_replace_the_chalk_list chalk 22 in
+    r = 0
+
+  let test_case_008 () : bool =
+    let chalk = Cons 5 (Cons 1 (Cons 5 Nil)) in
+    let r = find_the_student_that_will_replace_the_chalk_list chalk 1000000000 in
+    r = 2
+
+  let test_case_009 () : bool =
+    let chalk =
+      Cons 10000 (Cons 9000 (Cons 8000 (Cons 7000 (Cons 6000
+        (Cons 5000 (Cons 4000 (Cons 3000 (Cons 2000 (Cons 1000 Nil))))))))) in
+    let r = find_the_student_that_will_replace_the_chalk_list chalk 1000000000 in
+    r = 6
+
+  let test_case_010 () : bool =
+    let chalk = repeat_value 20 1 in
+    let r = find_the_student_that_will_replace_the_chalk_list chalk 9999999999 in
+    r = 19
+
+  let test_case_011 () : bool =
+    let chalk = Cons 100000 (Cons 200000 (Cons 300000 Nil)) in
+    let r = find_the_student_that_will_replace_the_chalk_list chalk 1000000000 in
+    r = 2
+
+  let test_case_012 () : bool =
+    let chalk = descending_list 9 1 in
+    let r = find_the_student_that_will_replace_the_chalk_list chalk 123456789 in
+    r = 1
+
+  let test_case_013 () : bool =
+    let chalk = Cons 5 (Cons 8 (Cons 12 (Cons 3 (Cons 7 Nil)))) in
+    let r = find_the_student_that_will_replace_the_chalk_list chalk 500000000 in
+    r = 1
+
+  let test_case_014 () : bool =
+    let chalk = Cons 7 (Cons 3 (Cons 2 (Cons 8 (Cons 6 (Cons 4 Nil))))) in
+    let r = find_the_student_that_will_replace_the_chalk_list chalk 987654321 in
+    r = 4
+
+  let test_case_015 () : bool =
+    let chalk = Cons 1 (Cons 10 (Cons 100 (Cons 1000 (Cons 10000 (Cons 100000 Nil))))) in
+    let r = find_the_student_that_will_replace_the_chalk_list chalk 123456789 in
+    r = 5
+
+  let test_case_016 () : bool =
+    let chalk =
+      Cons 1 (Cons 10 (Cons 100 (Cons 1000 (Cons 10000
+        (Cons 100000 (Cons 1000000 (Cons 10000000 (Cons 100000000 Nil)))))))) in
+    let r = find_the_student_that_will_replace_the_chalk_list chalk 987654321 in
+    r = 8
+
+  let test_case_017 () : bool =
+    let chalk = descending_list 9 1 in
+    let r = find_the_student_that_will_replace_the_chalk_list chalk 1200000000 in
+    r = 4
+
+  let test_case_018 () : bool =
+    let chalk = Cons 100000 (Cons 200000 (Cons 300000 (Cons 400000 (Cons 500000 Nil)))) in
+    let r = find_the_student_that_will_replace_the_chalk_list chalk 1000000000 in
+    r = 4
+
+  let test_case_019 () : bool =
+    let chalk = ascending_list 2 10 in
+    let r = find_the_student_that_will_replace_the_chalk_list chalk 100000000 in
+    r = 8
+
+  let run_tests () : bool =
+    if test_case_000 () then
+    if test_case_001 () then
+    if test_case_002 () then
+    if test_case_003 () then
+    if test_case_004 () then
+    if test_case_005 () then
+    if test_case_006 () then
+    if test_case_007 () then
+    if test_case_008 () then
+    if test_case_009 () then
+    if test_case_010 () then
+    if test_case_011 () then
+    if test_case_012 () then
+    if test_case_013 () then
+    if test_case_014 () then
+    if test_case_015 () then
+    if test_case_016 () then
+    if test_case_017 () then
+    if test_case_018 () then
+    if test_case_019 () then
+      true
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+
+end

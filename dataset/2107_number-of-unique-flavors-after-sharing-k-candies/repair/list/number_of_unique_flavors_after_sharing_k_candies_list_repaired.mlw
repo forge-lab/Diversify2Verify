@@ -1,0 +1,203 @@
+module NumberOfUniqueFlavorsAfterSharingKCandies_List_Spec
+
+  use int.Int
+  use list.List
+  use list.Length
+  use list.Append
+  use list.Elements
+  use set.Fset
+
+  let rec predicate flavors_in_range (candies: list int)
+    variant { candies }
+  =
+    match candies with
+    | Nil -> true
+    | Cons flavor rest ->
+        1 <= flavor &&
+        flavor <= 100000 &&
+        flavors_in_range rest
+    end
+
+  function unique_flavor_count (candies: list int) : int =
+    cardinal (elements candies)
+
+  predicate valid_kept_after_sharing
+      (candies: list int) (k: int) (kept: list int) =
+    exists left shared right: list int.
+      candies = left ++ (shared ++ right) /\
+      length shared = k /\
+      kept = left ++ right
+
+  predicate no_better_share
+      (candies: list int) (k: int) (result: int) =
+    forall kept: list int.
+      valid_kept_after_sharing candies k kept ->
+      unique_flavor_count kept <= result
+
+  predicate maximum_unique_flavors_after_sharing
+      (candies: list int) (k: int) (result: int) =
+    exists kept: list int.
+      valid_kept_after_sharing candies k kept /\
+      result = unique_flavor_count kept /\
+      no_better_share candies k result
+
+  let rec lemma unique_flavor_count_le_length (candies: list int)
+    ensures { unique_flavor_count candies <= length candies }
+    variant { candies }
+  =
+    match candies with
+    | Nil -> ()
+    | Cons _ rest -> unique_flavor_count_le_length rest
+    end
+
+  let lemma valid_kept_after_sharing_length
+      (candies: list int) (k: int) (kept: list int)
+    requires { valid_kept_after_sharing candies k kept }
+    ensures  { length kept = length candies - k }
+  =
+    assert { exists left shared right: list int.
+      candies = left ++ (shared ++ right) /\
+      length shared = k /\
+      kept = left ++ right }
+
+  let lemma valid_kept_after_sharing_unique_bound
+      (candies: list int) (k: int) (kept: list int)
+    requires { valid_kept_after_sharing candies k kept }
+    ensures  { unique_flavor_count kept <= unique_flavor_count candies }
+  =
+    assert { exists left shared right: list int.
+      candies = left ++ (shared ++ right) /\
+      length shared = k /\
+      kept = left ++ right };
+    assert { subset (elements kept) (elements candies) }
+
+  val number_of_unique_flavors_after_sharing_k_candies_list
+      (candies: list int) (k: int) : int
+    requires { 0 <= k <= length candies }
+    requires { length candies <= 100000 }
+    requires { flavors_in_range candies }
+    ensures  { maximum_unique_flavors_after_sharing candies k result }
+
+  let lemma test_000_python_assertions () =
+    let candies = (Nil: list int) in
+    let shared = (Nil: list int) in
+    let kept = (Nil: list int) in
+    assert { length candies = 0 };
+    assert { flavors_in_range candies };
+    assert { unique_flavor_count kept = 0 };
+    assert { candies = Nil ++ (shared ++ Nil) };
+    assert { kept = Nil ++ Nil };
+    assert { valid_kept_after_sharing candies 0 kept };
+    assert { no_better_share candies 0 0 };
+    assert { maximum_unique_flavors_after_sharing candies 0 0 }
+
+  let lemma test_001_python_assertions () =
+    let candies =
+      Cons 100000 (Cons 100000 (Cons 100000 (Cons 100000 Nil)))
+    in
+    let shared = Cons 100000 (Cons 100000 Nil) in
+    let right = Cons 100000 (Cons 100000 Nil) in
+    let kept = right in
+    assert { length candies = 4 };
+    assert { length shared = 2 };
+    assert { flavors_in_range candies };
+    assert { unique_flavor_count kept = 1 };
+    assert { candies = Nil ++ (shared ++ right) };
+    assert { kept = Nil ++ right };
+    assert { valid_kept_after_sharing candies 2 kept };
+    assert { unique_flavor_count candies = 1 };
+    assert { forall kept2: list int.
+      valid_kept_after_sharing candies 2 kept2 ->
+      unique_flavor_count kept2 <= unique_flavor_count candies };
+    assert { no_better_share candies 2 1 };
+    assert { maximum_unique_flavors_after_sharing candies 2 1 }
+
+  let lemma test_003_python_assertions () =
+    let candies = Cons 1 (Cons 2 (Cons 3 Nil)) in
+    let shared = candies in
+    let kept = (Nil: list int) in
+    assert { length candies = 3 };
+    assert { length shared = 3 };
+    assert { flavors_in_range candies };
+    assert { unique_flavor_count kept = 0 };
+    assert { candies = Nil ++ (shared ++ Nil) };
+    assert { kept = Nil ++ Nil };
+    assert { valid_kept_after_sharing candies 3 kept };
+    assert { no_better_share candies 3 0 };
+    assert { maximum_unique_flavors_after_sharing candies 3 0 }
+
+  let lemma test_004_python_assertions () =
+    let candies =
+      Cons 2 (Cons 2 (Cons 2 (Cons 2 (Cons 3 (Cons 3 Nil)))))
+    in
+    let left = Cons 2 (Cons 2 (Cons 2 Nil)) in
+    let shared = Cons 2 (Cons 3 Nil) in
+    let right = Cons 3 Nil in
+    let kept = left ++ right in
+    assert { length candies = 6 };
+    assert { length shared = 2 };
+    assert { flavors_in_range candies };
+    assert { unique_flavor_count kept = 2 };
+    assert { candies = left ++ (shared ++ right) };
+    assert { valid_kept_after_sharing candies 2 kept };
+    assert { unique_flavor_count candies = 2 };
+    assert { forall kept2: list int.
+      valid_kept_after_sharing candies 2 kept2 ->
+      unique_flavor_count kept2 <= unique_flavor_count candies };
+    assert { no_better_share candies 2 2 };
+    assert { maximum_unique_flavors_after_sharing candies 2 2 }
+
+  let lemma test_005_python_assertions () =
+    let candies =
+      Cons 1 (Cons 2 (Cons 2 (Cons 3 (Cons 4 (Cons 3 Nil)))))
+    in
+    let left = Cons 1 Nil in
+    let shared = Cons 2 (Cons 2 (Cons 3 Nil)) in
+    let right = Cons 4 (Cons 3 Nil) in
+    let kept = left ++ right in
+    assert { length candies = 6 };
+    assert { length shared = 3 };
+    assert { flavors_in_range candies };
+    assert { unique_flavor_count kept = 3 };
+    assert { candies = left ++ (shared ++ right) };
+    assert { valid_kept_after_sharing candies 3 kept };
+    assert { forall kept2: list int.
+      valid_kept_after_sharing candies 3 kept2 ->
+      length kept2 = length candies - 3 };
+    assert { forall kept2: list int.
+      valid_kept_after_sharing candies 3 kept2 ->
+      length kept2 = 3 };
+    assert { forall kept2: list int.
+      valid_kept_after_sharing candies 3 kept2 ->
+      unique_flavor_count kept2 <= length kept2 };
+    assert { forall kept2: list int.
+      valid_kept_after_sharing candies 3 kept2 ->
+      unique_flavor_count kept2 <= 3 };
+    assert { no_better_share candies 3 3 };
+    assert { maximum_unique_flavors_after_sharing candies 3 3 }
+
+  let lemma test_007_python_assertions () =
+    let candies = Cons 10 (Cons 20 (Cons 30 (Cons 40 (Cons 50 Nil)))) in
+    let kept = candies in
+    assert { length candies = 5 };
+    assert { flavors_in_range candies };
+    assert { unique_flavor_count kept = 5 };
+    assert { candies = candies ++ (Nil ++ Nil) };
+    assert { kept = candies ++ Nil };
+    assert { valid_kept_after_sharing candies 0 kept };
+    assert { no_better_share candies 0 5 };
+    assert { maximum_unique_flavors_after_sharing candies 0 5 }
+
+  let lemma test_010_python_assertions () =
+    let candies = Cons 2 (Cons 4 (Cons 5 Nil)) in
+    let kept = candies in
+    assert { length candies = 3 };
+    assert { flavors_in_range candies };
+    assert { unique_flavor_count kept = 3 };
+    assert { candies = candies ++ (Nil ++ Nil) };
+    assert { kept = candies ++ Nil };
+    assert { valid_kept_after_sharing candies 0 kept };
+    assert { no_better_share candies 0 3 };
+    assert { maximum_unique_flavors_after_sharing candies 0 3 }
+
+end

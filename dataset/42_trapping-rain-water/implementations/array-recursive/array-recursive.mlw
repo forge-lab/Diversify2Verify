@@ -1,0 +1,190 @@
+module TrappingRainWater_Array_Recursive_Implementation
+
+  use int.Int
+  use int.MinMax
+  use array.Array
+  use array.Init
+
+  let rec prefix_max (height: array int) (i: int) : int
+    variant { i }
+  =
+    if i <= 0 then
+      height[0]
+    else
+      max (prefix_max height (i - 1)) height[i]
+
+  let rec suffix_max (height: array int) (i: int) : int
+    variant { length height - i }
+  =
+    if i + 1 >= length height then
+      height[i]
+    else
+      max height[i] (suffix_max height (i + 1))
+
+  let water_at (height: array int) (i: int) : int =
+    let left_wall = prefix_max height i in
+    let right_wall = suffix_max height i in
+    let bound = min left_wall right_wall in
+    if bound > height[i] then
+      bound - height[i]
+    else
+      0
+
+  let rec sum_water_from (height: array int) (i: int) : int
+    variant { length height - i }
+  =
+    if i >= length height then
+      0
+    else
+      water_at height i + sum_water_from height (i + 1)
+
+  let trapping_rain_water_array (height: array int) : int =
+    if length height = 0 then
+      0
+    else
+      sum_water_from height 0
+
+  let test_000 () : bool =
+    let height = init 9 [|3; 1; 2; 1; 4; 3; 2; 1; 5|] in
+    let r = trapping_rain_water_array height in
+    r = 11
+
+  let test_001 () : bool =
+    let height = init 7 [|3; 0; 1; 3; 0; 1; 3|] in
+    let r = trapping_rain_water_array height in
+    r = 10
+
+  let test_002 () : bool =
+    let height = init 5 [|5; 4; 3; 2; 1|] in
+    let r = trapping_rain_water_array height in
+    r = 0
+
+  let test_003 () : bool =
+    let height = init 1 [|1|] in
+    let r = trapping_rain_water_array height in
+    r = 0
+
+  let test_004 () : bool =
+    let height = init 3 [|2; 0; 2|] in
+    let r = trapping_rain_water_array height in
+    r = 2
+
+  let test_005 () : bool =
+    let height = init 9 [|0; 0; 1; 0; 0; 0; 0; 0; 0|] in
+    let r = trapping_rain_water_array height in
+    r = 0
+
+  let test_006 () : bool =
+    let height = init 6 [|1; 1; 1; 1; 1; 1|] in
+    let r = trapping_rain_water_array height in
+    r = 0
+
+  let test_007 () : bool =
+    let height = init 12 [|1; 0; 2; 0; 1; 0; 3; 0; 1; 0; 1; 2|] in
+    let r = trapping_rain_water_array height in
+    r = 12
+
+  let test_008 () : bool =
+    let height = init 11 [|1; 2; 1; 0; 1; 0; 1; 0; 1; 2; 1|] in
+    let r = trapping_rain_water_array height in
+    r = 10
+
+  let test_009 () : bool =
+    let height = init 5 [|0; 0; 0; 0; 0|] in
+    let r = trapping_rain_water_array height in
+    r = 0
+
+  let test_010 () : bool =
+    let height = init 9 [|1; 2; 3; 4; 5; 4; 3; 2; 1|] in
+    let r = trapping_rain_water_array height in
+    r = 0
+
+  let test_011 () : bool =
+    let height = init 4 [|0; 0; 0; 0|] in
+    let r = trapping_rain_water_array height in
+    r = 0
+
+  let test_012 () : bool =
+    let height = init 4 [|5; 4; 1; 2|] in
+    let r = trapping_rain_water_array height in
+    r = 1
+
+  let test_013 () : bool =
+    let height = init 12 [|3; 0; 1; 3; 0; 1; 1; 3; 2; 1; 2; 1|] in
+    let r = trapping_rain_water_array height in
+    r = 13
+
+  let test_014 () : bool =
+    let height = init 6 [|4; 2; 0; 3; 2; 5|] in
+    let r = trapping_rain_water_array height in
+    r = 9
+
+  let test_015 () : bool =
+    let height = init 6 [|3; 0; 0; 2; 0; 4|] in
+    let r = trapping_rain_water_array height in
+    r = 10
+
+  let test_016 () : bool =
+    let height = init 9 [|5; 4; 3; 2; 1; 2; 3; 4; 5|] in
+    let r = trapping_rain_water_array height in
+    r = 16
+
+  let test_017 () : bool =
+    let height = init 11 [|1; 0; 2; 0; 1; 0; 3; 1; 0; 1; 2|] in
+    let r = trapping_rain_water_array height in
+    r = 10
+
+  let test_018 () : bool =
+    let height = init 5 [|0; 2; 0; 2; 0|] in
+    let r = trapping_rain_water_array height in
+    r = 2
+
+  let test_019 () : bool =
+    let height = init 5 [|1; 0; 0; 0; 1|] in
+    let r = trapping_rain_water_array height in
+    r = 3
+
+  let run_tests () : bool =
+    if test_000 () then
+    if test_001 () then
+    if test_002 () then
+    if test_003 () then
+    if test_004 () then
+    if test_005 () then
+    if test_006 () then
+    if test_007 () then
+    if test_008 () then
+    if test_009 () then
+    if test_010 () then
+    if test_011 () then
+    if test_012 () then
+    if test_013 () then
+    if test_014 () then
+    if test_015 () then
+    if test_016 () then
+    if test_017 () then
+    if test_018 () then
+    if test_019 () then
+      true
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+
+end

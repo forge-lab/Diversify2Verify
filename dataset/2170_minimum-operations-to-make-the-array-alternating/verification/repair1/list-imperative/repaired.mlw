@@ -1,0 +1,349 @@
+module MinimumOperationsToMakeTheArrayAlternating_List_Stage3_Imperative
+
+  use int.Int
+  use list.List
+  use list.Length
+  use list.Mem
+  use list.NumOcc
+  use ref.Ref
+
+  let rec predicate all_positive (nums: list int)
+    variant { nums }
+  =
+    match nums with
+    | Nil -> true
+    | Cons x xs -> x > 0 && all_positive xs
+    end
+
+  let rec function even_positions (nums: list int) : list int
+    variant { nums }
+  =
+    match nums with
+    | Nil -> Nil
+    | Cons x xs -> Cons x (odd_positions_from_tail xs)
+    end
+
+  with function odd_positions_from_tail (nums: list int) : list int
+    variant { nums }
+  =
+    match nums with
+    | Nil -> Nil
+    | Cons _ xs -> even_positions xs
+    end
+
+  function odd_positions (nums: list int) : list int =
+    match nums with
+    | Nil -> Nil
+    | Cons _ xs -> even_positions xs
+    end
+
+  predicate valid_alternating_values (even_value: int) (odd_value: int) =
+    even_value > 0 /\ odd_value > 0 /\ even_value <> odd_value
+
+  function kept_by_values (nums: list int) (even_value: int) (odd_value: int) : int =
+    num_occ even_value (even_positions nums) + num_occ odd_value (odd_positions nums)
+
+  predicate best_kept (nums: list int) (kept: int) =
+    exists even_value odd_value: int.
+      valid_alternating_values even_value odd_value /\
+      kept = kept_by_values nums even_value odd_value /\
+      (forall ev ov: int.
+        valid_alternating_values ev ov ->
+        kept_by_values nums ev ov <= kept)
+
+  predicate minimum_operations_spec (nums: list int) (ops: int) =
+    exists kept: int.
+      best_kept nums kept /\
+      ops = length nums - kept /\
+      0 <= ops <= length nums
+
+  let rec function kept_by_values_from (nums: list int) (even_value: int) (odd_value: int)
+      (even_turn: bool) : int
+    variant { nums }
+  =
+    match nums with
+    | Nil -> 0
+    | Cons x xs ->
+        (if even_turn then
+           if x = even_value then 1 else 0
+         else
+           if x = odd_value then 1 else 0) +
+        kept_by_values_from xs even_value odd_value (not even_turn)
+    end
+
+  let lemma odd_positions_from_tail_eq_odd_positions (nums: list int)
+    ensures { odd_positions_from_tail nums = odd_positions nums }
+  =
+    match nums with
+    | Nil -> ()
+    | Cons _ _ -> ()
+    end
+
+  let rec lemma kept_by_values_from_spec (nums: list int) (even_value: int) (odd_value: int)
+    ensures {
+      kept_by_values_from nums even_value odd_value true =
+      kept_by_values nums even_value odd_value
+    }
+    ensures {
+      kept_by_values_from nums even_value odd_value false =
+      num_occ odd_value (even_positions nums) + num_occ even_value (odd_positions nums)
+    }
+    variant { nums }
+  =
+    match nums with
+    | Nil -> ()
+    | Cons _ xs ->
+        odd_positions_from_tail_eq_odd_positions xs;
+        kept_by_values_from_spec xs even_value odd_value
+    end
+
+  let lemma candidate_pair_dominates_all_values
+      (nums: list int) (candidates: list int) (best: int)
+    requires { all_positive nums }
+    requires { forall x: int. mem x candidates -> x > 0 }
+    requires { forall x: int. x > 0 -> mem x nums -> mem x candidates }
+    requires { exists fresh: int. mem fresh candidates /\ fresh > 0 /\ not (mem fresh nums) }
+    requires {
+      forall ev ov: int.
+        mem ev candidates -> mem ov candidates ->
+        valid_alternating_values ev ov ->
+        kept_by_values nums ev ov <= best
+    }
+    ensures {
+      forall ev ov: int.
+        valid_alternating_values ev ov ->
+        kept_by_values nums ev ov <= best
+    }
+  = ()
+
+  let lemma candidate_search_yields_best
+      (nums: list int) (candidates: list int) (best: int)
+    requires { length nums >= 1 }
+    requires { all_positive nums }
+    requires { 0 <= best <= length nums }
+    requires { forall x: int. mem x candidates -> x > 0 }
+    requires { forall x: int. x > 0 -> mem x nums -> mem x candidates }
+    requires { exists fresh: int. mem fresh candidates /\ fresh > 0 /\ not (mem fresh nums) }
+    requires {
+      forall ev ov: int.
+        mem ev candidates -> mem ov candidates ->
+        valid_alternating_values ev ov ->
+        kept_by_values nums ev ov <= best
+    }
+    requires {
+      best = 0 \/
+      exists ev ov: int.
+        mem ev candidates /\ mem ov candidates /\
+        valid_alternating_values ev ov /\
+        best = kept_by_values nums ev ov
+    }
+    ensures { best_kept nums best }
+  =
+    candidate_pair_dominates_all_values nums candidates best
+
+  let contains_value (xs: list int) (x: int) : bool
+    ensures { result = true <-> mem x xs }
+  =
+    let found = ref false in
+    let cur = ref xs in
+    while (match !cur with Nil -> false | Cons _ _ -> true end) do
+      invariant { 0 <= length !cur }
+      invariant { !found = true -> mem x xs }
+      invariant { !found = false -> (mem x xs <-> mem x !cur) }
+      variant { length !cur }
+      match !cur with
+      | Nil -> ()
+      | Cons y ys ->
+          if y = x then begin
+            assert { mem x !cur };
+            assert { mem x xs };
+            found := true
+          end else begin
+            assert { mem x !cur <-> mem x ys };
+          end;
+          cur := ys
+      end
+    done;
+    assert { !cur = Nil };
+    !found
+
+  let collect_unique_values (nums: list int) : list int
+    ensures { forall x: int. mem x result -> x > 0 /\ mem x nums }
+    ensures { forall x: int. x > 0 -> mem x nums -> mem x result }
+  =
+    let seen = ref Nil in
+    let cur = ref nums in
+    while (match !cur with Nil -> false | Cons _ _ -> true end) do
+      invariant { 0 <= length !cur }
+      invariant { forall x: int. mem x !cur -> mem x nums }
+      invariant { forall x: int. mem x !seen -> x > 0 /\ mem x nums }
+      invariant { forall x: int. x > 0 -> mem x nums -> mem x !seen \/ mem x !cur }
+      variant { length !cur }
+      match !cur with
+      | Nil -> ()
+      | Cons x xs ->
+          if x > 0 && not (contains_value !seen x) then begin
+            assert { x > 0 };
+            assert { mem x nums };
+            seen := Cons x !seen
+          end else begin
+            if x > 0 then assert { mem x !seen } else ()
+          end;
+          cur := xs
+      end
+    done;
+    assert { !cur = Nil };
+    !seen
+
+  let max_value_or_zero (nums: list int) : int
+    ensures { result >= 0 }
+    ensures { forall x: int. mem x nums -> x <= result }
+  =
+    let best = ref 0 in
+    let cur = ref nums in
+    while (match !cur with Nil -> false | Cons _ _ -> true end) do
+      invariant { !best >= 0 }
+      invariant { 0 <= length !cur }
+      invariant { forall x: int. mem x nums -> x <= !best \/ mem x !cur }
+      variant { length !cur }
+      match !cur with
+      | Nil -> ()
+      | Cons x xs ->
+          if x > !best then best := x else ();
+          cur := xs
+      end
+    done;
+    assert { !cur = Nil };
+    !best
+
+  let fresh_positive_candidate (nums: list int) : int
+    ensures { result > 0 }
+    ensures { forall x: int. mem x nums -> x < result }
+  =
+    let candidate = max_value_or_zero nums + 1 in
+    if candidate > 0 then candidate else 1
+
+  let kept_by_values_exec (nums: list int) (even_value: int) (odd_value: int) : int
+    ensures { result = kept_by_values nums even_value odd_value }
+    ensures { 0 <= result <= length nums }
+  =
+    kept_by_values_from_spec nums even_value odd_value;
+    let kept = ref 0 in
+    let even_turn = ref true in
+    let cur = ref nums in
+    while (match !cur with Nil -> false | Cons _ _ -> true end) do
+      invariant { 0 <= !kept }
+      invariant { !kept + length !cur <= length nums }
+      invariant {
+        !kept + kept_by_values_from !cur even_value odd_value !even_turn =
+        kept_by_values_from nums even_value odd_value true
+      }
+      invariant { 0 <= length !cur }
+      variant { length !cur }
+      match !cur with
+      | Nil -> ()
+      | Cons x xs ->
+          if !even_turn then
+            if x = even_value then kept := !kept + 1 else ()
+          else
+            if x = odd_value then kept := !kept + 1 else ();
+          even_turn := not !even_turn;
+          cur := xs
+      end
+    done;
+    assert { !cur = Nil };
+    !kept
+
+  let minimum_operations_to_make_the_array_alternating_list (nums: list int) : int
+    requires { length nums >= 1 }
+    requires { all_positive nums }
+    ensures  { minimum_operations_spec nums result }
+  =
+    let fresh = fresh_positive_candidate nums in
+    let collected = collect_unique_values nums in
+    let candidates = Cons fresh collected in
+    assert { fresh > 0 };
+    assert { not (mem fresh nums) };
+    assert { forall x: int. mem x candidates -> x > 0 };
+    assert { forall x: int. x > 0 -> mem x nums -> mem x candidates };
+    assert { exists f: int. mem f candidates /\ f > 0 /\ not (mem f nums) };
+    let best = ref 0 in
+    let even_cur = ref candidates in
+    while (match !even_cur with Nil -> false | Cons _ _ -> true end) do
+      invariant { 0 <= !best <= length nums }
+      invariant { 0 <= length !even_cur }
+      invariant { forall x: int. mem x candidates -> x > 0 }
+      invariant { forall x: int. x > 0 -> mem x nums -> mem x candidates }
+      invariant { exists f: int. mem f candidates /\ f > 0 /\ not (mem f nums) }
+      invariant {
+        !best = 0 \/
+        exists ev ov: int.
+          mem ev candidates /\ mem ov candidates /\
+          valid_alternating_values ev ov /\
+          !best = kept_by_values nums ev ov
+      }
+      invariant {
+        forall ev ov: int.
+          mem ev candidates -> not (mem ev !even_cur) ->
+          mem ov candidates ->
+          valid_alternating_values ev ov ->
+          kept_by_values nums ev ov <= !best
+      }
+      variant { length !even_cur }
+      match !even_cur with
+      | Nil -> ()
+      | Cons even_value even_rest ->
+          let odd_cur = ref candidates in
+          while (match !odd_cur with Nil -> false | Cons _ _ -> true end) do
+            invariant { 0 <= !best <= length nums }
+            invariant { 0 <= length !odd_cur }
+            invariant { mem even_value candidates }
+            invariant { forall x: int. mem x candidates -> x > 0 }
+            invariant {
+              !best = 0 \/
+              exists ev ov: int.
+                mem ev candidates /\ mem ov candidates /\
+                valid_alternating_values ev ov /\
+                !best = kept_by_values nums ev ov
+            }
+            invariant {
+              forall ev ov: int.
+                mem ev candidates -> not (mem ev !even_cur) ->
+                mem ov candidates ->
+                valid_alternating_values ev ov ->
+                kept_by_values nums ev ov <= !best
+            }
+            invariant {
+              forall ov: int.
+                mem ov candidates -> not (mem ov !odd_cur) ->
+                valid_alternating_values even_value ov ->
+                kept_by_values nums even_value ov <= !best
+            }
+            variant { length !odd_cur }
+            match !odd_cur with
+            | Nil -> ()
+            | Cons odd_value odd_rest ->
+                if even_value <> odd_value then begin
+                  assert { valid_alternating_values even_value odd_value };
+                  let kept = kept_by_values_exec nums even_value odd_value in
+                  if kept > !best then best := kept else ()
+                end else ();
+                odd_cur := odd_rest
+            end
+          done;
+          assert { !odd_cur = Nil };
+          even_cur := even_rest
+      end
+    done;
+    assert { !even_cur = Nil };
+    assert {
+      forall ev ov: int.
+        mem ev candidates -> mem ov candidates ->
+        valid_alternating_values ev ov ->
+        kept_by_values nums ev ov <= !best
+    };
+    candidate_search_yields_best nums candidates !best;
+    assert { best_kept nums !best };
+    length nums - !best
+
+end

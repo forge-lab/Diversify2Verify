@@ -1,0 +1,170 @@
+module ArithmeticSlices_Array_Recursive_Implementation
+
+  use int.Int
+  use array.Array
+  use array.Init
+
+  let rec arithmetic_slices_from (nums: array int) (i: int) (prev: int) (total: int) : int
+    variant { length nums - i }
+  =
+    if i >= length nums then
+      total
+    else
+      let current =
+        if nums[i] - nums[i - 1] = nums[i - 1] - nums[i - 2] then
+          prev + 1
+        else
+          0
+      in
+      arithmetic_slices_from nums (i + 1) current (total + current)
+
+  let arithmetic_slices_array (nums: array int) : int =
+    if length nums < 3 then
+      0
+    else
+      arithmetic_slices_from nums 2 0 0
+
+  let test_case_000 () : bool =
+    let nums = init 10 [|1; 1; 1; 1; 1; 1; 1; 1; 1; 1|] in
+    let r = arithmetic_slices_array nums in
+    r = 36
+
+  let test_case_001 () : bool =
+    let nums = init 6 [|1; 2; 4; 5; 6; 7|] in
+    let r = arithmetic_slices_array nums in
+    r = 3
+
+  let test_case_002 () : bool =
+    let nums = init 4 [|3; -1; -5; -9|] in
+    let r = arithmetic_slices_array nums in
+    r = 3
+
+  let test_case_003 () : bool =
+    let nums = init 10 [|10; 9; 8; 7; 6; 5; 4; 3; 2; 1|] in
+    let r = arithmetic_slices_array nums in
+    r = 36
+
+  let test_case_004 () : bool =
+    let nums = init 5 [|1; 3; 5; 7; 9|] in
+    let r = arithmetic_slices_array nums in
+    r = 6
+
+  let test_case_005 () : bool =
+    let nums = init 10 [|1; 2; 3; 4; 5; 6; 7; 8; 9; 10|] in
+    let r = arithmetic_slices_array nums in
+    r = 36
+
+  let test_case_006 () : bool =
+    let nums = init 1 [|1|] in
+    let r = arithmetic_slices_array nums in
+    r = 0
+
+  let test_case_007 () : bool =
+    let nums = init 6 [|10; 7; 4; 3; 2; 1|] in
+    let r = arithmetic_slices_array nums in
+    r = 4
+
+  let test_case_008 () : bool =
+    let nums = init 4 [|1; 2; 3; 4|] in
+    let r = arithmetic_slices_array nums in
+    r = 3
+
+  let test_case_009 () : bool =
+    let nums = init 4 [|7; 7; 7; 7|] in
+    let r = arithmetic_slices_array nums in
+    r = 3
+
+  let test_case_010 () : bool =
+    let nums = init 7 [|10; 7; 7; 7; 7; 7; 10|] in
+    let r = arithmetic_slices_array nums in
+    r = 6
+
+  let test_case_011 () : bool =
+    let nums = init 4 [|3; -1; -5; -9|] in
+    let r = arithmetic_slices_array nums in
+    r = 3
+
+  let test_case_012 () : bool =
+    let nums = init 11 [|1; 1; 2; 3; 4; 5; 6; 7; 8; 9; 10|] in
+    let r = arithmetic_slices_array nums in
+    r = 36
+
+  let test_case_013 () : bool =
+    let nums = init 1 [|2|] in
+    let r = arithmetic_slices_array nums in
+    r = 0
+
+  let test_case_014 () : bool =
+    let nums = init 5 [|5; 5; 5; 5; 5|] in
+    let r = arithmetic_slices_array nums in
+    r = 6
+
+  let test_case_015 () : bool =
+    let nums = init 5 [|1; 3; 5; 7; 9|] in
+    let r = arithmetic_slices_array nums in
+    r = 6
+
+  let test_case_016 () : bool =
+    let nums = init 5 [|1; 2; 3; 4; 5|] in
+    let r = arithmetic_slices_array nums in
+    r = 6
+
+  let test_case_017 () : bool =
+    let nums = init 7 [|1; 3; 5; 7; 9; 11; 13|] in
+    let r = arithmetic_slices_array nums in
+    r = 15
+
+  let test_case_018 () : bool =
+    let nums = init 9 [|1; 2; 3; 4; 5; 6; 7; 8; 9|] in
+    let r = arithmetic_slices_array nums in
+    r = 28
+
+  let test_case_019 () : bool =
+    let nums = init 4 [|1; 2; 2; 3|] in
+    let r = arithmetic_slices_array nums in
+    r = 0
+
+  let run_tests () : bool =
+    if test_case_000 () then
+    if test_case_001 () then
+    if test_case_002 () then
+    if test_case_003 () then
+    if test_case_004 () then
+    if test_case_005 () then
+    if test_case_006 () then
+    if test_case_007 () then
+    if test_case_008 () then
+    if test_case_009 () then
+    if test_case_010 () then
+    if test_case_011 () then
+    if test_case_012 () then
+    if test_case_013 () then
+    if test_case_014 () then
+    if test_case_015 () then
+    if test_case_016 () then
+    if test_case_017 () then
+    if test_case_018 () then
+    if test_case_019 () then
+      true
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+
+end

@@ -1,0 +1,216 @@
+module MinimumMovesToPickKOnes_Array_Imperative
+
+  use int.Int
+  use int.EuclideanDivision
+  use array.Array
+  use array.Init
+  use ref.Ref
+
+  let collect_one_positions (nums: array int) : array int =
+    let count = ref 0 in
+    for i = 0 to length nums - 1 do
+      if nums[i] = 1 then
+        count := !count + 1
+    done;
+    let positions = make !count 0 in
+    let next = ref 0 in
+    for i = 0 to length nums - 1 do
+      if nums[i] = 1 then begin
+        positions[!next] <- i;
+        next := !next + 1
+      end
+    done;
+    positions
+
+  let build_prefix_sums (positions: array int) : array int =
+    let pref = make (length positions + 1) 0 in
+    for i = 0 to length positions - 1 do
+      pref[i + 1] <- pref[i] + positions[i]
+    done;
+    pref
+
+  let window_cost (positions: array int) (pref: array int) (left: int) (size: int) : int =
+    let right = left + size - 1 in
+    let mid = div (left + right) 2 in
+    let median = positions[mid] in
+    let left_sum = pref[mid] - pref[left] in
+    let right_sum = pref[right + 1] - pref[mid + 1] in
+    let left_cost = median * (mid - left) - left_sum in
+    let right_cost = right_sum - median * (right - mid) in
+    left_cost + right_cost
+
+  (* Choose some original ones and create the rest with changes. *)
+  let minimum_moves_to_pick_k_ones_array (nums: array int) (k: int) (maxChanges: int) : int =
+    let positions = collect_one_positions nums in
+    let pref = build_prefix_sums positions in
+    let lower = if k - maxChanges > 0 then k - maxChanges else 0 in
+    let upper = if k < length positions then k else length positions in
+    let initial_best = length nums * k + 2 * k in
+    let best = ref initial_best in
+    for s = lower to upper do
+      let move_cost =
+        if s = 0 then 0
+        else begin
+          let window_best = ref initial_best in
+          for left = 0 to length positions - s do
+            let current = window_cost positions pref left s in
+            if current < !window_best then
+              window_best := current
+          done;
+          !window_best
+        end in
+      let total = move_cost + 2 * (k - s) in
+      if total < !best then
+        best := total
+    done;
+    !best
+
+  let test_000 () : bool =
+    let nums = init 10 [|0; 1; 0; 1; 0; 1; 0; 1; 0; 1|] in
+    let r = minimum_moves_to_pick_k_ones_array nums 5 5 in
+    r = 8
+
+  let test_001 () : bool =
+    let nums = init 10 [|1; 1; 0; 0; 0; 0; 0; 0; 0; 1|] in
+    let r = minimum_moves_to_pick_k_ones_array nums 3 2 in
+    r = 3
+
+  let test_002 () : bool =
+    let nums = init 10 [|1; 0; 0; 0; 0; 0; 0; 0; 0; 1|] in
+    let r = minimum_moves_to_pick_k_ones_array nums 2 1 in
+    r = 2
+
+  let test_003 () : bool =
+    let nums = init 10 [|0; 0; 1; 0; 0; 0; 0; 0; 1; 0|] in
+    let r = minimum_moves_to_pick_k_ones_array nums 2 1 in
+    r = 2
+
+  let test_004 () : bool =
+    let nums = init 10 [|1; 0; 0; 0; 0; 0; 0; 0; 0; 0|] in
+    let r = minimum_moves_to_pick_k_ones_array nums 1 0 in
+    r = 0
+
+  let test_005 () : bool =
+    let nums = init 4 [|0; 0; 0; 0|] in
+    let r = minimum_moves_to_pick_k_ones_array nums 2 3 in
+    r = 4
+
+  let test_006 () : bool =
+    let nums = init 10 [|0; 1; 0; 1; 0; 1; 0; 1; 0; 1|] in
+    let r = minimum_moves_to_pick_k_ones_array nums 4 0 in
+    r = 8
+
+  let test_007 () : bool =
+    let nums = init 10 [|1; 1; 0; 0; 0; 1; 1; 0; 0; 1|] in
+    let r = minimum_moves_to_pick_k_ones_array nums 3 1 in
+    r = 3
+
+  let test_008 () : bool =
+    let nums = init 10 [|1; 1; 1; 1; 1; 1; 1; 1; 1; 1|] in
+    let r = minimum_moves_to_pick_k_ones_array nums 5 3 in
+    r = 6
+
+  let test_009 () : bool =
+    let nums = init 10 [|1; 1; 1; 1; 1; 0; 0; 0; 0; 0|] in
+    let r = minimum_moves_to_pick_k_ones_array nums 5 5 in
+    r = 6
+
+  let test_010 () : bool =
+    let nums = init 10 [|0; 1; 0; 1; 0; 1; 0; 1; 0; 1|] in
+    let r = minimum_moves_to_pick_k_ones_array nums 5 0 in
+    r = 12
+
+  let test_011 () : bool =
+    let nums = init 10 [|0; 0; 0; 0; 0; 1; 1; 1; 1; 1|] in
+    let r = minimum_moves_to_pick_k_ones_array nums 5 5 in
+    r = 6
+
+  let test_012 () : bool =
+    let nums = init 10 [|0; 0; 1; 0; 0; 0; 0; 1; 0; 0|] in
+    let r = minimum_moves_to_pick_k_ones_array nums 2 1 in
+    r = 2
+
+  let test_013 () : bool =
+    let nums = init 10 [|1; 0; 1; 0; 1; 0; 1; 0; 1; 0|] in
+    let r = minimum_moves_to_pick_k_ones_array nums 5 2 in
+    r = 8
+
+  let test_014 () : bool =
+    let nums = init 10 [|1; 1; 1; 1; 1; 1; 1; 1; 1; 1|] in
+    let r = minimum_moves_to_pick_k_ones_array nums 5 0 in
+    r = 6
+
+  let test_015 () : bool =
+    let nums = init 28
+      [|1; 1; 0; 0; 1; 1; 0; 0; 1; 1; 0; 0; 1; 1; 0; 0; 1; 1; 0; 0; 1; 1; 0; 0; 1; 1; 0; 0|] in
+    let r = minimum_moves_to_pick_k_ones_array nums 12 7 in
+    r = 26
+
+  let test_016 () : bool =
+    let nums = init 30
+      [|1; 0; 0; 0; 0; 0; 0; 0; 0; 0; 0; 0; 0; 0; 0; 0; 0; 0; 0; 0; 0; 0; 0; 0; 0; 0; 0; 0; 0; 1|] in
+    let r = minimum_moves_to_pick_k_ones_array nums 2 1 in
+    r = 2
+
+  let test_017 () : bool =
+    let nums = init 63
+      [|1; 0; 0; 1; 0; 0; 1; 0; 0; 1; 0; 0; 1; 0; 0; 1; 0; 0; 1; 0; 0; 1; 0; 0; 1; 0; 0; 1; 0; 0; 1; 0; 0; 1; 0; 0; 1; 0; 0; 1; 0; 0; 1; 0; 0; 1; 0; 0; 1; 0; 0; 1; 0; 0; 1; 0; 0; 1; 0; 0; 1; 0; 0|] in
+    let r = minimum_moves_to_pick_k_ones_array nums 15 20 in
+    r = 28
+
+  let test_018 () : bool =
+    let nums = init 20
+      [|1; 0; 1; 0; 1; 0; 1; 0; 1; 0; 1; 0; 1; 0; 1; 0; 1; 0; 1; 0|] in
+    let r = minimum_moves_to_pick_k_ones_array nums 10 5 in
+    r = 22
+
+  let test_019 () : bool =
+    let nums = init 21
+      [|1; 1; 1; 0; 0; 0; 1; 1; 1; 0; 0; 0; 1; 1; 1; 0; 0; 0; 1; 1; 1|] in
+    let r = minimum_moves_to_pick_k_ones_array nums 7 3 in
+    r = 13
+
+  let run_tests () : bool =
+    if test_000 () then
+    if test_001 () then
+    if test_002 () then
+    if test_003 () then
+    if test_004 () then
+    if test_005 () then
+    if test_006 () then
+    if test_007 () then
+    if test_008 () then
+    if test_009 () then
+    if test_010 () then
+    if test_011 () then
+    if test_012 () then
+    if test_013 () then
+    if test_014 () then
+    if test_015 () then
+    if test_016 () then
+    if test_017 () then
+    if test_018 () then
+    if test_019 () then
+      true
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+
+end

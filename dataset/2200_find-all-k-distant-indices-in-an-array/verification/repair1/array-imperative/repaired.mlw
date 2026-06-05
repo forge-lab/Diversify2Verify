@@ -1,0 +1,172 @@
+module FindAllKDistantIndicesInAnArray_Array_Stage3_Imperative
+
+  use int.Int
+  use int.Abs
+  use array.Array
+  use array.Init
+  use ref.Ref
+
+  predicate valid_input (nums: array int) (key: int) (k: int) =
+    1 <= length nums <= 1000 /\
+    (forall i: int. 0 <= i < length nums -> 1 <= nums[i] <= 1000) /\
+    (exists j: int. 0 <= j < length nums /\ nums[j] = key) /\
+    1 <= k <= length nums
+
+  predicate k_distant_index (nums: array int) (key: int) (k: int) (i: int) =
+    0 <= i < length nums /\
+    exists j: int.
+      0 <= j < length nums /\
+      nums[j] = key /\
+      abs (i - j) <= k
+
+  predicate strictly_sorted (a: array int) =
+    forall p q: int. 0 <= p < q < length a -> a[p] < a[q]
+
+  predicate output_spec (nums: array int) (key: int) (k: int) (result: array int) =
+    strictly_sorted result /\
+    (forall p: int. 0 <= p < length result ->
+      k_distant_index nums key k result[p]) /\
+    (forall i: int. k_distant_index nums key k i ->
+      exists p: int. 0 <= p < length result /\ result[p] = i)
+
+  predicate marks_match_spec (nums: array int) (key: int) (k: int) (marks: array int) =
+    length marks = length nums /\
+    (forall i: int. 0 <= i < length nums ->
+      (marks[i] = 1 <-> k_distant_index nums key k i))
+
+  predicate strictly_sorted_prefix (a: array int) (used: int) =
+    0 <= used <= length a /\
+    forall p q: int. 0 <= p < q < used -> a[p] < a[q]
+
+  let rec function marked_count_prefix (marks: array int) (i: int) : int
+    requires { 0 <= i <= length marks }
+    variant  { i }
+  =
+    if i = 0 then 0
+    else marked_count_prefix marks (i - 1) + (if marks[i - 1] = 1 then 1 else 0)
+
+  let rec lemma marked_count_prefix_monotone (marks: array int) (lo: int) (hi: int)
+    requires { 0 <= lo <= hi <= length marks }
+    requires { forall x: int. 0 <= x < length marks -> marks[x] = 0 \/ marks[x] = 1 }
+    ensures  { marked_count_prefix marks lo <= marked_count_prefix marks hi }
+    variant  { hi - lo }
+  =
+    if lo < hi then begin
+      assert { lo <= hi - 1 <= length marks };
+      marked_count_prefix_monotone marks lo (hi - 1);
+      assert { 0 <= hi - 1 < length marks };
+      assert { marks[hi - 1] = 0 \/ marks[hi - 1] = 1 };
+      assert { 0 <= (if marks[hi - 1] = 1 then 1 else 0) };
+      assert { marked_count_prefix marks hi =
+        marked_count_prefix marks (hi - 1) + (if marks[hi - 1] = 1 then 1 else 0) }
+    end
+
+  predicate result_prefix_matches_marks
+      (marks: array int) (res: array int) (used: int) (upto: int) =
+    0 <= upto <= length marks /\
+    0 <= used <= length res /\
+    used = marked_count_prefix marks upto /\
+    strictly_sorted_prefix res used /\
+    (forall p: int. 0 <= p < used -> 0 <= res[p] < upto /\ marks[res[p]] = 1) /\
+    (forall i: int. 0 <= i < upto -> marks[i] = 1 ->
+      exists p: int. 0 <= p < used /\ res[p] = i)
+
+  let find_all_k_distant_indices_in_an_array_array
+      (nums: array int) (key: int) (k: int) : array int
+    requires { valid_input nums key k }
+    ensures  { output_spec nums key k result }
+  =
+    let n = length nums in
+    if n = 0 then
+      make 0 0
+    else begin
+      let marks = make n 0 in
+      for j = 0 to n - 1 do
+        invariant { n = length nums }
+        invariant { length marks = n }
+        invariant { forall x: int. 0 <= x < n -> marks[x] = 0 \/ marks[x] = 1 }
+        invariant { forall x: int. 0 <= x < n -> marks[x] = 1 ->
+          exists t: int. 0 <= t < j /\ nums[t] = key /\ abs (x - t) <= k }
+        invariant { forall x t: int.
+          0 <= x < n -> 0 <= t < j -> nums[t] = key -> abs (x - t) <= k ->
+          marks[x] = 1 }
+        if nums[j] = key then begin
+          let left = if j - k < 0 then 0 else j - k in
+          let right = if j + k >= n then n - 1 else j + k in
+          assert { 0 <= left <= j <= right < n };
+          for i = left to right do
+            invariant { n = length nums }
+            invariant { length marks = n }
+            invariant { 0 <= left <= i <= right + 1 <= n }
+            invariant { forall x: int. 0 <= x < n -> marks[x] = 0 \/ marks[x] = 1 }
+            invariant { forall x: int. 0 <= x < n -> marks[x] = 1 ->
+              (exists t: int. 0 <= t < j /\ nums[t] = key /\ abs (x - t) <= k) \/
+              (left <= x < i /\ nums[j] = key /\ abs (x - j) <= k) }
+            invariant { forall x: int. left <= x < i -> marks[x] = 1 }
+            marks[i] <- 1
+          done;
+          assert { forall x: int. left <= x <= right -> marks[x] = 1 };
+          assert { forall x: int. 0 <= x < n -> abs (x - j) <= k -> left <= x <= right };
+          assert { forall x: int. 0 <= x < n -> nums[j] = key -> abs (x - j) <= k ->
+            marks[x] = 1 };
+          assert { forall x t: int.
+            0 <= x < n -> 0 <= t < j + 1 -> nums[t] = key -> abs (x - t) <= k ->
+            marks[x] = 1 }
+        end else begin
+          assert { forall x t: int.
+            0 <= x < n -> 0 <= t < j + 1 -> nums[t] = key -> abs (x - t) <= k ->
+            marks[x] = 1 }
+        end
+      done;
+      assert { marks_match_spec nums key k marks };
+
+      let count = ref 0 in
+      for i = 0 to n - 1 do
+        invariant { n = length nums }
+        invariant { length marks = n }
+        invariant { forall x: int. 0 <= x < n -> marks[x] = 0 \/ marks[x] = 1 }
+        invariant { 0 <= !count <= i }
+        invariant { !count = marked_count_prefix marks i }
+        if marks[i] = 1 then
+          count := !count + 1
+      done;
+      assert { !count = marked_count_prefix marks n };
+      assert { 0 <= !count <= n };
+
+      let result = make !count 0 in
+      let out = ref 0 in
+      for i = 0 to n - 1 do
+        invariant { n = length nums }
+        invariant { length marks = n }
+        invariant { length result = marked_count_prefix marks n }
+        invariant { forall x: int. 0 <= x < n -> marks[x] = 0 \/ marks[x] = 1 }
+        invariant { 0 <= !out <= length result }
+        invariant { !out = marked_count_prefix marks i }
+        invariant { result_prefix_matches_marks marks result !out i }
+        if marks[i] = 1 then begin
+          assert { 0 <= i < n };
+          assert { 0 <= i + 1 <= n };
+          assert { marked_count_prefix marks (i + 1) =
+            marked_count_prefix marks i + 1 };
+          marked_count_prefix_monotone marks (i + 1) n;
+          assert { marked_count_prefix marks (i + 1) <= marked_count_prefix marks n };
+          assert { !out + 1 <= length result };
+          assert { !out < length result };
+          result[!out] <- i;
+          out := !out + 1;
+          assert { result_prefix_matches_marks marks result !out (i + 1) }
+        end
+      done;
+      assert { !out = length result };
+      assert { result_prefix_matches_marks marks result (length result) n };
+      assert { marks_match_spec nums key k marks };
+      assert { strictly_sorted result };
+      assert { forall p: int. 0 <= p < length result ->
+        k_distant_index nums key k result[p] };
+      assert { forall i: int. k_distant_index nums key k i ->
+        exists p: int. 0 <= p < length result /\ result[p] = i };
+      assert { output_spec nums key k result };
+      result
+    end
+
+end

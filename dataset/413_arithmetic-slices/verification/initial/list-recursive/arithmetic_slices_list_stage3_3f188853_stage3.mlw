@@ -1,0 +1,42 @@
+module ArithmeticSlices_List_Stage3_Recursive
+
+  use int.Int
+  use list.List
+
+  let rec function count_arithmetic_extensions
+      (a: int) (b: int) (streak: int) (rest: list int) : int
+    variant { rest }
+  =
+    match rest with
+    | Nil -> 0
+    | Cons c cs ->
+        if b - a = c - b then
+          let next = streak + 1 in
+          next + count_arithmetic_extensions b c next cs
+        else
+          count_arithmetic_extensions b c 0 cs
+    end
+
+  let function arithmetic_slice_count (nums: list int) : int =
+    match nums with
+    | Nil -> 0
+    | Cons a tail ->
+        match tail with
+        | Nil -> 0
+        | Cons b rest -> count_arithmetic_extensions a b 0 rest
+        end
+    end
+
+  let arithmetic_slices_list (nums: list int) : int
+    ensures { result = arithmetic_slice_count nums }
+  =
+    match nums with
+    | Nil -> 0
+    | Cons a tail ->
+        match tail with
+        | Nil -> 0
+        | Cons b rest -> count_arithmetic_extensions a b 0 rest
+        end
+    end
+
+end

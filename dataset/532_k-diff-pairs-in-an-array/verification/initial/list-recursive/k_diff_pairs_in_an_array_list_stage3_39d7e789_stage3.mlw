@@ -1,0 +1,40 @@
+module KDiffPairsInAnArray_List_Stage3_Recursive
+
+  use int.Int
+  use list.List
+
+  let rec function occ (x: int) (l: list int) : int
+    variant { l }
+  =
+    match l with
+    | Nil -> 0
+    | Cons y ys -> (if y = x then 1 else 0) + occ x ys
+    end
+
+  let function pair_contribution (x: int) (nums: list int) (k: int) : int =
+    if k = 0 then
+      if occ x nums >= 2 then 1 else 0
+    else
+      if occ (x + k) nums >= 1 then 1 else 0
+
+  let rec function count_unique_kdiff_from
+      (seen: list int) (remaining: list int) (nums: list int) (k: int) : int
+    variant { remaining }
+  =
+    match remaining with
+    | Nil -> 0
+    | Cons x xs ->
+        (if occ x seen = 0 then pair_contribution x nums k else 0) +
+        count_unique_kdiff_from (Cons x seen) xs nums k
+    end
+
+  let function k_diff_pair_count (nums: list int) (k: int) : int =
+    count_unique_kdiff_from Nil nums nums k
+
+  let k_diff_pairs_in_an_array_list (nums: list int) (k: int) : int
+    requires { k >= 0 }
+    ensures  { result = k_diff_pair_count nums k }
+  =
+    count_unique_kdiff_from Nil nums nums k
+
+end

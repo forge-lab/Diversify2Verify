@@ -1,0 +1,208 @@
+module WidestPairOfIndicesWithEqualRangeSum_List_Imperative
+
+  use int.Int
+  use list.List
+  use ref.Ref
+
+  let widest_pair_of_indices_with_equal_range_sum_list (nums1: list int) (nums2: list int) : int =
+    let best = ref 0 in
+    let start1 = ref nums1 in
+    let start2 = ref nums2 in
+    while (match !start1, !start2 with
+           | Cons _ _, Cons _ _ -> true
+           | _, _ -> false
+           end) do
+      let cur1 = ref !start1 in
+      let cur2 = ref !start2 in
+      let diff = ref 0 in
+      let width = ref 0 in
+      while (match !cur1, !cur2 with
+             | Cons _ _, Cons _ _ -> true
+             | _, _ -> false
+             end) do
+        match !cur1, !cur2 with
+        | Cons x xs, Cons y ys ->
+            diff := !diff + x - y;
+            width := !width + 1;
+            if !diff = 0 then
+              if !width > !best then best := !width else ();
+            cur1 := xs;
+            cur2 := ys
+        | _, _ -> ()
+        end
+      done;
+      match !start1, !start2 with
+      | Cons _ xs, Cons _ ys ->
+          start1 := xs;
+          start2 := ys
+      | _, _ -> ()
+      end
+    done;
+    !best
+
+  let test_000 () : bool =
+    let nums1 = Cons 0 (Cons 1 Nil) in
+    let nums2 = Cons 1 (Cons 1 Nil) in
+    let r = widest_pair_of_indices_with_equal_range_sum_list nums1 nums2 in
+    r = 1
+
+  let test_001 () : bool =
+    let nums1 = Cons 0 (Cons 1 (Cons 0 (Cons 1 (Cons 0 (Cons 1 (Cons 0 (Cons 1 Nil))))))) in
+    let nums2 = Cons 1 (Cons 0 (Cons 1 (Cons 0 (Cons 1 (Cons 0 (Cons 1 (Cons 0 Nil))))))) in
+    let r = widest_pair_of_indices_with_equal_range_sum_list nums1 nums2 in
+    r = 8
+
+  let test_002 () : bool =
+    let nums1 = Cons 1 (Cons 0 (Cons 0 (Cons 1 (Cons 0 Nil)))) in
+    let nums2 = Cons 0 (Cons 1 (Cons 1 (Cons 0 (Cons 1 Nil)))) in
+    let r = widest_pair_of_indices_with_equal_range_sum_list nums1 nums2 in
+    r = 4
+
+  let test_003 () : bool =
+    let nums1 = Cons 0 (Cons 1 (Cons 0 (Cons 1 (Cons 0 Nil)))) in
+    let nums2 = Cons 1 (Cons 0 (Cons 1 (Cons 0 (Cons 1 Nil)))) in
+    let r = widest_pair_of_indices_with_equal_range_sum_list nums1 nums2 in
+    r = 4
+
+  let test_004 () : bool =
+    let nums1 = Cons 0 (Cons 0 (Cons 1 (Cons 1 (Cons 1 Nil)))) in
+    let nums2 = Cons 1 (Cons 1 (Cons 1 (Cons 0 (Cons 0 Nil)))) in
+    let r = widest_pair_of_indices_with_equal_range_sum_list nums1 nums2 in
+    r = 5
+
+  let test_005 () : bool =
+    let nums1 = Cons 1 (Cons 0 (Cons 0 (Cons 0 (Cons 0 Nil)))) in
+    let nums2 = Cons 0 (Cons 0 (Cons 0 (Cons 0 (Cons 1 Nil)))) in
+    let r = widest_pair_of_indices_with_equal_range_sum_list nums1 nums2 in
+    r = 5
+
+  let test_006 () : bool =
+    let nums1 = Cons 1 (Cons 1 (Cons 1 (Cons 0 (Cons 0 Nil)))) in
+    let nums2 = Cons 0 (Cons 0 (Cons 1 (Cons 1 (Cons 1 Nil)))) in
+    let r = widest_pair_of_indices_with_equal_range_sum_list nums1 nums2 in
+    r = 5
+
+  let test_007 () : bool =
+    let nums1 = Cons 1 (Cons 0 (Cons 1 (Cons 0 (Cons 1 Nil)))) in
+    let nums2 = Cons 1 (Cons 1 (Cons 0 (Cons 0 (Cons 1 Nil)))) in
+    let r = widest_pair_of_indices_with_equal_range_sum_list nums1 nums2 in
+    r = 5
+
+  let test_008 () : bool =
+    let nums1 = Cons 1 (Cons 1 (Cons 0 (Cons 0 (Cons 1 Nil)))) in
+    let nums2 = Cons 0 (Cons 0 (Cons 1 (Cons 1 (Cons 0 Nil)))) in
+    let r = widest_pair_of_indices_with_equal_range_sum_list nums1 nums2 in
+    r = 4
+
+  let test_009 () : bool =
+    let nums1 = Cons 0 (Cons 0 (Cons 0 (Cons 0 (Cons 0 Nil)))) in
+    let nums2 = Cons 0 (Cons 0 (Cons 0 (Cons 0 (Cons 0 Nil)))) in
+    let r = widest_pair_of_indices_with_equal_range_sum_list nums1 nums2 in
+    r = 5
+
+  let test_010 () : bool =
+    let nums1 = Cons 1 (Cons 1 (Cons 0 (Cons 0 (Cons 1 (Cons 1 Nil))))) in
+    let nums2 = Cons 1 (Cons 0 (Cons 1 (Cons 1 (Cons 0 (Cons 0 Nil))))) in
+    let r = widest_pair_of_indices_with_equal_range_sum_list nums1 nums2 in
+    r = 5
+
+  let test_011 () : bool =
+    let nums1 = Cons 1 (Cons 1 (Cons 0 (Cons 1 Nil))) in
+    let nums2 = Cons 0 (Cons 1 (Cons 1 (Cons 0 Nil))) in
+    let r = widest_pair_of_indices_with_equal_range_sum_list nums1 nums2 in
+    r = 3
+
+  let test_012 () : bool =
+    let nums1 = Cons 1 (Cons 0 (Cons 0 (Cons 0 (Cons 1 Nil)))) in
+    let nums2 = Cons 0 (Cons 1 (Cons 1 (Cons 1 (Cons 0 Nil)))) in
+    let r = widest_pair_of_indices_with_equal_range_sum_list nums1 nums2 in
+    r = 2
+
+  let test_013 () : bool =
+    let nums1 = Cons 0 Nil in
+    let nums2 = Cons 1 Nil in
+    let r = widest_pair_of_indices_with_equal_range_sum_list nums1 nums2 in
+    r = 0
+
+  let test_014 () : bool =
+    let nums1 = Cons 1 (Cons 0 (Cons 1 (Cons 0 (Cons 1 (Cons 0 (Cons 1 Nil)))))) in
+    let nums2 = Cons 0 (Cons 1 (Cons 0 (Cons 1 (Cons 0 (Cons 1 (Cons 0 Nil)))))) in
+    let r = widest_pair_of_indices_with_equal_range_sum_list nums1 nums2 in
+    r = 6
+
+  let test_015 () : bool =
+    let nums1 = Cons 1 (Cons 0 (Cons 1 (Cons 0 (Cons 1 Nil)))) in
+    let nums2 = Cons 0 (Cons 1 (Cons 0 (Cons 1 (Cons 0 Nil)))) in
+    let r = widest_pair_of_indices_with_equal_range_sum_list nums1 nums2 in
+    r = 4
+
+  let test_016 () : bool =
+    let nums1 = Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 Nil)))) in
+    let nums2 = Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 Nil)))) in
+    let r = widest_pair_of_indices_with_equal_range_sum_list nums1 nums2 in
+    r = 5
+
+  let test_017 () : bool =
+    let nums1 = Cons 1 (Cons 1 (Cons 0 (Cons 0 (Cons 1 (Cons 1 Nil))))) in
+    let nums2 = Cons 1 (Cons 0 (Cons 1 (Cons 0 (Cons 1 (Cons 0 Nil))))) in
+    let r = widest_pair_of_indices_with_equal_range_sum_list nums1 nums2 in
+    r = 5
+
+  let test_018 () : bool =
+    let nums1 = Cons 1 (Cons 1 (Cons 0 (Cons 0 (Cons 1 (Cons 0 Nil))))) in
+    let nums2 = Cons 0 (Cons 0 (Cons 1 (Cons 1 (Cons 0 (Cons 1 Nil))))) in
+    let r = widest_pair_of_indices_with_equal_range_sum_list nums1 nums2 in
+    r = 6
+
+  let test_019 () : bool =
+    let nums1 =
+      Cons 1 (Cons 1 (Cons 0 (Cons 0 (Cons 0 (Cons 0 (Cons 1 (Cons 1 (Cons 0 (Cons 0 (Cons 0 (Cons 0 (Cons 1 (Cons 1 (Cons 0 (Cons 0 (Cons 0 (Cons 0 Nil))))))))))))))))) in
+    let nums2 =
+      Cons 0 (Cons 0 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 0 (Cons 0 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 0 (Cons 0 (Cons 1 (Cons 1 (Cons 1 (Cons 1 Nil))))))))))))))))) in
+    let r = widest_pair_of_indices_with_equal_range_sum_list nums1 nums2 in
+    r = 8
+
+  let run_tests () : bool =
+    if test_000 () then
+    if test_001 () then
+    if test_002 () then
+    if test_003 () then
+    if test_004 () then
+    if test_005 () then
+    if test_006 () then
+    if test_007 () then
+    if test_008 () then
+    if test_009 () then
+    if test_010 () then
+    if test_011 () then
+    if test_012 () then
+    if test_013 () then
+    if test_014 () then
+    if test_015 () then
+    if test_016 () then
+    if test_017 () then
+    if test_018 () then
+    if test_019 () then
+      true
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+
+end

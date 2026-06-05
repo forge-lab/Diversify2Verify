@@ -1,0 +1,183 @@
+module MaximumDistanceBetweenAPairOfValues_List_Recursive_Implementation
+
+  use int.Int
+  use list.List
+
+  let rec count_valid_prefix (x: int) (ys: list int) : int
+    variant { ys }
+  =
+    match ys with
+    | Nil -> 0
+    | Cons y rest ->
+        if x <= y then 1 + count_valid_prefix x rest else 0
+    end
+
+  let rec max_distance_from_suffixes (nums1: list int) (nums2_suffix: list int) : int
+    variant { nums1 }
+  =
+    match nums1 with
+    | Nil -> 0
+    | Cons x xs ->
+        match nums2_suffix with
+        | Nil -> 0
+        | Cons _ ys_tail ->
+            let span = count_valid_prefix x nums2_suffix in
+            let dist = if span = 0 then 0 else span - 1 in
+            let rest = max_distance_from_suffixes xs ys_tail in
+            if dist >= rest then dist else rest
+        end
+    end
+
+  let maximum_distance_between_a_pair_of_values_list
+    (nums1: list int) (nums2: list int) : int
+  =
+    max_distance_from_suffixes nums1 nums2
+
+  let check_case (nums1: list int) (nums2: list int) (expected: int) : bool =
+    let r = maximum_distance_between_a_pair_of_values_list nums1 nums2 in
+    r = expected
+
+  let test_000 () : bool =
+    let nums1 = Cons 100 Nil in
+    let nums2 = Cons 101 Nil in
+    check_case nums1 nums2 0
+
+  let test_001 () : bool =
+    let nums1 = Cons 30 (Cons 29 (Cons 19 (Cons 5 Nil))) in
+    let nums2 = Cons 25 (Cons 25 (Cons 25 (Cons 25 (Cons 25 Nil)))) in
+    check_case nums1 nums2 2
+
+  let test_002 () : bool =
+    let nums1 = Cons 5 (Cons 4 (Cons 3 (Cons 2 (Cons 1 Nil)))) in
+    let nums2 = Cons 5 (Cons 4 (Cons 3 (Cons 2 (Cons 1 Nil)))) in
+    check_case nums1 nums2 0
+
+  let test_003 () : bool =
+    let nums1 = Cons 10 (Cons 9 (Cons 8 (Cons 7 (Cons 6 Nil)))) in
+    let nums2 = Cons 10 (Cons 9 (Cons 8 (Cons 7 (Cons 6 Nil)))) in
+    check_case nums1 nums2 0
+
+  let test_004 () : bool =
+    let nums1 = Cons 5 Nil in
+    let nums2 = Cons 10 Nil in
+    check_case nums1 nums2 0
+
+  let test_005 () : bool =
+    let nums1 = Cons 10 (Cons 9 (Cons 8 (Cons 7 Nil))) in
+    let nums2 = Cons 7 (Cons 7 (Cons 7 (Cons 7 Nil))) in
+    check_case nums1 nums2 0
+
+  let test_006 () : bool =
+    let nums1 = Cons 5 Nil in
+    let nums2 = Cons 5 Nil in
+    check_case nums1 nums2 0
+
+  let test_007 () : bool =
+    let nums1 = Cons 1 (Cons 1 (Cons 1 (Cons 1 Nil))) in
+    let nums2 = Cons 1 (Cons 1 (Cons 1 (Cons 1 Nil))) in
+    check_case nums1 nums2 3
+
+  let test_008 () : bool =
+    let nums1 = Cons 10 Nil in
+    let nums2 = Cons 5 Nil in
+    check_case nums1 nums2 0
+
+  let test_009 () : bool =
+    let nums1 = Cons 5 (Cons 5 (Cons 5 (Cons 5 Nil))) in
+    let nums2 = Cons 5 (Cons 5 (Cons 5 (Cons 5 (Cons 5 (Cons 5 Nil))))) in
+    check_case nums1 nums2 5
+
+  let test_010 () : bool =
+    let nums1 = Cons 10 (Cons 9 (Cons 8 (Cons 7 (Cons 6 Nil)))) in
+    let nums2 = Cons 6 (Cons 5 (Cons 4 (Cons 3 (Cons 2 (Cons 1 Nil))))) in
+    check_case nums1 nums2 0
+
+  let test_011 () : bool =
+    let nums1 = Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 Nil)))) in
+    let nums2 = Cons 10 (Cons 9 (Cons 8 (Cons 7 (Cons 6 (Cons 5 (Cons 4 (Cons 3 (Cons 2 (Cons 1 Nil))))))))) in
+    check_case nums1 nums2 9
+
+  let test_012 () : bool =
+    let nums1 = Cons 10 (Cons 9 (Cons 8 (Cons 7 (Cons 6 Nil)))) in
+    let nums2 = Cons 5 (Cons 4 (Cons 3 (Cons 2 (Cons 1 Nil)))) in
+    check_case nums1 nums2 0
+
+  let test_013 () : bool =
+    let nums1 = Cons 100 (Cons 90 Nil) in
+    let nums2 = Cons 95 (Cons 85 Nil) in
+    check_case nums1 nums2 0
+
+  let test_014 () : bool =
+    let nums1 = Cons 100 (Cons 90 (Cons 80 Nil)) in
+    let nums2 = Cons 100 (Cons 90 (Cons 80 (Cons 70 (Cons 60 Nil)))) in
+    check_case nums1 nums2 0
+
+  let test_015 () : bool =
+    let nums1 = Cons 99999 (Cons 99998 (Cons 99997 Nil)) in
+    let nums2 = Cons 100000 (Cons 99999 (Cons 99998 Nil)) in
+    check_case nums1 nums2 1
+
+  let test_016 () : bool =
+    let nums1 = Cons 1 Nil in
+    let nums2 = Cons 2 Nil in
+    check_case nums1 nums2 0
+
+  let test_017 () : bool =
+    let nums1 = Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 Nil)))) in
+    let nums2 = Cons 5 (Cons 5 (Cons 5 (Cons 5 (Cons 5 Nil)))) in
+    check_case nums1 nums2 4
+
+  let test_018 () : bool =
+    let nums1 = Cons 2 (Cons 2 (Cons 2 Nil)) in
+    let nums2 = Cons 10 (Cons 10 (Cons 1 Nil)) in
+    check_case nums1 nums2 1
+
+  let test_019 () : bool =
+    let nums1 = Cons 100 (Cons 50 (Cons 25 (Cons 10 Nil))) in
+    let nums2 = Cons 100 (Cons 100 (Cons 100 (Cons 100 Nil))) in
+    check_case nums1 nums2 3
+
+  let run_tests () : bool =
+    if test_000 () then
+    if test_001 () then
+    if test_002 () then
+    if test_003 () then
+    if test_004 () then
+    if test_005 () then
+    if test_006 () then
+    if test_007 () then
+    if test_008 () then
+    if test_009 () then
+    if test_010 () then
+    if test_011 () then
+    if test_012 () then
+    if test_013 () then
+    if test_014 () then
+    if test_015 () then
+    if test_016 () then
+    if test_017 () then
+    if test_018 () then
+    if test_019 () then
+      true
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+
+end

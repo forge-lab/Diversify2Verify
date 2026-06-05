@@ -1,0 +1,142 @@
+module MinimumCommonValue_Array_Stage3_Recursive
+
+  use int.Int
+  use array.Array
+  use array.IntArraySorted
+
+  predicate values_in_bounds (a: array int) =
+    forall i: int. 0 <= i < length a -> 1 <= a[i] <= 1000000000
+
+  predicate common_value (nums1: array int) (nums2: array int) (x: int) =
+    exists i j: int.
+      0 <= i < length nums1 /\
+      0 <= j < length nums2 /\
+      nums1[i] = x /\
+      nums2[j] = x
+
+  predicate minimum_common_result
+      (nums1: array int) (nums2: array int) (result: int) =
+    (result = (-1) /\ forall x: int. not (common_value nums1 nums2 x)) \/
+    (not (result = (-1)) /\
+      common_value nums1 nums2 result /\
+      forall x: int. common_value nums1 nums2 x -> result <= x)
+
+  predicate common_from
+      (nums1: array int) (nums2: array int) (i: int) (j: int) (x: int) =
+    exists p q: int.
+      i <= p < length nums1 /\
+      j <= q < length nums2 /\
+      nums1[p] = x /\
+      nums2[q] = x
+
+  predicate minimum_common_from
+      (nums1: array int) (nums2: array int) (i: int) (j: int) (result: int) =
+    (result = (-1) /\ forall x: int. not (common_from nums1 nums2 i j x)) \/
+    (not (result = (-1)) /\
+      common_from nums1 nums2 i j result /\
+      forall x: int. common_from nums1 nums2 i j x -> result <= x)
+
+  let rec minimum_common_value_array_from
+      (nums1: array int) (nums2: array int) (i: int) (j: int) : int
+    requires { 0 <= i <= length nums1 }
+    requires { 0 <= j <= length nums2 }
+    requires { sorted nums1 }
+    requires { sorted nums2 }
+    requires { values_in_bounds nums1 }
+    requires { values_in_bounds nums2 }
+    ensures  { minimum_common_from nums1 nums2 i j result }
+    variant  { (length nums1 - i) + (length nums2 - j) }
+  =
+    if i >= length nums1 then begin
+      assert { i = length nums1 };
+      assert { forall x: int. not (common_from nums1 nums2 i j x) };
+      assert { minimum_common_from nums1 nums2 i j (-1) };
+      -1
+    end else if j >= length nums2 then begin
+      assert { j = length nums2 };
+      assert { forall x: int. not (common_from nums1 nums2 i j x) };
+      assert { minimum_common_from nums1 nums2 i j (-1) };
+      -1
+    end else if nums1[i] = nums2[j] then begin
+      assert { 0 <= i < length nums1 };
+      assert { 0 <= j < length nums2 };
+      assert { common_from nums1 nums2 i j nums1[i] };
+      assert {
+        forall p: int.
+          i <= p < length nums1 -> nums1[i] <= nums1[p]
+      };
+      assert {
+        forall q: int.
+          j <= q < length nums2 -> nums2[j] <= nums2[q]
+      };
+      assert {
+        forall x: int.
+          common_from nums1 nums2 i j x -> nums1[i] <= x
+      };
+      assert { minimum_common_from nums1 nums2 i j nums1[i] };
+      nums1[i]
+    end else if nums1[i] < nums2[j] then begin
+      assert { 0 <= i < length nums1 };
+      assert { 0 <= j < length nums2 };
+      assert { nums1[i] < nums2[j] };
+      assert { 0 <= i + 1 <= length nums1 };
+      assert {
+        forall q: int.
+          j <= q < length nums2 -> nums2[j] <= nums2[q]
+      };
+      assert {
+        forall q: int.
+          j <= q < length nums2 -> nums1[i] <> nums2[q]
+      };
+      assert {
+        forall x: int.
+          common_from nums1 nums2 i j x <->
+          common_from nums1 nums2 (i + 1) j x
+      };
+      let r = minimum_common_value_array_from nums1 nums2 (i + 1) j in
+      assert { minimum_common_from nums1 nums2 (i + 1) j r };
+      assert { minimum_common_from nums1 nums2 i j r };
+      r
+    end else begin
+      assert { 0 <= i < length nums1 };
+      assert { 0 <= j < length nums2 };
+      assert { nums1[i] > nums2[j] };
+      assert { 0 <= j + 1 <= length nums2 };
+      assert {
+        forall p: int.
+          i <= p < length nums1 -> nums1[i] <= nums1[p]
+      };
+      assert {
+        forall p: int.
+          i <= p < length nums1 -> nums1[p] <> nums2[j]
+      };
+      assert {
+        forall x: int.
+          common_from nums1 nums2 i j x <->
+          common_from nums1 nums2 i (j + 1) x
+      };
+      let r = minimum_common_value_array_from nums1 nums2 i (j + 1) in
+      assert { minimum_common_from nums1 nums2 i (j + 1) r };
+      assert { minimum_common_from nums1 nums2 i j r };
+      r
+    end
+
+  let minimum_common_value_array (nums1: array int) (nums2: array int) : int
+    requires { length nums1 >= 1 }
+    requires { length nums2 >= 1 }
+    requires { sorted nums1 }
+    requires { sorted nums2 }
+    requires { values_in_bounds nums1 }
+    requires { values_in_bounds nums2 }
+    ensures  { minimum_common_result nums1 nums2 result }
+  =
+    let r = minimum_common_value_array_from nums1 nums2 0 0 in
+    assert { minimum_common_from nums1 nums2 0 0 r };
+    assert {
+      forall x: int.
+        common_from nums1 nums2 0 0 x <-> common_value nums1 nums2 x
+    };
+    assert { minimum_common_result nums1 nums2 r };
+    r
+
+end

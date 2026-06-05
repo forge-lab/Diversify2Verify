@@ -1,0 +1,143 @@
+module EliminateMaximumNumberOfMonsters_List_Spec
+
+  use int.Int
+  use list.List
+  use list.Length
+
+  let rec predicate positive_distance_speed (dist: list int) (speed: list int)
+    variant { dist }
+  =
+    match dist with
+    | Nil ->
+        match speed with
+        | Nil -> true
+        | Cons _ _ -> false
+        end
+    | Cons d ds ->
+        match speed with
+        | Nil -> false
+        | Cons s ss -> d > 0 && s > 0 && positive_distance_speed ds ss
+        end
+    end
+
+  let rec function arrived_by_count (dist: list int) (speed: list int) (minute: int) : int
+    variant { dist }
+  =
+    match dist with
+    | Nil -> 0
+    | Cons d ds ->
+        match speed with
+        | Nil -> 0
+        | Cons s ss ->
+            (if d <= s * minute then 1 else 0) + arrived_by_count ds ss minute
+        end
+    end
+
+  predicate no_loss_before (dist: list int) (speed: list int) (k: int) =
+    forall minute: int. 0 <= minute < k -> arrived_by_count dist speed minute <= minute
+
+  predicate loss_at (dist: list int) (speed: list int) (k: int) =
+    0 <= k < length dist /\ arrived_by_count dist speed k > k
+
+  predicate valid_elimination_result (dist: list int) (speed: list int) (r: int) =
+    0 <= r <= length dist /\
+    no_loss_before dist speed r /\
+    (r = length dist \/ loss_at dist speed r)
+
+  val eliminate_maximum_number_of_monsters_list (dist: list int) (speed: list int) : int
+    requires { length dist = length speed }
+    requires { not (is_nil dist) }
+    requires { positive_distance_speed dist speed }
+    ensures  { valid_elimination_result dist speed result }
+
+  let lemma check_test_000 () =
+    let dist = Cons 6 (Cons 7 (Cons 8 Nil)) in
+    let speed = Cons 2 (Cons 2 (Cons 2 Nil)) in
+    assert { positive_distance_speed dist speed };
+    assert { length dist = 3 };
+    assert { arrived_by_count dist speed 0 = 0 };
+    assert { arrived_by_count dist speed 1 = 0 };
+    assert { arrived_by_count dist speed 2 = 0 };
+    assert { no_loss_before dist speed 3 };
+    assert { valid_elimination_result dist speed 3 }
+
+  let lemma check_test_001 () =
+    let dist = Cons 1 (Cons 2 (Cons 3 Nil)) in
+    let speed = Cons 3 (Cons 2 (Cons 1 Nil)) in
+    assert { positive_distance_speed dist speed };
+    assert { length dist = 3 };
+    assert { arrived_by_count dist speed 0 = 0 };
+    assert { arrived_by_count dist speed 1 = 2 };
+    assert { no_loss_before dist speed 1 };
+    assert { loss_at dist speed 1 };
+    assert { valid_elimination_result dist speed 1 }
+
+  let lemma check_test_004 () =
+    let dist =
+      Cons 1 (Cons 2 (Cons 3 (Cons 4 (Cons 5
+        (Cons 6 (Cons 7 (Cons 8 (Cons 9 (Cons 10 Nil))))))))) in
+    let speed =
+      Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1
+        (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 Nil))))))))) in
+    assert { positive_distance_speed dist speed };
+    assert { length dist = 10 };
+    assert { arrived_by_count dist speed 0 = 0 };
+    assert { arrived_by_count dist speed 1 = 1 };
+    assert { arrived_by_count dist speed 2 = 2 };
+    assert { arrived_by_count dist speed 3 = 3 };
+    assert { arrived_by_count dist speed 4 = 4 };
+    assert { arrived_by_count dist speed 5 = 5 };
+    assert { arrived_by_count dist speed 6 = 6 };
+    assert { arrived_by_count dist speed 7 = 7 };
+    assert { arrived_by_count dist speed 8 = 8 };
+    assert { arrived_by_count dist speed 9 = 9 };
+    assert { no_loss_before dist speed 10 };
+    assert { valid_elimination_result dist speed 10 }
+
+  let lemma check_test_005 () =
+    let dist = Cons 3 (Cons 5 (Cons 7 (Cons 9 Nil))) in
+    let speed = Cons 1 (Cons 2 (Cons 3 (Cons 4 Nil))) in
+    assert { positive_distance_speed dist speed };
+    assert { length dist = 4 };
+    assert { arrived_by_count dist speed 0 = 0 };
+    assert { arrived_by_count dist speed 1 = 0 };
+    assert { arrived_by_count dist speed 2 = 0 };
+    assert { arrived_by_count dist speed 3 = 4 };
+    assert { no_loss_before dist speed 3 };
+    assert { loss_at dist speed 3 };
+    assert { valid_elimination_result dist speed 3 }
+
+  let lemma check_test_006 () =
+    let dist = Cons 1 (Cons 1 (Cons 2 (Cons 3 Nil))) in
+    let speed = Cons 1 (Cons 1 (Cons 1 (Cons 1 Nil))) in
+    assert { positive_distance_speed dist speed };
+    assert { length dist = 4 };
+    assert { arrived_by_count dist speed 0 = 0 };
+    assert { arrived_by_count dist speed 1 = 2 };
+    assert { no_loss_before dist speed 1 };
+    assert { loss_at dist speed 1 };
+    assert { valid_elimination_result dist speed 1 }
+
+  let lemma check_test_011 () =
+    let dist = Cons 1 (Cons 3 (Cons 4 Nil)) in
+    let speed = Cons 1 (Cons 1 (Cons 1 Nil)) in
+    assert { positive_distance_speed dist speed };
+    assert { length dist = 3 };
+    assert { arrived_by_count dist speed 0 = 0 };
+    assert { arrived_by_count dist speed 1 = 1 };
+    assert { arrived_by_count dist speed 2 = 1 };
+    assert { no_loss_before dist speed 3 };
+    assert { valid_elimination_result dist speed 3 }
+
+  let lemma check_test_014 () =
+    let dist = Cons 3 (Cons 2 (Cons 4 Nil)) in
+    let speed = Cons 5 (Cons 3 (Cons 2 Nil)) in
+    assert { positive_distance_speed dist speed };
+    assert { length dist = 3 };
+    assert { arrived_by_count dist speed 0 = 0 };
+    assert { arrived_by_count dist speed 1 = 2 };
+    assert { no_loss_before dist speed 1 };
+    assert { loss_at dist speed 1 };
+    assert { valid_elimination_result dist speed 1 }
+
+end

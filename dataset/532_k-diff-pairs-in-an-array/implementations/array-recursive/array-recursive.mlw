@@ -1,0 +1,211 @@
+module KDiffPairsInAnArray_Array_Recursive_Implementation
+
+  use int.Int
+  use array.Array
+  use array.Init
+
+  let rec occurs_from (nums: array int) (x: int) (i: int) : bool
+    requires { 0 <= i <= length nums }
+    variant { length nums - i }
+  =
+    if i >= length nums then
+      false
+    else if nums[i] = x then
+      true
+    else
+      occurs_from nums x (i + 1)
+
+  let rec seen_before_from (nums: array int) (x: int) (i: int) (stop: int) : bool
+    requires { 0 <= i <= stop <= length nums }
+    variant { stop - i }
+  =
+    if i >= stop then
+      false
+    else if nums[i] = x then
+      true
+    else
+      seen_before_from nums x (i + 1) stop
+
+  let rec duplicate_after (nums: array int) (x: int) (i: int) : bool
+    requires { 0 <= i <= length nums }
+    variant { length nums - i }
+  =
+    if i >= length nums then
+      false
+    else if nums[i] = x then
+      true
+    else
+      duplicate_after nums x (i + 1)
+
+  let rec count_pairs_from (nums: array int) (k: int) (i: int) : int
+    requires { 0 <= i <= length nums }
+    variant { length nums - i }
+  =
+    if i >= length nums then
+      0
+    else
+      let x = nums[i] in
+      if seen_before_from nums x 0 i then
+        count_pairs_from nums k (i + 1)
+      else
+        let contributes =
+          if k = 0 then
+            if duplicate_after nums x (i + 1) then 1 else 0
+          else if occurs_from nums (x + k) 0 then
+            1
+          else
+            0
+        in
+        contributes + count_pairs_from nums k (i + 1)
+
+  let k_diff_pairs_in_an_array_array (nums: array int) (k: int) : int
+    requires { 1 <= length nums <= 10000 }
+    requires { 0 <= k <= 10000000 }
+    requires { forall i: int. 0 <= i < length nums -> -10000000 <= nums[i] <= 10000000 }
+  =
+    count_pairs_from nums k 0
+
+  let test_000 () : bool =
+    let nums = init 5 [|1; 2; 3; 4; 5|] in
+    let r = k_diff_pairs_in_an_array_array nums 3 in
+    r = 2
+
+  let test_001 () : bool =
+    let nums = init 10 [|6; 3; 5; 7; 2; 3; 3; 8; 2; 4|] in
+    let r = k_diff_pairs_in_an_array_array nums 2 in
+    r = 5
+
+  let test_002 () : bool =
+    let nums = init 5 [|10; 20; 30; 40; 50|] in
+    let r = k_diff_pairs_in_an_array_array nums 10 in
+    r = 4
+
+  let test_003 () : bool =
+    let nums = init 10 [|1; 2; 3; 4; 5; 6; 7; 8; 9; 10|] in
+    let r = k_diff_pairs_in_an_array_array nums 5 in
+    r = 5
+
+  let test_004 () : bool =
+    let nums = init 5 [|1; 3; 1; 5; 4|] in
+    let r = k_diff_pairs_in_an_array_array nums 0 in
+    r = 1
+
+  let test_005 () : bool =
+    let nums = init 5 [|1; 1; 1; 1; 1|] in
+    let r = k_diff_pairs_in_an_array_array nums 0 in
+    r = 1
+
+  let test_006 () : bool =
+    let nums = init 6 [|(-1); (-1); (-1); 2; 2; 2|] in
+    let r = k_diff_pairs_in_an_array_array nums 3 in
+    r = 1
+
+  let test_007 () : bool =
+    let nums = init 5 [|(-1); (-2); (-3); (-4); (-5)|] in
+    let r = k_diff_pairs_in_an_array_array nums 1 in
+    r = 4
+
+  let test_008 () : bool =
+    let nums = init 6 [|1; 1; 2; 2; 3; 3|] in
+    let r = k_diff_pairs_in_an_array_array nums 1 in
+    r = 2
+
+  let test_009 () : bool =
+    let nums = init 5 [|3; 1; 4; 1; 5|] in
+    let r = k_diff_pairs_in_an_array_array nums 2 in
+    r = 2
+
+  let test_010 () : bool =
+    let nums = init 7 [|1; 2; 2; 3; 3; 4; 4|] in
+    let r = k_diff_pairs_in_an_array_array nums 2 in
+    r = 2
+
+  let test_011 () : bool =
+    let nums = init 5 [|1; 3; 5; 7; 9|] in
+    let r = k_diff_pairs_in_an_array_array nums 2 in
+    r = 4
+
+  let test_012 () : bool =
+    let nums = init 5 [|0; 0; 0; 0; 0|] in
+    let r = k_diff_pairs_in_an_array_array nums 0 in
+    r = 1
+
+  let test_013 () : bool =
+    let nums = init 5 [|1; 2; 3; 4; 5|] in
+    let r = k_diff_pairs_in_an_array_array nums 1 in
+    r = 4
+
+  let test_014 () : bool =
+    let nums = init 10 [|(-10000000); (-9999999); (-9999998); (-9999997); (-9999996); (-9999995); (-9999994); (-9999993); (-9999992); (-9999991)|] in
+    let r = k_diff_pairs_in_an_array_array nums 1 in
+    r = 9
+
+  let test_015 () : bool =
+    let nums = init 12 [|(-1); (-2); (-3); (-1); (-2); (-3); (-4); (-5); (-6); (-7); (-8); (-9)|] in
+    let r = k_diff_pairs_in_an_array_array nums 1 in
+    r = 8
+
+  let test_016 () : bool =
+    let nums = init 10 [|0; 0; 0; 0; 0; 0; 0; 0; 0; 0|] in
+    let r = k_diff_pairs_in_an_array_array nums 0 in
+    r = 1
+
+  let test_017 () : bool =
+    let nums = init 15 [|1; 1; 1; 1; 1; 2; 2; 2; 2; 2; 3; 3; 3; 3; 3|] in
+    let r = k_diff_pairs_in_an_array_array nums 1 in
+    r = 2
+
+  let test_018 () : bool =
+    let nums = init 20 [|1; 2; 3; 4; 5; 6; 7; 8; 9; 10; 11; 12; 13; 14; 15; 16; 17; 18; 19; 20|] in
+    let r = k_diff_pairs_in_an_array_array nums 19 in
+    r = 1
+
+  let test_019 () : bool =
+    let nums = init 11 [|100; 101; 102; 103; 104; 105; 106; 107; 108; 109; 110|] in
+    let r = k_diff_pairs_in_an_array_array nums 1 in
+    r = 10
+
+  let run_tests () : bool =
+    if test_000 () then
+    if test_001 () then
+    if test_002 () then
+    if test_003 () then
+    if test_004 () then
+    if test_005 () then
+    if test_006 () then
+    if test_007 () then
+    if test_008 () then
+    if test_009 () then
+    if test_010 () then
+    if test_011 () then
+    if test_012 () then
+    if test_013 () then
+    if test_014 () then
+    if test_015 () then
+    if test_016 () then
+    if test_017 () then
+    if test_018 () then
+    if test_019 () then
+      true
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+
+end

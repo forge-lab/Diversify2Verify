@@ -1,0 +1,265 @@
+module MakeArrayStrictlyIncreasing_List_Recursive_Implementation
+
+  use int.Int
+  use list.List
+  use option.Option
+
+  let min2 (a: int) (b: int) : int =
+    if a <= b then a else b
+
+  let rec length_list (l: list int) : int
+    variant { l }
+  =
+    match l with
+    | Nil -> 0
+    | Cons _ xs -> 1 + length_list xs
+    end
+
+  let rec min_with_current (l: list int) (current: int) : int
+    variant { l }
+  =
+    match l with
+    | Nil -> current
+    | Cons x xs ->
+        if x < current then min_with_current xs x
+        else min_with_current xs current
+    end
+
+  let lower_bound (arr1: list int) (arr2: list int) : int =
+    let base =
+      match arr1 with
+      | Nil ->
+          match arr2 with
+          | Nil -> 0
+          | Cons y ys -> min_with_current ys y
+          end
+      | Cons x xs ->
+          let min1 = min_with_current xs x in
+          match arr2 with
+          | Nil -> min1
+          | Cons y ys -> min2 min1 (min_with_current ys y)
+          end
+      end
+    in
+    base - 1
+
+  let rec insert_sorted_unique (x: int) (l: list int) : list int
+    variant { l }
+  =
+    match l with
+    | Nil -> Cons x Nil
+    | Cons y ys ->
+        if x = y then l
+        else if x < y then Cons x l
+        else Cons y (insert_sorted_unique x ys)
+    end
+
+  let rec sort_unique (l: list int) : list int
+    variant { l }
+  =
+    match l with
+    | Nil -> Nil
+    | Cons x xs -> insert_sorted_unique x (sort_unique xs)
+    end
+
+  let rec first_greater (prev: int) (l: list int) : option int
+    variant { l }
+  =
+    match l with
+    | Nil -> None
+    | Cons x xs ->
+        if x > prev then Some x
+        else first_greater prev xs
+    end
+
+  let rec solve_suffix
+      (arr1: list int) (sorted_arr2: list int) (prev: int) (limit: int) : int
+    variant { arr1 }
+  =
+    match arr1 with
+    | Nil -> 0
+    | Cons x xs ->
+        let keep_cost =
+          if x > prev then solve_suffix xs sorted_arr2 x limit else limit
+        in
+        let replace_cost =
+          match first_greater prev sorted_arr2 with
+          | None -> limit
+          | Some y ->
+              let tail_cost = solve_suffix xs sorted_arr2 y limit in
+              if tail_cost >= limit then limit else 1 + tail_cost
+          end
+        in
+        min2 keep_cost replace_cost
+    end
+
+  let make_array_strictly_increasing_list (arr1: list int) (arr2: list int) : int =
+    let sorted_arr2 = sort_unique arr2 in
+    let limit = length_list arr1 + 1 in
+    let result = solve_suffix arr1 sorted_arr2 (lower_bound arr1 arr2) limit in
+    if result >= limit then -1 else result
+
+  let test_000 () : bool =
+    let arr1 = Cons 1 (Cons 3 (Cons 5 (Cons 7 Nil))) in
+    let arr2 = Cons 2 (Cons 4 (Cons 6 (Cons 8 Nil))) in
+    let r = make_array_strictly_increasing_list arr1 arr2 in
+    r = 0
+
+  let test_001 () : bool =
+    let arr1 = Cons 1 (Cons 5 (Cons 3 (Cons 6 (Cons 7 Nil)))) in
+    let arr2 = Cons 1 (Cons 6 (Cons 3 (Cons 3 Nil))) in
+    let r = make_array_strictly_increasing_list arr1 arr2 in
+    r = -1
+
+  let test_002 () : bool =
+    let arr1 = Cons 1 (Cons 2 (Cons 3 (Cons 4 (Cons 5 Nil)))) in
+    let arr2 = Cons 6 (Cons 7 (Cons 8 (Cons 9 Nil))) in
+    let r = make_array_strictly_increasing_list arr1 arr2 in
+    r = 0
+
+  let test_003 () : bool =
+    let arr1 = Cons 1 (Cons 5 (Cons 3 (Cons 6 (Cons 7 Nil)))) in
+    let arr2 = Cons 1 (Cons 3 (Cons 2 (Cons 4 Nil))) in
+    let r = make_array_strictly_increasing_list arr1 arr2 in
+    r = 1
+
+  let test_004 () : bool =
+    let arr1 = Cons 10 (Cons 11 (Cons 12 Nil)) in
+    let arr2 = Cons 5 (Cons 6 (Cons 7 Nil)) in
+    let r = make_array_strictly_increasing_list arr1 arr2 in
+    r = 0
+
+  let test_005 () : bool =
+    let arr1 = Cons 1 Nil in
+    let arr2 = Cons 2 Nil in
+    let r = make_array_strictly_increasing_list arr1 arr2 in
+    r = 0
+
+  let test_006 () : bool =
+    let arr1 = Cons 1 (Cons 5 (Cons 3 (Cons 6 (Cons 7 Nil)))) in
+    let arr2 = Cons 4 (Cons 3 (Cons 1 Nil)) in
+    let r = make_array_strictly_increasing_list arr1 arr2 in
+    r = 2
+
+  let test_007 () : bool =
+    let arr1 = Cons 5 (Cons 4 (Cons 3 (Cons 2 (Cons 1 Nil)))) in
+    let arr2 = Cons 1 (Cons 2 (Cons 3 (Cons 4 (Cons 5 Nil)))) in
+    let r = make_array_strictly_increasing_list arr1 arr2 in
+    r = 4
+
+  let test_008 () : bool =
+    let arr1 = Cons 1 (Cons 2 (Cons 3 (Cons 4 Nil))) in
+    let arr2 = Cons 2 (Cons 3 (Cons 4 (Cons 5 Nil))) in
+    let r = make_array_strictly_increasing_list arr1 arr2 in
+    r = 0
+
+  let test_009 () : bool =
+    let arr1 = Cons 10 (Cons 9 (Cons 8 (Cons 7 (Cons 6 Nil)))) in
+    let arr2 = Cons 1 (Cons 2 (Cons 3 (Cons 4 (Cons 5 Nil)))) in
+    let r = make_array_strictly_increasing_list arr1 arr2 in
+    r = 4
+
+  let test_010 () : bool =
+    let arr1 = Cons 1 (Cons 2 (Cons 3 (Cons 4 (Cons 5 Nil)))) in
+    let arr2 = Cons 5 (Cons 4 (Cons 3 (Cons 2 (Cons 1 Nil)))) in
+    let r = make_array_strictly_increasing_list arr1 arr2 in
+    r = 0
+
+  let test_011 () : bool =
+    let arr1 = Cons 1 (Cons 3 (Cons 5 (Cons 7 (Cons 9 Nil)))) in
+    let arr2 = Cons 2 (Cons 4 (Cons 6 (Cons 8 (Cons 10 Nil)))) in
+    let r = make_array_strictly_increasing_list arr1 arr2 in
+    r = 0
+
+  let test_012 () : bool =
+    let arr1 = Cons 1 (Cons 10 (Cons 20 (Cons 30 Nil))) in
+    let arr2 = Cons 5 (Cons 15 (Cons 25 (Cons 35 Nil))) in
+    let r = make_array_strictly_increasing_list arr1 arr2 in
+    r = 0
+
+  let test_013 () : bool =
+    let arr1 = Cons 1 (Cons 2 (Cons 2 (Cons 3 (Cons 4 Nil)))) in
+    let arr2 = Cons 2 (Cons 3 (Cons 4 (Cons 5 (Cons 6 Nil)))) in
+    let r = make_array_strictly_increasing_list arr1 arr2 in
+    r = 3
+
+  let test_014 () : bool =
+    let arr1 = Cons 10 (Cons 9 (Cons 8 (Cons 7 (Cons 6 Nil)))) in
+    let arr2 = Cons 5 (Cons 4 (Cons 3 (Cons 2 (Cons 1 Nil)))) in
+    let r = make_array_strictly_increasing_list arr1 arr2 in
+    r = 4
+
+  let test_015 () : bool =
+    let arr1 = Cons 1 (Cons 1 (Cons 1 (Cons 1 Nil))) in
+    let arr2 = Cons 2 (Cons 2 (Cons 2 (Cons 2 Nil))) in
+    let r = make_array_strictly_increasing_list arr1 arr2 in
+    r = -1
+
+  let test_016 () : bool =
+    let arr1 = Cons 1 (Cons 2 (Cons 3 (Cons 4 (Cons 5 Nil)))) in
+    let arr2 = Cons 6 (Cons 7 (Cons 8 (Cons 9 (Cons 10 Nil)))) in
+    let r = make_array_strictly_increasing_list arr1 arr2 in
+    r = 0
+
+  let test_017 () : bool =
+    let arr1 = Cons 1 (Cons 1 (Cons 1 Nil)) in
+    let arr2 = Cons 2 (Cons 2 (Cons 2 Nil)) in
+    let r = make_array_strictly_increasing_list arr1 arr2 in
+    r = -1
+
+  let test_018 () : bool =
+    let arr1 = Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 Nil)))) in
+    let arr2 = Cons 2 (Cons 2 (Cons 2 (Cons 2 (Cons 2 Nil)))) in
+    let r = make_array_strictly_increasing_list arr1 arr2 in
+    r = -1
+
+  let test_019 () : bool =
+    let arr1 = Cons 1 (Cons 2000 Nil) in
+    let arr2 = Cons 1000 Nil in
+    let r = make_array_strictly_increasing_list arr1 arr2 in
+    r = 0
+
+  let run_tests () : bool =
+    if test_000 () then
+    if test_001 () then
+    if test_002 () then
+    if test_003 () then
+    if test_004 () then
+    if test_005 () then
+    if test_006 () then
+    if test_007 () then
+    if test_008 () then
+    if test_009 () then
+    if test_010 () then
+    if test_011 () then
+    if test_012 () then
+    if test_013 () then
+    if test_014 () then
+    if test_015 () then
+    if test_016 () then
+    if test_017 () then
+    if test_018 () then
+    if test_019 () then
+      true
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+
+end

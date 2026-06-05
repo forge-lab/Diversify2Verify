@@ -1,0 +1,223 @@
+module ReducingDishes_List_Spec
+
+  use int.Int
+  use list.List
+  use list.NumOcc
+  use list.Permut
+
+  let rec function like_time_from (time: int) (cooked: list int) : int
+    variant { cooked }
+  =
+    match cooked with
+    | Nil -> 0
+    | Cons x xs -> time * x + like_time_from (time + 1) xs
+    end
+
+  function like_time (cooked: list int) : int =
+    like_time_from 1 cooked
+
+  predicate sub_multiset (chosen: list int) (available: list int) =
+    forall x: int. num_occ x chosen <= num_occ x available
+
+  predicate max_like_time (satisfaction: list int) (best: int) =
+    (exists cooked: list int.
+       sub_multiset cooked satisfaction /\
+       best = like_time cooked) /\
+    (forall other: list int.
+       sub_multiset other satisfaction -> like_time other <= best)
+
+  predicate same_multiset (a: list int) (b: list int) =
+    permut a b
+
+  let rec predicate le_all (x: int) (l: list int)
+    variant { l }
+  =
+    match l with
+    | Nil -> true
+    | Cons y ys -> x <= y && le_all x ys
+    end
+
+  let rec predicate ge_all (x: int) (l: list int)
+    variant { l }
+  =
+    match l with
+    | Nil -> true
+    | Cons y ys -> x >= y && ge_all x ys
+    end
+
+  let rec predicate sorted_asc (l: list int)
+    variant { l }
+  =
+    match l with
+    | Nil -> true
+    | Cons x xs -> le_all x xs && sorted_asc xs
+    end
+
+  let rec lemma le_all_weaken (x y: int) (l: list int)
+    requires { x <= y }
+    requires { le_all y l }
+    ensures  { le_all x l }
+    variant  { l }
+  =
+    match l with
+    | Nil -> ()
+    | Cons _ ys -> le_all_weaken x y ys
+    end
+
+  let rec predicate sorted_desc (l: list int)
+    variant { l }
+  =
+    match l with
+    | Nil -> true
+    | Cons x xs -> ge_all x xs && sorted_desc xs
+    end
+
+  let rec insert_sorted (x: int) (l: list int) : list int
+    ensures { same_multiset result (Cons x l) }
+    ensures { sorted_asc l -> sorted_asc result }
+    ensures { forall b: int. le_all b l /\ b <= x -> le_all b result }
+    variant { l }
+  =
+    match l with
+    | Nil ->
+        assert { forall v: int.
+          num_occ v (Cons x Nil) = num_occ v Nil + (if v = x then 1 else 0) };
+        assert { same_multiset (Cons x Nil) (Cons x Nil) };
+        assert { forall b: int. b <= x -> le_all b (Cons x Nil) };
+        Cons x Nil
+    | Cons y ys ->
+        if x <= y then begin
+          assert { forall v: int.
+            num_occ v (Cons x l) = num_occ v l + (if v = x then 1 else 0) };
+          assert { same_multiset (Cons x l) (Cons x l) };
+          assert { sorted_asc l -> le_all x l };
+          assert { sorted_asc l -> le_all x ys };
+          assert { sorted_asc l -> sorted_asc (Cons x l) };
+          assert { forall b: int. le_all b l /\ b <= x -> le_all b (Cons x l) };
+          Cons x l
+        end else begin
+          let tail = insert_sorted x ys in
+          assert { x > y };
+          assert { same_multiset tail (Cons x ys) };
+          assert { same_multiset (Cons y tail) (Cons y (Cons x ys)) };
+          assert { same_multiset (Cons y (Cons x ys)) (Cons x (Cons y ys)) };
+          assert { same_multiset (Cons y tail) (Cons x l) };
+          assert { sorted_asc l -> le_all y ys };
+          assert { sorted_asc l -> sorted_asc ys };
+          assert { sorted_asc l -> sorted_asc tail };
+          assert { sorted_asc l -> y <= x };
+          assert { sorted_asc l -> le_all y tail };
+          assert { sorted_asc l -> sorted_asc (Cons y tail) };
+          assert { forall b: int. le_all b l /\ b <= x -> le_all b tail };
+          assert { forall b: int. le_all b l /\ b <= x -> le_all b (Cons y tail) };
+          Cons y tail
+        end
+    end
+
+  let rec sort_asc (l: list int) : list int
+    ensures { same_multiset result l }
+    ensures { sorted_asc result }
+    variant { l }
+  =
+    match l with
+    | Nil ->
+        assert { same_multiset Nil Nil };
+        Nil
+    | Cons x xs ->
+        let sx = sort_asc xs in
+        let r = insert_sorted x sx in
+        assert { same_multiset sx xs };
+        assert { same_multiset r (Cons x sx) };
+        assert { same_multiset (Cons x sx) (Cons x xs) };
+        assert { same_multiset r l };
+        r
+    end
+
+  let rec reverse_acc (l: list int) (acc: list int) : list int
+    ensures { forall v: int.
+      num_occ v result = num_occ v l + num_occ v acc }
+    variant { l }
+  =
+    match l with
+    | Nil ->
+        acc
+    | Cons x xs ->
+        reverse_acc xs (Cons x acc)
+    end
+
+  let reverse (l: list int) : list int
+    ensures { same_multiset result l }
+  =
+    reverse_acc l Nil
+
+  let lemma sub_multiset_same_right (chosen a b: list int)
+    requires { same_multiset a b }
+    requires { sub_multiset chosen a }
+    ensures  { sub_multiset chosen b }
+  =
+    assert { forall x: int. num_occ x a = num_occ x b };
+    assert { forall x: int. num_occ x chosen <= num_occ x b }
+
+  let rec function best_total_desc_model
+    (l: list int) (current_sum: int) (current_total: int) : int
+    variant { l }
+  =
+    match l with
+    | Nil ->
+        current_total
+    | Cons x xs ->
+        let next_sum = current_sum + x in
+        if next_sum > 0 then
+          best_total_desc_model xs next_sum (current_total + next_sum)
+        else
+          current_total
+    end
+
+  let rec best_total_desc (l: list int) (current_sum: int) (current_total: int) : int
+    requires { current_sum >= 0 }
+    requires { current_total >= 0 }
+    ensures  { result = best_total_desc_model l current_sum current_total }
+    ensures  { result >= current_total }
+    variant { l }
+  =
+    match l with
+    | Nil ->
+        current_total
+    | Cons x xs ->
+        let next_sum = current_sum + x in
+        if next_sum > 0 then
+          best_total_desc xs next_sum (current_total + next_sum)
+        else
+          current_total
+    end
+
+  let lemma best_total_desc_public_bridge (sorted_desc_l satisfaction: list int)
+    requires { sorted_desc sorted_desc_l }
+    requires { same_multiset sorted_desc_l satisfaction }
+    ensures  { max_like_time satisfaction (best_total_desc_model sorted_desc_l 0 0) }
+  =
+    let r = best_total_desc_model sorted_desc_l 0 0 in
+    assert { r >= 0 };
+    assert { exists cooked: list int.
+      sub_multiset cooked sorted_desc_l /\ r = like_time cooked };
+    assert { forall cooked: list int.
+      sub_multiset cooked sorted_desc_l -> sub_multiset cooked satisfaction };
+    assert { exists cooked: list int.
+      sub_multiset cooked satisfaction /\ r = like_time cooked };
+    assert { forall other: list int.
+      sub_multiset other satisfaction -> like_time other <= r };
+    assert { max_like_time satisfaction r }
+
+  let reducing_dishes_list (satisfaction: list int) : int
+    ensures { max_like_time satisfaction result }
+  =
+    let sorted_desc = reverse (sort_asc satisfaction) in
+    assert { same_multiset sorted_desc satisfaction };
+    let r = best_total_desc sorted_desc 0 0 in
+    assert { r >= 0 };
+    assert { r = best_total_desc_model sorted_desc 0 0 };
+    best_total_desc_public_bridge sorted_desc satisfaction;
+    assert { max_like_time satisfaction r };
+    r
+
+end

@@ -1,0 +1,126 @@
+== Stage 1: first prover on whole file ==
+Running in /Users/rubenm/Desktop/Diversify2Verify/codex-runs/stage1a-list/11_container-with-most-water-20260523-125649/generated/why3/list: why3 session create -o /Users/rubenm/Desktop/Diversify2Verify/codex-runs/stage1a-list/11_container-with-most-water-20260523-125649/generated/why3/list/.why3_sessions/container_with_most_water_list_stage1 -P Z3,4.8.6 -t 10 -m 8192 container_with_most_water_list.mlw
+Session created successfully
+Running in /Users/rubenm/Desktop/Diversify2Verify/codex-runs/stage1a-list/11_container-with-most-water-20260523-125649/generated/why3/list: why3 bench /Users/rubenm/Desktop/Diversify2Verify/codex-runs/stage1a-list/11_container-with-most-water-20260523-125649/generated/why3/list/.why3_sessions/container_with_most_water_list_stage1
+Progress: 6/1/0                       Progress: 5/2/0                       Progress: 4/3/0                       Progress: 3/4/0                       Progress: 2/5/0                       Progress: 1/6/0                       Progress: 1/1/2                       Progress: 0/2/2                       Progress: 0/0/1                       
+Replay completed, saving session... done
+== Stage 1 stats ==
+= Statistics for session /Users/rubenm/Desktop/Diversify2Verify/codex-runs/stage1a-list/11_container-with-most-water-20260523-125649/generated/why3/list/.why3_sessions/container_with_most_water_list_stage1
+
+== Number of root goals ==
+  total: 7  proved: 6
+
+== Number of sub goals ==
+  total: 0  proved: 0
+
+== Goals not proved ==
+  +-- file [../../container_with_most_water_list.mlw]
+    +-- theory ContainerWithMostWater_List_Spec
+      +-- goal test_012'vc
+  
+== Goals proved by only one prover ==
+  +-- file [../../container_with_most_water_list.mlw]
+    +-- theory ContainerWithMostWater_List_Spec
+      +-- goal test_000'vc: Z3 4.8.6
+      +-- goal test_001'vc: Z3 4.8.6
+      +-- goal test_003'vc: Z3 4.8.6
+      +-- goal test_005'vc: Z3 4.8.6
+      +-- goal test_006'vc: Z3 4.8.6
+      +-- goal test_009'vc: Z3 4.8.6
+  
+1 session(s) read, with a total of 7 proof goals.
+== Unproved root goals after first prover ==
+ContainerWithMostWater_List_Spec	test_012'vc
+== Stage 1: trying remaining goals with prover Alt-Ergo,2.4.0 ==
+---- stage1 | prover: Alt-Ergo,2.4.0 | theory: ContainerWithMostWater_List_Spec | goal: test_012'vc ----
+File container_with_most_water_list.mlw:
+Goal test_012'vc.
+Prover result is: Timeout (10.00s, 116743 steps).
+Remaining after prover Alt-Ergo,2.4.0: 1
+== Stage 1: trying remaining goals with prover CVC4,1.8 ==
+---- stage1 | prover: CVC4,1.8 | theory: ContainerWithMostWater_List_Spec | goal: test_012'vc ----
+File container_with_most_water_list.mlw:
+Goal test_012'vc.
+Prover result is: Timeout (10.00s, 134258 steps).
+Remaining after prover CVC4,1.8: 1
+== Goals still unproved after stage 1 ==
+ContainerWithMostWater_List_Spec	test_012'vc
+== Stage 2: split_vc on unproved goal ==
+Target theory: ContainerWithMostWater_List_Spec
+Target goal  : test_012'vc
+---- stage2 | prover: Z3,4.8.6 | theory: ContainerWithMostWater_List_Spec | goal: test_012'vc ----
+Transforms: split_vc
+File "container_with_most_water_list.mlw", line 160, characters 13-31:
+Sub-goal Assertion of goal test_012'vc.
+Prover result is: Valid (0.01s, 20756 steps).
+
+File "container_with_most_water_list.mlw", line 161, characters 13-33:
+Sub-goal Assertion of goal test_012'vc.
+Prover result is: Valid (0.01s, 20035 steps).
+
+File "container_with_most_water_list.mlw", line 162, characters 13-34:
+Sub-goal Assertion of goal test_012'vc.
+Prover result is: Timeout (10.00s, 175493307 steps).
+
+File "container_with_most_water_list.mlw", line 163, characters 13-35:
+Sub-goal Assertion of goal test_012'vc.
+Prover result is: Valid (0.01s, 15317 steps).
+
+File "container_with_most_water_list.mlw", line 164, characters 13-44:
+Sub-goal Assertion of goal test_012'vc.
+Prover result is: Valid (0.01s, 24584 steps).
+
+File "container_with_most_water_list.mlw", line 165, characters 13-40:
+Sub-goal Assertion of goal test_012'vc.
+Prover result is: Timeout (10.00s, 173994573 steps).
+Infrastructure issue in stage 2 with prover Z3,4.8.6; aborting rest of stage 2.
+== Goals still unproved after stage 2 (split_vc) ==
+ContainerWithMostWater_List_Spec	test_012'vc
+== Stage 3: split_vc + inline_all on still-unproved goal ==
+Target theory: ContainerWithMostWater_List_Spec
+Target goal  : test_012'vc
+---- stage3 | prover: Alt-Ergo,2.4.0 | theory: ContainerWithMostWater_List_Spec | goal: test_012'vc ----
+Transforms: split_vc inline_all
+File "container_with_most_water_list.mlw", line 160, characters 13-31:
+Sub-goal Assertion of goal test_012'vc.
+Prover result is: Valid (0.01s, 128 steps).
+
+File "container_with_most_water_list.mlw", line 161, characters 13-33:
+Sub-goal Assertion of goal test_012'vc.
+Prover result is: Valid (0.01s, 125 steps).
+
+File "container_with_most_water_list.mlw", line 162, characters 13-34:
+Sub-goal Assertion of goal test_012'vc.
+Prover result is: Valid (0.04s, 709 steps).
+
+File "container_with_most_water_list.mlw", line 163, characters 13-35:
+Sub-goal Assertion of goal test_012'vc.
+Prover result is: Valid (0.01s, 11 steps).
+
+File "container_with_most_water_list.mlw", line 164, characters 13-44:
+Sub-goal Assertion of goal test_012'vc.
+Prover result is: Valid (0.01s, 14 steps).
+
+File "container_with_most_water_list.mlw", line 165, characters 13-40:
+Sub-goal Assertion of goal test_012'vc.
+Prover result is: Valid (0.05s, 825 steps).
+
+File "container_with_most_water_list.mlw", line 167, characters 31-62:
+Sub-goal Assertion of goal test_012'vc.
+Prover result is: Valid (1.27s, 16516 steps).
+
+File "container_with_most_water_list.mlw", line 168, characters 13-45:
+Sub-goal Assertion of goal test_012'vc.
+Prover result is: Valid (0.04s, 891 steps).
+Solved with split_vc + inline_all using prover: Alt-Ergo,2.4.0
+== Final summary ==
+Unproved root goals after first prover : 1
+Remaining failures after split_vc      : 1
+Remaining failures after stage 3       : 0
+Detailed logs stored in                : /Users/rubenm/Desktop/Diversify2Verify/codex-runs/stage1a-list/11_container-with-most-water-20260523-125649/generated/why3/list/.why3_sessions/container_with_most_water_list_logs
+VERIFY_RESULT: SUCCESS
+VERIFY_REASON: proved_after_stage3
+VERIFY_STAGE: stage3
+VERIFY_ROOT_TOTAL: 7
+VERIFY_ROOT_PROVED: 7
+VERIFY_ROOT_REMAINING: 0

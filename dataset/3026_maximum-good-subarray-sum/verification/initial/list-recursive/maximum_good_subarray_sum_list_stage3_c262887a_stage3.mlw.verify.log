@@ -1,0 +1,125 @@
+== Stage 1: first prover on whole file ==
+Running in /Users/rubenm/Desktop/Diversify2Verify/codex-runs/testing6/3026_maximum-good-subarray-sum/stage3a/list-recursive/maximum_good_subarray_sum_list_stage3_c262887a/generated/why3/list: why3 session create -o /Users/rubenm/Desktop/Diversify2Verify/codex-runs/testing6/3026_maximum-good-subarray-sum/stage3a/list-recursive/maximum_good_subarray_sum_list_stage3_c262887a/generated/why3/list/.why3_sessions/maximum_good_subarray_sum_list_stage3_c262887a_stage3_stage1 -P Z3,4.8.6 -t 10 -m 8192 maximum_good_subarray_sum_list_stage3_c262887a_stage3.mlw
+Session created successfully
+Running in /Users/rubenm/Desktop/Diversify2Verify/codex-runs/testing6/3026_maximum-good-subarray-sum/stage3a/list-recursive/maximum_good_subarray_sum_list_stage3_c262887a/generated/why3/list: why3 bench /Users/rubenm/Desktop/Diversify2Verify/codex-runs/testing6/3026_maximum-good-subarray-sum/stage3a/list-recursive/maximum_good_subarray_sum_list_stage3_c262887a/generated/why3/list/.why3_sessions/maximum_good_subarray_sum_list_stage3_c262887a_stage3_stage1
+Progress: 3/1/0                       Progress: 2/2/0                       Progress: 1/3/0                       Progress: 0/4/0                       Progress: 0/1/2                       
+Replay completed, saving session... done
+== Stage 1 stats ==
+= Statistics for session /Users/rubenm/Desktop/Diversify2Verify/codex-runs/testing6/3026_maximum-good-subarray-sum/stage3a/list-recursive/maximum_good_subarray_sum_list_stage3_c262887a/generated/why3/list/.why3_sessions/maximum_good_subarray_sum_list_stage3_c262887a_stage3_stage1
+
+== Number of root goals ==
+  total: 4  proved: 2
+
+== Number of sub goals ==
+  total: 0  proved: 0
+
+== Goals not proved ==
+  +-- file [../../maximum_good_subarray_sum_list_stage3_c262887a_stage3.mlw]
+    +-- theory MaximumGoodSubarraySum_List_Stage3_Recursive
+      +-- goal last_value'vc
+      +-- goal best_over_starts'vc
+  
+== Goals proved by only one prover ==
+  +-- file [../../maximum_good_subarray_sum_list_stage3_c262887a_stage3.mlw]
+    +-- theory MaximumGoodSubarraySum_List_Stage3_Recursive
+      +-- goal best_with_first'vc: Z3 4.8.6
+      +-- goal maximum_good_subarray_sum_list'vc: Z3 4.8.6
+  
+1 session(s) read, with a total of 4 proof goals.
+== Unproved root goals after first prover ==
+MaximumGoodSubarraySum_List_Stage3_Recursive	last_value'vc
+MaximumGoodSubarraySum_List_Stage3_Recursive	best_over_starts'vc
+== Stage 1: trying remaining goals with prover Alt-Ergo,2.4.0 ==
+---- stage1 | prover: Alt-Ergo,2.4.0 | theory: MaximumGoodSubarraySum_List_Stage3_Recursive | goal: last_value'vc ----
+File maximum_good_subarray_sum_list_stage3_c262887a_stage3.mlw:
+Goal last_value'vc.
+Prover result is: Valid (0.01s, 55 steps).
+Solved in stage 1 using prover: Alt-Ergo,2.4.0
+---- stage1 | prover: Alt-Ergo,2.4.0 | theory: MaximumGoodSubarraySum_List_Stage3_Recursive | goal: best_over_starts'vc ----
+File maximum_good_subarray_sum_list_stage3_c262887a_stage3.mlw:
+Goal best_over_starts'vc.
+Prover result is: Timeout (10.00s, 502789 steps).
+Remaining after prover Alt-Ergo,2.4.0: 1
+== Stage 1: trying remaining goals with prover CVC4,1.8 ==
+---- stage1 | prover: CVC4,1.8 | theory: MaximumGoodSubarraySum_List_Stage3_Recursive | goal: best_over_starts'vc ----
+File maximum_good_subarray_sum_list_stage3_c262887a_stage3.mlw:
+Goal best_over_starts'vc.
+Prover result is: Timeout (10.00s, 1810386 steps).
+Remaining after prover CVC4,1.8: 1
+== Goals still unproved after stage 1 ==
+MaximumGoodSubarraySum_List_Stage3_Recursive	best_over_starts'vc
+== Stage 2: split_vc on unproved goal ==
+Target theory: MaximumGoodSubarraySum_List_Stage3_Recursive
+Target goal  : best_over_starts'vc
+---- stage2 | prover: Z3,4.8.6 | theory: MaximumGoodSubarraySum_List_Stage3_Recursive | goal: best_over_starts'vc ----
+Transforms: split_vc
+File "maximum_good_subarray_sum_list_stage3_c262887a_stage3.mlw", line 93, characters 42-65:
+Sub-goal Variant decrease of goal best_over_starts'vc.
+Prover result is: Valid (0.01s, 20317 steps).
+
+File "maximum_good_subarray_sum_list_stage3_c262887a_stage3.mlw", line 86, characters 14-64:
+Sub-goal Postcondition of goal best_over_starts'vc.
+Prover result is: Timeout (10.00s, 53427384 steps).
+---- stage2 | prover: Alt-Ergo,2.4.0 | theory: MaximumGoodSubarraySum_List_Stage3_Recursive | goal: best_over_starts'vc ----
+Transforms: split_vc
+File "maximum_good_subarray_sum_list_stage3_c262887a_stage3.mlw", line 93, characters 42-65:
+Sub-goal Variant decrease of goal best_over_starts'vc.
+Prover result is: Valid (0.01s, 45 steps).
+
+File "maximum_good_subarray_sum_list_stage3_c262887a_stage3.mlw", line 86, characters 14-64:
+Sub-goal Postcondition of goal best_over_starts'vc.
+Prover result is: Timeout (10.00s, 154502 steps).
+---- stage2 | prover: CVC4,1.8 | theory: MaximumGoodSubarraySum_List_Stage3_Recursive | goal: best_over_starts'vc ----
+Transforms: split_vc
+File "maximum_good_subarray_sum_list_stage3_c262887a_stage3.mlw", line 93, characters 42-65:
+Sub-goal Variant decrease of goal best_over_starts'vc.
+Prover result is: Valid (0.02s, 3962 steps).
+
+File "maximum_good_subarray_sum_list_stage3_c262887a_stage3.mlw", line 86, characters 14-64:
+Sub-goal Postcondition of goal best_over_starts'vc.
+Prover result is: Unknown (unknown + incomplete) (0.02s, 6514 steps).
+== Goals still unproved after stage 2 (split_vc) ==
+MaximumGoodSubarraySum_List_Stage3_Recursive	best_over_starts'vc
+== Stage 3: split_vc + inline_all on still-unproved goal ==
+Target theory: MaximumGoodSubarraySum_List_Stage3_Recursive
+Target goal  : best_over_starts'vc
+---- stage3 | prover: Z3,4.8.6 | theory: MaximumGoodSubarraySum_List_Stage3_Recursive | goal: best_over_starts'vc ----
+Transforms: split_vc inline_all
+File "maximum_good_subarray_sum_list_stage3_c262887a_stage3.mlw", line 93, characters 42-65:
+Sub-goal Variant decrease of goal best_over_starts'vc.
+Prover result is: Valid (0.01s, 20408 steps).
+
+File "maximum_good_subarray_sum_list_stage3_c262887a_stage3.mlw", line 86, characters 14-64:
+Sub-goal Postcondition of goal best_over_starts'vc.
+Prover result is: Timeout (10.00s, 27534819 steps).
+---- stage3 | prover: Alt-Ergo,2.4.0 | theory: MaximumGoodSubarraySum_List_Stage3_Recursive | goal: best_over_starts'vc ----
+Transforms: split_vc inline_all
+File "maximum_good_subarray_sum_list_stage3_c262887a_stage3.mlw", line 93, characters 42-65:
+Sub-goal Variant decrease of goal best_over_starts'vc.
+Prover result is: Valid (0.01s, 45 steps).
+
+File "maximum_good_subarray_sum_list_stage3_c262887a_stage3.mlw", line 86, characters 14-64:
+Sub-goal Postcondition of goal best_over_starts'vc.
+Prover result is: Timeout (10.00s, 276427 steps).
+---- stage3 | prover: CVC4,1.8 | theory: MaximumGoodSubarraySum_List_Stage3_Recursive | goal: best_over_starts'vc ----
+Transforms: split_vc inline_all
+File "maximum_good_subarray_sum_list_stage3_c262887a_stage3.mlw", line 93, characters 42-65:
+Sub-goal Variant decrease of goal best_over_starts'vc.
+Prover result is: Valid (0.02s, 3979 steps).
+
+File "maximum_good_subarray_sum_list_stage3_c262887a_stage3.mlw", line 86, characters 14-64:
+Sub-goal Postcondition of goal best_over_starts'vc.
+Prover result is: Timeout (10.00s, 727388 steps).
+== Final summary ==
+Unproved root goals after first prover : 1
+Remaining failures after split_vc      : 1
+Remaining failures after stage 3       : 1
+Detailed logs stored in                : /Users/rubenm/Desktop/Diversify2Verify/codex-runs/testing6/3026_maximum-good-subarray-sum/stage3a/list-recursive/maximum_good_subarray_sum_list_stage3_c262887a/generated/why3/list/.why3_sessions/maximum_good_subarray_sum_list_stage3_c262887a_stage3_logs
+Still unproved goals:
+MaximumGoodSubarraySum_List_Stage3_Recursive	best_over_starts'vc
+VERIFY_RESULT: FAILURE
+VERIFY_REASON: unproved_goals_remain
+VERIFY_STAGE: stage3
+VERIFY_ROOT_TOTAL: 4
+VERIFY_ROOT_PROVED: 3
+VERIFY_ROOT_REMAINING: 1

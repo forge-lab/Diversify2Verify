@@ -1,0 +1,96 @@
+module SubsequenceOfSizeKWithTheLargestEvenSum_Array_Spec
+
+  use int.Int
+  use int.EuclideanDivision
+  use int.Sum as IntSum
+  use array.Array
+  use array.Init
+  use ref.Ref
+
+  predicate valid_nums (nums: array int) =
+    1 <= length nums <= 100000 /\
+    forall i: int. 0 <= i < length nums -> 0 <= nums[i] <= 100000
+
+  predicate valid_choice (nums: array int) (k: int) (choice: array int) =
+    length choice = k /\
+    (forall t: int. 0 <= t < k -> 0 <= choice[t] < length nums) /\
+    (forall i j: int. 0 <= i < j < k -> choice[i] < choice[j])
+
+  function subsequence_sum (nums: array int) (choice: array int) : int =
+    IntSum.sum (fun t -> nums[choice[t]]) 0 (length choice)
+
+  predicate even_candidate_sum (nums: array int) (k: int) (s: int) =
+    exists choice: array int.
+      valid_choice nums k choice /\
+      s = subsequence_sum nums choice /\
+      mod s 2 = 0
+
+  predicate optimal_even_subsequence_sum
+      (nums: array int) (k: int) (result: int) =
+    (result = -1 /\
+     forall s: int. not (even_candidate_sum nums k s)) \/
+    (even_candidate_sum nums k result /\
+     forall s: int. even_candidate_sum nums k s -> s <= result)
+
+  let subsequence_of_size_k_with_the_largest_even_sum_array
+      (nums: array int) (k: int) : int
+    requires { valid_nums nums }
+    requires { 1 <= k <= length nums }
+    ensures  { optimal_even_subsequence_sum nums k result }
+  =
+    let n = length nums in
+    let best_even = make (k + 1) (-1) in
+    let best_odd = make (k + 1) (-1) in
+    best_even[0] <- 0;
+    for i = 0 to n - 1 do
+      invariant { n = length nums }
+      invariant { length best_even = k + 1 }
+      invariant { length best_odd = k + 1 }
+      invariant { 0 <= i <= n }
+      invariant { best_even[0] = 0 }
+      invariant { best_odd[0] = -1 }
+      let x = nums[i] in
+      let limit = if i + 1 < k then i + 1 else k in
+      assert { 0 <= limit <= k };
+      let j = ref limit in
+      while !j >= 1 do
+        invariant { n = length nums }
+        invariant { length best_even = k + 1 }
+        invariant { length best_odd = k + 1 }
+        invariant { 0 <= !j <= limit }
+        invariant { 0 <= limit <= k }
+        invariant { best_even[0] = 0 }
+        invariant { best_odd[0] = -1 }
+        variant { !j }
+        let prev = !j - 1 in
+        assert { 0 <= prev < k };
+        assert { 1 <= !j <= k };
+        if mod x 2 = 0 then begin
+          let prev_even = best_even[prev] in
+          if prev_even >= 0 then
+            let cand = prev_even + x in
+            if cand > best_even[!j] then best_even[!j] <- cand else ()
+          else ();
+          let prev_odd = best_odd[prev] in
+          if prev_odd >= 0 then
+            let cand = prev_odd + x in
+            if cand > best_odd[!j] then best_odd[!j] <- cand else ()
+          else ()
+        end else begin
+          let prev_odd = best_odd[prev] in
+          if prev_odd >= 0 then
+            let cand = prev_odd + x in
+            if cand > best_even[!j] then best_even[!j] <- cand else ()
+          else ();
+          let prev_even = best_even[prev] in
+          if prev_even >= 0 then
+            let cand = prev_even + x in
+            if cand > best_odd[!j] then best_odd[!j] <- cand else ()
+          else ()
+        end;
+        j := !j - 1
+      done
+    done;
+    best_even[k]
+
+end

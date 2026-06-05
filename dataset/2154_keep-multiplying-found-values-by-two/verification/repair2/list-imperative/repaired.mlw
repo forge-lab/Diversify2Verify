@@ -1,0 +1,227 @@
+module KeepMultiplyingFoundValuesByTwo_List_Stage3_Imperative
+
+  use int.Int
+  use int.Power
+  use list.List
+  use list.Length
+  use list.Mem
+  use ref.Ref
+
+  predicate valid_input (nums: list int) (original: int) =
+    1 <= length nums <= 1000 /\
+    1 <= original <= 1000 /\
+    forall x: int. mem x nums -> 1 <= x <= 1000
+
+  function doubled_value (original: int) (steps: int) : int =
+    original * power 2 steps
+
+  predicate doubling_prefix_found (nums: list int) (original: int) (steps: int) =
+    forall t: int. 0 <= t < steps -> mem (doubled_value original t) nums
+
+  predicate final_value (nums: list int) (original: int) (res: int) =
+    exists steps: int.
+      0 <= steps <= length nums /\
+      res = doubled_value original steps /\
+      doubling_prefix_found nums original steps /\
+      not (mem res nums)
+
+  let lemma doubled_value_zero (original: int)
+    ensures { doubled_value original 0 = original }
+  =
+    assert { power 2 0 = 1 }
+
+  let lemma doubled_value_succ (original: int) (steps: int)
+    requires { 0 <= steps }
+    ensures { doubled_value original (steps + 1) =
+              doubled_value original steps * 2 }
+  =
+    assert { power 2 (steps + 1) = 2 * power 2 steps }
+
+  let lemma doubling_prefix_extend (nums: list int) (original: int) (steps: int)
+    requires { 0 <= steps }
+    requires { doubling_prefix_found nums original steps }
+    requires { mem (doubled_value original steps) nums }
+    ensures  { doubling_prefix_found nums original (steps + 1) }
+  =
+    assert {
+      forall t: int. 0 <= t < steps + 1 ->
+        (0 <= t < steps \/ t = steps)
+    };
+    assert {
+      forall t: int. 0 <= t < steps + 1 ->
+        mem (doubled_value original t) nums
+    }
+
+  let rec function remove_one (target: int) (l: list int) : list int
+    variant { l }
+  =
+    match l with
+    | Nil -> Nil
+    | Cons x xs -> if x = target then xs else Cons x (remove_one target xs)
+    end
+
+  let rec lemma remove_one_length_mem (target: int) (l: list int)
+    requires { mem target l }
+    ensures  { length (remove_one target l) = length l - 1 }
+    variant  { l }
+  =
+    match l with
+    | Nil -> absurd
+    | Cons x xs ->
+        if x = target then
+          assert { remove_one target l = xs }
+        else begin
+          assert { mem target xs };
+          remove_one_length_mem target xs;
+          assert { remove_one target l = Cons x (remove_one target xs) }
+        end
+    end
+
+  let rec lemma remove_one_preserves_other (target: int) (y: int) (l: list int)
+    requires { y <> target }
+    ensures  { mem y (remove_one target l) <-> mem y l }
+    variant  { l }
+  =
+    match l with
+    | Nil -> ()
+    | Cons x xs ->
+        if x = target then
+          assert { remove_one target l = xs }
+        else begin
+          remove_one_preserves_other target y xs;
+          assert { remove_one target l = Cons x (remove_one target xs) }
+        end
+    end
+
+  let lemma doubled_value_positive (original: int) (steps: int)
+    requires { 1 <= original }
+    requires { 0 <= steps }
+    ensures  { 0 < doubled_value original steps }
+  =
+    assert { power 2 steps > 0 }
+
+  let lemma doubled_value_strict_step (original: int) (steps: int)
+    requires { 1 <= original }
+    requires { 0 <= steps }
+    ensures  { doubled_value original steps < doubled_value original (steps + 1) }
+  =
+    doubled_value_succ original steps;
+    doubled_value_positive original steps;
+    assert { doubled_value original (steps + 1) = doubled_value original steps * 2 }
+
+  let rec lemma doubled_value_strict_monotone (original: int) (i: int) (j: int)
+    requires { 1 <= original }
+    requires { 0 <= i < j }
+    ensures  { doubled_value original i < doubled_value original j }
+    variant  { j - i }
+  =
+    if j = i + 1 then
+      doubled_value_strict_step original i
+    else begin
+      assert { i < j - 1 };
+      doubled_value_strict_monotone original i (j - 1);
+      doubled_value_strict_step original (j - 1)
+    end
+
+  let rec lemma prefix_found_bound (nums: list int) (original: int) (steps: int)
+    requires { 1 <= original }
+    requires { 0 <= steps }
+    requires { doubling_prefix_found nums original steps }
+    ensures  { steps <= length nums }
+    variant  { steps }
+  =
+    if steps = 0 then
+      ()
+    else begin
+      let prev = steps - 1 in
+      assert { 0 <= prev < steps };
+      assert { mem (doubled_value original prev) nums };
+      remove_one_length_mem (doubled_value original prev) nums;
+      assert {
+        forall t: int. 0 <= t < prev ->
+          doubled_value original t <> doubled_value original prev
+      };
+      assert {
+        forall t: int. 0 <= t < prev ->
+          mem (doubled_value original t) (remove_one (doubled_value original prev) nums)
+      };
+      assert { doubling_prefix_found (remove_one (doubled_value original prev) nums) original prev };
+      prefix_found_bound (remove_one (doubled_value original prev) nums) original prev;
+      assert { prev <= length (remove_one (doubled_value original prev) nums) };
+      assert { length (remove_one (doubled_value original prev) nums) = length nums - 1 }
+    end
+
+  exception Found
+
+  let mem_int_imp (nums: list int) (target: int) : bool
+    ensures { result = True <-> mem target nums }
+    ensures { result = False <-> not (mem target nums) }
+  =
+    try
+      let cur = ref nums in
+      while (match !cur with Nil -> false | Cons _ _ -> true end) do
+        invariant { mem target !cur <-> mem target nums }
+        invariant { 0 <= length !cur <= length nums }
+        variant { length !cur }
+
+        match !cur with
+        | Nil ->
+            assert { false }
+        | Cons x xs ->
+            if x = target then begin
+              assert { mem target !cur };
+              assert { mem target nums };
+              raise Found
+            end;
+            assert { x <> target };
+            assert { mem target xs <-> mem target !cur };
+            cur := xs
+        end
+      done;
+      assert { !cur = Nil };
+      assert { not (mem target !cur) };
+      assert { not (mem target nums) };
+      false
+    with Found ->
+      assert { mem target nums };
+      true
+    end
+
+  let keep_multiplying_found_values_by_two_list (nums: list int) (original: int) : int
+    requires { valid_input nums original }
+    ensures  { final_value nums original result }
+  =
+    let current = ref original in
+    let ghost steps = ref 0 in
+    doubled_value_zero original;
+    assert { !current = doubled_value original !steps };
+    while mem_int_imp nums !current do
+      invariant { 0 <= !steps <= length nums }
+      invariant { !current = doubled_value original !steps }
+      invariant { doubling_prefix_found nums original !steps }
+      variant { length nums - !steps }
+
+      let ghost old_steps = !steps in
+      assert { mem !current nums };
+      assert { !current = doubled_value original old_steps };
+      doubling_prefix_extend nums original old_steps;
+      assert { doubling_prefix_found nums original (old_steps + 1) };
+      prefix_found_bound nums original (old_steps + 1);
+      assert { old_steps + 1 <= length nums };
+      current := !current * 2;
+      assert { !current = doubled_value original old_steps * 2 };
+      doubled_value_succ original old_steps;
+      assert { !current = doubled_value original (old_steps + 1) };
+      steps := old_steps + 1;
+      assert { !steps = old_steps + 1 };
+      assert { !current = doubled_value original !steps };
+      assert { doubling_prefix_found nums original !steps }
+    done;
+    assert { not (mem !current nums) };
+    assert { 0 <= !steps <= length nums };
+    assert { !current = doubled_value original !steps };
+    assert { doubling_prefix_found nums original !steps };
+    assert { final_value nums original !current };
+    !current
+
+end

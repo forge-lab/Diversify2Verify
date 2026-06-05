@@ -1,0 +1,147 @@
+module MaximumScoreOfAGoodSubarray_List_Spec
+
+  use int.Int
+  use list.List
+  use list.Length
+  use list.NthNoOpt
+
+  predicate values_in_range (nums: list int) =
+    forall idx: int.
+      0 <= idx /\ idx < length nums ->
+      1 <= nth idx nums /\ nth idx nums <= 20000
+
+  predicate valid_input (nums: list int) (k: int) =
+    1 <= length nums /\ length nums <= 100000 /\
+    0 <= k /\ k < length nums /\
+    values_in_range nums
+
+  predicate valid_interval (nums: list int) (k: int) (i: int) (j: int) =
+    0 <= i /\ i <= k /\ k <= j /\ j < length nums
+
+  predicate is_min_on_interval (nums: list int) (i: int) (j: int) (m: int) =
+    (forall t: int. i <= t /\ t <= j -> m <= nth t nums) /\
+    (exists t: int. i <= t /\ t <= j /\ nth t nums = m)
+
+  predicate good_subarray_score
+      (nums: list int) (k: int) (i: int) (j: int) (score: int) =
+    valid_interval nums k i j /\
+    exists m: int.
+      is_min_on_interval nums i j m /\
+      score = m * (j - i + 1)
+
+  predicate interval_score_at_most (nums: list int) (k: int) (bound: int) =
+    forall i j score: int.
+      good_subarray_score nums k i j score -> score <= bound
+
+  predicate maximum_good_subarray_score
+      (nums: list int) (k: int) (best: int) =
+    (exists i j: int. good_subarray_score nums k i j best) /\
+    interval_score_at_most nums k best
+
+  val maximum_score_of_a_good_subarray_list (nums: list int) (k: int) : int
+    requires { valid_input nums k }
+    ensures  { maximum_good_subarray_score nums k result }
+
+  let lemma test_000_good_subarray_score () =
+    let nums =
+      Cons 5 (Cons 5 (Cons 4 (Cons 5 (Cons 4
+      (Cons 1 (Cons 1 (Cons 1 Nil))))))) in
+    assert { length nums = 8 };
+    assert { nth 0 nums = 5 };
+    assert { nth 2 nums = 4 };
+    assert { nth 4 nums = 4 };
+    assert { valid_input nums 0 };
+    assert { valid_interval nums 0 0 4 };
+    assert { is_min_on_interval nums 0 4 4 };
+    assert { good_subarray_score nums 0 0 4 20 };
+    assert { interval_score_at_most nums 0 20 };
+    assert { maximum_good_subarray_score nums 0 20 }
+
+  let lemma test_001_good_subarray_score () =
+    let nums = Cons 10 (Cons 10 (Cons 10 (Cons 10 (Cons 10 Nil)))) in
+    assert { length nums = 5 };
+    assert { nth 0 nums = 10 };
+    assert { nth 2 nums = 10 };
+    assert { nth 4 nums = 10 };
+    assert { valid_input nums 2 };
+    assert { valid_interval nums 2 0 4 };
+    assert { is_min_on_interval nums 0 4 10 };
+    assert { good_subarray_score nums 2 0 4 50 };
+    assert { interval_score_at_most nums 2 50 };
+    assert { maximum_good_subarray_score nums 2 50 }
+
+  let lemma test_002_good_subarray_score () =
+    let nums =
+      Cons 9 (Cons 8 (Cons 7 (Cons 6 (Cons 5
+      (Cons 4 (Cons 3 (Cons 2 (Cons 1 Nil)))))))) in
+    assert { length nums = 9 };
+    assert { nth 0 nums = 9 };
+    assert { nth 4 nums = 5 };
+    assert { nth 8 nums = 1 };
+    assert { valid_input nums 4 };
+    assert { valid_interval nums 4 0 4 };
+    assert { is_min_on_interval nums 0 4 5 };
+    assert { good_subarray_score nums 4 0 4 25 };
+    assert { interval_score_at_most nums 4 25 };
+    assert { maximum_good_subarray_score nums 4 25 }
+
+  let lemma test_003_good_subarray_score () =
+    let nums =
+      Cons 1 (Cons 100 (Cons 1 (Cons 100 (Cons 1
+      (Cons 100 (Cons 1 (Cons 100 (Cons 1 (Cons 100 Nil))))))))) in
+    assert { length nums = 10 };
+    assert { nth 0 nums = 1 };
+    assert { nth 4 nums = 1 };
+    assert { nth 9 nums = 100 };
+    assert { valid_input nums 4 };
+    assert { valid_interval nums 4 0 9 };
+    assert { is_min_on_interval nums 0 9 1 };
+    assert { good_subarray_score nums 4 0 9 10 };
+    assert { interval_score_at_most nums 4 10 };
+    assert { maximum_good_subarray_score nums 4 10 }
+
+  let lemma test_006_good_subarray_score () =
+    let nums =
+      Cons 1 (Cons 2 (Cons 3 (Cons 4 (Cons 5
+      (Cons 6 (Cons 7 (Cons 8 (Cons 9 (Cons 10 Nil))))))))) in
+    assert { length nums = 10 };
+    assert { nth 4 nums = 5 };
+    assert { nth 5 nums = 6 };
+    assert { nth 9 nums = 10 };
+    assert { valid_input nums 5 };
+    assert { valid_interval nums 5 4 9 };
+    assert { is_min_on_interval nums 4 9 5 };
+    assert { good_subarray_score nums 5 4 9 30 };
+    assert { interval_score_at_most nums 5 30 };
+    assert { maximum_good_subarray_score nums 5 30 }
+
+  let lemma test_009_good_subarray_score () =
+    let nums = Cons 1 (Cons 4 (Cons 3 (Cons 7 (Cons 4 (Cons 5 Nil))))) in
+    assert { length nums = 6 };
+    assert { nth 1 nums = 4 };
+    assert { nth 2 nums = 3 };
+    assert { nth 3 nums = 7 };
+    assert { nth 5 nums = 5 };
+    assert { valid_input nums 3 };
+    assert { valid_interval nums 3 1 5 };
+    assert { is_min_on_interval nums 1 5 3 };
+    assert { good_subarray_score nums 3 1 5 15 };
+    assert { interval_score_at_most nums 3 15 };
+    assert { maximum_good_subarray_score nums 3 15 }
+
+  let lemma test_012_good_subarray_score () =
+    let nums =
+      Cons 100 (Cons 200 (Cons 300 (Cons 400 (Cons 500
+      (Cons 400 (Cons 300 (Cons 200 (Cons 100 Nil)))))))) in
+    assert { length nums = 9 };
+    assert { nth 2 nums = 300 };
+    assert { nth 4 nums = 500 };
+    assert { nth 6 nums = 300 };
+    assert { valid_input nums 4 };
+    assert { valid_interval nums 4 2 6 };
+    assert { is_min_on_interval nums 2 6 300 };
+    assert { good_subarray_score nums 4 2 6 1500 };
+    assert { interval_score_at_most nums 4 1500 };
+    assert { maximum_good_subarray_score nums 4 1500 }
+
+end

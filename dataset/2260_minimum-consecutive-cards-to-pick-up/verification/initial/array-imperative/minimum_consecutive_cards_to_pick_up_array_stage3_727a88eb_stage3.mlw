@@ -1,0 +1,109 @@
+module MinimumConsecutiveCardsToPickUp_Array_Stage3_Imperative
+
+  use int.Int
+  use array.Array
+  use array.Init
+  use ref.Ref
+
+  predicate valid_cards (cards: array int) =
+    1 <= length cards <= 100000 /\
+    forall i: int. 0 <= i < length cards -> 0 <= cards[i] <= 1000000
+
+  predicate matching_pair (cards: array int) (i: int) (j: int) =
+    0 <= i < j < length cards /\ cards[i] = cards[j]
+
+  predicate no_matching_pair (cards: array int) =
+    forall i j: int. 0 <= i < j < length cards -> cards[i] <> cards[j]
+
+  predicate has_pickup_length (cards: array int) (r: int) =
+    exists i j: int. matching_pair cards i j /\ r = j - i + 1
+
+  predicate minimum_pickup_result (cards: array int) (r: int) =
+    (r = -1 /\ no_matching_pair cards) \/
+    (2 <= r <= length cards /\
+     has_pickup_length cards r /\
+     forall i j: int. matching_pair cards i j -> r <= j - i + 1)
+
+  predicate processed_stage (cards: array int) (outer: int) (inner: int)
+                            (i: int) (j: int) =
+    matching_pair cards i j /\
+    (i < outer \/ (i = outer /\ j < inner))
+
+  predicate best_summary (cards: array int) (n: int) (best: int)
+                         (outer: int) (inner: int) =
+    n = length cards /\
+    0 <= outer <= n /\
+    0 <= inner <= n + 1 /\
+    ((best = n + 1 /\
+      forall i j: int.
+        processed_stage cards outer inner i j -> false) \/
+     (2 <= best <= n /\
+      has_pickup_length cards best /\
+      forall i j: int.
+        processed_stage cards outer inner i j -> best <= j - i + 1))
+
+  let minimum_consecutive_cards_to_pick_up_array (cards: array int) : int
+    requires { valid_cards cards }
+    ensures  { minimum_pickup_result cards result }
+  =
+    let n = length cards in
+    assert { 1 <= n <= 100000 };
+    if n <= 1 then begin
+      assert { n = 1 };
+      assert { no_matching_pair cards };
+      -1
+    end else begin
+      let best = ref (n + 1) in
+      for i = 0 to n - 1 do
+        invariant { 0 <= i <= n }
+        invariant { best_summary cards n !best i (i + 1) }
+
+        for j = i + 1 to n - 1 do
+          invariant { 0 <= i < n }
+          invariant { i + 1 <= j <= n }
+          invariant { best_summary cards n !best i j }
+
+          if cards[i] = cards[j] then begin
+            assert { matching_pair cards i j };
+            let span = j - i + 1 in
+            assert { 2 <= span <= n };
+            assert { has_pickup_length cards span };
+            assert { processed_stage cards i (j + 1) i j };
+            if span < !best then begin
+              best := span;
+              assert { best_summary cards n !best i (j + 1) }
+            end else begin
+              assert { !best <= span };
+              assert { best_summary cards n !best i (j + 1) }
+            end
+          end else begin
+            assert { not (matching_pair cards i j) };
+            assert { best_summary cards n !best i (j + 1) }
+          end
+        done;
+        assert { best_summary cards n !best (i + 1) (i + 2) }
+      done;
+      assert { best_summary cards n !best n (n + 1) };
+      if !best = n + 1 then begin
+        assert {
+          forall i j: int. matching_pair cards i j ->
+            processed_stage cards n (n + 1) i j
+        };
+        assert { no_matching_pair cards };
+        -1
+      end else begin
+        assert { 2 <= !best <= n };
+        assert { has_pickup_length cards !best };
+        assert {
+          forall i j: int. matching_pair cards i j ->
+            processed_stage cards n (n + 1) i j
+        };
+        assert {
+          forall i j: int. matching_pair cards i j ->
+            !best <= j - i + 1
+        };
+        !best
+      end
+    end
+
+end

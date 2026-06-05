@@ -1,0 +1,358 @@
+module FindTwoNonOverlappingSubArraysEachWithTargetSum_Array_Stage3_Recursive
+
+  use int.Int
+  use int.Sum as S
+  use array.Array
+  use array.Init
+  use array.ArraySum
+
+  predicate target_segment (arr: array int) (target: int) (l: int) (u: int) =
+    0 <= l < u <= length arr /\ sum arr l u = target
+
+  predicate non_overlapping (l1: int) (u1: int) (l2: int) (u2: int) =
+    u1 <= l2 \/ u2 <= l1
+
+  function pair_total_length (l1: int) (u1: int) (l2: int) (u2: int) : int =
+    (u1 - l1) + (u2 - l2)
+
+  predicate valid_pair (arr: array int) (target: int)
+      (l1: int) (u1: int) (l2: int) (u2: int) =
+    target_segment arr target l1 u1 /\
+    target_segment arr target l2 u2 /\
+    non_overlapping l1 u1 l2 u2
+
+  predicate no_valid_pair (arr: array int) (target: int) =
+    forall l1 u1 l2 u2: int.
+      not (valid_pair arr target l1 u1 l2 u2)
+
+  predicate minimal_total_length (arr: array int) (target: int) (k: int) =
+    (exists l1 u1 l2 u2: int.
+      valid_pair arr target l1 u1 l2 u2 /\
+      k = pair_total_length l1 u1 l2 u2) /\
+    (forall l1 u1 l2 u2: int.
+      valid_pair arr target l1 u1 l2 u2 ->
+      k <= pair_total_length l1 u1 l2 u2)
+
+  predicate correct_result (arr: array int) (target: int) (result: int) =
+    (result = (-1) /\ no_valid_pair arr target) \/
+    (result >= 2 /\ minimal_total_length arr target result)
+
+  predicate array_positive (arr: array int) =
+    forall i: int. 0 <= i < length arr -> 1 <= arr[i]
+
+  predicate no_target_before (arr: array int) (target: int)
+      (start: int) (j: int) =
+    forall u: int. start < u < j ->
+      not (target_segment arr target start u)
+
+  let lemma positive_sum_nonnegative (arr: array int) (l: int) (u: int)
+    requires { 0 <= l <= u <= length arr }
+    requires { array_positive arr }
+    ensures  { 0 <= sum arr l u }
+  =
+    assert { forall i: int. l <= i < u -> 0 <= arr[i] };
+    S.sum_nonneg arr.elts l u
+
+  let lemma positive_sum_extension_ge (arr: array int) (start: int)
+      (j: int) (u: int)
+    requires { 0 <= start <= j <= u <= length arr }
+    requires { array_positive arr }
+    ensures  { sum arr start j <= sum arr start u }
+  =
+    S.sum_decomp arr.elts start j u;
+    positive_sum_nonnegative arr j u;
+    assert { sum arr start u = sum arr start j + sum arr j u }
+
+  let lemma no_target_after_overshoot (arr: array int) (target: int)
+      (start: int) (j: int) (current: int)
+    requires { 0 <= start <= j <= length arr }
+    requires { array_positive arr }
+    requires { current = sum arr start j }
+    requires { current > target }
+    ensures  { forall u: int. j <= u <= length arr ->
+      not (target_segment arr target start u) }
+  =
+    assert { forall u: int. j <= u <= length arr ->
+      sum arr start j <= sum arr start u };
+    assert { forall u: int. j <= u <= length arr ->
+      current <= sum arr start u };
+    assert { forall u: int. j <= u <= length arr ->
+      target < sum arr start u };
+    assert { forall u: int. j <= u <= length arr ->
+      not (target_segment arr target start u) }
+
+  let lemma no_target_before_advance (arr: array int) (target: int)
+      (start: int) (j: int) (current: int)
+    requires { 0 <= start <= j <= length arr }
+    requires { current = sum arr start j }
+    requires { current <> target }
+    requires { no_target_before arr target start j }
+    ensures  { no_target_before arr target start (j + 1) }
+  =
+    assert { not (target_segment arr target start j) };
+    assert { forall u: int. start < u < j + 1 ->
+      not (target_segment arr target start u) }
+
+  predicate first_segment_end (arr: array int) (target: int) (start: int)
+      (endpoint: int) =
+    (endpoint = (-1) /\
+      forall u: int. start < u <= length arr ->
+        not (target_segment arr target start u)) \/
+    (start < endpoint <= length arr /\
+      target_segment arr target start endpoint /\
+      forall u: int. start < u < endpoint ->
+        not (target_segment arr target start u))
+
+  predicate segment_length_start (arr: array int) (target: int)
+      (start: int) (k: int) =
+    (k = length arr + 1 /\
+      forall u: int. start < u <= length arr ->
+        not (target_segment arr target start u)) \/
+    (1 <= k <= length arr - start /\
+      target_segment arr target start (start + k) /\
+      forall u: int. start < u <= length arr ->
+        target_segment arr target start u -> k <= u - start)
+
+  predicate best_single_suffix (arr: array int) (target: int)
+      (start: int) (k: int) =
+    (k = length arr + 1 /\
+      forall l u: int. start <= l < u <= length arr ->
+        not (target_segment arr target l u)) \/
+    (1 <= k <= length arr - start /\
+      (exists l u: int. start <= l < u <= length arr /\
+        target_segment arr target l u /\ k = u - l) /\
+      forall l u: int. start <= l < u <= length arr ->
+        target_segment arr target l u -> k <= u - l)
+
+  predicate ordered_valid_pair_from (arr: array int) (target: int)
+      (start: int) (l1: int) (u1: int) (l2: int) (u2: int) =
+    start <= l1 /\
+    target_segment arr target l1 u1 /\
+    target_segment arr target l2 u2 /\
+    u1 <= l2
+
+  predicate best_pair_suffix (arr: array int) (target: int)
+      (start: int) (k: int) =
+    (k = length arr + 1 /\
+      forall l1 u1 l2 u2: int.
+        not (ordered_valid_pair_from arr target start l1 u1 l2 u2)) \/
+    (2 <= k <= length arr - start /\
+      (exists l1 u1 l2 u2: int.
+        ordered_valid_pair_from arr target start l1 u1 l2 u2 /\
+        k = pair_total_length l1 u1 l2 u2) /\
+      forall l1 u1 l2 u2: int.
+        ordered_valid_pair_from arr target start l1 u1 l2 u2 ->
+        k <= pair_total_length l1 u1 l2 u2)
+
+  let min2 (x: int) (y: int) : int
+    ensures { result = x \/ result = y }
+    ensures { result <= x /\ result <= y }
+    ensures { forall z: int. z <= x /\ z <= y -> z <= result }
+  =
+    if x <= y then x else y
+
+  let no_solution (arr: array int) : int
+    ensures { result = length arr + 1 }
+    ensures { length arr < result }
+  =
+    length arr + 1
+
+  let rec find_segment_end_from (arr: array int) (target: int)
+      (start: int) (j: int) (current: int) : int
+    requires { 0 <= start <= j <= length arr }
+    requires { 1 <= target }
+    requires { array_positive arr }
+    requires { current = sum arr start j }
+    requires { current = target -> start < j }
+    requires { no_target_before arr target start j }
+    variant { length arr - j }
+    ensures { first_segment_end arr target start result }
+  =
+    if current = target then
+      begin
+      assert { start < j };
+      assert { target_segment arr target start j };
+      j
+      end
+    else if j >= length arr then
+      begin
+      assert { j = length arr };
+      assert { current <> target };
+      no_target_before_advance arr target start j current;
+      assert { forall u: int. start < u <= length arr ->
+        not (target_segment arr target start u) };
+      (-1)
+      end
+    else if current > target then
+      begin
+      no_target_after_overshoot arr target start j current;
+      assert { forall u: int. start < u <= length arr ->
+        not (target_segment arr target start u) };
+      (-1)
+      end
+    else
+      begin
+      assert { 0 <= j < length arr };
+      assert { 0 <= j + 1 <= length arr };
+      assert { current + arr[j] = sum arr start (j + 1) };
+      assert { current + arr[j] = target -> start < j + 1 };
+      assert { current <> target };
+      no_target_before_advance arr target start j current;
+      find_segment_end_from arr target start (j + 1) (current + arr[j])
+      end
+
+  let find_segment_end (arr: array int) (target: int) (j: int)
+      (current: int) : int
+    requires { 0 <= j <= length arr }
+    requires { 1 <= target }
+    requires { array_positive arr }
+    requires { current = 0 }
+    ensures { first_segment_end arr target j result }
+  =
+    assert { current = sum arr j j };
+    assert { no_target_before arr target j j };
+    find_segment_end_from arr target j j current
+
+  let segment_length_from (arr: array int) (target: int) (start: int) : int
+    requires { 0 <= start <= length arr }
+    requires { 1 <= target }
+    requires { array_positive arr }
+    ensures { segment_length_start arr target start result }
+  =
+    if start >= length arr then
+      begin
+      assert { start = length arr };
+      assert { forall u: int. start < u <= length arr ->
+        not (target_segment arr target start u) };
+      no_solution arr
+      end
+    else
+      begin
+      assert { 0 <= start < length arr };
+      let segment_end = find_segment_end arr target start 0 in
+      if segment_end = (-1) then
+        begin
+        assert { forall u: int. start < u <= length arr ->
+          not (target_segment arr target start u) };
+        no_solution arr
+        end
+      else
+        begin
+        assert { start < segment_end <= length arr };
+        assert { target_segment arr target start segment_end };
+        assert { 1 <= segment_end - start <= length arr - start };
+        assert { segment_length_start arr target start (segment_end - start) };
+        segment_end - start
+        end
+      end
+
+  let rec best_single_from (arr: array int) (target: int) (start: int) : int
+    requires { 0 <= start <= length arr }
+    requires { 1 <= target }
+    requires { array_positive arr }
+    variant { length arr - start }
+    ensures { best_single_suffix arr target start result }
+  =
+    if start >= length arr then
+      begin
+      assert { start = length arr };
+      assert { forall l u: int. start <= l < u <= length arr ->
+        not (target_segment arr target l u) };
+      no_solution arr
+      end
+    else
+      begin
+      assert { 0 <= start < length arr };
+      assert { 0 <= start + 1 <= length arr };
+      let here = segment_length_from arr target start in
+      let tail = best_single_from arr target (start + 1) in
+      let best = min2 here tail in
+      assert { best_single_suffix arr target start best };
+      best
+      end
+
+  let rec best_pair_from (arr: array int) (target: int) (start: int) : int
+    requires { 0 <= start <= length arr }
+    requires { 1 <= target }
+    requires { array_positive arr }
+    variant { length arr - start }
+    ensures { best_pair_suffix arr target start result }
+  =
+    if start >= length arr then
+      begin
+      assert { start = length arr };
+      assert { forall l1 u1 l2 u2: int.
+        not (ordered_valid_pair_from arr target start l1 u1 l2 u2) };
+      no_solution arr
+      end
+    else
+      begin
+      assert { 0 <= start < length arr };
+      assert { 0 <= start + 1 <= length arr };
+      let skip = best_pair_from arr target (start + 1) in
+      let segment_end = find_segment_end arr target start 0 in
+      if segment_end = (-1) then
+        begin
+        assert { forall u: int. start < u <= length arr ->
+          not (target_segment arr target start u) };
+        assert { best_pair_suffix arr target start skip };
+        skip
+        end
+      else
+        begin
+        assert { start < segment_end <= length arr };
+        assert { target_segment arr target start segment_end };
+        let second = best_single_from arr target segment_end in
+        let with_first =
+          if second > length arr then
+            begin
+            assert { second = length arr + 1 };
+            no_solution arr
+            end
+          else
+            begin
+            assert { 1 <= second <= length arr - segment_end };
+            assert { exists l2 u2: int. segment_end <= l2 < u2 <= length arr /\
+              target_segment arr target l2 u2 /\ second = u2 - l2 };
+            (segment_end - start) + second
+            end
+        in
+        let best = min2 with_first skip in
+        assert { best_pair_suffix arr target start best };
+        best
+        end
+      end
+
+  let lemma best_pair_suffix_correct_at_zero (arr: array int) (target: int)
+      (k: int)
+    requires { best_pair_suffix arr target 0 k }
+    ensures  { (k = length arr + 1 /\ no_valid_pair arr target) \/
+      (k <> length arr + 1 /\ minimal_total_length arr target k) }
+  =
+    assert { (k = length arr + 1 /\ no_valid_pair arr target) \/
+      (k <> length arr + 1 /\ minimal_total_length arr target k) }
+
+  let find_two_non_overlapping_sub_arrays_each_with_target_sum_array
+      (arr: array int) (target: int) : int
+    requires { 1 <= length arr <= 100000 }
+    requires { forall i: int. 0 <= i < length arr -> 1 <= arr[i] <= 1000 }
+    requires { 1 <= target <= 100000000 }
+    ensures  { correct_result arr target result }
+  =
+    let best = best_pair_from arr target 0 in
+    best_pair_suffix_correct_at_zero arr target best;
+    if best > length arr then
+      begin
+      assert { best = length arr + 1 };
+      assert { no_valid_pair arr target };
+      (-1)
+      end
+    else
+      begin
+      assert { best <> length arr + 1 };
+      assert { minimal_total_length arr target best };
+      assert { 2 <= best };
+      best
+      end
+
+end

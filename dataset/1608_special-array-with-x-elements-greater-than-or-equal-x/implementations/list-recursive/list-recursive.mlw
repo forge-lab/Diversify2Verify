@@ -1,0 +1,188 @@
+module SpecialArrayWithXElementsGreaterThanOrEqualX_List_Recursive_Implementation
+
+  use int.Int
+  use list.List
+
+  let rec list_length (nums: list int) : int
+    variant { nums }
+  =
+    match nums with
+    | Nil -> 0
+    | Cons _ rest -> 1 + list_length rest
+    end
+
+  let rec count_ge (nums: list int) (x: int) : int
+    variant { nums }
+  =
+    match nums with
+    | Nil -> 0
+    | Cons y ys ->
+        (if y >= x then 1 else 0) + count_ge ys x
+    end
+
+  let rec find_special_from (nums: list int) (x: int) : int
+    variant { x }
+  =
+    if x = 0 then
+      if count_ge nums 0 = 0 then 0 else -1
+    else if count_ge nums x = x then
+      x
+    else
+      find_special_from nums (x - 1)
+
+  let special_array_with_x_elements_greater_than_or_equal_x_list (nums: list int) : int =
+    find_special_from nums (list_length nums)
+
+  let test_test_000 () : bool =
+    let nums = Cons 6 (Cons 5 (Cons 4 (Cons 3 (Cons 2 (Cons 1 Nil))))) in
+    let r = special_array_with_x_elements_greater_than_or_equal_x_list nums in
+    r = -1
+
+  let test_test_001 () : bool =
+    let nums =
+      Cons 100 (Cons 100 (Cons 100 (Cons 100 (Cons 100
+        (Cons 100 (Cons 100 (Cons 100 (Cons 100 (Cons 100 Nil)))))))))
+    in
+    let r = special_array_with_x_elements_greater_than_or_equal_x_list nums in
+    r = 10
+
+  let test_test_002 () : bool =
+    let nums = Cons 0 (Cons 1 (Cons 2 (Cons 3 (Cons 4 (Cons 5 Nil))))) in
+    let r = special_array_with_x_elements_greater_than_or_equal_x_list nums in
+    r = 3
+
+  let test_test_003 () : bool =
+    let nums =
+      Cons 0 (Cons 1 (Cons 2 (Cons 3 (Cons 4
+        (Cons 5 (Cons 6 (Cons 7 (Cons 8 (Cons 9 (Cons 10 Nil))))))))))
+    in
+    let r = special_array_with_x_elements_greater_than_or_equal_x_list nums in
+    r = -1
+
+  let test_test_004 () : bool =
+    let nums = Cons 100 (Cons 200 (Cons 300 (Cons 400 (Cons 500 Nil)))) in
+    let r = special_array_with_x_elements_greater_than_or_equal_x_list nums in
+    r = 5
+
+  let test_test_005 () : bool =
+    let nums = Cons 0 (Cons 0 Nil) in
+    let r = special_array_with_x_elements_greater_than_or_equal_x_list nums in
+    r = -1
+
+  let test_test_006 () : bool =
+    let nums = Cons 1 Nil in
+    let r = special_array_with_x_elements_greater_than_or_equal_x_list nums in
+    r = 1
+
+  let test_test_007 () : bool =
+    let nums =
+      Cons 1 (Cons 1 (Cons 2 (Cons 2 (Cons 3
+        (Cons 3 (Cons 4 (Cons 4 (Cons 5 (Cons 5 Nil)))))))))
+    in
+    let r = special_array_with_x_elements_greater_than_or_equal_x_list nums in
+    r = 4
+
+  let test_test_008 () : bool =
+    let nums = Cons 10 (Cons 20 (Cons 30 (Cons 40 (Cons 50 Nil)))) in
+    let r = special_array_with_x_elements_greater_than_or_equal_x_list nums in
+    r = 5
+
+  let test_test_009 () : bool =
+    let nums = Cons 5 (Cons 5 (Cons 5 (Cons 5 (Cons 5 Nil)))) in
+    let r = special_array_with_x_elements_greater_than_or_equal_x_list nums in
+    r = 5
+
+  let test_test_010 () : bool =
+    let nums = Cons 0 (Cons 0 (Cons 0 (Cons 0 (Cons 0 Nil)))) in
+    let r = special_array_with_x_elements_greater_than_or_equal_x_list nums in
+    r = -1
+
+  let test_test_011 () : bool =
+    let nums = Cons 1 (Cons 2 (Cons 3 (Cons 4 (Cons 5 Nil)))) in
+    let r = special_array_with_x_elements_greater_than_or_equal_x_list nums in
+    r = 3
+
+  let test_test_012 () : bool =
+    let nums = Cons 1000 Nil in
+    let r = special_array_with_x_elements_greater_than_or_equal_x_list nums in
+    r = 1
+
+  let test_test_013 () : bool =
+    let nums = Cons 0 (Cons 0 (Cons 0 (Cons 0 (Cons 0 (Cons 0 Nil))))) in
+    let r = special_array_with_x_elements_greater_than_or_equal_x_list nums in
+    r = -1
+
+  let test_test_014 () : bool =
+    let nums = Cons 0 Nil in
+    let r = special_array_with_x_elements_greater_than_or_equal_x_list nums in
+    r = -1
+
+  let test_test_015 () : bool =
+    let nums = Cons 100 (Cons 200 (Cons 300 (Cons 400 (Cons 500 Nil)))) in
+    let r = special_array_with_x_elements_greater_than_or_equal_x_list nums in
+    r = 5
+
+  let test_test_016 () : bool =
+    let nums = Cons 0 (Cons 4 (Cons 3 (Cons 0 (Cons 4 Nil)))) in
+    let r = special_array_with_x_elements_greater_than_or_equal_x_list nums in
+    r = 3
+
+  let test_test_017 () : bool =
+    let nums = Cons 3 (Cons 5 Nil) in
+    let r = special_array_with_x_elements_greater_than_or_equal_x_list nums in
+    r = 2
+
+  let test_test_018 () : bool =
+    let nums = Cons 1000 (Cons 999 (Cons 998 (Cons 997 (Cons 996 Nil)))) in
+    let r = special_array_with_x_elements_greater_than_or_equal_x_list nums in
+    r = 5
+
+  let test_test_019 () : bool =
+    let nums = Cons 1 (Cons 2 (Cons 3 (Cons 3 (Cons 3 Nil)))) in
+    let r = special_array_with_x_elements_greater_than_or_equal_x_list nums in
+    r = 3
+
+  let run_tests () : bool =
+    if test_test_000 () then
+    if test_test_001 () then
+    if test_test_002 () then
+    if test_test_003 () then
+    if test_test_004 () then
+    if test_test_005 () then
+    if test_test_006 () then
+    if test_test_007 () then
+    if test_test_008 () then
+    if test_test_009 () then
+    if test_test_010 () then
+    if test_test_011 () then
+    if test_test_012 () then
+    if test_test_013 () then
+    if test_test_014 () then
+    if test_test_015 () then
+    if test_test_016 () then
+    if test_test_017 () then
+    if test_test_018 () then
+    if test_test_019 () then
+      true
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+
+end

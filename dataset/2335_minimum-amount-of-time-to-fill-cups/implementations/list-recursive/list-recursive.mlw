@@ -1,0 +1,187 @@
+module MinimumAmountOfTimeToFillCups_List_Recursive_Implementation
+
+  use int.Int
+  use list.List
+  use list.Length
+  use list.Mem
+
+  predicate valid_amounts (amount: list int) =
+    length amount = 3 /\
+    (forall x: int. mem x amount -> 0 <= x)
+
+  let rec sum_amount (amount: list int) : int
+    variant { amount }
+  =
+    match amount with
+    | Nil -> 0
+    | Cons x xs -> x + sum_amount xs
+    end
+
+  let rec max_amount (amount: list int) : int
+    variant { amount }
+  =
+    match amount with
+    | Nil -> 0
+    | Cons x xs ->
+        let rest_max = max_amount xs in
+        if x >= rest_max then x else rest_max
+    end
+
+  let rec ceil_half_nonneg (n: int) : int
+    requires { 0 <= n }
+    variant { n }
+  =
+    if n <= 1 then n else 1 + ceil_half_nonneg (n - 2)
+
+  let minimum_amount_of_time_to_fill_cups_list (amount: list int) : int
+    requires { valid_amounts amount }
+  =
+    let total = sum_amount amount in
+    let peak = max_amount amount in
+    let half = ceil_half_nonneg total in
+    if peak >= half then peak else half
+
+  let test_000 () : bool =
+    let amount = Cons 33 (Cons 33 (Cons 34 Nil)) in
+    let r = minimum_amount_of_time_to_fill_cups_list amount in
+    r = 50
+
+  let test_001 () : bool =
+    let amount = Cons 0 (Cons 0 (Cons 0 Nil)) in
+    let r = minimum_amount_of_time_to_fill_cups_list amount in
+    r = 0
+
+  let test_002 () : bool =
+    let amount = Cons 99 (Cons 1 (Cons 1 Nil)) in
+    let r = minimum_amount_of_time_to_fill_cups_list amount in
+    r = 99
+
+  let test_003 () : bool =
+    let amount = Cons 7 (Cons 7 (Cons 7 Nil)) in
+    let r = minimum_amount_of_time_to_fill_cups_list amount in
+    r = 11
+
+  let test_004 () : bool =
+    let amount = Cons 10 (Cons 10 (Cons 10 Nil)) in
+    let r = minimum_amount_of_time_to_fill_cups_list amount in
+    r = 15
+
+  let test_005 () : bool =
+    let amount = Cons 1 (Cons 2 (Cons 3 Nil)) in
+    let r = minimum_amount_of_time_to_fill_cups_list amount in
+    r = 3
+
+  let test_006 () : bool =
+    let amount = Cons 100 (Cons 0 (Cons 0 Nil)) in
+    let r = minimum_amount_of_time_to_fill_cups_list amount in
+    r = 100
+
+  let test_007 () : bool =
+    let amount = Cons 100 (Cons 100 (Cons 100 Nil)) in
+    let r = minimum_amount_of_time_to_fill_cups_list amount in
+    r = 150
+
+  let test_008 () : bool =
+    let amount = Cons 0 (Cons 1 (Cons 2 Nil)) in
+    let r = minimum_amount_of_time_to_fill_cups_list amount in
+    r = 2
+
+  let test_009 () : bool =
+    let amount = Cons 1 (Cons 4 (Cons 2 Nil)) in
+    let r = minimum_amount_of_time_to_fill_cups_list amount in
+    r = 4
+
+  let test_010 () : bool =
+    let amount = Cons 5 (Cons 0 (Cons 0 Nil)) in
+    let r = minimum_amount_of_time_to_fill_cups_list amount in
+    r = 5
+
+  let test_011 () : bool =
+    let amount = Cons 99 (Cons 99 (Cons 1 Nil)) in
+    let r = minimum_amount_of_time_to_fill_cups_list amount in
+    r = 100
+
+  let test_012 () : bool =
+    let amount = Cons 0 (Cons 50 (Cons 50 Nil)) in
+    let r = minimum_amount_of_time_to_fill_cups_list amount in
+    r = 50
+
+  let test_013 () : bool =
+    let amount = Cons 5 (Cons 4 (Cons 4 Nil)) in
+    let r = minimum_amount_of_time_to_fill_cups_list amount in
+    r = 7
+
+  let test_014 () : bool =
+    let amount = Cons 98 (Cons 1 (Cons 1 Nil)) in
+    let r = minimum_amount_of_time_to_fill_cups_list amount in
+    r = 98
+
+  let test_015 () : bool =
+    let amount = Cons 25 (Cons 0 (Cons 75 Nil)) in
+    let r = minimum_amount_of_time_to_fill_cups_list amount in
+    r = 75
+
+  let test_016 () : bool =
+    let amount = Cons 42 (Cons 42 (Cons 41 Nil)) in
+    let r = minimum_amount_of_time_to_fill_cups_list amount in
+    r = 63
+
+  let test_017 () : bool =
+    let amount = Cons 60 (Cons 20 (Cons 20 Nil)) in
+    let r = minimum_amount_of_time_to_fill_cups_list amount in
+    r = 60
+
+  let test_018 () : bool =
+    let amount = Cons 10 (Cons 50 (Cons 25 Nil)) in
+    let r = minimum_amount_of_time_to_fill_cups_list amount in
+    r = 50
+
+  let test_019 () : bool =
+    let amount = Cons 49 (Cons 49 (Cons 49 Nil)) in
+    let r = minimum_amount_of_time_to_fill_cups_list amount in
+    r = 74
+
+  let run_tests () : bool =
+    if test_000 () then
+    if test_001 () then
+    if test_002 () then
+    if test_003 () then
+    if test_004 () then
+    if test_005 () then
+    if test_006 () then
+    if test_007 () then
+    if test_008 () then
+    if test_009 () then
+    if test_010 () then
+    if test_011 () then
+    if test_012 () then
+    if test_013 () then
+    if test_014 () then
+    if test_015 () then
+    if test_016 () then
+    if test_017 () then
+    if test_018 () then
+    if test_019 () then
+      true
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+
+end

@@ -1,0 +1,185 @@
+module MinimumMovesToPickKOnes_List_Stage3_Imperative
+
+  use int.Int
+  use int.Abs
+  use list.List
+  use list.Length
+  use list.Mem
+  use list.NthNoOpt
+  use list.NumOcc
+  use ref.Ref
+
+  let rec predicate binary_list (nums: list int)
+    variant { nums }
+  =
+    match nums with
+    | Nil -> true
+    | Cons x xs -> (x = 0 || x = 1) && binary_list xs
+    end
+
+  predicate valid_pick_positions (nums: list int) (positions: list int) =
+    forall p: int.
+      mem p positions ->
+      0 <= p /\ p < length nums /\ nth p nums = 1
+
+  predicate distinct_positions (positions: list int) =
+    forall p: int. num_occ p positions <= 1
+
+  let rec function sum_distances (center: int) (positions: list int) : int
+    variant { positions }
+  =
+    match positions with
+    | Nil -> 0
+    | Cons p ps -> abs (p - center) + sum_distances center ps
+    end
+
+  predicate input_constraints (nums: list int) (k: int) (maxChanges: int) =
+    2 <= length nums /\
+    length nums <= 100000 /\
+    binary_list nums /\
+    1 <= k /\
+    k <= 100000 /\
+    0 <= maxChanges /\
+    maxChanges <= 100000 /\
+    maxChanges + num_occ 1 nums >= k
+
+  predicate feasible_pick_plan
+      (nums: list int) (k: int) (maxChanges: int)
+      (center: int) (picked: list int) (changed: int) (cost: int) =
+    0 <= center /\
+    center < length nums /\
+    0 <= changed /\
+    changed <= maxChanges /\
+    length picked + changed = k /\
+    distinct_positions picked /\
+    valid_pick_positions nums picked /\
+    cost = sum_distances center picked + 2 * changed
+
+  predicate no_better_plan
+      (nums: list int) (k: int) (maxChanges: int) (bound: int) =
+    forall center: int. forall picked: list int. forall changed cost: int.
+      feasible_pick_plan nums k maxChanges center picked changed cost -> bound <= cost
+
+  predicate minimum_moves_characterization
+      (nums: list int) (k: int) (maxChanges: int) (moves: int) =
+    (exists center: int. exists picked: list int. exists changed: int.
+       feasible_pick_plan nums k maxChanges center picked changed moves) /\
+    no_better_plan nums k maxChanges moves
+
+  let distance (x: int) (y: int) : int
+    ensures { result = abs (x - y) }
+    ensures { 0 <= result }
+  =
+    if x >= y then x - y else y - x
+
+  let rec insert_sorted (x: int) (l: list int) : list int
+    ensures { length result = length l + 1 }
+    variant { l }
+  =
+    match l with
+    | Nil -> Cons x Nil
+    | Cons y ys ->
+        if x <= y then Cons x (Cons y ys) else Cons y (insert_sorted x ys)
+    end
+
+  let minimum_moves_to_pick_k_ones_list (nums: list int) (k: int) (maxChanges: int) : int
+    requires { input_constraints nums k maxChanges }
+    ensures  { minimum_moves_characterization nums k maxChanges result }
+  =
+    let positions = ref (Nil: list int) in
+    let index = ref 0 in
+    let ones_count = ref 0 in
+    let cur = ref nums in
+    while (match !cur with Nil -> false | Cons _ _ -> true end) do
+      invariant { 0 <= !index }
+      invariant { !index + length !cur = length nums }
+      invariant { 0 <= !ones_count }
+      invariant { !ones_count <= !index }
+      variant { length !cur }
+      match !cur with
+      | Nil -> ()
+      | Cons x xs ->
+          assert { length !cur = 1 + length xs };
+          if x = 1 then (
+            positions := Cons !index !positions;
+            ones_count := !ones_count + 1
+          );
+          index := !index + 1;
+          cur := xs
+      end
+    done;
+    match !cur with
+    | Nil -> ()
+    | Cons _ _ -> absurd
+    end;
+    assert { !cur = Nil };
+    assert { !index = length nums };
+    let n = !index in
+    let min_existing = if k > maxChanges then k - maxChanges else 0 in
+    let max_existing = if k < !ones_count then k else !ones_count in
+    let best = ref (if min_existing = 0 then 2 * k else n * k + 2 * k + 1) in
+    let center = ref 0 in
+    while !center < n do
+      invariant { 0 <= !center }
+      invariant { !center <= n }
+      invariant { n = length nums }
+      invariant { 0 <= min_existing }
+      invariant { min_existing <= k }
+      invariant { 0 <= max_existing }
+      invariant { max_existing <= k }
+      invariant { 0 <= !best }
+      variant { n - !center }
+      let sorted_dists = ref (Nil: list int) in
+      let pos_cur = ref !positions in
+      while (match !pos_cur with Nil -> false | Cons _ _ -> true end) do
+        invariant { 0 <= length !pos_cur }
+        invariant { length !sorted_dists + length !pos_cur = length !positions }
+        variant { length !pos_cur }
+        match !pos_cur with
+        | Nil -> ()
+        | Cons p ps ->
+            assert { length !pos_cur = 1 + length ps };
+            sorted_dists := insert_sorted (distance p !center) !sorted_dists;
+            pos_cur := ps
+        end
+      done;
+      match !pos_cur with
+      | Nil -> ()
+      | Cons _ _ -> absurd
+      end;
+      assert { !pos_cur = Nil };
+      assert { length !sorted_dists = length !positions };
+      let taken = ref 0 in
+      let dist_sum = ref 0 in
+      let dist_cur = ref !sorted_dists in
+      while (match !dist_cur with Nil -> false | Cons _ _ -> true end) do
+        invariant { 0 <= !taken }
+        invariant { !taken <= max_existing }
+        invariant { 0 <= !dist_sum }
+        invariant { 0 <= length !dist_cur }
+        variant { length !dist_cur }
+        match !dist_cur with
+        | Nil -> ()
+        | Cons d ds ->
+            assert { length !dist_cur = 1 + length ds };
+            if !taken < max_existing then (
+              dist_sum := !dist_sum + d;
+              taken := !taken + 1;
+              if !taken >= min_existing then
+                let cost = !dist_sum + 2 * (k - !taken) in
+                if cost < !best then best := cost
+            );
+            dist_cur := ds
+        end
+      done;
+      match !dist_cur with
+      | Nil -> ()
+      | Cons _ _ -> absurd
+      end;
+      assert { !dist_cur = Nil };
+      center := !center + 1
+    done;
+    assert { !center = n };
+    !best
+
+end

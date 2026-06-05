@@ -1,0 +1,131 @@
+module SumOfMutatedArrayClosestToTarget_List_Spec
+
+  use int.Int
+  use int.Abs
+  use int.MinMax
+  use list.List
+
+  let rec predicate values_in_range (l: list int)
+    variant { l }
+  =
+    match l with
+    | Nil -> true
+    | Cons x xs -> 1 <= x && x <= 100000 && values_in_range xs
+    end
+
+  let rec function mutated_sum (l: list int) (v: int) : int
+    variant { l }
+  =
+    match l with
+    | Nil -> 0
+    | Cons x xs -> min x v + mutated_sum xs v
+    end
+
+  function distance_to_target (l: list int) (target: int) (v: int) : int =
+    abs (mutated_sum l v - target)
+
+  predicate best_mutation_value (l: list int) (target: int) (chosen: int) =
+    (forall v: int. distance_to_target l target chosen <= distance_to_target l target v) /\
+    (forall v: int.
+       distance_to_target l target chosen = distance_to_target l target v ->
+       chosen <= v)
+
+  val sum_of_mutated_array_closest_to_target_list (arr: list int) (target: int) : int
+    requires { arr <> Nil }
+    requires { values_in_range arr }
+    requires { 1 <= target /\ target <= 100000 }
+    ensures  { 0 <= result }
+    ensures  { best_mutation_value arr target result }
+
+  let lemma check_test_000 () =
+    let l = Cons 1 (Cons 2 (Cons 3 (Cons 4 (Cons 5 Nil)))) in
+    assert { values_in_range Nil };
+    assert { values_in_range (Cons 5 Nil) };
+    assert { values_in_range (Cons 4 (Cons 5 Nil)) };
+    assert { values_in_range (Cons 3 (Cons 4 (Cons 5 Nil))) };
+    assert { values_in_range (Cons 2 (Cons 3 (Cons 4 (Cons 5 Nil)))) };
+    assert { values_in_range l };
+    assert { mutated_sum Nil 3 = 0 };
+    assert { mutated_sum (Cons 5 Nil) 3 = 3 };
+    assert { mutated_sum (Cons 4 (Cons 5 Nil)) 3 = 6 };
+    assert { mutated_sum (Cons 3 (Cons 4 (Cons 5 Nil))) 3 = 9 };
+    assert { mutated_sum (Cons 2 (Cons 3 (Cons 4 (Cons 5 Nil)))) 3 = 11 };
+    assert { mutated_sum l 3 = 12 };
+    assert { mutated_sum l 2 = 9 };
+    assert { mutated_sum l 4 = 14 };
+    assert { distance_to_target l 11 3 = 1 };
+    assert { best_mutation_value l 11 3 }
+
+  let lemma check_test_001 () =
+    let l = Cons 5 (Cons 5 (Cons 5 (Cons 5 (Cons 5 Nil)))) in
+    assert { values_in_range l };
+    assert { mutated_sum Nil 3 = 0 };
+    assert { mutated_sum (Cons 5 Nil) 3 = 3 };
+    assert { mutated_sum (Cons 5 (Cons 5 Nil)) 3 = 6 };
+    assert { mutated_sum (Cons 5 (Cons 5 (Cons 5 Nil))) 3 = 9 };
+    assert { mutated_sum (Cons 5 (Cons 5 (Cons 5 (Cons 5 Nil)))) 3 = 12 };
+    assert { mutated_sum l 3 = 15 };
+    assert { mutated_sum l 4 = 20 };
+    assert { distance_to_target l 17 3 = 2 };
+    assert { best_mutation_value l 17 3 }
+
+  let lemma check_test_003 () =
+    let l = Cons 2 (Cons 3 (Cons 5 Nil)) in
+    assert { values_in_range l };
+    assert { mutated_sum Nil 5 = 0 };
+    assert { mutated_sum (Cons 5 Nil) 5 = 5 };
+    assert { mutated_sum (Cons 3 (Cons 5 Nil)) 5 = 8 };
+    assert { mutated_sum l 5 = 10 };
+    assert { mutated_sum l 4 = 9 };
+    assert { distance_to_target l 10 5 = 0 };
+    assert { best_mutation_value l 10 5 }
+
+  let lemma check_test_005 () =
+    let l = Cons 10000 (Cons 10000 (Cons 10000 Nil)) in
+    assert { values_in_range l };
+    assert { mutated_sum Nil 3333 = 0 };
+    assert { mutated_sum (Cons 10000 Nil) 3333 = 3333 };
+    assert { mutated_sum (Cons 10000 (Cons 10000 Nil)) 3333 = 6666 };
+    assert { mutated_sum l 3333 = 9999 };
+    assert { mutated_sum l 3334 = 10002 };
+    assert { distance_to_target l 10000 3333 = 1 };
+    assert { best_mutation_value l 10000 3333 }
+
+  let lemma check_test_008 () =
+    let l =
+      Cons 60864 (Cons 25176 (Cons 27249 (Cons 21296 (Cons 20204 Nil)))) in
+    assert { values_in_range l };
+    assert { mutated_sum Nil 11361 = 0 };
+    assert { mutated_sum (Cons 20204 Nil) 11361 = 11361 };
+    assert { mutated_sum (Cons 21296 (Cons 20204 Nil)) 11361 = 22722 };
+    assert { mutated_sum (Cons 27249 (Cons 21296 (Cons 20204 Nil))) 11361 = 34083 };
+    assert { mutated_sum (Cons 25176 (Cons 27249 (Cons 21296 (Cons 20204 Nil)))) 11361 = 45444 };
+    assert { mutated_sum l 11361 = 56805 };
+    assert { mutated_sum l 11360 = 56800 };
+    assert { distance_to_target l 56803 11361 = 2 };
+    assert { best_mutation_value l 56803 11361 }
+
+  let lemma check_test_010 () =
+    let l = Cons 100000 (Cons 100000 (Cons 100000 Nil)) in
+    assert { values_in_range l };
+    assert { mutated_sum Nil 100000 = 0 };
+    assert { mutated_sum (Cons 100000 Nil) 100000 = 100000 };
+    assert { mutated_sum (Cons 100000 (Cons 100000 Nil)) 100000 = 200000 };
+    assert { mutated_sum l 100000 = 300000 };
+    assert { mutated_sum l 99999 = 299997 };
+    assert { distance_to_target l 299999 100000 = 1 };
+    assert { best_mutation_value l 299999 100000 }
+
+  let lemma check_test_021 () =
+    let l5 = Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 Nil)))) in
+    let l10 = Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 l5)))) in
+    let l15 = Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 l10)))) in
+    let l = Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 l15)))) in
+    assert { values_in_range l };
+    assert { mutated_sum l 0 = 0 };
+    assert { mutated_sum l 1 = 20 };
+    assert { distance_to_target l 10 0 = 10 };
+    assert { distance_to_target l 10 1 = 10 };
+    assert { best_mutation_value l 10 0 }
+
+end

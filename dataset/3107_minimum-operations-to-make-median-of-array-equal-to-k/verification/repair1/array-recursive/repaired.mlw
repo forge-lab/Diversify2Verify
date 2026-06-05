@@ -1,0 +1,159 @@
+module MinimumOperationsToMakeMedianOfArrayEqualToK_Array_Stage3
+
+  use int.Int
+  use int.Abs
+  use int.EuclideanDivision
+  use array.Array
+  use array.Init
+
+  let rec function count_le_from (a: array int) (k: int) (i: int) : int
+    requires { 0 <= i <= length a }
+    variant  { length a - i }
+  =
+    if i = length a then 0
+    else (if a[i] <= k then 1 else 0) + count_le_from a k (i + 1)
+
+  let rec function count_ge_from (a: array int) (k: int) (i: int) : int
+    requires { 0 <= i <= length a }
+    variant  { length a - i }
+  =
+    if i = length a then 0
+    else (if k <= a[i] then 1 else 0) + count_ge_from a k (i + 1)
+
+  predicate median_equal_to_k (a: array int) (k: int) =
+    length a > 0 /\
+    exists mid: int.
+      0 <= mid < length a /\
+      2 * mid <= length a < 2 * (mid + 1) /\
+      count_le_from a k 0 >= mid + 1 /\
+      count_ge_from a k 0 >= length a - mid
+
+  let rec function operation_cost_from
+      (nums: array int) (target: array int) (i: int) : int
+    requires { length target = length nums }
+    requires { 0 <= i <= length nums }
+    variant  { length nums - i }
+  =
+    if i = length nums then 0
+    else abs (nums[i] - target[i]) + operation_cost_from nums target (i + 1)
+
+  let function operation_cost (nums: array int) (target: array int) : int
+    requires { length target = length nums }
+  =
+    operation_cost_from nums target 0
+
+  predicate feasible_target (nums: array int) (k: int) (target: array int) =
+    length target = length nums /\ median_equal_to_k target k
+
+  predicate minimum_operations_result (nums: array int) (k: int) (r: int) =
+    0 <= r /\
+    (exists target: array int.
+      feasible_target nums k target /\ operation_cost nums target = r) /\
+    (forall target: array int.
+      feasible_target nums k target -> r <= operation_cost nums target)
+
+  let rec copy_array_from (src: array int) (dst: array int) (i: int) : unit
+    requires { length src = length dst }
+    requires { 0 <= i <= length src }
+    ensures  { length dst = length src }
+    variant { length src - i }
+  =
+    if i >= length src then
+      ()
+    else begin
+      assert { 0 <= i < length src };
+      dst[i] <- src[i];
+      copy_array_from src dst (i + 1)
+    end
+
+  let copy_array (src: array int) : array int
+    ensures { length result = length src }
+  =
+    let dst = make (length src) 0 in
+    let _ = copy_array_from src dst 0 in
+    assert { length dst = length src };
+    dst
+
+  let rec shift_for_insertion (a: array int) (j: int) (key: int) : unit
+    requires { length a > 0 }
+    requires { -1 <= j < length a - 1 }
+    variant { j + 1 }
+  =
+    if j < 0 then begin
+      assert { 0 <= 0 < length a };
+      a[0] <- key
+    end else begin
+      assert { 0 <= j < length a };
+      assert { 0 <= j + 1 < length a };
+      if a[j] > key then begin
+        a[j + 1] <- a[j];
+        assert { -1 <= j - 1 < length a - 1 };
+        shift_for_insertion a (j - 1) key
+      end else
+        a[j + 1] <- key
+    end
+
+  let rec insertion_sort_from (a: array int) (i: int) : unit
+    requires { 1 <= i <= length a }
+    variant { length a - i }
+  =
+    if i >= length a then
+      ()
+    else begin
+      assert { 1 <= i < length a };
+      let key = a[i] in
+      assert { -1 <= i - 1 < length a - 1 };
+      shift_for_insertion a (i - 1) key;
+      assert { 1 <= i + 1 <= length a };
+      insertion_sort_from a (i + 1)
+    end
+
+  let sort_array (a: array int) : unit =
+    if length a >= 2 then begin
+      assert { 1 <= 1 <= length a };
+      insertion_sort_from a 1
+    end else
+      ()
+
+  let rec raise_suffix_cost_from (a: array int) (k: int) (i: int) : int
+    requires { 0 <= i <= length a }
+    variant { length a - i }
+  =
+    if i >= length a then
+      0
+    else if a[i] < k then
+      (k - a[i]) + raise_suffix_cost_from a k (i + 1)
+    else
+      0
+
+  let rec lower_prefix_cost_to (a: array int) (k: int) (i: int) : int
+    requires { i < length a }
+    variant { i + 1 }
+  =
+    if i < 0 then
+      0
+    else if a[i] > k then
+      (a[i] - k) + lower_prefix_cost_to a k (i - 1)
+    else
+      0
+
+  let minimum_operations_to_make_median_of_array_equal_to_k_array
+    (nums: array int) (k: int) : int
+    requires { length nums > 0 }
+    ensures  { minimum_operations_result nums k result }
+  =
+    let sorted = copy_array nums in
+    assert { length sorted = length nums };
+    assert { length sorted > 0 };
+    sort_array sorted;
+    assert { length sorted = length nums };
+    let mid = div (length sorted) 2 in
+    assert { 0 <= mid < length sorted };
+    if sorted[mid] < k then
+      raise_suffix_cost_from sorted k mid
+    else if sorted[mid] > k then
+      lower_prefix_cost_to sorted k mid
+    else
+      0
+
+end

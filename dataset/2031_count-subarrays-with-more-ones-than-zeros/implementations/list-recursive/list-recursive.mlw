@@ -1,0 +1,181 @@
+module CountSubarraysWithMoreOnesThanZeros_List_Recursive_Implementation
+
+  use int.Int
+  use int.EuclideanDivision
+  use list.List
+
+  let bit_score (x: int) : int =
+    if x = 1 then 1 else -1
+
+  let positive_indicator (balance: int) : int =
+    if balance > 0 then 1 else 0
+
+  let rec count_good_prefixes_aux (nums: list int) (balance: int) : int
+    variant { nums }
+  =
+    match nums with
+    | Nil -> 0
+    | Cons x xs ->
+        let next_balance = balance + bit_score x in
+        positive_indicator next_balance + count_good_prefixes_aux xs next_balance
+    end
+
+  let count_good_prefixes (nums: list int) : int =
+    count_good_prefixes_aux nums 0
+
+  let rec count_good_subarrays (nums: list int) : int
+    variant { nums }
+  =
+    match nums with
+    | Nil -> 0
+    | Cons _ xs ->
+        count_good_prefixes nums + count_good_subarrays xs
+    end
+
+  let count_subarrays_with_more_ones_than_zeros_list (nums: list int) : int =
+    mod (count_good_subarrays nums) 1000000007
+
+  let test_000 () : bool =
+    let nums = Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 0 Nil))))) in
+    let result = count_subarrays_with_more_ones_than_zeros_list nums in
+    result = 19
+
+  let test_001 () : bool =
+    let nums = Cons 1 (Cons 0 (Cons 1 (Cons 0 (Cons 1 Nil)))) in
+    let result = count_subarrays_with_more_ones_than_zeros_list nums in
+    result = 6
+
+  let test_002 () : bool =
+    let nums = Cons 1 (Cons 0 (Cons 0 (Cons 1 (Cons 0 (Cons 1 (Cons 1 (Cons 0 Nil))))))) in
+    let result = count_subarrays_with_more_ones_than_zeros_list nums in
+    result = 12
+
+  let test_003 () : bool =
+    let nums = Cons 1 Nil in
+    let result = count_subarrays_with_more_ones_than_zeros_list nums in
+    result = 1
+
+  let test_004 () : bool =
+    let nums = Cons 1 (Cons 1 (Cons 0 (Cons 0 (Cons 1 (Cons 1 (Cons 0 (Cons 0 Nil))))))) in
+    let result = count_subarrays_with_more_ones_than_zeros_list nums in
+    result = 13
+
+  let test_005 () : bool =
+    let nums = Cons 0 (Cons 0 (Cons 0 (Cons 1 (Cons 1 (Cons 1 Nil))))) in
+    let result = count_subarrays_with_more_ones_than_zeros_list nums in
+    result = 9
+
+  let test_006 () : bool =
+    let nums = Cons 1 (Cons 0 (Cons 1 (Cons 0 (Cons 1 (Cons 0 (Cons 1 (Cons 0 (Cons 1 (Cons 0 Nil))))))))) in
+    let result = count_subarrays_with_more_ones_than_zeros_list nums in
+    result = 15
+
+  let test_007 () : bool =
+    let nums = Cons 0 (Cons 0 (Cons 0 (Cons 0 (Cons 0 Nil)))) in
+    let result = count_subarrays_with_more_ones_than_zeros_list nums in
+    result = 0
+
+  let test_008 () : bool =
+    let nums = Cons 0 (Cons 1 (Cons 0 (Cons 1 (Cons 0 (Cons 1 (Cons 0 (Cons 1 (Cons 0 (Cons 1 Nil))))))))) in
+    let result = count_subarrays_with_more_ones_than_zeros_list nums in
+    result = 15
+
+  let test_009 () : bool =
+    let nums = Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 Nil)))) in
+    let result = count_subarrays_with_more_ones_than_zeros_list nums in
+    result = 15
+
+  let test_010 () : bool =
+    let nums = Cons 0 Nil in
+    let result = count_subarrays_with_more_ones_than_zeros_list nums in
+    result = 0
+
+  let test_011 () : bool =
+    let nums = Cons 0 (Cons 1 (Cons 0 (Cons 1 (Cons 0 (Cons 1 (Cons 0 Nil)))))) in
+    let result = count_subarrays_with_more_ones_than_zeros_list nums in
+    result = 6
+
+  let test_012 () : bool =
+    let nums = Cons 0 (Cons 1 (Cons 0 (Cons 1 (Cons 0 (Cons 1 (Cons 0 (Cons 1 Nil))))))) in
+    let result = count_subarrays_with_more_ones_than_zeros_list nums in
+    result = 10
+
+  let test_013 () : bool =
+    let nums = Cons 0 (Cons 0 (Cons 0 (Cons 0 (Cons 0 (Cons 0 Nil))))) in
+    let result = count_subarrays_with_more_ones_than_zeros_list nums in
+    result = 0
+
+  let test_014 () : bool =
+    let nums = Cons 0 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 0 (Cons 0 Nil))))))) in
+    let result = count_subarrays_with_more_ones_than_zeros_list nums in
+    result = 28
+
+  let test_015 () : bool =
+    let nums = Cons 1 (Cons 0 (Cons 0 (Cons 1 (Cons 1 (Cons 0 (Cons 0 (Cons 1 Nil))))))) in
+    let result = count_subarrays_with_more_ones_than_zeros_list nums in
+    result = 9
+
+  let test_016 () : bool =
+    let nums = Cons 1 (Cons 1 (Cons 0 (Cons 0 (Cons 1 (Cons 1 (Cons 0 (Cons 0 (Cons 1 (Cons 1 Nil))))))))) in
+    let result = count_subarrays_with_more_ones_than_zeros_list nums in
+    result = 24
+
+  let test_017 () : bool =
+    let nums = Cons 0 (Cons 1 (Cons 1 (Cons 0 (Cons 1 Nil)))) in
+    let result = count_subarrays_with_more_ones_than_zeros_list nums in
+    result = 9
+
+  let test_020 () : bool =
+    let nums = Cons 0 (Cons 0 (Cons 1 (Cons 1 (Cons 0 (Cons 0 (Cons 1 (Cons 1 (Cons 0 (Cons 0 Nil))))))))) in
+    let result = count_subarrays_with_more_ones_than_zeros_list nums in
+    result = 15
+
+  let test_019 () : bool =
+    let nums = Cons 1 (Cons 0 (Cons 1 (Cons 0 (Cons 1 (Cons 0 (Cons 1 Nil)))))) in
+    let result = count_subarrays_with_more_ones_than_zeros_list nums in
+    result = 10
+
+  let run_tests () : bool =
+    if test_000 () then
+    if test_001 () then
+    if test_002 () then
+    if test_003 () then
+    if test_004 () then
+    if test_005 () then
+    if test_006 () then
+    if test_007 () then
+    if test_008 () then
+    if test_009 () then
+    if test_010 () then
+    if test_011 () then
+    if test_012 () then
+    if test_013 () then
+    if test_014 () then
+    if test_015 () then
+    if test_016 () then
+    if test_017 () then
+    if test_020 () then
+    if test_019 () then
+      true
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+
+end

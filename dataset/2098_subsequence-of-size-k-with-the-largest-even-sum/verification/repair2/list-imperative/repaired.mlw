@@ -1,0 +1,196 @@
+module SubsequenceOfSizeKWithTheLargestEvenSum_List_Stage3_Imperative
+
+  use int.Int
+  use int.EuclideanDivision
+  use list.List
+  use list.Length
+  use list.Mem
+  use list.Sum
+  use ref.Ref
+
+  predicate valid_nums (nums: list int) =
+    1 <= length nums <= 100000 /\
+    forall x: int. mem x nums -> 0 <= x <= 100000
+
+  let rec predicate subsequence (chosen: list int) (nums: list int)
+    variant { nums }
+  =
+    match chosen, nums with
+    | Nil, _ -> true
+    | Cons _ _, Nil -> false
+    | Cons y ys, Cons x xs ->
+        (y = x && subsequence ys xs) || subsequence chosen xs
+    end
+
+  predicate even_candidate_sum (nums: list int) (k: int) (s: int) =
+    exists chosen: list int.
+      subsequence chosen nums /\
+      length chosen = k /\
+      s = sum chosen /\
+      mod s 2 = 0
+
+  predicate optimal_even_subsequence_sum
+      (nums: list int) (k: int) (result: int) =
+    (result = -1 /\
+     forall s: int. not (even_candidate_sum nums k s)) \/
+    (even_candidate_sum nums k result /\
+     forall s: int. even_candidate_sum nums k s -> s <= result)
+
+  let is_even (x: int) : bool
+    ensures { result = true <-> mod x 2 = 0 }
+  =
+    mod x 2 = 0
+
+  let rec insert_nondecreasing (x: int) (l: list int) : list int
+    ensures  { length result = length l + 1 }
+    ensures  { sum result = sum l + x }
+    ensures  { mem x result }
+    ensures  { forall y: int. mem y l -> mem y result }
+    variant  { l }
+  =
+    match l with
+    | Nil -> Cons x Nil
+    | Cons y ys ->
+        if x <= y then
+          Cons x l
+        else
+          Cons y (insert_nondecreasing x ys)
+    end
+
+  let record_remainder
+      (x: int)
+      (has_even: ref bool)
+      (best_even: ref int)
+      (has_odd: ref bool)
+      (best_odd: ref int) : unit
+    requires { !has_even -> mod !best_even 2 = 0 }
+    requires { !has_odd -> mod !best_odd 2 = 1 }
+    ensures { mod x 2 = 0 -> !has_even }
+    ensures { mod x 2 <> 0 -> !has_odd }
+    ensures { !has_even -> mod !best_even 2 = 0 }
+    ensures { !has_odd -> mod !best_odd 2 = 1 }
+  =
+    if is_even x then
+      begin
+      assert { mod x 2 = 0 };
+      if !has_even then
+        if x > !best_even then best_even := x else ()
+      else begin
+        has_even := true;
+        best_even := x
+      end
+      end
+    else
+      begin
+      assert { mod x 2 <> 0 };
+      assert { mod x 2 = 1 };
+      if !has_odd then
+        if x > !best_odd then best_odd := x else ()
+      else begin
+        has_odd := true;
+        best_odd := x
+      end
+      end
+
+  let subsequence_of_size_k_with_the_largest_even_sum_list
+      (nums: list int) (k: int) : int
+    requires { valid_nums nums }
+    requires { 1 <= k <= length nums }
+    ensures  { optimal_even_subsequence_sum nums k result }
+  =
+    let selected = ref (Nil : list int) in
+    let selected_len = ref 0 in
+    let selected_sum = ref 0 in
+    let has_rest_even = ref false in
+    let best_rest_even = ref 0 in
+    let has_rest_odd = ref false in
+    let best_rest_odd = ref 0 in
+    let cur = ref nums in
+    let ghost processed_len = ref 0 in
+    while (match !cur with Nil -> false | Cons _ _ -> true end) do
+      invariant { 0 <= length !cur <= length nums }
+      invariant { 0 <= !processed_len <= length nums }
+      invariant { !processed_len + length !cur = length nums }
+      invariant { 0 <= !selected_len <= k }
+      invariant { !selected_len <= !processed_len }
+      invariant { !selected_len = !processed_len \/ !selected_len = k }
+      invariant { !selected_len + length !cur >= k }
+      invariant { length !selected = !selected_len }
+      invariant { sum !selected = !selected_sum }
+      invariant { !has_rest_even -> mod !best_rest_even 2 = 0 }
+      invariant { !has_rest_odd -> mod !best_rest_odd 2 = 1 }
+      variant   { length !cur }
+
+      match !cur with
+      | Nil -> ()
+      | Cons x xs ->
+          if !selected_len < k then begin
+            selected := insert_nondecreasing x !selected;
+            selected_len := !selected_len + 1;
+            selected_sum := !selected_sum + x
+          end else
+            match !selected with
+            | Nil -> ()
+            | Cons smallest rest ->
+                if x > smallest then begin
+                  selected := insert_nondecreasing x rest;
+                  selected_sum := !selected_sum - smallest + x;
+                  record_remainder smallest
+                    has_rest_even best_rest_even
+                    has_rest_odd best_rest_odd
+                end else
+                  record_remainder x
+                    has_rest_even best_rest_even
+                    has_rest_odd best_rest_odd
+            end;
+          processed_len := !processed_len + 1;
+          cur := xs
+      end
+    done;
+    assert { !cur = Nil };
+    assert { length !cur = 0 };
+    assert { !processed_len = length nums };
+    assert { !selected_len >= k };
+    assert { !selected_len = k };
+    assert { length !selected = !selected_len };
+    assert { length !selected = k };
+    if is_even !selected_sum then
+      !selected_sum
+    else
+      let has_selected_even = ref false in
+      let smallest_selected_even = ref 0 in
+      let has_selected_odd = ref false in
+      let smallest_selected_odd = ref 0 in
+      let selected_cur = ref !selected in
+      while (match !selected_cur with Nil -> false | Cons _ _ -> true end) do
+        invariant { 0 <= length !selected_cur <= length !selected }
+        invariant { !has_selected_even -> mod !smallest_selected_even 2 = 0 }
+        invariant { !has_selected_odd -> mod !smallest_selected_odd 2 = 1 }
+        variant   { length !selected_cur }
+
+        match !selected_cur with
+        | Nil -> ()
+        | Cons x xs ->
+            if is_even x then
+              if not !has_selected_even then begin
+                has_selected_even := true;
+                smallest_selected_even := x
+              end
+            else if not !has_selected_odd then begin
+              has_selected_odd := true;
+              smallest_selected_odd := x
+            end;
+            selected_cur := xs
+        end
+      done;
+      assert { !selected_cur = Nil };
+      let best = ref (-1) in
+      if !has_selected_odd && !has_rest_even then
+        best := !selected_sum - !smallest_selected_odd + !best_rest_even;
+      if !has_selected_even && !has_rest_odd then begin
+        let candidate = !selected_sum - !smallest_selected_even + !best_rest_odd in
+        if candidate > !best then best := candidate else ()
+      end;
+      !best
+
+end

@@ -1,0 +1,274 @@
+module SubsequenceOfSizeKWithTheLargestEvenSum_Array_Recursive_Implementation
+
+  use int.Int
+  use int.EuclideanDivision
+  use array.Array
+  use array.Init
+
+  let rec copy_into (src: array int) (dst: array int) (i: int) : unit
+    variant { length src - i }
+  =
+    if i >= length src then
+      ()
+    else
+      begin
+      dst[i] <- src[i];
+      copy_into src dst (i + 1)
+      end
+
+  let clone_array (src: array int) : array int =
+    let dst = make (length src) 0 in
+    copy_into src dst 0;
+    dst
+
+  let swap (a: array int) (i: int) (j: int) : unit =
+    if i = j then
+      ()
+    else
+      begin
+      let tmp = a[i] in
+      a[i] <- a[j];
+      a[j] <- tmp
+      end
+
+  let rec max_index_from (a: array int) (best: int) (i: int) : int
+    variant { length a - i }
+  =
+    if i >= length a then
+      best
+    else if a[i] > a[best] then
+      max_index_from a i (i + 1)
+    else
+      max_index_from a best (i + 1)
+
+  let rec sort_desc_from (a: array int) (start: int) : unit
+    variant { length a - start }
+  =
+    if start >= length a then
+      ()
+    else
+      begin
+      let best = max_index_from a start (start + 1) in
+      swap a start best;
+      sort_desc_from a (start + 1)
+      end
+
+  let rec sum_prefix (a: array int) (limit: int) (i: int) : int
+    variant { limit - i }
+  =
+    if i >= limit then
+      0
+    else
+      a[i] + sum_prefix a limit (i + 1)
+
+  let rec smallest_with_parity_in_prefix
+      (a: array int) (limit: int) (i: int) (parity: int) (best: int) : int
+    variant { limit - i }
+  =
+    if i >= limit then
+      best
+    else
+      let v = a[i] in
+      let next_best =
+        if mod v 2 = parity && (best = -1 || v < best) then v else best
+      in
+      smallest_with_parity_in_prefix a limit (i + 1) parity next_best
+
+  let rec largest_with_parity_in_suffix
+      (a: array int) (start: int) (parity: int) (best: int) : int
+    variant { length a - start }
+  =
+    if start >= length a then
+      best
+    else
+      let v = a[start] in
+      let next_best =
+        if mod v 2 = parity && v > best then v else best
+      in
+      largest_with_parity_in_suffix a (start + 1) parity next_best
+
+  let subsequence_of_size_k_with_the_largest_even_sum_array
+      (nums: array int) (k: int) : int
+  =
+    let sorted = clone_array nums in
+    sort_desc_from sorted 0;
+    let top_sum = sum_prefix sorted k 0 in
+    if mod top_sum 2 = 0 then
+      top_sum
+    else
+      let smallest_odd = smallest_with_parity_in_prefix sorted k 0 1 (-1) in
+      let smallest_even = smallest_with_parity_in_prefix sorted k 0 0 (-1) in
+      let largest_odd = largest_with_parity_in_suffix sorted k 1 (-1) in
+      let largest_even = largest_with_parity_in_suffix sorted k 0 (-1) in
+      let replace_odd =
+        if smallest_odd = -1 || largest_even = -1 then
+          -1
+        else
+          top_sum - smallest_odd + largest_even
+      in
+      let replace_even =
+        if smallest_even = -1 || largest_odd = -1 then
+          -1
+        else
+          top_sum - smallest_even + largest_odd
+      in
+      if replace_odd >= replace_even then
+        replace_odd
+      else
+        replace_even
+
+  let test_000 () : bool =
+    let nums = init 5 [|0; 0; 0; 0; 0|] in
+    let r = subsequence_of_size_k_with_the_largest_even_sum_array nums 2 in
+    r = 0
+
+  let test_001 () : bool =
+    let nums = init 4 [|0; 0; 0; 0|] in
+    let r = subsequence_of_size_k_with_the_largest_even_sum_array nums 2 in
+    r = 0
+
+  let test_002 () : bool =
+    let nums = init 3 [|4; 6; 2|] in
+    let r = subsequence_of_size_k_with_the_largest_even_sum_array nums 3 in
+    r = 12
+
+  let test_003 () : bool =
+    let nums = init 10 [|1; 2; 3; 4; 5; 6; 7; 8; 9; 10|] in
+    let r = subsequence_of_size_k_with_the_largest_even_sum_array nums 5 in
+    r = 40
+
+  let test_004 () : bool =
+    let nums = init 3 [|1; 3; 5|] in
+    let r = subsequence_of_size_k_with_the_largest_even_sum_array nums 1 in
+    r = (-1)
+
+  let test_005 () : bool =
+    let nums = init 10 [|5; 5; 5; 5; 5; 5; 5; 5; 5; 5|] in
+    let r = subsequence_of_size_k_with_the_largest_even_sum_array nums 4 in
+    r = 20
+
+  let test_006 () : bool =
+    let nums = init 6 [|1; 2; 3; 4; 5; 6|] in
+    let r = subsequence_of_size_k_with_the_largest_even_sum_array nums 4 in
+    r = 18
+
+  let test_007 () : bool =
+    let nums = init 6 [|1; 1; 1; 1; 1; 1|] in
+    let r = subsequence_of_size_k_with_the_largest_even_sum_array nums 3 in
+    r = (-1)
+
+  let test_008 () : bool =
+    let nums = init 10 [|1; 1; 1; 1; 1; 1; 1; 1; 1; 1|] in
+    let r = subsequence_of_size_k_with_the_largest_even_sum_array nums 5 in
+    r = (-1)
+
+  let test_009 () : bool =
+    let nums = init 5 [|2; 2; 2; 2; 2|] in
+    let r = subsequence_of_size_k_with_the_largest_even_sum_array nums 2 in
+    r = 4
+
+  let test_010 () : bool =
+    let nums = init 10 [|1; 2; 3; 4; 5; 6; 7; 8; 9; 10|] in
+    let r = subsequence_of_size_k_with_the_largest_even_sum_array nums 4 in
+    r = 34
+
+  let test_011 () : bool =
+    let nums = init 5 [|4; 1; 5; 3; 1|] in
+    let r = subsequence_of_size_k_with_the_largest_even_sum_array nums 3 in
+    r = 12
+
+  let test_012 () : bool =
+    let nums = init 5 [|2; 4; 6; 8; 10|] in
+    let r = subsequence_of_size_k_with_the_largest_even_sum_array nums 5 in
+    r = 30
+
+  let test_013 () : bool =
+    let nums = init 10 [|0; 0; 0; 0; 0; 0; 0; 0; 0; 0|] in
+    let r = subsequence_of_size_k_with_the_largest_even_sum_array nums 3 in
+    r = 0
+
+  let test_014 () : bool =
+    let nums = init 5 [|8; 6; 4; 2; 0|] in
+    let r = subsequence_of_size_k_with_the_largest_even_sum_array nums 3 in
+    r = 18
+
+  let test_015 () : bool =
+    let nums = init 5 [|10; 20; 30; 40; 50|] in
+    let r = subsequence_of_size_k_with_the_largest_even_sum_array nums 3 in
+    r = 120
+
+  let test_016 () : bool =
+    let nums = init 10 [|10; 21; 32; 43; 54; 65; 76; 87; 98; 109|] in
+    let r = subsequence_of_size_k_with_the_largest_even_sum_array nums 4 in
+    r = 370
+
+  let test_017 () : bool =
+    let nums =
+      init 20
+        [|1; 2; 3; 4; 5; 6; 7; 8; 9; 10;
+          11; 12; 13; 14; 15; 16; 17; 18; 19; 20|]
+    in
+    let r = subsequence_of_size_k_with_the_largest_even_sum_array nums 19 in
+    r = 208
+
+  let test_018 () : bool =
+    let nums =
+      init 10 [|100000; 99999; 99998; 99997; 99996;
+                99995; 99994; 99993; 99992; 99991|]
+    in
+    let r = subsequence_of_size_k_with_the_largest_even_sum_array nums 5 in
+    r = 499990
+
+  let test_019 () : bool =
+    let nums =
+      init 21
+        [|100; 99; 98; 97; 96; 95; 94; 93; 92; 91;
+          90; 89; 88; 87; 86; 85; 84; 83; 82; 81; 80|]
+    in
+    let r = subsequence_of_size_k_with_the_largest_even_sum_array nums 10 in
+    r = 954
+
+  let run_tests () : bool =
+    if test_000 () then
+    if test_001 () then
+    if test_002 () then
+    if test_003 () then
+    if test_004 () then
+    if test_005 () then
+    if test_006 () then
+    if test_007 () then
+    if test_008 () then
+    if test_009 () then
+    if test_010 () then
+    if test_011 () then
+    if test_012 () then
+    if test_013 () then
+    if test_014 () then
+    if test_015 () then
+    if test_016 () then
+    if test_017 () then
+    if test_018 () then
+    if test_019 () then
+      true
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+
+end

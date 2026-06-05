@@ -1,0 +1,1947 @@
+{
+  "task": {
+    "task_id": "maximum-distance-between-a-pair-of-values",
+    "question_id": 1855,
+    "difficulty": "Medium",
+    "source_file": "bench1/1855.json"
+  },
+  "target": {
+    "name": "list",
+    "language": "why3",
+    "module_name": "MaximumDistanceBetweenAPairOfValues_List_Spec",
+    "output_file": "generated/why3/list/maximum_distance_between_a_pair_of_values_list.mlw",
+    "signature": {
+      "raw": "val maximum_distance_between_a_pair_of_values_list (nums1: list int) (nums2: list int) : int",
+      "function_name": "maximum_distance_between_a_pair_of_values_list",
+      "parameters": [
+        {
+          "name": "nums1",
+          "why3_type": "list int",
+          "semantic_type": "int_sequence"
+        },
+        {
+          "name": "nums2",
+          "why3_type": "list int",
+          "semantic_type": "int_sequence"
+        }
+      ],
+      "return": {
+        "why3_type": "int",
+        "semantic_type": "int"
+      }
+    }
+  },
+  "problem": {
+    "description": "You are given two non-increasing 0-indexed integer arrays nums1​​​​​​ and nums2​​​​​​.\nA pair of indices (i, j), where 0 <= i < nums1.length and 0 <= j < nums2.length, is valid if both i <= j and nums1[i] <= nums2[j]. The distance of the pair is j - i​​​​.\nReturn the maximum distance of any valid pair (i, j). If there are no valid pairs, return 0.\nAn array arr is non-increasing if arr[i-1] >= arr[i] for every 1 <= i < arr.length.\n \nExample 1:\n\nInput: nums1 = [55,30,5,4,2], nums2 = [100,20,10,10,5]\nOutput: 2\nExplanation: The valid pairs are (0,0), (2,2), (2,3), (2,4), (3,3), (3,4), and (4,4).\nThe maximum distance is 2 with pair (2,4).\n\nExample 2:\n\nInput: nums1 = [2,2,2], nums2 = [10,10,1]\nOutput: 1\nExplanation: The valid pairs are (0,0), (0,1), and (1,1).\nThe maximum distance is 1 with pair (0,1).\n\nExample 3:\n\nInput: nums1 = [30,29,19,5], nums2 = [25,25,25,25,25]\nOutput: 2\nExplanation: The valid pairs are (2,2), (2,3), (2,4), (3,3), and (3,4).\nThe maximum distance is 2 with pair (2,4).\n\n \nConstraints:\n\n1 <= nums1.length, nums2.length <= 105\n1 <= nums1[i], nums2[j] <= 105\nBoth nums1 and nums2 are non-increasing.\n\n"
+  },
+  "tests": [
+    {
+      "id": "test_000",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums1": [
+          100
+        ],
+        "nums2": [
+          101
+        ]
+      },
+      "expected": 0,
+      "warnings": []
+    },
+    {
+      "id": "test_001",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums1": [
+          30,
+          29,
+          19,
+          5
+        ],
+        "nums2": [
+          25,
+          25,
+          25,
+          25,
+          25
+        ]
+      },
+      "expected": 2,
+      "warnings": []
+    },
+    {
+      "id": "test_002",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums1": [
+          5,
+          4,
+          3,
+          2,
+          1
+        ],
+        "nums2": [
+          5,
+          4,
+          3,
+          2,
+          1
+        ]
+      },
+      "expected": 0,
+      "warnings": []
+    },
+    {
+      "id": "test_003",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums1": [
+          10,
+          9,
+          8,
+          7,
+          6
+        ],
+        "nums2": [
+          10,
+          9,
+          8,
+          7,
+          6
+        ]
+      },
+      "expected": 0,
+      "warnings": []
+    },
+    {
+      "id": "test_004",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums1": [
+          5
+        ],
+        "nums2": [
+          10
+        ]
+      },
+      "expected": 0,
+      "warnings": []
+    },
+    {
+      "id": "test_005",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums1": [
+          10,
+          9,
+          8,
+          7
+        ],
+        "nums2": [
+          7,
+          7,
+          7,
+          7
+        ]
+      },
+      "expected": 0,
+      "warnings": []
+    },
+    {
+      "id": "test_006",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums1": [
+          5
+        ],
+        "nums2": [
+          5
+        ]
+      },
+      "expected": 0,
+      "warnings": []
+    },
+    {
+      "id": "test_007",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums1": [
+          1,
+          1,
+          1,
+          1
+        ],
+        "nums2": [
+          1,
+          1,
+          1,
+          1
+        ]
+      },
+      "expected": 3,
+      "warnings": []
+    },
+    {
+      "id": "test_008",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums1": [
+          10
+        ],
+        "nums2": [
+          5
+        ]
+      },
+      "expected": 0,
+      "warnings": []
+    },
+    {
+      "id": "test_009",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums1": [
+          5,
+          5,
+          5,
+          5
+        ],
+        "nums2": [
+          5,
+          5,
+          5,
+          5,
+          5,
+          5
+        ]
+      },
+      "expected": 5,
+      "warnings": []
+    },
+    {
+      "id": "test_010",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums1": [
+          10,
+          9,
+          8,
+          7,
+          6
+        ],
+        "nums2": [
+          6,
+          5,
+          4,
+          3,
+          2,
+          1
+        ]
+      },
+      "expected": 0,
+      "warnings": []
+    },
+    {
+      "id": "test_011",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums1": [
+          1,
+          1,
+          1,
+          1,
+          1
+        ],
+        "nums2": [
+          10,
+          9,
+          8,
+          7,
+          6,
+          5,
+          4,
+          3,
+          2,
+          1
+        ]
+      },
+      "expected": 9,
+      "warnings": []
+    },
+    {
+      "id": "test_012",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums1": [
+          10,
+          9,
+          8,
+          7,
+          6
+        ],
+        "nums2": [
+          5,
+          4,
+          3,
+          2,
+          1
+        ]
+      },
+      "expected": 0,
+      "warnings": []
+    },
+    {
+      "id": "test_013",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums1": [
+          100,
+          90
+        ],
+        "nums2": [
+          95,
+          85
+        ]
+      },
+      "expected": 0,
+      "warnings": []
+    },
+    {
+      "id": "test_014",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums1": [
+          100,
+          90,
+          80
+        ],
+        "nums2": [
+          100,
+          90,
+          80,
+          70,
+          60
+        ]
+      },
+      "expected": 0,
+      "warnings": []
+    },
+    {
+      "id": "test_015",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums1": [
+          99999,
+          99998,
+          99997
+        ],
+        "nums2": [
+          100000,
+          99999,
+          99998
+        ]
+      },
+      "expected": 1,
+      "warnings": []
+    },
+    {
+      "id": "test_016",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums1": [
+          1
+        ],
+        "nums2": [
+          2
+        ]
+      },
+      "expected": 0,
+      "warnings": []
+    },
+    {
+      "id": "test_017",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums1": [
+          1,
+          1,
+          1,
+          1,
+          1
+        ],
+        "nums2": [
+          5,
+          5,
+          5,
+          5,
+          5
+        ]
+      },
+      "expected": 4,
+      "warnings": []
+    },
+    {
+      "id": "test_018",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums1": [
+          2,
+          2,
+          2
+        ],
+        "nums2": [
+          10,
+          10,
+          1
+        ]
+      },
+      "expected": 1,
+      "warnings": []
+    },
+    {
+      "id": "test_019",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums1": [
+          100,
+          50,
+          25,
+          10
+        ],
+        "nums2": [
+          100,
+          100,
+          100,
+          100
+        ]
+      },
+      "expected": 3,
+      "warnings": []
+    },
+    {
+      "id": "test_020",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums1": [
+          55,
+          30,
+          5,
+          4,
+          2
+        ],
+        "nums2": [
+          100,
+          20,
+          10,
+          10,
+          5
+        ]
+      },
+      "expected": 2,
+      "warnings": []
+    },
+    {
+      "id": "test_021",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums1": [
+          1
+        ],
+        "nums2": [
+          1
+        ]
+      },
+      "expected": 0,
+      "warnings": []
+    },
+    {
+      "id": "test_022",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums1": [
+          10,
+          9,
+          8,
+          7,
+          6
+        ],
+        "nums2": [
+          15,
+          14,
+          13,
+          12,
+          11
+        ]
+      },
+      "expected": 4,
+      "warnings": []
+    },
+    {
+      "id": "test_023",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums1": [
+          100000
+        ],
+        "nums2": [
+          100000
+        ]
+      },
+      "expected": 0,
+      "warnings": []
+    },
+    {
+      "id": "test_024",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums1": [
+          50,
+          40,
+          30,
+          20,
+          10
+        ],
+        "nums2": [
+          100,
+          80,
+          60,
+          40,
+          20
+        ]
+      },
+      "expected": 2,
+      "warnings": []
+    },
+    {
+      "id": "test_025",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums1": [
+          1,
+          2,
+          3,
+          4,
+          5
+        ],
+        "nums2": [
+          10,
+          9,
+          8,
+          7,
+          6,
+          5,
+          4,
+          3,
+          2,
+          1
+        ]
+      },
+      "expected": 9,
+      "warnings": []
+    },
+    {
+      "id": "test_026",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums1": [
+          30,
+          29,
+          19,
+          5
+        ],
+        "nums2": [
+          25,
+          25,
+          25,
+          25,
+          25,
+          20,
+          15,
+          10,
+          5
+        ]
+      },
+      "expected": 5,
+      "warnings": []
+    },
+    {
+      "id": "test_027",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums1": [
+          100,
+          90,
+          80,
+          70,
+          60,
+          50,
+          40,
+          30,
+          20,
+          10
+        ],
+        "nums2": [
+          100,
+          100,
+          100,
+          100,
+          100,
+          100,
+          100,
+          100,
+          100,
+          100
+        ]
+      },
+      "expected": 9,
+      "warnings": []
+    },
+    {
+      "id": "test_028",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums1": [
+          10,
+          9,
+          8,
+          7,
+          6,
+          5,
+          4,
+          3,
+          2,
+          1
+        ],
+        "nums2": [
+          10,
+          10,
+          10,
+          10,
+          10,
+          10,
+          10,
+          10,
+          10,
+          10
+        ]
+      },
+      "expected": 9,
+      "warnings": []
+    },
+    {
+      "id": "test_029",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums1": [
+          10,
+          9,
+          8,
+          7,
+          6,
+          5,
+          4,
+          3,
+          2,
+          1
+        ],
+        "nums2": [
+          20,
+          19,
+          18,
+          17,
+          16,
+          15,
+          14,
+          13,
+          12,
+          11
+        ]
+      },
+      "expected": 9,
+      "warnings": []
+    },
+    {
+      "id": "test_030",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums1": [
+          95,
+          85,
+          75,
+          65,
+          55
+        ],
+        "nums2": [
+          95,
+          85,
+          75,
+          65,
+          55,
+          45,
+          35,
+          25,
+          15,
+          5
+        ]
+      },
+      "expected": 0,
+      "warnings": []
+    },
+    {
+      "id": "test_031",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums1": [
+          1,
+          1,
+          1,
+          1,
+          1
+        ],
+        "nums2": [
+          10,
+          9,
+          8,
+          7,
+          6,
+          5,
+          4,
+          3,
+          2,
+          1,
+          0
+        ]
+      },
+      "expected": 9,
+      "warnings": []
+    },
+    {
+      "id": "test_032",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums1": [
+          10,
+          9,
+          8,
+          7,
+          6,
+          5,
+          4,
+          3,
+          2,
+          1
+        ],
+        "nums2": [
+          10,
+          9,
+          8,
+          7,
+          6,
+          5,
+          4,
+          3,
+          2,
+          1
+        ]
+      },
+      "expected": 0,
+      "warnings": []
+    },
+    {
+      "id": "test_033",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums1": [
+          100000,
+          100000,
+          100000,
+          100000,
+          100000
+        ],
+        "nums2": [
+          100000,
+          100000,
+          100000,
+          100000,
+          100000,
+          100000,
+          100000,
+          100000,
+          100000,
+          100000
+        ]
+      },
+      "expected": 9,
+      "warnings": []
+    },
+    {
+      "id": "test_034",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums1": [
+          10,
+          9,
+          8,
+          7,
+          6,
+          5,
+          4,
+          3,
+          2,
+          1
+        ],
+        "nums2": [
+          100,
+          90,
+          80,
+          70,
+          60,
+          50,
+          40,
+          30,
+          20,
+          10,
+          5,
+          4,
+          3,
+          2,
+          1
+        ]
+      },
+      "expected": 9,
+      "warnings": []
+    },
+    {
+      "id": "test_035",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums1": [
+          5,
+          5,
+          5,
+          5,
+          5,
+          5,
+          5,
+          5,
+          5,
+          5
+        ],
+        "nums2": [
+          5,
+          5,
+          5,
+          5,
+          5,
+          5,
+          5,
+          5,
+          5,
+          5
+        ]
+      },
+      "expected": 9,
+      "warnings": []
+    },
+    {
+      "id": "test_036",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums1": [
+          100,
+          90,
+          80,
+          70,
+          60,
+          50,
+          40,
+          30,
+          20,
+          10
+        ],
+        "nums2": [
+          100,
+          95,
+          90,
+          85,
+          80,
+          75,
+          70,
+          65,
+          60,
+          55,
+          50,
+          45,
+          40,
+          35,
+          30,
+          25,
+          20,
+          15,
+          10,
+          5
+        ]
+      },
+      "expected": 9,
+      "warnings": []
+    },
+    {
+      "id": "test_037",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums1": [
+          1000,
+          500,
+          250,
+          125,
+          62,
+          31,
+          15,
+          7,
+          3,
+          1
+        ],
+        "nums2": [
+          1000,
+          900,
+          800,
+          700,
+          600,
+          500,
+          400,
+          300,
+          200,
+          100
+        ]
+      },
+      "expected": 5,
+      "warnings": []
+    },
+    {
+      "id": "test_038",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums1": [
+          1
+        ],
+        "nums2": [
+          100000
+        ]
+      },
+      "expected": 0,
+      "warnings": []
+    },
+    {
+      "id": "test_039",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums1": [
+          50,
+          40,
+          30,
+          20,
+          10
+        ],
+        "nums2": [
+          55,
+          50,
+          45,
+          40,
+          35,
+          30,
+          25,
+          20,
+          15,
+          10,
+          5
+        ]
+      },
+      "expected": 5,
+      "warnings": []
+    },
+    {
+      "id": "test_040",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums1": [
+          5,
+          5,
+          5,
+          5,
+          5,
+          5,
+          5,
+          5,
+          5,
+          5
+        ],
+        "nums2": [
+          10,
+          9,
+          8,
+          7,
+          6,
+          5,
+          4,
+          3,
+          2,
+          1
+        ]
+      },
+      "expected": 5,
+      "warnings": []
+    },
+    {
+      "id": "test_041",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums1": [
+          100,
+          90,
+          80,
+          70,
+          60,
+          50,
+          40,
+          30,
+          20,
+          10
+        ],
+        "nums2": [
+          99,
+          89,
+          79,
+          69,
+          59,
+          49,
+          39,
+          29,
+          19,
+          9
+        ]
+      },
+      "expected": 0,
+      "warnings": []
+    },
+    {
+      "id": "test_042",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums1": [
+          999,
+          888,
+          777,
+          666,
+          555,
+          444,
+          333,
+          222,
+          111,
+          0
+        ],
+        "nums2": [
+          999,
+          888,
+          777,
+          666,
+          555,
+          444,
+          333,
+          222,
+          111,
+          0
+        ]
+      },
+      "expected": 0,
+      "warnings": []
+    },
+    {
+      "id": "test_043",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums1": [
+          50,
+          25,
+          10,
+          1
+        ],
+        "nums2": [
+          50,
+          40,
+          30,
+          25,
+          20,
+          15,
+          10,
+          5,
+          1
+        ]
+      },
+      "expected": 5,
+      "warnings": []
+    },
+    {
+      "id": "test_044",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums1": [
+          1,
+          1,
+          1,
+          1,
+          1
+        ],
+        "nums2": [
+          100,
+          90,
+          80,
+          70,
+          60,
+          50,
+          40,
+          30,
+          20,
+          10,
+          1
+        ]
+      },
+      "expected": 10,
+      "warnings": []
+    },
+    {
+      "id": "test_045",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums1": [
+          90,
+          80,
+          70,
+          60,
+          50
+        ],
+        "nums2": [
+          100,
+          90,
+          80,
+          70,
+          60,
+          50,
+          40,
+          30,
+          20,
+          10
+        ]
+      },
+      "expected": 1,
+      "warnings": []
+    },
+    {
+      "id": "test_046",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums1": [
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1
+        ],
+        "nums2": [
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1
+        ]
+      },
+      "expected": 9,
+      "warnings": []
+    },
+    {
+      "id": "test_047",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums1": [
+          99,
+          98,
+          97,
+          96,
+          95,
+          94,
+          93,
+          92,
+          91,
+          90
+        ],
+        "nums2": [
+          100,
+          99,
+          98,
+          97,
+          96,
+          95,
+          94,
+          93,
+          92,
+          91,
+          90
+        ]
+      },
+      "expected": 1,
+      "warnings": []
+    },
+    {
+      "id": "test_048",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums1": [
+          10,
+          5,
+          3,
+          2
+        ],
+        "nums2": [
+          10,
+          9,
+          8,
+          7,
+          6,
+          5,
+          4,
+          3,
+          2,
+          1
+        ]
+      },
+      "expected": 5,
+      "warnings": []
+    },
+    {
+      "id": "test_049",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums1": [
+          1,
+          2,
+          3,
+          4,
+          5
+        ],
+        "nums2": [
+          5,
+          4,
+          3,
+          2,
+          1
+        ]
+      },
+      "expected": 4,
+      "warnings": []
+    },
+    {
+      "id": "test_050",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums1": [
+          100,
+          90,
+          80,
+          70,
+          60,
+          50,
+          40,
+          30,
+          20,
+          10
+        ],
+        "nums2": [
+          10,
+          20,
+          30,
+          40,
+          50,
+          60,
+          70,
+          80,
+          90,
+          100
+        ]
+      },
+      "expected": 4,
+      "warnings": []
+    },
+    {
+      "id": "test_051",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums1": [
+          20,
+          10,
+          5,
+          2,
+          1
+        ],
+        "nums2": [
+          50,
+          40,
+          30,
+          20,
+          10,
+          5,
+          2,
+          1
+        ]
+      },
+      "expected": 3,
+      "warnings": []
+    },
+    {
+      "id": "test_052",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums1": [
+          50,
+          40,
+          30,
+          20,
+          10
+        ],
+        "nums2": [
+          100,
+          90,
+          80,
+          70,
+          60,
+          50,
+          40,
+          30,
+          20,
+          10
+        ]
+      },
+      "expected": 5,
+      "warnings": []
+    },
+    {
+      "id": "test_053",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums1": [
+          100
+        ],
+        "nums2": [
+          100,
+          100,
+          100,
+          100,
+          100,
+          100,
+          100,
+          100,
+          100,
+          100
+        ]
+      },
+      "expected": 9,
+      "warnings": []
+    },
+    {
+      "id": "test_054",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums1": [
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1
+        ],
+        "nums2": [
+          10,
+          10,
+          10,
+          10,
+          10,
+          10,
+          10,
+          10,
+          10,
+          10,
+          1
+        ]
+      },
+      "expected": 10,
+      "warnings": []
+    },
+    {
+      "id": "test_055",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums1": [
+          50,
+          30,
+          10
+        ],
+        "nums2": [
+          60,
+          50,
+          40,
+          30,
+          20,
+          10
+        ]
+      },
+      "expected": 3,
+      "warnings": []
+    },
+    {
+      "id": "test_056",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums1": [
+          10,
+          9,
+          8,
+          7,
+          6
+        ],
+        "nums2": [
+          10,
+          9,
+          8,
+          7,
+          6
+        ]
+      },
+      "expected": 0,
+      "warnings": []
+    },
+    {
+      "id": "test_057",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums1": [
+          90,
+          70,
+          50,
+          30,
+          10
+        ],
+        "nums2": [
+          100,
+          80,
+          60,
+          40,
+          20
+        ]
+      },
+      "expected": 0,
+      "warnings": []
+    },
+    {
+      "id": "test_058",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums1": [
+          100,
+          50,
+          25
+        ],
+        "nums2": [
+          150,
+          120,
+          90,
+          70,
+          50,
+          30,
+          10
+        ]
+      },
+      "expected": 3,
+      "warnings": []
+    },
+    {
+      "id": "test_059",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums1": [
+          99,
+          98,
+          97,
+          96,
+          95,
+          94,
+          93,
+          92,
+          91,
+          90
+        ],
+        "nums2": [
+          100,
+          100,
+          100,
+          100,
+          100,
+          100,
+          100,
+          100,
+          100,
+          100
+        ]
+      },
+      "expected": 9,
+      "warnings": []
+    },
+    {
+      "id": "test_060",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums1": [
+          1000,
+          900,
+          800,
+          700,
+          600
+        ],
+        "nums2": [
+          1000,
+          950,
+          900,
+          850,
+          800,
+          750,
+          700,
+          650,
+          600,
+          550,
+          500
+        ]
+      },
+      "expected": 4,
+      "warnings": []
+    },
+    {
+      "id": "test_061",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums1": [
+          99999,
+          88888,
+          77777,
+          66666,
+          55555,
+          44444,
+          33333,
+          22222,
+          11111,
+          1
+        ],
+        "nums2": [
+          100000,
+          99999,
+          88888,
+          77777,
+          66666,
+          55555,
+          44444,
+          33333,
+          22222,
+          11111
+        ]
+      },
+      "expected": 1,
+      "warnings": []
+    },
+    {
+      "id": "test_062",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums1": [
+          9,
+          8,
+          7,
+          6,
+          5,
+          4,
+          3,
+          2,
+          1
+        ],
+        "nums2": [
+          9,
+          8,
+          7,
+          6,
+          5,
+          4,
+          3,
+          2,
+          1
+        ]
+      },
+      "expected": 0,
+      "warnings": []
+    },
+    {
+      "id": "test_063",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums1": [
+          10,
+          10,
+          10,
+          10,
+          10,
+          10
+        ],
+        "nums2": [
+          15,
+          15,
+          15,
+          15,
+          15,
+          15,
+          15,
+          15,
+          15,
+          15,
+          15,
+          15,
+          15,
+          15,
+          15
+        ]
+      },
+      "expected": 14,
+      "warnings": []
+    },
+    {
+      "id": "test_064",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums1": [
+          5,
+          4,
+          3,
+          2,
+          1
+        ],
+        "nums2": [
+          10,
+          9,
+          8,
+          7,
+          6,
+          5,
+          4,
+          3,
+          2,
+          1
+        ]
+      },
+      "expected": 5,
+      "warnings": []
+    },
+    {
+      "id": "test_065",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums1": [
+          1000,
+          900,
+          800,
+          700,
+          600,
+          500,
+          400,
+          300,
+          200,
+          100
+        ],
+        "nums2": [
+          1000,
+          1000,
+          1000,
+          1000,
+          1000,
+          1000,
+          1000,
+          1000,
+          1000,
+          1000
+        ]
+      },
+      "expected": 9,
+      "warnings": []
+    },
+    {
+      "id": "test_066",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums1": [
+          100,
+          50,
+          25,
+          10,
+          1
+        ],
+        "nums2": [
+          200,
+          150,
+          100,
+          90,
+          80,
+          70,
+          60,
+          50,
+          40,
+          30,
+          25,
+          20,
+          15,
+          10,
+          5
+        ]
+      },
+      "expected": 10,
+      "warnings": []
+    },
+    {
+      "id": "test_067",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums1": [
+          10,
+          5,
+          5,
+          5,
+          5
+        ],
+        "nums2": [
+          20,
+          15,
+          15,
+          10,
+          10,
+          10,
+          5,
+          5,
+          5,
+          5
+        ]
+      },
+      "expected": 8,
+      "warnings": []
+    },
+    {
+      "id": "test_068",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums1": [
+          10,
+          9,
+          8,
+          7,
+          6,
+          5,
+          4,
+          3,
+          2,
+          1
+        ],
+        "nums2": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10
+        ]
+      },
+      "expected": 4,
+      "warnings": []
+    },
+    {
+      "id": "test_069",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums1": [
+          5,
+          4,
+          4,
+          3,
+          3,
+          3,
+          2,
+          1
+        ],
+        "nums2": [
+          9,
+          8,
+          7,
+          6,
+          5,
+          4,
+          4,
+          4,
+          3,
+          3,
+          3,
+          2,
+          2,
+          2,
+          1,
+          1,
+          1
+        ]
+      },
+      "expected": 9,
+      "warnings": []
+    },
+    {
+      "id": "test_070",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums1": [
+          100,
+          50,
+          30,
+          20,
+          10
+        ],
+        "nums2": [
+          150,
+          140,
+          130,
+          120,
+          110,
+          100,
+          90,
+          80,
+          70,
+          60,
+          50,
+          40,
+          30,
+          20,
+          10
+        ]
+      },
+      "expected": 10,
+      "warnings": []
+    },
+    {
+      "id": "test_071",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums1": [
+          100,
+          50,
+          25,
+          10,
+          5
+        ],
+        "nums2": [
+          100,
+          75,
+          50,
+          25,
+          10,
+          5,
+          2
+        ]
+      },
+      "expected": 1,
+      "warnings": []
+    },
+    {
+      "id": "test_072",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums1": [
+          10,
+          10,
+          10,
+          10,
+          10
+        ],
+        "nums2": [
+          20,
+          20,
+          20,
+          20,
+          20
+        ]
+      },
+      "expected": 4,
+      "warnings": []
+    },
+    {
+      "id": "test_073",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums1": [
+          100000
+        ],
+        "nums2": [
+          1
+        ]
+      },
+      "expected": 0,
+      "warnings": []
+    },
+    {
+      "id": "test_074",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "nums1": [
+          100,
+          90,
+          80,
+          70,
+          60
+        ],
+        "nums2": [
+          100,
+          95,
+          90,
+          85,
+          80,
+          75,
+          70,
+          65,
+          60,
+          55
+        ]
+      },
+      "expected": 4,
+      "warnings": []
+    }
+  ],
+  "normalization": {
+    "test_source": "python_assertions",
+    "test_count": 75,
+    "raw_test_sha256": "c3a37d28a79f17c787b21dd23e7c20508a37a2befcc25c47661ef578898df216",
+    "generated_by": "scripts/d2v-normalize-json.py",
+    "allow_extra_tests": false
+  }
+}

@@ -1,0 +1,172 @@
+module MinimumConsecutiveCardsToPickUp_List_Recursive_Implementation
+
+  use int.Int
+  use list.List
+
+  let min_positive (left: int) (right: int) : int =
+    if left = -1 then right else if right = -1 then left else if left <= right then left else right
+
+  let rec distance_to_next_match (card: int) (cards: list int) (span: int) : int
+    variant { cards }
+  =
+    match cards with
+    | Nil -> -1
+    | Cons x xs ->
+        if x = card then span else distance_to_next_match card xs (span + 1)
+    end
+
+  let rec minimum_consecutive_cards_to_pick_up_list (cards: list int) : int
+    variant { cards }
+  =
+    match cards with
+    | Nil -> -1
+    | Cons x xs ->
+        let current = distance_to_next_match x xs 2 in
+        let rest = minimum_consecutive_cards_to_pick_up_list xs in
+        min_positive current rest
+    end
+
+  let test_009 () : bool =
+    let cards = Cons 5 Nil in
+    let result = minimum_consecutive_cards_to_pick_up_list cards in
+    result = -1
+
+  let test_005 () : bool =
+    let cards = Cons 0 (Cons 0 Nil) in
+    let result = minimum_consecutive_cards_to_pick_up_list cards in
+    result = 2
+
+  let test_006 () : bool =
+    let cards = Cons 1 (Cons 1 Nil) in
+    let result = minimum_consecutive_cards_to_pick_up_list cards in
+    result = 2
+
+  let test_011 () : bool =
+    let cards = Cons 1000000 (Cons 999999 (Cons 1000000 Nil)) in
+    let result = minimum_consecutive_cards_to_pick_up_list cards in
+    result = 3
+
+  let test_014 () : bool =
+    let cards = Cons 1000000 (Cons 0 (Cons 1000000 Nil)) in
+    let result = minimum_consecutive_cards_to_pick_up_list cards in
+    result = 3
+
+  let test_013 () : bool =
+    let cards = Cons 1 (Cons 0 (Cons 5 (Cons 3 Nil))) in
+    let result = minimum_consecutive_cards_to_pick_up_list cards in
+    result = -1
+
+  let test_007 () : bool =
+    let cards = Cons 0 (Cons 0 (Cons 0 (Cons 0 (Cons 0 Nil)))) in
+    let result = minimum_consecutive_cards_to_pick_up_list cards in
+    result = 2
+
+  let test_012 () : bool =
+    let cards = Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 Nil)))) in
+    let result = minimum_consecutive_cards_to_pick_up_list cards in
+    result = 2
+
+  let test_103 () : bool =
+    let cards = Cons 1000000 (Cons 1000000 (Cons 1000000 (Cons 1000000 (Cons 1000000 Nil)))) in
+    let result = minimum_consecutive_cards_to_pick_up_list cards in
+    result = 2
+
+  let test_004 () : bool =
+    let cards = Cons 3 (Cons 4 (Cons 2 (Cons 3 (Cons 4 (Cons 7 Nil))))) in
+    let result = minimum_consecutive_cards_to_pick_up_list cards in
+    result = 4
+
+  let test_078 () : bool =
+    let cards = Cons 1000000 (Cons 999999 (Cons 999998 (Cons 999997 (Cons 999996 (Cons 1000000 Nil))))) in
+    let result = minimum_consecutive_cards_to_pick_up_list cards in
+    result = 6
+
+  let test_031 () : bool =
+    let cards = Cons 1000000 (Cons 999999 (Cons 999998 (Cons 999997 (Cons 999996 (Cons 999995 (Cons 1000000 Nil)))))) in
+    let result = minimum_consecutive_cards_to_pick_up_list cards in
+    result = 7
+
+  let test_002 () : bool =
+    let cards = Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 Nil))))))))) in
+    let result = minimum_consecutive_cards_to_pick_up_list cards in
+    result = 2
+
+  let test_003 () : bool =
+    let cards = Cons 1 (Cons 2 (Cons 3 (Cons 4 (Cons 5 (Cons 6 (Cons 7 (Cons 8 (Cons 9 (Cons 1 Nil))))))))) in
+    let result = minimum_consecutive_cards_to_pick_up_list cards in
+    result = 10
+
+  let test_010 () : bool =
+    let cards = Cons 1 (Cons 2 (Cons 3 (Cons 4 (Cons 5 (Cons 6 (Cons 7 (Cons 8 (Cons 9 (Cons 10 Nil))))))))) in
+    let result = minimum_consecutive_cards_to_pick_up_list cards in
+    result = -1
+
+  let test_051 () : bool =
+    let cards = Cons 9 (Cons 3 (Cons 1 (Cons 3 (Cons 2 (Cons 5 (Cons 9 (Cons 8 (Cons 3 (Cons 9 Nil))))))))) in
+    let result = minimum_consecutive_cards_to_pick_up_list cards in
+    result = 3
+
+  let test_057 () : bool =
+    let cards = Cons 1000000 (Cons 999999 (Cons 999998 (Cons 1000000 (Cons 999997 (Cons 999996 (Cons 999995 (Cons 999994 (Cons 999993 (Cons 1000000 Nil))))))))) in
+    let result = minimum_consecutive_cards_to_pick_up_list cards in
+    result = 4
+
+  let test_108 () : bool =
+    let cards = Cons 100000 (Cons 200000 (Cons 300000 (Cons 400000 (Cons 500000 (Cons 100000 (Cons 200000 (Cons 300000 (Cons 400000 (Cons 500000 Nil))))))))) in
+    let result = minimum_consecutive_cards_to_pick_up_list cards in
+    result = 6
+
+  let test_000 () : bool =
+    let cards = Cons 0 (Cons 1 (Cons 2 (Cons 3 (Cons 4 (Cons 5 (Cons 6 (Cons 7 (Cons 8 (Cons 9 (Cons 0 Nil)))))))))) in
+    let result = minimum_consecutive_cards_to_pick_up_list cards in
+    result = 11
+
+  let test_045 () : bool =
+    let cards = Cons 1000 (Cons 2000 (Cons 3000 (Cons 4000 (Cons 5000 (Cons 6000 (Cons 7000 (Cons 8000 (Cons 9000 (Cons 10000 (Cons 1000 Nil)))))))))) in
+    let result = minimum_consecutive_cards_to_pick_up_list cards in
+    result = 11
+
+  let run_tests () : bool =
+    if test_009 () then
+    if test_005 () then
+    if test_006 () then
+    if test_011 () then
+    if test_014 () then
+    if test_013 () then
+    if test_007 () then
+    if test_012 () then
+    if test_103 () then
+    if test_004 () then
+    if test_078 () then
+    if test_031 () then
+    if test_002 () then
+    if test_003 () then
+    if test_010 () then
+    if test_051 () then
+    if test_057 () then
+    if test_108 () then
+    if test_000 () then
+    if test_045 () then
+      true
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+
+end

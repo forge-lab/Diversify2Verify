@@ -1,0 +1,155 @@
+module FindTheStudentThatWillReplaceTheChalk_List_Spec
+
+  use int.Int
+  use list.List
+  use list.Length
+  use list.Sum
+
+  let rec predicate all_positive (chalk: list int)
+    variant { chalk }
+  =
+    match chalk with
+    | Nil -> true
+    | Cons c rest -> 0 < c && all_positive rest
+    end
+
+  let rec predicate replacement_index (chalk: list int) (rem: int) (idx: int)
+    variant { chalk }
+  =
+    match chalk with
+    | Nil -> false
+    | Cons c rest ->
+        (rem < c && idx = 0) ||
+        (c <= rem && 0 < idx && replacement_index rest (rem - c) (idx - 1))
+    end
+
+  predicate replacement_result (chalk: list int) (k: int) (idx: int) =
+    0 <= idx < length chalk /\
+    (exists rounds: int, rem: int.
+       0 <= rounds /\
+       0 <= rem < sum chalk /\
+       k = rounds * sum chalk + rem /\
+       replacement_index chalk rem idx)
+
+  val find_the_student_that_will_replace_the_chalk_list (chalk: list int) (k: int) : int
+    requires { chalk <> Nil }
+    requires { all_positive chalk }
+    requires { 0 <= k }
+    ensures  { replacement_result chalk k result }
+
+  let lemma check_test_000 () =
+    let l =
+      Cons 1 (Cons 2 (Cons 3 (Cons 4 (Cons 5 Nil)))) in
+    assert { sum l = 15 };
+    assert { length l = 5 };
+    assert { 15 = 1 * sum l + 0 };
+    assert { replacement_index l 0 0 };
+    assert { replacement_result l 15 0 }
+
+  let lemma check_test_001 () =
+    let l = Cons 1 Nil in
+    assert { sum l = 1 };
+    assert { length l = 1 };
+    assert { 1000000000 = 1000000000 * sum l + 0 };
+    assert { replacement_index l 0 0 };
+    assert { replacement_result l 1000000000 0 }
+
+  let lemma check_test_002 () =
+    let l =
+      Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1
+        (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 Nil))))))))) in
+    let t1 =
+      Cons 1 (Cons 1 (Cons 1 (Cons 1
+        (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 Nil)))))))) in
+    let t2 =
+      Cons 1 (Cons 1 (Cons 1
+        (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 Nil))))))) in
+    let t3 =
+      Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 Nil)))))) in
+    let t4 =
+      Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 Nil))))) in
+    let t5 =
+      Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 Nil)))) in
+    let t6 =
+      Cons 1 (Cons 1 (Cons 1 (Cons 1 Nil))) in
+    let t7 =
+      Cons 1 (Cons 1 (Cons 1 Nil)) in
+    let t8 =
+      Cons 1 (Cons 1 Nil) in
+    let t9 =
+      Cons 1 Nil in
+    assert { sum l = 10 };
+    assert { length l = 10 };
+    assert { 999999999 = 99999999 * sum l + 9 };
+    assert { replacement_index t9 0 0 };
+    assert { replacement_index t8 1 1 };
+    assert { replacement_index t7 2 2 };
+    assert { replacement_index t6 3 3 };
+    assert { replacement_index t5 4 4 };
+    assert { replacement_index t4 5 5 };
+    assert { replacement_index t3 6 6 };
+    assert { replacement_index t2 7 7 };
+    assert { replacement_index t1 8 8 };
+    assert { replacement_index l 9 9 };
+    assert { replacement_result l 999999999 9 }
+
+  let lemma check_test_003 () =
+    let l = Cons 10 (Cons 10 (Cons 10 Nil)) in
+    let t1 = Cons 10 (Cons 10 Nil) in
+    assert { sum l = 30 };
+    assert { length l = 3 };
+    assert { 100 = 3 * sum l + 10 };
+    assert { replacement_index t1 0 0 };
+    assert { replacement_index l 10 1 };
+    assert { replacement_result l 100 1 }
+
+  let lemma check_test_006 () =
+    let l = Cons 3 (Cons 4 (Cons 1 (Cons 2 Nil))) in
+    let t1 = Cons 4 (Cons 1 (Cons 2 Nil)) in
+    assert { sum l = 10 };
+    assert { length l = 4 };
+    assert { 25 = 2 * sum l + 5 };
+    assert { replacement_index t1 2 0 };
+    assert { replacement_index l 5 1 };
+    assert { replacement_result l 25 1 }
+
+  let lemma check_test_007 () =
+    let l = Cons 5 (Cons 1 (Cons 5 Nil)) in
+    assert { sum l = 11 };
+    assert { length l = 3 };
+    assert { 22 = 2 * sum l + 0 };
+    assert { replacement_index l 0 0 };
+    assert { replacement_result l 22 0 }
+
+  let lemma check_test_009 () =
+    let l =
+      Cons 10000 (Cons 9000 (Cons 8000 (Cons 7000 (Cons 6000
+        (Cons 5000 (Cons 4000 (Cons 3000 (Cons 2000 (Cons 1000 Nil))))))))) in
+    let t1 =
+      Cons 9000 (Cons 8000 (Cons 7000 (Cons 6000
+        (Cons 5000 (Cons 4000 (Cons 3000 (Cons 2000 (Cons 1000 Nil)))))))) in
+    let t2 =
+      Cons 8000 (Cons 7000 (Cons 6000
+        (Cons 5000 (Cons 4000 (Cons 3000 (Cons 2000 (Cons 1000 Nil))))))) in
+    let t3 =
+      Cons 7000 (Cons 6000
+        (Cons 5000 (Cons 4000 (Cons 3000 (Cons 2000 (Cons 1000 Nil)))))) in
+    let t4 =
+      Cons 6000 (Cons 5000 (Cons 4000 (Cons 3000 (Cons 2000 (Cons 1000 Nil))))) in
+    let t5 =
+      Cons 5000 (Cons 4000 (Cons 3000 (Cons 2000 (Cons 1000 Nil)))) in
+    let t6 =
+      Cons 4000 (Cons 3000 (Cons 2000 (Cons 1000 Nil))) in
+    assert { sum l = 55000 };
+    assert { length l = 10 };
+    assert { 1000000000 = 18181 * sum l + 45000 };
+    assert { replacement_index t6 0 0 };
+    assert { replacement_index t5 5000 1 };
+    assert { replacement_index t4 11000 2 };
+    assert { replacement_index t3 18000 3 };
+    assert { replacement_index t2 25000 4 };
+    assert { replacement_index t1 33000 5 };
+    assert { replacement_index l 45000 6 };
+    assert { replacement_result l 1000000000 6 }
+
+end

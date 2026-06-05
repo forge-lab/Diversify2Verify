@@ -1,0 +1,267 @@
+module SplitArrayLargestSum_Array_Stage3_Imperative
+
+  use int.Int
+  use int.EuclideanDivision
+  use array.Array
+  use array.ArraySum
+  use ref.Ref
+
+  predicate valid_partition (nums: array int) (k: int) (cuts: array int) =
+    length cuts = k + 1 /\
+    cuts[0] = 0 /\
+    cuts[k] = length nums /\
+    (forall p: int. 0 <= p <= k -> 0 <= cuts[p] <= length nums) /\
+    (forall p: int. 0 <= p < k -> cuts[p] < cuts[p + 1])
+
+  predicate feasible_with_bound (nums: array int) (k: int) (bound: int) =
+    exists cuts: array int.
+      valid_partition nums k cuts /\
+      forall p: int. 0 <= p < k -> sum nums cuts[p] cuts[p + 1] <= bound
+
+  predicate optimal_split_result (nums: array int) (k: int) (result: int) =
+    feasible_with_bound nums k result /\
+    forall bound: int. feasible_with_bound nums k bound -> result <= bound
+
+  let rec lemma array_sum_nonnegative_range (nums: array int) (l h: int)
+    requires { 0 <= l <= h <= length nums }
+    requires { forall i: int. 0 <= i < length nums -> 0 <= nums[i] }
+    ensures  { 0 <= sum nums l h }
+    variant  { h - l }
+  =
+    if l < h then begin
+      array_sum_nonnegative_range nums l (h - 1);
+      assert { 0 <= nums[h - 1] };
+      assert { sum nums l h = sum nums l (h - 1) + nums[h - 1] }
+    end
+
+  let lemma array_sum_subrange_le_total (nums: array int) (l h: int)
+    requires { 0 <= l <= h <= length nums }
+    requires { forall i: int. 0 <= i < length nums -> 0 <= nums[i] }
+    ensures  { sum nums l h <= sum nums 0 (length nums) }
+  =
+    array_sum_nonnegative_range nums 0 l;
+    array_sum_nonnegative_range nums l h;
+    array_sum_nonnegative_range nums h (length nums);
+    assert { sum nums 0 h = sum nums 0 l + sum nums l h };
+    assert { sum nums 0 (length nums) = sum nums 0 h + sum nums h (length nums) }
+
+  let lemma nonnegative_array_element_le_total (nums: array int) (j: int)
+    requires { 0 <= j < length nums }
+    requires { forall i: int. 0 <= i < length nums -> 0 <= nums[i] }
+    ensures  { nums[j] <= sum nums 0 (length nums) }
+  =
+    array_sum_nonnegative_range nums 0 j;
+    array_sum_subrange_le_total nums j (j + 1);
+    assert { sum nums j (j + 1) = nums[j] }
+
+  let lemma max_value_le_total_sum (nums: array int) (m: int)
+    requires { 1 <= length nums }
+    requires { forall i: int. 0 <= i < length nums -> 0 <= nums[i] }
+    requires { exists j: int. 0 <= j < length nums /\ m = nums[j] }
+    ensures  { m <= sum nums 0 (length nums) }
+  =
+    let j = any int ensures { 0 <= result < length nums /\ m = nums[result] } in
+    nonnegative_array_element_le_total nums j
+
+  let lemma total_sum_is_feasible_bound (nums: array int) (k: int)
+    requires { 1 <= k <= length nums }
+    requires { forall i: int. 0 <= i < length nums -> 0 <= nums[i] }
+    ensures  { feasible_with_bound nums k (sum nums 0 (length nums)) }
+  =
+    let cuts = make (k + 1) 0 in
+    for p = 1 to k - 1 do
+      invariant { length cuts = k + 1 }
+      invariant { cuts[0] = 0 }
+      invariant { forall q: int. 1 <= q < p -> cuts[q] = q }
+      cuts[p] <- p
+    done;
+    cuts[k] <- length nums;
+    assert { length cuts = k + 1 };
+    assert { cuts[0] = 0 };
+    assert { cuts[k] = length nums };
+    assert { forall p: int. 0 <= p <= k -> 0 <= cuts[p] <= length nums };
+    assert { forall p: int. 0 <= p < k -> cuts[p] < cuts[p + 1] };
+    assert { valid_partition nums k cuts };
+    assert {
+      forall p: int. 0 <= p < k ->
+        sum nums cuts[p] cuts[p + 1] <= sum nums 0 (length nums)
+    };
+    assert { feasible_with_bound nums k (sum nums 0 (length nums)) }
+
+  lemma feasible_bound_monotone:
+    forall nums: array int, k: int, lo hi: int.
+      feasible_with_bound nums k lo ->
+      lo <= hi ->
+      feasible_with_bound nums k hi
+
+  let rec lemma valid_partition_covers_from
+    (nums: array int) (k: int) (cuts: array int) (j p: int)
+    requires { valid_partition nums k cuts }
+    requires { 0 <= p < k }
+    requires { cuts[p] <= j < length nums }
+    ensures  { exists q: int. p <= q < k /\ cuts[q] <= j < cuts[q + 1] }
+    variant  { k - p }
+  =
+    if j < cuts[p + 1] then
+      assert { p <= p < k /\ cuts[p] <= j < cuts[p + 1] }
+    else begin
+      assert { p + 1 < k };
+      assert { cuts[p + 1] <= j };
+      valid_partition_covers_from nums k cuts j (p + 1)
+    end
+
+  let lemma valid_partition_covers_index
+    (nums: array int) (k: int) (cuts: array int) (j: int)
+    requires { valid_partition nums k cuts }
+    requires { 0 <= j < length nums }
+    ensures  { exists p: int. 0 <= p < k /\ cuts[p] <= j < cuts[p + 1] }
+  =
+    assert { 0 <= 0 < k };
+    assert { cuts[0] <= j < length nums };
+    valid_partition_covers_from nums k cuts j 0
+
+  let lemma nonnegative_array_element_le_subrange
+    (nums: array int) (l h j: int)
+    requires { 0 <= l <= j < h <= length nums }
+    requires { forall i: int. 0 <= i < length nums -> 0 <= nums[i] }
+    ensures  { nums[j] <= sum nums l h }
+  =
+    array_sum_nonnegative_range nums l j;
+    array_sum_subrange_le_total nums l h;
+    assert { sum nums l (j + 1) = sum nums l j + nums[j] };
+    assert { sum nums l h = sum nums l (j + 1) + sum nums (j + 1) h };
+    array_sum_nonnegative_range nums (j + 1) h
+
+  let lemma max_value_is_lower_bound (nums: array int) (k bound m: int)
+    requires { 1 <= k <= length nums }
+    requires { forall i: int. 0 <= i < length nums -> 0 <= nums[i] }
+    requires { forall i: int. 0 <= i < length nums -> nums[i] <= m }
+    requires { exists i: int. 0 <= i < length nums /\ m = nums[i] }
+    requires { feasible_with_bound nums k bound }
+    ensures  { m <= bound }
+  =
+    let j = any int ensures { 0 <= result < length nums /\ m = nums[result] } in
+    let cuts = any array int ensures {
+      valid_partition nums k result /\
+      forall p: int. 0 <= p < k -> sum nums result[p] result[p + 1] <= bound
+    } in
+    valid_partition_covers_index nums k cuts j;
+    let p = any int ensures { 0 <= result < k /\ cuts[result] <= j < cuts[result + 1] } in
+    nonnegative_array_element_le_subrange nums cuts[p] cuts[p + 1] j;
+    assert { m = nums[j] };
+    assert { sum nums cuts[p] cuts[p + 1] <= bound }
+
+  let max_array_value (nums: array int) : int
+    ensures { length nums = 0 -> result = 0 }
+    ensures { length nums > 0 -> exists i: int. 0 <= i < length nums /\ result = nums[i] }
+    ensures { length nums > 0 -> forall i: int. 0 <= i < length nums -> nums[i] <= result }
+  =
+    if length nums = 0 then
+      0
+    else
+      let current = ref nums[0] in
+      for i = 1 to length nums - 1 do
+        invariant { 1 <= i <= length nums }
+        invariant { exists j: int. 0 <= j < i /\ !current = nums[j] }
+        invariant { forall j: int. 0 <= j < i -> nums[j] <= !current }
+        if nums[i] > !current then
+          current := nums[i]
+      done;
+      !current
+
+  let total_sum (nums: array int) : int
+    ensures { result = sum nums 0 (length nums) }
+  =
+    let total = ref 0 in
+    for i = 0 to length nums - 1 do
+      invariant { 0 <= i <= length nums }
+      invariant { !total = sum nums 0 i }
+      total := !total + nums[i]
+    done;
+    !total
+
+  let can_split_with_bound (nums: array int) (k: int) (bound: int) : bool
+    requires { 1 <= k <= length nums }
+    requires { forall i: int. 0 <= i < length nums -> 0 <= nums[i] }
+    requires { 0 <= bound }
+    ensures { result = True \/ result = False }
+    ensures { result = True -> feasible_with_bound nums k bound }
+    ensures { result = False -> not feasible_with_bound nums k bound }
+  =
+    if length nums = 0 then
+      true
+    else
+      let parts = ref 1 in
+      let current = ref 0 in
+      let feasible = ref true in
+      for i = 0 to length nums - 1 do
+        invariant { 0 <= i <= length nums }
+        invariant { 1 <= !parts <= i + 1 }
+        invariant { 0 <= !current }
+        invariant { !feasible = True \/ !feasible = False }
+        if nums[i] > bound then begin
+          assert { 0 <= nums[i] };
+          feasible := false
+        end else if !current + nums[i] <= bound then begin
+          assert { 0 <= nums[i] };
+          assert { 0 <= !current + nums[i] };
+          current := !current + nums[i]
+        end else begin
+          assert { 0 <= nums[i] };
+          parts := !parts + 1;
+          current := nums[i]
+        end
+      done;
+      !feasible && !parts <= k
+
+  let split_array_largest_sum_array (nums: array int) (k: int) : int
+    requires { 1 <= length nums <= 1000 }
+    requires { forall i: int. 0 <= i < length nums -> 0 <= nums[i] <= 1000000 }
+    requires { 1 <= k <= 50 }
+    requires { k <= length nums }
+    ensures  { optimal_split_result nums k result }
+  =
+    if length nums = 0 then
+      0
+    else
+      let lo = ref (max_array_value nums) in
+      let hi = ref (total_sum nums) in
+      assert { length nums > 0 };
+      assert { !hi = sum nums 0 (length nums) };
+      assert { exists j: int. 0 <= j < length nums /\ !lo = nums[j] };
+      assert { forall j: int. 0 <= j < length nums -> nums[j] <= !lo };
+      assert { 0 <= !lo };
+      assert { !lo <= !hi };
+      assert { feasible_with_bound nums k !hi };
+      assert { forall bound: int. feasible_with_bound nums k bound -> !lo <= bound };
+      while !lo < !hi do
+        invariant { !lo <= !hi }
+        invariant { 0 <= !lo }
+        invariant { !hi <= sum nums 0 (length nums) }
+        invariant { feasible_with_bound nums k !hi }
+        invariant { forall bound: int. feasible_with_bound nums k bound -> !lo <= bound }
+        variant { !hi - !lo }
+        let mid = !lo + div (!hi - !lo) 2 in
+        assert { 0 < !hi - !lo };
+        assert { 0 <= div (!hi - !lo) 2 };
+        assert { div (!hi - !lo) 2 < !hi - !lo };
+        assert { !lo <= mid };
+        assert { mid < !hi };
+        assert { 0 <= mid };
+        if can_split_with_bound nums k mid then begin
+          assert { feasible_with_bound nums k mid };
+          hi := mid
+        end else begin
+          assert { not feasible_with_bound nums k mid };
+          assert { forall bound: int. feasible_with_bound nums k bound -> mid < bound };
+          assert { forall bound: int. feasible_with_bound nums k bound -> mid + 1 <= bound };
+          lo := mid + 1
+        end
+      done;
+      assert { !lo = !hi };
+      assert { feasible_with_bound nums k !lo };
+      assert { forall bound: int. feasible_with_bound nums k bound -> !lo <= bound };
+      assert { optimal_split_result nums k !lo };
+      !lo
+
+end

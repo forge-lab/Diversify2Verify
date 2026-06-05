@@ -1,0 +1,70 @@
+module MajorityElement_Array_Stage3_Imperative
+
+  use int.Int
+  use array.Array
+  use array.Init
+  use array.NumOfEq
+  use ref.Ref
+
+  function occurrences (nums: array int) (x: int) : int =
+    NumOfEq.numof nums x 0 (length nums)
+
+  predicate majority_value (nums: array int) (x: int) =
+    (exists i: int. 0 <= i < length nums /\ nums[i] = x) /\
+    2 * occurrences nums x > length nums
+
+  predicate valid_input (nums: array int) =
+    1 <= length nums <= 50000 /\
+    (forall i: int. 0 <= i < length nums ->
+      -1000000000 <= nums[i] <= 1000000000) /\
+    (exists x: int. majority_value nums x)
+
+  predicate majority_element_array_spec (nums: array int) (res: int) =
+    majority_value nums res /\
+    (forall x: int. majority_value nums x -> x = res)
+
+  function prefix_occurrences (nums: array int) (x: int) (hi: int) : int =
+    NumOfEq.numof nums x 0 hi
+
+  predicate seen_in_prefix (nums: array int) (x: int) (hi: int) =
+    exists k: int. 0 <= k < hi /\ nums[k] = x
+
+  predicate candidate_from_prefix (nums: array int) (cand: int) (hi: int) =
+    seen_in_prefix nums cand hi
+
+  let majority_element_array (nums: array int) : int
+    requires { valid_input nums }
+    ensures  { majority_element_array_spec nums result }
+  =
+    if length nums = 0 then begin
+      0
+    end else begin
+      let candidate = ref nums[0] in
+      let balance = ref 1 in
+      for i = 1 to length nums - 1 do
+        invariant { 1 <= i <= length nums }
+        invariant { 0 <= !balance }
+        invariant { candidate_from_prefix nums !candidate i }
+        invariant { valid_input nums }
+        invariant { forall x: int. 0 <= prefix_occurrences nums x i <= i }
+        invariant { exists x: int. majority_value nums x }
+
+        assert { 0 <= i < length nums };
+        if !balance = 0 then begin
+          candidate := nums[i];
+          balance := 1;
+          assert { candidate_from_prefix nums !candidate (i + 1) }
+        end else if nums[i] = !candidate then begin
+          balance := !balance + 1;
+          assert { candidate_from_prefix nums !candidate (i + 1) }
+        end else begin
+          balance := !balance - 1;
+          assert { candidate_from_prefix nums !candidate (i + 1) }
+        end
+      done;
+      assert { candidate_from_prefix nums !candidate (length nums) };
+      assert { exists x: int. majority_value nums x };
+      !candidate
+    end
+
+end

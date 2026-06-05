@@ -1,0 +1,187 @@
+module LongestTurbulentSubarray_List_Imperative_Implementation
+
+  use int.Int
+  use list.List
+  use ref.Ref
+
+  let longest_turbulent_subarray_list (arr: list int) : int =
+    match arr with
+    | Nil -> 0
+    | Cons first rest ->
+        let prev = ref first in
+        let dir = ref 0 in
+        let cur_len = ref 1 in
+        let best = ref 1 in
+        let cur = ref rest in
+        while (match !cur with Nil -> false | Cons _ _ -> true end) do
+          match !cur with
+          | Nil -> ()
+          | Cons x xs ->
+              if x = !prev then (
+                cur_len := 1;
+                dir := 0
+              ) else (
+                let cmp = if !prev < x then 1 else (-1) in
+                if !dir = 0 then (
+                  cur_len := 2;
+                  dir := cmp
+                ) else if cmp <> !dir then (
+                  cur_len := !cur_len + 1;
+                  dir := cmp
+                ) else (
+                  cur_len := 2;
+                  dir := cmp
+                )
+              );
+              if !cur_len > !best then best := !cur_len;
+              prev := x;
+              cur := xs
+          end
+        done;
+        !best
+    end
+
+  let test_000 () : bool =
+    let arr = Cons 9 (Cons 9 Nil) in
+    let r = longest_turbulent_subarray_list arr in
+    r = 1
+
+  let test_001 () : bool =
+    let arr = Cons 9 (Cons 4 (Cons 2 (Cons 10 (Cons 7 (Cons 8 (Cons 8 (Cons 1 (Cons 9 Nil)))))))) in
+    let r = longest_turbulent_subarray_list arr in
+    r = 5
+
+  let test_002 () : bool =
+    let arr = Cons 9 (Cons 8 (Cons 7 (Cons 6 (Cons 7 (Cons 8 (Cons 9 (Cons 8 (Cons 7 (Cons 6 Nil))))))))) in
+    let r = longest_turbulent_subarray_list arr in
+    r = 3
+
+  let test_003 () : bool =
+    let arr = Cons 1 (Cons 2 (Cons 1 (Cons 2 (Cons 1 (Cons 2 (Cons 1 (Cons 2 (Cons 3 Nil)))))))) in
+    let r = longest_turbulent_subarray_list arr in
+    r = 8
+
+  let test_004 () : bool =
+    let arr = Cons 1 (Cons 2 (Cons 1 (Cons 2 (Cons 1 (Cons 2 (Cons 1 (Cons 2 (Cons 1 Nil)))))))) in
+    let r = longest_turbulent_subarray_list arr in
+    r = 9
+
+  let test_005 () : bool =
+    let arr = Cons 9 (Cons 4 (Cons 2 (Cons 10 (Cons 7 (Cons 8 (Cons 7 (Cons 1 (Cons 9 (Cons 4 (Cons 2 (Cons 10 (Cons 7 (Cons 8 (Cons 8 (Cons 1 (Cons 9 Nil)))))))))))))))) in
+    let r = longest_turbulent_subarray_list arr in
+    r = 6
+
+  let test_006 () : bool =
+    let arr = Cons 10 (Cons 9 (Cons 4 (Cons 5 (Cons 4 (Cons 8 (Cons 9 (Cons 3 (Cons 5 Nil)))))))) in
+    let r = longest_turbulent_subarray_list arr in
+    r = 5
+
+  let test_007 () : bool =
+    let arr = Cons 10 (Cons 9 (Cons 8 (Cons 7 (Cons 6 (Cons 5 (Cons 4 (Cons 3 (Cons 2 (Cons 1 Nil))))))))) in
+    let r = longest_turbulent_subarray_list arr in
+    r = 2
+
+  let test_008 () : bool =
+    let arr = Cons 1 (Cons 2 (Cons 3 (Cons 4 (Cons 5 (Cons 6 (Cons 7 (Cons 8 (Cons 9 (Cons 10 Nil))))))))) in
+    let r = longest_turbulent_subarray_list arr in
+    r = 2
+
+  let test_009 () : bool =
+    let arr = Cons 0 (Cons 0 (Cons 0 (Cons 0 (Cons 0 (Cons 0 (Cons 0 (Cons 0 (Cons 0 Nil)))))))) in
+    let r = longest_turbulent_subarray_list arr in
+    r = 1
+
+  let test_010 () : bool =
+    let arr = Cons 1 (Cons 2 (Cons 2 (Cons 1 (Cons 2 (Cons 2 (Cons 1 (Cons 2 (Cons 2 Nil)))))))) in
+    let r = longest_turbulent_subarray_list arr in
+    r = 3
+
+  let test_011 () : bool =
+    let arr = Cons 2 (Cons 1 (Cons 2 (Cons 1 (Cons 2 (Cons 1 (Cons 2 (Cons 1 (Cons 2 Nil)))))))) in
+    let r = longest_turbulent_subarray_list arr in
+    r = 9
+
+  let test_012 () : bool =
+    let arr = Cons 1 (Cons 2 (Cons 3 (Cons 4 (Cons 5 (Cons 4 (Cons 3 (Cons 2 (Cons 1 Nil)))))))) in
+    let r = longest_turbulent_subarray_list arr in
+    r = 3
+
+  let test_013 () : bool =
+    let arr = Cons 0 (Cons 8 (Cons 45 (Cons 88 (Cons 48 (Cons 68 (Cons 28 (Cons 55 (Cons 17 (Cons 24 Nil))))))))) in
+    let r = longest_turbulent_subarray_list arr in
+    r = 8
+
+  let test_014 () : bool =
+    let arr = Cons 100 Nil in
+    let r = longest_turbulent_subarray_list arr in
+    r = 1
+
+  let test_015 () : bool =
+    let arr = Cons 8 (Cons 8 (Cons 8 (Cons 8 (Cons 8 (Cons 8 Nil))))) in
+    let r = longest_turbulent_subarray_list arr in
+    r = 1
+
+  let test_016 () : bool =
+    let arr = Cons 9 (Cons 8 (Cons 7 (Cons 6 (Cons 5 (Cons 4 (Cons 3 (Cons 2 (Cons 1 Nil)))))))) in
+    let r = longest_turbulent_subarray_list arr in
+    r = 2
+
+  let test_017 () : bool =
+    let arr = Cons 1 (Cons 2 (Cons 3 (Cons 2 (Cons 1 (Cons 2 (Cons 3 (Cons 2 (Cons 1 Nil)))))))) in
+    let r = longest_turbulent_subarray_list arr in
+    r = 3
+
+  let test_018 () : bool =
+    let arr = Cons 4 (Cons 8 (Cons 12 (Cons 16 Nil))) in
+    let r = longest_turbulent_subarray_list arr in
+    r = 2
+
+  let test_019 () : bool =
+    let arr = Cons 1 (Cons 3 (Cons 2 (Cons 5 (Cons 4 (Cons 7 (Cons 6 (Cons 9 (Cons 8 (Cons 10 Nil))))))))) in
+    let r = longest_turbulent_subarray_list arr in
+    r = 10
+
+  let run_tests () : bool =
+    if test_000 () then
+    if test_001 () then
+    if test_002 () then
+    if test_003 () then
+    if test_004 () then
+    if test_005 () then
+    if test_006 () then
+    if test_007 () then
+    if test_008 () then
+    if test_009 () then
+    if test_010 () then
+    if test_011 () then
+    if test_012 () then
+    if test_013 () then
+    if test_014 () then
+    if test_015 () then
+    if test_016 () then
+    if test_017 () then
+    if test_018 () then
+    if test_019 () then
+      true
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+
+end

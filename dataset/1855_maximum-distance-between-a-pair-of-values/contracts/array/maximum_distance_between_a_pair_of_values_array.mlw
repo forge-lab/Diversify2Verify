@@ -1,0 +1,320 @@
+module MaximumDistanceBetweenAPairOfValues_Array_Spec
+
+  use int.Int
+  use array.Array
+  use array.Init
+
+  predicate non_increasing (a: array int) =
+    forall i j: int.
+      0 <= i <= j < length a -> a[i] >= a[j]
+
+  predicate values_in_range (a: array int) =
+    forall i: int.
+      0 <= i < length a -> 1 <= a[i] <= 100000
+
+  predicate valid_input (nums1: array int) (nums2: array int) =
+    1 <= length nums1 <= 100000 /\
+    1 <= length nums2 <= 100000 /\
+    values_in_range nums1 /\
+    values_in_range nums2 /\
+    non_increasing nums1 /\
+    non_increasing nums2
+
+  predicate valid_pair (nums1: array int) (nums2: array int) (i: int) (j: int) =
+    0 <= i < length nums1 /\
+    0 <= j < length nums2 /\
+    i <= j /\
+    nums1[i] <= nums2[j]
+
+  function pair_distance (i: int) (j: int) : int =
+    j - i
+
+  predicate has_pair_distance
+    (nums1: array int) (nums2: array int) (d: int) =
+    exists i j: int.
+      valid_pair nums1 nums2 i j /\
+      d = pair_distance i j
+
+  predicate no_positive_distance_pair
+    (nums1: array int) (nums2: array int) =
+    forall i j: int.
+      valid_pair nums1 nums2 i j -> pair_distance i j <= 0
+
+  predicate distance_upper_bound
+    (nums1: array int) (nums2: array int) (d: int) =
+    forall i j: int.
+      valid_pair nums1 nums2 i j -> pair_distance i j <= d
+
+  predicate maximum_distance_spec
+    (nums1: array int) (nums2: array int) (res: int) =
+    (res = 0 /\ no_positive_distance_pair nums1 nums2) \/
+    (0 < res /\
+     has_pair_distance nums1 nums2 res /\
+     distance_upper_bound nums1 nums2 res)
+
+  predicate distance_bound_at
+    (nums1: array int) (nums2: array int) (d: int) (i: int) (j: int) =
+    valid_pair nums1 nums2 i j -> pair_distance i j <= d
+
+  val maximum_distance_between_a_pair_of_values_array
+    (nums1: array int) (nums2: array int) : int
+    requires { valid_input nums1 nums2 }
+    ensures  { maximum_distance_spec nums1 nums2 result }
+
+  let lemma test_000_python_assertions () =
+    let nums1 = init 1 [|100|] in
+    let nums2 = init 1 [|101|] in
+    assert { length nums1 = 1 };
+    assert { length nums2 = 1 };
+    assert { nums1[0] = 100 };
+    assert { nums2[0] = 101 };
+    assert { valid_input nums1 nums2 };
+    assert { valid_pair nums1 nums2 0 0 };
+    assert { pair_distance 0 0 = 0 };
+    assert {
+      forall i: int. 0 <= i < length nums1 -> i = 0
+    };
+    assert {
+      forall j: int. 0 <= j < length nums2 -> j = 0
+    };
+    assert { distance_bound_at nums1 nums2 0 0 0 };
+    assert { no_positive_distance_pair nums1 nums2 };
+    assert { maximum_distance_spec nums1 nums2 0 }
+
+  let lemma test_001_python_assertions () =
+    let nums1 = init 4 [|30; 29; 19; 5|] in
+    let nums2 = init 5 [|25; 25; 25; 25; 25|] in
+    assert { length nums1 = 4 };
+    assert { length nums2 = 5 };
+    assert { nums1[0] = 30 };
+    assert { nums1[1] = 29 };
+    assert { nums1[2] = 19 };
+    assert { nums1[3] = 5 };
+    assert { nums2[0] = 25 };
+    assert { nums2[1] = 25 };
+    assert { nums2[2] = 25 };
+    assert { nums2[3] = 25 };
+    assert { nums2[4] = 25 };
+    assert { valid_input nums1 nums2 };
+    assert { valid_pair nums1 nums2 2 4 };
+    assert { pair_distance 2 4 = 2 };
+    assert { has_pair_distance nums1 nums2 2 };
+    assert {
+      forall i: int. 0 <= i < length nums1 ->
+        i = 0 \/ i = 1 \/ i = 2 \/ i = 3
+    };
+    assert {
+      forall j: int. 0 <= j < length nums2 ->
+        j = 0 \/ j = 1 \/ j = 2 \/ j = 3 \/ j = 4
+    };
+    assert { distance_bound_at nums1 nums2 2 0 0 };
+    assert { distance_bound_at nums1 nums2 2 0 1 };
+    assert { distance_bound_at nums1 nums2 2 0 2 };
+    assert { distance_bound_at nums1 nums2 2 0 3 };
+    assert { distance_bound_at nums1 nums2 2 0 4 };
+    assert { distance_bound_at nums1 nums2 2 1 1 };
+    assert { distance_bound_at nums1 nums2 2 1 2 };
+    assert { distance_bound_at nums1 nums2 2 1 3 };
+    assert { distance_bound_at nums1 nums2 2 1 4 };
+    assert { distance_bound_at nums1 nums2 2 2 2 };
+    assert { distance_bound_at nums1 nums2 2 2 3 };
+    assert { distance_bound_at nums1 nums2 2 2 4 };
+    assert { distance_bound_at nums1 nums2 2 3 3 };
+    assert { distance_bound_at nums1 nums2 2 3 4 };
+    assert { distance_upper_bound nums1 nums2 2 };
+    assert { maximum_distance_spec nums1 nums2 2 }
+
+  let lemma test_005_python_assertions () =
+    let nums1 = init 4 [|10; 9; 8; 7|] in
+    let nums2 = init 4 [|7; 7; 7; 7|] in
+    assert { length nums1 = 4 };
+    assert { length nums2 = 4 };
+    assert { nums1[0] = 10 };
+    assert { nums1[1] = 9 };
+    assert { nums1[2] = 8 };
+    assert { nums1[3] = 7 };
+    assert { nums2[0] = 7 };
+    assert { nums2[1] = 7 };
+    assert { nums2[2] = 7 };
+    assert { nums2[3] = 7 };
+    assert { valid_input nums1 nums2 };
+    assert { valid_pair nums1 nums2 3 3 };
+    assert { pair_distance 3 3 = 0 };
+    assert {
+      forall i: int. 0 <= i < length nums1 ->
+        i = 0 \/ i = 1 \/ i = 2 \/ i = 3
+    };
+    assert {
+      forall j: int. 0 <= j < length nums2 ->
+        j = 0 \/ j = 1 \/ j = 2 \/ j = 3
+    };
+    assert { distance_bound_at nums1 nums2 0 0 0 };
+    assert { distance_bound_at nums1 nums2 0 0 1 };
+    assert { distance_bound_at nums1 nums2 0 0 2 };
+    assert { distance_bound_at nums1 nums2 0 0 3 };
+    assert { distance_bound_at nums1 nums2 0 1 1 };
+    assert { distance_bound_at nums1 nums2 0 1 2 };
+    assert { distance_bound_at nums1 nums2 0 1 3 };
+    assert { distance_bound_at nums1 nums2 0 2 2 };
+    assert { distance_bound_at nums1 nums2 0 2 3 };
+    assert { distance_bound_at nums1 nums2 0 3 3 };
+    assert { no_positive_distance_pair nums1 nums2 };
+    assert { maximum_distance_spec nums1 nums2 0 }
+
+  let lemma test_007_python_assertions () =
+    let nums1 = init 4 [|1; 1; 1; 1|] in
+    let nums2 = init 4 [|1; 1; 1; 1|] in
+    assert { length nums1 = 4 };
+    assert { length nums2 = 4 };
+    assert { nums1[0] = 1 };
+    assert { nums1[1] = 1 };
+    assert { nums1[2] = 1 };
+    assert { nums1[3] = 1 };
+    assert { nums2[0] = 1 };
+    assert { nums2[1] = 1 };
+    assert { nums2[2] = 1 };
+    assert { nums2[3] = 1 };
+    assert { valid_input nums1 nums2 };
+    assert { valid_pair nums1 nums2 0 3 };
+    assert { pair_distance 0 3 = 3 };
+    assert { has_pair_distance nums1 nums2 3 };
+    assert {
+      forall i: int. 0 <= i < length nums1 ->
+        i = 0 \/ i = 1 \/ i = 2 \/ i = 3
+    };
+    assert {
+      forall j: int. 0 <= j < length nums2 ->
+        j = 0 \/ j = 1 \/ j = 2 \/ j = 3
+    };
+    assert { distance_bound_at nums1 nums2 3 0 0 };
+    assert { distance_bound_at nums1 nums2 3 0 1 };
+    assert { distance_bound_at nums1 nums2 3 0 2 };
+    assert { distance_bound_at nums1 nums2 3 0 3 };
+    assert { distance_bound_at nums1 nums2 3 1 1 };
+    assert { distance_bound_at nums1 nums2 3 1 2 };
+    assert { distance_bound_at nums1 nums2 3 1 3 };
+    assert { distance_bound_at nums1 nums2 3 2 2 };
+    assert { distance_bound_at nums1 nums2 3 2 3 };
+    assert { distance_bound_at nums1 nums2 3 3 3 };
+    assert { distance_upper_bound nums1 nums2 3 };
+    assert { maximum_distance_spec nums1 nums2 3 }
+
+  let lemma test_009_python_assertions () =
+    let nums1 = init 4 [|5; 5; 5; 5|] in
+    let nums2 = init 6 [|5; 5; 5; 5; 5; 5|] in
+    assert { length nums1 = 4 };
+    assert { length nums2 = 6 };
+    assert { nums1[0] = 5 };
+    assert { nums1[1] = 5 };
+    assert { nums1[2] = 5 };
+    assert { nums1[3] = 5 };
+    assert { nums2[0] = 5 };
+    assert { nums2[1] = 5 };
+    assert { nums2[2] = 5 };
+    assert { nums2[3] = 5 };
+    assert { nums2[4] = 5 };
+    assert { nums2[5] = 5 };
+    assert { valid_input nums1 nums2 };
+    assert { valid_pair nums1 nums2 0 5 };
+    assert { pair_distance 0 5 = 5 };
+    assert { has_pair_distance nums1 nums2 5 };
+    assert {
+      forall i: int. 0 <= i < length nums1 ->
+        i = 0 \/ i = 1 \/ i = 2 \/ i = 3
+    };
+    assert {
+      forall j: int. 0 <= j < length nums2 ->
+        j = 0 \/ j = 1 \/ j = 2 \/ j = 3 \/ j = 4 \/ j = 5
+    };
+    assert { distance_bound_at nums1 nums2 5 0 0 };
+    assert { distance_bound_at nums1 nums2 5 0 1 };
+    assert { distance_bound_at nums1 nums2 5 0 2 };
+    assert { distance_bound_at nums1 nums2 5 0 3 };
+    assert { distance_bound_at nums1 nums2 5 0 4 };
+    assert { distance_bound_at nums1 nums2 5 0 5 };
+    assert { distance_bound_at nums1 nums2 5 1 1 };
+    assert { distance_bound_at nums1 nums2 5 1 2 };
+    assert { distance_bound_at nums1 nums2 5 1 3 };
+    assert { distance_bound_at nums1 nums2 5 1 4 };
+    assert { distance_bound_at nums1 nums2 5 1 5 };
+    assert { distance_bound_at nums1 nums2 5 2 2 };
+    assert { distance_bound_at nums1 nums2 5 2 3 };
+    assert { distance_bound_at nums1 nums2 5 2 4 };
+    assert { distance_bound_at nums1 nums2 5 2 5 };
+    assert { distance_bound_at nums1 nums2 5 3 3 };
+    assert { distance_bound_at nums1 nums2 5 3 4 };
+    assert { distance_bound_at nums1 nums2 5 3 5 };
+    assert { distance_upper_bound nums1 nums2 5 };
+    assert { maximum_distance_spec nums1 nums2 5 }
+
+  let lemma test_018_python_assertions () =
+    let nums1 = init 3 [|2; 2; 2|] in
+    let nums2 = init 3 [|10; 10; 1|] in
+    assert { length nums1 = 3 };
+    assert { length nums2 = 3 };
+    assert { nums1[0] = 2 };
+    assert { nums1[1] = 2 };
+    assert { nums1[2] = 2 };
+    assert { nums2[0] = 10 };
+    assert { nums2[1] = 10 };
+    assert { nums2[2] = 1 };
+    assert { valid_input nums1 nums2 };
+    assert { valid_pair nums1 nums2 0 1 };
+    assert { pair_distance 0 1 = 1 };
+    assert { has_pair_distance nums1 nums2 1 };
+    assert {
+      forall i: int. 0 <= i < length nums1 ->
+        i = 0 \/ i = 1 \/ i = 2
+    };
+    assert {
+      forall j: int. 0 <= j < length nums2 ->
+        j = 0 \/ j = 1 \/ j = 2
+    };
+    assert { distance_bound_at nums1 nums2 1 0 0 };
+    assert { distance_bound_at nums1 nums2 1 0 1 };
+    assert { distance_bound_at nums1 nums2 1 0 2 };
+    assert { distance_bound_at nums1 nums2 1 1 1 };
+    assert { distance_bound_at nums1 nums2 1 1 2 };
+    assert { distance_bound_at nums1 nums2 1 2 2 };
+    assert { distance_upper_bound nums1 nums2 1 };
+    assert { maximum_distance_spec nums1 nums2 1 }
+
+  let lemma test_019_python_assertions () =
+    let nums1 = init 4 [|100; 50; 25; 10|] in
+    let nums2 = init 4 [|100; 100; 100; 100|] in
+    assert { length nums1 = 4 };
+    assert { length nums2 = 4 };
+    assert { nums1[0] = 100 };
+    assert { nums1[1] = 50 };
+    assert { nums1[2] = 25 };
+    assert { nums1[3] = 10 };
+    assert { nums2[0] = 100 };
+    assert { nums2[1] = 100 };
+    assert { nums2[2] = 100 };
+    assert { nums2[3] = 100 };
+    assert { valid_input nums1 nums2 };
+    assert { valid_pair nums1 nums2 0 3 };
+    assert { pair_distance 0 3 = 3 };
+    assert { has_pair_distance nums1 nums2 3 };
+    assert {
+      forall i: int. 0 <= i < length nums1 ->
+        i = 0 \/ i = 1 \/ i = 2 \/ i = 3
+    };
+    assert {
+      forall j: int. 0 <= j < length nums2 ->
+        j = 0 \/ j = 1 \/ j = 2 \/ j = 3
+    };
+    assert { distance_bound_at nums1 nums2 3 0 0 };
+    assert { distance_bound_at nums1 nums2 3 0 1 };
+    assert { distance_bound_at nums1 nums2 3 0 2 };
+    assert { distance_bound_at nums1 nums2 3 0 3 };
+    assert { distance_bound_at nums1 nums2 3 1 1 };
+    assert { distance_bound_at nums1 nums2 3 1 2 };
+    assert { distance_bound_at nums1 nums2 3 1 3 };
+    assert { distance_bound_at nums1 nums2 3 2 2 };
+    assert { distance_bound_at nums1 nums2 3 2 3 };
+    assert { distance_bound_at nums1 nums2 3 3 3 };
+    assert { distance_upper_bound nums1 nums2 3 };
+    assert { maximum_distance_spec nums1 nums2 3 }
+
+end

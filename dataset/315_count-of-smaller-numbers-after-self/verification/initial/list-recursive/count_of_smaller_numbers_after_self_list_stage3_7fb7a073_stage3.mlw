@@ -1,0 +1,56 @@
+module CountOfSmallerNumbersAfterSelf_List_Stage3_Recursive
+
+  use int.Int
+  use list.List
+
+  let rec function count_smaller_than (x: int) (l: list int) : int
+    variant { l }
+  =
+    match l with
+    | Nil -> 0
+    | Cons y ys -> (if y < x then 1 else 0) + count_smaller_than x ys
+    end
+
+  let rec function smaller_counts (nums: list int) : list int
+    variant { nums }
+  =
+    match nums with
+    | Nil -> Nil
+    | Cons x xs -> Cons (count_smaller_than x xs) (smaller_counts xs)
+    end
+
+  let rec count_smaller_than_exec (x: int) (l: list int) : int
+    ensures { result = count_smaller_than x l }
+    variant { l }
+  =
+    match l with
+    | Nil ->
+        assert { count_smaller_than x l = 0 };
+        0
+    | Cons y ys ->
+        let tail = count_smaller_than_exec x ys in
+        assert { tail = count_smaller_than x ys };
+        assert { count_smaller_than x l =
+          (if y < x then 1 else 0) + count_smaller_than x ys };
+        (if y < x then 1 else 0) + tail
+    end
+
+  let rec count_of_smaller_numbers_after_self_list (nums: list int) : list int
+    ensures { result = smaller_counts nums }
+    variant { nums }
+  =
+    match nums with
+    | Nil ->
+        assert { smaller_counts nums = Nil };
+        Nil
+    | Cons x xs ->
+        let count = count_smaller_than_exec x xs in
+        let rest = count_of_smaller_numbers_after_self_list xs in
+        assert { count = count_smaller_than x xs };
+        assert { rest = smaller_counts xs };
+        assert { smaller_counts nums =
+          Cons (count_smaller_than x xs) (smaller_counts xs) };
+        Cons count rest
+    end
+
+end

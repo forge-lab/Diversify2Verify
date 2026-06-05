@@ -1,0 +1,218 @@
+module SumOfMutatedArrayClosestToTarget_List_Recursive_Implementation
+
+  use int.Int
+  use int.EuclideanDivision
+  use list.List
+
+  let abs_int (x: int) : int =
+    if x < 0 then -x else x
+
+  let rec capped_sum (l: list int) (value: int) : int
+    variant { l }
+  =
+    match l with
+    | Nil -> 0
+    | Cons x xs ->
+        (if x <= value then x else value) + capped_sum xs value
+    end
+
+  let distance_for_value (l: list int) (target: int) (value: int) : int =
+    abs_int (capped_sum l value - target)
+
+  let rec max_from (l: list int) (best: int) : int
+    variant { l }
+  =
+    match l with
+    | Nil -> best
+    | Cons x xs ->
+        if x > best then max_from xs x else max_from xs best
+    end
+
+  let max_value (l: list int) : int =
+    match l with
+    | Nil -> 0
+    | Cons x xs -> max_from xs x
+    end
+
+  let rec lower_bound_value (l: list int) (target: int) (lo: int) (hi: int) : int
+    variant { hi - lo }
+  =
+    if lo >= hi then
+      lo
+    else
+      let mid = lo + div (hi - lo) 2 in
+      let s = capped_sum l mid in
+      if s < target then
+        lower_bound_value l target (mid + 1) hi
+      else
+        lower_bound_value l target lo mid
+
+  let choose_better_value (l: list int) (target: int) (left: int) (right: int) : int =
+    let left_distance = distance_for_value l target left in
+    let right_distance = distance_for_value l target right in
+    if left_distance < right_distance then
+      left
+    else if right_distance < left_distance then
+      right
+    else if left <= right then
+      left
+    else
+      right
+
+  let sum_of_mutated_array_closest_to_target_list (arr: list int) (target: int) : int =
+    match arr with
+    | Nil -> 0
+    | Cons _ _ ->
+        let hi = max_value arr in
+        let right = lower_bound_value arr target 0 hi in
+        let left = if right = 0 then 0 else right - 1 in
+        choose_better_value arr target left right
+    end
+
+  let test_test_000 () : bool =
+    let l = Cons 1 (Cons 2 (Cons 3 (Cons 4 (Cons 5 Nil)))) in
+    let r = sum_of_mutated_array_closest_to_target_list l 11 in
+    r = 3
+
+  let test_test_001 () : bool =
+    let l = Cons 5 (Cons 5 (Cons 5 (Cons 5 (Cons 5 Nil)))) in
+    let r = sum_of_mutated_array_closest_to_target_list l 17 in
+    r = 3
+
+  let test_test_003 () : bool =
+    let l = Cons 2 (Cons 3 (Cons 5 Nil)) in
+    let r = sum_of_mutated_array_closest_to_target_list l 10 in
+    r = 5
+
+  let test_test_005 () : bool =
+    let l = Cons 10000 (Cons 10000 (Cons 10000 Nil)) in
+    let r = sum_of_mutated_array_closest_to_target_list l 10000 in
+    r = 3333
+
+  let test_test_008 () : bool =
+    let l = Cons 60864 (Cons 25176 (Cons 27249 (Cons 21296 (Cons 20204 Nil)))) in
+    let r = sum_of_mutated_array_closest_to_target_list l 56803 in
+    r = 11361
+
+  let test_test_010 () : bool =
+    let l = Cons 100000 (Cons 100000 (Cons 100000 Nil)) in
+    let r = sum_of_mutated_array_closest_to_target_list l 299999 in
+    r = 100000
+
+  let test_test_021 () : bool =
+    let l5 = Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 Nil)))) in
+    let l10 = Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 l5)))) in
+    let l15 = Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 l10)))) in
+    let l = Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 l15)))) in
+    let r = sum_of_mutated_array_closest_to_target_list l 10 in
+    r = 0
+
+  let test_test_016 () : bool =
+    let l = Cons 4 (Cons 9 (Cons 3 Nil)) in
+    let r = sum_of_mutated_array_closest_to_target_list l 10 in
+    r = 3
+
+  let test_test_012 () : bool =
+    let l = Cons 10 (Cons 20 (Cons 30 Nil)) in
+    let r = sum_of_mutated_array_closest_to_target_list l 25 in
+    r = 8
+
+  let test_test_009 () : bool =
+    let l = Cons 100000 (Cons 100000 (Cons 100000 Nil)) in
+    let r = sum_of_mutated_array_closest_to_target_list l 100000 in
+    r = 33333
+
+  let test_test_015 () : bool =
+    let l = Cons 100000 (Cons 100000 (Cons 100000 Nil)) in
+    let r = sum_of_mutated_array_closest_to_target_list l 250000 in
+    r = 83333
+
+  let test_test_006 () : bool =
+    let l = Cons 99999 (Cons 99999 (Cons 99999 (Cons 99999 Nil))) in
+    let r = sum_of_mutated_array_closest_to_target_list l 100000 in
+    r = 25000
+
+  let test_test_013 () : bool =
+    let l = Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 Nil)))) in
+    let r = sum_of_mutated_array_closest_to_target_list l 3 in
+    r = 1
+
+  let test_test_017 () : bool =
+    let l = Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 Nil)))) in
+    let r = sum_of_mutated_array_closest_to_target_list l 5 in
+    r = 1
+
+  let test_test_014 () : bool =
+    let l = Cons 1 (Cons 2 (Cons 3 (Cons 4 (Cons 5 Nil)))) in
+    let r = sum_of_mutated_array_closest_to_target_list l 15 in
+    r = 5
+
+  let test_test_011 () : bool =
+    let l = Cons 5 (Cons 5 (Cons 5 (Cons 5 (Cons 5 Nil)))) in
+    let r = sum_of_mutated_array_closest_to_target_list l 20 in
+    r = 4
+
+  let test_test_064 () : bool =
+    let l = Cons 1 (Cons 3 (Cons 5 (Cons 7 (Cons 9 Nil)))) in
+    let r = sum_of_mutated_array_closest_to_target_list l 25 in
+    r = 9
+
+  let test_test_004 () : bool =
+    let l = Cons 9 (Cons 9 (Cons 9 (Cons 9 (Cons 9 Nil)))) in
+    let r = sum_of_mutated_array_closest_to_target_list l 40 in
+    r = 8
+
+  let test_test_002 () : bool =
+    let l = Cons 10 (Cons 20 (Cons 30 (Cons 40 (Cons 50 Nil)))) in
+    let r = sum_of_mutated_array_closest_to_target_list l 100 in
+    r = 23
+
+  let test_test_043 () : bool =
+    let l = Cons 10 (Cons 20 (Cons 30 (Cons 40 (Cons 50 Nil)))) in
+    let r = sum_of_mutated_array_closest_to_target_list l 120 in
+    r = 30
+
+  let run_tests () : bool =
+    if test_test_000 () then
+    if test_test_001 () then
+    if test_test_003 () then
+    if test_test_005 () then
+    if test_test_008 () then
+    if test_test_010 () then
+    if test_test_021 () then
+    if test_test_016 () then
+    if test_test_012 () then
+    if test_test_009 () then
+    if test_test_015 () then
+    if test_test_006 () then
+    if test_test_013 () then
+    if test_test_017 () then
+    if test_test_014 () then
+    if test_test_011 () then
+    if test_test_064 () then
+    if test_test_004 () then
+    if test_test_002 () then
+    if test_test_043 () then
+      true
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+
+end

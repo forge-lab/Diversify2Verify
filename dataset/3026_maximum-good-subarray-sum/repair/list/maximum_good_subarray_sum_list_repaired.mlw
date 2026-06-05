@@ -1,0 +1,157 @@
+module MaximumGoodSubarraySum_List_Spec
+
+  use int.Int
+  use int.Abs
+  use list.List
+  use list.Length
+  use list.Append
+  use list.Sum
+
+  predicate first_value (l: list int) (x: int) =
+    match l with
+    | Nil -> false
+    | Cons y _ -> x = y
+    end
+
+  let rec predicate last_value (l: list int) (x: int)
+    variant { l }
+  =
+    match l with
+    | Nil -> false
+    | Cons y Nil -> x = y
+    | Cons _ ys -> last_value ys x
+    end
+
+  predicate good_segment (seg: list int) (k: int) =
+    exists first last: int.
+      first_value seg first /\
+      last_value seg last /\
+      abs (first - last) = k
+
+  predicate contiguous_segment (seg: list int) (nums: list int) =
+    exists left right: list int. nums = left ++ (seg ++ right)
+
+  predicate good_subarray_sum (nums: list int) (k: int) (s: int) =
+    exists seg: list int.
+      contiguous_segment seg nums /\
+      good_segment seg k /\
+      s = sum seg
+
+  predicate has_good_subarray_sum (nums: list int) (k: int) =
+    exists s: int. good_subarray_sum nums k s
+
+  predicate maximum_good_subarray_sum_spec (nums: list int) (k: int) (r: int) =
+    (has_good_subarray_sum nums k ->
+       good_subarray_sum nums k r /\
+       (forall s: int. good_subarray_sum nums k s -> s <= r)) /\
+    ((not (has_good_subarray_sum nums k)) -> r = 0)
+
+  val maximum_good_subarray_sum_list (nums: list int) (k: int) : int
+    requires { length nums >= 2 }
+    requires { k > 0 }
+    ensures  { maximum_good_subarray_sum_spec nums k result }
+
+  let lemma check_test_000 () =
+    let nums = Cons 1000000000 (Cons (-1000000000) Nil) in
+    let best = nums in
+    assert { length nums = 2 };
+    assert { first_value best 1000000000 };
+    assert { last_value best (-1000000000) };
+    assert { abs (1000000000 - (-1000000000)) = 2000000000 };
+    assert { good_segment best 2000000000 };
+    assert { nums = Nil ++ (best ++ Nil) };
+    assert { contiguous_segment best nums };
+    assert { sum best = 0 };
+    assert { good_subarray_sum nums 2000000000 0 }
+
+  let lemma check_test_001 () =
+    let best = Cons 2 (Cons 4 (Cons 5 Nil)) in
+    let nums = Cons (-1) (Cons 3 best) in
+    assert { length nums = 5 };
+    assert { first_value best 2 };
+    assert { last_value best 5 };
+    assert { abs (2 - 5) = 3 };
+    assert { good_segment best 3 };
+    assert { nums = (Cons (-1) (Cons 3 Nil)) ++ (best ++ Nil) };
+    assert { contiguous_segment best nums };
+    assert { sum (Cons 5 Nil) = 5 };
+    assert { sum (Cons 4 (Cons 5 Nil)) = 9 };
+    assert { sum best = 11 };
+    assert { good_subarray_sum nums 3 11 }
+
+  let lemma check_test_002 () =
+    let best = Cons 30 (Cons 40 (Cons 50 Nil)) in
+    let nums = Cons 10 (Cons 20 best) in
+    assert { length nums = 5 };
+    assert { first_value best 30 };
+    assert { last_value best 50 };
+    assert { abs (30 - 50) = 20 };
+    assert { good_segment best 20 };
+    assert { nums = (Cons 10 (Cons 20 Nil)) ++ (best ++ Nil) };
+    assert { contiguous_segment best nums };
+    assert { sum (Cons 50 Nil) = 50 };
+    assert { sum (Cons 40 (Cons 50 Nil)) = 90 };
+    assert { sum best = 120 };
+    assert { good_subarray_sum nums 20 120 }
+
+  let lemma check_test_006 () =
+    let nums = Cons 1 (Cons 3 (Cons 5 (Cons 7 (Cons 9 Nil)))) in
+    let best = nums in
+    assert { length nums = 5 };
+    assert { first_value best 1 };
+    assert { last_value best 9 };
+    assert { abs (1 - 9) = 8 };
+    assert { good_segment best 8 };
+    assert { nums = Nil ++ (best ++ Nil) };
+    assert { contiguous_segment best nums };
+    assert { sum (Cons 9 Nil) = 9 };
+    assert { sum (Cons 7 (Cons 9 Nil)) = 16 };
+    assert { sum (Cons 5 (Cons 7 (Cons 9 Nil))) = 21 };
+    assert { sum (Cons 3 (Cons 5 (Cons 7 (Cons 9 Nil)))) = 24 };
+    assert { sum best = 25 };
+    assert { good_subarray_sum nums 8 25 }
+
+  let lemma check_test_009 () =
+    let best = Cons (-1) (Cons (-2) (Cons (-3) Nil)) in
+    let nums = Cons (-1) (Cons (-2) (Cons (-3) (Cons (-4) Nil))) in
+    assert { length nums = 4 };
+    assert { first_value best (-1) };
+    assert { last_value best (-3) };
+    assert { abs ((-1) - (-3)) = 2 };
+    assert { good_segment best 2 };
+    assert { nums = Nil ++ (best ++ (Cons (-4) Nil)) };
+    assert { contiguous_segment best nums };
+    assert { sum (Cons (-3) Nil) = -3 };
+    assert { sum (Cons (-2) (Cons (-3) Nil)) = -5 };
+    assert { sum best = -6 };
+    assert { good_subarray_sum nums 2 (-6) }
+
+  let lemma check_test_010 () =
+    let best = Cons 1 (Cons (-1) Nil) in
+    let nums = Cons 1 (Cons (-1) (Cons 1 (Cons (-1) (Cons 1 Nil)))) in
+    assert { length nums = 5 };
+    assert { first_value best 1 };
+    assert { last_value best (-1) };
+    assert { abs (1 - (-1)) = 2 };
+    assert { good_segment best 2 };
+    assert { nums = Nil ++ (best ++ (Cons 1 (Cons (-1) (Cons 1 Nil)))) };
+    assert { contiguous_segment best nums };
+    assert { sum (Cons (-1) Nil) = -1 };
+    assert { sum best = 0 };
+    assert { good_subarray_sum nums 2 0 }
+
+  let lemma check_test_011 () =
+    let best = Cons 5 (Cons 6 Nil) in
+    let nums = Cons 1 (Cons 2 (Cons 3 (Cons 4 best))) in
+    assert { length nums = 6 };
+    assert { first_value best 5 };
+    assert { last_value best 6 };
+    assert { abs (5 - 6) = 1 };
+    assert { good_segment best 1 };
+    assert { nums = (Cons 1 (Cons 2 (Cons 3 (Cons 4 Nil)))) ++ (best ++ Nil) };
+    assert { contiguous_segment best nums };
+    assert { sum (Cons 6 Nil) = 6 };
+    assert { sum best = 11 };
+    assert { good_subarray_sum nums 1 11 }
+
+end

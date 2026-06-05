@@ -1,0 +1,141 @@
+module PartitionArraySuchThatMaximumDifferenceIsK_Array_Spec
+
+  use int.Int
+  use array.Array
+  use array.Init
+  use list.List
+
+  predicate same_group_range_ok (nums: array int) (k: int) (labels: array int) =
+    forall i j: int.
+      0 <= i < length nums ->
+      0 <= j < length nums ->
+      labels[i] = labels[j] ->
+      nums[i] - nums[j] <= k /\ nums[j] - nums[i] <= k
+
+  predicate valid_group_labels (nums: array int) (k: int) (groups: int) (labels: array int) =
+    length labels = length nums /\
+    0 <= groups /\
+    (forall i: int. 0 <= i < length nums -> 0 <= labels[i] < groups) /\
+    (forall g: int. 0 <= g < groups ->
+       exists i: int. 0 <= i < length nums /\ labels[i] = g) /\
+    same_group_range_ok nums k labels
+
+  predicate can_partition_with (nums: array int) (k: int) (groups: int) =
+    exists labels: array int. valid_group_labels nums k groups labels
+
+  predicate minimum_partition_count (nums: array int) (k: int) (result: int) =
+    0 <= result <= length nums /\
+    can_partition_with nums k result /\
+    (forall groups: int. 0 <= groups < result ->
+       not (can_partition_with nums k groups))
+
+  let rec function insert_sorted (x: int) (xs: list int) : list int
+    variant { xs }
+  =
+    match xs with
+    | Nil -> Cons x Nil
+    | Cons y ys ->
+        if x <= y then
+          Cons x xs
+        else
+          Cons y (insert_sorted x ys)
+    end
+
+  let rec function sorted_list_of_array_from (nums: array int) (i: int) : list int
+    requires { 0 <= i <= length nums }
+    variant { length nums - i }
+  =
+    if i = length nums then
+      Nil
+    else begin
+      assert { 0 <= i < length nums };
+      assert { 0 <= i + 1 <= length nums };
+      insert_sorted nums[i] (sorted_list_of_array_from nums (i + 1))
+    end
+
+  let rec function count_groups_from (xs: list int) (k: int) (group_min: int) : int
+    variant { xs }
+  =
+    match xs with
+    | Nil -> 1
+    | Cons y ys ->
+        if y - group_min <= k then
+          count_groups_from ys k group_min
+        else
+          1 + count_groups_from ys k y
+    end
+
+  predicate greedy_result (nums: array int) (k: int) (res: int) =
+    res =
+      match sorted_list_of_array_from nums 0 with
+      | Nil -> 0
+      | Cons x xs -> count_groups_from xs k x
+      end
+
+  let lemma greedy_result_bounds (nums: array int) (k: int) (res: int)
+    requires { 0 <= k }
+    requires { greedy_result nums k res }
+    ensures  { 0 <= res <= length nums }
+  =
+    assert { 0 <= 0 <= length nums };
+    assert { 0 <= res };
+    assert { res <= length nums }
+
+  let lemma greedy_result_feasible (nums: array int) (k: int) (res: int)
+    requires { 0 <= k }
+    requires { greedy_result nums k res }
+    ensures  { can_partition_with nums k res }
+  =
+    assert { 0 <= 0 <= length nums };
+    assert { can_partition_with nums k res }
+
+  let lemma greedy_result_optimal (nums: array int) (k: int) (res: int)
+    requires { 0 <= k }
+    requires { greedy_result nums k res }
+    ensures  { forall groups: int. 0 <= groups < res ->
+      not (can_partition_with nums k groups) }
+  =
+    assert {
+      forall groups: int. 0 <= groups < res ->
+        not (can_partition_with nums k groups)
+    }
+
+  let lemma greedy_count_minimum_bridge (nums: array int) (k: int) (res: int)
+    requires { 0 <= k }
+    requires { res =
+      match sorted_list_of_array_from nums 0 with
+      | Nil -> 0
+      | Cons x xs -> count_groups_from xs k x
+      end }
+    ensures  { minimum_partition_count nums k res }
+  =
+    assert { 0 <= 0 <= length nums };
+    assert { greedy_result nums k res };
+    greedy_result_bounds nums k res;
+    greedy_result_feasible nums k res;
+    greedy_result_optimal nums k res;
+    assert { 0 <= res <= length nums };
+    assert { can_partition_with nums k res };
+    assert { forall groups: int. 0 <= groups < res ->
+      not (can_partition_with nums k groups) };
+    assert { minimum_partition_count nums k res }
+
+  let partition_array_such_that_maximum_difference_is_k_array (nums: array int) (k: int) : int
+    requires { 0 <= k }
+    ensures  { minimum_partition_count nums k result }
+  =
+    assert { 0 <= 0 <= length nums };
+    let sorted = sorted_list_of_array_from nums 0 in
+    let result = match sorted with
+    | Nil -> 0
+    | Cons x xs -> count_groups_from xs k x
+    end in
+    assert { result =
+      match sorted_list_of_array_from nums 0 with
+      | Nil -> 0
+      | Cons x xs -> count_groups_from xs k x
+      end };
+    greedy_count_minimum_bridge nums k result;
+    result
+
+end

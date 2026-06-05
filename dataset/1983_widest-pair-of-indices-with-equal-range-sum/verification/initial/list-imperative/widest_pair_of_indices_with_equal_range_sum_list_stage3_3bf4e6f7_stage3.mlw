@@ -1,0 +1,171 @@
+module WidestPairOfIndicesWithEqualRangeSum_List_Stage3_Imperative
+
+  use int.Int
+  use list.List
+  use list.Length
+  use ref.Ref
+
+  let rec predicate binary_list (xs: list int)
+    variant { xs }
+  =
+    match xs with
+    | Nil -> true
+    | Cons x xt -> (x = 0 || x = 1) && binary_list xt
+    end
+
+  let rec function prefix_diff_sum (nums1: list int) (nums2: list int) (len: int) : int
+    variant { nums1 }
+  =
+    if len <= 0 then 0 else
+    match nums1 with
+    | Nil -> 0
+    | Cons x xs ->
+        match nums2 with
+        | Nil -> 0
+        | Cons y ys -> x - y + prefix_diff_sum xs ys (len - 1)
+        end
+    end
+
+  let rec function range_diff_sum (nums1: list int) (nums2: list int) (start: int) (len: int) : int
+    variant { nums1 }
+  =
+    if start <= 0 then prefix_diff_sum nums1 nums2 len else
+    match nums1 with
+    | Nil -> 0
+    | Cons _ xs ->
+        match nums2 with
+        | Nil -> 0
+        | Cons _ ys -> range_diff_sum xs ys (start - 1) len
+        end
+    end
+
+  predicate equal_sum_window (nums1: list int) (nums2: list int) (start: int) (len: int) =
+    0 <= start /\
+    0 < len /\
+    start + len <= length nums1 /\
+    length nums1 = length nums2 /\
+    range_diff_sum nums1 nums2 start len = 0
+
+  predicate has_equal_sum_window (nums1: list int) (nums2: list int) (len: int) =
+    exists start: int. equal_sum_window nums1 nums2 start len
+
+  predicate no_wider_equal_sum_window (nums1: list int) (nums2: list int) (limit: int) =
+    forall start len: int. equal_sum_window nums1 nums2 start len -> len <= limit
+
+  predicate widest_equal_sum_distance (nums1: list int) (nums2: list int) (distance: int) =
+    0 <= distance <= length nums1 /\
+    (distance = 0 -> not (has_equal_sum_window nums1 nums2 1)) /\
+    (distance = 0 -> no_wider_equal_sum_window nums1 nums2 0) /\
+    (distance > 0 -> has_equal_sum_window nums1 nums2 distance) /\
+    no_wider_equal_sum_window nums1 nums2 distance
+
+  let widest_pair_of_indices_with_equal_range_sum_list (nums1: list int) (nums2: list int) : int
+    requires { length nums1 = length nums2 }
+    requires { 1 <= length nums1 }
+    requires { binary_list nums1 }
+    requires { binary_list nums2 }
+    ensures  { widest_equal_sum_distance nums1 nums2 result }
+  =
+    let best = ref 0 in
+    let start1 = ref nums1 in
+    let start2 = ref nums2 in
+    while (match !start1, !start2 with
+           | Cons _ _, Cons _ _ -> true
+           | _, _ -> false
+           end) do
+      invariant { length !start1 = length !start2 }
+      invariant { 0 <= length !start1 <= length nums1 }
+      invariant { 0 <= !best <= length nums1 }
+      invariant { !best = 0 \/ has_equal_sum_window nums1 nums2 !best }
+      invariant {
+        forall start len: int.
+          0 <= start < length nums1 - length !start1 ->
+          equal_sum_window nums1 nums2 start len ->
+          len <= !best
+      }
+      variant { length !start1 }
+
+      let cur1 = ref !start1 in
+      let cur2 = ref !start2 in
+      let diff = ref 0 in
+      let width = ref 0 in
+      while (match !cur1, !cur2 with
+             | Cons _ _, Cons _ _ -> true
+             | _, _ -> false
+             end) do
+        invariant { length !cur1 = length !cur2 }
+        invariant { 0 <= length !cur1 <= length !start1 }
+        invariant { 0 <= !width <= length !start1 }
+        invariant { !width = length !start1 - length !cur1 }
+        invariant { !diff = prefix_diff_sum !start1 !start2 !width }
+        invariant { 0 <= !best <= length nums1 }
+        invariant { !best = 0 \/ has_equal_sum_window nums1 nums2 !best }
+        invariant {
+          forall start len: int.
+            0 <= start < length nums1 - length !start1 ->
+            equal_sum_window nums1 nums2 start len ->
+            len <= !best
+        }
+        invariant {
+          forall len: int.
+            0 < len <= !width ->
+            equal_sum_window nums1 nums2 (length nums1 - length !start1) len ->
+            len <= !best
+        }
+        variant { length !cur1 }
+
+        match !cur1, !cur2 with
+        | Cons x xs, Cons y ys ->
+            assert { !width < length !start1 };
+            diff := !diff + x - y;
+            width := !width + 1;
+            assert { !width = length !start1 - length xs };
+            assert { !diff = prefix_diff_sum !start1 !start2 !width };
+            if !diff = 0 then begin
+              assert {
+                range_diff_sum nums1 nums2 (length nums1 - length !start1) !width = 0
+              };
+              assert {
+                equal_sum_window nums1 nums2 (length nums1 - length !start1) !width
+              };
+              if !width > !best then best := !width else ()
+            end;
+            cur1 := xs;
+            cur2 := ys
+        | _, _ ->
+            assert { false }
+        end
+      done;
+      assert { !cur1 = Nil };
+      assert { !cur2 = Nil };
+      assert { !width = length !start1 };
+      assert {
+        forall len: int.
+          0 < len <= length !start1 ->
+          equal_sum_window nums1 nums2 (length nums1 - length !start1) len ->
+          len <= !best
+      };
+      match !start1, !start2 with
+      | Cons _ xs, Cons _ ys ->
+          assert { length xs = length ys };
+          assert {
+            forall start len: int.
+              0 <= start < length nums1 - length xs ->
+              equal_sum_window nums1 nums2 start len ->
+              len <= !best
+          };
+          start1 := xs;
+          start2 := ys
+      | _, _ ->
+          assert { false }
+      end
+    done;
+    assert { !start1 = Nil };
+    assert { !start2 = Nil };
+    assert { no_wider_equal_sum_window nums1 nums2 !best };
+    assert { !best = 0 -> not (has_equal_sum_window nums1 nums2 1) };
+    assert { !best = 0 -> no_wider_equal_sum_window nums1 nums2 0 };
+    assert { !best > 0 -> has_equal_sum_window nums1 nums2 !best };
+    !best
+
+end

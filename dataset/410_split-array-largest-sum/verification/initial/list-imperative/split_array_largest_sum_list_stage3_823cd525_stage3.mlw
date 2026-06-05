@@ -1,0 +1,195 @@
+module SplitArrayLargestSum_List_Stage3_Imperative
+
+  use int.Int
+  use int.EuclideanDivision
+  use list.List
+  use list.Length
+  use list.Append
+  use list.Sum
+  use ref.Ref
+
+  let rec predicate bounded_nonnegative_list (nums: list int)
+    variant { nums }
+  =
+    match nums with
+    | Nil -> true
+    | Cons x xs -> 0 <= x && x <= 1000000 && bounded_nonnegative_list xs
+    end
+
+  let rec function concat_segments (segments: list (list int)) : list int
+    variant { segments }
+  =
+    match segments with
+    | Nil -> Nil
+    | Cons segment rest -> segment ++ concat_segments rest
+    end
+
+  let rec predicate all_nonempty_segments (segments: list (list int))
+    variant { segments }
+  =
+    match segments with
+    | Nil -> true
+    | Cons segment rest ->
+        match segment with
+        | Nil -> false
+        | Cons _ _ -> all_nonempty_segments rest
+        end
+    end
+
+  let rec predicate all_segment_sums_le (segments: list (list int)) (bound: int)
+    variant { segments }
+  =
+    match segments with
+    | Nil -> true
+    | Cons segment rest -> sum segment <= bound && all_segment_sums_le rest bound
+    end
+
+  predicate partition_with_bound (nums: list int) (k: int) (bound: int) =
+    exists segments: list (list int).
+      length segments = k /\
+      concat_segments segments = nums /\
+      all_nonempty_segments segments /\
+      all_segment_sums_le segments bound
+
+  predicate optimal_largest_sum (nums: list int) (k: int) (answer: int) =
+    partition_with_bound nums k answer /\
+    (forall bound: int. bound < answer -> not (partition_with_bound nums k bound))
+
+  let sum_list (nums: list int) : int
+    requires { bounded_nonnegative_list nums }
+    ensures  { result = sum nums }
+    ensures  { 0 <= result }
+  =
+    let total = ref 0 in
+    let cur = ref nums in
+    while (match !cur with Nil -> false | Cons _ _ -> true end) do
+      invariant { 0 <= !total }
+      invariant { bounded_nonnegative_list !cur }
+      variant { length !cur }
+      match !cur with
+      | Nil -> ()
+      | Cons x xs ->
+          assert { 0 <= x };
+          total := !total + x;
+          cur := xs
+      end
+    done;
+    assert { !cur = Nil };
+    !total
+
+  let max_list (nums: list int) : int
+    requires { bounded_nonnegative_list nums }
+    ensures  { 0 <= result }
+    ensures  { nums <> Nil -> forall bound: int. bound < result -> not (partition_with_bound nums 1 bound) }
+  =
+    match nums with
+    | Nil -> 0
+    | Cons x xs ->
+        let current = ref x in
+        let cur = ref xs in
+        while (match !cur with Nil -> false | Cons _ _ -> true end) do
+          invariant { 0 <= !current }
+          invariant { bounded_nonnegative_list !cur }
+          variant { length !cur }
+          match !cur with
+          | Nil -> ()
+          | Cons y ys ->
+              assert { 0 <= y };
+              if y > !current then current := y;
+              cur := ys
+          end
+        done;
+        assert { !cur = Nil };
+        !current
+    end
+
+  let segments_needed (nums: list int) (bound: int) : int
+    requires { bounded_nonnegative_list nums }
+    requires { 0 <= bound }
+    ensures  { 0 <= result }
+    ensures  { nums <> Nil -> 1 <= result }
+  =
+    match nums with
+    | Nil -> 0
+    | Cons x xs ->
+        let segments = ref 1 in
+        let current_sum = ref x in
+        let cur = ref xs in
+        while (match !cur with Nil -> false | Cons _ _ -> true end) do
+          invariant { 1 <= !segments }
+          invariant { 0 <= !current_sum }
+          invariant { bounded_nonnegative_list !cur }
+          variant { length !cur }
+          match !cur with
+          | Nil -> ()
+          | Cons y ys ->
+              assert { 0 <= y };
+              if !current_sum + y <= bound then
+                current_sum := !current_sum + y
+              else begin
+                segments := !segments + 1;
+                current_sum := y
+              end;
+              cur := ys
+          end
+        done;
+        assert { !cur = Nil };
+        !segments
+    end
+
+  let can_split_with_bound (nums: list int) (k: int) (bound: int) : bool
+    requires { bounded_nonnegative_list nums }
+    requires { 1 <= k <= length nums }
+    requires { 0 <= bound }
+    ensures  { result = true -> partition_with_bound nums k bound }
+    ensures  { result = false -> not (partition_with_bound nums k bound) }
+  =
+    max_list nums <= bound && segments_needed nums bound <= k
+
+  let split_array_largest_sum_list (nums: list int) (k: int) : int
+    requires { 1 <= length nums <= 1000 }
+    requires { bounded_nonnegative_list nums }
+    requires { 1 <= k <= length nums }
+    requires { k <= 50 }
+    ensures  { optimal_largest_sum nums k result }
+  =
+    if k <= 0 then begin
+      assert { false };
+      0
+    end else
+      match nums with
+      | Nil ->
+          assert { false };
+          0
+      | Cons _ _ ->
+          let low = ref (max_list nums) in
+          let high = ref (sum_list nums) in
+          assert { 0 <= !low };
+          assert { !low <= !high };
+          assert { forall bound: int. bound < !low -> not (partition_with_bound nums k bound) };
+          assert { partition_with_bound nums k !high };
+          while !low < !high do
+            invariant { 0 <= !low }
+            invariant { !low <= !high }
+            invariant { forall bound: int. bound < !low -> not (partition_with_bound nums k bound) }
+            invariant { partition_with_bound nums k !high }
+            variant { !high - !low }
+            let mid = !low + div (!high - !low) 2 in
+            assert { !low <= mid };
+            assert { mid < !high };
+            if can_split_with_bound nums k mid then begin
+              assert { partition_with_bound nums k mid };
+              high := mid
+            end else begin
+              assert { not (partition_with_bound nums k mid) };
+              assert { forall bound: int. bound < mid + 1 -> not (partition_with_bound nums k bound) };
+              low := mid + 1
+            end
+          done;
+          assert { !low = !high };
+          assert { partition_with_bound nums k !low };
+          assert { forall bound: int. bound < !low -> not (partition_with_bound nums k bound) };
+          !low
+      end
+
+end

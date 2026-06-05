@@ -1,0 +1,163 @@
+module KDiffPairsInAnArray_List_Spec
+
+  use int.Int
+  use list.List
+
+  let rec function occ (x: int) (l: list int) : int
+    variant { l }
+  =
+    match l with
+    | Nil -> 0
+    | Cons y ys -> (if y = x then 1 else 0) + occ x ys
+    end
+
+  let function pair_contribution (x: int) (nums: list int) (k: int) : int =
+    if k = 0 then
+      if occ x nums >= 2 then 1 else 0
+    else
+      if occ (x + k) nums >= 1 then 1 else 0
+
+  let rec function count_unique_kdiff_from
+      (seen: list int) (remaining: list int) (nums: list int) (k: int) : int
+    variant { remaining }
+  =
+    match remaining with
+    | Nil -> 0
+    | Cons x xs ->
+        (if occ x seen = 0 then pair_contribution x nums k else 0) +
+        count_unique_kdiff_from (Cons x seen) xs nums k
+    end
+
+  let function k_diff_pair_count (nums: list int) (k: int) : int =
+    count_unique_kdiff_from Nil nums nums k
+
+  val k_diff_pairs_in_an_array_list (nums: list int) (k: int) : int
+    requires { k >= 0 }
+    ensures  { result = k_diff_pair_count nums k }
+
+  let lemma check_test_000 () =
+    let l1 = Cons 5 Nil in
+    let l2 = Cons 4 l1 in
+    let l3 = Cons 3 l2 in
+    let l4 = Cons 2 l3 in
+    let nums = Cons 1 l4 in
+    assert { occ 4 nums = 1 };
+    assert { occ 5 nums = 1 };
+    assert { pair_contribution 1 nums 3 = 1 };
+    assert { pair_contribution 2 nums 3 = 1 };
+    assert { pair_contribution 3 nums 3 = 0 };
+    assert { pair_contribution 4 nums 3 = 0 };
+    assert { pair_contribution 5 nums 3 = 0 };
+    assert { k_diff_pair_count nums 3 = 2 }
+
+  let lemma check_test_001 () =
+    let l1 = Cons 4 Nil in
+    let l2 = Cons 2 l1 in
+    let l3 = Cons 8 l2 in
+    let l4 = Cons 3 l3 in
+    let l5 = Cons 3 l4 in
+    let l6 = Cons 2 l5 in
+    let l7 = Cons 7 l6 in
+    let l8 = Cons 5 l7 in
+    let l9 = Cons 3 l8 in
+    let nums = Cons 6 l9 in
+    assert { occ 6 nums = 1 };
+    assert { occ 3 nums = 3 };
+    assert { occ 5 nums = 1 };
+    assert { occ 7 nums = 1 };
+    assert { occ 2 nums = 2 };
+    assert { occ 8 nums = 1 };
+    assert { occ 4 nums = 1 };
+    assert { pair_contribution 6 nums 2 = 1 };
+    assert { pair_contribution 3 nums 2 = 1 };
+    assert { pair_contribution 5 nums 2 = 1 };
+    assert { pair_contribution 7 nums 2 = 0 };
+    assert { pair_contribution 2 nums 2 = 1 };
+    assert { pair_contribution 8 nums 2 = 0 };
+    assert { pair_contribution 4 nums 2 = 1 };
+    assert { k_diff_pair_count nums 2 = 5 }
+
+  let lemma check_test_002 () =
+    let l1 = Cons 50 Nil in
+    let l2 = Cons 40 l1 in
+    let l3 = Cons 30 l2 in
+    let l4 = Cons 20 l3 in
+    let nums = Cons 10 l4 in
+    assert { occ 20 nums = 1 };
+    assert { occ 30 nums = 1 };
+    assert { occ 40 nums = 1 };
+    assert { occ 50 nums = 1 };
+    assert { pair_contribution 10 nums 10 = 1 };
+    assert { pair_contribution 20 nums 10 = 1 };
+    assert { pair_contribution 30 nums 10 = 1 };
+    assert { pair_contribution 40 nums 10 = 1 };
+    assert { pair_contribution 50 nums 10 = 0 };
+    assert { k_diff_pair_count nums 10 = 4 }
+
+  let lemma check_test_003 () =
+    let l1 = Cons 10 Nil in
+    let l2 = Cons 9 l1 in
+    let l3 = Cons 8 l2 in
+    let l4 = Cons 7 l3 in
+    let l5 = Cons 6 l4 in
+    let l6 = Cons 5 l5 in
+    let l7 = Cons 4 l6 in
+    let l8 = Cons 3 l7 in
+    let l9 = Cons 2 l8 in
+    let nums = Cons 1 l9 in
+    assert { occ 6 nums = 1 };
+    assert { occ 7 nums = 1 };
+    assert { occ 8 nums = 1 };
+    assert { occ 9 nums = 1 };
+    assert { occ 10 nums = 1 };
+    assert { pair_contribution 1 nums 5 = 1 };
+    assert { pair_contribution 2 nums 5 = 1 };
+    assert { pair_contribution 3 nums 5 = 1 };
+    assert { pair_contribution 4 nums 5 = 1 };
+    assert { pair_contribution 5 nums 5 = 1 };
+    assert { pair_contribution 6 nums 5 = 0 };
+    assert { k_diff_pair_count nums 5 = 5 }
+
+  let lemma check_test_004 () =
+    let l1 = Cons 4 Nil in
+    let l2 = Cons 5 l1 in
+    let l3 = Cons 1 l2 in
+    let l4 = Cons 3 l3 in
+    let nums = Cons 1 l4 in
+    assert { occ 1 nums = 2 };
+    assert { occ 3 nums = 1 };
+    assert { occ 5 nums = 1 };
+    assert { occ 4 nums = 1 };
+    assert { pair_contribution 1 nums 0 = 1 };
+    assert { pair_contribution 3 nums 0 = 0 };
+    assert { pair_contribution 5 nums 0 = 0 };
+    assert { pair_contribution 4 nums 0 = 0 };
+    assert { count_unique_kdiff_from (Cons 3 (Cons 1 Nil)) l3 nums 0 = 0 };
+    assert { k_diff_pair_count nums 0 = 1 }
+
+  let lemma check_test_005 () =
+    let l1 = Cons 1 Nil in
+    let l2 = Cons 1 l1 in
+    let l3 = Cons 1 l2 in
+    let l4 = Cons 1 l3 in
+    let nums = Cons 1 l4 in
+    assert { occ 1 nums = 5 };
+    assert { pair_contribution 1 nums 0 = 1 };
+    assert { count_unique_kdiff_from Nil nums nums 0 = 1 };
+    assert { k_diff_pair_count nums 0 = 1 }
+
+  let lemma check_test_006 () =
+    let l1 = Cons 2 Nil in
+    let l2 = Cons 2 l1 in
+    let l3 = Cons 2 l2 in
+    let l4 = Cons (-1) l3 in
+    let l5 = Cons (-1) l4 in
+    let nums = Cons (-1) l5 in
+    assert { occ (-1) nums = 3 };
+    assert { occ 2 nums = 3 };
+    assert { pair_contribution (-1) nums 3 = 1 };
+    assert { pair_contribution 2 nums 3 = 0 };
+    assert { count_unique_kdiff_from Nil nums nums 3 = 1 };
+    assert { k_diff_pair_count nums 3 = 1 }
+
+end

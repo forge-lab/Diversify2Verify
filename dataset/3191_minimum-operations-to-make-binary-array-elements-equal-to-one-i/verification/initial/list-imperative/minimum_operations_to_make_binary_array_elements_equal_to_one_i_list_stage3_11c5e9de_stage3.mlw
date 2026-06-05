@@ -1,0 +1,122 @@
+module MinimumOperationsToMakeBinaryArrayElementsEqualToOneI_List_Stage3_Imperative
+
+  use int.Int
+  use list.List
+  use list.Length
+  use ref.Ref
+
+  let rec predicate binary_list (nums: list int)
+    variant { nums }
+  =
+    match nums with
+    | Nil -> true
+    | Cons x xs -> (x = 0 || x = 1) && binary_list xs
+    end
+
+  let function effective_bit (x: int) (prev2: int) (prev1: int) : int =
+    if prev2 = prev1 then x else 1 - x
+
+  let rec function min_ops_from (prev2: int) (prev1: int) (nums: list int) : int
+    variant { nums }
+  =
+    match nums with
+    | Nil -> 0
+    | Cons x Nil ->
+        if effective_bit x prev2 prev1 = 1 then 0 else -1
+    | Cons x (Cons y Nil) ->
+        if effective_bit x prev2 prev1 = 1 then
+          if effective_bit y prev1 0 = 1 then 0 else -1
+        else -1
+    | Cons x (Cons y (Cons z zs)) ->
+        if effective_bit x prev2 prev1 = 1 then
+          min_ops_from prev1 0 (Cons y (Cons z zs))
+        else
+          let rest = min_ops_from prev1 1 (Cons y (Cons z zs)) in
+          if rest = -1 then -1 else 1 + rest
+    end
+
+  let function minimum_operations_spec (nums: list int) : int =
+    min_ops_from 0 0 nums
+
+  let function compose_ops (ops: int) (rest: int) : int =
+    if rest = -1 then -1 else ops + rest
+
+  let minimum_operations_to_make_binary_array_elements_equal_to_one_i_list (nums: list int) : int
+    requires { binary_list nums }
+    requires { length nums >= 3 }
+    ensures  { result = minimum_operations_spec nums }
+  =
+    let ops = ref 0 in
+    let prev2 = ref 0 in
+    let prev1 = ref 0 in
+    let cur = ref nums in
+    while (match !cur with Cons _ (Cons _ (Cons _ _)) -> true | _ -> false end) do
+      invariant { binary_list !cur }
+      invariant { length !cur >= 2 }
+      invariant { !ops >= 0 }
+      invariant { !prev2 = 0 \/ !prev2 = 1 }
+      invariant { !prev1 = 0 \/ !prev1 = 1 }
+      invariant { compose_ops !ops (min_ops_from !prev2 !prev1 !cur) = minimum_operations_spec nums }
+      variant { length !cur }
+
+      match !cur with
+      | Cons x (Cons y (Cons z zs)) ->
+          assert { binary_list (Cons y (Cons z zs)) };
+          let old_prev1 = !prev1 in
+          let current = effective_bit x !prev2 old_prev1 in
+          if current = 1 then (
+            assert { min_ops_from !prev2 old_prev1 !cur =
+                     min_ops_from old_prev1 0 (Cons y (Cons z zs)) };
+            prev2 := old_prev1;
+            prev1 := 0
+          ) else (
+            assert { current <> 1 };
+            assert { min_ops_from !prev2 old_prev1 !cur =
+                     compose_ops 1 (min_ops_from old_prev1 1 (Cons y (Cons z zs))) };
+            ops := !ops + 1;
+            prev2 := old_prev1;
+            prev1 := 1
+          );
+          cur := Cons y (Cons z zs)
+      | _ ->
+          assert { false }
+      end
+    done;
+    assert { not (match !cur with Cons _ (Cons _ (Cons _ _)) -> true | _ -> false end) };
+    match !cur with
+    | Cons x (Cons y Nil) ->
+        assert { min_ops_from !prev2 !prev1 !cur =
+                 if effective_bit x !prev2 !prev1 = 1 then
+                   if effective_bit y !prev1 0 = 1 then 0 else -1
+                 else -1 };
+        let first = effective_bit x !prev2 !prev1 in
+        if first <> 1 then (
+          assert { min_ops_from !prev2 !prev1 !cur = -1 };
+          -1
+        ) else
+          let second = effective_bit y !prev1 0 in
+          if second <> 1 then (
+            assert { min_ops_from !prev2 !prev1 !cur = -1 };
+            -1
+          ) else (
+            assert { min_ops_from !prev2 !prev1 !cur = 0 };
+            !ops
+          )
+    | Cons x Nil ->
+        let last = effective_bit x !prev2 !prev1 in
+        if last = 1 then (
+          assert { min_ops_from !prev2 !prev1 !cur = 0 };
+          !ops
+        ) else (
+          assert { min_ops_from !prev2 !prev1 !cur = -1 };
+          -1
+        )
+    | Nil ->
+        assert { min_ops_from !prev2 !prev1 !cur = 0 };
+        !ops
+    | _ ->
+        assert { false };
+        -1
+    end
+
+end

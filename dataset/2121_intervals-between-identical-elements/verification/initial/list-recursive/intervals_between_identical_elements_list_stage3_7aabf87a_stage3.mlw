@@ -1,0 +1,49 @@
+module IntervalsBetweenIdenticalElements_List_Stage3_Recursive
+
+  use int.Int
+  use int.Abs
+  use list.List
+
+  let rec function distance_sum_from (l: list int) (x: int) (i: int) (j: int) : int
+    variant { l }
+  =
+    match l with
+    | Nil -> 0
+    | Cons y ys ->
+        (if y = x then abs (i - j) else 0) + distance_sum_from ys x i (j + 1)
+    end
+
+  let rec predicate intervals_from (arr: list int) (remaining: list int) (i: int) (out: list int)
+    variant { remaining }
+  =
+    match remaining with
+    | Nil ->
+        match out with
+        | Nil -> true
+        | Cons _ _ -> false
+        end
+    | Cons x xs ->
+        match out with
+        | Nil -> false
+        | Cons r rs ->
+            r = distance_sum_from arr x i 0 &&
+            intervals_from arr xs (i + 1) rs
+        end
+    end
+
+  let rec build_intervals (arr: list int) (remaining: list int) (i: int) : list int
+    ensures { intervals_from arr remaining i result }
+    variant { remaining }
+  =
+    match remaining with
+    | Nil -> Nil
+    | Cons x xs ->
+        Cons (distance_sum_from arr x i 0) (build_intervals arr xs (i + 1))
+    end
+
+  let intervals_between_identical_elements_list (arr: list int) : list int
+    ensures { intervals_from arr arr 0 result }
+  =
+    build_intervals arr arr 0
+
+end

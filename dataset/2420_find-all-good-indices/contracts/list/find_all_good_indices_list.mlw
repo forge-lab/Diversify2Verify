@@ -1,0 +1,263 @@
+module FindAllGoodIndices_List_Spec
+
+  use int.Int
+  use list.List
+  use list.Length
+  use list.Mem
+  use list.Nth
+  use option.Option
+
+  predicate nth_is (nums: list int) (i: int) (v: int) =
+    nth i nums = Some v
+
+  predicate value_in_constraints (nums: list int) =
+    forall x: int. mem x nums -> 1 <= x <= 1000000
+
+  predicate valid_center (nums: list int) (k: int) (i: int) =
+    k <= i /\ i + k < length nums
+
+  predicate adjacent_nonincreasing (nums: list int) (lo: int) (hi: int) =
+    forall j x y: int.
+      lo <= j < hi ->
+      nth_is nums j x ->
+      nth_is nums (j + 1) y ->
+      x >= y
+
+  predicate adjacent_nondecreasing (nums: list int) (lo: int) (hi: int) =
+    forall j x y: int.
+      lo <= j < hi ->
+      nth_is nums j x ->
+      nth_is nums (j + 1) y ->
+      x <= y
+
+  predicate good_index (nums: list int) (k: int) (i: int) =
+    valid_center nums k i /\
+    adjacent_nonincreasing nums (i - k) (i - 1) /\
+    adjacent_nondecreasing nums (i + 1) (i + k)
+
+  let rec predicate all_greater_than (x: int) (indices: list int)
+    variant { indices }
+  =
+    match indices with
+    | Nil -> true
+    | Cons y ys -> x < y && all_greater_than x ys
+    end
+
+  let rec predicate strictly_increasing (indices: list int)
+    variant { indices }
+  =
+    match indices with
+    | Nil -> true
+    | Cons x xs -> all_greater_than x xs && strictly_increasing xs
+    end
+
+  predicate exact_good_indices (nums: list int) (k: int) (indices: list int) =
+    strictly_increasing indices /\
+    (forall i: int. mem i indices <-> good_index nums k i)
+
+  val find_all_good_indices_list (nums: list int) (k: int) : list int
+    requires { 3 <= length nums }
+    requires { 1 <= k }
+    requires { 2 * k <= length nums }
+    requires { value_in_constraints nums }
+    ensures  { exact_good_indices nums k result }
+
+  let lemma check_test_000 () =
+    let nums =
+      Cons 9 (Cons 8 (Cons 7 (Cons 6 (Cons 5 (Cons 4 (Cons 3
+      (Cons 2 (Cons 1 (Cons 2 (Cons 3 (Cons 4 (Cons 5 Nil)))))))))))) in
+    let expected = Cons 7 (Cons 8 (Cons 9 Nil)) in
+    assert { length nums = 13 };
+    assert { value_in_constraints nums };
+    assert { nth_is nums 4 5 };
+    assert { nth_is nums 5 4 };
+    assert { nth_is nums 6 3 };
+    assert { nth_is nums 7 2 };
+    assert { nth_is nums 8 1 };
+    assert { nth_is nums 9 2 };
+    assert { nth_is nums 10 3 };
+    assert { nth_is nums 11 4 };
+    assert { nth_is nums 12 5 };
+    assert { adjacent_nonincreasing nums 4 6 };
+    assert { adjacent_nonincreasing nums 5 7 };
+    assert { adjacent_nonincreasing nums 6 8 };
+    assert { adjacent_nondecreasing nums 8 10 };
+    assert { adjacent_nondecreasing nums 9 11 };
+    assert { adjacent_nondecreasing nums 10 12 };
+    assert { good_index nums 3 7 };
+    assert { good_index nums 3 8 };
+    assert { good_index nums 3 9 };
+    assert { not (good_index nums 3 6) };
+    assert { not (good_index nums 3 10) };
+    assert { mem 7 expected };
+    assert { mem 8 expected };
+    assert { mem 9 expected };
+    assert { forall i: int. mem i expected -> i = 7 \/ i = 8 \/ i = 9 };
+    assert { strictly_increasing expected };
+    assert { exact_good_indices nums 3 expected }
+
+  let lemma check_test_001 () =
+    let nums = Cons 1 (Cons 2 (Cons 3 (Cons 4 (Cons 3 (Cons 2 (Cons 1 Nil)))))) in
+    let expected: list int = Nil in
+    assert { length nums = 7 };
+    assert { value_in_constraints nums };
+    assert { nth_is nums 0 1 };
+    assert { nth_is nums 1 2 };
+    assert { nth_is nums 2 3 };
+    assert { nth_is nums 3 4 };
+    assert { nth_is nums 4 3 };
+    assert { nth_is nums 5 2 };
+    assert { nth_is nums 6 1 };
+    assert { not (adjacent_nonincreasing nums 0 1) };
+    assert { not (adjacent_nonincreasing nums 1 2) };
+    assert { not (adjacent_nondecreasing nums 4 5) };
+    assert { not (good_index nums 2 2) };
+    assert { not (good_index nums 2 3) };
+    assert { not (good_index nums 2 4) };
+    assert { forall i: int. not (mem i expected) };
+    assert { strictly_increasing expected };
+    assert { exact_good_indices nums 2 expected }
+
+  let lemma check_test_002 () =
+    let nums =
+      Cons 1 (Cons 2 (Cons 2 (Cons 3 (Cons 4 (Cons 5
+      (Cons 5 (Cons 4 (Cons 3 (Cons 2 (Cons 1 Nil)))))))))) in
+    let expected: list int = Nil in
+    assert { length nums = 11 };
+    assert { value_in_constraints nums };
+    assert { nth_is nums 0 1 };
+    assert { nth_is nums 1 2 };
+    assert { nth_is nums 2 2 };
+    assert { nth_is nums 3 3 };
+    assert { nth_is nums 4 4 };
+    assert { nth_is nums 5 5 };
+    assert { nth_is nums 6 5 };
+    assert { nth_is nums 7 4 };
+    assert { nth_is nums 8 3 };
+    assert { nth_is nums 9 2 };
+    assert { nth_is nums 10 1 };
+    assert { not (adjacent_nonincreasing nums 0 2) };
+    assert { not (adjacent_nonincreasing nums 1 3) };
+    assert { not (adjacent_nondecreasing nums 6 8) };
+    assert { not (adjacent_nondecreasing nums 7 9) };
+    assert { not (good_index nums 3 3) };
+    assert { not (good_index nums 3 4) };
+    assert { not (good_index nums 3 5) };
+    assert { not (good_index nums 3 6) };
+    assert { not (good_index nums 3 7) };
+    assert { forall i: int. not (mem i expected) };
+    assert { strictly_increasing expected };
+    assert { exact_good_indices nums 3 expected }
+
+  let lemma check_test_003 () =
+    let nums =
+      Cons 10 (Cons 9 (Cons 8 (Cons 7 (Cons 6
+      (Cons 5 (Cons 4 (Cons 3 (Cons 2 (Cons 1 Nil))))))))) in
+    let expected: list int = Nil in
+    assert { length nums = 10 };
+    assert { value_in_constraints nums };
+    assert { nth_is nums 0 10 };
+    assert { nth_is nums 1 9 };
+    assert { nth_is nums 2 8 };
+    assert { nth_is nums 3 7 };
+    assert { nth_is nums 4 6 };
+    assert { nth_is nums 5 5 };
+    assert { nth_is nums 6 4 };
+    assert { nth_is nums 7 3 };
+    assert { nth_is nums 8 2 };
+    assert { nth_is nums 9 1 };
+    assert { adjacent_nonincreasing nums 0 3 };
+    assert { adjacent_nonincreasing nums 1 4 };
+    assert { not (adjacent_nondecreasing nums 5 8) };
+    assert { not (adjacent_nondecreasing nums 6 9) };
+    assert { not (good_index nums 4 4) };
+    assert { not (good_index nums 4 5) };
+    assert { forall i: int. not (mem i expected) };
+    assert { strictly_increasing expected };
+    assert { exact_good_indices nums 4 expected }
+
+  let lemma check_test_004 () =
+    let nums =
+      Cons 1000000 (Cons 999999 (Cons 999998 (Cons 999997 (Cons 999996
+      (Cons 999995 (Cons 999994 (Cons 999993 (Cons 999992 Nil)))))))) in
+    let expected: list int = Nil in
+    assert { length nums = 9 };
+    assert { value_in_constraints nums };
+    assert { nth_is nums 0 1000000 };
+    assert { nth_is nums 1 999999 };
+    assert { nth_is nums 2 999998 };
+    assert { nth_is nums 3 999997 };
+    assert { nth_is nums 4 999996 };
+    assert { nth_is nums 5 999995 };
+    assert { nth_is nums 6 999994 };
+    assert { nth_is nums 7 999993 };
+    assert { nth_is nums 8 999992 };
+    assert { adjacent_nonincreasing nums 0 2 };
+    assert { adjacent_nonincreasing nums 1 3 };
+    assert { not (adjacent_nondecreasing nums 4 6) };
+    assert { not (adjacent_nondecreasing nums 5 7) };
+    assert { not (good_index nums 3 3) };
+    assert { not (good_index nums 3 4) };
+    assert { not (good_index nums 3 5) };
+    assert { forall i: int. not (mem i expected) };
+    assert { strictly_increasing expected };
+    assert { exact_good_indices nums 3 expected }
+
+  let lemma check_test_005 () =
+    let nums = Cons 5 (Cons 4 (Cons 3 (Cons 2 (Cons 1 (Cons 2 (Cons 3 (Cons 4 (Cons 5 Nil)))))))) in
+    let expected = Cons 3 (Cons 4 (Cons 5 Nil)) in
+    assert { length nums = 9 };
+    assert { value_in_constraints nums };
+    assert { nth_is nums 1 4 };
+    assert { nth_is nums 2 3 };
+    assert { nth_is nums 3 2 };
+    assert { nth_is nums 4 1 };
+    assert { nth_is nums 5 2 };
+    assert { nth_is nums 6 3 };
+    assert { nth_is nums 7 4 };
+    assert { adjacent_nonincreasing nums 1 2 };
+    assert { adjacent_nonincreasing nums 2 3 };
+    assert { adjacent_nonincreasing nums 3 4 };
+    assert { adjacent_nondecreasing nums 4 5 };
+    assert { adjacent_nondecreasing nums 5 6 };
+    assert { adjacent_nondecreasing nums 6 7 };
+    assert { good_index nums 2 3 };
+    assert { good_index nums 2 4 };
+    assert { good_index nums 2 5 };
+    assert { not (good_index nums 2 2) };
+    assert { not (good_index nums 2 6) };
+    assert { mem 3 expected };
+    assert { mem 4 expected };
+    assert { mem 5 expected };
+    assert { forall i: int. mem i expected -> i = 3 \/ i = 4 \/ i = 5 };
+    assert { strictly_increasing expected };
+    assert { exact_good_indices nums 2 expected }
+
+  let lemma check_test_006 () =
+    let nums = Cons 5 (Cons 4 (Cons 5 (Cons 3 (Cons 4 (Cons 5 (Cons 6 (Cons 7 (Cons 8 Nil)))))))) in
+    let expected = Cons 2 (Cons 4 Nil) in
+    assert { length nums = 9 };
+    assert { value_in_constraints nums };
+    assert { nth_is nums 0 5 };
+    assert { nth_is nums 1 4 };
+    assert { nth_is nums 2 5 };
+    assert { nth_is nums 3 3 };
+    assert { nth_is nums 4 4 };
+    assert { nth_is nums 5 5 };
+    assert { nth_is nums 6 6 };
+    assert { adjacent_nonincreasing nums 0 1 };
+    assert { adjacent_nonincreasing nums 2 3 };
+    assert { adjacent_nondecreasing nums 3 4 };
+    assert { adjacent_nondecreasing nums 5 6 };
+    assert { good_index nums 2 2 };
+    assert { good_index nums 2 4 };
+    assert { not (good_index nums 2 3) };
+    assert { not (good_index nums 2 5) };
+    assert { not (good_index nums 2 6) };
+    assert { mem 2 expected };
+    assert { mem 4 expected };
+    assert { forall i: int. mem i expected -> i = 2 \/ i = 4 };
+    assert { strictly_increasing expected };
+    assert { exact_good_indices nums 2 expected }
+
+end

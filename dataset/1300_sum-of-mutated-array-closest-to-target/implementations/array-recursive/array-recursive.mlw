@@ -1,0 +1,215 @@
+module SumOfMutatedArrayClosestToTarget_Array_Recursive_Implementation
+
+  use int.Int
+  use int.EuclideanDivision
+  use array.Array
+  use array.Init
+
+  let abs_int (x: int) : int =
+    if x < 0 then -x else x
+
+  let rec capped_sum_from (arr: array int) (value: int) (i: int) : int
+    variant { length arr - i }
+  =
+    if i >= length arr then
+      0
+    else
+      (if arr[i] <= value then arr[i] else value) + capped_sum_from arr value (i + 1)
+
+  let capped_sum (arr: array int) (value: int) : int =
+    capped_sum_from arr value 0
+
+  let distance_for_value (arr: array int) (target: int) (value: int) : int =
+    abs_int (capped_sum arr value - target)
+
+  let rec max_from (arr: array int) (i: int) (best: int) : int
+    variant { length arr - i }
+  =
+    if i >= length arr then
+      best
+    else if arr[i] > best then
+      max_from arr (i + 1) arr[i]
+    else
+      max_from arr (i + 1) best
+
+  let max_value (arr: array int) : int =
+    if length arr = 0 then 0 else max_from arr 1 arr[0]
+
+  let rec lower_bound_value (arr: array int) (target: int) (lo: int) (hi: int) : int
+    variant { hi - lo }
+  =
+    if lo >= hi then
+      lo
+    else
+      let mid = lo + div (hi - lo) 2 in
+      let s = capped_sum arr mid in
+      if s < target then
+        lower_bound_value arr target (mid + 1) hi
+      else
+        lower_bound_value arr target lo mid
+
+  let choose_better_value (arr: array int) (target: int) (left: int) (right: int) : int =
+    let left_distance = distance_for_value arr target left in
+    let right_distance = distance_for_value arr target right in
+    if left_distance < right_distance then
+      left
+    else if right_distance < left_distance then
+      right
+    else if left <= right then
+      left
+    else
+      right
+
+  let sum_of_mutated_array_closest_to_target_array (arr: array int) (target: int) : int =
+    if length arr = 0 then
+      0
+    else
+      let hi = max_value arr in
+      let right = lower_bound_value arr target 0 hi in
+      let left = if right = 0 then 0 else right - 1 in
+      choose_better_value arr target left right
+
+  let test_test_000 () : bool =
+    let a = init 5 [|1; 2; 3; 4; 5|] in
+    let r = sum_of_mutated_array_closest_to_target_array a 11 in
+    r = 3
+
+  let test_test_001 () : bool =
+    let a = init 5 [|5; 5; 5; 5; 5|] in
+    let r = sum_of_mutated_array_closest_to_target_array a 17 in
+    r = 3
+
+  let test_test_002 () : bool =
+    let a = init 5 [|10; 20; 30; 40; 50|] in
+    let r = sum_of_mutated_array_closest_to_target_array a 100 in
+    r = 23
+
+  let test_test_003 () : bool =
+    let a = init 3 [|2; 3; 5|] in
+    let r = sum_of_mutated_array_closest_to_target_array a 10 in
+    r = 5
+
+  let test_test_004 () : bool =
+    let a = init 5 [|9; 9; 9; 9; 9|] in
+    let r = sum_of_mutated_array_closest_to_target_array a 40 in
+    r = 8
+
+  let test_test_005 () : bool =
+    let a = init 3 [|10000; 10000; 10000|] in
+    let r = sum_of_mutated_array_closest_to_target_array a 10000 in
+    r = 3333
+
+  let test_test_006 () : bool =
+    let a = init 4 [|99999; 99999; 99999; 99999|] in
+    let r = sum_of_mutated_array_closest_to_target_array a 100000 in
+    r = 25000
+
+  let test_test_007 () : bool =
+    let a = init 10 [|1; 2; 3; 4; 5; 6; 7; 8; 9; 10|] in
+    let r = sum_of_mutated_array_closest_to_target_array a 50 in
+    r = 7
+
+  let test_test_008 () : bool =
+    let a = init 5 [|60864; 25176; 27249; 21296; 20204|] in
+    let r = sum_of_mutated_array_closest_to_target_array a 56803 in
+    r = 11361
+
+  let test_test_009 () : bool =
+    let a = init 3 [|100000; 100000; 100000|] in
+    let r = sum_of_mutated_array_closest_to_target_array a 100000 in
+    r = 33333
+
+  let test_test_010 () : bool =
+    let a = init 3 [|100000; 100000; 100000|] in
+    let r = sum_of_mutated_array_closest_to_target_array a 299999 in
+    r = 100000
+
+  let test_test_011 () : bool =
+    let a = init 5 [|5; 5; 5; 5; 5|] in
+    let r = sum_of_mutated_array_closest_to_target_array a 20 in
+    r = 4
+
+  let test_test_012 () : bool =
+    let a = init 3 [|10; 20; 30|] in
+    let r = sum_of_mutated_array_closest_to_target_array a 25 in
+    r = 8
+
+  let test_test_013 () : bool =
+    let a = init 5 [|1; 1; 1; 1; 1|] in
+    let r = sum_of_mutated_array_closest_to_target_array a 3 in
+    r = 1
+
+  let test_test_014 () : bool =
+    let a = init 5 [|1; 2; 3; 4; 5|] in
+    let r = sum_of_mutated_array_closest_to_target_array a 15 in
+    r = 5
+
+  let test_test_015 () : bool =
+    let a = init 3 [|100000; 100000; 100000|] in
+    let r = sum_of_mutated_array_closest_to_target_array a 250000 in
+    r = 83333
+
+  let test_test_016 () : bool =
+    let a = init 3 [|4; 9; 3|] in
+    let r = sum_of_mutated_array_closest_to_target_array a 10 in
+    r = 3
+
+  let test_test_017 () : bool =
+    let a = init 5 [|1; 1; 1; 1; 1|] in
+    let r = sum_of_mutated_array_closest_to_target_array a 5 in
+    r = 1
+
+  let test_test_018 () : bool =
+    let a = init 5 [|10000; 20000; 30000; 40000; 50000|] in
+    let r = sum_of_mutated_array_closest_to_target_array a 100000 in
+    r = 23333
+
+  let test_test_019 () : bool =
+    let a = init 10 [|10000; 10000; 10000; 10000; 10000; 10000; 10000; 10000; 10000; 10000|] in
+    let r = sum_of_mutated_array_closest_to_target_array a 95000 in
+    r = 9500
+
+  let run_tests () : bool =
+    if test_test_000 () then
+    if test_test_001 () then
+    if test_test_002 () then
+    if test_test_003 () then
+    if test_test_004 () then
+    if test_test_005 () then
+    if test_test_006 () then
+    if test_test_007 () then
+    if test_test_008 () then
+    if test_test_009 () then
+    if test_test_010 () then
+    if test_test_011 () then
+    if test_test_012 () then
+    if test_test_013 () then
+    if test_test_014 () then
+    if test_test_015 () then
+    if test_test_016 () then
+    if test_test_017 () then
+    if test_test_018 () then
+    if test_test_019 () then
+      true
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+
+end

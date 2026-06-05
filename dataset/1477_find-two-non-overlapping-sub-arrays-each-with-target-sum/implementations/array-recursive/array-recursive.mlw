@@ -1,0 +1,212 @@
+module FindTwoNonOverlappingSubArraysEachWithTargetSum_Array_Recursive_Impl
+
+  use int.Int
+  use array.Array
+  use array.Init
+
+  let min2 (x: int) (y: int) : int =
+    if x <= y then x else y
+
+  let no_solution (arr: array int) : int =
+    length arr + 1
+
+  let rec find_segment_end (arr: array int) (target: int) (j: int) (current: int) : int
+    variant { length arr - j }
+  =
+    if current = target then
+      j
+    else if j >= length arr then
+      (-1)
+    else if current > target then
+      (-1)
+    else
+      find_segment_end arr target (j + 1) (current + arr[j])
+
+  let segment_length_from (arr: array int) (target: int) (start: int) : int =
+    if start >= length arr then
+      no_solution arr
+    else
+      let segment_end = find_segment_end arr target start 0 in
+      if segment_end = (-1) then
+        no_solution arr
+      else
+        segment_end - start
+
+  let rec best_single_from (arr: array int) (target: int) (start: int) : int
+    variant { length arr - start }
+  =
+    if start >= length arr then
+      no_solution arr
+    else
+      min2 (segment_length_from arr target start)
+        (best_single_from arr target (start + 1))
+
+  let rec best_pair_from (arr: array int) (target: int) (start: int) : int
+    variant { length arr - start }
+  =
+    if start >= length arr then
+      no_solution arr
+    else
+      let skip = best_pair_from arr target (start + 1) in
+      let segment_end = find_segment_end arr target start 0 in
+      if segment_end = (-1) then
+        skip
+      else
+        let second = best_single_from arr target segment_end in
+        let with_first =
+          if second > length arr then
+            no_solution arr
+          else
+            (segment_end - start) + second
+        in
+        min2 with_first skip
+
+  let find_two_non_overlapping_sub_arrays_each_with_target_sum_array
+      (arr: array int) (target: int) : int =
+    let best = best_pair_from arr target 0 in
+    if best > length arr then (-1) else best
+
+  let test_000 () : bool =
+    let a = init 5 [|5; 5; 5; 5; 5|] in
+    let r = find_two_non_overlapping_sub_arrays_each_with_target_sum_array a 10 in
+    r = 4
+
+  let test_001 () : bool =
+    let a = init 10 [|1; 2; 3; 4; 5; 6; 7; 8; 9; 10|] in
+    let r = find_two_non_overlapping_sub_arrays_each_with_target_sum_array a 15 in
+    r = 5
+
+  let test_002 () : bool =
+    let a = init 10 [|2; 2; 2; 2; 2; 2; 2; 2; 2; 2|] in
+    let r = find_two_non_overlapping_sub_arrays_each_with_target_sum_array a 6 in
+    r = 6
+
+  let test_003 () : bool =
+    let a = init 9 [|1; 1; 1; 2; 2; 2; 3; 3; 3|] in
+    let r = find_two_non_overlapping_sub_arrays_each_with_target_sum_array a 6 in
+    r = 5
+
+  let test_004 () : bool =
+    let a = init 5 [|1; 2; 3; 4; 5|] in
+    let r = find_two_non_overlapping_sub_arrays_each_with_target_sum_array a 9 in
+    r = (-1)
+
+  let test_005 () : bool =
+    let a = init 5 [|3; 2; 2; 4; 3|] in
+    let r = find_two_non_overlapping_sub_arrays_each_with_target_sum_array a 3 in
+    r = 2
+
+  let test_006 () : bool =
+    let a = init 5 [|5; 5; 4; 4; 5|] in
+    let r = find_two_non_overlapping_sub_arrays_each_with_target_sum_array a 9 in
+    r = 4
+
+  let test_007 () : bool =
+    let a = init 10 [|2; 2; 2; 2; 2; 2; 2; 2; 2; 2|] in
+    let r = find_two_non_overlapping_sub_arrays_each_with_target_sum_array a 4 in
+    r = 4
+
+  let test_008 () : bool =
+    let a = init 3 [|1000; 1000; 1000|] in
+    let r = find_two_non_overlapping_sub_arrays_each_with_target_sum_array a 2000 in
+    r = (-1)
+
+  let test_009 () : bool =
+    let a = init 4 [|7; 3; 4; 7|] in
+    let r = find_two_non_overlapping_sub_arrays_each_with_target_sum_array a 7 in
+    r = 2
+
+  let test_010 () : bool =
+    let a = init 5 [|1000; 1000; 1000; 1000; 1000|] in
+    let r = find_two_non_overlapping_sub_arrays_each_with_target_sum_array a 2000 in
+    r = 4
+
+  let test_011 () : bool =
+    let a = init 9 [|1; 1; 1; 2; 2; 2; 3; 3; 3|] in
+    let r = find_two_non_overlapping_sub_arrays_each_with_target_sum_array a 3 in
+    r = 2
+
+  let test_012 () : bool =
+    let a = init 10 [|1; 2; 1; 2; 1; 2; 1; 2; 1; 2|] in
+    let r = find_two_non_overlapping_sub_arrays_each_with_target_sum_array a 3 in
+    r = 4
+
+  let test_013 () : bool =
+    let a = init 5 [|1000; 1000; 1000; 1000; 1000|] in
+    let r = find_two_non_overlapping_sub_arrays_each_with_target_sum_array a 5000 in
+    r = (-1)
+
+  let test_014 () : bool =
+    let a = init 8 [|1; 1; 1; 1; 1; 1; 1; 1|] in
+    let r = find_two_non_overlapping_sub_arrays_each_with_target_sum_array a 2 in
+    r = 4
+
+  let test_015 () : bool =
+    let a = init 9 [|5; 5; 5; 5; 5; 5; 5; 5; 5|] in
+    let r = find_two_non_overlapping_sub_arrays_each_with_target_sum_array a 15 in
+    r = 6
+
+  let test_016 () : bool =
+    let a = init 5 [|1; 2; 3; 4; 5|] in
+    let r = find_two_non_overlapping_sub_arrays_each_with_target_sum_array a 10 in
+    r = (-1)
+
+  let test_017 () : bool =
+    let a = init 5 [|10; 20; 30; 40; 50|] in
+    let r = find_two_non_overlapping_sub_arrays_each_with_target_sum_array a 60 in
+    r = (-1)
+
+  let test_018 () : bool =
+    let a = init 10 [|1; 4; 4; 4; 4; 4; 4; 4; 4; 1|] in
+    let r = find_two_non_overlapping_sub_arrays_each_with_target_sum_array a 8 in
+    r = 4
+
+  let test_019 () : bool =
+    let a = init 10 [|5; 5; 5; 5; 5; 5; 5; 5; 5; 5|] in
+    let r = find_two_non_overlapping_sub_arrays_each_with_target_sum_array a 15 in
+    r = 6
+
+  let run_tests () : bool =
+    if test_000 () then
+    if test_001 () then
+    if test_002 () then
+    if test_003 () then
+    if test_004 () then
+    if test_005 () then
+    if test_006 () then
+    if test_007 () then
+    if test_008 () then
+    if test_009 () then
+    if test_010 () then
+    if test_011 () then
+    if test_012 () then
+    if test_013 () then
+    if test_014 () then
+    if test_015 () then
+    if test_016 () then
+    if test_017 () then
+    if test_018 () then
+    if test_019 () then
+      true
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+
+end

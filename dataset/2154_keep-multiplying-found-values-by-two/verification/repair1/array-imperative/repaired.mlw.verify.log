@@ -1,0 +1,281 @@
+== Stage 1: first prover on whole file ==
+Running in /Users/rubenm/Desktop/Diversify2Verify/codex-runs/dataset-merge-verification/stage3a-repair/2154_keep-multiplying-found-values-by-two/array-imperative/keep_multiplying_found_values_by_two_array_stage3_51d62a65_stage3/generated/why3: why3 session create -o /Users/rubenm/Desktop/Diversify2Verify/codex-runs/dataset-merge-verification/stage3a-repair/2154_keep-multiplying-found-values-by-two/array-imperative/keep_multiplying_found_values_by_two_array_stage3_51d62a65_stage3/generated/why3/.why3_sessions/repaired_stage1 -P Z3,4.8.6 -t 10 -m 8192 repaired.mlw
+Session created successfully
+Running in /Users/rubenm/Desktop/Diversify2Verify/codex-runs/dataset-merge-verification/stage3a-repair/2154_keep-multiplying-found-values-by-two/array-imperative/keep_multiplying_found_values_by_two_array_stage3_51d62a65_stage3/generated/why3: why3 bench /Users/rubenm/Desktop/Diversify2Verify/codex-runs/dataset-merge-verification/stage3a-repair/2154_keep-multiplying-found-values-by-two/array-imperative/keep_multiplying_found_values_by_two_array_stage3_51d62a65_stage3/generated/why3/.why3_sessions/repaired_stage1
+Progress: 5/1/0                       Progress: 4/2/0                       Progress: 3/3/0                       Progress: 2/4/0                       Progress: 1/5/0                       Progress: 0/6/0                       Progress: 0/4/2                       Progress: 0/0/2                       
+Replay completed, saving session... done
+== Stage 1 stats ==
+= Statistics for session /Users/rubenm/Desktop/Diversify2Verify/codex-runs/dataset-merge-verification/stage3a-repair/2154_keep-multiplying-found-values-by-two/array-imperative/keep_multiplying_found_values_by_two_array_stage3_51d62a65_stage3/generated/why3/.why3_sessions/repaired_stage1
+
+== Number of root goals ==
+  total: 6  proved: 2
+
+== Number of sub goals ==
+  total: 0  proved: 0
+
+== Goals not proved ==
+  +-- file [../../repaired.mlw]
+    +-- theory KeepMultiplyingFoundValuesByTwo_Array_Spec
+      +-- goal doubled_value_positive'vc
+      +-- goal doubled_value_strict_increasing'vc
+      +-- goal prefix_plus_current_fits'vc
+      +-- goal keep_multiplying_found_values_by_two_array'vc
+  
+== Goals proved by only one prover ==
+  +-- file [../../repaired.mlw]
+    +-- theory KeepMultiplyingFoundValuesByTwo_Array_Spec
+      +-- goal doubled_values_distinct'vc: Z3 4.8.6
+      +-- goal contains_value_exec'vc: Z3 4.8.6
+  
+1 session(s) read, with a total of 6 proof goals.
+== Unproved root goals after first prover ==
+KeepMultiplyingFoundValuesByTwo_Array_Spec	doubled_value_positive'vc
+KeepMultiplyingFoundValuesByTwo_Array_Spec	doubled_value_strict_increasing'vc
+KeepMultiplyingFoundValuesByTwo_Array_Spec	prefix_plus_current_fits'vc
+KeepMultiplyingFoundValuesByTwo_Array_Spec	keep_multiplying_found_values_by_two_array'vc
+== Stage 1: trying remaining goals with prover Alt-Ergo,2.4.0 ==
+---- stage1 | prover: Alt-Ergo,2.4.0 | theory: KeepMultiplyingFoundValuesByTwo_Array_Spec | goal: doubled_value_positive'vc ----
+File repaired.mlw:
+Goal doubled_value_positive'vc.
+Prover result is: Valid (0.01s, 129 steps).
+Solved in stage 1 using prover: Alt-Ergo,2.4.0
+---- stage1 | prover: Alt-Ergo,2.4.0 | theory: KeepMultiplyingFoundValuesByTwo_Array_Spec | goal: doubled_value_strict_increasing'vc ----
+File repaired.mlw:
+Goal doubled_value_strict_increasing'vc.
+Prover result is: Valid (0.03s, 983 steps).
+Solved in stage 1 using prover: Alt-Ergo,2.4.0
+---- stage1 | prover: Alt-Ergo,2.4.0 | theory: KeepMultiplyingFoundValuesByTwo_Array_Spec | goal: prefix_plus_current_fits'vc ----
+File repaired.mlw:
+Goal prefix_plus_current_fits'vc.
+Prover result is: Timeout (10.00s, 77110 steps).
+---- stage1 | prover: Alt-Ergo,2.4.0 | theory: KeepMultiplyingFoundValuesByTwo_Array_Spec | goal: keep_multiplying_found_values_by_two_array'vc ----
+File repaired.mlw:
+Goal keep_multiplying_found_values_by_two_array'vc.
+Prover result is: Timeout (10.00s, 78367 steps).
+Remaining after prover Alt-Ergo,2.4.0: 2
+== Stage 1: trying remaining goals with prover CVC4,1.8 ==
+---- stage1 | prover: CVC4,1.8 | theory: KeepMultiplyingFoundValuesByTwo_Array_Spec | goal: prefix_plus_current_fits'vc ----
+File repaired.mlw:
+Goal prefix_plus_current_fits'vc.
+Prover result is: Timeout (10.00s, 619526 steps).
+---- stage1 | prover: CVC4,1.8 | theory: KeepMultiplyingFoundValuesByTwo_Array_Spec | goal: keep_multiplying_found_values_by_two_array'vc ----
+File repaired.mlw:
+Goal keep_multiplying_found_values_by_two_array'vc.
+Prover result is: Timeout (10.00s, 1078924 steps).
+Remaining after prover CVC4,1.8: 2
+== Goals still unproved after stage 1 ==
+KeepMultiplyingFoundValuesByTwo_Array_Spec	prefix_plus_current_fits'vc
+KeepMultiplyingFoundValuesByTwo_Array_Spec	keep_multiplying_found_values_by_two_array'vc
+== Stage 2: split_vc on unproved goal ==
+Target theory: KeepMultiplyingFoundValuesByTwo_Array_Spec
+Target goal  : prefix_plus_current_fits'vc
+---- stage2 | prover: Z3,4.8.6 | theory: KeepMultiplyingFoundValuesByTwo_Array_Spec | goal: prefix_plus_current_fits'vc ----
+Transforms: split_vc
+File "repaired.mlw", line 92, characters 15-43:
+Sub-goal Assertion of goal prefix_plus_current_fits'vc.
+Prover result is: Valid (0.01s, 19320 steps).
+
+File "repaired.mlw", line 94, characters 45-67:
+Sub-goal Assertion of goal prefix_plus_current_fits'vc.
+Prover result is: Timeout (10.00s, 68809335 steps).
+
+File "repaired.mlw", line 97, characters 51-61:
+Sub-goal Assertion of goal prefix_plus_current_fits'vc.
+Prover result is: Timeout (10.00s, 70019664 steps).
+
+File "repaired.mlw", line 99, characters 6-44:
+Sub-goal Precondition of goal prefix_plus_current_fits'vc.
+Prover result is: Valid (0.01s, 2471 steps).
+Infrastructure issue in stage 2 with prover Z3,4.8.6; aborting rest of stage 2.
+== Goals still unproved after stage 2 (split_vc) ==
+KeepMultiplyingFoundValuesByTwo_Array_Spec	prefix_plus_current_fits'vc
+KeepMultiplyingFoundValuesByTwo_Array_Spec	keep_multiplying_found_values_by_two_array'vc
+== Stage 3: split_vc + inline_all on still-unproved goal ==
+Target theory: KeepMultiplyingFoundValuesByTwo_Array_Spec
+Target goal  : prefix_plus_current_fits'vc
+---- stage3 | prover: Alt-Ergo,2.4.0 | theory: KeepMultiplyingFoundValuesByTwo_Array_Spec | goal: prefix_plus_current_fits'vc ----
+Transforms: split_vc inline_all
+File "repaired.mlw", line 92, characters 15-43:
+Sub-goal Assertion of goal prefix_plus_current_fits'vc.
+Prover result is: Valid (0.01s, 27 steps).
+
+File "repaired.mlw", line 94, characters 45-67:
+Sub-goal Assertion of goal prefix_plus_current_fits'vc.
+Prover result is: Valid (0.42s, 6263 steps).
+
+File "repaired.mlw", line 97, characters 51-61:
+Sub-goal Assertion of goal prefix_plus_current_fits'vc.
+Prover result is: Timeout (10.00s, 19100 steps).
+
+File "repaired.mlw", line 99, characters 6-44:
+Sub-goal Precondition of goal prefix_plus_current_fits'vc.
+Prover result is: Valid (0.01s, 21 steps).
+
+File "repaired.mlw", line 99, characters 6-44:
+Sub-goal Precondition of goal prefix_plus_current_fits'vc.
+Prover result is: Valid (0.01s, 107 steps).
+
+File "repaired.mlw", line 100, characters 6-12:
+Sub-goal Unreachable point of goal prefix_plus_current_fits'vc.
+Prover result is: Valid (0.01s, 136 steps).
+
+File "repaired.mlw", line 87, characters 15-34:
+Sub-goal Postcondition of goal prefix_plus_current_fits'vc.
+Prover result is: Valid (0.01s, 12 steps).
+---- stage3 | prover: CVC4,1.8 | theory: KeepMultiplyingFoundValuesByTwo_Array_Spec | goal: prefix_plus_current_fits'vc ----
+Transforms: split_vc inline_all
+File "repaired.mlw", line 92, characters 15-43:
+Sub-goal Assertion of goal prefix_plus_current_fits'vc.
+Prover result is: Valid (0.02s, 5624 steps).
+
+File "repaired.mlw", line 94, characters 45-67:
+Sub-goal Assertion of goal prefix_plus_current_fits'vc.
+Prover result is: Valid (0.03s, 8580 steps).
+
+File "repaired.mlw", line 97, characters 51-61:
+Sub-goal Assertion of goal prefix_plus_current_fits'vc.
+Prover result is: Timeout (10.00s, 906534 steps).
+
+File "repaired.mlw", line 99, characters 6-44:
+Sub-goal Precondition of goal prefix_plus_current_fits'vc.
+Prover result is: Valid (0.02s, 5723 steps).
+
+File "repaired.mlw", line 99, characters 6-44:
+Sub-goal Precondition of goal prefix_plus_current_fits'vc.
+Prover result is: Valid (0.02s, 7103 steps).
+
+File "repaired.mlw", line 100, characters 6-12:
+Sub-goal Unreachable point of goal prefix_plus_current_fits'vc.
+Prover result is: Valid (0.02s, 6310 steps).
+
+File "repaired.mlw", line 87, characters 15-34:
+Sub-goal Postcondition of goal prefix_plus_current_fits'vc.
+Prover result is: Valid (0.01s, 5219 steps).
+== Stage 3: split_vc + inline_all on still-unproved goal ==
+Target theory: KeepMultiplyingFoundValuesByTwo_Array_Spec
+Target goal  : keep_multiplying_found_values_by_two_array'vc
+---- stage3 | prover: Alt-Ergo,2.4.0 | theory: KeepMultiplyingFoundValuesByTwo_Array_Spec | goal: keep_multiplying_found_values_by_two_array'vc ----
+Transforms: split_vc inline_all
+File "repaired.mlw", line 135, characters 26-46:
+Sub-goal Array creation size of goal
+keep_multiplying_found_values_by_two_array'vc.
+Prover result is: Valid (0.01s, 15 steps).
+
+File "repaired.mlw", line 138, characters 18-44:
+Sub-goal Loop invariant init of goal
+keep_multiplying_found_values_by_two_array'vc.
+Prover result is: Valid (0.01s, 17 steps).
+
+File "repaired.mlw", line 139, characters 18-58:
+Sub-goal Loop invariant init of goal
+keep_multiplying_found_values_by_two_array'vc.
+Prover result is: Valid (0.01s, 39 steps).
+
+File "repaired.mlw", line 140, characters 18-60:
+Sub-goal Loop invariant init of goal
+keep_multiplying_found_values_by_two_array'vc.
+Prover result is: Valid (0.01s, 22 steps).
+
+File "repaired.mlw", line 143, character 10 to line 144, character 55:
+Sub-goal Loop invariant init of goal
+keep_multiplying_found_values_by_two_array'vc.
+Prover result is: Valid (0.01s, 42 steps).
+
+File "repaired.mlw", line 147, characters 48-76:
+Sub-goal Loop invariant init of goal
+keep_multiplying_found_values_by_two_array'vc.
+Prover result is: Valid (0.01s, 29 steps).
+
+File "repaired.mlw", line 149, characters 18-31:
+Sub-goal Loop invariant init of goal
+keep_multiplying_found_values_by_two_array'vc.
+Prover result is: Valid (0.01s, 14 steps).
+
+File "repaired.mlw", line 153, characters 17-45:
+Sub-goal Assertion of goal keep_multiplying_found_values_by_two_array'vc.
+Prover result is: Valid (0.01s, 134 steps).
+
+File "repaired.mlw", line 154, characters 17-57:
+Sub-goal Assertion of goal keep_multiplying_found_values_by_two_array'vc.
+Prover result is: Valid (0.01s, 51 steps).
+
+File "repaired.mlw", line 155, characters 17-68:
+Sub-goal Assertion of goal keep_multiplying_found_values_by_two_array'vc.
+Prover result is: Valid (0.01s, 163 steps).
+
+File "repaired.mlw", line 158, character 10 to line 160, character 11:
+Sub-goal Witness existence of goal
+keep_multiplying_found_values_by_two_array'vc.
+Prover result is: Valid (0.01s, 189 steps).
+
+File "repaired.mlw", line 162, characters 17-59:
+Sub-goal Assertion of goal keep_multiplying_found_values_by_two_array'vc.
+Prover result is: Valid (0.01s, 75 steps).
+
+File "repaired.mlw", line 163, characters 8-73:
+Sub-goal Precondition of goal keep_multiplying_found_values_by_two_array'vc.
+Prover result is: Valid (0.01s, 76 steps).
+
+File "repaired.mlw", line 163, characters 8-73:
+Sub-goal Precondition of goal keep_multiplying_found_values_by_two_array'vc.
+Prover result is: Valid (0.01s, 77 steps).
+
+File "repaired.mlw", line 163, characters 8-73:
+Sub-goal Precondition of goal keep_multiplying_found_values_by_two_array'vc.
+Prover result is: Valid (0.01s, 76 steps).
+
+File "repaired.mlw", line 163, characters 8-73:
+Sub-goal Precondition of goal keep_multiplying_found_values_by_two_array'vc.
+Prover result is: Valid (0.01s, 76 steps).
+
+File "repaired.mlw", line 163, characters 8-73:
+Sub-goal Precondition of goal keep_multiplying_found_values_by_two_array'vc.
+Prover result is: Valid (0.01s, 387 steps).
+
+File "repaired.mlw", line 163, characters 8-73:
+Sub-goal Precondition of goal keep_multiplying_found_values_by_two_array'vc.
+Prover result is: Valid (0.01s, 280 steps).
+
+File "repaired.mlw", line 164, characters 17-37:
+Sub-goal Assertion of goal keep_multiplying_found_values_by_two_array'vc.
+Prover result is: Valid (0.01s, 76 steps).
+
+File "repaired.mlw", line 165, characters 14-41:
+Sub-goal Index in array bounds of goal
+keep_multiplying_found_values_by_two_array'vc.
+Prover result is: Valid (0.01s, 77 steps).
+
+File "repaired.mlw", line 166, characters 17-65:
+Sub-goal Assertion of goal keep_multiplying_found_values_by_two_array'vc.
+Prover result is: Valid (6.87s, 100009 steps).
+
+File "repaired.mlw", line 169, characters 17-39:
+Sub-goal Assertion of goal keep_multiplying_found_values_by_two_array'vc.
+Prover result is: Valid (0.01s, 100 steps).
+
+File "repaired.mlw", line 170, characters 17-57:
+Sub-goal Assertion of goal keep_multiplying_found_values_by_two_array'vc.
+Prover result is: Valid (0.01s, 386 steps).
+
+File "repaired.mlw", line 171, characters 17-59:
+Sub-goal Assertion of goal keep_multiplying_found_values_by_two_array'vc.
+Prover result is: Valid (3.76s, 46791 steps).
+
+File "repaired.mlw", line 174, character 12 to line 175, character 57:
+Sub-goal Assertion of goal keep_multiplying_found_values_by_two_array'vc.
+Prover result is: Timeout (10.00s, 56424 steps).
+Infrastructure issue in stage 3 with prover Alt-Ergo,2.4.0; aborting rest of stage 3.
+== Final summary ==
+Unproved root goals after first prover : 2
+Remaining failures after split_vc      : 2
+Remaining failures after stage 3       : 2
+Detailed logs stored in                : /Users/rubenm/Desktop/Diversify2Verify/codex-runs/dataset-merge-verification/stage3a-repair/2154_keep-multiplying-found-values-by-two/array-imperative/keep_multiplying_found_values_by_two_array_stage3_51d62a65_stage3/generated/why3/.why3_sessions/repaired_logs
+Still unproved goals:
+KeepMultiplyingFoundValuesByTwo_Array_Spec	prefix_plus_current_fits'vc
+KeepMultiplyingFoundValuesByTwo_Array_Spec	keep_multiplying_found_values_by_two_array'vc
+VERIFY_RESULT: FAILURE
+VERIFY_REASON: unproved_goals_remain
+VERIFY_STAGE: stage3
+VERIFY_ROOT_TOTAL: 6
+VERIFY_ROOT_PROVED: 4
+VERIFY_ROOT_REMAINING: 2

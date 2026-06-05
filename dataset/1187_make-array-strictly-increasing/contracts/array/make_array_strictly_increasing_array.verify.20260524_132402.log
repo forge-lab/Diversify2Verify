@@ -1,0 +1,762 @@
+== Stage 1: first prover on whole file ==
+Running in /Users/rubenm/Desktop/Diversify2Verify/codex-runs2/stage1a-array/1187_make-array-strictly-increasing-20260523-235013/generated/why3/array: why3 session create -o /Users/rubenm/Desktop/Diversify2Verify/codex-runs2/stage1a-array/1187_make-array-strictly-increasing-20260523-235013/generated/why3/array/.why3_sessions/make_array_strictly_increasing_array_stage1 -P Z3,4.8.6 -t 10 -m 8192 make_array_strictly_increasing_array.mlw
+Session created successfully
+Running in /Users/rubenm/Desktop/Diversify2Verify/codex-runs2/stage1a-array/1187_make-array-strictly-increasing-20260523-235013/generated/why3/array: why3 bench /Users/rubenm/Desktop/Diversify2Verify/codex-runs2/stage1a-array/1187_make-array-strictly-increasing-20260523-235013/generated/why3/array/.why3_sessions/make_array_strictly_increasing_array_stage1
+Progress: 7/1/0                       Progress: 6/2/0                       Progress: 5/3/0                       Progress: 4/4/0                       Progress: 3/5/0                       Progress: 2/6/0                       Progress: 2/0/1                       Progress: 1/1/1                       Progress: 0/2/1                       
+Replay completed, saving session... done
+== Stage 1 stats ==
+= Statistics for session /Users/rubenm/Desktop/Diversify2Verify/codex-runs2/stage1a-array/1187_make-array-strictly-increasing-20260523-235013/generated/why3/array/.why3_sessions/make_array_strictly_increasing_array_stage1
+
+== Number of root goals ==
+  total: 8  proved: 4
+
+== Number of sub goals ==
+  total: 0  proved: 0
+
+== Goals not proved ==
+  +-- file [../../make_array_strictly_increasing_array.mlw]
+    +-- theory MakeArrayStrictlyIncreasing_Array_Spec
+      +-- goal test_001_expected_minus_1'vc
+      +-- goal test_003_expected_1'vc
+      +-- goal test_006_expected_2'vc
+      +-- goal test_009_expected_4'vc
+  
+== Goals proved by only one prover ==
+  +-- file [../../make_array_strictly_increasing_array.mlw]
+    +-- theory MakeArrayStrictlyIncreasing_Array_Spec
+      +-- goal changes_from'vc: Z3 4.8.6
+      +-- goal test_000_expected_0'vc: Z3 4.8.6
+      +-- goal test_005_expected_0'vc: Z3 4.8.6
+      +-- goal test_007_expected_4'vc: Z3 4.8.6
+  
+1 session(s) read, with a total of 8 proof goals.
+== Unproved root goals after first prover ==
+MakeArrayStrictlyIncreasing_Array_Spec	test_001_expected_minus_1'vc
+MakeArrayStrictlyIncreasing_Array_Spec	test_003_expected_1'vc
+MakeArrayStrictlyIncreasing_Array_Spec	test_006_expected_2'vc
+MakeArrayStrictlyIncreasing_Array_Spec	test_009_expected_4'vc
+== Stage 1: trying remaining goals with prover Alt-Ergo,2.4.0 ==
+---- stage1 | prover: Alt-Ergo,2.4.0 | theory: MakeArrayStrictlyIncreasing_Array_Spec | goal: test_001_expected_minus_1'vc ----
+File make_array_strictly_increasing_array.mlw:
+Goal test_001_expected_minus_1'vc.
+Prover result is: Timeout (10.00s, 273154 steps).
+---- stage1 | prover: Alt-Ergo,2.4.0 | theory: MakeArrayStrictlyIncreasing_Array_Spec | goal: test_003_expected_1'vc ----
+File make_array_strictly_increasing_array.mlw:
+Goal test_003_expected_1'vc.
+Prover result is: Valid (2.07s, 59050 steps).
+Solved in stage 1 using prover: Alt-Ergo,2.4.0
+---- stage1 | prover: Alt-Ergo,2.4.0 | theory: MakeArrayStrictlyIncreasing_Array_Spec | goal: test_006_expected_2'vc ----
+File make_array_strictly_increasing_array.mlw:
+Goal test_006_expected_2'vc.
+Prover result is: Timeout (10.00s, 189318 steps).
+---- stage1 | prover: Alt-Ergo,2.4.0 | theory: MakeArrayStrictlyIncreasing_Array_Spec | goal: test_009_expected_4'vc ----
+File make_array_strictly_increasing_array.mlw:
+Goal test_009_expected_4'vc.
+Prover result is: Valid (1.32s, 37477 steps).
+Solved in stage 1 using prover: Alt-Ergo,2.4.0
+Remaining after prover Alt-Ergo,2.4.0: 2
+== Stage 1: trying remaining goals with prover CVC4,1.8 ==
+---- stage1 | prover: CVC4,1.8 | theory: MakeArrayStrictlyIncreasing_Array_Spec | goal: test_001_expected_minus_1'vc ----
+File make_array_strictly_increasing_array.mlw:
+Goal test_001_expected_minus_1'vc.
+Prover result is: Timeout (10.00s, 4063917 steps).
+---- stage1 | prover: CVC4,1.8 | theory: MakeArrayStrictlyIncreasing_Array_Spec | goal: test_006_expected_2'vc ----
+File make_array_strictly_increasing_array.mlw:
+Goal test_006_expected_2'vc.
+Prover result is: Timeout (10.00s, 4564659 steps).
+Remaining after prover CVC4,1.8: 2
+== Goals still unproved after stage 1 ==
+MakeArrayStrictlyIncreasing_Array_Spec	test_001_expected_minus_1'vc
+MakeArrayStrictlyIncreasing_Array_Spec	test_006_expected_2'vc
+== Stage 2: split_vc on unproved goal ==
+Target theory: MakeArrayStrictlyIncreasing_Array_Spec
+Target goal  : test_001_expected_minus_1'vc
+---- stage2 | prover: Z3,4.8.6 | theory: MakeArrayStrictlyIncreasing_Array_Spec | goal: test_001_expected_minus_1'vc ----
+Transforms: split_vc
+File "make_array_strictly_increasing_array.mlw", line 81, characters 15-39:
+Sub-goal Array creation size of goal test_001_expected_minus_1'vc.
+Prover result is: Valid (0.01s, 278 steps).
+
+File "make_array_strictly_increasing_array.mlw", line 82, characters 15-36:
+Sub-goal Array creation size of goal test_001_expected_minus_1'vc.
+Prover result is: Valid (0.01s, 632 steps).
+
+File "make_array_strictly_increasing_array.mlw", line 83, characters 13-28:
+Sub-goal Assertion of goal test_001_expected_minus_1'vc.
+Prover result is: Valid (0.01s, 731 steps).
+
+File "make_array_strictly_increasing_array.mlw", line 84, characters 13-28:
+Sub-goal Assertion of goal test_001_expected_minus_1'vc.
+Prover result is: Valid (0.01s, 740 steps).
+
+File "make_array_strictly_increasing_array.mlw", line 85, characters 13-84:
+Sub-goal Assertion of goal test_001_expected_minus_1'vc.
+Prover result is: Valid (0.01s, 11009 steps).
+
+File "make_array_strictly_increasing_array.mlw", line 86, characters 13-69:
+Sub-goal Assertion of goal test_001_expected_minus_1'vc.
+Prover result is: Valid (0.01s, 11942 steps).
+
+File "make_array_strictly_increasing_array.mlw", line 89, characters 8-49:
+Sub-goal Assertion of goal test_001_expected_minus_1'vc.
+Prover result is: Valid (0.01s, 11736 steps).
+
+File "make_array_strictly_increasing_array.mlw", line 93, characters 8-40:
+Sub-goal Assertion of goal test_001_expected_minus_1'vc.
+Prover result is: Valid (0.01s, 12217 steps).
+
+File "make_array_strictly_increasing_array.mlw", line 95, characters 13-44:
+Sub-goal Assertion of goal test_001_expected_minus_1'vc.
+Prover result is: Unknown (unknown) (0.03s, 186603 steps).
+
+File "make_array_strictly_increasing_array.mlw", line 96, characters 13-44:
+Sub-goal Assertion of goal test_001_expected_minus_1'vc.
+Prover result is: Valid (0.01s, 21739 steps).
+
+File "make_array_strictly_increasing_array.mlw", line 97, characters 13-44:
+Sub-goal Assertion of goal test_001_expected_minus_1'vc.
+Prover result is: Valid (0.01s, 22007 steps).
+
+File "make_array_strictly_increasing_array.mlw", line 98, characters 13-44:
+Sub-goal Assertion of goal test_001_expected_minus_1'vc.
+Prover result is: Valid (0.01s, 22277 steps).
+
+File "make_array_strictly_increasing_array.mlw", line 99, characters 13-44:
+Sub-goal Assertion of goal test_001_expected_minus_1'vc.
+Prover result is: Valid (0.01s, 22549 steps).
+
+File "make_array_strictly_increasing_array.mlw", line 100, characters 13-44:
+Sub-goal Assertion of goal test_001_expected_minus_1'vc.
+Prover result is: Valid (0.01s, 22819 steps).
+
+File "make_array_strictly_increasing_array.mlw", line 101, characters 13-44:
+Sub-goal Assertion of goal test_001_expected_minus_1'vc.
+Prover result is: Valid (0.01s, 23089 steps).
+---- stage2 | prover: Alt-Ergo,2.4.0 | theory: MakeArrayStrictlyIncreasing_Array_Spec | goal: test_001_expected_minus_1'vc ----
+Transforms: split_vc
+File "make_array_strictly_increasing_array.mlw", line 81, characters 15-39:
+Sub-goal Array creation size of goal test_001_expected_minus_1'vc.
+Prover result is: Valid (0.01s, 1 steps).
+
+File "make_array_strictly_increasing_array.mlw", line 82, characters 15-36:
+Sub-goal Array creation size of goal test_001_expected_minus_1'vc.
+Prover result is: Valid (0.01s, 3 steps).
+
+File "make_array_strictly_increasing_array.mlw", line 83, characters 13-28:
+Sub-goal Assertion of goal test_001_expected_minus_1'vc.
+Prover result is: Valid (0.01s, 5 steps).
+
+File "make_array_strictly_increasing_array.mlw", line 84, characters 13-28:
+Sub-goal Assertion of goal test_001_expected_minus_1'vc.
+Prover result is: Valid (0.01s, 5 steps).
+
+File "make_array_strictly_increasing_array.mlw", line 85, characters 13-84:
+Sub-goal Assertion of goal test_001_expected_minus_1'vc.
+Prover result is: Valid (0.01s, 161 steps).
+
+File "make_array_strictly_increasing_array.mlw", line 86, characters 13-69:
+Sub-goal Assertion of goal test_001_expected_minus_1'vc.
+Prover result is: Valid (0.01s, 225 steps).
+
+File "make_array_strictly_increasing_array.mlw", line 89, characters 8-49:
+Sub-goal Assertion of goal test_001_expected_minus_1'vc.
+Prover result is: Valid (0.01s, 38 steps).
+
+File "make_array_strictly_increasing_array.mlw", line 93, characters 8-40:
+Sub-goal Assertion of goal test_001_expected_minus_1'vc.
+Prover result is: Valid (0.01s, 37 steps).
+
+File "make_array_strictly_increasing_array.mlw", line 95, characters 13-44:
+Sub-goal Assertion of goal test_001_expected_minus_1'vc.
+Prover result is: Timeout (10.00s, 172484 steps).
+
+File "make_array_strictly_increasing_array.mlw", line 96, characters 13-44:
+Sub-goal Assertion of goal test_001_expected_minus_1'vc.
+Prover result is: Valid (0.01s, 126 steps).
+
+File "make_array_strictly_increasing_array.mlw", line 97, characters 13-44:
+Sub-goal Assertion of goal test_001_expected_minus_1'vc.
+Prover result is: Valid (0.01s, 125 steps).
+
+File "make_array_strictly_increasing_array.mlw", line 98, characters 13-44:
+Sub-goal Assertion of goal test_001_expected_minus_1'vc.
+Prover result is: Valid (0.01s, 128 steps).
+
+File "make_array_strictly_increasing_array.mlw", line 99, characters 13-44:
+Sub-goal Assertion of goal test_001_expected_minus_1'vc.
+Prover result is: Valid (0.01s, 130 steps).
+
+File "make_array_strictly_increasing_array.mlw", line 100, characters 13-44:
+Sub-goal Assertion of goal test_001_expected_minus_1'vc.
+Prover result is: Valid (0.01s, 136 steps).
+
+File "make_array_strictly_increasing_array.mlw", line 101, characters 13-44:
+Sub-goal Assertion of goal test_001_expected_minus_1'vc.
+Prover result is: Valid (0.01s, 135 steps).
+---- stage2 | prover: CVC4,1.8 | theory: MakeArrayStrictlyIncreasing_Array_Spec | goal: test_001_expected_minus_1'vc ----
+Transforms: split_vc
+File "make_array_strictly_increasing_array.mlw", line 81, characters 15-39:
+Sub-goal Array creation size of goal test_001_expected_minus_1'vc.
+Prover result is: Valid (0.01s, 777 steps).
+
+File "make_array_strictly_increasing_array.mlw", line 82, characters 15-36:
+Sub-goal Array creation size of goal test_001_expected_minus_1'vc.
+Prover result is: Valid (0.01s, 1684 steps).
+
+File "make_array_strictly_increasing_array.mlw", line 83, characters 13-28:
+Sub-goal Assertion of goal test_001_expected_minus_1'vc.
+Prover result is: Valid (0.01s, 1905 steps).
+
+File "make_array_strictly_increasing_array.mlw", line 84, characters 13-28:
+Sub-goal Assertion of goal test_001_expected_minus_1'vc.
+Prover result is: Valid (0.01s, 1908 steps).
+
+File "make_array_strictly_increasing_array.mlw", line 85, characters 13-84:
+Sub-goal Assertion of goal test_001_expected_minus_1'vc.
+Prover result is: Valid (0.01s, 2949 steps).
+
+File "make_array_strictly_increasing_array.mlw", line 86, characters 13-69:
+Sub-goal Assertion of goal test_001_expected_minus_1'vc.
+Prover result is: Valid (0.02s, 3274 steps).
+
+File "make_array_strictly_increasing_array.mlw", line 89, characters 8-49:
+Sub-goal Assertion of goal test_001_expected_minus_1'vc.
+Prover result is: Valid (0.01s, 2504 steps).
+
+File "make_array_strictly_increasing_array.mlw", line 93, characters 8-40:
+Sub-goal Assertion of goal test_001_expected_minus_1'vc.
+Prover result is: Valid (0.01s, 2824 steps).
+
+File "make_array_strictly_increasing_array.mlw", line 95, characters 13-44:
+Sub-goal Assertion of goal test_001_expected_minus_1'vc.
+Prover result is: Timeout (10.00s, 4459802 steps).
+
+File "make_array_strictly_increasing_array.mlw", line 96, characters 13-44:
+Sub-goal Assertion of goal test_001_expected_minus_1'vc.
+Prover result is: Valid (0.02s, 4310 steps).
+
+File "make_array_strictly_increasing_array.mlw", line 97, characters 13-44:
+Sub-goal Assertion of goal test_001_expected_minus_1'vc.
+Prover result is: Valid (0.02s, 4329 steps).
+
+File "make_array_strictly_increasing_array.mlw", line 98, characters 13-44:
+Sub-goal Assertion of goal test_001_expected_minus_1'vc.
+Prover result is: Valid (0.02s, 4348 steps).
+
+File "make_array_strictly_increasing_array.mlw", line 99, characters 13-44:
+Sub-goal Assertion of goal test_001_expected_minus_1'vc.
+Prover result is: Valid (0.02s, 4367 steps).
+
+File "make_array_strictly_increasing_array.mlw", line 100, characters 13-44:
+Sub-goal Assertion of goal test_001_expected_minus_1'vc.
+Prover result is: Valid (0.02s, 4386 steps).
+
+File "make_array_strictly_increasing_array.mlw", line 101, characters 13-44:
+Sub-goal Assertion of goal test_001_expected_minus_1'vc.
+Prover result is: Valid (0.02s, 4405 steps).
+== Stage 2: split_vc on unproved goal ==
+Target theory: MakeArrayStrictlyIncreasing_Array_Spec
+Target goal  : test_006_expected_2'vc
+---- stage2 | prover: Z3,4.8.6 | theory: MakeArrayStrictlyIncreasing_Array_Spec | goal: test_006_expected_2'vc ----
+Transforms: split_vc
+File "make_array_strictly_increasing_array.mlw", line 153, characters 15-39:
+Sub-goal Array creation size of goal test_006_expected_2'vc.
+Prover result is: Valid (0.01s, 278 steps).
+
+File "make_array_strictly_increasing_array.mlw", line 154, characters 15-33:
+Sub-goal Array creation size of goal test_006_expected_2'vc.
+Prover result is: Valid (0.01s, 632 steps).
+
+File "make_array_strictly_increasing_array.mlw", line 155, characters 14-38:
+Sub-goal Array creation size of goal test_006_expected_2'vc.
+Prover result is: Valid (0.01s, 719 steps).
+
+File "make_array_strictly_increasing_array.mlw", line 156, characters 13-28:
+Sub-goal Assertion of goal test_006_expected_2'vc.
+Prover result is: Valid (0.01s, 826 steps).
+
+File "make_array_strictly_increasing_array.mlw", line 157, characters 13-28:
+Sub-goal Assertion of goal test_006_expected_2'vc.
+Prover result is: Valid (0.01s, 835 steps).
+
+File "make_array_strictly_increasing_array.mlw", line 158, characters 13-27:
+Sub-goal Assertion of goal test_006_expected_2'vc.
+Prover result is: Valid (0.01s, 844 steps).
+
+File "make_array_strictly_increasing_array.mlw", line 159, characters 13-35:
+Sub-goal Assertion of goal test_006_expected_2'vc.
+Prover result is: Valid (0.01s, 17463 steps).
+
+File "make_array_strictly_increasing_array.mlw", line 160, characters 13-35:
+Sub-goal Assertion of goal test_006_expected_2'vc.
+Prover result is: Valid (0.01s, 24185 steps).
+
+File "make_array_strictly_increasing_array.mlw", line 161, characters 13-36:
+Sub-goal Assertion of goal test_006_expected_2'vc.
+Prover result is: Valid (0.01s, 16599 steps).
+
+File "make_array_strictly_increasing_array.mlw", line 162, characters 13-49:
+Sub-goal Assertion of goal test_006_expected_2'vc.
+Prover result is: Valid (0.01s, 17019 steps).
+
+File "make_array_strictly_increasing_array.mlw", line 163, characters 13-49:
+Sub-goal Assertion of goal test_006_expected_2'vc.
+Prover result is: Valid (0.01s, 17001 steps).
+
+File "make_array_strictly_increasing_array.mlw", line 164, characters 13-49:
+Sub-goal Assertion of goal test_006_expected_2'vc.
+Prover result is: Valid (0.01s, 17168 steps).
+
+File "make_array_strictly_increasing_array.mlw", line 165, characters 13-49:
+Sub-goal Assertion of goal test_006_expected_2'vc.
+Prover result is: Valid (0.01s, 17489 steps).
+
+File "make_array_strictly_increasing_array.mlw", line 166, characters 13-49:
+Sub-goal Assertion of goal test_006_expected_2'vc.
+Prover result is: Valid (0.01s, 17650 steps).
+
+File "make_array_strictly_increasing_array.mlw", line 169, characters 8-49:
+Sub-goal Assertion of goal test_006_expected_2'vc.
+Prover result is: Valid (0.01s, 17215 steps).
+
+File "make_array_strictly_increasing_array.mlw", line 171, characters 13-40:
+Sub-goal Assertion of goal test_006_expected_2'vc.
+Prover result is: Valid (0.01s, 18612 steps).
+
+File "make_array_strictly_increasing_array.mlw", line 172, characters 13-40:
+Sub-goal Assertion of goal test_006_expected_2'vc.
+Prover result is: Valid (0.01s, 19842 steps).
+
+File "make_array_strictly_increasing_array.mlw", line 173, characters 13-40:
+Sub-goal Assertion of goal test_006_expected_2'vc.
+Prover result is: Valid (0.01s, 20715 steps).
+
+File "make_array_strictly_increasing_array.mlw", line 174, characters 13-40:
+Sub-goal Assertion of goal test_006_expected_2'vc.
+Prover result is: Valid (0.01s, 22059 steps).
+
+File "make_array_strictly_increasing_array.mlw", line 175, characters 13-40:
+Sub-goal Assertion of goal test_006_expected_2'vc.
+Prover result is: Valid (0.01s, 23660 steps).
+
+File "make_array_strictly_increasing_array.mlw", line 176, characters 13-40:
+Sub-goal Assertion of goal test_006_expected_2'vc.
+Prover result is: Valid (0.01s, 26000 steps).
+
+File "make_array_strictly_increasing_array.mlw", line 177, characters 13-42:
+Sub-goal Assertion of goal test_006_expected_2'vc.
+Prover result is: Valid (0.01s, 33545 steps).
+
+File "make_array_strictly_increasing_array.mlw", line 178, characters 13-38:
+Sub-goal Assertion of goal test_006_expected_2'vc.
+Prover result is: Valid (0.01s, 24593 steps).
+
+File "make_array_strictly_increasing_array.mlw", line 179, characters 13-44:
+Sub-goal Assertion of goal test_006_expected_2'vc.
+Prover result is: Valid (0.02s, 82984 steps).
+
+File "make_array_strictly_increasing_array.mlw", line 180, characters 13-44:
+Sub-goal Assertion of goal test_006_expected_2'vc.
+Prover result is: Unknown (unknown) (0.04s, 300882 steps).
+
+File "make_array_strictly_increasing_array.mlw", line 181, characters 13-43:
+Sub-goal Assertion of goal test_006_expected_2'vc.
+Prover result is: Valid (0.01s, 72850 steps).
+---- stage2 | prover: Alt-Ergo,2.4.0 | theory: MakeArrayStrictlyIncreasing_Array_Spec | goal: test_006_expected_2'vc ----
+Transforms: split_vc
+File "make_array_strictly_increasing_array.mlw", line 153, characters 15-39:
+Sub-goal Array creation size of goal test_006_expected_2'vc.
+Prover result is: Valid (0.01s, 1 steps).
+
+File "make_array_strictly_increasing_array.mlw", line 154, characters 15-33:
+Sub-goal Array creation size of goal test_006_expected_2'vc.
+Prover result is: Valid (0.01s, 3 steps).
+
+File "make_array_strictly_increasing_array.mlw", line 155, characters 14-38:
+Sub-goal Array creation size of goal test_006_expected_2'vc.
+Prover result is: Valid (0.01s, 6 steps).
+
+File "make_array_strictly_increasing_array.mlw", line 156, characters 13-28:
+Sub-goal Assertion of goal test_006_expected_2'vc.
+Prover result is: Valid (0.01s, 7 steps).
+
+File "make_array_strictly_increasing_array.mlw", line 157, characters 13-28:
+Sub-goal Assertion of goal test_006_expected_2'vc.
+Prover result is: Valid (0.01s, 7 steps).
+
+File "make_array_strictly_increasing_array.mlw", line 158, characters 13-27:
+Sub-goal Assertion of goal test_006_expected_2'vc.
+Prover result is: Valid (0.00s, 7 steps).
+
+File "make_array_strictly_increasing_array.mlw", line 159, characters 13-35:
+Sub-goal Assertion of goal test_006_expected_2'vc.
+Prover result is: Valid (0.01s, 149 steps).
+
+File "make_array_strictly_increasing_array.mlw", line 160, characters 13-35:
+Sub-goal Assertion of goal test_006_expected_2'vc.
+Prover result is: Valid (0.01s, 181 steps).
+
+File "make_array_strictly_increasing_array.mlw", line 161, characters 13-36:
+Sub-goal Assertion of goal test_006_expected_2'vc.
+Prover result is: Valid (0.01s, 241 steps).
+
+File "make_array_strictly_increasing_array.mlw", line 162, characters 13-49:
+Sub-goal Assertion of goal test_006_expected_2'vc.
+Prover result is: Valid (0.01s, 82 steps).
+
+File "make_array_strictly_increasing_array.mlw", line 163, characters 13-49:
+Sub-goal Assertion of goal test_006_expected_2'vc.
+Prover result is: Valid (0.01s, 138 steps).
+
+File "make_array_strictly_increasing_array.mlw", line 164, characters 13-49:
+Sub-goal Assertion of goal test_006_expected_2'vc.
+Prover result is: Valid (0.01s, 173 steps).
+
+File "make_array_strictly_increasing_array.mlw", line 165, characters 13-49:
+Sub-goal Assertion of goal test_006_expected_2'vc.
+Prover result is: Valid (0.01s, 211 steps).
+
+File "make_array_strictly_increasing_array.mlw", line 166, characters 13-49:
+Sub-goal Assertion of goal test_006_expected_2'vc.
+Prover result is: Valid (0.01s, 255 steps).
+
+File "make_array_strictly_increasing_array.mlw", line 169, characters 8-49:
+Sub-goal Assertion of goal test_006_expected_2'vc.
+Prover result is: Valid (0.01s, 26 steps).
+
+File "make_array_strictly_increasing_array.mlw", line 171, characters 13-40:
+Sub-goal Assertion of goal test_006_expected_2'vc.
+Prover result is: Valid (0.01s, 37 steps).
+
+File "make_array_strictly_increasing_array.mlw", line 172, characters 13-40:
+Sub-goal Assertion of goal test_006_expected_2'vc.
+Prover result is: Valid (0.03s, 741 steps).
+
+File "make_array_strictly_increasing_array.mlw", line 173, characters 13-40:
+Sub-goal Assertion of goal test_006_expected_2'vc.
+Prover result is: Valid (0.03s, 880 steps).
+
+File "make_array_strictly_increasing_array.mlw", line 174, characters 13-40:
+Sub-goal Assertion of goal test_006_expected_2'vc.
+Prover result is: Valid (0.06s, 986 steps).
+
+File "make_array_strictly_increasing_array.mlw", line 175, characters 13-40:
+Sub-goal Assertion of goal test_006_expected_2'vc.
+Prover result is: Valid (0.04s, 1126 steps).
+
+File "make_array_strictly_increasing_array.mlw", line 176, characters 13-40:
+Sub-goal Assertion of goal test_006_expected_2'vc.
+Prover result is: Valid (0.05s, 1441 steps).
+
+File "make_array_strictly_increasing_array.mlw", line 177, characters 13-42:
+Sub-goal Assertion of goal test_006_expected_2'vc.
+Prover result is: Valid (0.01s, 215 steps).
+
+File "make_array_strictly_increasing_array.mlw", line 178, characters 13-38:
+Sub-goal Assertion of goal test_006_expected_2'vc.
+Prover result is: Valid (0.02s, 466 steps).
+
+File "make_array_strictly_increasing_array.mlw", line 179, characters 13-44:
+Sub-goal Assertion of goal test_006_expected_2'vc.
+Prover result is: Valid (0.49s, 10943 steps).
+
+File "make_array_strictly_increasing_array.mlw", line 180, characters 13-44:
+Sub-goal Assertion of goal test_006_expected_2'vc.
+Prover result is: Timeout (10.00s, 217493 steps).
+
+File "make_array_strictly_increasing_array.mlw", line 181, characters 13-43:
+Sub-goal Assertion of goal test_006_expected_2'vc.
+Prover result is: Valid (0.66s, 13506 steps).
+---- stage2 | prover: CVC4,1.8 | theory: MakeArrayStrictlyIncreasing_Array_Spec | goal: test_006_expected_2'vc ----
+Transforms: split_vc
+File "make_array_strictly_increasing_array.mlw", line 153, characters 15-39:
+Sub-goal Array creation size of goal test_006_expected_2'vc.
+Prover result is: Valid (0.01s, 777 steps).
+
+File "make_array_strictly_increasing_array.mlw", line 154, characters 15-33:
+Sub-goal Array creation size of goal test_006_expected_2'vc.
+Prover result is: Valid (0.01s, 1684 steps).
+
+File "make_array_strictly_increasing_array.mlw", line 155, characters 14-38:
+Sub-goal Array creation size of goal test_006_expected_2'vc.
+Prover result is: Valid (0.01s, 1896 steps).
+
+File "make_array_strictly_increasing_array.mlw", line 156, characters 13-28:
+Sub-goal Assertion of goal test_006_expected_2'vc.
+Prover result is: Valid (0.01s, 2136 steps).
+
+File "make_array_strictly_increasing_array.mlw", line 157, characters 13-28:
+Sub-goal Assertion of goal test_006_expected_2'vc.
+Prover result is: Valid (0.01s, 2139 steps).
+
+File "make_array_strictly_increasing_array.mlw", line 158, characters 13-27:
+Sub-goal Assertion of goal test_006_expected_2'vc.
+Prover result is: Valid (0.01s, 2142 steps).
+
+File "make_array_strictly_increasing_array.mlw", line 159, characters 13-35:
+Sub-goal Assertion of goal test_006_expected_2'vc.
+Prover result is: Unknown (unknown + incomplete) (0.01s, 2738 steps).
+
+File "make_array_strictly_increasing_array.mlw", line 160, characters 13-35:
+Sub-goal Assertion of goal test_006_expected_2'vc.
+Prover result is: Unknown (unknown + incomplete) (0.01s, 3172 steps).
+
+File "make_array_strictly_increasing_array.mlw", line 161, characters 13-36:
+Sub-goal Assertion of goal test_006_expected_2'vc.
+Prover result is: Valid (0.02s, 5069 steps).
+
+File "make_array_strictly_increasing_array.mlw", line 162, characters 13-49:
+Sub-goal Assertion of goal test_006_expected_2'vc.
+Prover result is: Valid (0.02s, 4360 steps).
+
+File "make_array_strictly_increasing_array.mlw", line 163, characters 13-49:
+Sub-goal Assertion of goal test_006_expected_2'vc.
+Prover result is: Valid (0.02s, 5040 steps).
+
+File "make_array_strictly_increasing_array.mlw", line 164, characters 13-49:
+Sub-goal Assertion of goal test_006_expected_2'vc.
+Prover result is: Valid (0.02s, 5746 steps).
+
+File "make_array_strictly_increasing_array.mlw", line 165, characters 13-49:
+Sub-goal Assertion of goal test_006_expected_2'vc.
+Prover result is: Valid (0.02s, 6435 steps).
+
+File "make_array_strictly_increasing_array.mlw", line 166, characters 13-49:
+Sub-goal Assertion of goal test_006_expected_2'vc.
+Prover result is: Valid (0.02s, 7180 steps).
+
+File "make_array_strictly_increasing_array.mlw", line 169, characters 8-49:
+Sub-goal Assertion of goal test_006_expected_2'vc.
+Prover result is: Valid (0.01s, 3134 steps).
+
+File "make_array_strictly_increasing_array.mlw", line 171, characters 13-40:
+Sub-goal Assertion of goal test_006_expected_2'vc.
+Prover result is: Valid (0.02s, 4661 steps).
+
+File "make_array_strictly_increasing_array.mlw", line 172, characters 13-40:
+Sub-goal Assertion of goal test_006_expected_2'vc.
+Prover result is: Valid (0.03s, 8557 steps).
+
+File "make_array_strictly_increasing_array.mlw", line 173, characters 13-40:
+Sub-goal Assertion of goal test_006_expected_2'vc.
+Prover result is: Valid (0.03s, 8681 steps).
+
+File "make_array_strictly_increasing_array.mlw", line 174, characters 13-40:
+Sub-goal Assertion of goal test_006_expected_2'vc.
+Prover result is: Valid (0.03s, 8924 steps).
+
+File "make_array_strictly_increasing_array.mlw", line 175, characters 13-40:
+Sub-goal Assertion of goal test_006_expected_2'vc.
+Prover result is: Valid (0.03s, 9296 steps).
+
+File "make_array_strictly_increasing_array.mlw", line 176, characters 13-40:
+Sub-goal Assertion of goal test_006_expected_2'vc.
+Prover result is: Valid (0.03s, 9437 steps).
+
+File "make_array_strictly_increasing_array.mlw", line 177, characters 13-42:
+Sub-goal Assertion of goal test_006_expected_2'vc.
+Prover result is: Valid (0.04s, 12247 steps).
+
+File "make_array_strictly_increasing_array.mlw", line 178, characters 13-38:
+Sub-goal Assertion of goal test_006_expected_2'vc.
+Prover result is: Valid (0.02s, 4176 steps).
+
+File "make_array_strictly_increasing_array.mlw", line 179, characters 13-44:
+Sub-goal Assertion of goal test_006_expected_2'vc.
+Prover result is: Valid (0.06s, 19881 steps).
+
+File "make_array_strictly_increasing_array.mlw", line 180, characters 13-44:
+Sub-goal Assertion of goal test_006_expected_2'vc.
+Prover result is: Timeout (10.00s, 3788737 steps).
+
+File "make_array_strictly_increasing_array.mlw", line 181, characters 13-43:
+Sub-goal Assertion of goal test_006_expected_2'vc.
+Prover result is: Valid (0.09s, 30365 steps).
+== Goals still unproved after stage 2 (split_vc) ==
+MakeArrayStrictlyIncreasing_Array_Spec	test_001_expected_minus_1'vc
+MakeArrayStrictlyIncreasing_Array_Spec	test_006_expected_2'vc
+== Stage 3: split_vc + inline_all on still-unproved goal ==
+Target theory: MakeArrayStrictlyIncreasing_Array_Spec
+Target goal  : test_001_expected_minus_1'vc
+---- stage3 | prover: Z3,4.8.6 | theory: MakeArrayStrictlyIncreasing_Array_Spec | goal: test_001_expected_minus_1'vc ----
+Transforms: split_vc inline_all
+File "make_array_strictly_increasing_array.mlw", line 81, characters 15-39:
+Sub-goal Array creation size of goal test_001_expected_minus_1'vc.
+Prover result is: Valid (0.01s, 300 steps).
+
+File "make_array_strictly_increasing_array.mlw", line 82, characters 15-36:
+Sub-goal Array creation size of goal test_001_expected_minus_1'vc.
+Prover result is: Valid (0.01s, 642 steps).
+
+File "make_array_strictly_increasing_array.mlw", line 83, characters 13-28:
+Sub-goal Assertion of goal test_001_expected_minus_1'vc.
+Prover result is: Valid (0.01s, 749 steps).
+
+File "make_array_strictly_increasing_array.mlw", line 84, characters 13-28:
+Sub-goal Assertion of goal test_001_expected_minus_1'vc.
+Prover result is: Valid (0.01s, 758 steps).
+
+File "make_array_strictly_increasing_array.mlw", line 85, characters 13-84:
+Sub-goal Assertion of goal test_001_expected_minus_1'vc.
+Prover result is: Valid (0.01s, 10630 steps).
+
+File "make_array_strictly_increasing_array.mlw", line 86, characters 13-69:
+Sub-goal Assertion of goal test_001_expected_minus_1'vc.
+Prover result is: Valid (0.01s, 11434 steps).
+
+File "make_array_strictly_increasing_array.mlw", line 89, characters 8-49:
+Sub-goal Assertion of goal test_001_expected_minus_1'vc.
+Prover result is: Valid (0.01s, 12083 steps).
+
+File "make_array_strictly_increasing_array.mlw", line 93, characters 8-40:
+Sub-goal Assertion of goal test_001_expected_minus_1'vc.
+Prover result is: Valid (0.01s, 12727 steps).
+
+File "make_array_strictly_increasing_array.mlw", line 95, characters 13-44:
+Sub-goal Assertion of goal test_001_expected_minus_1'vc.
+Prover result is: Valid (0.01s, 28005 steps).
+
+File "make_array_strictly_increasing_array.mlw", line 96, characters 13-44:
+Sub-goal Assertion of goal test_001_expected_minus_1'vc.
+Prover result is: Valid (0.01s, 35860 steps).
+
+File "make_array_strictly_increasing_array.mlw", line 97, characters 13-44:
+Sub-goal Assertion of goal test_001_expected_minus_1'vc.
+Prover result is: Valid (0.01s, 41723 steps).
+
+File "make_array_strictly_increasing_array.mlw", line 98, characters 13-44:
+Sub-goal Assertion of goal test_001_expected_minus_1'vc.
+Prover result is: Valid (0.01s, 45139 steps).
+
+File "make_array_strictly_increasing_array.mlw", line 99, characters 13-44:
+Sub-goal Assertion of goal test_001_expected_minus_1'vc.
+Prover result is: Valid (0.01s, 45443 steps).
+
+File "make_array_strictly_increasing_array.mlw", line 100, characters 13-44:
+Sub-goal Assertion of goal test_001_expected_minus_1'vc.
+Prover result is: Valid (0.01s, 50491 steps).
+
+File "make_array_strictly_increasing_array.mlw", line 101, characters 13-44:
+Sub-goal Assertion of goal test_001_expected_minus_1'vc.
+Prover result is: Valid (0.01s, 51625 steps).
+Solved with split_vc + inline_all using prover: Z3,4.8.6
+== Stage 3: split_vc + inline_all on still-unproved goal ==
+Target theory: MakeArrayStrictlyIncreasing_Array_Spec
+Target goal  : test_006_expected_2'vc
+---- stage3 | prover: Z3,4.8.6 | theory: MakeArrayStrictlyIncreasing_Array_Spec | goal: test_006_expected_2'vc ----
+Transforms: split_vc inline_all
+File "make_array_strictly_increasing_array.mlw", line 153, characters 15-39:
+Sub-goal Array creation size of goal test_006_expected_2'vc.
+Prover result is: Valid (0.01s, 300 steps).
+
+File "make_array_strictly_increasing_array.mlw", line 154, characters 15-33:
+Sub-goal Array creation size of goal test_006_expected_2'vc.
+Prover result is: Valid (0.01s, 642 steps).
+
+File "make_array_strictly_increasing_array.mlw", line 155, characters 14-38:
+Sub-goal Array creation size of goal test_006_expected_2'vc.
+Prover result is: Valid (0.01s, 749 steps).
+
+File "make_array_strictly_increasing_array.mlw", line 156, characters 13-28:
+Sub-goal Assertion of goal test_006_expected_2'vc.
+Prover result is: Valid (0.01s, 864 steps).
+
+File "make_array_strictly_increasing_array.mlw", line 157, characters 13-28:
+Sub-goal Assertion of goal test_006_expected_2'vc.
+Prover result is: Valid (0.01s, 873 steps).
+
+File "make_array_strictly_increasing_array.mlw", line 158, characters 13-27:
+Sub-goal Assertion of goal test_006_expected_2'vc.
+Prover result is: Valid (0.01s, 882 steps).
+
+File "make_array_strictly_increasing_array.mlw", line 159, characters 13-35:
+Sub-goal Assertion of goal test_006_expected_2'vc.
+Prover result is: Valid (0.01s, 23583 steps).
+
+File "make_array_strictly_increasing_array.mlw", line 160, characters 13-35:
+Sub-goal Assertion of goal test_006_expected_2'vc.
+Prover result is: Valid (0.01s, 24186 steps).
+
+File "make_array_strictly_increasing_array.mlw", line 161, characters 13-36:
+Sub-goal Assertion of goal test_006_expected_2'vc.
+Prover result is: Valid (0.01s, 13763 steps).
+
+File "make_array_strictly_increasing_array.mlw", line 162, characters 13-49:
+Sub-goal Assertion of goal test_006_expected_2'vc.
+Prover result is: Valid (0.01s, 14371 steps).
+
+File "make_array_strictly_increasing_array.mlw", line 163, characters 13-49:
+Sub-goal Assertion of goal test_006_expected_2'vc.
+Prover result is: Valid (0.01s, 16338 steps).
+
+File "make_array_strictly_increasing_array.mlw", line 164, characters 13-49:
+Sub-goal Assertion of goal test_006_expected_2'vc.
+Prover result is: Valid (0.01s, 17420 steps).
+
+File "make_array_strictly_increasing_array.mlw", line 165, characters 13-49:
+Sub-goal Assertion of goal test_006_expected_2'vc.
+Prover result is: Valid (0.01s, 18489 steps).
+
+File "make_array_strictly_increasing_array.mlw", line 166, characters 13-49:
+Sub-goal Assertion of goal test_006_expected_2'vc.
+Prover result is: Valid (0.01s, 19557 steps).
+
+File "make_array_strictly_increasing_array.mlw", line 169, characters 8-49:
+Sub-goal Assertion of goal test_006_expected_2'vc.
+Prover result is: Valid (0.01s, 20740 steps).
+
+File "make_array_strictly_increasing_array.mlw", line 171, characters 13-40:
+Sub-goal Assertion of goal test_006_expected_2'vc.
+Prover result is: Valid (0.01s, 21907 steps).
+
+File "make_array_strictly_increasing_array.mlw", line 172, characters 13-40:
+Sub-goal Assertion of goal test_006_expected_2'vc.
+Prover result is: Valid (0.01s, 22514 steps).
+
+File "make_array_strictly_increasing_array.mlw", line 173, characters 13-40:
+Sub-goal Assertion of goal test_006_expected_2'vc.
+Prover result is: Valid (0.01s, 24281 steps).
+
+File "make_array_strictly_increasing_array.mlw", line 174, characters 13-40:
+Sub-goal Assertion of goal test_006_expected_2'vc.
+Prover result is: Valid (0.01s, 24451 steps).
+
+File "make_array_strictly_increasing_array.mlw", line 175, characters 13-40:
+Sub-goal Assertion of goal test_006_expected_2'vc.
+Prover result is: Valid (0.01s, 26035 steps).
+
+File "make_array_strictly_increasing_array.mlw", line 176, characters 13-40:
+Sub-goal Assertion of goal test_006_expected_2'vc.
+Prover result is: Valid (0.01s, 28019 steps).
+
+File "make_array_strictly_increasing_array.mlw", line 177, characters 13-42:
+Sub-goal Assertion of goal test_006_expected_2'vc.
+Prover result is: Valid (0.01s, 34374 steps).
+
+File "make_array_strictly_increasing_array.mlw", line 178, characters 13-38:
+Sub-goal Assertion of goal test_006_expected_2'vc.
+Prover result is: Valid (0.01s, 38515 steps).
+
+File "make_array_strictly_increasing_array.mlw", line 179, characters 13-44:
+Sub-goal Assertion of goal test_006_expected_2'vc.
+Prover result is: Valid (0.01s, 53825 steps).
+
+File "make_array_strictly_increasing_array.mlw", line 180, characters 13-44:
+Sub-goal Assertion of goal test_006_expected_2'vc.
+Prover result is: Valid (0.01s, 74462 steps).
+
+File "make_array_strictly_increasing_array.mlw", line 181, characters 13-43:
+Sub-goal Assertion of goal test_006_expected_2'vc.
+Prover result is: Valid (0.02s, 94520 steps).
+Solved with split_vc + inline_all using prover: Z3,4.8.6
+== Final summary ==
+Unproved root goals after first prover : 2
+Remaining failures after split_vc      : 2
+Remaining failures after stage 3       : 0
+Detailed logs stored in                : /Users/rubenm/Desktop/Diversify2Verify/codex-runs2/stage1a-array/1187_make-array-strictly-increasing-20260523-235013/generated/why3/array/.why3_sessions/make_array_strictly_increasing_array_logs
+VERIFY_RESULT: SUCCESS
+VERIFY_REASON: proved_after_stage3
+VERIFY_STAGE: stage3
+VERIFY_ROOT_TOTAL: 8
+VERIFY_ROOT_PROVED: 8
+VERIFY_ROOT_REMAINING: 0

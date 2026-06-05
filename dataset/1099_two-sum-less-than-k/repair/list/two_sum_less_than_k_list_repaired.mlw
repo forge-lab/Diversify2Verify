@@ -1,0 +1,138 @@
+module TwoSumLessThanK_List_Spec
+
+  use int.Int
+  use list.List
+  use list.Length
+
+  let rec predicate all_between (l: list int) (lo: int) (hi: int)
+    variant { l }
+  =
+    match l with
+    | Nil -> true
+    | Cons x xs -> lo <= x && x <= hi && all_between xs lo hi
+    end
+
+  let rec predicate has_sum_with (x: int) (l: list int) (s: int)
+    variant { l }
+  =
+    match l with
+    | Nil -> false
+    | Cons y ys -> x + y = s || has_sum_with x ys s
+    end
+
+  let rec predicate has_pair_sum (l: list int) (s: int)
+    variant { l }
+  =
+    match l with
+    | Nil -> false
+    | Cons x xs -> has_sum_with x xs s || has_pair_sum xs s
+    end
+
+  let function max_int (a: int) (b: int) : int =
+    if a >= b then a else b
+
+  let rec function best_with_first (x: int) (xs: list int) (k: int) : int
+    variant { xs }
+  =
+    match xs with
+    | Nil -> -1
+    | Cons y ys ->
+        let tail_best = best_with_first x ys k in
+        let candidate = x + y in
+        if candidate < k then max_int candidate tail_best else tail_best
+    end
+
+  let rec function best_pair_sum_less_than (l: list int) (k: int) : int
+    variant { l }
+  =
+    match l with
+    | Nil -> -1
+    | Cons x xs -> max_int (best_with_first x xs k) (best_pair_sum_less_than xs k)
+    end
+
+  predicate no_pair_sum_below (nums: list int) (k: int) =
+    forall s: int. s < k -> not (has_pair_sum nums s)
+
+  predicate valid_two_sum_less_than_k (nums: list int) (k: int) (r: int) =
+    (r = -1 /\ no_pair_sum_below nums k) \/
+    (r < k /\
+     has_pair_sum nums r /\
+     (forall s: int. s < k /\ has_pair_sum nums s -> s <= r))
+
+  val two_sum_less_than_k_list (nums: list int) (k: int) : int
+    requires { 1 <= length nums <= 100 }
+    requires { all_between nums 1 1000 }
+    requires { 1 <= k <= 2000 }
+    ensures  { result = best_pair_sum_less_than nums k }
+    ensures  { valid_two_sum_less_than_k nums k result }
+
+  let lemma check_test_000 () =
+    let nums = Cons 500 (Cons 500 (Cons 500 (Cons 500 Nil))) in
+    assert { all_between nums 1 1000 };
+    assert { has_pair_sum nums 1000 };
+    assert { best_with_first 500 (Cons 500 (Cons 500 (Cons 500 Nil))) 1000 = -1 };
+    assert { best_pair_sum_less_than nums 1000 = -1 };
+    assert { valid_two_sum_less_than_k nums 1000 (-1) }
+
+  let lemma check_test_001 () =
+    let nums = Cons 5 (Cons 15 (Cons 25 (Cons 35 Nil))) in
+    assert { all_between nums 1 1000 };
+    assert { has_pair_sum nums 20 };
+    assert { has_pair_sum nums 30 };
+    assert { has_pair_sum nums 40 };
+    assert { not (has_pair_sum nums 45) };
+    assert { best_with_first 5 (Cons 15 (Cons 25 (Cons 35 Nil))) 50 = 40 };
+    assert { best_pair_sum_less_than nums 50 = 40 };
+    assert { valid_two_sum_less_than_k nums 50 40 }
+
+  let lemma check_test_002 () =
+    let nums = Cons 1 (Cons 2 (Cons 3 (Cons 4 (Cons 5 Nil)))) in
+    assert { all_between nums 1 1000 };
+    assert { has_pair_sum nums 3 };
+    assert { has_pair_sum nums 6 };
+    assert { has_pair_sum nums 7 };
+    assert { has_pair_sum nums 8 };
+    assert { best_with_first 1 (Cons 2 (Cons 3 (Cons 4 (Cons 5 Nil)))) 8 = 6 };
+    assert { best_pair_sum_less_than nums 8 = 7 };
+    assert { valid_two_sum_less_than_k nums 8 7 }
+
+  let lemma check_test_003 () =
+    let nums = Cons 999 (Cons 998 (Cons 997 (Cons 996 Nil))) in
+    assert { all_between nums 1 1000 };
+    assert { has_pair_sum nums 1993 };
+    assert { has_pair_sum nums 1994 };
+    assert { has_pair_sum nums 1995 };
+    assert { best_with_first 999 (Cons 998 (Cons 997 (Cons 996 Nil))) 1995 = -1 };
+    assert { best_with_first 998 (Cons 997 (Cons 996 Nil)) 1995 = 1994 };
+    assert { best_pair_sum_less_than nums 1995 = 1994 };
+    assert { valid_two_sum_less_than_k nums 1995 1994 }
+
+  let lemma check_test_004 () =
+    let nums = Cons 5 (Cons 15 (Cons 25 (Cons 35 (Cons 45 Nil)))) in
+    assert { all_between nums 1 1000 };
+    assert { has_pair_sum nums 40 };
+    assert { has_pair_sum nums 50 };
+    assert { not (has_pair_sum nums 45) };
+    assert { best_with_first 5 (Cons 15 (Cons 25 (Cons 35 (Cons 45 Nil)))) 50 = 40 };
+    assert { best_pair_sum_less_than nums 50 = 40 };
+    assert { valid_two_sum_less_than_k nums 50 40 }
+
+  let lemma check_test_005 () =
+    let nums = Cons 5 (Cons 5 (Cons 5 (Cons 5 Nil))) in
+    assert { all_between nums 1 1000 };
+    assert { has_pair_sum nums 10 };
+    assert { best_with_first 5 (Cons 5 (Cons 5 (Cons 5 Nil))) 10 = -1 };
+    assert { best_pair_sum_less_than nums 10 = -1 };
+    assert { valid_two_sum_less_than_k nums 10 (-1) }
+
+  let lemma check_test_006 () =
+    let nums = Cons 999 (Cons 998 (Cons 997 (Cons 996 Nil))) in
+    assert { all_between nums 1 1000 };
+    assert { has_pair_sum nums 1994 };
+    assert { has_pair_sum nums 1995 };
+    assert { has_pair_sum nums 1997 };
+    assert { best_with_first 999 (Cons 998 (Cons 997 (Cons 996 Nil))) 2000 = 1997 };
+    assert { best_pair_sum_less_than nums 2000 = 1997 };
+    assert { valid_two_sum_less_than_k nums 2000 1997 }
+
+end

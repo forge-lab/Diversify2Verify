@@ -1,0 +1,254 @@
+module MinimumMovesToPickKOnes_List_Stage3_Recursive
+
+  use int.Int
+  use int.Abs
+  use int.EuclideanDivision
+  use list.List
+  use list.Length
+  use list.Mem
+  use list.NthNoOpt
+  use list.NumOcc
+
+  let rec predicate binary_list (nums: list int)
+    variant { nums }
+  =
+    match nums with
+    | Nil -> true
+    | Cons x xs -> (x = 0 || x = 1) && binary_list xs
+    end
+
+  predicate valid_pick_positions (nums: list int) (positions: list int) =
+    forall p: int.
+      mem p positions ->
+      0 <= p /\ p < length nums /\ nth p nums = 1
+
+  predicate distinct_positions (positions: list int) =
+    forall p: int. num_occ p positions <= 1
+
+  let rec function sum_distances (center: int) (positions: list int) : int
+    variant { positions }
+  =
+    match positions with
+    | Nil -> 0
+    | Cons p ps -> abs (p - center) + sum_distances center ps
+    end
+
+  predicate input_constraints (nums: list int) (k: int) (maxChanges: int) =
+    2 <= length nums /\
+    length nums <= 100000 /\
+    binary_list nums /\
+    1 <= k /\
+    k <= 100000 /\
+    0 <= maxChanges /\
+    maxChanges <= 100000 /\
+    maxChanges + num_occ 1 nums >= k
+
+  predicate feasible_pick_plan
+      (nums: list int) (k: int) (maxChanges: int)
+      (center: int) (picked: list int) (changed: int) (cost: int) =
+    0 <= center /\
+    center < length nums /\
+    0 <= changed /\
+    changed <= maxChanges /\
+    length picked + changed = k /\
+    distinct_positions picked /\
+    valid_pick_positions nums picked /\
+    cost = sum_distances center picked + 2 * changed
+
+  predicate no_better_plan
+      (nums: list int) (k: int) (maxChanges: int) (bound: int) =
+    forall center: int. forall picked: list int. forall changed cost: int.
+      feasible_pick_plan nums k maxChanges center picked changed cost -> bound <= cost
+
+  predicate minimum_moves_characterization
+      (nums: list int) (k: int) (maxChanges: int) (moves: int) =
+    (exists center: int. exists picked: list int. exists changed: int.
+       feasible_pick_plan nums k maxChanges center picked changed moves) /\
+    no_better_plan nums k maxChanges moves
+
+  predicate collected_positions_model (nums: list int) (positions: list int) =
+    valid_pick_positions nums positions /\
+    distinct_positions positions /\
+    length positions = num_occ 1 nums
+
+  predicate all_feasible_picks_bounded
+      (nums: list int) (k: int) (maxChanges: int) (m: int) =
+    forall center: int. forall picked: list int. forall changed cost: int.
+      feasible_pick_plan nums k maxChanges center picked changed cost ->
+      length picked <= m
+
+  predicate bounded_existing_pick_cost
+      (nums: list int) (k: int) (maxChanges: int) (m: int) (cost: int) =
+    input_constraints nums k maxChanges /\
+    0 <= m /\ m <= k /\
+    (exists center: int. exists picked: list int. exists changed: int.
+       feasible_pick_plan nums k maxChanges center picked changed cost /\
+       length picked <= m) /\
+    (forall center: int. forall picked: list int. forall changed other_cost: int.
+       feasible_pick_plan nums k maxChanges center picked changed other_cost /\
+       length picked <= m ->
+       cost <= other_cost)
+
+  let lemma bounded_existing_at_max_implies_public
+      (nums: list int) (k: int) (maxChanges: int) (m: int) (cost: int)
+    requires { bounded_existing_pick_cost nums k maxChanges m cost }
+    requires { all_feasible_picks_bounded nums k maxChanges m }
+    ensures  { minimum_moves_characterization nums k maxChanges cost }
+  =
+    assert { exists center: int. exists picked: list int. exists changed: int.
+      feasible_pick_plan nums k maxChanges center picked changed cost };
+    assert { no_better_plan nums k maxChanges cost }
+
+  let min_int (x: int) (y: int) : int
+    ensures { result = x \/ result = y }
+    ensures { result <= x }
+    ensures { result <= y }
+    ensures { 0 <= x -> 0 <= y -> 0 <= result }
+  =
+    if x <= y then x else y
+
+  let rec reverse_append (xs: list int) (acc: list int) : list int
+    variant { xs }
+  =
+    match xs with
+    | Nil -> acc
+    | Cons x rest -> reverse_append rest (Cons x acc)
+    end
+
+  let reverse (xs: list int) : list int =
+    reverse_append xs Nil
+
+  let rec list_length (xs: list int) : int
+    ensures { result = length xs }
+    ensures { 0 <= result }
+    variant { xs }
+  =
+    match xs with
+    | Nil -> 0
+    | Cons _ rest -> 1 + list_length rest
+    end
+
+  let rec has_at_least (xs: list int) (n: int) : bool
+    ensures { result -> n <= length xs }
+    variant { xs }
+  =
+    if n <= 0 then true else
+    match xs with
+    | Nil -> false
+    | Cons _ rest -> has_at_least rest (n - 1)
+    end
+
+  let rec take_prefix (xs: list int) (n: int) : list int
+    variant { xs }
+  =
+    if n <= 0 then Nil else
+    match xs with
+    | Nil -> Nil
+    | Cons x rest -> Cons x (take_prefix rest (n - 1))
+    end
+
+  let rec nth_or_zero (xs: list int) (i: int) : int
+    variant { xs }
+  =
+    match xs with
+    | Nil -> 0
+    | Cons x rest ->
+        if i <= 0 then x else nth_or_zero rest (i - 1)
+    end
+
+  let rec sum_abs_to (center: int) (xs: list int) : int
+    variant { xs }
+  =
+    match xs with
+    | Nil -> 0
+    | Cons x rest -> abs (x - center) + sum_abs_to center rest
+    end
+
+  let rec collect_one_positions_rev (nums: list int) (idx: int) (acc: list int) : list int
+    variant { nums }
+  =
+    match nums with
+    | Nil -> acc
+    | Cons x rest ->
+        if x = 1 then
+          collect_one_positions_rev rest (idx + 1) (Cons idx acc)
+        else
+          collect_one_positions_rev rest (idx + 1) acc
+    end
+
+  let collect_one_positions (nums: list int) : list int
+    ensures { collected_positions_model nums result }
+  =
+    reverse (collect_one_positions_rev nums 0 Nil)
+
+  let window_cost (positions: list int) (m: int) : int =
+    let window = take_prefix positions m in
+    let center = nth_or_zero window (div m 2) in
+    sum_abs_to center window
+
+  let rec min_window_cost (positions: list int) (m: int) : int
+    variant { positions }
+  =
+    if m <= 0 then 0 else
+    if has_at_least positions m then
+      match positions with
+      | Nil -> 1000000000
+      | Cons _ rest ->
+          let current = window_cost positions m in
+          let next = min_window_cost rest m in
+          min_int current next
+      end
+    else
+      1000000000
+
+  let rec best_cost_for_existing_count
+      (nums: list int) (positions: list int) (k: int) (maxChanges: int) (m: int) : int
+    requires { input_constraints nums k maxChanges }
+    requires { collected_positions_model nums positions }
+    requires { 0 <= m }
+    requires { m <= k }
+    ensures  { bounded_existing_pick_cost nums k maxChanges m result }
+    variant { m }
+  =
+    let changed = k - m in
+    let current =
+      if changed > maxChanges then
+        1000000000
+      else if m = 0 then
+        2 * k
+      else
+        min_window_cost positions m + 2 * changed
+    in
+    if m = 0 then
+      current
+    else
+      begin
+        assert { m <> 0 };
+        assert { 0 < m };
+        assert { 0 <= m - 1 };
+        assert { m - 1 < m };
+        assert { m - 1 <= k };
+        min_int current (best_cost_for_existing_count nums positions k maxChanges (m - 1))
+      end
+
+  let minimum_moves_to_pick_k_ones_list (nums: list int) (k: int) (maxChanges: int) : int
+    requires { input_constraints nums k maxChanges }
+    ensures  { minimum_moves_characterization nums k maxChanges result }
+  =
+    let positions = collect_one_positions nums in
+    assert { collected_positions_model nums positions };
+    let positions_len = list_length positions in
+    assert { positions_len = length positions };
+    assert { 0 <= positions_len };
+    let max_existing = min_int k positions_len in
+    assert { 0 <= max_existing };
+    assert { max_existing <= k };
+    assert { max_existing = k \/ max_existing = positions_len };
+    let result = best_cost_for_existing_count nums positions k maxChanges max_existing in
+    assert { bounded_existing_pick_cost nums k maxChanges max_existing result };
+    assert { all_feasible_picks_bounded nums k maxChanges max_existing };
+    bounded_existing_at_max_implies_public nums k maxChanges max_existing result;
+    assert { minimum_moves_characterization nums k maxChanges result };
+    result
+
+end

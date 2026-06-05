@@ -1,0 +1,550 @@
+== Stage 1: first prover on whole file ==
+Running in /Users/rubenm/Desktop/Diversify2Verify/codex-runs/dataset-merge-verification/stage3a-repair/2616_minimize-the-maximum-difference-of-pairs/array-recursive/minimize_the_maximum_difference_of_pairs_array_stage3_48f65a80_stage3/generated/why3: why3 session create -o /Users/rubenm/Desktop/Diversify2Verify/codex-runs/dataset-merge-verification/stage3a-repair/2616_minimize-the-maximum-difference-of-pairs/array-recursive/minimize_the_maximum_difference_of_pairs_array_stage3_48f65a80_stage3/generated/why3/.why3_sessions/repaired_stage1 -P Z3,4.8.6 -t 10 -m 8192 repaired.mlw
+Session created successfully
+Running in /Users/rubenm/Desktop/Diversify2Verify/codex-runs/dataset-merge-verification/stage3a-repair/2616_minimize-the-maximum-difference-of-pairs/array-recursive/minimize_the_maximum_difference_of_pairs_array_stage3_48f65a80_stage3/generated/why3: why3 bench /Users/rubenm/Desktop/Diversify2Verify/codex-runs/dataset-merge-verification/stage3a-repair/2616_minimize-the-maximum-difference-of-pairs/array-recursive/minimize_the_maximum_difference_of_pairs_array_stage3_48f65a80_stage3/generated/why3/.why3_sessions/repaired_stage1
+Progress: 7/1/0                       Progress: 6/2/0                       Progress: 5/3/0                       Progress: 4/4/0                       Progress: 3/5/0                       Progress: 2/6/0                       Progress: 2/0/1                       Progress: 1/1/1                       Progress: 0/2/1                       Progress: 0/0/1                       
+Replay completed, saving session... done
+== Stage 1 stats ==
+= Statistics for session /Users/rubenm/Desktop/Diversify2Verify/codex-runs/dataset-merge-verification/stage3a-repair/2616_minimize-the-maximum-difference-of-pairs/array-recursive/minimize_the_maximum_difference_of_pairs_array_stage3_48f65a80_stage3/generated/why3/.why3_sessions/repaired_stage1
+
+== Number of root goals ==
+  total: 8  proved: 6
+
+== Number of sub goals ==
+  total: 0  proved: 0
+
+== Goals not proved ==
+  +-- file [../../repaired.mlw]
+    +-- theory MinimizeTheMaximumDifferenceOfPairs_Array_Stage3
+      +-- goal insert_sorted'vc
+      +-- goal minimize_the_maximum_difference_of_pairs_array'vc
+  
+== Goals proved by only one prover ==
+  +-- file [../../repaired.mlw]
+    +-- theory MinimizeTheMaximumDifferenceOfPairs_Array_Stage3
+      +-- goal sorted_non_decreasing'vc: Z3 4.8.6
+      +-- goal array_to_list'vc: Z3 4.8.6
+      +-- goal sort_list'vc: Z3 4.8.6
+      +-- goal last_of_sorted_from'vc: Z3 4.8.6
+      +-- goal count_pairs_with_bound'vc: Z3 4.8.6
+      +-- goal lower_bound_threshold'vc: Z3 4.8.6
+  
+1 session(s) read, with a total of 8 proof goals.
+== Unproved root goals after first prover ==
+MinimizeTheMaximumDifferenceOfPairs_Array_Stage3	insert_sorted'vc
+MinimizeTheMaximumDifferenceOfPairs_Array_Stage3	minimize_the_maximum_difference_of_pairs_array'vc
+== Stage 1: trying remaining goals with prover Alt-Ergo,2.4.0 ==
+---- stage1 | prover: Alt-Ergo,2.4.0 | theory: MinimizeTheMaximumDifferenceOfPairs_Array_Stage3 | goal: insert_sorted'vc ----
+File repaired.mlw:
+Goal insert_sorted'vc.
+Prover result is: Timeout (10.00s, 334012 steps).
+---- stage1 | prover: Alt-Ergo,2.4.0 | theory: MinimizeTheMaximumDifferenceOfPairs_Array_Stage3 | goal: minimize_the_maximum_difference_of_pairs_array'vc ----
+File repaired.mlw:
+Goal minimize_the_maximum_difference_of_pairs_array'vc.
+Prover result is: Timeout (10.00s, 269148 steps).
+Remaining after prover Alt-Ergo,2.4.0: 2
+== Stage 1: trying remaining goals with prover CVC4,1.8 ==
+---- stage1 | prover: CVC4,1.8 | theory: MinimizeTheMaximumDifferenceOfPairs_Array_Stage3 | goal: insert_sorted'vc ----
+File repaired.mlw:
+Goal insert_sorted'vc.
+Prover result is: Unknown (unknown + incomplete) (0.04s, 9430 steps).
+---- stage1 | prover: CVC4,1.8 | theory: MinimizeTheMaximumDifferenceOfPairs_Array_Stage3 | goal: minimize_the_maximum_difference_of_pairs_array'vc ----
+File repaired.mlw:
+Goal minimize_the_maximum_difference_of_pairs_array'vc.
+Prover result is: Unknown (unknown + incomplete) (0.04s, 13179 steps).
+Remaining after prover CVC4,1.8: 2
+== Goals still unproved after stage 1 ==
+MinimizeTheMaximumDifferenceOfPairs_Array_Stage3	insert_sorted'vc
+MinimizeTheMaximumDifferenceOfPairs_Array_Stage3	minimize_the_maximum_difference_of_pairs_array'vc
+== Stage 2: split_vc on unproved goal ==
+Target theory: MinimizeTheMaximumDifferenceOfPairs_Array_Stage3
+Target goal  : insert_sorted'vc
+---- stage2 | prover: Z3,4.8.6 | theory: MinimizeTheMaximumDifferenceOfPairs_Array_Stage3 | goal: insert_sorted'vc ----
+Transforms: split_vc
+File "repaired.mlw", line 77, characters 17-37:
+Sub-goal Variant decrease of goal insert_sorted'vc.
+Prover result is: Valid (0.01s, 16807 steps).
+
+File "repaired.mlw", line 77, characters 17-37:
+Sub-goal Precondition of goal insert_sorted'vc.
+Prover result is: Valid (0.01s, 15874 steps).
+
+File "repaired.mlw", line 67, characters 15-75:
+Sub-goal Postcondition of goal insert_sorted'vc.
+Prover result is: Valid (0.07s, 807480 steps).
+
+File "repaired.mlw", line 68, characters 15-43:
+Sub-goal Postcondition of goal insert_sorted'vc.
+Prover result is: Timeout (10.00s, 177792062 steps).
+---- stage2 | prover: Alt-Ergo,2.4.0 | theory: MinimizeTheMaximumDifferenceOfPairs_Array_Stage3 | goal: insert_sorted'vc ----
+Transforms: split_vc
+File "repaired.mlw", line 77, characters 17-37:
+Sub-goal Variant decrease of goal insert_sorted'vc.
+Prover result is: Valid (0.01s, 37 steps).
+
+File "repaired.mlw", line 77, characters 17-37:
+Sub-goal Precondition of goal insert_sorted'vc.
+Prover result is: Valid (0.01s, 130 steps).
+
+File "repaired.mlw", line 67, characters 15-75:
+Sub-goal Postcondition of goal insert_sorted'vc.
+Prover result is: Valid (0.03s, 747 steps).
+
+File "repaired.mlw", line 68, characters 15-43:
+Sub-goal Postcondition of goal insert_sorted'vc.
+Prover result is: Timeout (10.00s, 422580 steps).
+---- stage2 | prover: CVC4,1.8 | theory: MinimizeTheMaximumDifferenceOfPairs_Array_Stage3 | goal: insert_sorted'vc ----
+Transforms: split_vc
+File "repaired.mlw", line 77, characters 17-37:
+Sub-goal Variant decrease of goal insert_sorted'vc.
+Prover result is: Valid (0.02s, 3297 steps).
+
+File "repaired.mlw", line 77, characters 17-37:
+Sub-goal Precondition of goal insert_sorted'vc.
+Prover result is: Valid (0.02s, 3580 steps).
+
+File "repaired.mlw", line 67, characters 15-75:
+Sub-goal Postcondition of goal insert_sorted'vc.
+Prover result is: Unknown (unknown + incomplete) (0.02s, 5297 steps).
+
+File "repaired.mlw", line 68, characters 15-43:
+Sub-goal Postcondition of goal insert_sorted'vc.
+Prover result is: Unknown (unknown + incomplete) (0.02s, 5337 steps).
+== Stage 2: split_vc on unproved goal ==
+Target theory: MinimizeTheMaximumDifferenceOfPairs_Array_Stage3
+Target goal  : minimize_the_maximum_difference_of_pairs_array'vc
+---- stage2 | prover: Z3,4.8.6 | theory: MinimizeTheMaximumDifferenceOfPairs_Array_Stage3 | goal: minimize_the_maximum_difference_of_pairs_array'vc ----
+Transforms: split_vc
+File "repaired.mlw", line 157, characters 15-20:
+Sub-goal Assertion of goal minimize_the_maximum_difference_of_pairs_array'vc.
+Prover result is: Valid (0.01s, 13828 steps).
+
+File "repaired.mlw", line 158, characters 15-42:
+Sub-goal Assertion of goal minimize_the_maximum_difference_of_pairs_array'vc.
+Prover result is: Valid (0.01s, 25780 steps).
+
+File "repaired.mlw", line 159, characters 61-67:
+Sub-goal Assertion of goal minimize_the_maximum_difference_of_pairs_array'vc.
+Prover result is: Valid (0.01s, 26046 steps).
+
+File "repaired.mlw", line 160, characters 15-46:
+Sub-goal Assertion of goal minimize_the_maximum_difference_of_pairs_array'vc.
+Prover result is: Valid (0.01s, 27757 steps).
+
+File "repaired.mlw", line 163, characters 15-20:
+Sub-goal Assertion of goal minimize_the_maximum_difference_of_pairs_array'vc.
+Prover result is: Valid (0.01s, 1202 steps).
+
+File "repaired.mlw", line 164, characters 15-36:
+Sub-goal Assertion of goal minimize_the_maximum_difference_of_pairs_array'vc.
+Prover result is: Valid (0.01s, 13991 steps).
+
+File "repaired.mlw", line 165, characters 22-42:
+Sub-goal Precondition of goal
+minimize_the_maximum_difference_of_pairs_array'vc.
+Prover result is: Valid (0.01s, 1228 steps).
+
+File "repaired.mlw", line 166, characters 15-56:
+Sub-goal Assertion of goal minimize_the_maximum_difference_of_pairs_array'vc.
+Prover result is: Valid (0.01s, 1328 steps).
+
+File "repaired.mlw", line 168, characters 15-58:
+Sub-goal Assertion of goal minimize_the_maximum_difference_of_pairs_array'vc.
+Prover result is: Valid (0.01s, 17145 steps).
+
+File "repaired.mlw", line 169, characters 15-48:
+Sub-goal Assertion of goal minimize_the_maximum_difference_of_pairs_array'vc.
+Prover result is: Valid (0.01s, 1354 steps).
+
+File "repaired.mlw", line 172, characters 19-24:
+Sub-goal Assertion of goal minimize_the_maximum_difference_of_pairs_array'vc.
+Prover result is: Valid (0.01s, 11085 steps).
+
+File "repaired.mlw", line 176, characters 19-26:
+Sub-goal Assertion of goal minimize_the_maximum_difference_of_pairs_array'vc.
+Prover result is: Unknown (unknown) (0.02s, 78797 steps).
+
+File "repaired.mlw", line 177, characters 23-63:
+Sub-goal Precondition of goal
+minimize_the_maximum_difference_of_pairs_array'vc.
+Prover result is: Valid (0.01s, 1523 steps).
+
+File "repaired.mlw", line 177, characters 23-63:
+Sub-goal Precondition of goal
+minimize_the_maximum_difference_of_pairs_array'vc.
+Prover result is: Valid (0.01s, 1526 steps).
+
+File "repaired.mlw", line 178, characters 19-30:
+Sub-goal Assertion of goal minimize_the_maximum_difference_of_pairs_array'vc.
+Prover result is: Valid (0.01s, 1523 steps).
+
+File "repaired.mlw", line 179, characters 19-55:
+Sub-goal Assertion of goal minimize_the_maximum_difference_of_pairs_array'vc.
+Prover result is: Unknown (unknown) (0.02s, 100881 steps).
+
+File "repaired.mlw", line 154, characters 15-51:
+Sub-goal Postcondition of goal
+minimize_the_maximum_difference_of_pairs_array'vc.
+Prover result is: Valid (0.02s, 58483 steps).
+---- stage2 | prover: Alt-Ergo,2.4.0 | theory: MinimizeTheMaximumDifferenceOfPairs_Array_Stage3 | goal: minimize_the_maximum_difference_of_pairs_array'vc ----
+Transforms: split_vc
+File "repaired.mlw", line 157, characters 15-20:
+Sub-goal Assertion of goal minimize_the_maximum_difference_of_pairs_array'vc.
+Prover result is: Valid (0.01s, 10 steps).
+
+File "repaired.mlw", line 158, characters 15-42:
+Sub-goal Assertion of goal minimize_the_maximum_difference_of_pairs_array'vc.
+Prover result is: Valid (0.01s, 13 steps).
+
+File "repaired.mlw", line 159, characters 61-67:
+Sub-goal Assertion of goal minimize_the_maximum_difference_of_pairs_array'vc.
+Prover result is: Valid (0.01s, 17 steps).
+
+File "repaired.mlw", line 160, characters 15-46:
+Sub-goal Assertion of goal minimize_the_maximum_difference_of_pairs_array'vc.
+Prover result is: Valid (0.01s, 28 steps).
+
+File "repaired.mlw", line 163, characters 15-20:
+Sub-goal Assertion of goal minimize_the_maximum_difference_of_pairs_array'vc.
+Prover result is: Valid (0.01s, 10 steps).
+
+File "repaired.mlw", line 164, characters 15-36:
+Sub-goal Assertion of goal minimize_the_maximum_difference_of_pairs_array'vc.
+Prover result is: Valid (0.01s, 11 steps).
+
+File "repaired.mlw", line 165, characters 22-42:
+Sub-goal Precondition of goal
+minimize_the_maximum_difference_of_pairs_array'vc.
+Prover result is: Valid (0.01s, 13 steps).
+
+File "repaired.mlw", line 166, characters 15-56:
+Sub-goal Assertion of goal minimize_the_maximum_difference_of_pairs_array'vc.
+Prover result is: Valid (0.01s, 15 steps).
+
+File "repaired.mlw", line 168, characters 15-58:
+Sub-goal Assertion of goal minimize_the_maximum_difference_of_pairs_array'vc.
+Prover result is: Valid (0.01s, 20 steps).
+
+File "repaired.mlw", line 169, characters 15-48:
+Sub-goal Assertion of goal minimize_the_maximum_difference_of_pairs_array'vc.
+Prover result is: Valid (0.01s, 21 steps).
+
+File "repaired.mlw", line 172, characters 19-24:
+Sub-goal Assertion of goal minimize_the_maximum_difference_of_pairs_array'vc.
+Prover result is: Valid (0.01s, 26 steps).
+
+File "repaired.mlw", line 176, characters 19-26:
+Sub-goal Assertion of goal minimize_the_maximum_difference_of_pairs_array'vc.
+Prover result is: Timeout (10.00s, 330086 steps).
+
+File "repaired.mlw", line 177, characters 23-63:
+Sub-goal Precondition of goal
+minimize_the_maximum_difference_of_pairs_array'vc.
+Prover result is: Valid (0.01s, 25 steps).
+
+File "repaired.mlw", line 177, characters 23-63:
+Sub-goal Precondition of goal
+minimize_the_maximum_difference_of_pairs_array'vc.
+Prover result is: Valid (0.01s, 25 steps).
+
+File "repaired.mlw", line 178, characters 19-30:
+Sub-goal Assertion of goal minimize_the_maximum_difference_of_pairs_array'vc.
+Prover result is: Valid (0.01s, 29 steps).
+
+File "repaired.mlw", line 179, characters 19-55:
+Sub-goal Assertion of goal minimize_the_maximum_difference_of_pairs_array'vc.
+Prover result is: Timeout (10.00s, 228118 steps).
+
+File "repaired.mlw", line 154, characters 15-51:
+Sub-goal Postcondition of goal
+minimize_the_maximum_difference_of_pairs_array'vc.
+Prover result is: Valid (0.16s, 4155 steps).
+---- stage2 | prover: CVC4,1.8 | theory: MinimizeTheMaximumDifferenceOfPairs_Array_Stage3 | goal: minimize_the_maximum_difference_of_pairs_array'vc ----
+Transforms: split_vc
+File "repaired.mlw", line 157, characters 15-20:
+Sub-goal Assertion of goal minimize_the_maximum_difference_of_pairs_array'vc.
+Prover result is: Valid (0.02s, 3187 steps).
+
+File "repaired.mlw", line 158, characters 15-42:
+Sub-goal Assertion of goal minimize_the_maximum_difference_of_pairs_array'vc.
+Prover result is: Valid (0.02s, 4548 steps).
+
+File "repaired.mlw", line 159, characters 61-67:
+Sub-goal Assertion of goal minimize_the_maximum_difference_of_pairs_array'vc.
+Prover result is: Valid (0.02s, 4635 steps).
+
+File "repaired.mlw", line 160, characters 15-46:
+Sub-goal Assertion of goal minimize_the_maximum_difference_of_pairs_array'vc.
+Prover result is: Valid (0.02s, 4892 steps).
+
+File "repaired.mlw", line 163, characters 15-20:
+Sub-goal Assertion of goal minimize_the_maximum_difference_of_pairs_array'vc.
+Prover result is: Valid (0.01s, 3110 steps).
+
+File "repaired.mlw", line 164, characters 15-36:
+Sub-goal Assertion of goal minimize_the_maximum_difference_of_pairs_array'vc.
+Prover result is: Valid (0.01s, 3213 steps).
+
+File "repaired.mlw", line 165, characters 22-42:
+Sub-goal Precondition of goal
+minimize_the_maximum_difference_of_pairs_array'vc.
+Prover result is: Valid (0.01s, 3148 steps).
+
+File "repaired.mlw", line 166, characters 15-56:
+Sub-goal Assertion of goal minimize_the_maximum_difference_of_pairs_array'vc.
+Prover result is: Valid (0.01s, 3352 steps).
+
+File "repaired.mlw", line 168, characters 15-58:
+Sub-goal Assertion of goal minimize_the_maximum_difference_of_pairs_array'vc.
+Prover result is: Valid (0.01s, 3483 steps).
+
+File "repaired.mlw", line 169, characters 15-48:
+Sub-goal Assertion of goal minimize_the_maximum_difference_of_pairs_array'vc.
+Prover result is: Valid (0.01s, 3398 steps).
+
+File "repaired.mlw", line 172, characters 19-24:
+Sub-goal Assertion of goal minimize_the_maximum_difference_of_pairs_array'vc.
+Prover result is: Valid (0.02s, 3818 steps).
+
+File "repaired.mlw", line 176, characters 19-26:
+Sub-goal Assertion of goal minimize_the_maximum_difference_of_pairs_array'vc.
+Prover result is: Unknown (unknown + incomplete) (0.02s, 5077 steps).
+
+File "repaired.mlw", line 177, characters 23-63:
+Sub-goal Precondition of goal
+minimize_the_maximum_difference_of_pairs_array'vc.
+Prover result is: Valid (0.01s, 3862 steps).
+
+File "repaired.mlw", line 177, characters 23-63:
+Sub-goal Precondition of goal
+minimize_the_maximum_difference_of_pairs_array'vc.
+Prover result is: Valid (0.01s, 3869 steps).
+
+File "repaired.mlw", line 178, characters 19-30:
+Sub-goal Assertion of goal minimize_the_maximum_difference_of_pairs_array'vc.
+Prover result is: Valid (0.01s, 3899 steps).
+
+File "repaired.mlw", line 179, characters 19-55:
+Sub-goal Assertion of goal minimize_the_maximum_difference_of_pairs_array'vc.
+Prover result is: Unknown (unknown + incomplete) (0.02s, 6642 steps).
+
+File "repaired.mlw", line 154, characters 15-51:
+Sub-goal Postcondition of goal
+minimize_the_maximum_difference_of_pairs_array'vc.
+Prover result is: Unknown (unknown + incomplete) (0.02s, 6422 steps).
+== Goals still unproved after stage 2 (split_vc) ==
+MinimizeTheMaximumDifferenceOfPairs_Array_Stage3	insert_sorted'vc
+MinimizeTheMaximumDifferenceOfPairs_Array_Stage3	minimize_the_maximum_difference_of_pairs_array'vc
+== Stage 3: split_vc + inline_all on still-unproved goal ==
+Target theory: MinimizeTheMaximumDifferenceOfPairs_Array_Stage3
+Target goal  : insert_sorted'vc
+---- stage3 | prover: Z3,4.8.6 | theory: MinimizeTheMaximumDifferenceOfPairs_Array_Stage3 | goal: insert_sorted'vc ----
+Transforms: split_vc inline_all
+File "repaired.mlw", line 77, characters 17-37:
+Sub-goal Variant decrease of goal insert_sorted'vc.
+Prover result is: Valid (0.01s, 15536 steps).
+
+File "repaired.mlw", line 77, characters 17-37:
+Sub-goal Precondition of goal insert_sorted'vc.
+Prover result is: Valid (0.01s, 14579 steps).
+
+File "repaired.mlw", line 67, characters 15-75:
+Sub-goal Postcondition of goal insert_sorted'vc.
+Prover result is: Valid (0.07s, 724587 steps).
+
+File "repaired.mlw", line 68, characters 15-43:
+Sub-goal Postcondition of goal insert_sorted'vc.
+Prover result is: Timeout (10.00s, 175690365 steps).
+---- stage3 | prover: Alt-Ergo,2.4.0 | theory: MinimizeTheMaximumDifferenceOfPairs_Array_Stage3 | goal: insert_sorted'vc ----
+Transforms: split_vc inline_all
+File "repaired.mlw", line 77, characters 17-37:
+Sub-goal Variant decrease of goal insert_sorted'vc.
+Prover result is: Valid (0.01s, 41 steps).
+
+File "repaired.mlw", line 77, characters 17-37:
+Sub-goal Precondition of goal insert_sorted'vc.
+Prover result is: Valid (0.01s, 146 steps).
+
+File "repaired.mlw", line 67, characters 15-75:
+Sub-goal Postcondition of goal insert_sorted'vc.
+Prover result is: Valid (0.03s, 678 steps).
+
+File "repaired.mlw", line 68, characters 15-43:
+Sub-goal Postcondition of goal insert_sorted'vc.
+Prover result is: Timeout (10.00s, 417085 steps).
+---- stage3 | prover: CVC4,1.8 | theory: MinimizeTheMaximumDifferenceOfPairs_Array_Stage3 | goal: insert_sorted'vc ----
+Transforms: split_vc inline_all
+File "repaired.mlw", line 77, characters 17-37:
+Sub-goal Variant decrease of goal insert_sorted'vc.
+Prover result is: Valid (0.02s, 3389 steps).
+
+File "repaired.mlw", line 77, characters 17-37:
+Sub-goal Precondition of goal insert_sorted'vc.
+Prover result is: Valid (0.02s, 3689 steps).
+
+File "repaired.mlw", line 67, characters 15-75:
+Sub-goal Postcondition of goal insert_sorted'vc.
+Prover result is: Unknown (unknown + incomplete) (0.02s, 5427 steps).
+
+File "repaired.mlw", line 68, characters 15-43:
+Sub-goal Postcondition of goal insert_sorted'vc.
+Prover result is: Unknown (unknown + incomplete) (0.02s, 5469 steps).
+== Stage 3: split_vc + inline_all on still-unproved goal ==
+Target theory: MinimizeTheMaximumDifferenceOfPairs_Array_Stage3
+Target goal  : minimize_the_maximum_difference_of_pairs_array'vc
+---- stage3 | prover: Z3,4.8.6 | theory: MinimizeTheMaximumDifferenceOfPairs_Array_Stage3 | goal: minimize_the_maximum_difference_of_pairs_array'vc ----
+Transforms: split_vc inline_all
+File "repaired.mlw", line 157, characters 15-20:
+Sub-goal Assertion of goal minimize_the_maximum_difference_of_pairs_array'vc.
+Prover result is: Valid (0.01s, 16159 steps).
+
+File "repaired.mlw", line 158, characters 15-42:
+Sub-goal Assertion of goal minimize_the_maximum_difference_of_pairs_array'vc.
+Prover result is: Valid (0.01s, 2815 steps).
+
+File "repaired.mlw", line 159, characters 61-67:
+Sub-goal Assertion of goal minimize_the_maximum_difference_of_pairs_array'vc.
+Prover result is: Valid (0.01s, 3672 steps).
+
+File "repaired.mlw", line 160, characters 15-46:
+Sub-goal Assertion of goal minimize_the_maximum_difference_of_pairs_array'vc.
+Prover result is: Valid (0.01s, 5404 steps).
+
+File "repaired.mlw", line 163, characters 15-20:
+Sub-goal Assertion of goal minimize_the_maximum_difference_of_pairs_array'vc.
+Prover result is: Valid (0.01s, 2613 steps).
+
+File "repaired.mlw", line 164, characters 15-36:
+Sub-goal Assertion of goal minimize_the_maximum_difference_of_pairs_array'vc.
+Prover result is: Valid (0.01s, 15752 steps).
+
+File "repaired.mlw", line 165, characters 22-42:
+Sub-goal Precondition of goal
+minimize_the_maximum_difference_of_pairs_array'vc.
+Prover result is: Valid (0.01s, 2027 steps).
+
+File "repaired.mlw", line 166, characters 15-56:
+Sub-goal Assertion of goal minimize_the_maximum_difference_of_pairs_array'vc.
+Prover result is: Valid (0.01s, 1519 steps).
+
+File "repaired.mlw", line 168, characters 15-58:
+Sub-goal Assertion of goal minimize_the_maximum_difference_of_pairs_array'vc.
+Prover result is: Valid (0.01s, 19157 steps).
+
+File "repaired.mlw", line 169, characters 15-48:
+Sub-goal Assertion of goal minimize_the_maximum_difference_of_pairs_array'vc.
+Prover result is: Valid (0.01s, 1545 steps).
+
+File "repaired.mlw", line 172, characters 19-24:
+Sub-goal Assertion of goal minimize_the_maximum_difference_of_pairs_array'vc.
+Prover result is: Valid (0.01s, 12860 steps).
+
+File "repaired.mlw", line 176, characters 19-26:
+Sub-goal Assertion of goal minimize_the_maximum_difference_of_pairs_array'vc.
+Prover result is: Timeout (10.00s, 158745038 steps).
+
+File "repaired.mlw", line 177, characters 23-63:
+Sub-goal Precondition of goal
+minimize_the_maximum_difference_of_pairs_array'vc.
+Prover result is: Valid (0.01s, 2530 steps).
+
+File "repaired.mlw", line 177, characters 23-63:
+Sub-goal Precondition of goal
+minimize_the_maximum_difference_of_pairs_array'vc.
+Prover result is: Valid (0.01s, 1735 steps).
+
+File "repaired.mlw", line 178, characters 19-30:
+Sub-goal Assertion of goal minimize_the_maximum_difference_of_pairs_array'vc.
+Prover result is: Valid (0.01s, 2612 steps).
+
+File "repaired.mlw", line 179, characters 19-55:
+Sub-goal Assertion of goal minimize_the_maximum_difference_of_pairs_array'vc.
+Prover result is: Timeout (10.00s, 167289276 steps).
+
+File "repaired.mlw", line 154, characters 15-51:
+Sub-goal Postcondition of goal
+minimize_the_maximum_difference_of_pairs_array'vc.
+Prover result is: Valid (0.25s, 2265013 steps).
+---- stage3 | prover: Alt-Ergo,2.4.0 | theory: MinimizeTheMaximumDifferenceOfPairs_Array_Stage3 | goal: minimize_the_maximum_difference_of_pairs_array'vc ----
+Transforms: split_vc inline_all
+File "repaired.mlw", line 157, characters 15-20:
+Sub-goal Assertion of goal minimize_the_maximum_difference_of_pairs_array'vc.
+Prover result is: Valid (0.01s, 7 steps).
+
+File "repaired.mlw", line 158, characters 15-42:
+Sub-goal Assertion of goal minimize_the_maximum_difference_of_pairs_array'vc.
+Prover result is: Valid (0.01s, 7 steps).
+
+File "repaired.mlw", line 159, characters 61-67:
+Sub-goal Assertion of goal minimize_the_maximum_difference_of_pairs_array'vc.
+Prover result is: Valid (0.01s, 8 steps).
+
+File "repaired.mlw", line 160, characters 15-46:
+Sub-goal Assertion of goal minimize_the_maximum_difference_of_pairs_array'vc.
+Prover result is: Valid (0.01s, 10 steps).
+
+File "repaired.mlw", line 163, characters 15-20:
+Sub-goal Assertion of goal minimize_the_maximum_difference_of_pairs_array'vc.
+Prover result is: Valid (0.01s, 8 steps).
+
+File "repaired.mlw", line 164, characters 15-36:
+Sub-goal Assertion of goal minimize_the_maximum_difference_of_pairs_array'vc.
+Prover result is: Valid (0.01s, 14 steps).
+
+File "repaired.mlw", line 165, characters 22-42:
+Sub-goal Precondition of goal
+minimize_the_maximum_difference_of_pairs_array'vc.
+Prover result is: Valid (0.01s, 9 steps).
+
+File "repaired.mlw", line 166, characters 15-56:
+Sub-goal Assertion of goal minimize_the_maximum_difference_of_pairs_array'vc.
+Prover result is: Valid (0.01s, 12 steps).
+
+File "repaired.mlw", line 168, characters 15-58:
+Sub-goal Assertion of goal minimize_the_maximum_difference_of_pairs_array'vc.
+Prover result is: Valid (0.01s, 15 steps).
+
+File "repaired.mlw", line 169, characters 15-48:
+Sub-goal Assertion of goal minimize_the_maximum_difference_of_pairs_array'vc.
+Prover result is: Valid (0.01s, 16 steps).
+
+File "repaired.mlw", line 172, characters 19-24:
+Sub-goal Assertion of goal minimize_the_maximum_difference_of_pairs_array'vc.
+Prover result is: Valid (0.01s, 36 steps).
+
+File "repaired.mlw", line 176, characters 19-26:
+Sub-goal Assertion of goal minimize_the_maximum_difference_of_pairs_array'vc.
+Prover result is: Timeout (10.00s, 275983 steps).
+
+File "repaired.mlw", line 177, characters 23-63:
+Sub-goal Precondition of goal
+minimize_the_maximum_difference_of_pairs_array'vc.
+Prover result is: Valid (0.01s, 19 steps).
+
+File "repaired.mlw", line 177, characters 23-63:
+Sub-goal Precondition of goal
+minimize_the_maximum_difference_of_pairs_array'vc.
+Prover result is: Valid (0.01s, 19 steps).
+
+File "repaired.mlw", line 178, characters 19-30:
+Sub-goal Assertion of goal minimize_the_maximum_difference_of_pairs_array'vc.
+Prover result is: Valid (0.01s, 21 steps).
+
+File "repaired.mlw", line 179, characters 19-55:
+Sub-goal Assertion of goal minimize_the_maximum_difference_of_pairs_array'vc.
+Prover result is: Timeout (10.00s, 134330 steps).
+Infrastructure issue in stage 3 with prover Alt-Ergo,2.4.0; aborting rest of stage 3.
+== Final summary ==
+Unproved root goals after first prover : 2
+Remaining failures after split_vc      : 2
+Remaining failures after stage 3       : 2
+Detailed logs stored in                : /Users/rubenm/Desktop/Diversify2Verify/codex-runs/dataset-merge-verification/stage3a-repair/2616_minimize-the-maximum-difference-of-pairs/array-recursive/minimize_the_maximum_difference_of_pairs_array_stage3_48f65a80_stage3/generated/why3/.why3_sessions/repaired_logs
+Still unproved goals:
+MinimizeTheMaximumDifferenceOfPairs_Array_Stage3	insert_sorted'vc
+MinimizeTheMaximumDifferenceOfPairs_Array_Stage3	minimize_the_maximum_difference_of_pairs_array'vc
+VERIFY_RESULT: FAILURE
+VERIFY_REASON: unproved_goals_remain
+VERIFY_STAGE: stage3
+VERIFY_ROOT_TOTAL: 8
+VERIFY_ROOT_PROVED: 6
+VERIFY_ROOT_REMAINING: 2

@@ -1,0 +1,176 @@
+module KeepMultiplyingFoundValuesByTwo_Array_Recursive_Implementation
+
+  use int.Int
+  use array.Array
+  use array.Init
+
+  let rec contains_value_from (nums: array int) (target: int) (i: int) : bool
+    variant { length nums - i }
+  =
+    if i = length nums then
+      false
+    else if nums[i] = target then
+      true
+    else
+      contains_value_from nums target (i + 1)
+
+  let contains_value (nums: array int) (target: int) : bool =
+    contains_value_from nums target 0
+
+  let rec keep_multiplying_from (nums: array int) (current: int) (remaining: int) : int
+    variant { remaining }
+  =
+    if remaining = 0 then
+      current
+    else if contains_value nums current then
+      keep_multiplying_from nums (current * 2) (remaining - 1)
+    else
+      current
+
+  let keep_multiplying_found_values_by_two_array (nums: array int) (original: int) : int =
+    keep_multiplying_from nums original (length nums + 1)
+
+  let test_000 () : bool =
+    let nums = init 5 [|10; 20; 30; 40; 50|] in
+    let r = keep_multiplying_found_values_by_two_array nums 5 in
+    r = 5
+
+  let test_001 () : bool =
+    let nums = init 5 [|1000; 500; 250; 125; 625|] in
+    let r = keep_multiplying_found_values_by_two_array nums 5 in
+    r = 5
+
+  let test_002 () : bool =
+    let nums = init 5 [|3; 6; 9; 12; 15|] in
+    let r = keep_multiplying_found_values_by_two_array nums 3 in
+    r = 24
+
+  let test_003 () : bool =
+    let nums = init 4 [|1; 2; 4; 8|] in
+    let r = keep_multiplying_found_values_by_two_array nums 1 in
+    r = 16
+
+  let test_004 () : bool =
+    let nums = init 5 [|8; 16; 32; 64; 128|] in
+    let r = keep_multiplying_found_values_by_two_array nums 8 in
+    r = 256
+
+  let test_005 () : bool =
+    let nums = init 3 [|2; 7; 9|] in
+    let r = keep_multiplying_found_values_by_two_array nums 4 in
+    r = 4
+
+  let test_006 () : bool =
+    let nums = init 5 [|1000; 1000; 1000; 1000; 1000|] in
+    let r = keep_multiplying_found_values_by_two_array nums 1000 in
+    r = 2000
+
+  let test_007 () : bool =
+    let nums = init 5 [|1; 3; 5; 7; 9|] in
+    let r = keep_multiplying_found_values_by_two_array nums 2 in
+    r = 2
+
+  let test_008 () : bool =
+    let nums = init 5 [|10; 20; 30; 40; 50|] in
+    let r = keep_multiplying_found_values_by_two_array nums 10 in
+    r = 80
+
+  let test_009 () : bool =
+    let nums = init 5 [|2; 2; 2; 2; 2|] in
+    let r = keep_multiplying_found_values_by_two_array nums 2 in
+    r = 4
+
+  let test_010 () : bool =
+    let nums = init 7 [|8; 16; 32; 64; 128; 256; 512|] in
+    let r = keep_multiplying_found_values_by_two_array nums 4 in
+    r = 4
+
+  let test_011 () : bool =
+    let nums = init 6 [|1000; 500; 250; 125; 62; 31|] in
+    let r = keep_multiplying_found_values_by_two_array nums 1 in
+    r = 1
+
+  let test_012 () : bool =
+    let nums = init 5 [|1; 1; 1; 1; 1|] in
+    let r = keep_multiplying_found_values_by_two_array nums 1 in
+    r = 2
+
+  let test_013 () : bool =
+    let nums = init 5 [|1; 2; 4; 8; 16|] in
+    let r = keep_multiplying_found_values_by_two_array nums 1 in
+    r = 32
+
+  let test_014 () : bool =
+    let nums = init 5 [|4; 8; 16; 32; 64|] in
+    let r = keep_multiplying_found_values_by_two_array nums 2 in
+    r = 2
+
+  let test_015 () : bool =
+    let nums = init 5 [|5; 3; 6; 1; 12|] in
+    let r = keep_multiplying_found_values_by_two_array nums 3 in
+    r = 24
+
+  let test_016 () : bool =
+    let nums = init 4 [|1000; 500; 250; 125|] in
+    let r = keep_multiplying_found_values_by_two_array nums 125 in
+    r = 2000
+
+  let test_017 () : bool =
+    let nums = init 5 [|10; 20; 40; 80; 160|] in
+    let r = keep_multiplying_found_values_by_two_array nums 10 in
+    r = 320
+
+  let test_018 () : bool =
+    let nums = init 5 [|7; 14; 28; 56; 112|] in
+    let r = keep_multiplying_found_values_by_two_array nums 7 in
+    r = 224
+
+  let test_019 () : bool =
+    let nums = init 5 [|1; 3; 5; 7; 9|] in
+    let r = keep_multiplying_found_values_by_two_array nums 1 in
+    r = 2
+
+  let run_tests () : bool =
+    if test_000 () then
+    if test_001 () then
+    if test_002 () then
+    if test_003 () then
+    if test_004 () then
+    if test_005 () then
+    if test_006 () then
+    if test_007 () then
+    if test_008 () then
+    if test_009 () then
+    if test_010 () then
+    if test_011 () then
+    if test_012 () then
+    if test_013 () then
+    if test_014 () then
+    if test_015 () then
+    if test_016 () then
+    if test_017 () then
+    if test_018 () then
+    if test_019 () then
+      true
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+
+end

@@ -1,0 +1,157 @@
+module FindTheDistanceValueBetweenTwoArrays_Array_Spec
+
+  use int.Int
+  use int.Abs
+  use array.Array
+  use array.Init
+  use array.NumOf
+
+  predicate far_from_all (arr2: array int) (x: int) (d: int) =
+    forall j: int. 0 <= j < length arr2 -> abs (x - arr2[j]) > d
+
+  function distance_value (arr1: array int) (arr2: array int) (d: int) : int =
+    numof (fun _ v -> far_from_all arr2 v d) arr1 0 (length arr1)
+
+  val find_the_distance_value_between_two_arrays_array (arr1: array int) (arr2: array int) (d: int) : int
+    ensures { result = distance_value arr1 arr2 d }
+
+  let lemma test_000 () =
+    let arr1 = init 3 [|10; 20; 30|] in
+    let arr2 = init 3 [|5; 15; 25|] in
+    assert { length arr1 = 3 };
+    assert { length arr2 = 3 };
+    assert { arr1[0] = 10 };
+    assert { arr1[1] = 20 };
+    assert { arr1[2] = 30 };
+    assert { arr2[0] = 5 };
+    assert { arr2[1] = 15 };
+    assert { arr2[2] = 25 };
+    assert {
+      forall j: int. 0 <= j < length arr2 ->
+        j = 0 \/ j = 1 \/ j = 2
+    };
+    assert { far_from_all arr2 10 4 };
+    assert { far_from_all arr2 20 4 };
+    assert { far_from_all arr2 30 4 };
+    assert { distance_value arr1 arr2 4 = 3 }
+
+  let lemma test_001 () =
+    let arr1 = init 2 [|-1000; 1000|] in
+    let arr2 = init 2 [|-500; 500|] in
+    assert { length arr1 = 2 };
+    assert { length arr2 = 2 };
+    assert { arr1[0] = (-1000) };
+    assert { arr1[1] = 1000 };
+    assert { arr2[0] = (-500) };
+    assert { arr2[1] = 500 };
+    assert {
+      forall j: int. 0 <= j < length arr2 ->
+        j = 0 \/ j = 1
+    };
+    assert { far_from_all arr2 (-1000) 499 };
+    assert { far_from_all arr2 1000 499 };
+    assert { distance_value arr1 arr2 499 = 2 }
+
+  let lemma test_002 () =
+    let arr1 = init 3 [|4; 5; 8|] in
+    let arr2 = init 4 [|10; 9; 1; 8|] in
+    assert { length arr1 = 3 };
+    assert { length arr2 = 4 };
+    assert { arr1[0] = 4 };
+    assert { arr1[1] = 5 };
+    assert { arr1[2] = 8 };
+    assert { arr2[0] = 10 };
+    assert { arr2[1] = 9 };
+    assert { arr2[2] = 1 };
+    assert { arr2[3] = 8 };
+    assert {
+      forall j: int. 0 <= j < length arr2 ->
+        j = 0 \/ j = 1 \/ j = 2 \/ j = 3
+    };
+    assert { far_from_all arr2 4 2 };
+    assert { far_from_all arr2 5 2 };
+    assert { 0 <= 3 < length arr2 };
+    assert { abs (8 - arr2[3]) <= 2 };
+    assert { not (far_from_all arr2 8 2) };
+    assert { distance_value arr1 arr2 2 = 2 }
+
+  let lemma test_003 () =
+    let arr1 = init 4 [|1; 4; 2; 3|] in
+    let arr2 = init 6 [|-4; -3; 6; 10; 20; 30|] in
+    assert { length arr1 = 4 };
+    assert { length arr2 = 6 };
+    assert { arr1[0] = 1 };
+    assert { arr1[1] = 4 };
+    assert { arr1[2] = 2 };
+    assert { arr1[3] = 3 };
+    assert { arr2[0] = (-4) };
+    assert { arr2[1] = (-3) };
+    assert { arr2[2] = 6 };
+    assert { arr2[3] = 10 };
+    assert { arr2[4] = 20 };
+    assert { arr2[5] = 30 };
+    assert {
+      forall j: int. 0 <= j < length arr2 ->
+        j = 0 \/ j = 1 \/ j = 2 \/ j = 3 \/ j = 4 \/ j = 5
+    };
+    assert { far_from_all arr2 1 3 };
+    assert { 0 <= 2 < length arr2 };
+    assert { abs (4 - arr2[2]) <= 3 };
+    assert { not (far_from_all arr2 4 3) };
+    assert { far_from_all arr2 2 3 };
+    assert { 0 <= 2 < length arr2 };
+    assert { abs (3 - arr2[2]) <= 3 };
+    assert { not (far_from_all arr2 3 3) };
+    assert { distance_value arr1 arr2 3 = 2 }
+
+  let lemma test_005 () =
+    let arr1 = init 4 [|0; 0; 0; 0|] in
+    let arr2 = init 4 [|1; 2; 3; 4|] in
+    assert { length arr1 = 4 };
+    assert { length arr2 = 4 };
+    assert { arr1[0] = 0 };
+    assert { arr1[1] = 0 };
+    assert { arr1[2] = 0 };
+    assert { arr1[3] = 0 };
+    assert { arr2[0] = 1 };
+    assert { arr2[1] = 2 };
+    assert { arr2[2] = 3 };
+    assert { arr2[3] = 4 };
+    assert {
+      forall j: int. 0 <= j < length arr2 ->
+        j = 0 \/ j = 1 \/ j = 2 \/ j = 3
+    };
+    assert { far_from_all arr2 0 0 };
+    assert { distance_value arr1 arr2 0 = 4 }
+
+  let lemma test_006 () =
+    let arr1 = init 1 [|1000|] in
+    let arr2 = init 1 [|-1000|] in
+    assert { length arr1 = 1 };
+    assert { length arr2 = 1 };
+    assert { arr1[0] = 1000 };
+    assert { arr2[0] = (-1000) };
+    assert {
+      forall j: int. 0 <= j < length arr2 ->
+        j = 0
+    };
+    assert { far_from_all arr2 1000 1999 };
+    assert { distance_value arr1 arr2 1999 = 1 }
+
+  let lemma test_007 () =
+    let arr1 = init 1 [|1|] in
+    let arr2 = init 1 [|1|] in
+    assert { length arr1 = 1 };
+    assert { length arr2 = 1 };
+    assert { arr1[0] = 1 };
+    assert { arr2[0] = 1 };
+    assert {
+      forall j: int. 0 <= j < length arr2 ->
+        j = 0
+    };
+    assert { 0 <= 0 < length arr2 };
+    assert { abs (1 - arr2[0]) <= 0 };
+    assert { not (far_from_all arr2 1 0) };
+    assert { distance_value arr1 arr2 0 = 0 }
+
+end

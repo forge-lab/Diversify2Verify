@@ -1,0 +1,201 @@
+== Stage 1: first prover on whole file ==
+Running in /Users/rubenm/Desktop/Diversify2Verify/codex-runs/stage1a-list/2260_minimum-consecutive-cards-to-pick-up-20260523-140639/generated/why3/list: why3 session create -o /Users/rubenm/Desktop/Diversify2Verify/codex-runs/stage1a-list/2260_minimum-consecutive-cards-to-pick-up-20260523-140639/generated/why3/list/.why3_sessions/minimum_consecutive_cards_to_pick_up_list_stage1 -P Z3,4.8.6 -t 10 -m 8192 minimum_consecutive_cards_to_pick_up_list.mlw
+Session created successfully
+Running in /Users/rubenm/Desktop/Diversify2Verify/codex-runs/stage1a-list/2260_minimum-consecutive-cards-to-pick-up-20260523-140639/generated/why3/list: why3 bench /Users/rubenm/Desktop/Diversify2Verify/codex-runs/stage1a-list/2260_minimum-consecutive-cards-to-pick-up-20260523-140639/generated/why3/list/.why3_sessions/minimum_consecutive_cards_to_pick_up_list_stage1
+Progress: 6/1/0                       Progress: 5/2/0                       Progress: 4/3/0                       Progress: 3/4/0                       Progress: 2/5/0                       Progress: 1/6/0                       Progress: 1/2/2                       Progress: 0/3/2                       Progress: 0/0/1                       
+Replay completed, saving session... done
+== Stage 1 stats ==
+= Statistics for session /Users/rubenm/Desktop/Diversify2Verify/codex-runs/stage1a-list/2260_minimum-consecutive-cards-to-pick-up-20260523-140639/generated/why3/list/.why3_sessions/minimum_consecutive_cards_to_pick_up_list_stage1
+
+== Number of root goals ==
+  total: 7  proved: 4
+
+== Number of sub goals ==
+  total: 0  proved: 0
+
+== Goals not proved ==
+  +-- file [../../minimum_consecutive_cards_to_pick_up_list.mlw]
+    +-- theory MinimumConsecutiveCardsToPickUp_List_Spec
+      +-- goal check_test_005'vc
+      +-- goal check_test_004'vc
+      +-- goal check_test_000'vc
+  
+== Goals proved by only one prover ==
+  +-- file [../../minimum_consecutive_cards_to_pick_up_list.mlw]
+    +-- theory MinimumConsecutiveCardsToPickUp_List_Spec
+      +-- goal check_test_009'vc: Z3 4.8.6
+      +-- goal check_test_013'vc: Z3 4.8.6
+      +-- goal check_test_086'vc: Z3 4.8.6
+      +-- goal check_test_108'vc: Z3 4.8.6
+  
+1 session(s) read, with a total of 7 proof goals.
+== Unproved root goals after first prover ==
+MinimumConsecutiveCardsToPickUp_List_Spec	check_test_005'vc
+MinimumConsecutiveCardsToPickUp_List_Spec	check_test_004'vc
+MinimumConsecutiveCardsToPickUp_List_Spec	check_test_000'vc
+== Stage 1: trying remaining goals with prover Alt-Ergo,2.4.0 ==
+---- stage1 | prover: Alt-Ergo,2.4.0 | theory: MinimumConsecutiveCardsToPickUp_List_Spec | goal: check_test_005'vc ----
+File minimum_consecutive_cards_to_pick_up_list.mlw:
+Goal check_test_005'vc.
+Prover result is: Timeout (10.00s, 18503 steps).
+---- stage1 | prover: Alt-Ergo,2.4.0 | theory: MinimumConsecutiveCardsToPickUp_List_Spec | goal: check_test_004'vc ----
+File minimum_consecutive_cards_to_pick_up_list.mlw:
+Goal check_test_004'vc.
+Prover result is: Timeout (10.00s, 120657 steps).
+---- stage1 | prover: Alt-Ergo,2.4.0 | theory: MinimumConsecutiveCardsToPickUp_List_Spec | goal: check_test_000'vc ----
+File minimum_consecutive_cards_to_pick_up_list.mlw:
+Goal check_test_000'vc.
+Prover result is: Timeout (10.00s, 417339 steps).
+Remaining after prover Alt-Ergo,2.4.0: 3
+== Stage 1: trying remaining goals with prover CVC4,1.8 ==
+---- stage1 | prover: CVC4,1.8 | theory: MinimumConsecutiveCardsToPickUp_List_Spec | goal: check_test_005'vc ----
+File minimum_consecutive_cards_to_pick_up_list.mlw:
+Goal check_test_005'vc.
+Prover result is: Unknown (unknown + incomplete) (0.03s, 7151 steps).
+---- stage1 | prover: CVC4,1.8 | theory: MinimumConsecutiveCardsToPickUp_List_Spec | goal: check_test_004'vc ----
+File minimum_consecutive_cards_to_pick_up_list.mlw:
+Goal check_test_004'vc.
+Prover result is: Unknown (unknown + incomplete) (0.11s, 29637 steps).
+---- stage1 | prover: CVC4,1.8 | theory: MinimumConsecutiveCardsToPickUp_List_Spec | goal: check_test_000'vc ----
+File minimum_consecutive_cards_to_pick_up_list.mlw:
+Goal check_test_000'vc.
+Prover result is: Timeout (10.00s, 1700480 steps).
+Remaining after prover CVC4,1.8: 3
+== Goals still unproved after stage 1 ==
+MinimumConsecutiveCardsToPickUp_List_Spec	check_test_005'vc
+MinimumConsecutiveCardsToPickUp_List_Spec	check_test_004'vc
+MinimumConsecutiveCardsToPickUp_List_Spec	check_test_000'vc
+== Stage 2: split_vc on unproved goal ==
+Target theory: MinimumConsecutiveCardsToPickUp_List_Spec
+Target goal  : check_test_005'vc
+---- stage2 | prover: Z3,4.8.6 | theory: MinimumConsecutiveCardsToPickUp_List_Spec | goal: check_test_005'vc ----
+Transforms: split_vc
+File "minimum_consecutive_cards_to_pick_up_list.mlw", line 54, characters 13-29:
+Sub-goal Assertion of goal check_test_005'vc.
+Prover result is: Valid (0.01s, 10999 steps).
+
+File "minimum_consecutive_cards_to_pick_up_list.mlw", line 55, characters 13-39:
+Sub-goal Assertion of goal check_test_005'vc.
+Prover result is: Valid (0.01s, 18053 steps).
+
+File "minimum_consecutive_cards_to_pick_up_list.mlw", line 56, characters 13-28:
+Sub-goal Assertion of goal check_test_005'vc.
+Prover result is: Valid (0.01s, 13633 steps).
+
+File "minimum_consecutive_cards_to_pick_up_list.mlw", line 57, characters 13-28:
+Sub-goal Assertion of goal check_test_005'vc.
+Prover result is: Valid (0.01s, 14429 steps).
+
+File "minimum_consecutive_cards_to_pick_up_list.mlw", line 58, characters 13-42:
+Sub-goal Assertion of goal check_test_005'vc.
+Prover result is: Valid (0.01s, 16305 steps).
+
+File "minimum_consecutive_cards_to_pick_up_list.mlw", line 59, characters 13-36:
+Sub-goal Assertion of goal check_test_005'vc.
+Prover result is: Valid (0.01s, 16612 steps).
+
+File "minimum_consecutive_cards_to_pick_up_list.mlw", line 60, characters 61-70:
+Sub-goal Assertion of goal check_test_005'vc.
+Prover result is: Valid (0.01s, 16244 steps).
+
+File "minimum_consecutive_cards_to_pick_up_list.mlw", line 61, characters 13-42:
+Sub-goal Assertion of goal check_test_005'vc.
+Prover result is: Valid (0.01s, 19196 steps).
+Solved with split_vc using prover: Z3,4.8.6
+== Stage 2: split_vc on unproved goal ==
+Target theory: MinimumConsecutiveCardsToPickUp_List_Spec
+Target goal  : check_test_004'vc
+---- stage2 | prover: Z3,4.8.6 | theory: MinimumConsecutiveCardsToPickUp_List_Spec | goal: check_test_004'vc ----
+Transforms: split_vc
+File "minimum_consecutive_cards_to_pick_up_list.mlw", line 65, characters 13-29:
+Sub-goal Assertion of goal check_test_004'vc.
+Prover result is: Valid (0.01s, 12501 steps).
+
+File "minimum_consecutive_cards_to_pick_up_list.mlw", line 66, characters 13-39:
+Sub-goal Assertion of goal check_test_004'vc.
+Prover result is: Valid (0.01s, 21654 steps).
+
+File "minimum_consecutive_cards_to_pick_up_list.mlw", line 67, characters 13-28:
+Sub-goal Assertion of goal check_test_004'vc.
+Prover result is: Valid (0.01s, 14237 steps).
+
+File "minimum_consecutive_cards_to_pick_up_list.mlw", line 68, characters 13-28:
+Sub-goal Assertion of goal check_test_004'vc.
+Prover result is: Valid (0.01s, 18754 steps).
+
+File "minimum_consecutive_cards_to_pick_up_list.mlw", line 69, characters 13-28:
+Sub-goal Assertion of goal check_test_004'vc.
+Prover result is: Valid (0.01s, 16723 steps).
+
+File "minimum_consecutive_cards_to_pick_up_list.mlw", line 70, characters 13-28:
+Sub-goal Assertion of goal check_test_004'vc.
+Prover result is: Valid (0.01s, 19395 steps).
+
+File "minimum_consecutive_cards_to_pick_up_list.mlw", line 71, characters 13-42:
+Sub-goal Assertion of goal check_test_004'vc.
+Prover result is: Valid (0.01s, 19956 steps).
+
+File "minimum_consecutive_cards_to_pick_up_list.mlw", line 72, characters 13-42:
+Sub-goal Assertion of goal check_test_004'vc.
+Prover result is: Valid (0.01s, 20136 steps).
+
+File "minimum_consecutive_cards_to_pick_up_list.mlw", line 73, characters 13-36:
+Sub-goal Assertion of goal check_test_004'vc.
+Prover result is: Valid (0.01s, 19281 steps).
+
+File "minimum_consecutive_cards_to_pick_up_list.mlw", line 74, characters 61-70:
+Sub-goal Assertion of goal check_test_004'vc.
+Prover result is: Valid (0.01s, 48498 steps).
+
+File "minimum_consecutive_cards_to_pick_up_list.mlw", line 75, characters 13-42:
+Sub-goal Assertion of goal check_test_004'vc.
+Prover result is: Valid (0.01s, 22059 steps).
+Solved with split_vc using prover: Z3,4.8.6
+== Stage 2: split_vc on unproved goal ==
+Target theory: MinimumConsecutiveCardsToPickUp_List_Spec
+Target goal  : check_test_000'vc
+---- stage2 | prover: Z3,4.8.6 | theory: MinimumConsecutiveCardsToPickUp_List_Spec | goal: check_test_000'vc ----
+Transforms: split_vc
+File "minimum_consecutive_cards_to_pick_up_list.mlw", line 89, characters 13-30:
+Sub-goal Assertion of goal check_test_000'vc.
+Prover result is: Valid (0.01s, 14503 steps).
+
+File "minimum_consecutive_cards_to_pick_up_list.mlw", line 90, characters 13-39:
+Sub-goal Assertion of goal check_test_000'vc.
+Prover result is: Valid (0.01s, 26066 steps).
+
+File "minimum_consecutive_cards_to_pick_up_list.mlw", line 91, characters 13-28:
+Sub-goal Assertion of goal check_test_000'vc.
+Prover result is: Valid (0.01s, 14992 steps).
+
+File "minimum_consecutive_cards_to_pick_up_list.mlw", line 92, characters 13-29:
+Sub-goal Assertion of goal check_test_000'vc.
+Prover result is: Valid (0.01s, 24033 steps).
+
+File "minimum_consecutive_cards_to_pick_up_list.mlw", line 93, characters 13-43:
+Sub-goal Assertion of goal check_test_000'vc.
+Prover result is: Valid (0.01s, 23541 steps).
+
+File "minimum_consecutive_cards_to_pick_up_list.mlw", line 94, characters 13-37:
+Sub-goal Assertion of goal check_test_000'vc.
+Prover result is: Valid (0.01s, 21389 steps).
+
+File "minimum_consecutive_cards_to_pick_up_list.mlw", line 95, characters 61-71:
+Sub-goal Assertion of goal check_test_000'vc.
+Prover result is: Valid (0.04s, 276364 steps).
+
+File "minimum_consecutive_cards_to_pick_up_list.mlw", line 96, characters 13-43:
+Sub-goal Assertion of goal check_test_000'vc.
+Prover result is: Valid (0.01s, 24461 steps).
+Solved with split_vc using prover: Z3,4.8.6
+== Final summary ==
+Unproved root goals after first prover : 3
+Remaining failures after split_vc      : 0
+Remaining failures after stage 3       : 0
+Detailed logs stored in                : /Users/rubenm/Desktop/Diversify2Verify/codex-runs/stage1a-list/2260_minimum-consecutive-cards-to-pick-up-20260523-140639/generated/why3/list/.why3_sessions/minimum_consecutive_cards_to_pick_up_list_logs
+VERIFY_RESULT: SUCCESS
+VERIFY_REASON: proved_after_stage2
+VERIFY_STAGE: stage2
+VERIFY_ROOT_TOTAL: 7
+VERIFY_ROOT_PROVED: 7
+VERIFY_ROOT_REMAINING: 0

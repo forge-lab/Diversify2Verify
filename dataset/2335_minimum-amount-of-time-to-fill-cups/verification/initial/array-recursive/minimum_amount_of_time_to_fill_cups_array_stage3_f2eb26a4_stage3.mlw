@@ -1,0 +1,107 @@
+module MinimumAmountOfTimeToFillCups_Array_Spec
+
+  use int.Int
+  use int.MinMax
+  use int.EuclideanDivision
+  use array.Array
+  use array.Init
+  use array.ArraySum
+
+  predicate valid_amount (amount: array int) =
+    length amount = 3 /\
+    forall i: int. 0 <= i < length amount -> 0 <= amount[i] <= 100
+
+  function cups_total (amount: array int) : int =
+    ArraySum.sum amount 0 3
+
+  function largest_type_amount (amount: array int) : int =
+    max (amount[0]) (max (amount[1]) (amount[2]))
+
+  predicate feasible_time (amount: array int) (seconds: int) =
+    0 <= seconds /\
+    largest_type_amount amount <= seconds /\
+    cups_total amount <= 2 * seconds
+
+  predicate minimum_fill_time (amount: array int) (seconds: int) =
+    feasible_time amount seconds /\
+    forall other: int. feasible_time amount other -> seconds <= other
+
+  let rec sum_from (amount: array int) (i: int) : int
+    requires { 0 <= i <= length amount }
+    ensures  { result = ArraySum.sum amount i (length amount) }
+    ensures  { i = 0 /\ length amount = 3 -> result = cups_total amount }
+    variant  { length amount - i }
+  =
+    if i >= length amount then
+      0
+    else
+      amount[i] + sum_from amount (i + 1)
+
+  let rec max_from (amount: array int) (i: int) (current: int) : int
+    requires { 0 <= i <= length amount }
+    ensures  { current <= result }
+    ensures  { forall k: int. i <= k < length amount -> amount[k] <= result }
+    ensures  { result = current \/ exists k: int. i <= k < length amount /\ result = amount[k] }
+    ensures  { length amount = 3 /\ i = 1 /\ current = amount[0] ->
+               result = largest_type_amount amount }
+    variant  { length amount - i }
+  =
+    if i >= length amount then
+      current
+    else if amount[i] > current then
+      max_from amount (i + 1) amount[i]
+    else
+      max_from amount (i + 1) current
+
+  let ceil_half (n: int) : int
+    requires { 0 <= n }
+    ensures  { result = div (n + 1) 2 }
+    ensures  { 0 <= result }
+    ensures  { n <= 2 * result }
+    ensures  { forall s: int. 0 <= s /\ n <= 2 * s -> result <= s }
+  =
+    div (n + 1) 2
+
+  let maximum_amount (amount: array int) : int
+    ensures { length amount = 0 -> result = 0 }
+    ensures { length amount = 3 -> result = largest_type_amount amount }
+    ensures { 0 < length amount ->
+              forall k: int. 0 <= k < length amount -> amount[k] <= result }
+  =
+    if length amount = 0 then
+      0
+    else
+      max_from amount 1 amount[0]
+
+  let minimum_amount_of_time_to_fill_cups_array (amount: array int) : int
+    requires { valid_amount amount }
+    ensures  { minimum_fill_time amount result }
+  =
+    let total = sum_from amount 0 in
+    let largest = maximum_amount amount in
+    let pairing_bound = ceil_half total in
+    assert { length amount = 3 };
+    assert { total = cups_total amount };
+    assert { largest = largest_type_amount amount };
+    assert { 0 <= total };
+    assert { 0 <= largest };
+    assert { total <= 2 * pairing_bound };
+    assert { forall other: int. feasible_time amount other -> largest <= other };
+    assert { forall other: int. feasible_time amount other -> pairing_bound <= other };
+    if largest >= pairing_bound then begin
+      assert { 0 <= largest };
+      assert { largest_type_amount amount <= largest };
+      assert { cups_total amount <= 2 * largest };
+      assert { feasible_time amount largest };
+      assert { forall other: int. feasible_time amount other -> largest <= other };
+      largest
+    end else begin
+      assert { 0 <= pairing_bound };
+      assert { largest_type_amount amount <= pairing_bound };
+      assert { cups_total amount <= 2 * pairing_bound };
+      assert { feasible_time amount pairing_bound };
+      assert { forall other: int. feasible_time amount other -> pairing_bound <= other };
+      pairing_bound
+    end
+
+end

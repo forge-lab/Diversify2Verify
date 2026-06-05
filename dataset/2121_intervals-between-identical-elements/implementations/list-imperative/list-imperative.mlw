@@ -1,0 +1,268 @@
+module IntervalsBetweenIdenticalElements_List_Imperative_Implementation
+
+  use int.Int
+  use int.Abs
+  use list.List
+  use ref.Ref
+
+  let is_nonempty (l: list int) : bool =
+    match l with
+    | Nil -> false
+    | Cons _ _ -> true
+    end
+
+  let reverse_list (l: list int) : list int =
+    let cur = ref l in
+    let acc = ref Nil in
+    while is_nonempty !cur do
+      match !cur with
+      | Nil -> ()
+      | Cons x xs ->
+          acc := Cons x !acc;
+          cur := xs
+      end
+    done;
+    !acc
+
+  let rec equal_list (left: list int) (right: list int) : bool =
+    match left, right with
+    | Nil, Nil -> true
+    | Cons x xs, Cons y ys -> x = y && equal_list xs ys
+    | _, _ -> false
+    end
+
+  let distance_sum_for_value_at_index (arr: list int) (x: int) (i: int) : int =
+    let total = ref 0 in
+    let j = ref 0 in
+    let cur = ref arr in
+    while is_nonempty !cur do
+      match !cur with
+      | Nil -> ()
+      | Cons y ys ->
+          if y = x then total := !total + abs (i - !j);
+          j := !j + 1;
+          cur := ys
+      end
+    done;
+    !total
+
+  let intervals_between_identical_elements_list (arr: list int) : list int =
+    let rev_out = ref Nil in
+    let cur = ref arr in
+    let i = ref 0 in
+    while is_nonempty !cur do
+      match !cur with
+      | Nil -> ()
+      | Cons x xs ->
+          let distance = distance_sum_for_value_at_index arr x !i in
+          rev_out := Cons distance !rev_out;
+          i := !i + 1;
+          cur := xs
+      end
+    done;
+    reverse_list !rev_out
+
+  let test_000 () : bool =
+    let arr =
+      Cons 100000 (Cons 1 (Cons 100000 (Cons 2 (Cons 100000 (Cons 3 (Cons 100000 (Cons 4 (Cons 100000 (Cons 5 (Nil)))))))))) in
+    let expected =
+      Cons 20 (Cons 0 (Cons 14 (Cons 0 (Cons 12 (Cons 0 (Cons 14 (Cons 0 (Cons 20 (Cons 0 (Nil)))))))))) in
+    let r = intervals_between_identical_elements_list arr in
+    equal_list r expected
+
+  let test_001 () : bool =
+    let arr =
+      Cons 5 (Cons 4 (Cons 3 (Cons 2 (Cons 1 (Nil))))) in
+    let expected =
+      Cons 0 (Cons 0 (Cons 0 (Cons 0 (Cons 0 (Nil))))) in
+    let r = intervals_between_identical_elements_list arr in
+    equal_list r expected
+
+  let test_002 () : bool =
+    let arr =
+      Cons 1 (Cons 3 (Cons 2 (Cons 3 (Cons 1 (Cons 4 (Cons 2 (Cons 3 (Cons 1 (Cons 4 (Cons 2 (Nil))))))))))) in
+    let expected =
+      Cons 12 (Cons 8 (Cons 12 (Cons 6 (Cons 8 (Cons 4 (Cons 8 (Cons 10 (Cons 12 (Cons 4 (Cons 12 (Nil))))))))))) in
+    let r = intervals_between_identical_elements_list arr in
+    equal_list r expected
+
+  let test_003 () : bool =
+    let arr =
+      Cons 1 (Cons 2 (Cons 3 (Cons 4 (Cons 5 (Cons 1 (Cons 2 (Cons 3 (Cons 4 (Cons 5 (Nil)))))))))) in
+    let expected =
+      Cons 5 (Cons 5 (Cons 5 (Cons 5 (Cons 5 (Cons 5 (Cons 5 (Cons 5 (Cons 5 (Cons 5 (Nil)))))))))) in
+    let r = intervals_between_identical_elements_list arr in
+    equal_list r expected
+
+  let test_004 () : bool =
+    let arr =
+      Cons 1 (Cons 2 (Cons 3 (Cons 4 (Cons 5 (Nil))))) in
+    let expected =
+      Cons 0 (Cons 0 (Cons 0 (Cons 0 (Cons 0 (Nil))))) in
+    let r = intervals_between_identical_elements_list arr in
+    equal_list r expected
+
+  let test_005 () : bool =
+    let arr =
+      Cons 5 (Cons 5 (Cons 5 (Cons 5 (Cons 5 (Cons 5 (Cons 5 (Cons 5 (Cons 5 (Cons 5 (Nil)))))))))) in
+    let expected =
+      Cons 45 (Cons 37 (Cons 31 (Cons 27 (Cons 25 (Cons 25 (Cons 27 (Cons 31 (Cons 37 (Cons 45 (Nil)))))))))) in
+    let r = intervals_between_identical_elements_list arr in
+    equal_list r expected
+
+  let test_006 () : bool =
+    let arr =
+      Cons 10 (Cons 5 (Cons 10 (Cons 10 (Nil)))) in
+    let expected =
+      Cons 5 (Cons 0 (Cons 3 (Cons 4 (Nil)))) in
+    let r = intervals_between_identical_elements_list arr in
+    equal_list r expected
+
+  let test_007 () : bool =
+    let arr =
+      Cons 5 (Cons 5 (Cons 5 (Cons 5 (Cons 5 (Nil))))) in
+    let expected =
+      Cons 10 (Cons 7 (Cons 6 (Cons 7 (Cons 10 (Nil))))) in
+    let r = intervals_between_identical_elements_list arr in
+    equal_list r expected
+
+  let test_008 () : bool =
+    let arr =
+      Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Nil))))) in
+    let expected =
+      Cons 10 (Cons 7 (Cons 6 (Cons 7 (Cons 10 (Nil))))) in
+    let r = intervals_between_identical_elements_list arr in
+    equal_list r expected
+
+  let test_009 () : bool =
+    let arr =
+      Cons 1 (Cons 1 (Cons 2 (Cons 2 (Cons 3 (Cons 3 (Cons 4 (Cons 4 (Nil)))))))) in
+    let expected =
+      Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Nil)))))))) in
+    let r = intervals_between_identical_elements_list arr in
+    equal_list r expected
+
+  let test_010 () : bool =
+    let arr =
+      Cons 2 (Cons 1 (Cons 3 (Cons 1 (Cons 2 (Cons 3 (Cons 3 (Nil))))))) in
+    let expected =
+      Cons 4 (Cons 2 (Cons 7 (Cons 2 (Cons 4 (Cons 4 (Cons 5 (Nil))))))) in
+    let r = intervals_between_identical_elements_list arr in
+    equal_list r expected
+
+  let test_011 () : bool =
+    let arr =
+      Cons 1 (Cons 2 (Cons 2 (Cons 1 (Cons 3 (Cons 3 (Cons 3 (Cons 4 (Cons 4 (Cons 4 (Cons 4 (Cons 5 (Cons 5 (Cons 5 (Cons 5 (Cons 5 (Cons 6 (Cons 6 (Cons 6 (Cons 6 (Cons 6 (Cons 6 (Nil)))))))))))))))))))))) in
+    let expected =
+      Cons 3 (Cons 1 (Cons 1 (Cons 3 (Cons 3 (Cons 2 (Cons 3 (Cons 6 (Cons 4 (Cons 4 (Cons 6 (Cons 10 (Cons 7 (Cons 6 (Cons 7 (Cons 10 (Cons 15 (Cons 11 (Cons 9 (Cons 9 (Cons 11 (Cons 15 (Nil)))))))))))))))))))))) in
+    let r = intervals_between_identical_elements_list arr in
+    equal_list r expected
+
+  let test_012 () : bool =
+    let arr =
+      Cons 1 (Cons 1 (Cons 2 (Cons 2 (Cons 3 (Cons 3 (Cons 4 (Cons 4 (Cons 5 (Cons 5 (Cons 6 (Cons 6 (Cons 7 (Cons 7 (Cons 8 (Cons 8 (Cons 9 (Cons 9 (Cons 10 (Cons 10 (Cons 1 (Cons 1 (Cons 2 (Cons 2 (Cons 3 (Cons 3 (Cons 4 (Cons 4 (Cons 5 (Cons 5 (Nil)))))))))))))))))))))))))))))) in
+    let expected =
+      Cons 42 (Cons 40 (Cons 42 (Cons 40 (Cons 42 (Cons 40 (Cons 42 (Cons 40 (Cons 42 (Cons 40 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 40 (Cons 42 (Cons 40 (Cons 42 (Cons 40 (Cons 42 (Cons 40 (Cons 42 (Cons 40 (Cons 42 (Nil)))))))))))))))))))))))))))))) in
+    let r = intervals_between_identical_elements_list arr in
+    equal_list r expected
+
+  let test_013 () : bool =
+    let arr =
+      Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 2 (Cons 2 (Cons 2 (Cons 2 (Cons 2 (Cons 3 (Cons 3 (Cons 3 (Cons 3 (Cons 3 (Cons 4 (Cons 4 (Cons 4 (Cons 4 (Cons 4 (Nil)))))))))))))))))))) in
+    let expected =
+      Cons 10 (Cons 7 (Cons 6 (Cons 7 (Cons 10 (Cons 10 (Cons 7 (Cons 6 (Cons 7 (Cons 10 (Cons 10 (Cons 7 (Cons 6 (Cons 7 (Cons 10 (Cons 10 (Cons 7 (Cons 6 (Cons 7 (Cons 10 (Nil)))))))))))))))))))) in
+    let r = intervals_between_identical_elements_list arr in
+    equal_list r expected
+
+  let test_014 () : bool =
+    let arr =
+      Cons 1 (Cons 2 (Cons 3 (Cons 4 (Cons 5 (Cons 5 (Cons 4 (Cons 3 (Cons 2 (Cons 1 (Cons 1 (Cons 2 (Cons 3 (Cons 4 (Cons 5 (Cons 5 (Cons 4 (Cons 3 (Cons 2 (Cons 1 (Nil)))))))))))))))))))) in
+    let expected =
+      Cons 38 (Cons 34 (Cons 30 (Cons 26 (Cons 22 (Cons 20 (Cons 20 (Cons 20 (Cons 20 (Cons 20 (Cons 20 (Cons 20 (Cons 20 (Cons 20 (Cons 20 (Cons 22 (Cons 26 (Cons 30 (Cons 34 (Cons 38 (Nil)))))))))))))))))))) in
+    let r = intervals_between_identical_elements_list arr in
+    equal_list r expected
+
+  let test_015 () : bool =
+    let arr =
+      Cons 1 (Cons 2 (Cons 3 (Cons 4 (Cons 5 (Cons 6 (Cons 7 (Cons 8 (Cons 9 (Cons 10 (Cons 10 (Cons 9 (Cons 8 (Cons 7 (Cons 6 (Cons 5 (Cons 4 (Cons 3 (Cons 2 (Cons 1 (Nil)))))))))))))))))))) in
+    let expected =
+      Cons 19 (Cons 17 (Cons 15 (Cons 13 (Cons 11 (Cons 9 (Cons 7 (Cons 5 (Cons 3 (Cons 1 (Cons 1 (Cons 3 (Cons 5 (Cons 7 (Cons 9 (Cons 11 (Cons 13 (Cons 15 (Cons 17 (Cons 19 (Nil)))))))))))))))))))) in
+    let r = intervals_between_identical_elements_list arr in
+    equal_list r expected
+
+  let test_016 () : bool =
+    let arr =
+      Cons 1 (Cons 2 (Cons 3 (Cons 4 (Cons 5 (Cons 1 (Cons 2 (Cons 3 (Cons 4 (Cons 5 (Cons 1 (Cons 2 (Cons 3 (Cons 4 (Cons 5 (Nil))))))))))))))) in
+    let expected =
+      Cons 15 (Cons 15 (Cons 15 (Cons 15 (Cons 15 (Cons 10 (Cons 10 (Cons 10 (Cons 10 (Cons 10 (Cons 15 (Cons 15 (Cons 15 (Cons 15 (Cons 15 (Nil))))))))))))))) in
+    let r = intervals_between_identical_elements_list arr in
+    equal_list r expected
+
+  let test_017 () : bool =
+    let arr =
+      Cons 10 (Cons 9 (Cons 8 (Cons 7 (Cons 6 (Cons 5 (Cons 4 (Cons 3 (Cons 2 (Cons 1 (Cons 1 (Cons 2 (Cons 3 (Cons 4 (Cons 5 (Cons 6 (Cons 7 (Cons 8 (Cons 9 (Cons 10 (Nil)))))))))))))))))))) in
+    let expected =
+      Cons 19 (Cons 17 (Cons 15 (Cons 13 (Cons 11 (Cons 9 (Cons 7 (Cons 5 (Cons 3 (Cons 1 (Cons 1 (Cons 3 (Cons 5 (Cons 7 (Cons 9 (Cons 11 (Cons 13 (Cons 15 (Cons 17 (Cons 19 (Nil)))))))))))))))))))) in
+    let r = intervals_between_identical_elements_list arr in
+    equal_list r expected
+
+  let test_018 () : bool =
+    let arr =
+      Cons 30 (Cons 28 (Cons 26 (Cons 24 (Cons 22 (Cons 20 (Cons 18 (Cons 16 (Cons 14 (Cons 12 (Cons 10 (Cons 8 (Cons 6 (Cons 4 (Cons 2 (Nil))))))))))))))) in
+    let expected =
+      Cons 0 (Cons 0 (Cons 0 (Cons 0 (Cons 0 (Cons 0 (Cons 0 (Cons 0 (Cons 0 (Cons 0 (Cons 0 (Cons 0 (Cons 0 (Cons 0 (Cons 0 (Nil))))))))))))))) in
+    let r = intervals_between_identical_elements_list arr in
+    equal_list r expected
+
+  let test_019 () : bool =
+    let arr =
+      Cons 10 (Cons 20 (Cons 10 (Cons 30 (Cons 10 (Cons 40 (Cons 10 (Cons 50 (Cons 10 (Cons 60 (Cons 10 (Cons 70 (Cons 10 (Cons 80 (Cons 10 (Cons 90 (Cons 10 (Cons 100 (Cons 10 (Cons 110 (Nil)))))))))))))))))))) in
+    let expected =
+      Cons 90 (Cons 0 (Cons 74 (Cons 0 (Cons 62 (Cons 0 (Cons 54 (Cons 0 (Cons 50 (Cons 0 (Cons 50 (Cons 0 (Cons 54 (Cons 0 (Cons 62 (Cons 0 (Cons 74 (Cons 0 (Cons 90 (Cons 0 (Nil)))))))))))))))))))) in
+    let r = intervals_between_identical_elements_list arr in
+    equal_list r expected
+
+  let run_tests () : bool =
+    if test_000 () then
+    if test_001 () then
+    if test_002 () then
+    if test_003 () then
+    if test_004 () then
+    if test_005 () then
+    if test_006 () then
+    if test_007 () then
+    if test_008 () then
+    if test_009 () then
+    if test_010 () then
+    if test_011 () then
+    if test_012 () then
+    if test_013 () then
+    if test_014 () then
+    if test_015 () then
+    if test_016 () then
+    if test_017 () then
+    if test_018 () then
+    if test_019 () then
+      true
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+
+end

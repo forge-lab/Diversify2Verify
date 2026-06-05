@@ -1,0 +1,188 @@
+module MinimizeMaximumOfArray_List_Imperative_Implementation
+
+  use int.Int
+  use int.EuclideanDivision
+  use list.List
+  use ref.Ref
+
+  let minimize_maximum_of_array_list (nums: list int) : int =
+    let prefix_sum = ref 0 in
+    let prefix_len = ref 0 in
+    let best = ref 0 in
+    let cur = ref nums in
+    while (match !cur with Nil -> false | Cons _ _ -> true end) do
+      match !cur with
+      | Nil -> ()
+      | Cons x xs ->
+          prefix_sum := !prefix_sum + x;
+          prefix_len := !prefix_len + 1;
+          let candidate = div (!prefix_sum + !prefix_len - 1) !prefix_len in
+          if candidate > !best then best := candidate;
+          cur := xs
+      end
+    done;
+    !best
+
+  let test_000 () : bool =
+    let nums = Cons 1 (Cons 9 (Cons 1 (Cons 9 (Cons 1 Nil)))) in
+    let r = minimize_maximum_of_array_list nums in
+    r = 5
+
+  let test_001 () : bool =
+    let nums = Cons 1 (Cons 1000000000 Nil) in
+    let r = minimize_maximum_of_array_list nums in
+    r = 500000001
+
+  let test_002 () : bool =
+    let nums =
+      Cons 1000000000
+        (Cons 1000000000
+           (Cons 1000000000 (Cons 1000000000 (Cons 1000000000 Nil)))) in
+    let r = minimize_maximum_of_array_list nums in
+    r = 1000000000
+
+  let test_003 () : bool =
+    let nums = Cons 9 (Cons 7 (Cons 5 (Cons 3 (Cons 1 Nil)))) in
+    let r = minimize_maximum_of_array_list nums in
+    r = 9
+
+  let test_004 () : bool =
+    let nums =
+      Cons 10
+        (Cons 9
+           (Cons 8
+              (Cons 7
+                 (Cons 6 (Cons 5 (Cons 4 (Cons 3 (Cons 2 (Cons 1 Nil))))))))) in
+    let r = minimize_maximum_of_array_list nums in
+    r = 10
+
+  let test_005 () : bool =
+    let nums = Cons 1000000000 (Cons 1000000000 Nil) in
+    let r = minimize_maximum_of_array_list nums in
+    r = 1000000000
+
+  let test_006 () : bool =
+    let nums = Cons 5 (Cons 5 (Cons 5 (Cons 5 (Cons 5 Nil)))) in
+    let r = minimize_maximum_of_array_list nums in
+    r = 5
+
+  let test_007 () : bool =
+    let nums = Cons 0 (Cons 0 (Cons 0 (Cons 0 (Cons 0 Nil)))) in
+    let r = minimize_maximum_of_array_list nums in
+    r = 0
+
+  let test_008 () : bool =
+    let nums = Cons 1 (Cons 2 (Cons 3 (Cons 4 (Cons 5 Nil)))) in
+    let r = minimize_maximum_of_array_list nums in
+    r = 3
+
+  let test_009 () : bool =
+    let nums = Cons 1 (Cons 1000000000 (Cons 1 (Cons 1000000000 (Cons 1 Nil)))) in
+    let r = minimize_maximum_of_array_list nums in
+    r = 500000001
+
+  let test_010 () : bool =
+    let nums = Cons 1 (Cons 2 (Cons 1000000000 (Cons 2 (Cons 1 Nil)))) in
+    let r = minimize_maximum_of_array_list nums in
+    r = 333333335
+
+  let test_011 () : bool =
+    let nums =
+      Cons 1
+        (Cons 1
+           (Cons 1
+              (Cons 1
+                 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 Nil))))))))) in
+    let r = minimize_maximum_of_array_list nums in
+    r = 1
+
+  let test_012 () : bool =
+    let nums = Cons 1000000000 (Cons 0 (Cons 0 (Cons 0 (Cons 0 Nil)))) in
+    let r = minimize_maximum_of_array_list nums in
+    r = 1000000000
+
+  let test_013 () : bool =
+    let nums = Cons 5 (Cons 4 (Cons 3 (Cons 2 (Cons 1 Nil)))) in
+    let r = minimize_maximum_of_array_list nums in
+    r = 5
+
+  let test_014 () : bool =
+    let nums = Cons 1 (Cons 1000000000 (Cons 1 (Cons 1 (Cons 1 Nil)))) in
+    let r = minimize_maximum_of_array_list nums in
+    r = 500000001
+
+  let test_015 () : bool =
+    let nums = Cons 1 (Cons 1000000000 (Cons 1 Nil)) in
+    let r = minimize_maximum_of_array_list nums in
+    r = 500000001
+
+  let test_016 () : bool =
+    let nums = Cons 10 (Cons 1 Nil) in
+    let r = minimize_maximum_of_array_list nums in
+    r = 10
+
+  let test_017 () : bool =
+    let nums = Cons 3 (Cons 7 (Cons 1 (Cons 6 Nil))) in
+    let r = minimize_maximum_of_array_list nums in
+    r = 5
+
+  let test_018 () : bool =
+    let nums = Cons 1000000000 (Cons 1 Nil) in
+    let r = minimize_maximum_of_array_list nums in
+    r = 1000000000
+
+  let test_019 () : bool =
+    let nums =
+      Cons 500
+        (Cons 450
+           (Cons 400
+              (Cons 350
+                 (Cons 300
+                    (Cons 250 (Cons 200 (Cons 150 (Cons 100 (Cons 50 Nil))))))))) in
+    let r = minimize_maximum_of_array_list nums in
+    r = 500
+
+  let run_tests () : bool =
+    if test_000 () then
+    if test_001 () then
+    if test_002 () then
+    if test_003 () then
+    if test_004 () then
+    if test_005 () then
+    if test_006 () then
+    if test_007 () then
+    if test_008 () then
+    if test_009 () then
+    if test_010 () then
+    if test_011 () then
+    if test_012 () then
+    if test_013 () then
+    if test_014 () then
+    if test_015 () then
+    if test_016 () then
+    if test_017 () then
+    if test_018 () then
+    if test_019 () then
+      true
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+
+end

@@ -1,0 +1,214 @@
+module AppendKIntegersWithMinimalSum_Array_Recursive_Implementation
+
+  use int.Int
+  use int.EuclideanDivision
+  use array.Array
+  use array.Init
+  use list.List
+
+  let rec insert_sorted_unique (x: int) (xs: list int) : list int
+    variant { xs }
+  =
+    match xs with
+    | Nil -> Cons x Nil
+    | Cons y ys ->
+        if x = y then
+          xs
+        else if x < y then
+          Cons x xs
+        else
+          Cons y (insert_sorted_unique x ys)
+    end
+
+  let rec sorted_unique_list_of_array_from (nums: array int) (i: int) : list int
+    variant { length nums - i }
+  =
+    if i >= length nums then
+      Nil
+    else
+      insert_sorted_unique nums[i] (sorted_unique_list_of_array_from nums (i + 1))
+
+  let arithmetic_sum (start: int) (count: int) : int =
+    if count <= 0 then
+      0
+    else
+      div (count * (2 * start + count - 1)) 2
+
+  let rec consume_sorted
+      (sorted: list int) (next_value: int) (remaining: int) (acc: int) : int
+    variant { sorted }
+  =
+    if remaining <= 0 then
+      acc
+    else
+      match sorted with
+      | Nil -> acc + arithmetic_sum next_value remaining
+      | Cons x xs ->
+          if x < next_value then
+            consume_sorted xs next_value remaining acc
+          else if x = next_value then
+            consume_sorted xs (next_value + 1) remaining acc
+          else
+            let gap = x - next_value in
+            if remaining <= gap then
+              acc + arithmetic_sum next_value remaining
+            else
+              consume_sorted xs (x + 1) (remaining - gap)
+                (acc + arithmetic_sum next_value gap)
+      end
+
+  let append_k_integers_with_minimal_sum_array (nums: array int) (k: int) : int =
+    if k <= 0 then
+      0
+    else
+      let sorted = sorted_unique_list_of_array_from nums 0 in
+      consume_sorted sorted 1 k 0
+
+  let test_000 () : bool =
+    let nums = init 5 [|1; 2; 3; 4; 5|] in
+    let r = append_k_integers_with_minimal_sum_array nums 3 in
+    r = 21
+
+  let test_001 () : bool =
+    let nums = init 5 [|1; 4; 25; 10; 25|] in
+    let r = append_k_integers_with_minimal_sum_array nums 2 in
+    r = 5
+
+  let test_002 () : bool =
+    let nums = init 1 [|1000000000|] in
+    let r = append_k_integers_with_minimal_sum_array nums 100000 in
+    r = 5000050000
+
+  let test_003 () : bool =
+    let nums = init 1 [|1000000000|] in
+    let r = append_k_integers_with_minimal_sum_array nums 1 in
+    r = 1
+
+  let test_004 () : bool =
+    let nums = init 5 [|1; 3; 5; 7; 9|] in
+    let r = append_k_integers_with_minimal_sum_array nums 10 in
+    r = 95
+
+  let test_005 () : bool =
+    let nums = init 1 [|1|] in
+    let r = append_k_integers_with_minimal_sum_array nums 1 in
+    r = 2
+
+  let test_006 () : bool =
+    let nums = init 5 [|1; 3; 5; 7; 9|] in
+    let r = append_k_integers_with_minimal_sum_array nums 5 in
+    r = 30
+
+  let test_007 () : bool =
+    let nums = init 5 [|10; 20; 30; 40; 50|] in
+    let r = append_k_integers_with_minimal_sum_array nums 5 in
+    r = 15
+
+  let test_008 () : bool =
+    let nums = init 2 [|5; 6|] in
+    let r = append_k_integers_with_minimal_sum_array nums 6 in
+    r = 25
+
+  let test_009 () : bool =
+    let nums = init 5 [|1; 1; 1; 1; 1|] in
+    let r = append_k_integers_with_minimal_sum_array nums 1 in
+    r = 2
+
+  let test_010 () : bool =
+    let nums = init 1 [|1000000000|] in
+    let r = append_k_integers_with_minimal_sum_array nums 100000000 in
+    r = 5000000050000000
+
+  let test_011 () : bool =
+    let nums = init 3 [|10; 20; 30|] in
+    let r = append_k_integers_with_minimal_sum_array nums 5 in
+    r = 15
+
+  let test_012 () : bool =
+    let nums = init 5 [|5; 15; 25; 35; 45|] in
+    let r = append_k_integers_with_minimal_sum_array nums 15 in
+    r = 133
+
+  let test_013 () : bool =
+    let nums = init 5 [|100; 200; 300; 400; 500|] in
+    let r = append_k_integers_with_minimal_sum_array nums 50 in
+    r = 1275
+
+  let test_014 () : bool =
+    let nums = init 10 [|1; 10; 20; 30; 40; 50; 60; 70; 80; 90|] in
+    let r = append_k_integers_with_minimal_sum_array nums 50 in
+    r = 1445
+
+  let test_015 () : bool =
+    let nums = init 10 [|1; 2; 3; 4; 5; 6; 7; 8; 9; 10|] in
+    let r = append_k_integers_with_minimal_sum_array nums 10 in
+    r = 155
+
+  let test_016 () : bool =
+    let nums = init 9 [|2; 3; 4; 5; 6; 7; 8; 9; 10|] in
+    let r = append_k_integers_with_minimal_sum_array nums 1 in
+    r = 1
+
+  let test_017 () : bool =
+    let nums = init 10 [|1; 2; 4; 8; 16; 32; 64; 128; 256; 512|] in
+    let r = append_k_integers_with_minimal_sum_array nums 30 in
+    r = 603
+
+  let test_018 () : bool =
+    let nums =
+      init 25
+        [|1; 5; 9; 13; 17; 21; 25; 29; 33; 37; 41; 45; 49;
+          53; 57; 61; 65; 69; 73; 77; 81; 85; 89; 93; 97|]
+    in
+    let r = append_k_integers_with_minimal_sum_array nums 25 in
+    r = 442
+
+  let test_019 () : bool =
+    let nums = init 10 [|1; 2; 3; 4; 5; 6; 7; 8; 9; 10|] in
+    let r = append_k_integers_with_minimal_sum_array nums 5 in
+    r = 65
+
+  let run_tests () : bool =
+    if test_000 () then
+    if test_001 () then
+    if test_002 () then
+    if test_003 () then
+    if test_004 () then
+    if test_005 () then
+    if test_006 () then
+    if test_007 () then
+    if test_008 () then
+    if test_009 () then
+    if test_010 () then
+    if test_011 () then
+    if test_012 () then
+    if test_013 () then
+    if test_014 () then
+    if test_015 () then
+    if test_016 () then
+    if test_017 () then
+    if test_018 () then
+    if test_019 () then
+      true
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+
+end

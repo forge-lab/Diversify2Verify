@@ -1,0 +1,276 @@
+module EqualSumArraysWithMinimumNumberOfOperations_List_Recursive_Implementation
+
+  use int.Int
+  use list.List
+
+  let rec sum_list (nums: list int) : int
+    variant { nums }
+  =
+    match nums with
+    | Nil -> 0
+    | Cons x xs -> x + sum_list xs
+    end
+
+  let rec length_list (nums: list int) : int
+    variant { nums }
+  =
+    match nums with
+    | Nil -> 0
+    | Cons _ xs -> 1 + length_list xs
+    end
+
+  let rec count_occurrence (value: int) (nums: list int) : int
+    variant { nums }
+  =
+    match nums with
+    | Nil -> 0
+    | Cons x xs ->
+        (if x = value then 1 else 0) + count_occurrence value xs
+    end
+
+  let count_gain5_inc_first (nums1: list int) (nums2: list int) : int =
+    count_occurrence 1 nums1 + count_occurrence 6 nums2
+
+  let count_gain4_inc_first (nums1: list int) (nums2: list int) : int =
+    count_occurrence 2 nums1 + count_occurrence 5 nums2
+
+  let count_gain3_inc_first (nums1: list int) (nums2: list int) : int =
+    count_occurrence 3 nums1 + count_occurrence 4 nums2
+
+  let count_gain2_inc_first (nums1: list int) (nums2: list int) : int =
+    count_occurrence 4 nums1 + count_occurrence 3 nums2
+
+  let count_gain1_inc_first (nums1: list int) (nums2: list int) : int =
+    count_occurrence 5 nums1 + count_occurrence 2 nums2
+
+  let count_gain5_dec_first (nums1: list int) (nums2: list int) : int =
+    count_occurrence 6 nums1 + count_occurrence 1 nums2
+
+  let count_gain4_dec_first (nums1: list int) (nums2: list int) : int =
+    count_occurrence 5 nums1 + count_occurrence 2 nums2
+
+  let count_gain3_dec_first (nums1: list int) (nums2: list int) : int =
+    count_occurrence 4 nums1 + count_occurrence 3 nums2
+
+  let count_gain2_dec_first (nums1: list int) (nums2: list int) : int =
+    count_occurrence 3 nums1 + count_occurrence 4 nums2
+
+  let count_gain1_dec_first (nums1: list int) (nums2: list int) : int =
+    count_occurrence 2 nums1 + count_occurrence 5 nums2
+
+  let max_gain_with_ops (k: int) (c5: int) (c4: int) (c3: int) (c2: int) (c1: int) : int =
+    if k <= 0 then 0
+    else if k <= c5 then 5 * k
+    else if k <= c5 + c4 then 5 * c5 + 4 * (k - c5)
+    else if k <= c5 + c4 + c3 then
+      5 * c5 + 4 * c4 + 3 * (k - c5 - c4)
+    else if k <= c5 + c4 + c3 + c2 then
+      5 * c5 + 4 * c4 + 3 * c3 + 2 * (k - c5 - c4 - c3)
+    else if k <= c5 + c4 + c3 + c2 + c1 then
+      5 * c5 + 4 * c4 + 3 * c3 + 2 * c2 + (k - c5 - c4 - c3 - c2)
+    else
+      5 * c5 + 4 * c4 + 3 * c3 + 2 * c2 + c1
+
+  let rec min_ops_for_diff
+    (remaining: int) (c5: int) (c4: int) (c3: int) (c2: int) (c1: int) : int
+    variant { if remaining > 0 then remaining else 0 }
+  =
+    if remaining <= 0 then 0
+    else if c5 > 0 then 1 + min_ops_for_diff (remaining - 5) (c5 - 1) c4 c3 c2 c1
+    else if c4 > 0 then 1 + min_ops_for_diff (remaining - 4) c5 (c4 - 1) c3 c2 c1
+    else if c3 > 0 then 1 + min_ops_for_diff (remaining - 3) c5 c4 (c3 - 1) c2 c1
+    else if c2 > 0 then 1 + min_ops_for_diff (remaining - 2) c5 c4 c3 (c2 - 1) c1
+    else if c1 > 0 then 1 + min_ops_for_diff (remaining - 1) c5 c4 c3 c2 (c1 - 1)
+    else 1000000
+
+  let equal_sum_arrays_with_minimum_number_of_operations_list
+    (nums1: list int) (nums2: list int) : int
+  =
+    let sum1 = sum_list nums1 in
+    let sum2 = sum_list nums2 in
+    if sum1 = sum2 then 0
+    else if sum1 < sum2 then
+      let diff = sum2 - sum1 in
+      let c5 = count_gain5_inc_first nums1 nums2 in
+      let c4 = count_gain4_inc_first nums1 nums2 in
+      let c3 = count_gain3_inc_first nums1 nums2 in
+      let c2 = count_gain2_inc_first nums1 nums2 in
+      let c1 = count_gain1_inc_first nums1 nums2 in
+      let total_ops = length_list nums1 + length_list nums2 in
+      if max_gain_with_ops total_ops c5 c4 c3 c2 c1 < diff then -1
+      else min_ops_for_diff diff c5 c4 c3 c2 c1
+    else
+      let diff = sum1 - sum2 in
+      let c5 = count_gain5_dec_first nums1 nums2 in
+      let c4 = count_gain4_dec_first nums1 nums2 in
+      let c3 = count_gain3_dec_first nums1 nums2 in
+      let c2 = count_gain2_dec_first nums1 nums2 in
+      let c1 = count_gain1_dec_first nums1 nums2 in
+      let total_ops = length_list nums1 + length_list nums2 in
+      if max_gain_with_ops total_ops c5 c4 c3 c2 c1 < diff then -1
+      else min_ops_for_diff diff c5 c4 c3 c2 c1
+
+  let test_000 () : bool =
+    let nums1 = Cons 6 (Cons 5 (Cons 4 (Cons 3 (Cons 2 (Cons 1 Nil))))) in
+    let nums2 = Cons 1 (Cons 2 (Cons 3 (Cons 4 (Cons 5 (Cons 6 Nil))))) in
+    let r = equal_sum_arrays_with_minimum_number_of_operations_list nums1 nums2 in
+    r = 0
+
+  let test_001 () : bool =
+    let nums1 = Cons 3 (Cons 3 (Cons 3 (Cons 3 Nil))) in
+    let nums2 = Cons 2 (Cons 2 (Cons 2 (Cons 2 Nil))) in
+    let r = equal_sum_arrays_with_minimum_number_of_operations_list nums1 nums2 in
+    r = 1
+
+  let test_002 () : bool =
+    let nums1 = Cons 1 (Cons 1 Nil) in
+    let nums2 = Cons 6 (Cons 6 Nil) in
+    let r = equal_sum_arrays_with_minimum_number_of_operations_list nums1 nums2 in
+    r = 2
+
+  let test_003 () : bool =
+    let nums1 = Cons 6 (Cons 6 (Cons 6 Nil)) in
+    let nums2 = Cons 1 (Cons 1 Nil) in
+    let r = equal_sum_arrays_with_minimum_number_of_operations_list nums1 nums2 in
+    r = 4
+
+  let test_004 () : bool =
+    let nums1 = Cons 1 (Cons 1 (Cons 2 Nil)) in
+    let nums2 = Cons 6 (Cons 6 (Cons 6 Nil)) in
+    let r = equal_sum_arrays_with_minimum_number_of_operations_list nums1 nums2 in
+    r = 3
+
+  let test_005 () : bool =
+    let nums1 = Cons 1 (Cons 1 Nil) in
+    let nums2 = Cons 6 (Cons 6 (Cons 6 Nil)) in
+    let r = equal_sum_arrays_with_minimum_number_of_operations_list nums1 nums2 in
+    r = 4
+
+  let test_006 () : bool =
+    let nums1 = Cons 5 (Cons 5 (Cons 5 (Cons 5 Nil))) in
+    let nums2 = Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 Nil)))))) in
+    let r = equal_sum_arrays_with_minimum_number_of_operations_list nums1 nums2 in
+    r = 3
+
+  let test_007 () : bool =
+    let nums1 = Cons 1 (Cons 2 Nil) in
+    let nums2 = Cons 5 (Cons 6 Nil) in
+    let r = equal_sum_arrays_with_minimum_number_of_operations_list nums1 nums2 in
+    r = 2
+
+  let test_008 () : bool =
+    let nums1 = Cons 6 (Cons 6 (Cons 6 Nil)) in
+    let nums2 = Cons 1 (Cons 1 (Cons 1 Nil)) in
+    let r = equal_sum_arrays_with_minimum_number_of_operations_list nums1 nums2 in
+    r = 3
+
+  let test_009 () : bool =
+    let nums1 = Cons 3 (Cons 3 (Cons 3 Nil)) in
+    let nums2 = Cons 3 (Cons 3 (Cons 3 Nil)) in
+    let r = equal_sum_arrays_with_minimum_number_of_operations_list nums1 nums2 in
+    r = 0
+
+  let test_010 () : bool =
+    let nums1 = Cons 2 (Cons 3 (Cons 4 Nil)) in
+    let nums2 = Cons 5 (Cons 5 (Cons 5 Nil)) in
+    let r = equal_sum_arrays_with_minimum_number_of_operations_list nums1 nums2 in
+    r = 2
+
+  let test_011 () : bool =
+    let nums1 = Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 Nil)))))) in
+    let nums2 = Cons 6 Nil in
+    let r = equal_sum_arrays_with_minimum_number_of_operations_list nums1 nums2 in
+    r = -1
+
+  let test_012 () : bool =
+    let nums1 = Cons 6 Nil in
+    let nums2 = Cons 1 Nil in
+    let r = equal_sum_arrays_with_minimum_number_of_operations_list nums1 nums2 in
+    r = 1
+
+  let test_013 () : bool =
+    let nums1 = Cons 1 (Cons 2 (Cons 3 (Cons 4 (Cons 5 (Cons 6 Nil))))) in
+    let nums2 = Cons 1 (Cons 1 (Cons 2 (Cons 2 (Cons 2 (Cons 2 Nil))))) in
+    let r = equal_sum_arrays_with_minimum_number_of_operations_list nums1 nums2 in
+    r = 3
+
+  let test_014 () : bool =
+    let nums1 = Cons 3 (Cons 3 (Cons 3 Nil)) in
+    let nums2 = Cons 2 (Cons 2 (Cons 2 Nil)) in
+    let r = equal_sum_arrays_with_minimum_number_of_operations_list nums1 nums2 in
+    r = 1
+
+  let test_015 () : bool =
+    let nums1 = Cons 6 (Cons 6 Nil) in
+    let nums2 = Cons 1 Nil in
+    let r = equal_sum_arrays_with_minimum_number_of_operations_list nums1 nums2 in
+    r = 3
+
+  let test_016 () : bool =
+    let nums1 = Cons 2 (Cons 2 (Cons 2 Nil)) in
+    let nums2 = Cons 5 (Cons 5 (Cons 5 Nil)) in
+    let r = equal_sum_arrays_with_minimum_number_of_operations_list nums1 nums2 in
+    r = 3
+
+  let test_017 () : bool =
+    let nums1 = Cons 3 (Cons 3 (Cons 3 Nil)) in
+    let nums2 = Cons 2 (Cons 2 (Cons 2 (Cons 2 Nil))) in
+    let r = equal_sum_arrays_with_minimum_number_of_operations_list nums1 nums2 in
+    r = 1
+
+  let test_018 () : bool =
+    let nums1 = Cons 1 Nil in
+    let nums2 = Cons 6 Nil in
+    let r = equal_sum_arrays_with_minimum_number_of_operations_list nums1 nums2 in
+    r = 1
+
+  let test_019 () : bool =
+    let nums1 = Cons 1 (Cons 1 (Cons 1 Nil)) in
+    let nums2 = Cons 6 (Cons 6 (Cons 6 Nil)) in
+    let r = equal_sum_arrays_with_minimum_number_of_operations_list nums1 nums2 in
+    r = 3
+
+  let run_tests () : bool =
+    if test_000 () then
+    if test_001 () then
+    if test_002 () then
+    if test_003 () then
+    if test_004 () then
+    if test_005 () then
+    if test_006 () then
+    if test_007 () then
+    if test_008 () then
+    if test_009 () then
+    if test_010 () then
+    if test_011 () then
+    if test_012 () then
+    if test_013 () then
+    if test_014 () then
+    if test_015 () then
+    if test_016 () then
+    if test_017 () then
+    if test_018 () then
+    if test_019 () then
+      true
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+
+end

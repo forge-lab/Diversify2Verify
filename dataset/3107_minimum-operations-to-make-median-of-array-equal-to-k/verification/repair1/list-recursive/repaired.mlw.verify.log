@@ -1,0 +1,115 @@
+== Stage 1: first prover on whole file ==
+Running in /Users/rubenm/Desktop/Diversify2Verify/codex-runs/dataset-merge-verification/stage3a-repair/3107_minimum-operations-to-make-median-of-array-equal-to-k/list-recursive/minimum_operations_to_make_median_of_array_equal_to_k_list_stage3_12ea9ba8_stage3/generated/why3: why3 session create -o /Users/rubenm/Desktop/Diversify2Verify/codex-runs/dataset-merge-verification/stage3a-repair/3107_minimum-operations-to-make-median-of-array-equal-to-k/list-recursive/minimum_operations_to_make_median_of_array_equal_to_k_list_stage3_12ea9ba8_stage3/generated/why3/.why3_sessions/repaired_stage1 -P Z3,4.8.6 -t 10 -m 8192 repaired.mlw
+Session created successfully
+Running in /Users/rubenm/Desktop/Diversify2Verify/codex-runs/dataset-merge-verification/stage3a-repair/3107_minimum-operations-to-make-median-of-array-equal-to-k/list-recursive/minimum_operations_to_make_median_of_array_equal_to_k_list_stage3_12ea9ba8_stage3/generated/why3: why3 bench /Users/rubenm/Desktop/Diversify2Verify/codex-runs/dataset-merge-verification/stage3a-repair/3107_minimum-operations-to-make-median-of-array-equal-to-k/list-recursive/minimum_operations_to_make_median_of_array_equal_to_k_list_stage3_12ea9ba8_stage3/generated/why3/.why3_sessions/repaired_stage1
+Progress: 11/1/0                       Progress: 10/2/0                       Progress: 9/3/0                       Progress: 8/4/0                       Progress: 7/5/0                       Progress: 6/6/0                       Progress: 6/0/0                       Progress: 5/1/0                       Progress: 4/2/0                       Progress: 3/3/0                       Progress: 2/4/0                       Progress: 1/5/0                       Progress: 0/6/0                       Progress: 0/1/2                       
+Replay completed, saving session... done
+== Stage 1 stats ==
+= Statistics for session /Users/rubenm/Desktop/Diversify2Verify/codex-runs/dataset-merge-verification/stage3a-repair/3107_minimum-operations-to-make-median-of-array-equal-to-k/list-recursive/minimum_operations_to_make_median_of_array_equal_to_k_list_stage3_12ea9ba8_stage3/generated/why3/.why3_sessions/repaired_stage1
+
+== Number of root goals ==
+  total: 12  proved: 10
+
+== Number of sub goals ==
+  total: 0  proved: 0
+
+== Goals not proved ==
+  +-- file [../../repaired.mlw]
+    +-- theory MinimumOperationsToMakeMedianOfArrayEqualToK_List_Spec
+      +-- goal median_adjustment_from_sorted'vc
+      +-- goal sorted_adjustment_establishes_minimum_result'vc
+  
+== Goals proved by only one prover ==
+  +-- file [../../repaired.mlw]
+    +-- theory MinimumOperationsToMakeMedianOfArrayEqualToK_List_Spec
+      +-- goal all_nonnegative'vc: Z3 4.8.6
+      +-- goal count_lt'vc: Z3 4.8.6
+      +-- goal count_gt'vc: Z3 4.8.6
+      +-- goal transform_cost'vc: Z3 4.8.6
+      +-- goal insert_sorted'vc: Z3 4.8.6
+      +-- goal insertion_sort'vc: Z3 4.8.6
+      +-- goal suffix_raise_cost_model'vc: Z3 4.8.6
+      +-- goal median_adjustment_model'vc: Z3 4.8.6
+      +-- goal suffix_raise_cost'vc: Z3 4.8.6
+      +-- goal minimum_operations_to_make_median_of_array_equal_to_k_list'vc: Z3 4.8.6
+  
+1 session(s) read, with a total of 12 proof goals.
+== Unproved root goals after first prover ==
+MinimumOperationsToMakeMedianOfArrayEqualToK_List_Spec	median_adjustment_from_sorted'vc
+MinimumOperationsToMakeMedianOfArrayEqualToK_List_Spec	sorted_adjustment_establishes_minimum_result'vc
+== Stage 1: trying remaining goals with prover Alt-Ergo,2.4.0 ==
+---- stage1 | prover: Alt-Ergo,2.4.0 | theory: MinimumOperationsToMakeMedianOfArrayEqualToK_List_Spec | goal: median_adjustment_from_sorted'vc ----
+File repaired.mlw:
+Goal median_adjustment_from_sorted'vc.
+Prover result is: Valid (0.01s, 215 steps).
+Solved in stage 1 using prover: Alt-Ergo,2.4.0
+---- stage1 | prover: Alt-Ergo,2.4.0 | theory: MinimumOperationsToMakeMedianOfArrayEqualToK_List_Spec | goal: sorted_adjustment_establishes_minimum_result'vc ----
+File repaired.mlw:
+Goal sorted_adjustment_establishes_minimum_result'vc.
+Prover result is: Timeout (10.00s, 18091 steps).
+Remaining after prover Alt-Ergo,2.4.0: 1
+== Stage 1: trying remaining goals with prover CVC4,1.8 ==
+---- stage1 | prover: CVC4,1.8 | theory: MinimumOperationsToMakeMedianOfArrayEqualToK_List_Spec | goal: sorted_adjustment_establishes_minimum_result'vc ----
+File repaired.mlw:
+Goal sorted_adjustment_establishes_minimum_result'vc.
+Prover result is: Unknown (unknown + incomplete) (0.04s, 11862 steps).
+Remaining after prover CVC4,1.8: 1
+== Goals still unproved after stage 1 ==
+MinimumOperationsToMakeMedianOfArrayEqualToK_List_Spec	sorted_adjustment_establishes_minimum_result'vc
+== Stage 2: split_vc on unproved goal ==
+Target theory: MinimumOperationsToMakeMedianOfArrayEqualToK_List_Spec
+Target goal  : sorted_adjustment_establishes_minimum_result'vc
+---- stage2 | prover: Z3,4.8.6 | theory: MinimumOperationsToMakeMedianOfArrayEqualToK_List_Spec | goal: sorted_adjustment_establishes_minimum_result'vc ----
+Transforms: split_vc
+File "repaired.mlw", line 156, character 6 to line 157, character 80:
+Sub-goal Postcondition of goal
+sorted_adjustment_establishes_minimum_result'vc.
+Prover result is: Timeout (10.00s, 2234007740 steps).
+---- stage2 | prover: Alt-Ergo,2.4.0 | theory: MinimumOperationsToMakeMedianOfArrayEqualToK_List_Spec | goal: sorted_adjustment_establishes_minimum_result'vc ----
+Transforms: split_vc
+File "repaired.mlw", line 156, character 6 to line 157, character 80:
+Sub-goal Postcondition of goal
+sorted_adjustment_establishes_minimum_result'vc.
+Prover result is: Timeout (10.00s, 18020 steps).
+---- stage2 | prover: CVC4,1.8 | theory: MinimumOperationsToMakeMedianOfArrayEqualToK_List_Spec | goal: sorted_adjustment_establishes_minimum_result'vc ----
+Transforms: split_vc
+File "repaired.mlw", line 156, character 6 to line 157, character 80:
+Sub-goal Postcondition of goal
+sorted_adjustment_establishes_minimum_result'vc.
+Prover result is: Unknown (unknown + incomplete) (0.03s, 11730 steps).
+== Goals still unproved after stage 2 (split_vc) ==
+MinimumOperationsToMakeMedianOfArrayEqualToK_List_Spec	sorted_adjustment_establishes_minimum_result'vc
+== Stage 3: split_vc + inline_all on still-unproved goal ==
+Target theory: MinimumOperationsToMakeMedianOfArrayEqualToK_List_Spec
+Target goal  : sorted_adjustment_establishes_minimum_result'vc
+---- stage3 | prover: Z3,4.8.6 | theory: MinimumOperationsToMakeMedianOfArrayEqualToK_List_Spec | goal: sorted_adjustment_establishes_minimum_result'vc ----
+Transforms: split_vc inline_all
+File "repaired.mlw", line 156, character 6 to line 157, character 80:
+Sub-goal Postcondition of goal
+sorted_adjustment_establishes_minimum_result'vc.
+Prover result is: Timeout (10.00s, 374261713 steps).
+---- stage3 | prover: Alt-Ergo,2.4.0 | theory: MinimumOperationsToMakeMedianOfArrayEqualToK_List_Spec | goal: sorted_adjustment_establishes_minimum_result'vc ----
+Transforms: split_vc inline_all
+File "repaired.mlw", line 156, character 6 to line 157, character 80:
+Sub-goal Postcondition of goal
+sorted_adjustment_establishes_minimum_result'vc.
+Prover result is: Timeout (10.00s, 15352 steps).
+---- stage3 | prover: CVC4,1.8 | theory: MinimumOperationsToMakeMedianOfArrayEqualToK_List_Spec | goal: sorted_adjustment_establishes_minimum_result'vc ----
+Transforms: split_vc inline_all
+File "repaired.mlw", line 156, character 6 to line 157, character 80:
+Sub-goal Postcondition of goal
+sorted_adjustment_establishes_minimum_result'vc.
+Prover result is: Unknown (unknown + incomplete) (0.03s, 12127 steps).
+== Final summary ==
+Unproved root goals after first prover : 1
+Remaining failures after split_vc      : 1
+Remaining failures after stage 3       : 1
+Detailed logs stored in                : /Users/rubenm/Desktop/Diversify2Verify/codex-runs/dataset-merge-verification/stage3a-repair/3107_minimum-operations-to-make-median-of-array-equal-to-k/list-recursive/minimum_operations_to_make_median_of_array_equal_to_k_list_stage3_12ea9ba8_stage3/generated/why3/.why3_sessions/repaired_logs
+Still unproved goals:
+MinimumOperationsToMakeMedianOfArrayEqualToK_List_Spec	sorted_adjustment_establishes_minimum_result'vc
+VERIFY_RESULT: FAILURE
+VERIFY_REASON: unproved_goals_remain
+VERIFY_STAGE: stage3
+VERIFY_ROOT_TOTAL: 12
+VERIFY_ROOT_PROVED: 11
+VERIFY_ROOT_REMAINING: 1

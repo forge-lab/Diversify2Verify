@@ -1,0 +1,202 @@
+module FindTwoNonOverlappingSubArraysEachWithTargetSum_List_Imperative
+
+  use int.Int
+  use list.List
+  use ref.Ref
+
+  let has_cons (l: list int) : bool =
+    match l with
+    | Nil -> false
+    | Cons _ _ -> true
+    end
+
+  let find_two_non_overlapping_sub_arrays_each_with_target_sum_list
+    (arr: list int) (target: int) : int =
+    let best = ref 0 in
+    let found = ref false in
+    let start_cur = ref arr in
+    while has_cons !start_cur do
+      let first_sum = ref 0 in
+      let first_len = ref 0 in
+      let end_cur = ref !start_cur in
+      while has_cons !end_cur do
+        match !end_cur with
+        | Nil -> ()
+        | Cons x xs ->
+            first_sum := !first_sum + x;
+            first_len := !first_len + 1;
+            if !first_sum = target then
+              begin
+                let second_start = ref xs in
+                while has_cons !second_start do
+                  let second_sum = ref 0 in
+                  let second_len = ref 0 in
+                  let second_end = ref !second_start in
+                  while has_cons !second_end do
+                    match !second_end with
+                    | Nil -> ()
+                    | Cons y ys ->
+                        second_sum := !second_sum + y;
+                        second_len := !second_len + 1;
+                        if !second_sum = target then
+                          begin
+                            let candidate = !first_len + !second_len in
+                            if !found then
+                              begin
+                                if candidate < !best then best := candidate else ()
+                              end
+                            else
+                              begin
+                                best := candidate;
+                                found := true
+                              end
+                          end
+                        else ();
+                        second_end := ys
+                    end
+                  done;
+                  match !second_start with
+                  | Nil -> ()
+                  | Cons _ rest -> second_start := rest
+                  end
+                done
+              end
+            else ();
+            end_cur := xs
+        end
+      done;
+      match !start_cur with
+      | Nil -> ()
+      | Cons _ rest -> start_cur := rest
+      end
+    done;
+    if !found then !best else (-1)
+
+  let check_case (arr: list int) (target: int) (expected: int) : bool =
+    let r = find_two_non_overlapping_sub_arrays_each_with_target_sum_list arr target in
+    r = expected
+
+  let test_000 () : bool =
+    let arr = Cons 5 (Cons 5 (Cons 5 (Cons 5 (Cons 5 (Nil))))) in
+    check_case arr 10 4
+
+  let test_001 () : bool =
+    let arr = Cons 1 (Cons 2 (Cons 3 (Cons 4 (Cons 5 (Cons 6 (Cons 7 (Cons 8 (Cons 9 (Cons 10 (Nil)))))))))) in
+    check_case arr 15 5
+
+  let test_002 () : bool =
+    let arr = Cons 2 (Cons 2 (Cons 2 (Cons 2 (Cons 2 (Cons 2 (Cons 2 (Cons 2 (Cons 2 (Cons 2 (Nil)))))))))) in
+    check_case arr 6 6
+
+  let test_003 () : bool =
+    let arr = Cons 1 (Cons 1 (Cons 1 (Cons 2 (Cons 2 (Cons 2 (Cons 3 (Cons 3 (Cons 3 (Nil))))))))) in
+    check_case arr 6 5
+
+  let test_004 () : bool =
+    let arr = Cons 1 (Cons 2 (Cons 3 (Cons 4 (Cons 5 (Nil))))) in
+    check_case arr 9 (-1)
+
+  let test_005 () : bool =
+    let arr = Cons 3 (Cons 2 (Cons 2 (Cons 4 (Cons 3 (Nil))))) in
+    check_case arr 3 2
+
+  let test_006 () : bool =
+    let arr = Cons 5 (Cons 5 (Cons 4 (Cons 4 (Cons 5 (Nil))))) in
+    check_case arr 9 4
+
+  let test_007 () : bool =
+    let arr = Cons 2 (Cons 2 (Cons 2 (Cons 2 (Cons 2 (Cons 2 (Cons 2 (Cons 2 (Cons 2 (Cons 2 (Nil)))))))))) in
+    check_case arr 4 4
+
+  let test_008 () : bool =
+    let arr = Cons 1000 (Cons 1000 (Cons 1000 (Nil))) in
+    check_case arr 2000 (-1)
+
+  let test_009 () : bool =
+    let arr = Cons 7 (Cons 3 (Cons 4 (Cons 7 (Nil)))) in
+    check_case arr 7 2
+
+  let test_010 () : bool =
+    let arr = Cons 1000 (Cons 1000 (Cons 1000 (Cons 1000 (Cons 1000 (Nil))))) in
+    check_case arr 2000 4
+
+  let test_011 () : bool =
+    let arr = Cons 1 (Cons 1 (Cons 1 (Cons 2 (Cons 2 (Cons 2 (Cons 3 (Cons 3 (Cons 3 (Nil))))))))) in
+    check_case arr 3 2
+
+  let test_012 () : bool =
+    let arr = Cons 1 (Cons 2 (Cons 1 (Cons 2 (Cons 1 (Cons 2 (Cons 1 (Cons 2 (Cons 1 (Cons 2 (Nil)))))))))) in
+    check_case arr 3 4
+
+  let test_013 () : bool =
+    let arr = Cons 1000 (Cons 1000 (Cons 1000 (Cons 1000 (Cons 1000 (Nil))))) in
+    check_case arr 5000 (-1)
+
+  let test_014 () : bool =
+    let arr = Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Nil)))))))) in
+    check_case arr 2 4
+
+  let test_015 () : bool =
+    let arr = Cons 5 (Cons 5 (Cons 5 (Cons 5 (Cons 5 (Cons 5 (Cons 5 (Cons 5 (Cons 5 (Nil))))))))) in
+    check_case arr 15 6
+
+  let test_016 () : bool =
+    let arr = Cons 1 (Cons 2 (Cons 3 (Cons 4 (Cons 5 (Nil))))) in
+    check_case arr 10 (-1)
+
+  let test_017 () : bool =
+    let arr = Cons 10 (Cons 20 (Cons 30 (Cons 40 (Cons 50 (Nil))))) in
+    check_case arr 60 (-1)
+
+  let test_018 () : bool =
+    let arr = Cons 1 (Cons 4 (Cons 4 (Cons 4 (Cons 4 (Cons 4 (Cons 4 (Cons 4 (Cons 4 (Cons 1 (Nil)))))))))) in
+    check_case arr 8 4
+
+  let test_019 () : bool =
+    let arr = Cons 5 (Cons 5 (Cons 5 (Cons 5 (Cons 5 (Cons 5 (Cons 5 (Cons 5 (Cons 5 (Cons 5 (Nil)))))))))) in
+    check_case arr 15 6
+
+  let run_tests () : bool =
+    if test_000 () then
+    if test_001 () then
+    if test_002 () then
+    if test_003 () then
+    if test_004 () then
+    if test_005 () then
+    if test_006 () then
+    if test_007 () then
+    if test_008 () then
+    if test_009 () then
+    if test_010 () then
+    if test_011 () then
+    if test_012 () then
+    if test_013 () then
+    if test_014 () then
+    if test_015 () then
+    if test_016 () then
+    if test_017 () then
+    if test_018 () then
+    if test_019 () then
+      true
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+
+end

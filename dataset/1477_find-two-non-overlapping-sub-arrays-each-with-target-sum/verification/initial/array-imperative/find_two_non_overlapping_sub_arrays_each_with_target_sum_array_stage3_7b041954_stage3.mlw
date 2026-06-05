@@ -1,0 +1,130 @@
+module FindTwoNonOverlappingSubArraysEachWithTargetSum_Array_Spec
+
+  use int.Int
+  use array.Array
+  use array.Init
+  use array.ArraySum
+  use ref.Ref
+
+  predicate target_segment (arr: array int) (target: int) (l: int) (u: int) =
+    0 <= l < u <= length arr /\ sum arr l u = target
+
+  predicate non_overlapping (l1: int) (u1: int) (l2: int) (u2: int) =
+    u1 <= l2 \/ u2 <= l1
+
+  function pair_total_length (l1: int) (u1: int) (l2: int) (u2: int) : int =
+    (u1 - l1) + (u2 - l2)
+
+  predicate valid_pair (arr: array int) (target: int)
+      (l1: int) (u1: int) (l2: int) (u2: int) =
+    target_segment arr target l1 u1 /\
+    target_segment arr target l2 u2 /\
+    non_overlapping l1 u1 l2 u2
+
+  predicate no_valid_pair (arr: array int) (target: int) =
+    forall l1 u1 l2 u2: int.
+      not (valid_pair arr target l1 u1 l2 u2)
+
+  predicate minimal_total_length (arr: array int) (target: int) (k: int) =
+    (exists l1 u1 l2 u2: int.
+      valid_pair arr target l1 u1 l2 u2 /\
+      k = pair_total_length l1 u1 l2 u2) /\
+    (forall l1 u1 l2 u2: int.
+      valid_pair arr target l1 u1 l2 u2 ->
+      k <= pair_total_length l1 u1 l2 u2)
+
+  predicate correct_result (arr: array int) (target: int) (result: int) =
+    (result = (-1) /\ no_valid_pair arr target) \/
+    (result >= 2 /\ minimal_total_length arr target result)
+
+  predicate right_ordered_valid_pair (arr: array int) (target: int)
+      (l1: int) (u1: int) (l2: int) (u2: int) =
+    valid_pair arr target l1 u1 l2 u2 /\ u1 <= l2
+
+  predicate candidate_pair_length (arr: array int) (target: int) (candidate: int) =
+    exists l1 u1 l2 u2: int.
+      right_ordered_valid_pair arr target l1 u1 l2 u2 /\
+      candidate = pair_total_length l1 u1 l2 u2
+
+  predicate best_candidate_result (arr: array int) (target: int) (best: int) =
+    candidate_pair_length arr target best /\
+    forall l1 u1 l2 u2: int.
+      right_ordered_valid_pair arr target l1 u1 l2 u2 ->
+      best <= pair_total_length l1 u1 l2 u2
+
+  let find_two_non_overlapping_sub_arrays_each_with_target_sum_array
+    (arr: array int) (target: int) : int
+    requires { 1 <= length arr <= 100000 }
+    requires { forall i: int. 0 <= i < length arr -> 1 <= arr[i] <= 1000 }
+    requires { 1 <= target <= 100000000 }
+    ensures  { correct_result arr target result }
+  =
+    let n = length arr in
+    let best = ref 0 in
+    let found = ref false in
+    for l1 = 0 to n - 1 do
+      invariant { n = length arr }
+      invariant { 0 <= l1 <= n }
+      invariant { !found -> 2 <= !best }
+      invariant { not !found -> !best = 0 }
+      let sum1 = ref 0 in
+      for u1 = l1 + 1 to n do
+        invariant { n = length arr }
+        invariant { 0 <= l1 < n }
+        invariant { l1 + 1 <= u1 <= n }
+        invariant { 0 <= !sum1 }
+        invariant { !found -> 2 <= !best }
+        invariant { not !found -> !best = 0 }
+        sum1 := !sum1 + arr[u1 - 1];
+        assert { 0 <= l1 < u1 <= length arr };
+        if !sum1 = target then
+          begin
+            assert { target_segment arr target l1 u1 };
+            for l2 = u1 to n - 1 do
+              invariant { n = length arr }
+              invariant { 0 <= l1 < u1 <= n }
+              invariant { u1 <= l2 <= n }
+              invariant { target_segment arr target l1 u1 }
+              invariant { !found -> 2 <= !best }
+              invariant { not !found -> !best = 0 }
+              let sum2 = ref 0 in
+              for u2 = l2 + 1 to n do
+                invariant { n = length arr }
+                invariant { 0 <= l1 < u1 <= l2 < n }
+                invariant { l2 + 1 <= u2 <= n }
+                invariant { target_segment arr target l1 u1 }
+                invariant { 0 <= !sum2 }
+                invariant { !found -> 2 <= !best }
+                invariant { not !found -> !best = 0 }
+                sum2 := !sum2 + arr[u2 - 1];
+                assert { 0 <= l2 < u2 <= length arr };
+                if !sum2 = target then
+                  begin
+                    assert { target_segment arr target l2 u2 };
+                    assert { non_overlapping l1 u1 l2 u2 };
+                    assert { valid_pair arr target l1 u1 l2 u2 };
+                    assert { right_ordered_valid_pair arr target l1 u1 l2 u2 };
+                    let candidate = (u1 - l1) + (u2 - l2) in
+                    assert { candidate = pair_total_length l1 u1 l2 u2 };
+                    assert { candidate_pair_length arr target candidate };
+                    assert { 2 <= candidate };
+                    if !found then
+                      begin
+                        if candidate < !best then best := candidate else ()
+                      end
+                    else
+                      begin
+                        best := candidate;
+                        found := true
+                      end
+                  end
+                else ()
+              done
+            done
+          end
+        else ()
+      done
+    done;
+    if !found then !best else (-1)
+
+end

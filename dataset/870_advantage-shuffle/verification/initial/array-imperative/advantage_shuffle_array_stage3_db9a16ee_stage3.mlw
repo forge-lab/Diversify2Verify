@@ -1,0 +1,168 @@
+module AdvantageShuffle_Array_Stage3_Imperative
+
+  use int.Int
+  use array.Array
+  use array.Init
+  use array.ArrayPermut
+  use array.NumOf
+  use ref.Ref
+
+  predicate input_values_in_range (nums1: array int) (nums2: array int) =
+    length nums2 = length nums1 /\
+    forall i: int.
+      0 <= i < length nums1 ->
+        0 <= nums1[i] <= 1000000000 /\ 0 <= nums2[i] <= 1000000000
+
+  predicate beats_at (candidate: array int) (nums2: array int) (i: int) =
+    0 <= i < length candidate /\ 0 <= i < length nums2 /\ candidate[i] > nums2[i]
+
+  function advantage_count (candidate: array int) (nums2: array int) : int =
+    numof (fun i v -> 0 <= i < length nums2 /\ v > nums2[i]) candidate 0 (length candidate)
+
+  predicate valid_permutation_result (nums1: array int) (result: array int) =
+    length result = length nums1 /\ permut_all result nums1
+
+  predicate optimal_advantage_result (nums1: array int) (nums2: array int) (result: array int) =
+    length nums2 = length nums1 /\
+    valid_permutation_result nums1 result /\
+    (forall candidate: array int.
+       valid_permutation_result nums1 candidate ->
+         advantage_count candidate nums2 <= advantage_count result nums2)
+
+  predicate sorted_non_decreasing (a: array int) =
+    forall i j: int. 0 <= i <= j < length a -> a[i] <= a[j]
+
+  predicate index_array_for (idx: array int) (n: int) =
+    length idx = n /\
+    (forall i: int. 0 <= i < n -> 0 <= idx[i] < n) /\
+    (forall i j: int. 0 <= i < j < n -> idx[i] <> idx[j])
+
+  predicate sorted_index_view (original: array int) (values: array int) (idx: array int) =
+    length values = length original /\
+    index_array_for idx (length original) /\
+    (forall i: int. 0 <= i < length original -> values[i] = original[idx[i]]) /\
+    sorted_non_decreasing values
+
+  let copy_array (a: array int) : array int
+    ensures { length result = length a }
+    ensures { forall i: int. 0 <= i < length a -> result[i] = a[i] }
+  =
+    let n = length a in
+    let b = make n 0 in
+    for i = 0 to n - 1 do
+      invariant { length b = n }
+      invariant { forall k: int. 0 <= k < i -> b[k] = a[k] }
+      b[i] <- a[i]
+    done;
+    b
+
+  let sort_array_ascending (a: array int) : array int
+    ensures { length result = length a }
+    ensures { permut_all result a }
+    ensures { sorted_non_decreasing result }
+  =
+    let b = copy_array a in
+    let n = length b in
+    for i = 0 to n - 1 do
+      invariant { length b = n }
+      invariant { permut_all b a }
+      invariant { forall p q: int. 0 <= p <= q < i -> b[p] <= b[q] }
+      invariant { forall p q: int. 0 <= p < i <= q < n -> b[p] <= b[q] }
+      let min_idx = ref i in
+      for j = i + 1 to n - 1 do
+        invariant { i <= !min_idx < n }
+        invariant { i + 1 <= j <= n }
+        invariant { forall k: int. i <= k < j -> b[!min_idx] <= b[k] }
+        if b[j] < b[!min_idx] then
+          min_idx := j
+      done;
+      if !min_idx <> i then begin
+        let tmp = b[i] in
+        b[i] <- b[!min_idx];
+        b[!min_idx] <- tmp
+      end else
+        ()
+    done;
+    b
+
+  let sort_values_with_indices (a: array int) : (array int, array int)
+  =
+    let values = copy_array a in
+    let n = length a in
+    let indices = make n 0 in
+    for i = 0 to n - 1 do
+      invariant { length indices = n }
+      invariant { forall k: int. 0 <= k < i -> indices[k] = k }
+      indices[i] <- i
+    done;
+    for i = 0 to n - 1 do
+      invariant { length values = n }
+      invariant { length indices = n }
+      invariant { forall k: int. 0 <= k < n -> 0 <= indices[k] < n }
+      invariant { forall p q: int. 0 <= p <= q < i -> values[p] <= values[q] }
+      invariant { forall p q: int. 0 <= p < i <= q < n -> values[p] <= values[q] }
+      invariant { forall k: int. 0 <= k < n -> values[k] = a[indices[k]] }
+      let min_idx = ref i in
+      for j = i + 1 to n - 1 do
+        invariant { i <= !min_idx < n }
+        invariant { i + 1 <= j <= n }
+        invariant { forall k: int. i <= k < j -> values[!min_idx] <= values[k] }
+        invariant { forall k: int. i <= k < j /\ values[!min_idx] = values[k] -> indices[!min_idx] <= indices[k] }
+        if values[j] < values[!min_idx] then
+          min_idx := j
+        else if values[j] = values[!min_idx] then
+          if indices[j] < indices[!min_idx] then
+            min_idx := j
+          else
+            ()
+        else
+          ()
+      done;
+      if !min_idx <> i then begin
+        let tmp_value = values[i] in
+        let tmp_index = indices[i] in
+        values[i] <- values[!min_idx];
+        indices[i] <- indices[!min_idx];
+        values[!min_idx] <- tmp_value;
+        indices[!min_idx] <- tmp_index
+      end else
+        ()
+    done;
+    (values, indices)
+
+  let advantage_shuffle_array (nums1: array int) (nums2: array int) : array int
+    requires { 1 <= length nums1 }
+    requires { length nums2 = length nums1 }
+    requires { input_values_in_range nums1 nums2 }
+    ensures  { optimal_advantage_result nums1 nums2 result }
+  =
+    let n = length nums1 in
+    let sorted_nums1 = sort_array_ascending nums1 in
+    let (sorted_nums2, sorted_indices) = sort_values_with_indices nums2 in
+    let result = make n 0 in
+    let left = ref 0 in
+    let right = ref (n - 1) in
+    for i = 0 to n - 1 do
+      invariant { length sorted_nums1 = n }
+      invariant { length sorted_nums2 = n }
+      invariant { length sorted_indices = n }
+      invariant { length result = n }
+      invariant { sorted_non_decreasing sorted_nums1 }
+      invariant { sorted_index_view nums2 sorted_nums2 sorted_indices }
+      invariant { 0 <= !left <= i }
+      invariant { -1 <= !right < n }
+      invariant { !left + (n - 1 - !right) = i }
+      invariant { !left <= !right + 1 }
+      invariant { forall k: int. 0 <= k < !left -> result[sorted_indices[k]] > sorted_nums2[k] }
+      let value = sorted_nums1[i] in
+      if value > sorted_nums2[!left] then begin
+        result[sorted_indices[!left]] <- value;
+        left := !left + 1
+      end else begin
+        result[sorted_indices[!right]] <- value;
+        right := !right - 1
+      end
+    done;
+    result
+
+end

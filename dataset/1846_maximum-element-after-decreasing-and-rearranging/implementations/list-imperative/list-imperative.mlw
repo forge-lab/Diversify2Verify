@@ -1,0 +1,196 @@
+module MaximumElementAfterDecreasingAndRearranging_List_Imperative
+
+  use int.Int
+  use list.List
+  use ref.Ref
+
+  let list_length (arr: list int) : int =
+    let len = ref 0 in
+    let cur = ref arr in
+    while (match !cur with Nil -> false | Cons _ _ -> true end) do
+      match !cur with
+      | Nil -> ()
+      | Cons _ xs ->
+          len := !len + 1;
+          cur := xs
+      end
+    done;
+    !len
+
+  let count_ge_exec (arr: list int) (threshold: int) : int =
+    let count = ref 0 in
+    let cur = ref arr in
+    while (match !cur with Nil -> false | Cons _ _ -> true end) do
+      match !cur with
+      | Nil -> ()
+      | Cons x xs ->
+          if threshold <= x then count := !count + 1;
+          cur := xs
+      end
+    done;
+    !count
+
+  let can_build_height_exec (arr: list int) (height: int) : bool =
+    let ok = ref true in
+    let target = ref 1 in
+    while !ok && !target <= height do
+      let needed = height - !target + 1 in
+      if count_ge_exec arr !target < needed then ok := false;
+      target := !target + 1
+    done;
+    !ok
+
+  let maximum_element_after_decreasing_and_rearranging_list (arr: list int) : int =
+    let n = list_length arr in
+    let best = ref 0 in
+    let height = ref 1 in
+    while !height <= n do
+      if can_build_height_exec arr !height then best := !height;
+      height := !height + 1
+    done;
+    !best
+
+  let test_000 () : bool =
+    let arr = Cons 3 (Cons 2 (Cons 1 Nil)) in
+    let r = maximum_element_after_decreasing_and_rearranging_list arr in
+    r = 3
+
+  let test_001 () : bool =
+    let arr = Cons 5 (Cons 4 (Cons 3 (Cons 2 (Cons 1 Nil)))) in
+    let r = maximum_element_after_decreasing_and_rearranging_list arr in
+    r = 5
+
+  let test_002 () : bool =
+    let arr = Cons 1 (Cons 1000000000 (Cons 2 (Cons 3 (Cons 4 Nil)))) in
+    let r = maximum_element_after_decreasing_and_rearranging_list arr in
+    r = 5
+
+  let test_003 () : bool =
+    let arr = Cons 9 (Cons 7 (Cons 5 (Cons 3 (Cons 1 Nil)))) in
+    let r = maximum_element_after_decreasing_and_rearranging_list arr in
+    r = 5
+
+  let test_004 () : bool =
+    let arr = Cons 5 (Cons 5 (Cons 5 (Cons 5 (Cons 5 Nil)))) in
+    let r = maximum_element_after_decreasing_and_rearranging_list arr in
+    r = 5
+
+  let test_005 () : bool =
+    let arr = Cons 1000000000 (Cons 1 (Cons 1000000000 (Cons 1 (Cons 1000000000 Nil)))) in
+    let r = maximum_element_after_decreasing_and_rearranging_list arr in
+    r = 4
+
+  let test_006 () : bool =
+    let arr = Cons 1 (Cons 10 (Cons 20 (Cons 30 (Cons 40 Nil)))) in
+    let r = maximum_element_after_decreasing_and_rearranging_list arr in
+    r = 5
+
+  let test_007 () : bool =
+    let arr = Cons 1 (Cons 1000000000 (Cons 2 (Cons 1000000000 (Cons 3 Nil)))) in
+    let r = maximum_element_after_decreasing_and_rearranging_list arr in
+    r = 5
+
+  let test_008 () : bool =
+    let arr = Cons 1 Nil in
+    let r = maximum_element_after_decreasing_and_rearranging_list arr in
+    r = 1
+
+  let test_009 () : bool =
+    let arr = Cons 100 (Cons 1 (Cons 1000 Nil)) in
+    let r = maximum_element_after_decreasing_and_rearranging_list arr in
+    r = 3
+
+  let test_010 () : bool =
+    let arr = Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 Nil)))) in
+    let r = maximum_element_after_decreasing_and_rearranging_list arr in
+    r = 1
+
+  let test_011 () : bool =
+    let arr = Cons 10 (Cons 9 (Cons 8 (Cons 7 (Cons 6 (Cons 5 (Cons 4 (Cons 3 (Cons 2 (Cons 1 Nil))))))))) in
+    let r = maximum_element_after_decreasing_and_rearranging_list arr in
+    r = 10
+
+  let test_012 () : bool =
+    let arr = Cons 1 (Cons 10 (Cons 100 (Cons 1000 (Cons 10000 Nil)))) in
+    let r = maximum_element_after_decreasing_and_rearranging_list arr in
+    r = 5
+
+  let test_013 () : bool =
+    let arr = Cons 1 (Cons 2 (Cons 2 (Cons 3 (Cons 3 (Cons 3 (Cons 4 (Cons 4 (Cons 4 (Cons 4 Nil))))))))) in
+    let r = maximum_element_after_decreasing_and_rearranging_list arr in
+    r = 4
+
+  let test_014 () : bool =
+    let arr = Cons 1 (Cons 2 (Cons 3 (Cons 4 (Cons 5 Nil)))) in
+    let r = maximum_element_after_decreasing_and_rearranging_list arr in
+    r = 5
+
+  let test_015 () : bool =
+    let arr = Cons 2 (Cons 3 (Cons 4 (Cons 5 (Cons 6 Nil)))) in
+    let r = maximum_element_after_decreasing_and_rearranging_list arr in
+    r = 5
+
+  let test_016 () : bool =
+    let arr = Cons 9 (Cons 8 (Cons 7 (Cons 6 (Cons 5 (Cons 4 (Cons 3 (Cons 2 (Cons 1 Nil)))))))) in
+    let r = maximum_element_after_decreasing_and_rearranging_list arr in
+    r = 9
+
+  let test_017 () : bool =
+    let arr = Cons 2 (Cons 2 (Cons 1 (Cons 2 (Cons 1 Nil)))) in
+    let r = maximum_element_after_decreasing_and_rearranging_list arr in
+    r = 2
+
+  let test_018 () : bool =
+    let arr = Cons 1 (Cons 3 (Cons 5 (Cons 7 (Cons 9 Nil)))) in
+    let r = maximum_element_after_decreasing_and_rearranging_list arr in
+    r = 5
+
+  let test_019 () : bool =
+    let arr = Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 Nil))))))))) in
+    let r = maximum_element_after_decreasing_and_rearranging_list arr in
+    r = 1
+
+  let run_tests () : bool =
+    if test_000 () then
+    if test_001 () then
+    if test_002 () then
+    if test_003 () then
+    if test_004 () then
+    if test_005 () then
+    if test_006 () then
+    if test_007 () then
+    if test_008 () then
+    if test_009 () then
+    if test_010 () then
+    if test_011 () then
+    if test_012 () then
+    if test_013 () then
+    if test_014 () then
+    if test_015 () then
+    if test_016 () then
+    if test_017 () then
+    if test_018 () then
+    if test_019 () then
+      true
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+
+end

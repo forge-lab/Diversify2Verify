@@ -1,0 +1,157 @@
+module EliminateMaximumNumberOfMonsters_Array_Spec
+
+  use int.Int
+  use array.Array
+  use array.Init
+
+  predicate input_constraints (dist: array int) (speed: array int) =
+    length dist = length speed /\
+    1 <= length dist /\ length dist <= 100000 /\
+    (forall i: int. 0 <= i < length dist ->
+      1 <= dist[i] /\ dist[i] <= 100000 /\
+      1 <= speed[i] /\ speed[i] <= 100000)
+
+  predicate killed_before (order: array int) (i: int) (t: int) =
+    exists p: int. 0 <= p < t /\ order[p] = i
+
+  predicate distinct_prefix (order: array int) (k: int) =
+    forall p q: int. 0 <= p < q < k -> order[p] <> order[q]
+
+  predicate all_uneliminated_safe_at
+    (dist: array int) (speed: array int) (order: array int) (t: int) =
+    forall i: int. 0 <= i < length dist ->
+      not (killed_before order i t) ->
+      dist[i] > speed[i] * t
+
+  predicate valid_elimination_order
+    (dist: array int) (speed: array int) (order: array int) (k: int) =
+    length dist = length speed /\
+    0 <= k <= length dist /\
+    length order = k /\
+    distinct_prefix order k /\
+    (forall t: int. 0 <= t < k ->
+      all_uneliminated_safe_at dist speed order t /\
+      0 <= order[t] < length dist /\
+      not (killed_before order order[t] t))
+
+  predicate can_eliminate_count (dist: array int) (speed: array int) (k: int) =
+    exists order: array int. valid_elimination_order dist speed order k
+
+  predicate optimal_elimination_count (dist: array int) (speed: array int) (r: int) =
+    0 <= r <= length dist /\
+    can_eliminate_count dist speed r /\
+    (forall k: int. 0 <= k <= length dist ->
+      can_eliminate_count dist speed k -> k <= r)
+
+  val eliminate_maximum_number_of_monsters_array
+    (dist: array int) (speed: array int) : int
+    requires { input_constraints dist speed }
+    ensures  { optimal_elimination_count dist speed result }
+
+  let lemma test_000 () =
+    let dist = init 3 [|6; 7; 8|] in
+    let speed = init 3 [|2; 2; 2|] in
+    let order = init 3 [|0; 1; 2|] in
+    assert { length dist = 3 /\ length speed = 3 /\ length order = 3 };
+    assert { dist[0] = 6 /\ dist[1] = 7 /\ dist[2] = 8 };
+    assert { speed[0] = 2 /\ speed[1] = 2 /\ speed[2] = 2 };
+    assert { all_uneliminated_safe_at dist speed order 0 };
+    assert { all_uneliminated_safe_at dist speed order 1 };
+    assert { all_uneliminated_safe_at dist speed order 2 };
+    assert { valid_elimination_order dist speed order 3 };
+    assert { can_eliminate_count dist speed 3 };
+    assert { optimal_elimination_count dist speed 3 }
+
+  let lemma test_001 () =
+    let dist = init 3 [|1; 2; 3|] in
+    let speed = init 3 [|3; 2; 1|] in
+    let order = init 1 [|0|] in
+    assert { length dist = 3 /\ length speed = 3 /\ length order = 1 };
+    assert { dist[0] = 1 /\ dist[1] = 2 /\ dist[2] = 3 };
+    assert { speed[0] = 3 /\ speed[1] = 2 /\ speed[2] = 1 };
+    assert { all_uneliminated_safe_at dist speed order 0 };
+    assert { valid_elimination_order dist speed order 1 };
+    assert { can_eliminate_count dist speed 1 };
+    assert { not (can_eliminate_count dist speed 2) };
+    assert { optimal_elimination_count dist speed 1 }
+
+  let lemma test_002 () =
+    let dist = init 3 [|100; 200; 300|] in
+    let speed = init 3 [|1; 1; 1|] in
+    let order = init 3 [|0; 1; 2|] in
+    assert { length dist = 3 /\ length speed = 3 /\ length order = 3 };
+    assert { dist[0] = 100 /\ dist[1] = 200 /\ dist[2] = 300 };
+    assert { speed[0] = 1 /\ speed[1] = 1 /\ speed[2] = 1 };
+    assert { all_uneliminated_safe_at dist speed order 0 };
+    assert { all_uneliminated_safe_at dist speed order 1 };
+    assert { all_uneliminated_safe_at dist speed order 2 };
+    assert { valid_elimination_order dist speed order 3 };
+    assert { can_eliminate_count dist speed 3 };
+    assert { optimal_elimination_count dist speed 3 }
+
+  let lemma test_003 () =
+    let dist = init 3 [|7; 14; 21|] in
+    let speed = init 3 [|1; 2; 3|] in
+    let order = init 3 [|0; 1; 2|] in
+    assert { length dist = 3 /\ length speed = 3 /\ length order = 3 };
+    assert { dist[0] = 7 /\ dist[1] = 14 /\ dist[2] = 21 };
+    assert { speed[0] = 1 /\ speed[1] = 2 /\ speed[2] = 3 };
+    assert { all_uneliminated_safe_at dist speed order 0 };
+    assert { all_uneliminated_safe_at dist speed order 1 };
+    assert { all_uneliminated_safe_at dist speed order 2 };
+    assert { valid_elimination_order dist speed order 3 };
+    assert { can_eliminate_count dist speed 3 };
+    assert { optimal_elimination_count dist speed 3 }
+
+  let lemma test_004 () =
+    let dist = init 10 [|1; 2; 3; 4; 5; 6; 7; 8; 9; 10|] in
+    let speed = init 10 [|1; 1; 1; 1; 1; 1; 1; 1; 1; 1|] in
+    let order = init 10 [|0; 1; 2; 3; 4; 5; 6; 7; 8; 9|] in
+    assert { length dist = 10 /\ length speed = 10 /\ length order = 10 };
+    assert { dist[0] = 1 /\ dist[1] = 2 /\ dist[2] = 3 /\ dist[3] = 4 /\ dist[4] = 5 };
+    assert { dist[5] = 6 /\ dist[6] = 7 /\ dist[7] = 8 /\ dist[8] = 9 /\ dist[9] = 10 };
+    assert { speed[0] = 1 /\ speed[1] = 1 /\ speed[2] = 1 /\ speed[3] = 1 /\ speed[4] = 1 };
+    assert { speed[5] = 1 /\ speed[6] = 1 /\ speed[7] = 1 /\ speed[8] = 1 /\ speed[9] = 1 };
+    assert { all_uneliminated_safe_at dist speed order 0 };
+    assert { all_uneliminated_safe_at dist speed order 1 };
+    assert { all_uneliminated_safe_at dist speed order 2 };
+    assert { all_uneliminated_safe_at dist speed order 3 };
+    assert { all_uneliminated_safe_at dist speed order 4 };
+    assert { all_uneliminated_safe_at dist speed order 5 };
+    assert { all_uneliminated_safe_at dist speed order 6 };
+    assert { all_uneliminated_safe_at dist speed order 7 };
+    assert { all_uneliminated_safe_at dist speed order 8 };
+    assert { all_uneliminated_safe_at dist speed order 9 };
+    assert { valid_elimination_order dist speed order 10 };
+    assert { can_eliminate_count dist speed 10 };
+    assert { optimal_elimination_count dist speed 10 }
+
+  let lemma test_005 () =
+    let dist = init 4 [|3; 5; 7; 9|] in
+    let speed = init 4 [|1; 2; 3; 4|] in
+    let order = init 3 [|0; 1; 2|] in
+    assert { length dist = 4 /\ length speed = 4 /\ length order = 3 };
+    assert { dist[0] = 3 /\ dist[1] = 5 /\ dist[2] = 7 /\ dist[3] = 9 };
+    assert { speed[0] = 1 /\ speed[1] = 2 /\ speed[2] = 3 /\ speed[3] = 4 };
+    assert { all_uneliminated_safe_at dist speed order 0 };
+    assert { all_uneliminated_safe_at dist speed order 1 };
+    assert { all_uneliminated_safe_at dist speed order 2 };
+    assert { valid_elimination_order dist speed order 3 };
+    assert { can_eliminate_count dist speed 3 };
+    assert { not (can_eliminate_count dist speed 4) };
+    assert { optimal_elimination_count dist speed 3 }
+
+  let lemma test_006 () =
+    let dist = init 4 [|1; 1; 2; 3|] in
+    let speed = init 4 [|1; 1; 1; 1|] in
+    let order = init 1 [|0|] in
+    assert { length dist = 4 /\ length speed = 4 /\ length order = 1 };
+    assert { dist[0] = 1 /\ dist[1] = 1 /\ dist[2] = 2 /\ dist[3] = 3 };
+    assert { speed[0] = 1 /\ speed[1] = 1 /\ speed[2] = 1 /\ speed[3] = 1 };
+    assert { all_uneliminated_safe_at dist speed order 0 };
+    assert { valid_elimination_order dist speed order 1 };
+    assert { can_eliminate_count dist speed 1 };
+    assert { not (can_eliminate_count dist speed 2) };
+    assert { optimal_elimination_count dist speed 1 }
+
+end

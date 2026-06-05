@@ -1,0 +1,119 @@
+module MinimizeMaximumOfArray_List_Stage3_Recursive
+
+  use int.Int
+  use int.EuclideanDivision
+  use list.List
+  use list.Length
+  use list.Prefix
+  use list.Sum
+
+  let rec predicate nonnegative_list (nums: list int)
+    variant { nums }
+  =
+    match nums with
+    | Nil -> true
+    | Cons x xs -> 0 <= x && nonnegative_list xs
+    end
+
+  predicate prefix_capacity_bound (nums: list int) (m: int) =
+    forall k: int. 1 <= k <= length nums ->
+      sum (prefix k nums) <= m * k
+
+  predicate optimal_minimized_maximum (nums: list int) (m: int) =
+    0 <= m /\
+    prefix_capacity_bound nums m /\
+    (forall smaller: int. 0 <= smaller < m ->
+      not (prefix_capacity_bound nums smaller))
+
+  let rec predicate scan_capacity_bound
+      (nums: list int) (prefix_sum: int) (prefix_len: int) (m: int)
+    variant { nums }
+  =
+    match nums with
+    | Nil -> true
+    | Cons x xs ->
+        prefix_sum + x <= m * prefix_len &&
+        scan_capacity_bound xs (prefix_sum + x) (prefix_len + 1) m
+    end
+
+  let ceil_div_positive (sum: int) (count: int) : int
+    requires { 0 <= sum }
+    requires { 1 <= count }
+    ensures  { 0 <= result }
+    ensures  { sum <= result * count }
+    ensures  { forall smaller: int. 0 <= smaller < result ->
+      not (sum <= smaller * count) }
+  =
+    if mod sum count = 0 then div sum count else div sum count + 1
+
+  let rec scan_prefix_bounds
+      (nums: list int) (prefix_sum: int) (prefix_len: int) (best: int) : int
+    requires { 0 <= prefix_sum }
+    requires { 1 <= prefix_len }
+    requires { 0 <= best }
+    requires { nonnegative_list nums }
+    ensures  { 0 <= result }
+    ensures  { best <= result }
+    ensures  { scan_capacity_bound nums prefix_sum prefix_len result }
+    ensures  { forall smaller: int. 0 <= smaller < result ->
+      not (best <= smaller /\ scan_capacity_bound nums prefix_sum prefix_len smaller) }
+    variant { nums }
+  =
+    match nums with
+    | Nil -> best
+    | Cons x xs ->
+        assert { 0 <= x };
+        assert { nonnegative_list xs };
+        let new_sum = prefix_sum + x in
+        assert { 0 <= new_sum };
+        let current_bound = ceil_div_positive new_sum prefix_len in
+        assert { new_sum <= current_bound * prefix_len };
+        let new_best =
+          if current_bound > best then current_bound else best in
+        assert { 0 <= new_best };
+        assert { best <= new_best };
+        assert { current_bound <= new_best };
+        scan_prefix_bounds xs new_sum (prefix_len + 1) new_best
+    end
+
+  let rec lemma scan_capacity_bound_to_prefix_capacity (nums: list int) (m: int)
+    requires { scan_capacity_bound nums 0 1 m }
+    ensures  { prefix_capacity_bound nums m }
+    variant  { nums }
+  =
+    match nums with
+    | Nil ->
+        assert { length nums = 0 }
+    | Cons _ xs ->
+        scan_capacity_bound_to_prefix_capacity xs (m)
+    end
+
+  let rec lemma prefix_capacity_to_scan_capacity_bound (nums: list int) (m: int)
+    requires { prefix_capacity_bound nums m }
+    ensures  { scan_capacity_bound nums 0 1 m }
+    variant  { nums }
+  =
+    match nums with
+    | Nil ->
+        assert { scan_capacity_bound Nil 0 1 m }
+    | Cons _ xs ->
+        prefix_capacity_to_scan_capacity_bound xs (m)
+    end
+
+  let minimize_maximum_of_array_list (nums: list int) : int
+    requires { 2 <= length nums }
+    requires { nonnegative_list nums }
+    ensures  { optimal_minimized_maximum nums result }
+  =
+    let result = scan_prefix_bounds nums 0 1 0 in
+    assert { 0 <= result };
+    assert { scan_capacity_bound nums 0 1 result };
+    scan_capacity_bound_to_prefix_capacity nums result;
+    assert { prefix_capacity_bound nums result };
+    assert { forall smaller: int. 0 <= smaller < result ->
+      not (scan_capacity_bound nums 0 1 smaller) };
+    assert { forall smaller: int. 0 <= smaller < result ->
+      not (prefix_capacity_bound nums smaller) };
+    result
+
+end

@@ -1,0 +1,287 @@
+module ArithmeticSlices_Array_Spec
+
+  use int.Int
+  use array.Array
+  use array.Init
+  use ref.Ref
+
+  let rec function is_arithmetic_run (nums: array int) (lo: int) (hi: int) : bool
+    requires { 0 <= lo <= hi < length nums }
+    variant  { hi - lo }
+  =
+    if hi <= lo + 1 then true
+    else if nums[hi] - nums[hi - 1] = nums[lo + 1] - nums[lo] then
+      is_arithmetic_run nums lo (hi - 1)
+    else false
+
+  predicate arithmetic_slice (nums: array int) (lo: int) (hi: int) =
+    0 <= lo /\ lo + 2 <= hi < length nums /\
+    is_arithmetic_run nums lo hi = true /\
+    (forall k: int.
+       lo <= k < hi -> nums[k + 1] - nums[k] = nums[lo + 1] - nums[lo])
+
+  let rec function count_ends_from (nums: array int) (lo: int) (hi: int) : int
+    requires { 0 <= lo }
+    requires { lo + 2 <= hi <= length nums }
+    variant  { length nums - hi }
+  =
+    if hi = length nums then 0
+    else
+      (if is_arithmetic_run nums lo hi then 1 else 0) +
+      count_ends_from nums lo (hi + 1)
+
+  let rec function count_starts_from (nums: array int) (lo: int) : int
+    requires { 0 <= lo <= length nums }
+    variant  { length nums - lo }
+  =
+    if lo + 2 >= length nums then 0
+    else count_ends_from nums lo (lo + 2) + count_starts_from nums (lo + 1)
+
+  function arithmetic_slice_count (nums: array int) : int =
+    count_starts_from nums 0
+
+  let rec function ending_slice_count (nums: array int) (hi: int) : int
+    requires { 0 <= hi < length nums }
+    variant  { hi }
+  =
+    if hi < 2 then 0
+    else if nums[hi] - nums[hi - 1] = nums[hi - 1] - nums[hi - 2] then
+      ending_slice_count nums (hi - 1) + 1
+    else 0
+
+  let rec function prefix_slice_count (nums: array int) (hi: int) : int
+    requires { -1 <= hi < length nums }
+    variant  { hi + 1 }
+  =
+    if hi < 2 then 0
+    else prefix_slice_count nums (hi - 1) + ending_slice_count nums hi
+
+  let rec function count_ends_between (nums: array int) (lo: int) (hi: int) (limit: int) : int
+    requires { 0 <= lo }
+    requires { lo + 2 <= hi }
+    requires { lo + 1 <= limit < length nums }
+    variant  { limit - hi + 1 }
+  =
+    if hi > limit then 0
+    else
+      (if is_arithmetic_run nums lo hi then 1 else 0) +
+      count_ends_between nums lo (hi + 1) limit
+
+  let rec function count_starts_to (nums: array int) (lo: int) (hi: int) : int
+    requires { 0 <= lo <= length nums }
+    requires { -1 <= hi < length nums }
+    variant  { length nums - lo }
+  =
+    if lo + 2 > hi then 0
+    else count_ends_between nums lo (lo + 2) hi + count_starts_to nums (lo + 1) hi
+
+  let rec function count_starts_ending_at (nums: array int) (lo: int) (hi: int) : int
+    requires { 0 <= lo <= hi < length nums }
+    variant  { hi - lo }
+  =
+    if lo + 2 > hi then 0
+    else
+      (if is_arithmetic_run nums lo hi then 1 else 0) +
+      count_starts_ending_at nums (lo + 1) hi
+
+  let rec lemma count_ends_between_full (nums: array int) (lo: int) (hi: int)
+    requires { 0 <= lo }
+    requires { lo + 2 <= hi <= length nums }
+    requires { lo + 2 <= length nums }
+    ensures  { count_ends_between nums lo hi (length nums - 1) = count_ends_from nums lo hi }
+    variant  { length nums - hi }
+  =
+    if hi < length nums then (
+      count_ends_between_full nums lo (hi + 1);
+      assert { count_ends_between nums lo hi (length nums - 1) =
+        (if is_arithmetic_run nums lo hi then 1 else 0) +
+        count_ends_between nums lo (hi + 1) (length nums - 1) };
+      assert { count_ends_from nums lo hi =
+        (if is_arithmetic_run nums lo hi then 1 else 0) +
+        count_ends_from nums lo (hi + 1) }
+    ) else
+      assert { hi = length nums }
+
+  let rec lemma count_starts_to_full (nums: array int) (lo: int)
+    requires { 0 <= lo <= length nums }
+    ensures  { count_starts_to nums lo (length nums - 1) = count_starts_from nums lo }
+    variant  { length nums - lo }
+  =
+    if lo + 2 < length nums then (
+      count_ends_between_full nums lo (lo + 2);
+      count_starts_to_full nums (lo + 1)
+    ) else (
+      assert { lo + 2 > length nums - 1 };
+      assert { lo + 2 >= length nums }
+    )
+
+  let rec lemma count_ends_between_last (nums: array int) (lo: int) (hi: int) (limit: int)
+    requires { 0 <= lo }
+    requires { lo + 2 <= hi <= limit < length nums }
+    ensures  { count_ends_between nums lo hi limit =
+      count_ends_between nums lo hi (limit - 1) +
+      (if is_arithmetic_run nums lo limit then 1 else 0) }
+    variant  { limit - hi }
+  =
+    if hi < limit then
+      count_ends_between_last nums lo (hi + 1) limit
+    else (
+      assert { hi = limit };
+      assert { count_ends_between nums lo hi (limit - 1) = 0 }
+    )
+
+  let rec lemma count_starts_to_step (nums: array int) (lo: int) (hi: int)
+    requires { 0 <= lo <= hi < length nums }
+    ensures  { count_starts_to nums lo hi =
+      count_starts_to nums lo (hi - 1) + count_starts_ending_at nums lo hi }
+    variant  { hi - lo }
+  =
+    if lo + 2 <= hi then (
+      count_ends_between_last nums lo (lo + 2) hi;
+      count_starts_to_step nums (lo + 1) hi
+    ) else (
+      assert { lo + 2 > hi };
+      assert { lo + 2 > hi - 1 }
+    )
+
+  let rec lemma is_arithmetic_run_all_diffs (nums: array int) (lo: int) (hi: int)
+    requires { 0 <= lo <= hi < length nums }
+    ensures  { is_arithmetic_run nums lo hi = true ->
+      forall k: int. lo <= k < hi -> nums[k + 1] - nums[k] = nums[lo + 1] - nums[lo] }
+    variant  { hi - lo }
+  =
+    if hi > lo + 1 then (
+      is_arithmetic_run_all_diffs nums lo (hi - 1);
+      assert { is_arithmetic_run nums lo hi = true ->
+        nums[hi] - nums[hi - 1] = nums[lo + 1] - nums[lo] }
+    )
+
+  let lemma is_arithmetic_run_extend_iff (nums: array int) (lo: int) (hi: int)
+    requires { 0 <= lo }
+    requires { lo + 2 <= hi < length nums }
+    requires { nums[hi] - nums[hi - 1] = nums[hi - 1] - nums[hi - 2] }
+    ensures  { is_arithmetic_run nums lo hi = is_arithmetic_run nums lo (hi - 1) }
+  =
+    if is_arithmetic_run nums lo (hi - 1) then (
+      is_arithmetic_run_all_diffs nums lo (hi - 1);
+      assert { nums[hi - 1] - nums[hi - 2] = nums[lo + 1] - nums[lo] };
+      assert { nums[hi] - nums[hi - 1] = nums[lo + 1] - nums[lo] }
+    )
+
+  let rec lemma count_starts_ending_step_when_equal (nums: array int) (lo: int) (hi: int)
+    requires { 0 <= lo }
+    requires { lo + 2 <= hi < length nums }
+    requires { nums[hi] - nums[hi - 1] = nums[hi - 1] - nums[hi - 2] }
+    ensures  { count_starts_ending_at nums lo hi =
+      count_starts_ending_at nums lo (hi - 1) + 1 }
+    variant  { hi - lo }
+  =
+    if lo + 2 = hi then (
+      assert { is_arithmetic_run nums lo hi = true };
+      assert { count_starts_ending_at nums lo (hi - 1) = 0 }
+    ) else (
+      is_arithmetic_run_extend_iff nums lo hi;
+      count_starts_ending_step_when_equal nums (lo + 1) hi
+    )
+
+  let rec lemma no_arithmetic_run_when_last_diff_breaks (nums: array int) (lo: int) (hi: int)
+    requires { 0 <= lo }
+    requires { lo + 2 <= hi < length nums }
+    requires { nums[hi] - nums[hi - 1] <> nums[hi - 1] - nums[hi - 2] }
+    ensures  { is_arithmetic_run nums lo hi = false }
+    variant  { hi - lo }
+  =
+    if is_arithmetic_run nums lo hi then (
+      is_arithmetic_run_all_diffs nums lo hi;
+      assert { nums[hi] - nums[hi - 1] = nums[lo + 1] - nums[lo] };
+      assert { nums[hi - 1] - nums[hi - 2] = nums[lo + 1] - nums[lo] }
+    )
+
+  let rec lemma count_starts_ending_zero_when_breaks (nums: array int) (lo: int) (hi: int)
+    requires { 0 <= lo <= hi < length nums }
+    requires { nums[hi] - nums[hi - 1] <> nums[hi - 1] - nums[hi - 2] }
+    ensures  { count_starts_ending_at nums lo hi = 0 }
+    variant  { hi - lo }
+  =
+    if lo + 2 <= hi then (
+      no_arithmetic_run_when_last_diff_breaks nums lo hi;
+      count_starts_ending_zero_when_breaks nums (lo + 1) hi
+    )
+
+  let rec lemma ending_slice_count_matches_starts_ending_at (nums: array int) (hi: int)
+    requires { 0 <= hi < length nums }
+    ensures  { ending_slice_count nums hi = count_starts_ending_at nums 0 hi }
+    variant  { hi }
+  =
+    if hi >= 2 then (
+      ending_slice_count_matches_starts_ending_at nums (hi - 1);
+      if nums[hi] - nums[hi - 1] = nums[hi - 1] - nums[hi - 2] then
+        count_starts_ending_step_when_equal nums 0 hi
+      else
+        count_starts_ending_zero_when_breaks nums 0 hi
+    )
+
+  let rec lemma prefix_slice_count_matches_count_starts_to (nums: array int) (hi: int)
+    requires { 0 <= hi < length nums }
+    ensures  { prefix_slice_count nums hi = count_starts_to nums 0 hi }
+    variant  { hi }
+  =
+    if hi < 2 then (
+      assert { count_starts_to nums 0 hi = 0 }
+    ) else (
+      prefix_slice_count_matches_count_starts_to nums (hi - 1);
+      ending_slice_count_matches_starts_ending_at nums hi;
+      count_starts_to_step nums 0 hi
+    )
+
+  let lemma prefix_slice_count_matches_arithmetic_slice_count (nums: array int)
+    requires { 1 <= length nums }
+    ensures  { prefix_slice_count nums (length nums - 1) = arithmetic_slice_count nums }
+  =
+    assert { -1 <= length nums - 1 < length nums };
+    assert { 0 <= length nums - 1 < length nums };
+    prefix_slice_count_matches_count_starts_to nums (length nums - 1);
+    count_starts_to_full nums 0;
+    assert { arithmetic_slice_count nums = count_starts_from nums 0 };
+    assert { prefix_slice_count nums (length nums - 1) = count_starts_to nums 0 (length nums - 1) };
+    assert { count_starts_to nums 0 (length nums - 1) = count_starts_from nums 0 }
+
+  let arithmetic_slices_array (nums: array int) : int
+    requires { 1 <= length nums <= 5000 }
+    requires { forall i: int. 0 <= i < length nums -> -1000 <= nums[i] <= 1000 }
+    ensures  { result = arithmetic_slice_count nums }
+    ensures  { result >= 0 }
+  =
+    let n = length nums in
+    if n < 3 then (
+      assert { arithmetic_slice_count nums = 0 };
+      0
+    ) else (
+      let current = ref 0 in
+      let total = ref 0 in
+      for i = 2 to n - 1 do
+        invariant { 2 <= i <= n }
+        invariant { !current >= 0 }
+        invariant { !total >= 0 }
+        invariant { !current = (if i = 2 then 0 else ending_slice_count nums (i - 1)) }
+        invariant { !total = prefix_slice_count nums (i - 1) }
+        if nums[i] - nums[i - 1] = nums[i - 1] - nums[i - 2] then (
+          assert { ending_slice_count nums i = ending_slice_count nums (i - 1) + 1 };
+          current := !current + 1;
+          total := !total + !current
+        ) else (
+          assert { ending_slice_count nums i = 0 };
+          current := 0
+        );
+        assert { !current = ending_slice_count nums i };
+        assert { !total = prefix_slice_count nums i }
+      done;
+      let last = n - 1 in
+      assert { last = length nums - 1 };
+      assert { !total = prefix_slice_count nums last };
+      prefix_slice_count_matches_arithmetic_slice_count nums;
+      assert { prefix_slice_count nums last = arithmetic_slice_count nums };
+      !total
+    )
+
+end

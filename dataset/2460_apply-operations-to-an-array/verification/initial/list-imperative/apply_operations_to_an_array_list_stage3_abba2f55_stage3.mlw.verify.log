@@ -1,0 +1,479 @@
+== Stage 1: first prover on whole file ==
+Running in /Users/rubenm/Desktop/Diversify2Verify/codex-runs/testing4/2460_apply-operations-to-an-array/stage3a/list-imperative/apply_operations_to_an_array_list_stage3_abba2f55/generated/why3/list: why3 session create -o /Users/rubenm/Desktop/Diversify2Verify/codex-runs/testing4/2460_apply-operations-to-an-array/stage3a/list-imperative/apply_operations_to_an_array_list_stage3_abba2f55/generated/why3/list/.why3_sessions/apply_operations_to_an_array_list_stage3_abba2f55_stage3_stage1 -P Z3,4.8.6 -t 10 -m 8192 apply_operations_to_an_array_list_stage3_abba2f55_stage3.mlw
+Session created successfully
+Running in /Users/rubenm/Desktop/Diversify2Verify/codex-runs/testing4/2460_apply-operations-to-an-array/stage3a/list-imperative/apply_operations_to_an_array_list_stage3_abba2f55/generated/why3/list: why3 bench /Users/rubenm/Desktop/Diversify2Verify/codex-runs/testing4/2460_apply-operations-to-an-array/stage3a/list-imperative/apply_operations_to_an_array_list_stage3_abba2f55/generated/why3/list/.why3_sessions/apply_operations_to_an_array_list_stage3_abba2f55_stage3_stage1
+Progress: 7/1/0                       Progress: 6/2/0                       Progress: 5/3/0                       Progress: 4/4/0                       Progress: 3/5/0                       Progress: 2/6/0                       Progress: 2/1/2                       Progress: 1/2/2                       Progress: 0/3/2                       Progress: 0/2/2                       Progress: 0/1/2                       Progress: 0/0/1                       
+Replay completed, saving session... done
+== Stage 1 stats ==
+= Statistics for session /Users/rubenm/Desktop/Diversify2Verify/codex-runs/testing4/2460_apply-operations-to-an-array/stage3a/list-imperative/apply_operations_to_an_array_list_stage3_abba2f55/generated/why3/list/.why3_sessions/apply_operations_to_an_array_list_stage3_abba2f55_stage3_stage1
+
+== Number of root goals ==
+  total: 8  proved: 4
+
+== Number of sub goals ==
+  total: 0  proved: 0
+
+== Goals not proved ==
+  +-- file [../../apply_operations_to_an_array_list_stage3_abba2f55_stage3.mlw]
+    +-- theory ApplyOperationsToAnArray_List_Stage3_Imperative
+      +-- goal operation_pass'vc
+      +-- goal make_zeros_impl'vc
+      +-- goal operation_pass_impl'vc
+      +-- goal shift_zeros_to_end_impl'vc
+  
+== Goals proved by only one prover ==
+  +-- file [../../apply_operations_to_an_array_list_stage3_abba2f55_stage3.mlw]
+    +-- theory ApplyOperationsToAnArray_List_Stage3_Imperative
+      +-- goal shift_zeros_to_end'vc: Z3 4.8.6
+      +-- goal zeros'vc: Z3 4.8.6
+      +-- goal reverse_list_impl'vc: Z3 4.8.6
+      +-- goal apply_operations_to_an_array_list'vc: Z3 4.8.6
+  
+1 session(s) read, with a total of 8 proof goals.
+== Unproved root goals after first prover ==
+ApplyOperationsToAnArray_List_Stage3_Imperative	operation_pass'vc
+ApplyOperationsToAnArray_List_Stage3_Imperative	make_zeros_impl'vc
+ApplyOperationsToAnArray_List_Stage3_Imperative	operation_pass_impl'vc
+ApplyOperationsToAnArray_List_Stage3_Imperative	shift_zeros_to_end_impl'vc
+== Stage 1: trying remaining goals with prover Alt-Ergo,2.4.0 ==
+---- stage1 | prover: Alt-Ergo,2.4.0 | theory: ApplyOperationsToAnArray_List_Stage3_Imperative | goal: operation_pass'vc ----
+File apply_operations_to_an_array_list_stage3_abba2f55_stage3.mlw:
+Goal operation_pass'vc.
+Prover result is: Valid (0.01s, 46 steps).
+Solved in stage 1 using prover: Alt-Ergo,2.4.0
+---- stage1 | prover: Alt-Ergo,2.4.0 | theory: ApplyOperationsToAnArray_List_Stage3_Imperative | goal: make_zeros_impl'vc ----
+File apply_operations_to_an_array_list_stage3_abba2f55_stage3.mlw:
+Goal make_zeros_impl'vc.
+Prover result is: Valid (0.05s, 1430 steps).
+Solved in stage 1 using prover: Alt-Ergo,2.4.0
+---- stage1 | prover: Alt-Ergo,2.4.0 | theory: ApplyOperationsToAnArray_List_Stage3_Imperative | goal: operation_pass_impl'vc ----
+File apply_operations_to_an_array_list_stage3_abba2f55_stage3.mlw:
+Goal operation_pass_impl'vc.
+Prover result is: Valid (0.12s, 5092 steps).
+Solved in stage 1 using prover: Alt-Ergo,2.4.0
+---- stage1 | prover: Alt-Ergo,2.4.0 | theory: ApplyOperationsToAnArray_List_Stage3_Imperative | goal: shift_zeros_to_end_impl'vc ----
+File apply_operations_to_an_array_list_stage3_abba2f55_stage3.mlw:
+Goal shift_zeros_to_end_impl'vc.
+Prover result is: Timeout (10.00s, 389179 steps).
+Remaining after prover Alt-Ergo,2.4.0: 1
+== Stage 1: trying remaining goals with prover CVC4,1.8 ==
+---- stage1 | prover: CVC4,1.8 | theory: ApplyOperationsToAnArray_List_Stage3_Imperative | goal: shift_zeros_to_end_impl'vc ----
+File apply_operations_to_an_array_list_stage3_abba2f55_stage3.mlw:
+Goal shift_zeros_to_end_impl'vc.
+Prover result is: Timeout (10.00s, 2123108 steps).
+Remaining after prover CVC4,1.8: 1
+== Goals still unproved after stage 1 ==
+ApplyOperationsToAnArray_List_Stage3_Imperative	shift_zeros_to_end_impl'vc
+== Stage 2: split_vc on unproved goal ==
+Target theory: ApplyOperationsToAnArray_List_Stage3_Imperative
+Target goal  : shift_zeros_to_end_impl'vc
+---- stage2 | prover: Z3,4.8.6 | theory: ApplyOperationsToAnArray_List_Stage3_Imperative | goal: shift_zeros_to_end_impl'vc ----
+Transforms: split_vc
+File "apply_operations_to_an_array_list_stage3_abba2f55_stage3.mlw", line 129, characters 18-34:
+Sub-goal Loop invariant init of goal shift_zeros_to_end_impl'vc.
+Prover result is: Valid (0.01s, 1317 steps).
+
+File "apply_operations_to_an_array_list_stage3_abba2f55_stage3.mlw", line 130, characters 18-34:
+Sub-goal Loop invariant init of goal shift_zeros_to_end_impl'vc.
+Prover result is: Valid (0.01s, 18221 steps).
+
+File "apply_operations_to_an_array_list_stage3_abba2f55_stage3.mlw", line 131, characters 18-42:
+Sub-goal Loop invariant init of goal shift_zeros_to_end_impl'vc.
+Prover result is: Valid (0.01s, 3359 steps).
+
+File "apply_operations_to_an_array_list_stage3_abba2f55_stage3.mlw", line 132, characters 18-79:
+Sub-goal Loop invariant init of goal shift_zeros_to_end_impl'vc.
+Prover result is: Valid (0.01s, 1882 steps).
+
+File "apply_operations_to_an_array_list_stage3_abba2f55_stage3.mlw", line 133, characters 16-27:
+Sub-goal Loop variant decrease of goal shift_zeros_to_end_impl'vc.
+Prover result is: Valid (0.01s, 1929 steps).
+
+File "apply_operations_to_an_array_list_stage3_abba2f55_stage3.mlw", line 129, characters 18-34:
+Sub-goal Loop invariant preservation of goal shift_zeros_to_end_impl'vc.
+Prover result is: Valid (0.01s, 1913 steps).
+
+File "apply_operations_to_an_array_list_stage3_abba2f55_stage3.mlw", line 130, characters 18-34:
+Sub-goal Loop invariant preservation of goal shift_zeros_to_end_impl'vc.
+Prover result is: Valid (0.01s, 1918 steps).
+
+File "apply_operations_to_an_array_list_stage3_abba2f55_stage3.mlw", line 131, characters 18-42:
+Sub-goal Loop invariant preservation of goal shift_zeros_to_end_impl'vc.
+Prover result is: Valid (0.01s, 1923 steps).
+
+File "apply_operations_to_an_array_list_stage3_abba2f55_stage3.mlw", line 132, characters 18-79:
+Sub-goal Loop invariant preservation of goal shift_zeros_to_end_impl'vc.
+Prover result is: Valid (0.01s, 1938 steps).
+
+File "apply_operations_to_an_array_list_stage3_abba2f55_stage3.mlw", line 133, characters 16-27:
+Sub-goal Loop variant decrease of goal shift_zeros_to_end_impl'vc.
+Prover result is: Valid (0.01s, 28600 steps).
+
+File "apply_operations_to_an_array_list_stage3_abba2f55_stage3.mlw", line 129, characters 18-34:
+Sub-goal Loop invariant preservation of goal shift_zeros_to_end_impl'vc.
+Prover result is: Valid (0.01s, 27820 steps).
+
+File "apply_operations_to_an_array_list_stage3_abba2f55_stage3.mlw", line 130, characters 18-34:
+Sub-goal Loop invariant preservation of goal shift_zeros_to_end_impl'vc.
+Prover result is: Valid (0.01s, 28617 steps).
+
+File "apply_operations_to_an_array_list_stage3_abba2f55_stage3.mlw", line 131, characters 18-42:
+Sub-goal Loop invariant preservation of goal shift_zeros_to_end_impl'vc.
+Prover result is: Valid (0.01s, 2056 steps).
+
+File "apply_operations_to_an_array_list_stage3_abba2f55_stage3.mlw", line 132, characters 18-79:
+Sub-goal Loop invariant preservation of goal shift_zeros_to_end_impl'vc.
+Prover result is: Valid (0.01s, 28795 steps).
+
+File "apply_operations_to_an_array_list_stage3_abba2f55_stage3.mlw", line 133, characters 16-27:
+Sub-goal Loop variant decrease of goal shift_zeros_to_end_impl'vc.
+Prover result is: Valid (0.01s, 28737 steps).
+
+File "apply_operations_to_an_array_list_stage3_abba2f55_stage3.mlw", line 129, characters 18-34:
+Sub-goal Loop invariant preservation of goal shift_zeros_to_end_impl'vc.
+Prover result is: Valid (0.01s, 2051 steps).
+
+File "apply_operations_to_an_array_list_stage3_abba2f55_stage3.mlw", line 130, characters 18-34:
+Sub-goal Loop invariant preservation of goal shift_zeros_to_end_impl'vc.
+Prover result is: Valid (0.01s, 28679 steps).
+
+File "apply_operations_to_an_array_list_stage3_abba2f55_stage3.mlw", line 131, characters 18-42:
+Sub-goal Loop invariant preservation of goal shift_zeros_to_end_impl'vc.
+Prover result is: Valid (0.01s, 29154 steps).
+
+File "apply_operations_to_an_array_list_stage3_abba2f55_stage3.mlw", line 132, characters 18-79:
+Sub-goal Loop invariant preservation of goal shift_zeros_to_end_impl'vc.
+Prover result is: Timeout (10.00s, 44816095 steps).
+
+File "apply_operations_to_an_array_list_stage3_abba2f55_stage3.mlw", line 145, characters 13-23:
+Sub-goal Assertion of goal shift_zeros_to_end_impl'vc.
+Prover result is: Valid (0.03s, 275685 steps).
+
+File "apply_operations_to_an_array_list_stage3_abba2f55_stage3.mlw", line 146, characters 13-29:
+Sub-goal Assertion of goal shift_zeros_to_end_impl'vc.
+Prover result is: Valid (0.01s, 2060 steps).
+
+File "apply_operations_to_an_array_list_stage3_abba2f55_stage3.mlw", line 147, characters 21-50:
+Sub-goal Precondition of goal shift_zeros_to_end_impl'vc.
+Prover result is: Valid (0.01s, 2065 steps).
+
+File "apply_operations_to_an_array_list_stage3_abba2f55_stage3.mlw", line 150, characters 18-36:
+Sub-goal Loop invariant init of goal shift_zeros_to_end_impl'vc.
+Prover result is: Valid (0.01s, 2078 steps).
+
+File "apply_operations_to_an_array_list_stage3_abba2f55_stage3.mlw", line 151, characters 18-62:
+Sub-goal Loop invariant init of goal shift_zeros_to_end_impl'vc.
+Prover result is: Valid (0.01s, 17169 steps).
+
+File "apply_operations_to_an_array_list_stage3_abba2f55_stage3.mlw", line 152, characters 16-29:
+Sub-goal Loop variant decrease of goal shift_zeros_to_end_impl'vc.
+Prover result is: Valid (0.01s, 2138 steps).
+
+File "apply_operations_to_an_array_list_stage3_abba2f55_stage3.mlw", line 150, characters 18-36:
+Sub-goal Loop invariant preservation of goal shift_zeros_to_end_impl'vc.
+Prover result is: Valid (0.01s, 2122 steps).
+
+File "apply_operations_to_an_array_list_stage3_abba2f55_stage3.mlw", line 151, characters 18-62:
+Sub-goal Loop invariant preservation of goal shift_zeros_to_end_impl'vc.
+Prover result is: Valid (0.01s, 2133 steps).
+
+File "apply_operations_to_an_array_list_stage3_abba2f55_stage3.mlw", line 152, characters 16-29:
+Sub-goal Loop variant decrease of goal shift_zeros_to_end_impl'vc.
+Prover result is: Valid (0.01s, 31533 steps).
+
+File "apply_operations_to_an_array_list_stage3_abba2f55_stage3.mlw", line 150, characters 18-36:
+Sub-goal Loop invariant preservation of goal shift_zeros_to_end_impl'vc.
+Prover result is: Valid (0.01s, 31530 steps).
+
+File "apply_operations_to_an_array_list_stage3_abba2f55_stage3.mlw", line 151, characters 18-62:
+Sub-goal Loop invariant preservation of goal shift_zeros_to_end_impl'vc.
+Prover result is: Timeout (10.00s, 44386221 steps).
+
+File "apply_operations_to_an_array_list_stage3_abba2f55_stage3.mlw", line 160, characters 13-25:
+Sub-goal Assertion of goal shift_zeros_to_end_impl'vc.
+Prover result is: Valid (0.04s, 276215 steps).
+Infrastructure issue in stage 2 with prover Z3,4.8.6; aborting rest of stage 2.
+== Goals still unproved after stage 2 (split_vc) ==
+ApplyOperationsToAnArray_List_Stage3_Imperative	shift_zeros_to_end_impl'vc
+== Stage 3: split_vc + inline_all on still-unproved goal ==
+Target theory: ApplyOperationsToAnArray_List_Stage3_Imperative
+Target goal  : shift_zeros_to_end_impl'vc
+---- stage3 | prover: Alt-Ergo,2.4.0 | theory: ApplyOperationsToAnArray_List_Stage3_Imperative | goal: shift_zeros_to_end_impl'vc ----
+Transforms: split_vc inline_all
+File "apply_operations_to_an_array_list_stage3_abba2f55_stage3.mlw", line 129, characters 18-34:
+Sub-goal Loop invariant init of goal shift_zeros_to_end_impl'vc.
+Prover result is: Valid (0.01s, 2 steps).
+
+File "apply_operations_to_an_array_list_stage3_abba2f55_stage3.mlw", line 130, characters 18-34:
+Sub-goal Loop invariant init of goal shift_zeros_to_end_impl'vc.
+Prover result is: Valid (0.01s, 6 steps).
+
+File "apply_operations_to_an_array_list_stage3_abba2f55_stage3.mlw", line 131, characters 18-42:
+Sub-goal Loop invariant init of goal shift_zeros_to_end_impl'vc.
+Prover result is: Valid (0.01s, 7 steps).
+
+File "apply_operations_to_an_array_list_stage3_abba2f55_stage3.mlw", line 132, characters 18-79:
+Sub-goal Loop invariant init of goal shift_zeros_to_end_impl'vc.
+Prover result is: Valid (0.01s, 8 steps).
+
+File "apply_operations_to_an_array_list_stage3_abba2f55_stage3.mlw", line 133, characters 16-27:
+Sub-goal Loop variant decrease of goal shift_zeros_to_end_impl'vc.
+Prover result is: Valid (0.01s, 8 steps).
+
+File "apply_operations_to_an_array_list_stage3_abba2f55_stage3.mlw", line 129, characters 18-34:
+Sub-goal Loop invariant preservation of goal shift_zeros_to_end_impl'vc.
+Prover result is: Valid (0.01s, 8 steps).
+
+File "apply_operations_to_an_array_list_stage3_abba2f55_stage3.mlw", line 130, characters 18-34:
+Sub-goal Loop invariant preservation of goal shift_zeros_to_end_impl'vc.
+Prover result is: Valid (0.01s, 8 steps).
+
+File "apply_operations_to_an_array_list_stage3_abba2f55_stage3.mlw", line 131, characters 18-42:
+Sub-goal Loop invariant preservation of goal shift_zeros_to_end_impl'vc.
+Prover result is: Valid (0.01s, 8 steps).
+
+File "apply_operations_to_an_array_list_stage3_abba2f55_stage3.mlw", line 132, characters 18-79:
+Sub-goal Loop invariant preservation of goal shift_zeros_to_end_impl'vc.
+Prover result is: Valid (0.01s, 8 steps).
+
+File "apply_operations_to_an_array_list_stage3_abba2f55_stage3.mlw", line 133, characters 16-27:
+Sub-goal Loop variant decrease of goal shift_zeros_to_end_impl'vc.
+Prover result is: Valid (0.01s, 29 steps).
+
+File "apply_operations_to_an_array_list_stage3_abba2f55_stage3.mlw", line 129, characters 18-34:
+Sub-goal Loop invariant preservation of goal shift_zeros_to_end_impl'vc.
+Prover result is: Valid (0.01s, 20 steps).
+
+File "apply_operations_to_an_array_list_stage3_abba2f55_stage3.mlw", line 130, characters 18-34:
+Sub-goal Loop invariant preservation of goal shift_zeros_to_end_impl'vc.
+Prover result is: Valid (0.01s, 26 steps).
+
+File "apply_operations_to_an_array_list_stage3_abba2f55_stage3.mlw", line 131, characters 18-42:
+Sub-goal Loop invariant preservation of goal shift_zeros_to_end_impl'vc.
+Prover result is: Valid (0.01s, 14 steps).
+
+File "apply_operations_to_an_array_list_stage3_abba2f55_stage3.mlw", line 132, characters 18-79:
+Sub-goal Loop invariant preservation of goal shift_zeros_to_end_impl'vc.
+Prover result is: Valid (0.01s, 29 steps).
+
+File "apply_operations_to_an_array_list_stage3_abba2f55_stage3.mlw", line 133, characters 16-27:
+Sub-goal Loop variant decrease of goal shift_zeros_to_end_impl'vc.
+Prover result is: Valid (0.01s, 32 steps).
+
+File "apply_operations_to_an_array_list_stage3_abba2f55_stage3.mlw", line 129, characters 18-34:
+Sub-goal Loop invariant preservation of goal shift_zeros_to_end_impl'vc.
+Prover result is: Valid (0.01s, 12 steps).
+
+File "apply_operations_to_an_array_list_stage3_abba2f55_stage3.mlw", line 130, characters 18-34:
+Sub-goal Loop invariant preservation of goal shift_zeros_to_end_impl'vc.
+Prover result is: Valid (0.01s, 26 steps).
+
+File "apply_operations_to_an_array_list_stage3_abba2f55_stage3.mlw", line 131, characters 18-42:
+Sub-goal Loop invariant preservation of goal shift_zeros_to_end_impl'vc.
+Prover result is: Valid (0.01s, 32 steps).
+
+File "apply_operations_to_an_array_list_stage3_abba2f55_stage3.mlw", line 132, characters 18-79:
+Sub-goal Loop invariant preservation of goal shift_zeros_to_end_impl'vc.
+Prover result is: Valid (0.01s, 40 steps).
+
+File "apply_operations_to_an_array_list_stage3_abba2f55_stage3.mlw", line 145, characters 13-23:
+Sub-goal Assertion of goal shift_zeros_to_end_impl'vc.
+Prover result is: Valid (0.02s, 478 steps).
+
+File "apply_operations_to_an_array_list_stage3_abba2f55_stage3.mlw", line 146, characters 13-29:
+Sub-goal Assertion of goal shift_zeros_to_end_impl'vc.
+Prover result is: Valid (0.01s, 10 steps).
+
+File "apply_operations_to_an_array_list_stage3_abba2f55_stage3.mlw", line 147, characters 21-50:
+Sub-goal Precondition of goal shift_zeros_to_end_impl'vc.
+Prover result is: Valid (0.01s, 10 steps).
+
+File "apply_operations_to_an_array_list_stage3_abba2f55_stage3.mlw", line 150, characters 18-36:
+Sub-goal Loop invariant init of goal shift_zeros_to_end_impl'vc.
+Prover result is: Valid (0.01s, 12 steps).
+
+File "apply_operations_to_an_array_list_stage3_abba2f55_stage3.mlw", line 151, characters 18-62:
+Sub-goal Loop invariant init of goal shift_zeros_to_end_impl'vc.
+Prover result is: Valid (0.01s, 26 steps).
+
+File "apply_operations_to_an_array_list_stage3_abba2f55_stage3.mlw", line 152, characters 16-29:
+Sub-goal Loop variant decrease of goal shift_zeros_to_end_impl'vc.
+Prover result is: Valid (0.01s, 17 steps).
+
+File "apply_operations_to_an_array_list_stage3_abba2f55_stage3.mlw", line 150, characters 18-36:
+Sub-goal Loop invariant preservation of goal shift_zeros_to_end_impl'vc.
+Prover result is: Valid (0.01s, 17 steps).
+
+File "apply_operations_to_an_array_list_stage3_abba2f55_stage3.mlw", line 151, characters 18-62:
+Sub-goal Loop invariant preservation of goal shift_zeros_to_end_impl'vc.
+Prover result is: Valid (0.01s, 17 steps).
+
+File "apply_operations_to_an_array_list_stage3_abba2f55_stage3.mlw", line 152, characters 16-29:
+Sub-goal Loop variant decrease of goal shift_zeros_to_end_impl'vc.
+Prover result is: Valid (0.01s, 52 steps).
+
+File "apply_operations_to_an_array_list_stage3_abba2f55_stage3.mlw", line 150, characters 18-36:
+Sub-goal Loop invariant preservation of goal shift_zeros_to_end_impl'vc.
+Prover result is: Valid (0.01s, 42 steps).
+
+File "apply_operations_to_an_array_list_stage3_abba2f55_stage3.mlw", line 151, characters 18-62:
+Sub-goal Loop invariant preservation of goal shift_zeros_to_end_impl'vc.
+Prover result is: Valid (0.01s, 61 steps).
+
+File "apply_operations_to_an_array_list_stage3_abba2f55_stage3.mlw", line 160, characters 13-25:
+Sub-goal Assertion of goal shift_zeros_to_end_impl'vc.
+Prover result is: Timeout (10.00s, 282061 steps).
+
+File "apply_operations_to_an_array_list_stage3_abba2f55_stage3.mlw", line 122, characters 14-46:
+Sub-goal Postcondition of goal shift_zeros_to_end_impl'vc.
+Prover result is: Timeout (10.00s, 295955 steps).
+
+File "apply_operations_to_an_array_list_stage3_abba2f55_stage3.mlw", line 123, characters 14-41:
+Sub-goal Postcondition of goal shift_zeros_to_end_impl'vc.
+Prover result is: Valid (0.01s, 40 steps).
+---- stage3 | prover: CVC4,1.8 | theory: ApplyOperationsToAnArray_List_Stage3_Imperative | goal: shift_zeros_to_end_impl'vc ----
+Transforms: split_vc inline_all
+File "apply_operations_to_an_array_list_stage3_abba2f55_stage3.mlw", line 129, characters 18-34:
+Sub-goal Loop invariant init of goal shift_zeros_to_end_impl'vc.
+Prover result is: Valid (0.02s, 3711 steps).
+
+File "apply_operations_to_an_array_list_stage3_abba2f55_stage3.mlw", line 130, characters 18-34:
+Sub-goal Loop invariant init of goal shift_zeros_to_end_impl'vc.
+Prover result is: Valid (0.02s, 4398 steps).
+
+File "apply_operations_to_an_array_list_stage3_abba2f55_stage3.mlw", line 131, characters 18-42:
+Sub-goal Loop invariant init of goal shift_zeros_to_end_impl'vc.
+Prover result is: Valid (0.02s, 4986 steps).
+
+File "apply_operations_to_an_array_list_stage3_abba2f55_stage3.mlw", line 132, characters 18-79:
+Sub-goal Loop invariant init of goal shift_zeros_to_end_impl'vc.
+Prover result is: Valid (0.02s, 5010 steps).
+
+File "apply_operations_to_an_array_list_stage3_abba2f55_stage3.mlw", line 133, characters 16-27:
+Sub-goal Loop variant decrease of goal shift_zeros_to_end_impl'vc.
+Prover result is: Valid (0.02s, 5137 steps).
+
+File "apply_operations_to_an_array_list_stage3_abba2f55_stage3.mlw", line 129, characters 18-34:
+Sub-goal Loop invariant preservation of goal shift_zeros_to_end_impl'vc.
+Prover result is: Valid (0.02s, 5123 steps).
+
+File "apply_operations_to_an_array_list_stage3_abba2f55_stage3.mlw", line 130, characters 18-34:
+Sub-goal Loop invariant preservation of goal shift_zeros_to_end_impl'vc.
+Prover result is: Valid (0.02s, 5126 steps).
+
+File "apply_operations_to_an_array_list_stage3_abba2f55_stage3.mlw", line 131, characters 18-42:
+Sub-goal Loop invariant preservation of goal shift_zeros_to_end_impl'vc.
+Prover result is: Valid (0.02s, 5129 steps).
+
+File "apply_operations_to_an_array_list_stage3_abba2f55_stage3.mlw", line 132, characters 18-79:
+Sub-goal Loop invariant preservation of goal shift_zeros_to_end_impl'vc.
+Prover result is: Valid (0.02s, 5132 steps).
+
+File "apply_operations_to_an_array_list_stage3_abba2f55_stage3.mlw", line 133, characters 16-27:
+Sub-goal Loop variant decrease of goal shift_zeros_to_end_impl'vc.
+Prover result is: Valid (0.02s, 6282 steps).
+
+File "apply_operations_to_an_array_list_stage3_abba2f55_stage3.mlw", line 129, characters 18-34:
+Sub-goal Loop invariant preservation of goal shift_zeros_to_end_impl'vc.
+Prover result is: Valid (0.02s, 5698 steps).
+
+File "apply_operations_to_an_array_list_stage3_abba2f55_stage3.mlw", line 130, characters 18-34:
+Sub-goal Loop invariant preservation of goal shift_zeros_to_end_impl'vc.
+Prover result is: Valid (0.03s, 6311 steps).
+
+File "apply_operations_to_an_array_list_stage3_abba2f55_stage3.mlw", line 131, characters 18-42:
+Sub-goal Loop invariant preservation of goal shift_zeros_to_end_impl'vc.
+Prover result is: Valid (0.02s, 5497 steps).
+
+File "apply_operations_to_an_array_list_stage3_abba2f55_stage3.mlw", line 132, characters 18-79:
+Sub-goal Loop invariant preservation of goal shift_zeros_to_end_impl'vc.
+Prover result is: Valid (0.02s, 6418 steps).
+
+File "apply_operations_to_an_array_list_stage3_abba2f55_stage3.mlw", line 133, characters 16-27:
+Sub-goal Loop variant decrease of goal shift_zeros_to_end_impl'vc.
+Prover result is: Valid (0.02s, 6262 steps).
+
+File "apply_operations_to_an_array_list_stage3_abba2f55_stage3.mlw", line 129, characters 18-34:
+Sub-goal Loop invariant preservation of goal shift_zeros_to_end_impl'vc.
+Prover result is: Valid (0.02s, 5414 steps).
+
+File "apply_operations_to_an_array_list_stage3_abba2f55_stage3.mlw", line 130, characters 18-34:
+Sub-goal Loop invariant preservation of goal shift_zeros_to_end_impl'vc.
+Prover result is: Valid (0.02s, 6234 steps).
+
+File "apply_operations_to_an_array_list_stage3_abba2f55_stage3.mlw", line 131, characters 18-42:
+Sub-goal Loop invariant preservation of goal shift_zeros_to_end_impl'vc.
+Prover result is: Valid (0.02s, 6478 steps).
+
+File "apply_operations_to_an_array_list_stage3_abba2f55_stage3.mlw", line 132, characters 18-79:
+Sub-goal Loop invariant preservation of goal shift_zeros_to_end_impl'vc.
+Prover result is: Valid (0.02s, 6625 steps).
+
+File "apply_operations_to_an_array_list_stage3_abba2f55_stage3.mlw", line 145, characters 13-23:
+Sub-goal Assertion of goal shift_zeros_to_end_impl'vc.
+Prover result is: Unknown (unknown + incomplete) (0.02s, 6405 steps).
+
+File "apply_operations_to_an_array_list_stage3_abba2f55_stage3.mlw", line 146, characters 13-29:
+Sub-goal Assertion of goal shift_zeros_to_end_impl'vc.
+Prover result is: Valid (0.02s, 5445 steps).
+
+File "apply_operations_to_an_array_list_stage3_abba2f55_stage3.mlw", line 147, characters 21-50:
+Sub-goal Precondition of goal shift_zeros_to_end_impl'vc.
+Prover result is: Valid (0.02s, 5448 steps).
+
+File "apply_operations_to_an_array_list_stage3_abba2f55_stage3.mlw", line 150, characters 18-36:
+Sub-goal Loop invariant init of goal shift_zeros_to_end_impl'vc.
+Prover result is: Valid (0.02s, 5472 steps).
+
+File "apply_operations_to_an_array_list_stage3_abba2f55_stage3.mlw", line 151, characters 18-62:
+Sub-goal Loop invariant init of goal shift_zeros_to_end_impl'vc.
+Prover result is: Valid (0.02s, 6017 steps).
+
+File "apply_operations_to_an_array_list_stage3_abba2f55_stage3.mlw", line 152, characters 16-29:
+Sub-goal Loop variant decrease of goal shift_zeros_to_end_impl'vc.
+Prover result is: Valid (0.02s, 5597 steps).
+
+File "apply_operations_to_an_array_list_stage3_abba2f55_stage3.mlw", line 150, characters 18-36:
+Sub-goal Loop invariant preservation of goal shift_zeros_to_end_impl'vc.
+Prover result is: Valid (0.02s, 5583 steps).
+
+File "apply_operations_to_an_array_list_stage3_abba2f55_stage3.mlw", line 151, characters 18-62:
+Sub-goal Loop invariant preservation of goal shift_zeros_to_end_impl'vc.
+Prover result is: Valid (0.02s, 5586 steps).
+
+File "apply_operations_to_an_array_list_stage3_abba2f55_stage3.mlw", line 152, characters 16-29:
+Sub-goal Loop variant decrease of goal shift_zeros_to_end_impl'vc.
+Prover result is: Valid (0.02s, 6927 steps).
+
+File "apply_operations_to_an_array_list_stage3_abba2f55_stage3.mlw", line 150, characters 18-36:
+Sub-goal Loop invariant preservation of goal shift_zeros_to_end_impl'vc.
+Prover result is: Valid (0.02s, 6891 steps).
+
+File "apply_operations_to_an_array_list_stage3_abba2f55_stage3.mlw", line 151, characters 18-62:
+Sub-goal Loop invariant preservation of goal shift_zeros_to_end_impl'vc.
+Prover result is: Valid (0.02s, 7248 steps).
+
+File "apply_operations_to_an_array_list_stage3_abba2f55_stage3.mlw", line 160, characters 13-25:
+Sub-goal Assertion of goal shift_zeros_to_end_impl'vc.
+Prover result is: Timeout (10.00s, 243810 steps).
+
+File "apply_operations_to_an_array_list_stage3_abba2f55_stage3.mlw", line 122, characters 14-46:
+Sub-goal Postcondition of goal shift_zeros_to_end_impl'vc.
+Prover result is: Timeout (10.00s, 3134510 steps).
+
+File "apply_operations_to_an_array_list_stage3_abba2f55_stage3.mlw", line 123, characters 14-41:
+Sub-goal Postcondition of goal shift_zeros_to_end_impl'vc.
+Prover result is: Valid (0.02s, 6603 steps).
+== Final summary ==
+Unproved root goals after first prover : 1
+Remaining failures after split_vc      : 1
+Remaining failures after stage 3       : 1
+Detailed logs stored in                : /Users/rubenm/Desktop/Diversify2Verify/codex-runs/testing4/2460_apply-operations-to-an-array/stage3a/list-imperative/apply_operations_to_an_array_list_stage3_abba2f55/generated/why3/list/.why3_sessions/apply_operations_to_an_array_list_stage3_abba2f55_stage3_logs
+Still unproved goals:
+ApplyOperationsToAnArray_List_Stage3_Imperative	shift_zeros_to_end_impl'vc
+VERIFY_RESULT: FAILURE
+VERIFY_REASON: unproved_goals_remain
+VERIFY_STAGE: stage3
+VERIFY_ROOT_TOTAL: 8
+VERIFY_ROOT_PROVED: 7
+VERIFY_ROOT_REMAINING: 1

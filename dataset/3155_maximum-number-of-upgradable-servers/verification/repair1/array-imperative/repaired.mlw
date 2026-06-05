@@ -1,0 +1,177 @@
+module MaximumNumberOfUpgradableServers_Array_Spec
+
+  use int.Int
+  use int.EuclideanDivision
+  use array.Array
+  use array.Init
+
+  predicate valid_inputs (count: array int) (upgrade: array int)
+      (sell: array int) (money: array int) =
+    1 <= length count /\
+    length upgrade = length count /\
+    length sell = length count /\
+    length money = length count /\
+    (forall i: int. 0 <= i < length count ->
+      1 <= count[i] /\ 1 <= upgrade[i] /\ 1 <= sell[i] /\ 1 <= money[i])
+
+  predicate feasible_upgrade_count (count: array int) (upgrade: array int)
+      (sell: array int) (money: array int) (i: int) (k: int) =
+    0 <= i < length count /\
+    0 <= k <= count[i] /\
+    k * upgrade[i] <= money[i] + (count[i] - k) * sell[i]
+
+  predicate optimal_upgrade_count (count: array int) (upgrade: array int)
+      (sell: array int) (money: array int) (i: int) (k: int) =
+    feasible_upgrade_count count upgrade sell money i k /\
+    (forall candidate: int.
+      feasible_upgrade_count count upgrade sell money i candidate ->
+      candidate <= k)
+
+  predicate answer_spec (count: array int) (upgrade: array int)
+      (sell: array int) (money: array int) (answer: array int) =
+    length answer = length count /\
+    (forall i: int. 0 <= i < length count ->
+      optimal_upgrade_count count upgrade sell money i answer[i])
+
+  lemma euclidean_div_product_le:
+    forall total denom: int.
+      0 <= total /\ 0 < denom ->
+      (div total denom) * denom <= total
+
+  lemma euclidean_div_floor_upper:
+    forall total denom k: int.
+      0 <= total /\ 0 < denom /\ 0 <= k /\ k * denom <= total ->
+      k <= div total denom
+
+  let lemma computed_choice_is_optimal
+      (count: array int) (upgrade: array int) (sell: array int) (money: array int)
+      (i: int) (candidate: int) (chosen: int)
+    requires { valid_inputs count upgrade sell money }
+    requires { 0 <= i < length count }
+    requires {
+      candidate =
+        div (money[i] + count[i] * sell[i]) (upgrade[i] + sell[i])
+    }
+    requires {
+      chosen =
+        (if candidate < 0 then 0
+         else if candidate <= count[i] then candidate
+         else count[i])
+    }
+    ensures  { optimal_upgrade_count count upgrade sell money i chosen }
+  =
+    let total = money[i] + count[i] * sell[i] in
+    let denom = upgrade[i] + sell[i] in
+    assert { 1 <= count[i] };
+    assert { 1 <= upgrade[i] };
+    assert { 1 <= sell[i] };
+    assert { 1 <= money[i] };
+    assert { 0 <= total };
+    assert { 0 < denom };
+    assert { candidate * denom <= total };
+    assert { 0 <= candidate };
+    if candidate <= count[i] then begin
+      assert { chosen = candidate };
+      assert {
+        chosen * upgrade[i] <=
+          money[i] + (count[i] - chosen) * sell[i]
+      };
+      assert { feasible_upgrade_count count upgrade sell money i chosen };
+      assert {
+        forall other: int.
+          feasible_upgrade_count count upgrade sell money i other ->
+          other * denom <= total
+      };
+      assert {
+        forall other: int.
+          feasible_upgrade_count count upgrade sell money i other ->
+          other <= chosen
+      };
+      assert { optimal_upgrade_count count upgrade sell money i chosen }
+    end else begin
+      assert { count[i] < candidate };
+      assert { chosen = count[i] };
+      assert { (count[i] + 1) * denom <= candidate * denom };
+      assert { (count[i] + 1) * denom <= total };
+      assert { count[i] * upgrade[i] <= money[i] };
+      assert { count[i] * upgrade[i] <= money[i] + (count[i] - chosen) * sell[i] };
+      assert { feasible_upgrade_count count upgrade sell money i chosen };
+      assert {
+        forall other: int.
+          feasible_upgrade_count count upgrade sell money i other ->
+          other <= count[i]
+      };
+      assert {
+        forall other: int.
+          feasible_upgrade_count count upgrade sell money i other ->
+          other <= chosen
+      };
+      assert { optimal_upgrade_count count upgrade sell money i chosen }
+    end
+
+  let maximum_number_of_upgradable_servers_array
+      (count: array int) (upgrade: array int) (sell: array int) (money: array int)
+      : array int
+    requires { valid_inputs count upgrade sell money }
+    ensures  { answer_spec count upgrade sell money result }
+  =
+    let n = length count in
+    assert { 1 <= n };
+    assert { length upgrade = n };
+    assert { length sell = n };
+    assert { length money = n };
+    let answer = make n 0 in
+    assert { length answer = n };
+    for i = 0 to n - 1 do
+      invariant { length answer = n }
+      invariant { length count = n }
+      invariant { length upgrade = n }
+      invariant { length sell = n }
+      invariant { length money = n }
+      invariant { 0 <= i <= n }
+      invariant {
+        forall j: int. 0 <= j < i ->
+          optimal_upgrade_count count upgrade sell money j answer[j]
+      }
+      let total_value = money[i] + count[i] * sell[i] in
+      let candidate = div total_value (upgrade[i] + sell[i]) in
+      if candidate < 0 then begin
+        answer[i] <- 0;
+        assert {
+          answer[i] =
+            (if candidate < 0 then 0
+             else if candidate <= count[i] then candidate
+             else count[i])
+        }
+      end else if candidate <= count[i] then begin
+        answer[i] <- candidate;
+        assert {
+          answer[i] =
+            (if candidate < 0 then 0
+             else if candidate <= count[i] then candidate
+             else count[i])
+        }
+      end else begin
+        answer[i] <- count[i];
+        assert {
+          answer[i] =
+            (if candidate < 0 then 0
+             else if candidate <= count[i] then candidate
+             else count[i])
+        }
+      end;
+      assert {
+        candidate =
+          div (money[i] + count[i] * sell[i]) (upgrade[i] + sell[i])
+      };
+      computed_choice_is_optimal count upgrade sell money i candidate answer[i];
+      assert { optimal_upgrade_count count upgrade sell money i answer[i] }
+    done;
+    assert {
+      forall i: int. 0 <= i < length count ->
+        optimal_upgrade_count count upgrade sell money i answer[i]
+    };
+    assert { answer_spec count upgrade sell money answer };
+    answer
+
+end

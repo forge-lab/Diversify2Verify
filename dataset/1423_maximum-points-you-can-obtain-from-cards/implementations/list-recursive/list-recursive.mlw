@@ -1,0 +1,234 @@
+module MaximumPointsYouCanObtainFromCards_List_Recursive_Implementation
+
+  use int.Int
+  use list.List
+  use list.Length
+
+  let rec take_prefix_sum (n: int) (xs: list int) : int
+    variant { xs }
+  =
+    if n <= 0 then 0 else
+    match xs with
+    | Nil -> 0
+    | Cons x tl -> x + take_prefix_sum (n - 1) tl
+    end
+
+  let rec take_suffix_sum (n: int) (xs: list int) : int
+    variant { xs }
+  =
+    if n <= 0 then 0 else
+    match xs with
+    | Nil -> 0
+    | Cons x tl ->
+        if length xs <= n then x + take_suffix_sum n tl
+        else take_suffix_sum n tl
+    end
+
+  let split_score (cardPoints: list int) (k: int) (left_count: int) : int =
+    take_prefix_sum left_count cardPoints +
+    take_suffix_sum (k - left_count) cardPoints
+
+  let max_int (x: int) (y: int) : int =
+    if x >= y then x else y
+
+  let rec append (xs: list int) (ys: list int) : list int
+    variant { xs }
+  =
+    match xs with
+    | Nil -> ys
+    | Cons x tl -> Cons x (append tl ys)
+    end
+
+  let rec repeat (n: int) (x: int) : list int
+    variant { n }
+  =
+    if n <= 0 then Nil
+    else Cons x (repeat (n - 1) x)
+
+  let rec range_desc (hi: int) (lo: int) : list int
+    variant { hi - lo + 1 }
+  =
+    if hi < lo then Nil
+    else Cons hi (range_desc (hi - 1) lo)
+
+  let rec range_asc (lo: int) (hi: int) : list int
+    variant { hi - lo + 1 }
+  =
+    if hi < lo then Nil
+    else Cons lo (range_asc (lo + 1) hi)
+
+  let rec odd_range (start: int) (count: int) : list int
+    variant { count }
+  =
+    if count <= 0 then Nil
+    else Cons start (odd_range (start + 2) (count - 1))
+
+  let rec powers_of_ten (count: int) (current: int) : list int
+    variant { count }
+  =
+    if count <= 0 then Nil
+    else Cons current (powers_of_ten (count - 1) (current * 10))
+
+  let rec best_split_score (cardPoints: list int) (k: int) (left_count: int) : int
+    variant { left_count }
+  =
+    if left_count <= 0 then split_score cardPoints k 0
+    else
+      max_int
+        (best_split_score cardPoints k (left_count - 1))
+        (split_score cardPoints k left_count)
+
+  let maximum_points_you_can_obtain_from_cards_list (cardPoints: list int) (k: int) : int
+    requires { 1 <= k <= length cardPoints }
+  =
+    best_split_score cardPoints k k
+
+  let test_000 () : bool =
+    let l = Cons 5 (Cons 2 (Cons 1 (Cons 2 (Cons 5 Nil)))) in
+    let r = maximum_points_you_can_obtain_from_cards_list l 3 in
+    r = 12
+
+  let test_001 () : bool =
+    let l = Cons 9 (Cons 7 (Cons 7 (Cons 9 (Cons 7 (Cons 7 (Cons 9 Nil)))))) in
+    let r = maximum_points_you_can_obtain_from_cards_list l 7 in
+    r = 55
+
+  let test_002 () : bool =
+    let l = Cons 1 (Cons 1000 (Cons 1 Nil)) in
+    let r = maximum_points_you_can_obtain_from_cards_list l 1 in
+    r = 1
+
+  let test_003 () : bool =
+    let l = range_desc 10 1 in
+    let r = maximum_points_you_can_obtain_from_cards_list l 5 in
+    r = 40
+
+  let test_004 () : bool =
+    let l = Cons 2 (Cons 2 (Cons 2 Nil)) in
+    let r = maximum_points_you_can_obtain_from_cards_list l 2 in
+    r = 4
+
+  let test_005 () : bool =
+    let l = range_desc 10 1 in
+    let r = maximum_points_you_can_obtain_from_cards_list l 4 in
+    r = 34
+
+  let test_006 () : bool =
+    let l = Cons 1 (Cons 2 (Cons 3 (Cons 4 (Cons 5 (Cons 6 (Cons 1 Nil)))))) in
+    let r = maximum_points_you_can_obtain_from_cards_list l 3 in
+    r = 12
+
+  let test_007 () : bool =
+    let l = range_desc 20 1 in
+    let r = maximum_points_you_can_obtain_from_cards_list l 5 in
+    r = 90
+
+  let test_008 () : bool =
+    let l = repeat 10 1000 in
+    let r = maximum_points_you_can_obtain_from_cards_list l 5 in
+    r = 5000
+
+  let test_009 () : bool =
+    let l =
+      Cons 100 (Cons 400 (Cons 300 (Cons 100 (Cons 200
+      (Cons 500 (Cons 600 (Cons 300 (Cons 400 Nil)))))))) in
+    let r = maximum_points_you_can_obtain_from_cards_list l 4 in
+    r = 1800
+
+  let test_010 () : bool =
+    let l = append (powers_of_ten 10 1) (powers_of_ten 10 1) in
+    let r = maximum_points_you_can_obtain_from_cards_list l 10 in
+    r = 1111111111
+
+  let test_011 () : bool =
+    let l = odd_range 1 20 in
+    let r = maximum_points_you_can_obtain_from_cards_list l 10 in
+    r = 300
+
+  let test_012 () : bool =
+    let prefix = Cons 5 (Cons 2 (Cons 1 (Cons 2 (Cons 5 Nil)))) in
+    let suffix = Cons 2 (Cons 1 (Cons 2 (Cons 5 Nil))) in
+    let l = append prefix (append (repeat 4 5) suffix) in
+    let r = maximum_points_you_can_obtain_from_cards_list l 8 in
+    r = 30
+
+  let test_013 () : bool =
+    let l = repeat 10 10000 in
+    let r = maximum_points_you_can_obtain_from_cards_list l 10 in
+    r = 100000
+
+  let test_014 () : bool =
+    let l = append (range_desc 9 1) (range_asc 10 20) in
+    let r = maximum_points_you_can_obtain_from_cards_list l 10 in
+    r = 155
+
+  let test_016 () : bool =
+    let l = range_asc 1 20 in
+    let r = maximum_points_you_can_obtain_from_cards_list l 15 in
+    r = 195
+
+  let test_017 () : bool =
+    let l = range_asc 1 10 in
+    let r = maximum_points_you_can_obtain_from_cards_list l 2 in
+    r = 19
+
+  let test_018 () : bool =
+    let l = repeat 10 10000 in
+    let r = maximum_points_you_can_obtain_from_cards_list l 5 in
+    r = 50000
+
+  let test_019 () : bool =
+    let l = Cons 3 (Cons 1 (Cons 2 (Cons 7 (Cons 4 (Cons 5 (Cons 6 Nil)))))) in
+    let r = maximum_points_you_can_obtain_from_cards_list l 3 in
+    r = 15
+
+  let test_020 () : bool =
+    let block = Cons 10 (Cons 1 (Cons 1 Nil)) in
+    let l = append block (append block block) in
+    let r = maximum_points_you_can_obtain_from_cards_list l 3 in
+    r = 12
+
+  let run_tests () : bool =
+    if test_000 () then
+    if test_001 () then
+    if test_002 () then
+    if test_003 () then
+    if test_004 () then
+    if test_005 () then
+    if test_006 () then
+    if test_007 () then
+    if test_008 () then
+    if test_009 () then
+    if test_010 () then
+    if test_011 () then
+    if test_012 () then
+    if test_013 () then
+    if test_014 () then
+    if test_016 () then
+    if test_017 () then
+    if test_018 () then
+    if test_019 () then
+    if test_020 () then
+      true
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+
+end

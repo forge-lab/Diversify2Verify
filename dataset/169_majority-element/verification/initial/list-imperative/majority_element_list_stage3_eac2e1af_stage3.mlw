@@ -1,0 +1,46 @@
+module MajorityElement_List_Stage3_Imperative
+
+  use int.Int
+  use list.List
+  use list.Length
+  use list.NumOcc
+  use ref.Ref
+
+  predicate is_majority (nums: list int) (x: int) =
+    2 * num_occ x nums > length nums
+
+  predicate has_majority (nums: list int) =
+    exists x: int. is_majority nums x
+
+  let majority_element_list (nums: list int) : int
+    requires { has_majority nums }
+    ensures  { is_majority nums result }
+  =
+    match nums with
+    | Nil -> 0
+    | Cons h t ->
+        let candidate = ref h in
+        let balance = ref 1 in
+        let cur = ref t in
+        while (match !cur with Nil -> false | Cons _ _ -> true end) do
+          invariant { 0 <= length !cur }
+          invariant { 0 <= !balance }
+          variant { length !cur }
+
+          match !cur with
+          | Nil -> ()
+          | Cons x xs ->
+              if !balance = 0 then (
+                candidate := x;
+                balance := 1
+              ) else if x = !candidate then
+                balance := !balance + 1
+              else
+                balance := !balance - 1;
+              cur := xs
+          end
+        done;
+        !candidate
+    end
+
+end

@@ -1,0 +1,267 @@
+module MinimumSumOfSquaredDifference_Array_Spec
+
+  use int.Int
+  use int.Abs
+  use array.Array
+  use array.Init
+
+  function square (x: int) : int =
+    x * x
+
+  let function abs_diff_at
+    (nums1: array int) (nums2: array int) (i: int) : int
+    requires { 0 <= i < length nums1 }
+    requires { 0 <= i < length nums2 }
+  =
+    abs (nums1[i] - nums2[i])
+
+  let rec function total_abs_diff_from
+    (nums1: array int) (nums2: array int) (i: int) : int
+    requires { length nums1 = length nums2 }
+    requires { 0 <= i <= length nums1 }
+    variant  { length nums1 - i }
+  =
+    if i = length nums1 then 0
+    else abs (nums1[i] - nums2[i]) + total_abs_diff_from nums1 nums2 (i + 1)
+
+  let function total_abs_diff (nums1: array int) (nums2: array int) : int
+    requires { length nums1 = length nums2 }
+  =
+    total_abs_diff_from nums1 nums2 0
+
+  let rec function residual_sum_from (residual: array int) (i: int) : int
+    requires { 0 <= i <= length residual }
+    variant  { length residual - i }
+  =
+    if i = length residual then 0
+    else residual[i] + residual_sum_from residual (i + 1)
+
+  let function residual_sum (residual: array int) : int =
+    residual_sum_from residual 0
+
+  let rec function squared_residual_sum_from
+    (residual: array int) (i: int) : int
+    requires { 0 <= i <= length residual }
+    variant  { length residual - i }
+  =
+    if i = length residual then 0
+    else residual[i] * residual[i] + squared_residual_sum_from residual (i + 1)
+
+  let function squared_residual_sum (residual: array int) : int =
+    squared_residual_sum_from residual 0
+
+  predicate valid_input
+    (nums1: array int) (nums2: array int) (k1: int) (k2: int)
+  =
+    length nums1 = length nums2 /\
+    1 <= length nums1 <= 100000 /\
+    0 <= k1 <= 1000000000 /\
+    0 <= k2 <= 1000000000 /\
+    (forall i: int.
+      0 <= i < length nums1 ->
+      0 <= nums1[i] <= 100000 /\ 0 <= nums2[i] <= 100000)
+
+  predicate valid_residual
+    (nums1: array int) (nums2: array int) (k1: int) (k2: int)
+    (residual: array int)
+  =
+    length nums1 = length nums2 /\
+    length residual = length nums1 /\
+    0 <= k1 /\ 0 <= k2 /\
+    (forall i: int.
+      0 <= i < length residual ->
+      0 <= residual[i] <= abs_diff_at nums1 nums2 i) /\
+    0 <= total_abs_diff nums1 nums2 - residual_sum residual <= k1 + k2
+
+  predicate minimum_squared_difference_result
+    (nums1: array int) (nums2: array int) (k1: int) (k2: int)
+    (res: int)
+  =
+    (exists residual: array int.
+      valid_residual nums1 nums2 k1 k2 residual /\
+      res = squared_residual_sum residual) /\
+    (forall residual: array int.
+      valid_residual nums1 nums2 k1 k2 residual ->
+      res <= squared_residual_sum residual)
+
+  val minimum_sum_of_squared_difference_array
+    (nums1: array int) (nums2: array int) (k1: int) (k2: int) : int
+    requires { valid_input nums1 nums2 k1 k2 }
+    ensures  { minimum_squared_difference_result nums1 nums2 k1 k2 result }
+
+  let lemma test_000_equal_arrays_surplus_operations () =
+    let nums1 = init 4 [|5; 5; 5; 5|] in
+    let nums2 = init 4 [|5; 5; 5; 5|] in
+    let residual = init 4 [|0; 0; 0; 0|] in
+    assert { length nums1 = 4 };
+    assert { length nums2 = 4 };
+    assert { length residual = 4 };
+    assert { nums1[0] = 5 /\ nums2[0] = 5 };
+    assert { nums1[1] = 5 /\ nums2[1] = 5 };
+    assert { nums1[2] = 5 /\ nums2[2] = 5 };
+    assert { nums1[3] = 5 /\ nums2[3] = 5 };
+    assert { abs_diff_at nums1 nums2 0 = 0 };
+    assert { abs_diff_at nums1 nums2 1 = 0 };
+    assert { abs_diff_at nums1 nums2 2 = 0 };
+    assert { abs_diff_at nums1 nums2 3 = 0 };
+    assert { total_abs_diff nums1 nums2 = 0 };
+    assert { residual_sum residual = 0 };
+    assert { squared_residual_sum residual = 0 };
+    assert { valid_residual nums1 nums2 100 100 residual };
+    assert {
+      exists witness: array int.
+        valid_residual nums1 nums2 100 100 witness /\
+        0 = squared_residual_sum witness
+    }
+
+  let lemma test_003_unit_differences_two_reductions () =
+    let nums1 = init 5 [|1; 3; 5; 7; 9|] in
+    let nums2 = init 5 [|2; 4; 6; 8; 10|] in
+    let residual = init 5 [|0; 0; 1; 1; 1|] in
+    assert { length nums1 = 5 };
+    assert { length nums2 = 5 };
+    assert { length residual = 5 };
+    assert { nums1[0] = 1 /\ nums2[0] = 2 };
+    assert { nums1[1] = 3 /\ nums2[1] = 4 };
+    assert { nums1[2] = 5 /\ nums2[2] = 6 };
+    assert { nums1[3] = 7 /\ nums2[3] = 8 };
+    assert { nums1[4] = 9 /\ nums2[4] = 10 };
+    assert { abs_diff_at nums1 nums2 0 = 1 };
+    assert { abs_diff_at nums1 nums2 1 = 1 };
+    assert { abs_diff_at nums1 nums2 2 = 1 };
+    assert { abs_diff_at nums1 nums2 3 = 1 };
+    assert { abs_diff_at nums1 nums2 4 = 1 };
+    assert { total_abs_diff nums1 nums2 = 5 };
+    assert { residual_sum residual = 3 };
+    assert { squared_residual_sum residual = 3 };
+    assert { valid_residual nums1 nums2 1 1 residual };
+    assert {
+      exists witness: array int.
+        valid_residual nums1 nums2 1 1 witness /\
+        3 = squared_residual_sum witness
+    }
+
+  let lemma test_007_no_operations_example () =
+    let nums1 = init 4 [|1; 2; 3; 4|] in
+    let nums2 = init 4 [|2; 10; 20; 19|] in
+    let residual = init 4 [|1; 8; 17; 15|] in
+    assert { length nums1 = 4 };
+    assert { length nums2 = 4 };
+    assert { length residual = 4 };
+    assert { nums1[0] = 1 /\ nums2[0] = 2 };
+    assert { nums1[1] = 2 /\ nums2[1] = 10 };
+    assert { nums1[2] = 3 /\ nums2[2] = 20 };
+    assert { nums1[3] = 4 /\ nums2[3] = 19 };
+    assert { abs_diff_at nums1 nums2 0 = 1 };
+    assert { abs_diff_at nums1 nums2 1 = 8 };
+    assert { abs_diff_at nums1 nums2 2 = 17 };
+    assert { abs_diff_at nums1 nums2 3 = 15 };
+    assert { total_abs_diff nums1 nums2 = 41 };
+    assert { residual_sum residual = 41 };
+    assert { squared_residual_sum residual = 579 };
+    assert { valid_residual nums1 nums2 0 0 residual };
+    assert {
+      exists witness: array int.
+        valid_residual nums1 nums2 0 0 witness /\
+        579 = squared_residual_sum witness
+    }
+
+  let lemma test_009_equal_differences_balanced_reduction () =
+    let nums1 = init 4 [|5; 5; 5; 5|] in
+    let nums2 = init 4 [|1; 1; 1; 1|] in
+    let residual = init 4 [|2; 2; 2; 2|] in
+    assert { length nums1 = 4 };
+    assert { length nums2 = 4 };
+    assert { length residual = 4 };
+    assert { nums1[0] = 5 /\ nums2[0] = 1 };
+    assert { nums1[1] = 5 /\ nums2[1] = 1 };
+    assert { nums1[2] = 5 /\ nums2[2] = 1 };
+    assert { nums1[3] = 5 /\ nums2[3] = 1 };
+    assert { abs_diff_at nums1 nums2 0 = 4 };
+    assert { abs_diff_at nums1 nums2 1 = 4 };
+    assert { abs_diff_at nums1 nums2 2 = 4 };
+    assert { abs_diff_at nums1 nums2 3 = 4 };
+    assert { total_abs_diff nums1 nums2 = 16 };
+    assert { residual_sum residual = 8 };
+    assert { squared_residual_sum residual = 16 };
+    assert { valid_residual nums1 nums2 4 4 residual };
+    assert {
+      exists witness: array int.
+        valid_residual nums1 nums2 4 4 witness /\
+        16 = squared_residual_sum witness
+    }
+
+  let lemma test_012_mixed_differences_two_residual_units () =
+    let nums1 = init 5 [|1; 2; 3; 4; 5|] in
+    let nums2 = init 5 [|5; 4; 3; 2; 1|] in
+    let residual = init 5 [|1; 0; 0; 0; 1|] in
+    assert { length nums1 = 5 };
+    assert { length nums2 = 5 };
+    assert { length residual = 5 };
+    assert { nums1[0] = 1 /\ nums2[0] = 5 };
+    assert { nums1[1] = 2 /\ nums2[1] = 4 };
+    assert { nums1[2] = 3 /\ nums2[2] = 3 };
+    assert { nums1[3] = 4 /\ nums2[3] = 2 };
+    assert { nums1[4] = 5 /\ nums2[4] = 1 };
+    assert { abs_diff_at nums1 nums2 0 = 4 };
+    assert { abs_diff_at nums1 nums2 1 = 2 };
+    assert { abs_diff_at nums1 nums2 2 = 0 };
+    assert { abs_diff_at nums1 nums2 3 = 2 };
+    assert { abs_diff_at nums1 nums2 4 = 4 };
+    assert { total_abs_diff nums1 nums2 = 12 };
+    assert { residual_sum residual = 2 };
+    assert { squared_residual_sum residual = 2 };
+    assert { valid_residual nums1 nums2 5 5 residual };
+    assert {
+      exists witness: array int.
+        valid_residual nums1 nums2 5 5 witness /\
+        2 = squared_residual_sum witness
+    }
+
+  let lemma test_017_uneven_differences_small_residual_sum () =
+    let nums1 = init 3 [|10; 20; 30|] in
+    let nums2 = init 3 [|1; 2; 3|] in
+    let residual = init 3 [|1; 1; 2|] in
+    assert { length nums1 = 3 };
+    assert { length nums2 = 3 };
+    assert { length residual = 3 };
+    assert { nums1[0] = 10 /\ nums2[0] = 1 };
+    assert { nums1[1] = 20 /\ nums2[1] = 2 };
+    assert { nums1[2] = 30 /\ nums2[2] = 3 };
+    assert { abs_diff_at nums1 nums2 0 = 9 };
+    assert { abs_diff_at nums1 nums2 1 = 18 };
+    assert { abs_diff_at nums1 nums2 2 = 27 };
+    assert { total_abs_diff nums1 nums2 = 54 };
+    assert { residual_sum residual = 4 };
+    assert { squared_residual_sum residual = 6 };
+    assert { valid_residual nums1 nums2 25 25 residual };
+    assert {
+      exists witness: array int.
+        valid_residual nums1 nums2 25 25 witness /\
+        6 = squared_residual_sum witness
+    }
+
+  let lemma test_024_large_balanced_residuals () =
+    let nums1 = init 3 [|100000; 100000; 100000|] in
+    let nums2 = init 3 [|0; 0; 0|] in
+    let residual = init 3 [|33333; 33333; 33334|] in
+    assert { length nums1 = 3 };
+    assert { length nums2 = 3 };
+    assert { length residual = 3 };
+    assert { nums1[0] = 100000 /\ nums2[0] = 0 };
+    assert { nums1[1] = 100000 /\ nums2[1] = 0 };
+    assert { nums1[2] = 100000 /\ nums2[2] = 0 };
+    assert { abs_diff_at nums1 nums2 0 = 100000 };
+    assert { abs_diff_at nums1 nums2 1 = 100000 };
+    assert { abs_diff_at nums1 nums2 2 = 100000 };
+    assert { total_abs_diff nums1 nums2 = 300000 };
+    assert { residual_sum residual = 100000 };
+    assert { squared_residual_sum residual = 3333333334 };
+    assert { valid_residual nums1 nums2 100000 100000 residual };
+    assert {
+      exists witness: array int.
+        valid_residual nums1 nums2 100000 100000 witness /\
+        3333333334 = squared_residual_sum witness
+    }
+
+end

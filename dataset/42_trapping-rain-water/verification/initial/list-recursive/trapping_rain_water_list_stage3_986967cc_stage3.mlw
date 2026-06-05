@@ -1,0 +1,88 @@
+module TrappingRainWater_List_Stage3_Recursive
+
+  use int.Int
+  use int.MinMax
+  use list.List
+
+  let rec predicate all_nonnegative (height: list int)
+    variant { height }
+  =
+    match height with
+    | Nil -> true
+    | Cons h rest -> 0 <= h && all_nonnegative rest
+    end
+
+  let rec function max_height (height: list int) : int
+    variant { height }
+  =
+    match height with
+    | Nil -> 0
+    | Cons h rest -> max h (max_height rest)
+    end
+
+  let function water_at (left_max: int) (h: int) (right_max: int) : int =
+    max 0 (min (max left_max h) right_max - h)
+
+  let rec function trapped_from (left_max: int) (height: list int) : int
+    variant { height }
+  =
+    match height with
+    | Nil -> 0
+    | Cons h rest ->
+        water_at left_max h (max_height height) +
+        trapped_from (max left_max h) rest
+    end
+
+  function trapped_water (height: list int) : int =
+    trapped_from 0 height
+
+  predicate valid_height (height: list int) =
+    height <> Nil /\ all_nonnegative height
+
+  let rec max_height_impl (height: list int) : int
+    ensures { result = max_height height }
+    ensures { all_nonnegative height -> 0 <= result }
+    variant { height }
+  =
+    match height with
+    | Nil ->
+        0
+    | Cons h rest ->
+        assert { all_nonnegative height -> 0 <= h };
+        assert { all_nonnegative height -> all_nonnegative rest };
+        max h (max_height_impl rest)
+    end
+
+  let water_at_impl (left_max: int) (h: int) (right_max: int) : int
+    ensures { result = water_at left_max h right_max }
+    ensures { 0 <= result }
+  =
+    max 0 (min (max left_max h) right_max - h)
+
+  let rec trapped_from_impl (left_max: int) (height: list int) : int
+    requires { all_nonnegative height }
+    ensures  { result = trapped_from left_max height }
+    ensures  { 0 <= result }
+    variant  { height }
+  =
+    match height with
+    | Nil ->
+        0
+    | Cons h rest ->
+        assert { all_nonnegative rest };
+        let here = water_at_impl left_max h (max_height_impl height) in
+        let tail = trapped_from_impl (max left_max h) rest in
+        assert { here = water_at left_max h (max_height height) };
+        assert { tail = trapped_from (max left_max h) rest };
+        here + tail
+    end
+
+  let trapping_rain_water_list (height: list int) : int
+    requires { valid_height height }
+    ensures  { result = trapped_water height }
+    ensures  { 0 <= result }
+  =
+    assert { all_nonnegative height };
+    trapped_from_impl 0 height
+
+end

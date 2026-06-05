@@ -1,0 +1,159 @@
+module MaximumPointsYouCanObtainFromCards_List_Stage3_Imperative
+
+  use int.Int
+  use list.List
+  use list.Length
+  use list.Reverse
+  use ref.Ref
+
+  let rec function take_prefix_sum (n: int) (xs: list int) : int
+    variant { xs }
+  =
+    if n <= 0 then 0 else
+    match xs with
+    | Nil -> 0
+    | Cons x tl -> x + take_prefix_sum (n - 1) tl
+    end
+
+  let rec function take_suffix_sum (n: int) (xs: list int) : int
+    variant { xs }
+  =
+    match xs with
+    | Nil -> 0
+    | Cons x tl ->
+        if length xs <= n then x + take_suffix_sum n tl
+        else take_suffix_sum n tl
+    end
+
+  predicate valid_take_split (cardPoints: list int) (k: int) (left_count: int) =
+    0 <= left_count <= k /\ k <= length cardPoints
+
+  function split_score (cardPoints: list int) (k: int) (left_count: int) : int =
+    take_prefix_sum left_count cardPoints +
+    take_suffix_sum (k - left_count) cardPoints
+
+  predicate is_maximum_card_score (cardPoints: list int) (k: int) (answer: int) =
+    1 <= k <= length cardPoints /\
+    (exists left_count: int.
+       valid_take_split cardPoints k left_count /\
+       answer = split_score cardPoints k left_count) /\
+    (forall other_count: int.
+       valid_take_split cardPoints k other_count ->
+       split_score cardPoints k other_count <= answer)
+
+  predicate best_split_range
+    (cardPoints: list int) (k: int) (lo: int) (hi: int) (best: int) =
+    0 <= lo <= hi <= k /\
+    (exists left_count: int.
+       lo <= left_count <= hi /\
+       valid_take_split cardPoints k left_count /\
+       best = split_score cardPoints k left_count) /\
+    (forall left_count: int.
+       lo <= left_count <= hi ->
+       valid_take_split cardPoints k left_count ->
+       split_score cardPoints k left_count <= best)
+
+  let rec lemma take_suffix_sum_zero (xs: list int)
+    ensures { take_suffix_sum 0 xs = 0 }
+    variant { xs }
+  =
+    match xs with
+    | Nil -> ()
+    | Cons _ tl -> take_suffix_sum_zero tl
+    end
+
+  let rec lemma reverse_list_length (xs: list int)
+    ensures { length (reverse xs) = length xs }
+    variant { xs }
+  =
+    match xs with
+    | Nil -> ()
+    | Cons _ tl -> reverse_list_length tl
+    end
+
+  let reverse_list (xs: list int) : list int
+    ensures { result = reverse xs }
+    ensures { length result = length xs }
+  =
+    let acc = ref Nil in
+    let cur = ref xs in
+    while (match !cur with Nil -> false | Cons _ _ -> true end) do
+      invariant { 0 <= length !cur }
+      invariant { length !acc + length !cur = length xs }
+      variant { length !cur }
+      match !cur with
+      | Nil -> assert { false }
+      | Cons x tl ->
+          acc := Cons x !acc;
+          cur := tl
+      end
+    done;
+    assert { !cur = Nil };
+    reverse_list_length xs;
+    !acc
+
+  let maximum_points_you_can_obtain_from_cards_list (cardPoints: list int) (k: int) : int
+    requires { 1 <= k <= length cardPoints }
+    ensures  { is_maximum_card_score cardPoints k result }
+  =
+    let prefix_sum = ref 0 in
+    let prefix_count = ref 0 in
+    let prefix_rev = ref Nil in
+    let left_cur = ref cardPoints in
+    while !prefix_count < k do
+      invariant { 0 <= !prefix_count <= k }
+      invariant { !prefix_sum = take_prefix_sum !prefix_count cardPoints }
+      invariant { length !prefix_rev = !prefix_count }
+      invariant { length !left_cur + !prefix_count = length cardPoints }
+      variant { k - !prefix_count }
+      match !left_cur with
+      | Nil ->
+          assert { false }
+      | Cons x tl ->
+          prefix_sum := !prefix_sum + x;
+          prefix_rev := Cons x !prefix_rev;
+          prefix_count := !prefix_count + 1;
+          left_cur := tl
+      end
+    done;
+    assert { !prefix_count = k };
+    take_suffix_sum_zero cardPoints;
+    assert { split_score cardPoints k k = !prefix_sum };
+    let best = ref !prefix_sum in
+    let current = ref !prefix_sum in
+    let remaining_left = ref !prefix_rev in
+    let right_cur = ref (reverse_list cardPoints) in
+    let swaps = ref 0 in
+    assert { valid_take_split cardPoints k k };
+    assert { best_split_range cardPoints k k k !best };
+    while !swaps < k do
+      invariant { 0 <= !swaps <= k }
+      invariant { length !remaining_left = k - !swaps }
+      invariant { length !right_cur = length cardPoints - !swaps }
+      invariant { !current = split_score cardPoints k (k - !swaps) }
+      invariant { best_split_range cardPoints k (k - !swaps) k !best }
+      variant { k - !swaps }
+      match !remaining_left, !right_cur with
+      | Cons left_x left_xs, Cons right_x right_xs ->
+          current := !current - left_x + right_x;
+          assert { !current = split_score cardPoints k (k - (!swaps + 1)) };
+          if !current > !best then begin
+            best := !current;
+            assert { best_split_range cardPoints k (k - (!swaps + 1)) k !best }
+          end else begin
+            assert { best_split_range cardPoints k (k - (!swaps + 1)) k !best }
+          end;
+          remaining_left := left_xs;
+          right_cur := right_xs;
+          swaps := !swaps + 1
+      | _, _ ->
+          assert { false };
+          swaps := k
+      end
+    done;
+    assert { !swaps = k };
+    assert { best_split_range cardPoints k 0 k !best };
+    assert { is_maximum_card_score cardPoints k !best };
+    !best
+
+end

@@ -1,0 +1,85 @@
+module CountNumberOfNiceSubarrays_List_Stage3_Recursive
+
+  use int.Int
+  use int.EuclideanDivision
+  use list.List
+  use list.Length
+
+  let rec predicate all_between (nums: list int) (lo: int) (hi: int)
+    variant { nums }
+  =
+    match nums with
+    | Nil -> true
+    | Cons x xs -> lo <= x && x <= hi && all_between xs lo hi
+    end
+
+  let function odd_indicator (x: int) : int =
+    if mod x 2 = 1 then 1 else 0
+
+  let rec function count_prefixes_with_odd_count (nums: list int) (k: int) : int
+    variant { nums }
+  =
+    match nums with
+    | Nil -> if k = 0 then 1 else 0
+    | Cons x xs ->
+        (if k = 0 then 1 else 0) +
+        count_prefixes_with_odd_count xs (k - odd_indicator x)
+    end
+
+  let rec function count_nice_subarrays (nums: list int) (k: int) : int
+    variant { nums }
+  =
+    match nums with
+    | Nil -> 0
+    | Cons _ xs ->
+        count_prefixes_with_odd_count nums k + count_nice_subarrays xs k
+    end
+
+  predicate valid_input (nums: list int) (k: int) =
+    1 <= length nums <= 50000 /\
+    all_between nums 1 100000 /\
+    1 <= k <= length nums
+
+  let rec exec_count_prefixes_with_odd_count (nums: list int) (k: int) : int
+    ensures { result = count_prefixes_with_odd_count nums k }
+    ensures { result >= 0 }
+    variant { nums }
+  =
+    match nums with
+    | Nil -> if k = 0 then 1 else 0
+    | Cons x xs ->
+        let current = if k = 0 then 1 else 0 in
+        let rest = exec_count_prefixes_with_odd_count xs (k - odd_indicator x) in
+        assert { current >= 0 };
+        assert { rest >= 0 };
+        current + rest
+    end
+
+  let rec exec_count_nice_subarrays (nums: list int) (k: int) : int
+    ensures { result = count_nice_subarrays nums k }
+    ensures { result >= 0 }
+    variant { nums }
+  =
+    match nums with
+    | Nil -> 0
+    | Cons _ xs ->
+        let prefix_count = exec_count_prefixes_with_odd_count nums k in
+        let suffix_count = exec_count_nice_subarrays xs k in
+        assert { prefix_count = count_prefixes_with_odd_count nums k };
+        assert { suffix_count = count_nice_subarrays xs k };
+        assert { prefix_count >= 0 };
+        assert { suffix_count >= 0 };
+        prefix_count + suffix_count
+    end
+
+  let count_number_of_nice_subarrays_list (nums: list int) (k: int) : int
+    requires { valid_input nums k }
+    ensures  { result = count_nice_subarrays nums k }
+    ensures  { result >= 0 }
+  =
+    let result = exec_count_nice_subarrays nums k in
+    assert { result = count_nice_subarrays nums k };
+    assert { result >= 0 };
+    result
+
+end

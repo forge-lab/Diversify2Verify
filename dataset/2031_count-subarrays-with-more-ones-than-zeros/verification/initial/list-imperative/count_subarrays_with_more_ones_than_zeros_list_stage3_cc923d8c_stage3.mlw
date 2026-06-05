@@ -1,0 +1,140 @@
+module CountSubarraysWithMoreOnesThanZeros_List_Stage3_Imperative
+
+  use int.Int
+  use int.EuclideanDivision
+  use list.List
+  use list.Length
+  use ref.Ref
+
+  function result_modulus : int = 1000000007
+
+  let rec predicate binary_list (nums: list int)
+    variant { nums }
+  =
+    match nums with
+    | Nil -> true
+    | Cons x xs -> (x = 0 || x = 1) && binary_list xs
+    end
+
+  predicate valid_input (nums: list int) =
+    1 <= length nums <= 100000 /\
+    binary_list nums
+
+  let function bit_score (x: int) : int =
+    if x = 1 then 1 else -1
+
+  let function positive_indicator (balance: int) : int =
+    if balance > 0 then 1 else 0
+
+  let rec function count_good_prefixes_aux
+      (nums: list int) (balance: int) : int
+    variant { nums }
+  =
+    match nums with
+    | Nil -> 0
+    | Cons x xs ->
+        let next_balance = balance + bit_score x in
+        positive_indicator next_balance +
+        count_good_prefixes_aux xs next_balance
+    end
+
+  let function count_good_prefixes (nums: list int) : int =
+    count_good_prefixes_aux nums 0
+
+  let rec function count_good_subarrays (nums: list int) : int
+    variant { nums }
+  =
+    match nums with
+    | Nil -> 0
+    | Cons _ xs ->
+        count_good_prefixes nums + count_good_subarrays xs
+    end
+
+  predicate count_subarrays_with_more_ones_than_zeros_list_spec
+      (nums: list int) (result: int) =
+    result = mod (count_good_subarrays nums) result_modulus
+
+  let result_modulus_impl () : int
+    ensures { result = result_modulus }
+  =
+    1000000007
+
+  let count_good_prefixes_impl (nums: list int) : int
+    ensures { result = count_good_prefixes nums }
+  =
+    let balance = ref 0 in
+    let count = ref 0 in
+    let cur = ref nums in
+    while (match !cur with Nil -> false | Cons _ _ -> true end) do
+      invariant {
+        !count + count_good_prefixes_aux !cur !balance =
+        count_good_prefixes_aux nums 0
+      }
+      variant { length !cur }
+
+      match !cur with
+      | Nil -> ()
+      | Cons x xs ->
+          let old_balance = !balance in
+          let old_count = !count in
+          let next_balance = old_balance + bit_score x in
+          assert {
+            count_good_prefixes_aux (Cons x xs) old_balance =
+            positive_indicator next_balance +
+            count_good_prefixes_aux xs next_balance
+          };
+          balance := next_balance;
+          if !balance > 0 then begin
+            assert { positive_indicator !balance = 1 };
+            count := old_count + 1
+          end else begin
+            assert { positive_indicator !balance = 0 }
+          end;
+          assert { !count = old_count + positive_indicator !balance };
+          cur := xs;
+          assert { !balance = next_balance };
+          assert { !cur = xs }
+      end
+    done;
+    assert { !cur = Nil };
+    assert { count_good_prefixes_aux !cur !balance = 0 };
+    assert { count_good_prefixes nums = count_good_prefixes_aux nums 0 };
+    !count
+
+  let count_subarrays_with_more_ones_than_zeros_list (nums: list int) : int
+    requires { valid_input nums }
+    ensures  { count_subarrays_with_more_ones_than_zeros_list_spec nums result }
+    ensures  { 0 <= result < result_modulus }
+  =
+    let total = ref 0 in
+    let suffix = ref nums in
+    while (match !suffix with Nil -> false | Cons _ _ -> true end) do
+      invariant {
+        !total + count_good_subarrays !suffix =
+        count_good_subarrays nums
+      }
+      variant { length !suffix }
+
+      match !suffix with
+      | Nil -> ()
+      | Cons _ xs ->
+          let old_total = !total in
+          let current_prefixes = count_good_prefixes_impl !suffix in
+          assert { current_prefixes = count_good_prefixes !suffix };
+          assert {
+            count_good_subarrays !suffix =
+            count_good_prefixes !suffix + count_good_subarrays xs
+          };
+          total := old_total + current_prefixes;
+          suffix := xs;
+          assert { !suffix = xs }
+      end
+    done;
+    assert { !suffix = Nil };
+    assert { count_good_subarrays !suffix = 0 };
+    assert { !total = count_good_subarrays nums };
+    let modulus = result_modulus_impl () in
+    assert { modulus = result_modulus };
+    mod !total modulus
+
+end

@@ -1,0 +1,170 @@
+module FindIndicesWithIndexAndValueDifferenceI_Array_Stage3
+
+  use int.Int
+  use int.Abs
+  use array.Array
+  use array.Init
+
+  predicate valid_index_pair (nums: array int) (indexDifference: int)
+      (valueDifference: int) (i: int) (j: int) =
+    0 <= i < length nums /\
+    0 <= j < length nums /\
+    abs (i - j) >= indexDifference /\
+    abs (nums[i] - nums[j]) >= valueDifference
+
+  predicate no_valid_index_pair (nums: array int) (indexDifference: int)
+      (valueDifference: int) =
+    forall i j: int.
+      0 <= i < length nums ->
+      0 <= j < length nums ->
+      not (abs (i - j) >= indexDifference /\
+           abs (nums[i] - nums[j]) >= valueDifference)
+
+  predicate answer_is (answer: array int) (i: int) (j: int) =
+    length answer = 2 /\ answer[0] = i /\ answer[1] = j
+
+  predicate valid_answer (nums: array int) (indexDifference: int)
+      (valueDifference: int) (answer: array int) =
+    length answer = 2 /\
+    ((answer_is answer (-1) (-1) /\
+      no_valid_index_pair nums indexDifference valueDifference) \/
+     valid_index_pair nums indexDifference valueDifference answer[0] answer[1])
+
+  predicate no_remaining_index_pair (nums: array int) (indexDifference: int)
+      (valueDifference: int) (i: int) (j: int) =
+    forall p q: int.
+      0 <= p < length nums ->
+      0 <= q < length nums ->
+      (i < p \/ (p = i /\ j <= q)) ->
+      not (abs (p - q) >= indexDifference /\
+           abs (nums[p] - nums[q]) >= valueDifference)
+
+  let lemma no_remaining_start_implies_no_valid
+      (nums: array int) (indexDifference: int) (valueDifference: int)
+    requires { no_remaining_index_pair nums indexDifference valueDifference 0 0 }
+    ensures  { no_valid_index_pair nums indexDifference valueDifference }
+  =
+    assert {
+      forall p q: int.
+        0 <= p < length nums ->
+        0 <= q < length nums ->
+        (0 < p \/ (p = 0 /\ 0 <= q))
+    };
+    assert { no_valid_index_pair nums indexDifference valueDifference }
+
+  let lemma no_remaining_empty_suffix
+      (nums: array int) (indexDifference: int) (valueDifference: int)
+      (i: int) (j: int)
+    requires { i >= length nums }
+    ensures  { no_remaining_index_pair nums indexDifference valueDifference i j }
+  =
+    assert {
+      forall p q: int.
+        0 <= p < length nums ->
+        0 <= q < length nums ->
+        not (i < p \/ (p = i /\ j <= q))
+    };
+    assert { no_remaining_index_pair nums indexDifference valueDifference i j }
+
+  let lemma no_remaining_after_row
+      (nums: array int) (indexDifference: int) (valueDifference: int)
+      (i: int) (j: int)
+    requires { 0 <= i < length nums }
+    requires { length nums <= j }
+    requires { no_remaining_index_pair nums indexDifference valueDifference (i + 1) 0 }
+    ensures  { no_remaining_index_pair nums indexDifference valueDifference i j }
+  =
+    assert {
+      forall p q: int.
+        0 <= p < length nums ->
+        0 <= q < length nums ->
+        (i < p \/ (p = i /\ j <= q)) ->
+        ((i + 1) < p \/ (p = i + 1 /\ 0 <= q))
+    };
+    assert { no_remaining_index_pair nums indexDifference valueDifference i j }
+
+  let lemma no_remaining_after_column
+      (nums: array int) (indexDifference: int) (valueDifference: int)
+      (i: int) (j: int)
+    requires { 0 <= i < length nums }
+    requires { 0 <= j < length nums }
+    requires { not (abs (i - j) >= indexDifference /\
+                    abs (nums[i] - nums[j]) >= valueDifference) }
+    requires { no_remaining_index_pair nums indexDifference valueDifference i (j + 1) }
+    ensures  { no_remaining_index_pair nums indexDifference valueDifference i j }
+  =
+    assert {
+      forall p q: int.
+        0 <= p < length nums ->
+        0 <= q < length nums ->
+        (i < p \/ (p = i /\ j <= q)) ->
+        (p = i /\ q = j) \/
+        (i < p \/ (p = i /\ j + 1 <= q))
+    };
+    assert { no_remaining_index_pair nums indexDifference valueDifference i j }
+
+  let abs_int (x: int) : int
+    ensures { result = abs x }
+  =
+    if x >= 0 then x else -x
+
+  let make_answer (i: int) (j: int) : array int
+    ensures { answer_is result i j }
+  =
+    init 2 [|i; j|]
+
+  let rec find_indices_from
+      (nums: array int) (indexDifference: int) (valueDifference: int)
+      (i: int) (j: int) : array int
+    requires { 0 <= i <= length nums }
+    requires { 0 <= j <= length nums }
+    variant { length nums - i, length nums - j }
+    ensures  { length result = 2 }
+    ensures  {
+      (answer_is result (-1) (-1) /\
+       no_remaining_index_pair nums indexDifference valueDifference i j) \/
+      valid_index_pair nums indexDifference valueDifference result[0] result[1]
+    }
+  =
+    if i >= length nums then
+      let answer = make_answer (-1) (-1) in
+      no_remaining_empty_suffix nums indexDifference valueDifference i j;
+      answer
+    else if j >= length nums then
+      let answer =
+        find_indices_from nums indexDifference valueDifference (i + 1) 0 in
+      if answer[0] = -1 && answer[1] = -1 then
+        no_remaining_after_row nums indexDifference valueDifference i j;
+      answer
+    else
+      let index_gap = abs_int (i - j) in
+      let value_gap = abs_int (nums[i] - nums[j]) in
+      if index_gap >= indexDifference && value_gap >= valueDifference then
+        let answer = make_answer i j in
+        assert { valid_index_pair nums indexDifference valueDifference i j };
+        answer
+      else
+        let answer =
+          find_indices_from nums indexDifference valueDifference i (j + 1) in
+        if answer[0] = -1 && answer[1] = -1 then
+          no_remaining_after_column nums indexDifference valueDifference i j;
+        answer
+
+  let find_indices_with_index_and_value_difference_i_array
+      (nums: array int) (indexDifference: int) (valueDifference: int) : array int
+    ensures { valid_answer nums indexDifference valueDifference result }
+  =
+    let answer =
+      find_indices_from nums indexDifference valueDifference 0 0 in
+    if answer[0] = -1 && answer[1] = -1 then begin
+      assert { answer_is answer (-1) (-1) };
+      no_remaining_start_implies_no_valid nums indexDifference valueDifference;
+      assert { no_valid_index_pair nums indexDifference valueDifference };
+      assert { valid_answer nums indexDifference valueDifference answer }
+    end else begin
+      assert { valid_index_pair nums indexDifference valueDifference answer[0] answer[1] };
+      assert { valid_answer nums indexDifference valueDifference answer }
+    end;
+    answer
+
+end

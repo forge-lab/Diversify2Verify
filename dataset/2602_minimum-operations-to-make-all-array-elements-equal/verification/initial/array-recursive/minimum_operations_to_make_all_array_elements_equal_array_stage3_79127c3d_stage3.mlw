@@ -1,0 +1,107 @@
+module MinimumOperationsToMakeAllArrayElementsEqual_Array_Stage3_Recursive
+
+  use int.Int
+  use int.Abs
+  use int.Sum
+  use array.Array
+  use array.Init
+
+  predicate valid_input (nums: array int) (queries: array int) =
+    1 <= length nums <= 100000 /\
+    1 <= length queries <= 100000 /\
+    (forall i: int. 0 <= i < length nums -> 1 <= nums[i] <= 1000000000) /\
+    (forall j: int. 0 <= j < length queries -> 1 <= queries[j] <= 1000000000)
+
+  function operation_cost_at (nums: array int) (q: int) (i: int) : int =
+    abs (nums[i] - q)
+
+  function operations_for_query (nums: array int) (q: int) : int =
+    sum (fun i -> operation_cost_at nums q i) 0 (length nums)
+
+  predicate expected_at
+    (nums: array int) (queries: array int) (result: array int) (j: int)
+  =
+    0 <= j < length queries ->
+    result[j] = operations_for_query nums queries[j]
+
+  predicate minimum_operations_to_make_all_array_elements_equal_array_spec
+    (nums: array int) (queries: array int) (result: array int)
+  =
+    length result = length queries /\
+    forall j: int. 0 <= j < length queries ->
+      expected_at nums queries result j
+
+  let abs_diff (x: int) (y: int) : int
+    ensures { result = abs (x - y) }
+  =
+    if x >= y then begin
+      assert { x - y >= 0 };
+      x - y
+    end else begin
+      assert { x - y < 0 };
+      y - x
+    end
+
+  let rec operations_for_query_from (nums: array int) (q: int) (i: int) : int
+    requires { 0 <= i <= length nums }
+    variant  { length nums - i }
+    ensures  { result = sum (fun k -> operation_cost_at nums q k) i (length nums) }
+  =
+    if i >= length nums then begin
+      assert { i = length nums };
+      0
+    end else begin
+      assert { 0 <= i < length nums };
+      assert { i + 1 <= length nums };
+      let current = abs_diff nums[i] q in
+      assert { current = operation_cost_at nums q i };
+      current + operations_for_query_from nums q (i + 1)
+    end
+
+  let rec fill_results
+    (nums: array int) (queries: array int) (out: array int) (j: int) : unit
+    requires { length out = length queries }
+    requires { 0 <= j <= length queries }
+    requires { 0 <= length nums }
+    variant  { length queries - j }
+    ensures  { length out = length queries }
+    ensures  {
+      forall k: int. j <= k < length queries ->
+        expected_at nums queries out k
+    }
+  =
+    if j >= length queries then begin
+      assert { j = length queries };
+      ()
+    end else begin
+      assert { 0 <= j < length queries };
+      assert { 0 <= 0 <= length nums };
+      out[j] <- operations_for_query_from nums queries[j] 0;
+      assert { out[j] = operations_for_query nums queries[j] };
+      fill_results nums queries out (j + 1);
+      assert { expected_at nums queries out j };
+      assert {
+        forall k: int. j <= k < length queries ->
+          expected_at nums queries out k
+      }
+    end
+
+  let minimum_operations_to_make_all_array_elements_equal_array
+    (nums: array int) (queries: array int) : array int
+    requires { valid_input nums queries }
+    ensures  {
+      minimum_operations_to_make_all_array_elements_equal_array_spec
+        nums queries result
+    }
+  =
+    let result = make (length queries) 0 in
+    assert { length result = length queries };
+    assert { 0 <= length nums };
+    fill_results nums queries result 0;
+    assert {
+      forall j: int. 0 <= j < length queries ->
+        expected_at nums queries result j
+    };
+    result
+
+end

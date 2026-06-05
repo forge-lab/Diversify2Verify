@@ -1,0 +1,91 @@
+module KeepMultiplyingFoundValuesByTwo_List_Stage3_Imperative
+
+  use int.Int
+  use int.Power
+  use list.List
+  use list.Length
+  use list.Mem
+  use ref.Ref
+
+  predicate valid_input (nums: list int) (original: int) =
+    1 <= length nums <= 1000 /\
+    1 <= original <= 1000 /\
+    forall x: int. mem x nums -> 1 <= x <= 1000
+
+  function doubled_value (original: int) (steps: int) : int =
+    original * power 2 steps
+
+  predicate doubling_prefix_found (nums: list int) (original: int) (steps: int) =
+    forall t: int. 0 <= t < steps -> mem (doubled_value original t) nums
+
+  predicate final_value (nums: list int) (original: int) (res: int) =
+    exists steps: int.
+      0 <= steps <= length nums /\
+      res = doubled_value original steps /\
+      doubling_prefix_found nums original steps /\
+      not (mem res nums)
+
+  exception Found
+
+  let mem_int_imp (nums: list int) (target: int) : bool
+    ensures { result = True <-> mem target nums }
+    ensures { result = False <-> not (mem target nums) }
+  =
+    try
+      let cur = ref nums in
+      while (match !cur with Nil -> false | Cons _ _ -> true end) do
+        invariant { mem target !cur <-> mem target nums }
+        invariant { 0 <= length !cur <= length nums }
+        variant { length !cur }
+
+        match !cur with
+        | Nil ->
+            assert { false }
+        | Cons x xs ->
+            if x = target then begin
+              assert { mem target !cur };
+              assert { mem target nums };
+              raise Found
+            end;
+            assert { x <> target };
+            assert { mem target xs <-> mem target !cur };
+            cur := xs
+        end
+      done;
+      assert { !cur = Nil };
+      assert { not (mem target !cur) };
+      assert { not (mem target nums) };
+      false
+    with Found ->
+      assert { mem target nums };
+      true
+    end
+
+  let keep_multiplying_found_values_by_two_list (nums: list int) (original: int) : int
+    requires { valid_input nums original }
+    ensures  { final_value nums original result }
+  =
+    let current = ref original in
+    let ghost steps = ref 0 in
+    while mem_int_imp nums !current do
+      invariant { 0 <= !steps <= length nums }
+      invariant { !current = doubled_value original !steps }
+      invariant { doubling_prefix_found nums original !steps }
+      variant { length nums - !steps }
+
+      assert { mem !current nums };
+      assert { !current = doubled_value original !steps };
+      assert { doubling_prefix_found nums original (!steps + 1) };
+      current := !current * 2;
+      steps := !steps + 1;
+      assert { !current = doubled_value original !steps };
+      assert { doubling_prefix_found nums original !steps }
+    done;
+    assert { not (mem !current nums) };
+    assert { 0 <= !steps <= length nums };
+    assert { !current = doubled_value original !steps };
+    assert { doubling_prefix_found nums original !steps };
+    assert { final_value nums original !current };
+    !current
+
+end

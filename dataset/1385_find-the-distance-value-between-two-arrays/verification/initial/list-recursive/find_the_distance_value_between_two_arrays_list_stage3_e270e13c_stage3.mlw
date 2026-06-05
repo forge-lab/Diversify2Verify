@@ -1,0 +1,49 @@
+module FindTheDistanceValueBetweenTwoArrays_List_Stage3_Recursive
+
+  use int.Int
+  use int.Abs
+  use list.List
+
+  let rec function far_from_all (arr2: list int) (x: int) (d: int) : bool
+    variant { arr2 }
+  =
+    match arr2 with
+    | Nil -> true
+    | Cons y ys ->
+        if abs (x - y) > d then far_from_all ys x d else false
+    end
+
+  let rec function distance_value_list
+    (arr1: list int) (arr2: list int) (d: int) : int
+    variant { arr1 }
+  =
+    match arr1 with
+    | Nil -> 0
+    | Cons x xs ->
+        (if far_from_all arr2 x d then 1 else 0) +
+        distance_value_list xs arr2 d
+    end
+
+  let rec far_from_all_exec (arr2: list int) (x: int) (d: int) : bool
+    ensures { result = far_from_all arr2 x d }
+    variant { arr2 }
+  =
+    match arr2 with
+    | Nil -> true
+    | Cons y ys ->
+        if abs (x - y) > d then far_from_all_exec ys x d else false
+    end
+
+  let rec find_the_distance_value_between_two_arrays_list
+    (arr1: list int) (arr2: list int) (d: int) : int
+    ensures { result = distance_value_list arr1 arr2 d }
+    variant { arr1 }
+  =
+    match arr1 with
+    | Nil -> 0
+    | Cons x xs ->
+        (if far_from_all_exec arr2 x d then 1 else 0) +
+        find_the_distance_value_between_two_arrays_list xs arr2 d
+    end
+
+end

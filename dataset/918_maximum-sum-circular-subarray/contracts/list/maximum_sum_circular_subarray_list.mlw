@@ -1,0 +1,115 @@
+module MaximumSumCircularSubarray_List_Spec
+
+  use int.Int
+  use list.List
+  use list.Append
+  use list.Sum
+
+  predicate linear_segment (nums: list int) (seg: list int) =
+    seg <> Nil /\
+    exists left right: list int.
+      nums = (left ++ seg) ++ right
+
+  predicate wrapped_segment (nums: list int) (seg: list int) =
+    seg <> Nil /\
+    exists prefix middle suffix: list int.
+      prefix <> Nil /\
+      suffix <> Nil /\
+      nums = (prefix ++ middle) ++ suffix /\
+      seg = suffix ++ prefix
+
+  predicate circular_segment (nums: list int) (seg: list int) =
+    linear_segment nums seg \/ wrapped_segment nums seg
+
+  predicate is_max_circular_subarray_sum (nums: list int) (answer: int) =
+    nums <> Nil /\
+    (exists seg: list int. circular_segment nums seg /\ answer = sum seg) /\
+    (forall seg: list int. circular_segment nums seg -> sum seg <= answer)
+
+  val maximum_sum_circular_subarray_list (nums: list int) : int
+    requires { nums <> Nil }
+    ensures  { is_max_circular_subarray_sum nums result }
+
+  let lemma check_test_000 () =
+    let nums = Cons 1 (Cons (-2) (Cons 3 (Cons (-2) Nil))) in
+    let seg = Cons 3 Nil in
+    assert { nums = ((Cons 1 (Cons (-2) Nil)) ++ seg) ++ (Cons (-2) Nil) };
+    assert { linear_segment nums seg };
+    assert { sum seg = 3 };
+    assert { forall candidate: list int.
+      circular_segment nums candidate -> sum candidate <= 3 };
+    assert { is_max_circular_subarray_sum nums 3 }
+
+  let lemma check_test_003 () =
+    let nums = Cons 5 (Cons (-3) (Cons 5 Nil)) in
+    let prefix = Cons 5 Nil in
+    let middle = Cons (-3) Nil in
+    let suffix = Cons 5 Nil in
+    let seg = Cons 5 (Cons 5 Nil) in
+    assert { nums = (prefix ++ middle) ++ suffix };
+    assert { seg = suffix ++ prefix };
+    assert { wrapped_segment nums seg };
+    assert { sum seg = 10 };
+    assert { forall candidate: list int.
+      circular_segment nums candidate -> sum candidate <= 10 };
+    assert { is_max_circular_subarray_sum nums 10 }
+
+  let lemma check_test_004 () =
+    let nums = Cons 3 (Cons (-1) (Cons 2 (Cons (-1) Nil))) in
+    let prefix = Cons 3 Nil in
+    let middle = Cons (-1) Nil in
+    let suffix = Cons 2 (Cons (-1) Nil) in
+    let seg = Cons 2 (Cons (-1) (Cons 3 Nil)) in
+    assert { nums = (prefix ++ middle) ++ suffix };
+    assert { seg = suffix ++ prefix };
+    assert { wrapped_segment nums seg };
+    assert { sum seg = 4 };
+    assert { forall candidate: list int.
+      circular_segment nums candidate -> sum candidate <= 4 };
+    assert { is_max_circular_subarray_sum nums 4 }
+
+  let lemma check_test_005 () =
+    let nums = Cons 2 (Cons (-2) (Cons 2 (Cons 7 Nil))) in
+    let prefix = Cons 2 Nil in
+    let middle = Cons (-2) Nil in
+    let suffix = Cons 2 (Cons 7 Nil) in
+    let seg = Cons 2 (Cons 7 (Cons 2 Nil)) in
+    assert { nums = (prefix ++ middle) ++ suffix };
+    assert { seg = suffix ++ prefix };
+    assert { wrapped_segment nums seg };
+    assert { sum seg = 11 };
+    assert { forall candidate: list int.
+      circular_segment nums candidate -> sum candidate <= 11 };
+    assert { is_max_circular_subarray_sum nums 11 }
+
+  let lemma check_test_009 () =
+    let nums = Cons 1 (Cons 2 (Cons 3 (Cons 4 (Cons 5 Nil)))) in
+    let seg = nums in
+    assert { nums = (Nil ++ seg) ++ Nil };
+    assert { linear_segment nums seg };
+    assert { sum seg = 15 };
+    assert { forall candidate: list int.
+      circular_segment nums candidate -> sum candidate <= 15 };
+    assert { is_max_circular_subarray_sum nums 15 }
+
+  let lemma check_test_010 () =
+    let nums = Cons (-1) (Cons (-2) (Cons (-3) (Cons (-4) Nil))) in
+    let seg = Cons (-1) Nil in
+    assert { nums = (Nil ++ seg) ++ (Cons (-2) (Cons (-3) (Cons (-4) Nil))) };
+    assert { linear_segment nums seg };
+    assert { sum seg = (-1) };
+    assert { forall candidate: list int.
+      circular_segment nums candidate -> sum candidate <= (-1) };
+    assert { is_max_circular_subarray_sum nums (-1) }
+
+  let lemma check_test_014 () =
+    let nums = Cons (-3) (Cons (-2) (Cons (-3) Nil)) in
+    let seg = Cons (-2) Nil in
+    assert { nums = ((Cons (-3) Nil) ++ seg) ++ (Cons (-3) Nil) };
+    assert { linear_segment nums seg };
+    assert { sum seg = (-2) };
+    assert { forall candidate: list int.
+      circular_segment nums candidate -> sum candidate <= (-2) };
+    assert { is_max_circular_subarray_sum nums (-2) }
+
+end

@@ -1,0 +1,163 @@
+module FindTheStudentThatWillReplaceTheChalk_Array_Recursive_Implementation
+
+  use int.Int
+  use int.EuclideanDivision
+  use array.Array
+  use array.Init
+
+  let rec total_chalk_from (chalk: array int) (i: int) : int
+    variant { length chalk - i }
+  =
+    if i >= length chalk then
+      0
+    else
+      chalk[i] + total_chalk_from chalk (i + 1)
+
+  let rec find_replacement_from (chalk: array int) (i: int) (remaining: int) : int
+    variant { length chalk - i }
+  =
+    if i >= length chalk then
+      0
+    else if remaining < chalk[i] then
+      i
+    else
+      find_replacement_from chalk (i + 1) (remaining - chalk[i])
+
+  let find_the_student_that_will_replace_the_chalk_array (chalk: array int) (k: int) : int =
+    if length chalk = 0 then
+      0
+    else
+      let total = total_chalk_from chalk 0 in
+      let remaining =
+        if total = 0 then 0 else mod k total
+      in
+      find_replacement_from chalk 0 remaining
+
+  let check_case (chalk: array int) (k: int) (expected: int) : bool =
+    let r = find_the_student_that_will_replace_the_chalk_array chalk k in
+    r = expected
+
+  let test_000 () : bool =
+    let chalk = init 5 [|1; 2; 3; 4; 5|] in
+    check_case chalk 15 0
+
+  let test_001 () : bool =
+    let chalk = init 1 [|1|] in
+    check_case chalk 1000000000 0
+
+  let test_002 () : bool =
+    let chalk = init 10 [|1; 1; 1; 1; 1; 1; 1; 1; 1; 1|] in
+    check_case chalk 999999999 9
+
+  let test_003 () : bool =
+    let chalk = init 3 [|10; 10; 10|] in
+    check_case chalk 100 1
+
+  let test_004 () : bool =
+    let chalk = init 1 [|100000|] in
+    check_case chalk 1000000000 0
+
+  let test_005 () : bool =
+    let chalk = init 10 [|1; 1; 1; 1; 1; 1; 1; 1; 1; 1|] in
+    check_case chalk 1000000000 0
+
+  let test_006 () : bool =
+    let chalk = init 4 [|3; 4; 1; 2|] in
+    check_case chalk 25 1
+
+  let test_007 () : bool =
+    let chalk = init 3 [|5; 1; 5|] in
+    check_case chalk 22 0
+
+  let test_008 () : bool =
+    let chalk = init 3 [|5; 1; 5|] in
+    check_case chalk 1000000000 2
+
+  let test_009 () : bool =
+    let chalk = init 10 [|10000; 9000; 8000; 7000; 6000; 5000; 4000; 3000; 2000; 1000|] in
+    check_case chalk 1000000000 6
+
+  let test_010 () : bool =
+    let chalk = init 20 [|1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1|] in
+    check_case chalk 9999999999 19
+
+  let test_011 () : bool =
+    let chalk = init 3 [|100000; 200000; 300000|] in
+    check_case chalk 1000000000 2
+
+  let test_012 () : bool =
+    let chalk = init 9 [|9; 8; 7; 6; 5; 4; 3; 2; 1|] in
+    check_case chalk 123456789 1
+
+  let test_013 () : bool =
+    let chalk = init 5 [|5; 8; 12; 3; 7|] in
+    check_case chalk 500000000 1
+
+  let test_014 () : bool =
+    let chalk = init 6 [|7; 3; 2; 8; 6; 4|] in
+    check_case chalk 987654321 4
+
+  let test_015 () : bool =
+    let chalk = init 6 [|1; 10; 100; 1000; 10000; 100000|] in
+    check_case chalk 123456789 5
+
+  let test_016 () : bool =
+    let chalk = init 9 [|1; 10; 100; 1000; 10000; 100000; 1000000; 10000000; 100000000|] in
+    check_case chalk 987654321 8
+
+  let test_017 () : bool =
+    let chalk = init 9 [|9; 8; 7; 6; 5; 4; 3; 2; 1|] in
+    check_case chalk 1200000000 4
+
+  let test_018 () : bool =
+    let chalk = init 5 [|100000; 200000; 300000; 400000; 500000|] in
+    check_case chalk 1000000000 4
+
+  let test_019 () : bool =
+    let chalk = init 9 [|2; 3; 4; 5; 6; 7; 8; 9; 10|] in
+    check_case chalk 100000000 8
+
+  let run_tests () : bool =
+    if test_000 () then
+    if test_001 () then
+    if test_002 () then
+    if test_003 () then
+    if test_004 () then
+    if test_005 () then
+    if test_006 () then
+    if test_007 () then
+    if test_008 () then
+    if test_009 () then
+    if test_010 () then
+    if test_011 () then
+    if test_012 () then
+    if test_013 () then
+    if test_014 () then
+    if test_015 () then
+    if test_016 () then
+    if test_017 () then
+    if test_018 () then
+    if test_019 () then
+      true
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+
+end

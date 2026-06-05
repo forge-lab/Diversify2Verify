@@ -1,0 +1,166 @@
+module LongestIncreasingSubsequence_List_Stage3_Imperative
+
+  use int.Int
+  use list.List
+  use list.Length
+  use list.Mem
+  use list.Append
+  use list.Reverse
+  use ref.Ref
+
+  predicate valid_input (nums: list int) =
+    1 <= length nums <= 2500 /\
+    (forall x: int. mem x nums -> -10000 <= x <= 10000)
+
+  let rec predicate is_subsequence (sub: list int) (nums: list int)
+    variant { nums }
+  =
+    match sub with
+    | Nil -> true
+    | Cons x xs ->
+        match nums with
+        | Nil -> false
+        | Cons y ys ->
+            (x = y && is_subsequence xs ys) || is_subsequence sub ys
+        end
+    end
+
+  let rec predicate strictly_increasing (seq: list int)
+    variant { seq }
+  =
+    match seq with
+    | Nil -> true
+    | Cons _ Nil -> true
+    | Cons x xs ->
+        match xs with
+        | Nil -> true
+        | Cons y _ -> x < y && strictly_increasing xs
+        end
+    end
+
+  predicate valid_increasing_subsequence (seq: list int) (nums: list int) =
+    seq <> Nil /\
+    is_subsequence seq nums /\
+    strictly_increasing seq
+
+  predicate has_increasing_subsequence_length (nums: list int) (k: int) =
+    exists seq: list int.
+      valid_increasing_subsequence seq nums /\ length seq = k
+
+  predicate longest_increasing_subsequence_length
+    (nums: list int) (answer: int) =
+    1 <= answer <= length nums /\
+    has_increasing_subsequence_length nums answer /\
+    (forall seq: list int.
+      valid_increasing_subsequence seq nums -> length seq <= answer)
+
+  predicate bounded_lengths (lengths: list int) (n: int) =
+    forall d: int. mem d lengths -> 1 <= d <= n
+
+  predicate is_suffix (suffix: list int) (whole: list int) =
+    exists prefix: list int. whole = prefix ++ suffix
+
+  predicate processed_cursor_state
+    (nums: list int) (seen: list int) (cur: list int) =
+    nums = reverse seen ++ cur
+
+  predicate processed_lis_summary (processed: list int) (best: int) =
+    (processed = Nil /\ best = 0) \/
+    (processed <> Nil /\
+      longest_increasing_subsequence_length processed best)
+
+  predicate predecessor_scan_state
+    (seen: list int) (lengths: list int)
+    (prev_nums: list int) (prev_lengths: list int) =
+    is_suffix prev_nums seen /\
+    is_suffix prev_lengths lengths /\
+    length prev_nums = length prev_lengths
+
+  predicate best_here_summary
+    (processed: list int) (x: int) (best_here: int) =
+    1 <= best_here <= length processed + 1 /\
+    has_increasing_subsequence_length (processed ++ Cons x Nil) best_here
+
+  let longest_increasing_subsequence_list (nums: list int) : int
+    requires { valid_input nums }
+    ensures  { longest_increasing_subsequence_length nums result }
+  =
+    let seen = ref Nil in
+    let lengths = ref Nil in
+    let best_overall = ref 0 in
+    let cur = ref nums in
+    while (match !cur with Nil -> false | Cons _ _ -> true end) do
+      invariant { 0 <= length !cur <= length nums }
+      invariant { 0 <= length !seen <= length nums }
+      invariant { length !seen + length !cur = length nums }
+      invariant { length !seen = length !lengths }
+      invariant { bounded_lengths !lengths (length !seen) }
+      invariant { 0 <= !best_overall <= length nums }
+      invariant { processed_cursor_state nums !seen !cur }
+      invariant { is_suffix !cur nums }
+      invariant { processed_lis_summary (reverse !seen) !best_overall }
+      variant   { length !cur }
+
+      match !cur with
+      | Nil -> ()
+      | Cons x xs ->
+          assert { length !seen + length (Cons x xs) = length nums };
+          assert { length (Cons x !seen) + length xs = length nums };
+          let best_here = ref 1 in
+          let prev_nums = ref !seen in
+          let prev_lengths = ref !lengths in
+          while (match !prev_nums with Nil -> false | Cons _ _ -> true end) do
+            invariant { 0 <= length !prev_nums <= length !seen }
+            invariant { 0 <= length !prev_lengths <= length !lengths }
+            invariant { length !prev_nums = length !prev_lengths }
+            invariant { bounded_lengths !prev_lengths (length !seen) }
+            invariant { 1 <= !best_here <= length !seen + 1 }
+            invariant { predecessor_scan_state !seen !lengths !prev_nums !prev_lengths }
+            variant   { length !prev_nums }
+
+            match !prev_nums, !prev_lengths with
+            | Cons y ys, Cons d ds ->
+                assert { bounded_lengths !prev_lengths (length !seen) };
+                assert { mem d !prev_lengths };
+                assert { 1 <= d <= length !seen };
+                assert { bounded_lengths ds (length !seen) };
+                if y < x then begin
+                  let candidate = d + 1 in
+                  assert { 2 <= candidate <= length !seen + 1 };
+                  if candidate > !best_here then best_here := candidate
+                end else ();
+                prev_nums := ys;
+                prev_lengths := ds;
+                assert { bounded_lengths !prev_lengths (length !seen) }
+            | _, _ ->
+                prev_nums := Nil;
+                prev_lengths := Nil
+            end
+          done;
+          assert { !prev_nums = Nil };
+          assert { !prev_lengths = Nil };
+          assert { 1 <= !best_here <= length !seen + 1 };
+          assert { best_here_summary (reverse !seen) x !best_here };
+          seen := Cons x !seen;
+          lengths := Cons !best_here !lengths;
+          assert { bounded_lengths !lengths (length !seen) };
+          if !best_here > !best_overall then
+            best_overall := !best_here
+          else ();
+          assert { processed_lis_summary (reverse !seen) !best_overall };
+          cur := xs;
+          assert { length !seen + length !cur = length nums };
+          assert { 0 <= length !seen <= length nums }
+      end
+    done;
+    assert { !cur = Nil };
+    assert { nums = reverse !seen };
+    assert { 1 <= !best_overall <= length nums };
+    assert { has_increasing_subsequence_length nums !best_overall };
+    assert {
+      forall seq: list int.
+        valid_increasing_subsequence seq nums -> length seq <= !best_overall
+    };
+    !best_overall
+
+end

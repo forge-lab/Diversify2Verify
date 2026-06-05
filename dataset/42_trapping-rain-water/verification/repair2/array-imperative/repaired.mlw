@@ -1,0 +1,311 @@
+module TrappingRainWater_Array_Stage3_Imperative
+
+  use int.Int
+  use int.MinMax
+  use array.Array
+  use array.Init
+  use array.ArraySum
+  use ref.Ref
+
+  predicate valid_height_input (height: array int) =
+    1 <= length height <= 20000 /\
+    forall i: int. 0 <= i < length height -> 0 <= height[i] <= 100000
+
+  predicate prefix_max_value (height: array int) (i: int) (m: int) =
+    0 <= i < length height /\
+    (exists k: int. 0 <= k <= i /\ height[k] = m) /\
+    (forall k: int. 0 <= k <= i -> height[k] <= m)
+
+  predicate suffix_max_value (height: array int) (i: int) (m: int) =
+    0 <= i < length height /\
+    (exists k: int. i <= k < length height /\ height[k] = m) /\
+    (forall k: int. i <= k < length height -> height[k] <= m)
+
+  predicate trapped_contribution (height: array int) (i: int) (c: int) =
+    0 <= i < length height /\
+    exists left_wall right_wall: int.
+      prefix_max_value height i left_wall /\
+      suffix_max_value height i right_wall /\
+      c = max 0 (min left_wall right_wall - height[i])
+
+  predicate water_profile (height: array int) (water: array int) =
+    length water = length height /\
+    forall i: int.
+      0 <= i < length height -> trapped_contribution height i water[i]
+
+  predicate trapped_water_total (height: array int) (total: int) =
+    exists water: array int.
+      water_profile height water /\
+      total = ArraySum.sum water 0 (length water)
+
+  let rec function prefix_max_at (height: array int) (i: int) : int
+    requires { 0 <= i < length height }
+    variant  { i }
+  =
+    if i = 0 then height[0]
+    else
+      let m = prefix_max_at height (i - 1) in
+      if height[i] > m then height[i] else m
+
+  let rec function suffix_max_at (height: array int) (i: int) : int
+    requires { 0 <= i < length height }
+    variant  { length height - i }
+  =
+    if i = length height - 1 then height[i]
+    else
+      let m = suffix_max_at height (i + 1) in
+      if height[i] > m then height[i] else m
+
+  let rec lemma prefix_max_at_spec (height: array int) (i: int)
+    requires { 0 <= i < length height }
+    ensures  { prefix_max_value height i (prefix_max_at height i) }
+    variant  { i }
+  =
+    if i = 0 then begin
+      assert { prefix_max_at height i = height[0] };
+      assert { exists k: int. 0 <= k <= i /\ height[k] = prefix_max_at height i };
+      assert { forall k: int. 0 <= k <= i -> height[k] <= prefix_max_at height i }
+    end else begin
+      prefix_max_at_spec height (i - 1);
+      assert { prefix_max_value height (i - 1) (prefix_max_at height (i - 1)) };
+      let ghost old_m = prefix_max_at height (i - 1) in
+      if height[i] > old_m then begin
+        assert { prefix_max_at height i = height[i] };
+        assert { exists k: int. 0 <= k <= i /\ height[k] = prefix_max_at height i };
+        assert { forall k: int. 0 <= k <= i -> height[k] <= prefix_max_at height i }
+      end else begin
+        assert { prefix_max_at height i = old_m };
+        assert { exists k: int. 0 <= k <= i /\ height[k] = prefix_max_at height i };
+        assert { forall k: int. 0 <= k <= i -> height[k] <= prefix_max_at height i }
+      end
+    end
+
+  let rec lemma suffix_max_at_spec (height: array int) (i: int)
+    requires { 0 <= i < length height }
+    ensures  { suffix_max_value height i (suffix_max_at height i) }
+    variant  { length height - i }
+  =
+    if i = length height - 1 then begin
+      assert { suffix_max_at height i = height[i] };
+      assert { exists k: int. i <= k < length height /\ height[k] = suffix_max_at height i };
+      assert { forall k: int. i <= k < length height -> height[k] <= suffix_max_at height i }
+    end else begin
+      suffix_max_at_spec height (i + 1);
+      assert { suffix_max_value height (i + 1) (suffix_max_at height (i + 1)) };
+      let ghost old_m = suffix_max_at height (i + 1) in
+      if height[i] > old_m then begin
+        assert { suffix_max_at height i = height[i] };
+        assert { exists k: int. i <= k < length height /\ height[k] = suffix_max_at height i };
+        assert { forall k: int. i <= k < length height -> height[k] <= suffix_max_at height i }
+      end else begin
+        assert { suffix_max_at height i = old_m };
+        assert { exists k: int. i <= k < length height /\ height[k] = suffix_max_at height i };
+        assert { forall k: int. i <= k < length height -> height[k] <= suffix_max_at height i }
+      end
+    end
+
+  let lemma prefix_max_value_monotone (height: array int) (i j mi mj: int)
+    requires { prefix_max_value height i mi }
+    requires { prefix_max_value height j mj }
+    requires { 0 <= i <= j < length height }
+    ensures  { mi <= mj }
+  =
+    assert { forall k: int. 0 <= k <= i -> height[k] <= mj };
+    assert { exists k: int. 0 <= k <= i /\ height[k] = mi };
+    assert { mi <= mj }
+
+  let lemma suffix_max_value_monotone (height: array int) (i j mi mj: int)
+    requires { suffix_max_value height i mi }
+    requires { suffix_max_value height j mj }
+    requires { 0 <= i <= j < length height }
+    ensures  { mj <= mi }
+  =
+    assert { forall k: int. j <= k < length height -> height[k] <= mi };
+    assert { exists k: int. j <= k < length height /\ height[k] = mj };
+    assert { mj <= mi }
+
+  let lemma left_endpoint_zero_contribution (height: array int)
+    requires { 1 <= length height }
+    ensures  { trapped_contribution height 0 0 }
+  =
+    prefix_max_at_spec height 0;
+    suffix_max_at_spec height 0;
+    let ghost right_wall = suffix_max_at height 0 in
+    assert { prefix_max_value height 0 (height[0]) };
+    assert { suffix_max_value height 0 right_wall };
+    assert { height[0] <= right_wall };
+    assert { min height[0] right_wall = height[0] };
+    assert { max 0 (min height[0] right_wall - height[0]) = 0 };
+    assert { trapped_contribution height 0 0 }
+
+  let lemma right_endpoint_zero_contribution (height: array int)
+    requires { 1 <= length height }
+    ensures  { trapped_contribution height (length height - 1) 0 }
+  =
+    let ghost last = length height - 1 in
+    prefix_max_at_spec height last;
+    suffix_max_at_spec height last;
+    let ghost left_wall = prefix_max_at height last in
+    assert { prefix_max_value height last left_wall };
+    assert { suffix_max_value height last (height[last]) };
+    assert { height[last] <= left_wall };
+    assert { min left_wall height[last] = height[last] };
+    assert { max 0 (min left_wall height[last] - height[last]) = 0 };
+    assert { trapped_contribution height last 0 }
+
+  let lemma profile_sum_gives_total (height: array int) (water: array int) (total: int)
+    requires { water_profile height water }
+    requires { total = ArraySum.sum water 0 (length water) }
+    ensures  { trapped_water_total height total }
+  =
+    assert { trapped_water_total height total }
+
+  let lemma profile_sum_gives_total_by_height_length (height: array int) (water: array int) (total: int)
+    requires { water_profile height water }
+    requires { total = ArraySum.sum water 0 (length height) }
+    ensures  { trapped_water_total height total }
+  =
+    assert { length water = length height };
+    assert { total = ArraySum.sum water 0 (length water) };
+    profile_sum_gives_total height water total
+
+  let lemma trapped_contribution_eq (height: array int) (i c d: int)
+    requires { trapped_contribution height i c }
+    requires { c = d }
+    ensures  { trapped_contribution height i d }
+  =
+    assert { trapped_contribution height i d }
+
+  let lemma small_input_zero_total (height: array int)
+    requires { valid_height_input height }
+    requires { length height <= 2 }
+    ensures  { trapped_water_total height 0 }
+  =
+    let n = length height in
+    let ghost water = make n 0 in
+    assert { 1 <= n <= 2 };
+    assert { length water = n };
+    left_endpoint_zero_contribution height;
+    if n = 1 then begin
+      assert { forall i: int. 0 <= i < n -> i = 0 };
+      assert { forall i: int. 0 <= i < n -> trapped_contribution height i water[i] };
+      assert { water_profile height water };
+      assert { forall i: int. 0 <= i < length water -> water[i] = 0 };
+      assert { ArraySum.sum water 0 (length water) = 0 };
+      profile_sum_gives_total height water 0
+    end else begin
+      assert { n = 2 };
+      right_endpoint_zero_contribution height;
+      assert { forall i: int. 0 <= i < n -> i = 0 \/ i = n - 1 };
+      assert { forall i: int. 0 <= i < n -> trapped_contribution height i water[i] };
+      assert { water_profile height water };
+      assert { forall i: int. 0 <= i < length water -> water[i] = 0 };
+      assert { ArraySum.sum water 0 (length water) = 0 };
+      profile_sum_gives_total height water 0
+    end
+
+  let trapping_rain_water_array (height: array int) : int
+    requires { valid_height_input height }
+    ensures  { trapped_water_total height result }
+  =
+    let n = length height in
+    if n <= 2 then begin
+      small_input_zero_total height;
+      assert { trapped_water_total height 0 };
+      0
+    end else begin
+      let left = ref 0 in
+      let right = ref (n - 1) in
+      let left_max = ref height[0] in
+      let right_max = ref height[n - 1] in
+      let total = ref 0 in
+      let ghost water = make n 0 in
+      assert { 0 <= 0 < n };
+      assert { 0 <= n - 1 < n };
+      assert { prefix_max_value height 0 !left_max };
+      assert { suffix_max_value height (n - 1) !right_max };
+      left_endpoint_zero_contribution height;
+      right_endpoint_zero_contribution height;
+      assert { water[0] = 0 };
+      trapped_contribution_eq height 0 0 water[0];
+      assert { trapped_contribution height 0 water[0] };
+      assert { water[n - 1] = 0 };
+      trapped_contribution_eq height (n - 1) 0 water[n - 1];
+      assert { trapped_contribution height (n - 1) water[n - 1] };
+      while !left < !right do
+        invariant { 0 <= !left <= !right < n }
+        invariant { prefix_max_value height !left !left_max }
+        invariant { suffix_max_value height !right !right_max }
+        invariant { length water = n }
+        invariant { forall i: int. 0 <= i <= !left -> trapped_contribution height i water[i] }
+        invariant { forall i: int. !right <= i < n -> trapped_contribution height i water[i] }
+        invariant { !total = ArraySum.sum water 0 (!left + 1) + ArraySum.sum water !right n }
+        variant   { !right - !left }
+        if !left_max <= !right_max then begin
+          left := !left + 1;
+          assert { 0 <= !left < n };
+          if height[!left] > !left_max then begin
+            water[!left] <- 0;
+            assert { prefix_max_value height !left height[!left] };
+            let ghost right_wall = suffix_max_at height !left in
+            suffix_max_at_spec height !left;
+            left_max := height[!left];
+            assert { prefix_max_value height !left !left_max };
+            assert { suffix_max_value height !left right_wall };
+            assert { min !left_max right_wall <= height[!left] };
+            assert { max 0 (min !left_max right_wall - height[!left]) = 0 };
+            assert { trapped_contribution height !left water[!left] }
+          end else begin
+            assert { prefix_max_value height !left !left_max };
+            let ghost right_wall = suffix_max_at height !left in
+            suffix_max_at_spec height !left;
+            suffix_max_value_monotone height !left !right right_wall !right_max;
+            assert { !left_max <= right_wall };
+            assert { min !left_max right_wall = !left_max };
+            water[!left] <- !left_max - height[!left];
+            total := !total + (!left_max - height[!left]);
+            assert { trapped_contribution height !left water[!left] }
+          end
+        end else begin
+          right := !right - 1;
+          assert { 0 <= !right < n };
+          if height[!right] > !right_max then begin
+            water[!right] <- 0;
+            let ghost left_wall = prefix_max_at height !right in
+            prefix_max_at_spec height !right;
+            assert { suffix_max_value height !right height[!right] };
+            right_max := height[!right];
+            assert { suffix_max_value height !right !right_max };
+            assert { prefix_max_value height !right left_wall };
+            assert { min left_wall !right_max <= height[!right] };
+            assert { max 0 (min left_wall !right_max - height[!right]) = 0 };
+            assert { trapped_contribution height !right water[!right] }
+          end else begin
+            assert { suffix_max_value height !right !right_max };
+            let ghost left_wall = prefix_max_at height !right in
+            prefix_max_at_spec height !right;
+            prefix_max_value_monotone height !left !right !left_max left_wall;
+            assert { !right_max <= left_wall };
+            assert { min left_wall !right_max = !right_max };
+            water[!right] <- !right_max - height[!right];
+            total := !total + (!right_max - height[!right]);
+            assert { trapped_contribution height !right water[!right] }
+          end
+        end
+      done;
+      assert { !left = !right };
+      assert { forall i: int. 0 <= i < n -> trapped_contribution height i water[i] by
+        if i <= !left then trapped_contribution height i water[i]
+        else trapped_contribution height i water[i] };
+      assert { water_profile height water };
+      assert { !total = ArraySum.sum water 0 n };
+      assert { n = length height };
+      assert { !total = ArraySum.sum water 0 (length height) };
+      profile_sum_gives_total_by_height_length height water !total;
+      assert { trapped_water_total height !total };
+      let result = !total in
+      assert { trapped_water_total height result };
+      result
+    end
+
+end

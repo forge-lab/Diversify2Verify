@@ -1,0 +1,270 @@
+module ApplyOperationsToAnArray_List_Imperative_Implementation
+
+  use int.Int
+  use list.List
+  use ref.Ref
+
+  exception NotEqual
+
+  let reverse_list (l: list int) : list int =
+    let cur = ref l in
+    let acc = ref Nil in
+    while (match !cur with Nil -> false | Cons _ _ -> true end) do
+      match !cur with
+      | Nil -> ()
+      | Cons x xs ->
+          acc := Cons x (!acc);
+          cur := xs
+      end
+    done;
+    !acc
+
+  let make_zeros (n: int) : list int =
+    let remaining = ref n in
+    let acc = ref Nil in
+    while !remaining > 0 do
+      acc := Cons 0 (!acc);
+      remaining := !remaining - 1
+    done;
+    !acc
+
+  let operation_pass (nums: list int) : list int =
+    let cur = ref nums in
+    let acc = ref Nil in
+    while (match !cur with Nil -> false | Cons _ _ -> true end) do
+      match !cur with
+      | Nil -> ()
+      | Cons x Nil ->
+          acc := Cons x (!acc);
+          cur := Nil
+      | Cons x (Cons y ys) ->
+          if x = y then begin
+            acc := Cons (x + y) (!acc);
+            cur := Cons 0 ys
+          end else begin
+            acc := Cons x (!acc);
+            cur := Cons y ys
+          end
+      end
+    done;
+    reverse_list !acc
+
+  let shift_zeros_to_end (nums: list int) : list int =
+    let zero_count = ref 0 in
+    let nonzero_rev = ref Nil in
+    let cur = ref nums in
+    while (match !cur with Nil -> false | Cons _ _ -> true end) do
+      match !cur with
+      | Nil -> ()
+      | Cons x xs ->
+          if x = 0 then
+            zero_count := !zero_count + 1
+          else
+            nonzero_rev := Cons x (!nonzero_rev);
+          cur := xs
+      end
+    done;
+    let result = ref (make_zeros !zero_count) in
+    let build = ref !nonzero_rev in
+    while (match !build with Nil -> false | Cons _ _ -> true end) do
+      match !build with
+      | Nil -> ()
+      | Cons x xs ->
+          result := Cons x (!result);
+          build := xs
+      end
+    done;
+    !result
+
+  let apply_operations_to_an_array_list (nums: list int) : list int =
+    let after_ops = operation_pass nums in
+    shift_zeros_to_end after_ops
+
+  let list_eq (xs: list int) (ys: list int) : bool =
+    try
+      let left = ref xs in
+      let right = ref ys in
+      while (match !left, !right with
+             | Cons _ _, Cons _ _ -> true
+             | _, _ -> false
+             end) do
+        match !left, !right with
+        | Cons x xs1, Cons y ys1 ->
+            if not (x = y) then raise NotEqual;
+            left := xs1;
+            right := ys1
+        | _, _ -> ()
+        end
+      done;
+      match !left, !right with
+      | Nil, Nil -> true
+      | _, _ -> false
+      end
+    with NotEqual ->
+      false
+    end
+
+  let test_000 () : bool =
+    let nums = Cons 6 (Cons 5 (Cons 4 (Cons 3 (Cons 2 (Cons 1 (Nil)))))) in
+    let expected = Cons 6 (Cons 5 (Cons 4 (Cons 3 (Cons 2 (Cons 1 (Nil)))))) in
+    let r = apply_operations_to_an_array_list nums in
+    list_eq r expected
+
+  let test_001 () : bool =
+    let nums = Cons 1 (Cons 2 (Cons 3 (Cons 2 (Cons 3 (Cons 2 (Nil)))))) in
+    let expected = Cons 1 (Cons 2 (Cons 3 (Cons 2 (Cons 3 (Cons 2 (Nil)))))) in
+    let r = apply_operations_to_an_array_list nums in
+    list_eq r expected
+
+  let test_002 () : bool =
+    let nums = Cons 2 (Cons 2 (Cons 0 (Cons 0 (Cons 1 (Cons 1 (Cons 1 (Nil))))))) in
+    let expected = Cons 4 (Cons 2 (Cons 1 (Cons 0 (Cons 0 (Cons 0 (Cons 0 (Nil))))))) in
+    let r = apply_operations_to_an_array_list nums in
+    list_eq r expected
+
+  let test_003 () : bool =
+    let nums = Cons 10 (Cons 10 (Cons 0 (Cons 0 (Cons 10 (Cons 10 (Cons 10 (Nil))))))) in
+    let expected = Cons 20 (Cons 20 (Cons 10 (Cons 0 (Cons 0 (Cons 0 (Cons 0 (Nil))))))) in
+    let r = apply_operations_to_an_array_list nums in
+    list_eq r expected
+
+  let test_004 () : bool =
+    let nums = Cons 1 (Cons 3 (Cons 3 (Cons 3 (Cons 2 (Cons 2 (Cons 1 (Nil))))))) in
+    let expected = Cons 1 (Cons 6 (Cons 3 (Cons 4 (Cons 1 (Cons 0 (Cons 0 (Nil))))))) in
+    let r = apply_operations_to_an_array_list nums in
+    list_eq r expected
+
+  let test_005 () : bool =
+    let nums = Cons 1 (Cons 2 (Cons 3 (Cons 2 (Cons 1 (Cons 2 (Nil)))))) in
+    let expected = Cons 1 (Cons 2 (Cons 3 (Cons 2 (Cons 1 (Cons 2 (Nil)))))) in
+    let r = apply_operations_to_an_array_list nums in
+    list_eq r expected
+
+  let test_006 () : bool =
+    let nums = Cons 1 (Cons 2 (Cons 3 (Cons 4 (Cons 5 (Cons 6 (Cons 7 (Cons 8 (Cons 9 (Cons 0 (Nil)))))))))) in
+    let expected = Cons 1 (Cons 2 (Cons 3 (Cons 4 (Cons 5 (Cons 6 (Cons 7 (Cons 8 (Cons 9 (Cons 0 (Nil)))))))))) in
+    let r = apply_operations_to_an_array_list nums in
+    list_eq r expected
+
+  let test_007 () : bool =
+    let nums = Cons 10 (Cons 10 (Cons 0 (Cons 0 (Cons 10 (Cons 10 (Cons 0 (Cons 0 (Cons 10 (Cons 10 (Nil)))))))))) in
+    let expected = Cons 20 (Cons 20 (Cons 20 (Cons 0 (Cons 0 (Cons 0 (Cons 0 (Cons 0 (Cons 0 (Cons 0 (Nil)))))))))) in
+    let r = apply_operations_to_an_array_list nums in
+    list_eq r expected
+
+  let test_008 () : bool =
+    let nums = Cons 1 (Cons 3 (Cons 3 (Cons 3 (Cons 2 (Cons 2 (Cons 1 (Cons 1 (Cons 0 (Cons 0 (Nil)))))))))) in
+    let expected = Cons 1 (Cons 6 (Cons 3 (Cons 4 (Cons 2 (Cons 0 (Cons 0 (Cons 0 (Cons 0 (Cons 0 (Nil)))))))))) in
+    let r = apply_operations_to_an_array_list nums in
+    list_eq r expected
+
+  let test_009 () : bool =
+    let nums = Cons 0 (Cons 1 (Nil)) in
+    let expected = Cons 1 (Cons 0 (Nil)) in
+    let r = apply_operations_to_an_array_list nums in
+    list_eq r expected
+
+  let test_010 () : bool =
+    let nums = Cons 0 (Cons 0 (Cons 0 (Cons 0 (Cons 0 (Nil))))) in
+    let expected = Cons 0 (Cons 0 (Cons 0 (Cons 0 (Cons 0 (Nil))))) in
+    let r = apply_operations_to_an_array_list nums in
+    list_eq r expected
+
+  let test_011 () : bool =
+    let nums = Cons 2 (Cons 2 (Cons 2 (Cons 2 (Cons 2 (Cons 2 (Nil)))))) in
+    let expected = Cons 4 (Cons 4 (Cons 4 (Cons 0 (Cons 0 (Cons 0 (Nil)))))) in
+    let r = apply_operations_to_an_array_list nums in
+    list_eq r expected
+
+  let test_012 () : bool =
+    let nums = Cons 1 (Cons 0 (Cons 1 (Cons 0 (Cons 1 (Cons 0 (Nil)))))) in
+    let expected = Cons 1 (Cons 1 (Cons 1 (Cons 0 (Cons 0 (Cons 0 (Nil)))))) in
+    let r = apply_operations_to_an_array_list nums in
+    list_eq r expected
+
+  let test_013 () : bool =
+    let nums = Cons 1 (Cons 2 (Cons 3 (Cons 4 (Cons 5 (Cons 6 (Nil)))))) in
+    let expected = Cons 1 (Cons 2 (Cons 3 (Cons 4 (Cons 5 (Cons 6 (Nil)))))) in
+    let r = apply_operations_to_an_array_list nums in
+    list_eq r expected
+
+  let test_014 () : bool =
+    let nums = Cons 10 (Cons 10 (Cons 20 (Cons 20 (Cons 30 (Cons 30 (Nil)))))) in
+    let expected = Cons 20 (Cons 40 (Cons 60 (Cons 0 (Cons 0 (Cons 0 (Nil)))))) in
+    let r = apply_operations_to_an_array_list nums in
+    list_eq r expected
+
+  let test_015 () : bool =
+    let nums = Cons 0 (Cons 0 (Cons 0 (Cons 0 (Cons 0 (Cons 0 (Nil)))))) in
+    let expected = Cons 0 (Cons 0 (Cons 0 (Cons 0 (Cons 0 (Cons 0 (Nil)))))) in
+    let r = apply_operations_to_an_array_list nums in
+    list_eq r expected
+
+  let test_016 () : bool =
+    let nums = Cons 1000 (Cons 1000 (Cons 0 (Cons 0 (Cons 1000 (Cons 1000 (Nil)))))) in
+    let expected = Cons 2000 (Cons 2000 (Cons 0 (Cons 0 (Cons 0 (Cons 0 (Nil)))))) in
+    let r = apply_operations_to_an_array_list nums in
+    list_eq r expected
+
+  let test_017 () : bool =
+    let nums = Cons 1 (Cons 0 (Cons 2 (Cons 0 (Cons 0 (Cons 1 (Nil)))))) in
+    let expected = Cons 1 (Cons 2 (Cons 1 (Cons 0 (Cons 0 (Cons 0 (Nil)))))) in
+    let r = apply_operations_to_an_array_list nums in
+    list_eq r expected
+
+  let test_018 () : bool =
+    let nums = Cons 1 (Cons 1 (Cons 0 (Cons 0 (Cons 1 (Cons 1 (Nil)))))) in
+    let expected = Cons 2 (Cons 2 (Cons 0 (Cons 0 (Cons 0 (Cons 0 (Nil)))))) in
+    let r = apply_operations_to_an_array_list nums in
+    list_eq r expected
+
+  let test_019 () : bool =
+    let nums = Cons 5 (Cons 5 (Cons 5 (Cons 5 (Cons 5 (Cons 5 (Nil)))))) in
+    let expected = Cons 10 (Cons 10 (Cons 10 (Cons 0 (Cons 0 (Cons 0 (Nil)))))) in
+    let r = apply_operations_to_an_array_list nums in
+    list_eq r expected
+
+  let run_tests () : bool =
+    if test_000 () then
+    if test_001 () then
+    if test_002 () then
+    if test_003 () then
+    if test_004 () then
+    if test_005 () then
+    if test_006 () then
+    if test_007 () then
+    if test_008 () then
+    if test_009 () then
+    if test_010 () then
+    if test_011 () then
+    if test_012 () then
+    if test_013 () then
+    if test_014 () then
+    if test_015 () then
+    if test_016 () then
+    if test_017 () then
+    if test_018 () then
+    if test_019 () then
+      true
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+
+end

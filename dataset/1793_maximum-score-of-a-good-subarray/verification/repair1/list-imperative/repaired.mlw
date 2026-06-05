@@ -1,0 +1,218 @@
+module MaximumScoreOfAGoodSubarray_List_Stage3_Imperative
+
+  use int.Int
+  use list.List
+  use list.Length
+  use list.NthNoOpt
+  use ref.Ref
+
+  predicate values_in_range (nums: list int) =
+    forall idx: int.
+      0 <= idx /\ idx < length nums ->
+      1 <= nth idx nums /\ nth idx nums <= 20000
+
+  predicate valid_input (nums: list int) (k: int) =
+    1 <= length nums /\ length nums <= 100000 /\
+    0 <= k /\ k < length nums /\
+    values_in_range nums
+
+  predicate valid_interval (nums: list int) (k: int) (i: int) (j: int) =
+    0 <= i /\ i <= k /\ k <= j /\ j < length nums
+
+  predicate is_min_on_interval (nums: list int) (i: int) (j: int) (m: int) =
+    (forall t: int. i <= t /\ t <= j -> m <= nth t nums) /\
+    (exists t: int. i <= t /\ t <= j /\ nth t nums = m)
+
+  predicate good_subarray_score
+      (nums: list int) (k: int) (i: int) (j: int) (score: int) =
+    valid_interval nums k i j /\
+    exists m: int.
+      is_min_on_interval nums i j m /\
+      score = m * (j - i + 1)
+
+  predicate interval_score_at_most (nums: list int) (k: int) (bound: int) =
+    forall i j score: int.
+      good_subarray_score nums k i j score -> score <= bound
+
+  predicate maximum_good_subarray_score
+      (nums: list int) (k: int) (best: int) =
+    (exists i j: int. good_subarray_score nums k i j best) /\
+    interval_score_at_most nums k best
+
+  let lemma values_in_range_cons_elim (x: int) (xs: list int)
+    requires { values_in_range (Cons x xs) }
+    ensures  { 1 <= x }
+    ensures  { x <= 20000 }
+    ensures  { values_in_range xs }
+  =
+    assert { length (Cons x xs) = length xs + 1 };
+    assert { nth 0 (Cons x xs) = x };
+    assert { 0 <= 0 /\ 0 < length (Cons x xs) };
+    assert { 1 <= nth 0 (Cons x xs) /\ nth 0 (Cons x xs) <= 20000 };
+    assert { forall idx: int.
+      0 <= idx /\ idx < length xs ->
+      nth idx xs = nth (idx + 1) (Cons x xs) };
+    assert { forall idx: int.
+      0 <= idx /\ idx < length xs ->
+      1 <= nth idx xs /\ nth idx xs <= 20000 }
+
+  let lemma values_in_range_cons_intro (x: int) (xs: list int)
+    requires { 1 <= x }
+    requires { x <= 20000 }
+    requires { values_in_range xs }
+    ensures  { values_in_range (Cons x xs) }
+  =
+    assert { length (Cons x xs) = length xs + 1 };
+    assert { nth 0 (Cons x xs) = x };
+    assert { forall idx: int.
+      0 <= idx /\ idx < length (Cons x xs) ->
+      idx = 0 \/ 0 <= idx - 1 /\ idx - 1 < length xs };
+    assert { forall idx: int.
+      0 <= idx /\ idx < length (Cons x xs) /\ idx <> 0 ->
+      nth idx (Cons x xs) = nth (idx - 1) xs };
+    assert { forall idx: int.
+      0 <= idx /\ idx < length (Cons x xs) ->
+      1 <= nth idx (Cons x xs) /\ nth idx (Cons x xs) <= 20000 }
+
+  let maximum_score_of_a_good_subarray_list (nums: list int) (k: int) : int
+    requires { valid_input nums k }
+    ensures  { maximum_good_subarray_score nums k result }
+  =
+    let left_rev = ref Nil in
+    let right = ref Nil in
+    let pivot = ref 0 in
+    let cur = ref nums in
+    let pos = ref 0 in
+    let found = ref false in
+
+    while (match !cur with Nil -> false | Cons _ _ -> not !found end) do
+      invariant { 0 <= !pos }
+      invariant { !pos <= k }
+      invariant { !pos <= length nums }
+      invariant { not !found -> !pos + length !cur = length nums }
+      invariant { values_in_range !cur }
+      invariant { values_in_range !left_rev }
+      invariant { !found -> !cur = Nil /\ !pos = k }
+      invariant { !found -> 1 <= !pivot /\ !pivot <= 20000 }
+      invariant { !found -> values_in_range !right }
+      variant { length !cur }
+
+      match !cur with
+      | Nil ->
+          assert { false }
+      | Cons x xs ->
+          values_in_range_cons_elim x xs;
+          assert { 1 <= x };
+          assert { x <= 20000 };
+          assert { values_in_range xs };
+          if !pos < k then (
+            values_in_range_cons_intro x !left_rev;
+            left_rev := Cons x !left_rev;
+            cur := xs;
+            pos := !pos + 1
+          ) else (
+            assert { !pos = k };
+            assert { 0 <= k /\ k < length nums };
+            pivot := x;
+            right := xs;
+            found := true;
+            cur := Nil
+          )
+      end
+    done;
+
+    assert { !found };
+    assert { !pos = k };
+    assert { 1 <= !pivot };
+    assert { !pivot <= 20000 };
+    assert { values_in_range !right };
+
+    let best = ref !pivot in
+
+    let cur_min0 = ref !pivot in
+    let width0 = ref 1 in
+    let cur_right0 = ref !right in
+    while (match !cur_right0 with Nil -> false | Cons _ _ -> true end) do
+      invariant { 1 <= !width0 }
+      invariant { !width0 + length !cur_right0 = 1 + length !right }
+      invariant { 1 <= !cur_min0 /\ !cur_min0 <= 20000 }
+      invariant { 1 <= !best }
+      invariant { values_in_range !cur_right0 }
+      variant { length !cur_right0 }
+
+      match !cur_right0 with
+      | Nil ->
+          assert { false }
+      | Cons x xs ->
+          values_in_range_cons_elim x xs;
+          assert { 1 <= x };
+          assert { x <= 20000 };
+          assert { values_in_range xs };
+          if x < !cur_min0 then cur_min0 := x;
+          width0 := !width0 + 1;
+          let score = !cur_min0 * !width0 in
+          if score > !best then best := score;
+          cur_right0 := xs
+      end
+    done;
+
+    assert { !cur_right0 = Nil };
+
+    let left_cur = ref !left_rev in
+    let left_count = ref 0 in
+    let left_min = ref !pivot in
+    while (match !left_cur with Nil -> false | Cons _ _ -> true end) do
+      invariant { 0 <= !left_count }
+      invariant { !left_count + length !left_cur = length !left_rev }
+      invariant { 1 <= !left_min /\ !left_min <= 20000 }
+      invariant { 1 <= !best }
+      invariant { values_in_range !left_cur }
+      variant { length !left_cur }
+
+      match !left_cur with
+      | Nil ->
+          assert { false }
+      | Cons x xs ->
+          values_in_range_cons_elim x xs;
+          assert { 1 <= x };
+          assert { x <= 20000 };
+          assert { values_in_range xs };
+          if x < !left_min then left_min := x;
+          left_count := !left_count + 1;
+          let cur_min = ref !left_min in
+          let width = ref (!left_count + 1) in
+          let score0 = !cur_min * !width in
+          if score0 > !best then best := score0;
+          let cur_right = ref !right in
+          while (match !cur_right with Nil -> false | Cons _ _ -> true end) do
+            invariant { !left_count + 1 <= !width }
+            invariant { !width + length !cur_right = !left_count + 1 + length !right }
+            invariant { 1 <= !cur_min /\ !cur_min <= 20000 }
+            invariant { 1 <= !best }
+            invariant { values_in_range !cur_right }
+            variant { length !cur_right }
+
+            match !cur_right with
+            | Nil ->
+                assert { false }
+            | Cons y ys ->
+                values_in_range_cons_elim y ys;
+                assert { 1 <= y };
+                assert { y <= 20000 };
+                assert { values_in_range ys };
+                if y < !cur_min then cur_min := y;
+                width := !width + 1;
+                let score = !cur_min * !width in
+                if score > !best then best := score;
+                cur_right := ys
+            end
+          done;
+          assert { !cur_right = Nil };
+          left_cur := xs
+      end
+    done;
+
+    assert { !left_cur = Nil };
+    !best
+
+end

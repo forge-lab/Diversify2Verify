@@ -1,0 +1,146 @@
+== Stage 1: first prover on whole file ==
+Running in /Users/rubenm/Desktop/Diversify2Verify/codex-runs/dataset-merge-verification/stage3a-repair/1402_reducing-dishes/array-recursive/reducing_dishes_array_stage3_a6842662_stage3/generated/why3: why3 session create -o /Users/rubenm/Desktop/Diversify2Verify/codex-runs/dataset-merge-verification/stage3a-repair/1402_reducing-dishes/array-recursive/reducing_dishes_array_stage3_a6842662_stage3/generated/why3/.why3_sessions/repaired_stage1 -P Z3,4.8.6 -t 10 -m 8192 repaired.mlw
+Session created successfully
+Running in /Users/rubenm/Desktop/Diversify2Verify/codex-runs/dataset-merge-verification/stage3a-repair/1402_reducing-dishes/array-recursive/reducing_dishes_array_stage3_a6842662_stage3/generated/why3: why3 bench /Users/rubenm/Desktop/Diversify2Verify/codex-runs/dataset-merge-verification/stage3a-repair/1402_reducing-dishes/array-recursive/reducing_dishes_array_stage3_a6842662_stage3/generated/why3/.why3_sessions/repaired_stage1
+Progress: 7/1/0                       Progress: 6/2/0                       Progress: 5/3/0                       Progress: 4/4/0                       Progress: 3/5/0                       Progress: 2/6/0                       Progress: 2/0/0                       Progress: 1/1/0                       Progress: 0/2/0                       
+Replay completed, saving session... done
+== Stage 1 stats ==
+= Statistics for session /Users/rubenm/Desktop/Diversify2Verify/codex-runs/dataset-merge-verification/stage3a-repair/1402_reducing-dishes/array-recursive/reducing_dishes_array_stage3_a6842662_stage3/generated/why3/.why3_sessions/repaired_stage1
+
+== Number of root goals ==
+  total: 8  proved: 7
+
+== Number of sub goals ==
+  total: 0  proved: 0
+
+== Goals not proved ==
+  +-- file [../../repaired.mlw]
+    +-- theory ReducingDishes_Array_Spec
+      +-- goal reducing_dishes_array'vc
+  
+== Goals proved by only one prover ==
+  +-- file [../../repaired.mlw]
+    +-- theory ReducingDishes_Array_Spec
+      +-- goal score_from'vc: Z3 4.8.6
+      +-- goal array_to_list_from'vc: Z3 4.8.6
+      +-- goal array_to_list'vc: Z3 4.8.6
+      +-- goal insert_sorted'vc: Z3 4.8.6
+      +-- goal sort_asc'vc: Z3 4.8.6
+      +-- goal reverse_acc'vc: Z3 4.8.6
+      +-- goal best_total_desc'vc: Z3 4.8.6
+  
+1 session(s) read, with a total of 8 proof goals.
+== Unproved root goals after first prover ==
+ReducingDishes_Array_Spec	reducing_dishes_array'vc
+== Stage 1: trying remaining goals with prover Alt-Ergo,2.4.0 ==
+---- stage1 | prover: Alt-Ergo,2.4.0 | theory: ReducingDishes_Array_Spec | goal: reducing_dishes_array'vc ----
+File repaired.mlw:
+Goal reducing_dishes_array'vc.
+Prover result is: Timeout (10.00s, 95142 steps).
+Remaining after prover Alt-Ergo,2.4.0: 1
+== Stage 1: trying remaining goals with prover CVC4,1.8 ==
+---- stage1 | prover: CVC4,1.8 | theory: ReducingDishes_Array_Spec | goal: reducing_dishes_array'vc ----
+File repaired.mlw:
+Goal reducing_dishes_array'vc.
+Prover result is: Timeout (10.00s, 4070847 steps).
+Remaining after prover CVC4,1.8: 1
+== Goals still unproved after stage 1 ==
+ReducingDishes_Array_Spec	reducing_dishes_array'vc
+== Stage 2: split_vc on unproved goal ==
+Target theory: ReducingDishes_Array_Spec
+Target goal  : reducing_dishes_array'vc
+---- stage2 | prover: Z3,4.8.6 | theory: ReducingDishes_Array_Spec | goal: reducing_dishes_array'vc ----
+Transforms: split_vc
+File "repaired.mlw", line 100, characters 13-19:
+Sub-goal Assertion of goal reducing_dishes_array'vc.
+Prover result is: Valid (0.01s, 1634 steps).
+
+File "repaired.mlw", line 101, characters 13-42:
+Sub-goal Assertion of goal reducing_dishes_array'vc.
+Prover result is: Unknown (unknown) (0.02s, 53233 steps).
+
+File "repaired.mlw", line 103, characters 45-70:
+Sub-goal Assertion of goal reducing_dishes_array'vc.
+Prover result is: Timeout (10.00s, 8523298 steps).
+
+File "repaired.mlw", line 104, characters 13-45:
+Sub-goal Assertion of goal reducing_dishes_array'vc.
+Prover result is: Valid (0.01s, 27833 steps).
+
+File "repaired.mlw", line 96, characters 14-51:
+Sub-goal Postcondition of goal reducing_dishes_array'vc.
+Prover result is: Valid (0.01s, 2077 steps).
+---- stage2 | prover: Alt-Ergo,2.4.0 | theory: ReducingDishes_Array_Spec | goal: reducing_dishes_array'vc ----
+Transforms: split_vc
+File "repaired.mlw", line 100, characters 13-19:
+Sub-goal Assertion of goal reducing_dishes_array'vc.
+Prover result is: Valid (0.01s, 2 steps).
+
+File "repaired.mlw", line 101, characters 13-42:
+Sub-goal Assertion of goal reducing_dishes_array'vc.
+Prover result is: Timeout (10.00s, 137406 steps).
+
+File "repaired.mlw", line 103, characters 45-70:
+Sub-goal Assertion of goal reducing_dishes_array'vc.
+Prover result is: Timeout (10.00s, 5516 steps).
+
+File "repaired.mlw", line 104, characters 13-45:
+Sub-goal Assertion of goal reducing_dishes_array'vc.
+Prover result is: Valid (0.01s, 26 steps).
+
+File "repaired.mlw", line 96, characters 14-51:
+Sub-goal Postcondition of goal reducing_dishes_array'vc.
+Prover result is: Valid (0.01s, 6 steps).
+---- stage2 | prover: CVC4,1.8 | theory: ReducingDishes_Array_Spec | goal: reducing_dishes_array'vc ----
+Transforms: split_vc
+File "repaired.mlw", line 100, characters 13-19:
+Sub-goal Assertion of goal reducing_dishes_array'vc.
+Prover result is: Valid (0.02s, 4350 steps).
+
+File "repaired.mlw", line 101, characters 13-42:
+Sub-goal Assertion of goal reducing_dishes_array'vc.
+Prover result is: Unknown (unknown + incomplete) (0.02s, 5720 steps).
+
+File "repaired.mlw", line 103, characters 45-70:
+Sub-goal Assertion of goal reducing_dishes_array'vc.
+Prover result is: Timeout (10.00s, 2496528 steps).
+
+File "repaired.mlw", line 104, characters 13-45:
+Sub-goal Assertion of goal reducing_dishes_array'vc.
+Prover result is: Valid (0.02s, 5927 steps).
+
+File "repaired.mlw", line 96, characters 14-51:
+Sub-goal Postcondition of goal reducing_dishes_array'vc.
+Prover result is: Valid (0.02s, 5415 steps).
+== Goals still unproved after stage 2 (split_vc) ==
+ReducingDishes_Array_Spec	reducing_dishes_array'vc
+== Stage 3: split_vc + inline_all on still-unproved goal ==
+Target theory: ReducingDishes_Array_Spec
+Target goal  : reducing_dishes_array'vc
+---- stage3 | prover: Z3,4.8.6 | theory: ReducingDishes_Array_Spec | goal: reducing_dishes_array'vc ----
+Transforms: split_vc inline_all
+File "repaired.mlw", line 100, characters 13-19:
+Sub-goal Assertion of goal reducing_dishes_array'vc.
+Prover result is: Valid (0.01s, 2784 steps).
+
+File "repaired.mlw", line 101, characters 13-42:
+Sub-goal Assertion of goal reducing_dishes_array'vc.
+Prover result is: Timeout (10.00s, 65655208 steps).
+
+File "repaired.mlw", line 103, characters 45-70:
+Sub-goal Assertion of goal reducing_dishes_array'vc.
+Prover result is: Timeout (10.00s, 54834770 steps).
+Infrastructure issue in stage 3 with prover Z3,4.8.6; aborting rest of stage 3.
+== Final summary ==
+Unproved root goals after first prover : 1
+Remaining failures after split_vc      : 1
+Remaining failures after stage 3       : 1
+Detailed logs stored in                : /Users/rubenm/Desktop/Diversify2Verify/codex-runs/dataset-merge-verification/stage3a-repair/1402_reducing-dishes/array-recursive/reducing_dishes_array_stage3_a6842662_stage3/generated/why3/.why3_sessions/repaired_logs
+Still unproved goals:
+ReducingDishes_Array_Spec	reducing_dishes_array'vc
+VERIFY_RESULT: FAILURE
+VERIFY_REASON: unproved_goals_remain
+VERIFY_STAGE: stage3
+VERIFY_ROOT_TOTAL: 8
+VERIFY_ROOT_PROVED: 7
+VERIFY_ROOT_REMAINING: 1

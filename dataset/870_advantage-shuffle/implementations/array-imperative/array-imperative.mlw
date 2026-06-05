@@ -1,0 +1,284 @@
+module AdvantageShuffle_Array_Imperative_Implementation
+
+  use int.Int
+  use array.Array
+  use array.Init
+  use ref.Ref
+
+  exception NotEqual
+
+  let copy_array (a: array int) : array int =
+    let n = length a in
+    let b = make n 0 in
+    for i = 0 to n - 1 do
+      b[i] <- a[i]
+    done;
+    b
+
+  let arrays_equal (a: array int) (b: array int) : bool =
+    if length a <> length b then
+      false
+    else
+      try
+        for i = 0 to length a - 1 do
+          if a[i] <> b[i] then
+            raise NotEqual
+        done;
+        true
+      with NotEqual ->
+        false
+      end
+
+  let sort_array_ascending (a: array int) : array int =
+    let b = copy_array a in
+    let n = length b in
+    for i = 0 to n - 1 do
+      let min_idx = ref i in
+      for j = i + 1 to n - 1 do
+        if b[j] < b[!min_idx] then
+          min_idx := j
+      done;
+      if !min_idx <> i then begin
+        let tmp = b[i] in
+        b[i] <- b[!min_idx];
+        b[!min_idx] <- tmp
+      end else
+        ()
+    done;
+    b
+
+  let sort_values_with_indices (a: array int) : (array int, array int) =
+    let values = copy_array a in
+    let n = length a in
+    let indices = make n 0 in
+    for i = 0 to n - 1 do
+      indices[i] <- i
+    done;
+    for i = 0 to n - 1 do
+      let min_idx = ref i in
+      for j = i + 1 to n - 1 do
+        if values[j] < values[!min_idx] then
+          min_idx := j
+        else if values[j] = values[!min_idx] then
+          if indices[j] < indices[!min_idx] then
+            min_idx := j
+          else
+            ()
+        else
+          ()
+      done;
+      if !min_idx <> i then begin
+        let tmp_value = values[i] in
+        let tmp_index = indices[i] in
+        values[i] <- values[!min_idx];
+        indices[i] <- indices[!min_idx];
+        values[!min_idx] <- tmp_value;
+        indices[!min_idx] <- tmp_index
+      end else
+        ()
+    done;
+    (values, indices)
+
+  let advantage_shuffle_array (nums1: array int) (nums2: array int) : array int =
+    let n = length nums1 in
+    let sorted_nums1 = sort_array_ascending nums1 in
+    let (sorted_nums2, sorted_indices) = sort_values_with_indices nums2 in
+    let result = make n 0 in
+    let left = ref 0 in
+    let right = ref (n - 1) in
+    for i = 0 to n - 1 do
+      let value = sorted_nums1[i] in
+      if value > sorted_nums2[!left] then begin
+        result[sorted_indices[!left]] <- value;
+        left := !left + 1
+      end else begin
+        result[sorted_indices[!right]] <- value;
+        right := !right - 1
+      end
+    done;
+    result
+
+  let test_000 () : bool =
+    let nums1 = init 5 [|10; 20; 30; 40; 50|] in
+    let nums2 = init 5 [|5; 15; 25; 35; 45|] in
+    let expected = init 5 [|10; 20; 30; 40; 50|] in
+    let r = advantage_shuffle_array nums1 nums2 in
+    arrays_equal r expected
+
+  let test_001 () : bool =
+    let nums1 = init 4 [|5; 15; 25; 35|] in
+    let nums2 = init 4 [|10; 20; 30; 40|] in
+    let expected = init 4 [|15; 25; 35; 5|] in
+    let r = advantage_shuffle_array nums1 nums2 in
+    arrays_equal r expected
+
+  let test_002 () : bool =
+    let nums1 = init 4 [|2; 7; 11; 15|] in
+    let nums2 = init 4 [|1; 10; 4; 11|] in
+    let expected = init 4 [|2; 11; 7; 15|] in
+    let r = advantage_shuffle_array nums1 nums2 in
+    arrays_equal r expected
+
+  let test_003 () : bool =
+    let nums1 = init 5 [|100; 90; 80; 70; 60|] in
+    let nums2 = init 5 [|60; 70; 80; 90; 100|] in
+    let expected = init 5 [|70; 80; 90; 100; 60|] in
+    let r = advantage_shuffle_array nums1 nums2 in
+    arrays_equal r expected
+
+  let test_004 () : bool =
+    let nums1 = init 5 [|9; 12; 24; 22; 15|] in
+    let nums2 = init 5 [|14; 13; 25; 17; 22|] in
+    let expected = init 5 [|22; 15; 9; 24; 12|] in
+    let r = advantage_shuffle_array nums1 nums2 in
+    arrays_equal r expected
+
+  let test_005 () : bool =
+    let nums1 = init 5 [|5; 6; 7; 8; 9|] in
+    let nums2 = init 5 [|1; 2; 3; 4; 5|] in
+    let expected = init 5 [|5; 6; 7; 8; 9|] in
+    let r = advantage_shuffle_array nums1 nums2 in
+    arrays_equal r expected
+
+  let test_006 () : bool =
+    let nums1 = init 4 [|5; 6; 7; 8|] in
+    let nums2 = init 4 [|4; 5; 6; 7|] in
+    let expected = init 4 [|5; 6; 7; 8|] in
+    let r = advantage_shuffle_array nums1 nums2 in
+    arrays_equal r expected
+
+  let test_007 () : bool =
+    let nums1 = init 4 [|100; 200; 300; 400|] in
+    let nums2 = init 4 [|50; 150; 250; 350|] in
+    let expected = init 4 [|100; 200; 300; 400|] in
+    let r = advantage_shuffle_array nums1 nums2 in
+    arrays_equal r expected
+
+  let test_008 () : bool =
+    let nums1 = init 4 [|12; 24; 8; 32|] in
+    let nums2 = init 4 [|13; 25; 32; 11|] in
+    let expected = init 4 [|24; 32; 8; 12|] in
+    let r = advantage_shuffle_array nums1 nums2 in
+    arrays_equal r expected
+
+  let test_009 () : bool =
+    let nums1 = init 4 [|10; 10; 10; 10|] in
+    let nums2 = init 4 [|1; 1; 1; 1|] in
+    let expected = init 4 [|10; 10; 10; 10|] in
+    let r = advantage_shuffle_array nums1 nums2 in
+    arrays_equal r expected
+
+  let test_010 () : bool =
+    let nums1 = init 4 [|1; 2; 3; 4|] in
+    let nums2 = init 4 [|1; 2; 3; 4|] in
+    let expected = init 4 [|2; 3; 4; 1|] in
+    let r = advantage_shuffle_array nums1 nums2 in
+    arrays_equal r expected
+
+  let test_011 () : bool =
+    let nums1 = init 4 [|100; 90; 80; 70|] in
+    let nums2 = init 4 [|60; 70; 80; 90|] in
+    let expected = init 4 [|70; 80; 90; 100|] in
+    let r = advantage_shuffle_array nums1 nums2 in
+    arrays_equal r expected
+
+  let test_012 () : bool =
+    let nums1 = init 5 [|1; 2; 3; 4; 5|] in
+    let nums2 = init 5 [|5; 4; 3; 2; 1|] in
+    let expected = init 5 [|1; 5; 4; 3; 2|] in
+    let r = advantage_shuffle_array nums1 nums2 in
+    arrays_equal r expected
+
+  let test_013 () : bool =
+    let nums1 = init 4 [|1; 2; 3; 4|] in
+    let nums2 = init 4 [|4; 3; 2; 1|] in
+    let expected = init 4 [|1; 4; 3; 2|] in
+    let r = advantage_shuffle_array nums1 nums2 in
+    arrays_equal r expected
+
+  let test_014 () : bool =
+    let nums1 = init 5 [|1; 2; 3; 4; 5|] in
+    let nums2 = init 5 [|9; 8; 7; 6; 5|] in
+    let expected = init 5 [|1; 2; 3; 4; 5|] in
+    let r = advantage_shuffle_array nums1 nums2 in
+    arrays_equal r expected
+
+  let test_015 () : bool =
+    let nums1 = init 4 [|5; 6; 7; 8|] in
+    let nums2 = init 4 [|1; 2; 3; 4|] in
+    let expected = init 4 [|5; 6; 7; 8|] in
+    let r = advantage_shuffle_array nums1 nums2 in
+    arrays_equal r expected
+
+  let test_016 () : bool =
+    let nums1 = init 4 [|1; 2; 3; 4|] in
+    let nums2 = init 4 [|5; 6; 7; 8|] in
+    let expected = init 4 [|4; 3; 2; 1|] in
+    let r = advantage_shuffle_array nums1 nums2 in
+    arrays_equal r expected
+
+  let test_017 () : bool =
+    let nums1 = init 6 [|8; 24; 15; 3; 17; 22|] in
+    let nums2 = init 6 [|25; 18; 9; 13; 22; 6|] in
+    let expected = init 6 [|3; 22; 15; 17; 24; 8|] in
+    let r = advantage_shuffle_array nums1 nums2 in
+    arrays_equal r expected
+
+  let test_018 () : bool =
+    let nums1 = init 5 [|100; 200; 300; 400; 500|] in
+    let nums2 = init 5 [|450; 350; 250; 150; 50|] in
+    let expected = init 5 [|500; 400; 300; 200; 100|] in
+    let r = advantage_shuffle_array nums1 nums2 in
+    arrays_equal r expected
+
+  let test_019 () : bool =
+    let nums1 = init 10 [|8; 6; 4; 2; 0; 1; 3; 5; 7; 9|] in
+    let nums2 = init 10 [|9; 7; 5; 3; 1; 0; 2; 4; 6; 8|] in
+    let expected = init 10 [|0; 8; 6; 4; 2; 1; 3; 5; 7; 9|] in
+    let r = advantage_shuffle_array nums1 nums2 in
+    arrays_equal r expected
+
+  let run_tests () : bool =
+    if test_000 () then
+    if test_001 () then
+    if test_002 () then
+    if test_003 () then
+    if test_004 () then
+    if test_005 () then
+    if test_006 () then
+    if test_007 () then
+    if test_008 () then
+    if test_009 () then
+    if test_010 () then
+    if test_011 () then
+    if test_012 () then
+    if test_013 () then
+    if test_014 () then
+    if test_015 () then
+    if test_016 () then
+    if test_017 () then
+    if test_018 () then
+    if test_019 () then
+      true
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+
+end

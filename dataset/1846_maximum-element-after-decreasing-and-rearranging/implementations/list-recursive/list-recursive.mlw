@@ -1,0 +1,150 @@
+module MaximumElementAfterDecreasingAndRearranging_List_Recursive_Implementation
+
+  use int.Int
+  use list.List
+
+  let rec list_length (arr: list int) : int
+    variant { arr }
+  =
+    match arr with
+    | Nil -> 0
+    | Cons _ xs -> 1 + list_length xs
+    end
+
+  let rec count_ge (arr: list int) (threshold: int) : int
+    variant { arr }
+  =
+    match arr with
+    | Nil -> 0
+    | Cons x xs -> (if threshold <= x then 1 else 0) + count_ge xs threshold
+    end
+
+  let rec can_build_from (arr: list int) (height: int) (remaining: int) : bool
+    variant { remaining }
+  =
+    if remaining <= 0 then true else
+    let target = height - remaining + 1 in
+    count_ge arr target >= remaining && can_build_from arr height (remaining - 1)
+
+  let can_build_height (arr: list int) (height: int) : bool =
+    let n = list_length arr in
+    1 <= height && height <= n && can_build_from arr height height
+
+  let rec best_height_from (arr: list int) (candidate: int) : int
+    variant { candidate }
+  =
+    if candidate <= 0 then 0 else
+    if can_build_height arr candidate then candidate else
+    best_height_from arr (candidate - 1)
+
+  let maximum_element_after_decreasing_and_rearranging_list (arr: list int) : int =
+    best_height_from arr (list_length arr)
+
+  let check_case (arr: list int) (expected: int) : bool =
+    let result = maximum_element_after_decreasing_and_rearranging_list arr in
+    result = expected
+
+  let test_000 () : bool =
+    check_case (Cons 3 (Cons 2 (Cons 1 Nil))) 3
+
+  let test_001 () : bool =
+    check_case (Cons 5 (Cons 4 (Cons 3 (Cons 2 (Cons 1 Nil))))) 5
+
+  let test_002 () : bool =
+    check_case (Cons 1 (Cons 1000000000 (Cons 2 (Cons 3 (Cons 4 Nil))))) 5
+
+  let test_003 () : bool =
+    check_case (Cons 9 (Cons 7 (Cons 5 (Cons 3 (Cons 1 Nil))))) 5
+
+  let test_004 () : bool =
+    check_case (Cons 5 (Cons 5 (Cons 5 (Cons 5 (Cons 5 Nil))))) 5
+
+  let test_005 () : bool =
+    check_case (Cons 1000000000 (Cons 1 (Cons 1000000000 (Cons 1 (Cons 1000000000 Nil))))) 4
+
+  let test_006 () : bool =
+    check_case (Cons 1 (Cons 10 (Cons 20 (Cons 30 (Cons 40 Nil))))) 5
+
+  let test_007 () : bool =
+    check_case (Cons 1 (Cons 1000000000 (Cons 2 (Cons 1000000000 (Cons 3 Nil))))) 5
+
+  let test_008 () : bool =
+    check_case (Cons 1 Nil) 1
+
+  let test_009 () : bool =
+    check_case (Cons 100 (Cons 1 (Cons 1000 Nil))) 3
+
+  let test_010 () : bool =
+    check_case (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 Nil))))) 1
+
+  let test_011 () : bool =
+    check_case (Cons 10 (Cons 9 (Cons 8 (Cons 7 (Cons 6 (Cons 5 (Cons 4 (Cons 3 (Cons 2 (Cons 1 Nil)))))))))) 10
+
+  let test_012 () : bool =
+    check_case (Cons 1 (Cons 10 (Cons 100 (Cons 1000 (Cons 10000 Nil))))) 5
+
+  let test_013 () : bool =
+    check_case (Cons 1 (Cons 2 (Cons 2 (Cons 3 (Cons 3 (Cons 3 (Cons 4 (Cons 4 (Cons 4 (Cons 4 Nil)))))))))) 4
+
+  let test_014 () : bool =
+    check_case (Cons 1 (Cons 2 (Cons 3 (Cons 4 (Cons 5 Nil))))) 5
+
+  let test_015 () : bool =
+    check_case (Cons 2 (Cons 3 (Cons 4 (Cons 5 (Cons 6 Nil))))) 5
+
+  let test_016 () : bool =
+    check_case (Cons 9 (Cons 8 (Cons 7 (Cons 6 (Cons 5 (Cons 4 (Cons 3 (Cons 2 (Cons 1 Nil))))))))) 9
+
+  let test_017 () : bool =
+    check_case (Cons 2 (Cons 2 (Cons 1 (Cons 2 (Cons 1 Nil))))) 2
+
+  let test_018 () : bool =
+    check_case (Cons 1 (Cons 3 (Cons 5 (Cons 7 (Cons 9 Nil))))) 5
+
+  let test_019 () : bool =
+    check_case (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 Nil)))))))))) 1
+
+  let run_tests () : bool =
+    if test_000 () then
+    if test_001 () then
+    if test_002 () then
+    if test_003 () then
+    if test_004 () then
+    if test_005 () then
+    if test_006 () then
+    if test_007 () then
+    if test_008 () then
+    if test_009 () then
+    if test_010 () then
+    if test_011 () then
+    if test_012 () then
+    if test_013 () then
+    if test_014 () then
+    if test_015 () then
+    if test_016 () then
+    if test_017 () then
+    if test_018 () then
+    if test_019 () then
+      true
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+
+end

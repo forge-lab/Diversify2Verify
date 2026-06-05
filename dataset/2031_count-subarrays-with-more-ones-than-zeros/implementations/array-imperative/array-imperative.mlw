@@ -1,0 +1,169 @@
+module CountSubarraysWithMoreOnesThanZeros_Array_Imperative_Implementation
+
+  use int.Int
+  use int.EuclideanDivision
+  use array.Array
+  use array.Init
+  use ref.Ref
+
+  let result_modulus () : int = 1000000007
+
+  let bit_score (x: int) : int =
+    if x = 1 then 1 else -1
+
+  let count_subarrays_with_more_ones_than_zeros_array (nums: array int) : int =
+    let total = ref 0 in
+    for start = 0 to length nums - 1 do
+      let balance = ref 0 in
+      for finish = start to length nums - 1 do
+        balance := !balance + bit_score (nums[finish]);
+        if !balance > 0 then
+          total := !total + 1
+      done
+    done;
+    mod !total (result_modulus ())
+
+  let test_000 () : bool =
+    let nums = init 6 [|1; 1; 1; 1; 1; 0|] in
+    let r = count_subarrays_with_more_ones_than_zeros_array nums in
+    r = 19
+
+  let test_001 () : bool =
+    let nums = init 5 [|1; 0; 1; 0; 1|] in
+    let r = count_subarrays_with_more_ones_than_zeros_array nums in
+    r = 6
+
+  let test_002 () : bool =
+    let nums = init 8 [|1; 0; 0; 1; 0; 1; 1; 0|] in
+    let r = count_subarrays_with_more_ones_than_zeros_array nums in
+    r = 12
+
+  let test_003 () : bool =
+    let nums = init 1 [|1|] in
+    let r = count_subarrays_with_more_ones_than_zeros_array nums in
+    r = 1
+
+  let test_004 () : bool =
+    let nums = init 8 [|1; 1; 0; 0; 1; 1; 0; 0|] in
+    let r = count_subarrays_with_more_ones_than_zeros_array nums in
+    r = 13
+
+  let test_005 () : bool =
+    let nums = init 6 [|0; 0; 0; 1; 1; 1|] in
+    let r = count_subarrays_with_more_ones_than_zeros_array nums in
+    r = 9
+
+  let test_006 () : bool =
+    let nums = init 10 [|1; 0; 1; 0; 1; 0; 1; 0; 1; 0|] in
+    let r = count_subarrays_with_more_ones_than_zeros_array nums in
+    r = 15
+
+  let test_007 () : bool =
+    let nums = init 5 [|0; 0; 0; 0; 0|] in
+    let r = count_subarrays_with_more_ones_than_zeros_array nums in
+    r = 0
+
+  let test_008 () : bool =
+    let nums = init 10 [|0; 1; 0; 1; 0; 1; 0; 1; 0; 1|] in
+    let r = count_subarrays_with_more_ones_than_zeros_array nums in
+    r = 15
+
+  let test_009 () : bool =
+    let nums = init 5 [|1; 1; 1; 1; 1|] in
+    let r = count_subarrays_with_more_ones_than_zeros_array nums in
+    r = 15
+
+  let test_010 () : bool =
+    let nums = init 1 [|0|] in
+    let r = count_subarrays_with_more_ones_than_zeros_array nums in
+    r = 0
+
+  let test_011 () : bool =
+    let nums = init 7 [|0; 1; 0; 1; 0; 1; 0|] in
+    let r = count_subarrays_with_more_ones_than_zeros_array nums in
+    r = 6
+
+  let test_012 () : bool =
+    let nums = init 8 [|0; 1; 0; 1; 0; 1; 0; 1|] in
+    let r = count_subarrays_with_more_ones_than_zeros_array nums in
+    r = 10
+
+  let test_013 () : bool =
+    let nums = init 6 [|0; 0; 0; 0; 0; 0|] in
+    let r = count_subarrays_with_more_ones_than_zeros_array nums in
+    r = 0
+
+  let test_014 () : bool =
+    let nums = init 8 [|0; 1; 1; 1; 1; 1; 0; 0|] in
+    let r = count_subarrays_with_more_ones_than_zeros_array nums in
+    r = 28
+
+  let test_015 () : bool =
+    let nums = init 8 [|1; 0; 0; 1; 1; 0; 0; 1|] in
+    let r = count_subarrays_with_more_ones_than_zeros_array nums in
+    r = 9
+
+  let test_016 () : bool =
+    let nums = init 10 [|1; 1; 0; 0; 1; 1; 0; 0; 1; 1|] in
+    let r = count_subarrays_with_more_ones_than_zeros_array nums in
+    r = 24
+
+  let test_017 () : bool =
+    let nums = init 5 [|0; 1; 1; 0; 1|] in
+    let r = count_subarrays_with_more_ones_than_zeros_array nums in
+    r = 9
+
+  let test_018 () : bool =
+    let nums = init 20 [|1; 0; 0; 0; 0; 0; 0; 0; 0; 0; 0; 0; 0; 0; 0; 0; 0; 0; 0; 0|] in
+    let r = count_subarrays_with_more_ones_than_zeros_array nums in
+    r = 1
+
+  let test_019 () : bool =
+    let nums = init 7 [|1; 0; 1; 0; 1; 0; 1|] in
+    let r = count_subarrays_with_more_ones_than_zeros_array nums in
+    r = 10
+
+  let run_tests () : bool =
+    if test_000 () then
+    if test_001 () then
+    if test_002 () then
+    if test_003 () then
+    if test_004 () then
+    if test_005 () then
+    if test_006 () then
+    if test_007 () then
+    if test_008 () then
+    if test_009 () then
+    if test_010 () then
+    if test_011 () then
+    if test_012 () then
+    if test_013 () then
+    if test_014 () then
+    if test_015 () then
+    if test_016 () then
+    if test_017 () then
+    if test_018 () then
+    if test_019 () then
+      true
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+
+end

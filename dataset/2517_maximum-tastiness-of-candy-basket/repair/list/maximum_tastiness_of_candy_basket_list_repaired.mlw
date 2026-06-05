@@ -1,0 +1,155 @@
+module MaximumTastinessOfCandyBasket_List_Spec
+
+  use int.Int
+  use int.Abs
+  use list.List
+  use list.Length
+  use list.Mem
+  use list.NumOcc
+
+  let rec predicate spaced_from (x: int) (basket: list int) (d: int)
+    variant { basket }
+  =
+    match basket with
+    | Nil -> true
+    | Cons y ys -> d <= abs (x - y) && spaced_from x ys d
+    end
+
+  let rec predicate pairwise_spaced (basket: list int) (d: int)
+    variant { basket }
+  =
+    match basket with
+    | Nil -> true
+    | Cons x xs -> spaced_from x xs d && pairwise_spaced xs d
+    end
+
+  predicate submultiset (basket: list int) (price: list int) =
+    forall x: int. num_occ x basket <= num_occ x price
+
+  predicate valid_basket
+    (price: list int) (basket: list int) (k: int) (d: int) =
+    length basket = k /\
+    submultiset basket price /\
+    pairwise_spaced basket d
+
+  predicate feasible_tastiness (price: list int) (k: int) (d: int) =
+    d >= 0 /\
+    exists basket: list int. valid_basket price basket k d
+
+  predicate maximum_tastiness (price: list int) (k: int) (result: int) =
+    feasible_tastiness price k result /\
+    (forall d: int. feasible_tastiness price k d -> d <= result)
+
+  val maximum_tastiness_of_candy_basket_list (price: list int) (k: int) : int
+    requires { 2 <= k <= length price }
+    requires { forall x: int. mem x price -> 1 <= x }
+    ensures  { maximum_tastiness price k result }
+
+  let lemma check_test_002 () =
+    let price =
+      Cons 10 (Cons 20 (Cons 30 (Cons 40 (Cons 50 Nil)))) in
+    let basket = Cons 10 (Cons 30 (Cons 50 Nil)) in
+    assert { length basket = 3 };
+    assert { num_occ 10 basket = 1 };
+    assert { num_occ 30 basket = 1 };
+    assert { num_occ 50 basket = 1 };
+    assert { submultiset basket price };
+    assert { spaced_from 50 Nil 20 };
+    assert { spaced_from 30 (Cons 50 Nil) 20 };
+    assert { spaced_from 10 (Cons 30 (Cons 50 Nil)) 20 };
+    assert { pairwise_spaced basket 20 };
+    assert { valid_basket price basket 3 20 };
+    assert { feasible_tastiness price 3 20 }
+
+  let lemma check_test_003 () =
+    let price =
+      Cons 13 (Cons 5 (Cons 1 (Cons 8 (Cons 21 (Cons 2 Nil))))) in
+    let basket = Cons 5 (Cons 13 (Cons 21 Nil)) in
+    assert { length basket = 3 };
+    assert { num_occ 5 basket = 1 };
+    assert { num_occ 13 basket = 1 };
+    assert { num_occ 21 basket = 1 };
+    assert { submultiset basket price };
+    assert { spaced_from 21 Nil 8 };
+    assert { spaced_from 13 (Cons 21 Nil) 8 };
+    assert { spaced_from 5 (Cons 13 (Cons 21 Nil)) 8 };
+    assert { pairwise_spaced basket 8 };
+    assert { valid_basket price basket 3 8 };
+    assert { feasible_tastiness price 3 8 }
+
+  let lemma check_test_004 () =
+    let price =
+      Cons 1 (Cons 1000000000 (Cons 2 (Cons 999999999 Nil))) in
+    let basket = Cons 1 (Cons 1000000000 Nil) in
+    assert { length basket = 2 };
+    assert { num_occ 1 basket = 1 };
+    assert { num_occ 1000000000 basket = 1 };
+    assert { submultiset basket price };
+    assert { spaced_from 1000000000 Nil 999999999 };
+    assert { spaced_from 1 (Cons 1000000000 Nil) 999999999 };
+    assert { pairwise_spaced basket 999999999 };
+    assert { valid_basket price basket 2 999999999 };
+    assert { feasible_tastiness price 2 999999999 }
+
+  let lemma check_test_005 () =
+    let price = Cons 7 (Cons 7 (Cons 7 (Cons 7 Nil))) in
+    let basket = Cons 7 (Cons 7 Nil) in
+    assert { length basket = 2 };
+    assert { num_occ 7 basket = 2 };
+    assert { num_occ 7 price = 4 };
+    assert { submultiset basket price };
+    assert { spaced_from 7 Nil 0 };
+    assert { spaced_from 7 (Cons 7 Nil) 0 };
+    assert { pairwise_spaced basket 0 };
+    assert { valid_basket price basket 2 0 };
+    assert { feasible_tastiness price 2 0 }
+
+  let lemma check_test_007 () =
+    let price = Cons 1 (Cons 3 (Cons 1 Nil)) in
+    let basket = Cons 1 (Cons 3 Nil) in
+    assert { length basket = 2 };
+    assert { num_occ 1 basket = 1 };
+    assert { num_occ 3 basket = 1 };
+    assert { submultiset basket price };
+    assert { spaced_from 3 Nil 2 };
+    assert { spaced_from 1 (Cons 3 Nil) 2 };
+    assert { pairwise_spaced basket 2 };
+    assert { valid_basket price basket 2 2 };
+    assert { feasible_tastiness price 2 2 }
+
+  let lemma check_test_008 () =
+    let price =
+      Cons 10 (Cons 20 (Cons 30 (Cons 40 (Cons 50 Nil)))) in
+    let basket = Cons 10 (Cons 20 (Cons 30 (Cons 50 Nil))) in
+    assert { length basket = 4 };
+    assert { num_occ 10 basket = 1 };
+    assert { num_occ 20 basket = 1 };
+    assert { num_occ 30 basket = 1 };
+    assert { num_occ 50 basket = 1 };
+    assert { submultiset basket price };
+    assert { spaced_from 50 Nil 10 };
+    assert { spaced_from 30 (Cons 50 Nil) 10 };
+    assert { spaced_from 20 (Cons 30 (Cons 50 Nil)) 10 };
+    assert { spaced_from 10 (Cons 20 (Cons 30 (Cons 50 Nil))) 10 };
+    assert { pairwise_spaced basket 10 };
+    assert { valid_basket price basket 4 10 };
+    assert { feasible_tastiness price 4 10 }
+
+  let lemma check_test_019 () =
+    let price =
+      Cons 1 (Cons 1 (Cons 2 (Cons 2 (Cons 3 (Cons 3
+        (Cons 4 (Cons 4 (Cons 5 (Cons 5 Nil))))))))) in
+    let basket = Cons 1 (Cons 3 (Cons 5 Nil)) in
+    assert { length basket = 3 };
+    assert { num_occ 1 basket = 1 };
+    assert { num_occ 3 basket = 1 };
+    assert { num_occ 5 basket = 1 };
+    assert { submultiset basket price };
+    assert { spaced_from 5 Nil 2 };
+    assert { spaced_from 3 (Cons 5 Nil) 2 };
+    assert { spaced_from 1 (Cons 3 (Cons 5 Nil)) 2 };
+    assert { pairwise_spaced basket 2 };
+    assert { valid_basket price basket 3 2 };
+    assert { feasible_tastiness price 3 2 }
+
+end

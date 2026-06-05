@@ -1,0 +1,169 @@
+module MinimumCostToMakeArrayEqual_List_Stage3_Recursive
+
+  use int.Int
+  use int.Abs
+  use list.List
+  use list.Length
+  use list.Mem
+
+  let rec predicate positive_list (l: list int)
+    variant { l }
+  =
+    match l with
+    | Nil -> true
+    | Cons x xs -> x > 0 && positive_list xs
+    end
+
+  let rec function weighted_cost_to (nums: list int) (costs: list int) (target: int) : int
+    variant { nums }
+  =
+    match nums with
+    | Nil -> 0
+    | Cons n ns ->
+        match costs with
+        | Nil -> 0
+        | Cons c cs -> c * abs (n - target) + weighted_cost_to ns cs target
+        end
+    end
+
+  predicate valid_input (nums: list int) (costs: list int) =
+    nums <> Nil /\
+    length nums = length costs /\
+    positive_list nums /\
+    positive_list costs
+
+  predicate minimum_cost_spec (nums: list int) (costs: list int) (result: int) =
+    result >= 0 /\
+    (exists target: int. result = weighted_cost_to nums costs target) /\
+    (forall target: int. result <= weighted_cost_to nums costs target)
+
+  predicate no_more_than_candidate_targets
+    (nums: list int) (costs: list int) (targets: list int) (result: int) =
+    forall target: int. mem target targets -> result <= weighted_cost_to nums costs target
+
+  predicate witnessed_candidate_cost
+    (nums: list int) (costs: list int) (result: int) =
+    exists witness: int. mem witness nums /\ result = weighted_cost_to nums costs witness
+
+  predicate no_more_than_input_targets
+    (nums: list int) (costs: list int) (result: int) =
+    forall target: int. mem target nums -> result <= weighted_cost_to nums costs target
+
+  predicate targets_are_input_targets (nums: list int) (targets: list int) =
+    forall target: int. mem target targets -> mem target nums
+
+  lemma input_targets_cover_all_targets:
+    forall nums cost: list int, target: int.
+      valid_input nums cost ->
+      exists witness: int.
+        mem witness nums /\
+        weighted_cost_to nums cost witness <= weighted_cost_to nums cost target
+
+  let rec lemma weighted_cost_nonnegative (nums: list int) (costs: list int) (target: int)
+    requires { length nums = length costs }
+    requires { positive_list costs }
+    ensures  { weighted_cost_to nums costs target >= 0 }
+    variant  { nums }
+  =
+    match nums with
+    | Nil -> ()
+    | Cons n ns ->
+        match costs with
+        | Nil -> absurd
+        | Cons c cs ->
+            assert { c > 0 };
+            assert { abs (n - target) >= 0 };
+            weighted_cost_nonnegative ns cs target
+        end
+    end
+
+  let rec weighted_cost_to_exec (nums: list int) (cost: list int) (target: int) : int
+    ensures { result = weighted_cost_to nums cost target }
+    variant { nums }
+  =
+    match nums, cost with
+    | Nil, Nil -> 0
+    | Cons n ns, Cons c cs ->
+        c * abs (n - target) + weighted_cost_to_exec ns cs target
+    | _, _ -> 0
+    end
+
+  let rec minimum_cost_from_targets
+    (nums: list int) (cost: list int) (targets: list int) (current_best: int) : int
+    requires { valid_input nums cost }
+    requires { current_best >= 0 }
+    requires { witnessed_candidate_cost nums cost current_best }
+    requires { targets_are_input_targets nums targets }
+    ensures  { result >= 0 }
+    ensures  { result <= current_best }
+    ensures  { witnessed_candidate_cost nums cost result }
+    ensures  { no_more_than_candidate_targets nums cost targets result }
+    variant  { targets }
+  =
+    match targets with
+    | Nil ->
+        assert { witnessed_candidate_cost nums cost current_best };
+        current_best
+    | Cons target rest ->
+        let candidate = weighted_cost_to_exec nums cost target in
+        weighted_cost_nonnegative nums cost target;
+        assert { candidate = weighted_cost_to nums cost target };
+        assert { candidate >= 0 };
+        if candidate < current_best then
+        begin
+          assert { mem target nums };
+          assert { witnessed_candidate_cost nums cost candidate };
+          assert { targets_are_input_targets nums rest };
+          minimum_cost_from_targets nums cost rest candidate
+        end
+        else
+        begin
+          assert { witnessed_candidate_cost nums cost current_best };
+          assert { targets_are_input_targets nums rest };
+          minimum_cost_from_targets nums cost rest current_best
+        end
+    end
+
+  let lemma candidate_minimum_is_global (nums: list int) (cost: list int) (best: int)
+    requires { valid_input nums cost }
+    requires { witnessed_candidate_cost nums cost best }
+    requires { no_more_than_input_targets nums cost best }
+    ensures  { forall target: int. best <= weighted_cost_to nums cost target }
+  =
+    assert {
+      forall target: int.
+        exists witness: int.
+          mem witness nums /\
+          weighted_cost_to nums cost witness <= weighted_cost_to nums cost target
+    };
+    assert {
+      forall target: int.
+        best <= weighted_cost_to nums cost target
+    }
+
+  let minimum_cost_to_make_array_equal_list (nums: list int) (cost: list int) : int
+    requires { valid_input nums cost }
+    ensures  { minimum_cost_spec nums cost result }
+  =
+    match nums with
+    | Nil -> 0
+    | Cons target rest ->
+        let initial = weighted_cost_to_exec nums cost target in
+        weighted_cost_nonnegative nums cost target;
+        assert { initial = weighted_cost_to nums cost target };
+        assert { initial >= 0 };
+        assert { mem target nums };
+        assert { witnessed_candidate_cost nums cost initial };
+        assert { targets_are_input_targets nums rest };
+        let result = minimum_cost_from_targets nums cost rest initial in
+        assert { result >= 0 };
+        assert { witnessed_candidate_cost nums cost result };
+        assert { result <= weighted_cost_to nums cost target };
+        assert { no_more_than_candidate_targets nums cost rest result };
+        assert { no_more_than_input_targets nums cost result };
+        candidate_minimum_is_global nums cost result;
+        assert { forall any_target: int. result <= weighted_cost_to nums cost any_target };
+        result
+    end
+
+end

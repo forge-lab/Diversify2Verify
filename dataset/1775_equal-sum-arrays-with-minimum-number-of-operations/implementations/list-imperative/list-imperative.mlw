@@ -1,0 +1,265 @@
+module EqualSumArraysWithMinimumNumberOfOperations_List_Imperative
+
+  use int.Int
+  use list.List
+  use ref.Ref
+
+  let sum_list (nums: list int) : int =
+    let total = ref 0 in
+    let cur = ref nums in
+    while (match !cur with Nil -> false | Cons _ _ -> true end) do
+      match !cur with
+      | Nil -> ()
+      | Cons x xs ->
+          total := !total + x;
+          cur := xs
+      end
+    done;
+    !total
+
+  let equal_sum_arrays_with_minimum_number_of_operations_list
+      (nums1: list int) (nums2: list int) : int =
+    let sum1 = sum_list nums1 in
+    let sum2 = sum_list nums2 in
+    if sum1 = sum2 then 0 else
+    let diff = ref (if sum1 < sum2 then sum2 - sum1 else sum1 - sum2) in
+    let c1 = ref 0 in
+    let c2 = ref 0 in
+    let c3 = ref 0 in
+    let c4 = ref 0 in
+    let c5 = ref 0 in
+    if sum1 < sum2 then (
+      let cur1 = ref nums1 in
+      while (match !cur1 with Nil -> false | Cons _ _ -> true end) do
+        match !cur1 with
+        | Nil -> ()
+        | Cons x xs ->
+            let gain = 6 - x in
+            if gain = 5 then c5 := !c5 + 1
+            else if gain = 4 then c4 := !c4 + 1
+            else if gain = 3 then c3 := !c3 + 1
+            else if gain = 2 then c2 := !c2 + 1
+            else if gain = 1 then c1 := !c1 + 1;
+            cur1 := xs
+        end
+      done;
+      let cur2 = ref nums2 in
+      while (match !cur2 with Nil -> false | Cons _ _ -> true end) do
+        match !cur2 with
+        | Nil -> ()
+        | Cons y ys ->
+            let gain = y - 1 in
+            if gain = 5 then c5 := !c5 + 1
+            else if gain = 4 then c4 := !c4 + 1
+            else if gain = 3 then c3 := !c3 + 1
+            else if gain = 2 then c2 := !c2 + 1
+            else if gain = 1 then c1 := !c1 + 1;
+            cur2 := ys
+        end
+      done
+    ) else (
+      let cur1 = ref nums1 in
+      while (match !cur1 with Nil -> false | Cons _ _ -> true end) do
+        match !cur1 with
+        | Nil -> ()
+        | Cons x xs ->
+            let gain = x - 1 in
+            if gain = 5 then c5 := !c5 + 1
+            else if gain = 4 then c4 := !c4 + 1
+            else if gain = 3 then c3 := !c3 + 1
+            else if gain = 2 then c2 := !c2 + 1
+            else if gain = 1 then c1 := !c1 + 1;
+            cur1 := xs
+        end
+      done;
+      let cur2 = ref nums2 in
+      while (match !cur2 with Nil -> false | Cons _ _ -> true end) do
+        match !cur2 with
+        | Nil -> ()
+        | Cons y ys ->
+            let gain = 6 - y in
+            if gain = 5 then c5 := !c5 + 1
+            else if gain = 4 then c4 := !c4 + 1
+            else if gain = 3 then c3 := !c3 + 1
+            else if gain = 2 then c2 := !c2 + 1
+            else if gain = 1 then c1 := !c1 + 1;
+            cur2 := ys
+        end
+      done
+    );
+    let available = 5 * !c5 + 4 * !c4 + 3 * !c3 + 2 * !c2 + !c1 in
+    if available < !diff then -1 else
+    let ops = ref 0 in
+    while !diff > 0 do
+      if !c5 > 0 then (
+        c5 := !c5 - 1;
+        diff := !diff - 5;
+        ops := !ops + 1
+      ) else if !c4 > 0 then (
+        c4 := !c4 - 1;
+        diff := !diff - 4;
+        ops := !ops + 1
+      ) else if !c3 > 0 then (
+        c3 := !c3 - 1;
+        diff := !diff - 3;
+        ops := !ops + 1
+      ) else if !c2 > 0 then (
+        c2 := !c2 - 1;
+        diff := !diff - 2;
+        ops := !ops + 1
+      ) else (
+        c1 := !c1 - 1;
+        diff := !diff - 1;
+        ops := !ops + 1
+      )
+    done;
+    !ops
+
+  let matches_expected (nums1: list int) (nums2: list int) (expected: int) : bool =
+    let result = equal_sum_arrays_with_minimum_number_of_operations_list nums1 nums2 in
+    result = expected
+
+  let test_000 () : bool =
+    let nums1 = Cons 6 (Cons 5 (Cons 4 (Cons 3 (Cons 2 (Cons 1 Nil))))) in
+    let nums2 = Cons 1 (Cons 2 (Cons 3 (Cons 4 (Cons 5 (Cons 6 Nil))))) in
+    matches_expected nums1 nums2 0
+
+  let test_001 () : bool =
+    let nums1 = Cons 3 (Cons 3 (Cons 3 (Cons 3 Nil))) in
+    let nums2 = Cons 2 (Cons 2 (Cons 2 (Cons 2 Nil))) in
+    matches_expected nums1 nums2 1
+
+  let test_002 () : bool =
+    let nums1 = Cons 1 (Cons 1 Nil) in
+    let nums2 = Cons 6 (Cons 6 Nil) in
+    matches_expected nums1 nums2 2
+
+  let test_003 () : bool =
+    let nums1 = Cons 6 (Cons 6 (Cons 6 Nil)) in
+    let nums2 = Cons 1 (Cons 1 Nil) in
+    matches_expected nums1 nums2 4
+
+  let test_004 () : bool =
+    let nums1 = Cons 1 (Cons 1 (Cons 2 Nil)) in
+    let nums2 = Cons 6 (Cons 6 (Cons 6 Nil)) in
+    matches_expected nums1 nums2 3
+
+  let test_005 () : bool =
+    let nums1 = Cons 1 (Cons 1 Nil) in
+    let nums2 = Cons 6 (Cons 6 (Cons 6 Nil)) in
+    matches_expected nums1 nums2 4
+
+  let test_006 () : bool =
+    let nums1 = Cons 5 (Cons 5 (Cons 5 (Cons 5 Nil))) in
+    let nums2 = Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 Nil)))))) in
+    matches_expected nums1 nums2 3
+
+  let test_007 () : bool =
+    let nums1 = Cons 1 (Cons 2 Nil) in
+    let nums2 = Cons 5 (Cons 6 Nil) in
+    matches_expected nums1 nums2 2
+
+  let test_008 () : bool =
+    let nums1 = Cons 6 (Cons 6 (Cons 6 Nil)) in
+    let nums2 = Cons 1 (Cons 1 (Cons 1 Nil)) in
+    matches_expected nums1 nums2 3
+
+  let test_009 () : bool =
+    let nums1 = Cons 3 (Cons 3 (Cons 3 Nil)) in
+    let nums2 = Cons 3 (Cons 3 (Cons 3 Nil)) in
+    matches_expected nums1 nums2 0
+
+  let test_010 () : bool =
+    let nums1 = Cons 2 (Cons 3 (Cons 4 Nil)) in
+    let nums2 = Cons 5 (Cons 5 (Cons 5 Nil)) in
+    matches_expected nums1 nums2 2
+
+  let test_011 () : bool =
+    let nums1 = Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 Nil)))))) in
+    let nums2 = Cons 6 Nil in
+    matches_expected nums1 nums2 (-1)
+
+  let test_012 () : bool =
+    let nums1 = Cons 6 Nil in
+    let nums2 = Cons 1 Nil in
+    matches_expected nums1 nums2 1
+
+  let test_013 () : bool =
+    let nums1 = Cons 1 (Cons 2 (Cons 3 (Cons 4 (Cons 5 (Cons 6 Nil))))) in
+    let nums2 = Cons 1 (Cons 1 (Cons 2 (Cons 2 (Cons 2 (Cons 2 Nil))))) in
+    matches_expected nums1 nums2 3
+
+  let test_014 () : bool =
+    let nums1 = Cons 3 (Cons 3 (Cons 3 Nil)) in
+    let nums2 = Cons 2 (Cons 2 (Cons 2 Nil)) in
+    matches_expected nums1 nums2 1
+
+  let test_015 () : bool =
+    let nums1 = Cons 6 (Cons 6 Nil) in
+    let nums2 = Cons 1 Nil in
+    matches_expected nums1 nums2 3
+
+  let test_016 () : bool =
+    let nums1 = Cons 2 (Cons 2 (Cons 2 Nil)) in
+    let nums2 = Cons 5 (Cons 5 (Cons 5 Nil)) in
+    matches_expected nums1 nums2 3
+
+  let test_017 () : bool =
+    let nums1 = Cons 3 (Cons 3 (Cons 3 Nil)) in
+    let nums2 = Cons 2 (Cons 2 (Cons 2 (Cons 2 Nil))) in
+    matches_expected nums1 nums2 1
+
+  let test_018 () : bool =
+    let nums1 = Cons 1 Nil in
+    let nums2 = Cons 6 Nil in
+    matches_expected nums1 nums2 1
+
+  let test_019 () : bool =
+    let nums1 = Cons 1 (Cons 1 (Cons 1 Nil)) in
+    let nums2 = Cons 6 (Cons 6 (Cons 6 Nil)) in
+    matches_expected nums1 nums2 3
+
+  let run_tests () : bool =
+    if test_000 () then
+    if test_001 () then
+    if test_002 () then
+    if test_003 () then
+    if test_004 () then
+    if test_005 () then
+    if test_006 () then
+    if test_007 () then
+    if test_008 () then
+    if test_009 () then
+    if test_010 () then
+    if test_011 () then
+    if test_012 () then
+    if test_013 () then
+    if test_014 () then
+    if test_015 () then
+    if test_016 () then
+    if test_017 () then
+    if test_018 () then
+    if test_019 () then
+      true
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+
+end

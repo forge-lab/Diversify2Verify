@@ -1,0 +1,178 @@
+module SumOfFlooredPairs_Array_Spec
+
+  use int.Int
+  use int.EuclideanDivision
+  use array.Array
+  use array.Init
+
+  function result_modulus : int = 1000000007
+
+  predicate valid_problem_values (nums: array int) =
+    forall i: int. 0 <= i < length nums -> 1 <= nums[i] <= 100000
+
+  predicate valid_problem_input (nums: array int) =
+    1 <= length nums <= 100000 /\
+    valid_problem_values nums
+
+  let rec function pair_row_sum_from (nums: array int) (i: int) (j: int) : int
+    requires { valid_problem_values nums }
+    requires { 0 <= i < length nums }
+    requires { 0 <= j <= length nums }
+    variant  { length nums - j }
+  =
+    if j = length nums then 0
+    else div nums[i] nums[j] + pair_row_sum_from nums i (j + 1)
+
+  let rec function floored_pair_sum_from (nums: array int) (i: int) : int
+    requires { valid_problem_values nums }
+    requires { 0 <= i <= length nums }
+    variant  { length nums - i }
+  =
+    if i = length nums then 0
+    else pair_row_sum_from nums i 0 + floored_pair_sum_from nums (i + 1)
+
+  predicate sum_of_floored_pairs_array_spec (nums: array int) (res: int) =
+    res = mod (floored_pair_sum_from nums 0) result_modulus
+
+  val sum_of_floored_pairs_array (nums: array int) : int
+    requires { valid_problem_input nums }
+    ensures  { sum_of_floored_pairs_array_spec nums result }
+    ensures  { 0 <= result < result_modulus }
+
+  let lemma test_000_python_assertions () =
+    let nums = init 7 [|7; 7; 7; 7; 7; 7; 7|] in
+    assert { length nums = 7 };
+    assert { nums[0] = 7 };
+    assert { nums[1] = 7 };
+    assert { nums[2] = 7 };
+    assert { nums[3] = 7 };
+    assert { nums[4] = 7 };
+    assert { nums[5] = 7 };
+    assert { nums[6] = 7 };
+    assert { valid_problem_input nums };
+    assert { pair_row_sum_from nums 0 0 = 7 };
+    assert { pair_row_sum_from nums 6 0 = 7 };
+    assert { floored_pair_sum_from nums 6 = 7 };
+    assert { floored_pair_sum_from nums 0 = 49 };
+    assert { sum_of_floored_pairs_array_spec nums 49 }
+
+  let lemma test_001_python_assertions () =
+    let nums = init 10 [|1; 1; 1; 1; 1; 1; 1; 1; 1; 1|] in
+    assert { length nums = 10 };
+    assert { nums[0] = 1 };
+    assert { nums[1] = 1 };
+    assert { nums[2] = 1 };
+    assert { nums[3] = 1 };
+    assert { nums[4] = 1 };
+    assert { nums[5] = 1 };
+    assert { nums[6] = 1 };
+    assert { nums[7] = 1 };
+    assert { nums[8] = 1 };
+    assert { nums[9] = 1 };
+    assert { valid_problem_input nums };
+    assert { pair_row_sum_from nums 0 0 = 10 };
+    assert { pair_row_sum_from nums 9 0 = 10 };
+    assert { floored_pair_sum_from nums 9 = 10 };
+    assert { floored_pair_sum_from nums 0 = 100 };
+    assert { sum_of_floored_pairs_array_spec nums 100 }
+
+  let lemma test_002_python_assertions () =
+    let nums = init 3 [|2; 5; 9|] in
+    assert { length nums = 3 };
+    assert { nums[0] = 2 };
+    assert { nums[1] = 5 };
+    assert { nums[2] = 9 };
+    assert { valid_problem_input nums };
+    assert { div nums[0] nums[0] = 1 };
+    assert { div nums[0] nums[1] = 0 };
+    assert { div nums[0] nums[2] = 0 };
+    assert { pair_row_sum_from nums 0 0 = 1 };
+    assert { pair_row_sum_from nums 1 0 = 3 };
+    assert { pair_row_sum_from nums 2 0 = 6 };
+    assert { floored_pair_sum_from nums 2 = 6 };
+    assert { floored_pair_sum_from nums 1 = 9 };
+    assert { floored_pair_sum_from nums 0 = 10 };
+    assert { sum_of_floored_pairs_array_spec nums 10 }
+
+  let lemma test_003_python_assertions () =
+    let nums = init 3 [|100000; 1; 100000|] in
+    assert { length nums = 3 };
+    assert { nums[0] = 100000 };
+    assert { nums[1] = 1 };
+    assert { nums[2] = 100000 };
+    assert { valid_problem_input nums };
+    assert { div nums[0] nums[0] = 1 };
+    assert { div nums[0] nums[1] = 100000 };
+    assert { div nums[0] nums[2] = 1 };
+    assert { pair_row_sum_from nums 0 0 = 100002 };
+    assert { pair_row_sum_from nums 1 0 = 1 };
+    assert { pair_row_sum_from nums 2 0 = 100002 };
+    assert { floored_pair_sum_from nums 2 = 100002 };
+    assert { floored_pair_sum_from nums 1 = 100003 };
+    assert { floored_pair_sum_from nums 0 = 200005 };
+    assert { sum_of_floored_pairs_array_spec nums 200005 }
+
+  let lemma test_004_python_assertions () =
+    let nums = init 5 [|100000; 50000; 25000; 12500; 6250|] in
+    assert { length nums = 5 };
+    assert { nums[0] = 100000 };
+    assert { nums[1] = 50000 };
+    assert { nums[2] = 25000 };
+    assert { nums[3] = 12500 };
+    assert { nums[4] = 6250 };
+    assert { valid_problem_input nums };
+    assert { pair_row_sum_from nums 0 0 = 31 };
+    assert { pair_row_sum_from nums 1 0 = 15 };
+    assert { pair_row_sum_from nums 2 0 = 7 };
+    assert { pair_row_sum_from nums 3 0 = 3 };
+    assert { pair_row_sum_from nums 4 0 = 1 };
+    assert { floored_pair_sum_from nums 4 = 1 };
+    assert { floored_pair_sum_from nums 3 = 4 };
+    assert { floored_pair_sum_from nums 2 = 11 };
+    assert { floored_pair_sum_from nums 1 = 26 };
+    assert { floored_pair_sum_from nums 0 = 57 };
+    assert { sum_of_floored_pairs_array_spec nums 57 }
+
+  let lemma test_006_python_assertions () =
+    let nums = init 5 [|10; 20; 30; 40; 50|] in
+    assert { length nums = 5 };
+    assert { nums[0] = 10 };
+    assert { nums[1] = 20 };
+    assert { nums[2] = 30 };
+    assert { nums[3] = 40 };
+    assert { nums[4] = 50 };
+    assert { valid_problem_input nums };
+    assert { pair_row_sum_from nums 0 0 = 1 };
+    assert { pair_row_sum_from nums 1 0 = 3 };
+    assert { pair_row_sum_from nums 2 0 = 5 };
+    assert { pair_row_sum_from nums 3 0 = 8 };
+    assert { pair_row_sum_from nums 4 0 = 10 };
+    assert { floored_pair_sum_from nums 4 = 10 };
+    assert { floored_pair_sum_from nums 3 = 18 };
+    assert { floored_pair_sum_from nums 2 = 23 };
+    assert { floored_pair_sum_from nums 1 = 26 };
+    assert { floored_pair_sum_from nums 0 = 27 };
+    assert { sum_of_floored_pairs_array_spec nums 27 }
+
+  let lemma test_008_python_assertions () =
+    let nums = init 5 [|1; 2; 3; 4; 5|] in
+    assert { length nums = 5 };
+    assert { nums[0] = 1 };
+    assert { nums[1] = 2 };
+    assert { nums[2] = 3 };
+    assert { nums[3] = 4 };
+    assert { nums[4] = 5 };
+    assert { valid_problem_input nums };
+    assert { pair_row_sum_from nums 0 0 = 1 };
+    assert { pair_row_sum_from nums 1 0 = 3 };
+    assert { pair_row_sum_from nums 2 0 = 5 };
+    assert { pair_row_sum_from nums 3 0 = 8 };
+    assert { pair_row_sum_from nums 4 0 = 10 };
+    assert { floored_pair_sum_from nums 4 = 10 };
+    assert { floored_pair_sum_from nums 3 = 18 };
+    assert { floored_pair_sum_from nums 2 = 23 };
+    assert { floored_pair_sum_from nums 1 = 26 };
+    assert { floored_pair_sum_from nums 0 = 27 };
+    assert { sum_of_floored_pairs_array_spec nums 27 }
+
+end

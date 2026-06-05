@@ -1,0 +1,203 @@
+module GetTheMaximumScore_Array_Recursive_Implementation
+
+  use int.Int
+  use int.MinMax
+  use int.EuclideanDivision
+  use array.Array
+  use array.Init
+
+  let rec suffix_sum (nums: array int) (i: int) : int
+    variant { length nums - i }
+  =
+    if i >= length nums then
+      0
+    else
+      nums[i] + suffix_sum nums (i + 1)
+
+  let rec max_score_scan
+      (nums1: array int) (nums2: array int)
+      (i: int) (j: int) (acc1: int) (acc2: int) : int
+    variant { (length nums1 - i) + (length nums2 - j) }
+  =
+    if i >= length nums1 then
+      max acc1 (acc2 + suffix_sum nums2 j)
+    else if j >= length nums2 then
+      max (acc1 + suffix_sum nums1 i) acc2
+    else if nums1[i] < nums2[j] then
+      max_score_scan nums1 nums2 (i + 1) j (acc1 + nums1[i]) acc2
+    else if nums1[i] > nums2[j] then
+      max_score_scan nums1 nums2 i (j + 1) acc1 (acc2 + nums2[j])
+    else
+      let merged = max acc1 acc2 + nums1[i] in
+      merged + max_score_scan nums1 nums2 (i + 1) (j + 1) 0 0
+
+  let maximum_path_score (nums1: array int) (nums2: array int) : int =
+    max_score_scan nums1 nums2 0 0 0 0
+
+  let get_the_maximum_score_array (nums1: array int) (nums2: array int) : int =
+    mod (maximum_path_score nums1 nums2) 1000000007
+
+  let test_000 () : bool =
+    let nums1 = init 1 [|10000000|] in
+    let nums2 = init 1 [|10000000|] in
+    let r = get_the_maximum_score_array nums1 nums2 in
+    r = 10000000
+
+  let test_001 () : bool =
+    let nums1 = init 5 [|2; 4; 5; 8; 10|] in
+    let nums2 = init 4 [|4; 6; 8; 9|] in
+    let r = get_the_maximum_score_array nums1 nums2 in
+    r = 30
+
+  let test_002 () : bool =
+    let nums1 = init 3 [|1; 2; 3|] in
+    let nums2 = init 7 [|4; 5; 6; 7; 8; 9; 10|] in
+    let r = get_the_maximum_score_array nums1 nums2 in
+    r = 49
+
+  let test_003 () : bool =
+    let nums1 = init 3 [|1; 2; 3|] in
+    let nums2 = init 8 [|3; 4; 5; 6; 7; 8; 9; 10|] in
+    let r = get_the_maximum_score_array nums1 nums2 in
+    r = 55
+
+  let test_004 () : bool =
+    let nums1 = init 10 [|1; 2; 3; 4; 5; 6; 7; 8; 9; 10|] in
+    let nums2 = init 10 [|11; 12; 13; 14; 15; 16; 17; 18; 19; 20|] in
+    let r = get_the_maximum_score_array nums1 nums2 in
+    r = 155
+
+  let test_005 () : bool =
+    let nums1 = init 5 [|1; 4; 6; 8; 10|] in
+    let nums2 = init 5 [|2; 4; 6; 8; 12|] in
+    let r = get_the_maximum_score_array nums1 nums2 in
+    r = 32
+
+  let test_006 () : bool =
+    let nums1 = init 4 [|5; 10; 15; 20|] in
+    let nums2 = init 20 [|1; 2; 3; 4; 5; 6; 7; 8; 9; 10; 11; 12; 13; 14; 15; 16; 17; 18; 19; 20|] in
+    let r = get_the_maximum_score_array nums1 nums2 in
+    r = 210
+
+  let test_007 () : bool =
+    let nums1 = init 5 [|1; 3; 5; 7; 9|] in
+    let nums2 = init 3 [|3; 5; 100|] in
+    let r = get_the_maximum_score_array nums1 nums2 in
+    r = 109
+
+  let test_008 () : bool =
+    let nums1 = init 5 [|1; 2; 3; 4; 5|] in
+    let nums2 = init 5 [|6; 7; 8; 9; 10|] in
+    let r = get_the_maximum_score_array nums1 nums2 in
+    r = 40
+
+  let test_009 () : bool =
+    let nums1 = init 3 [|1; 2; 3|] in
+    let nums2 = init 3 [|3; 4; 5|] in
+    let r = get_the_maximum_score_array nums1 nums2 in
+    r = 15
+
+  let test_010 () : bool =
+    let nums1 = init 5 [|10; 20; 30; 40; 50|] in
+    let nums2 = init 6 [|5; 15; 25; 35; 45; 55|] in
+    let r = get_the_maximum_score_array nums1 nums2 in
+    r = 180
+
+  let test_011 () : bool =
+    let nums1 = init 10 [|1; 2; 3; 4; 5; 6; 7; 8; 9; 10|] in
+    let nums2 = init 10 [|1; 2; 3; 4; 5; 6; 7; 8; 9; 10|] in
+    let r = get_the_maximum_score_array nums1 nums2 in
+    r = 55
+
+  let test_012 () : bool =
+    let nums1 = init 6 [|1; 2; 3; 4; 5; 6|] in
+    let nums2 = init 6 [|3; 4; 5; 6; 7; 8|] in
+    let r = get_the_maximum_score_array nums1 nums2 in
+    r = 36
+
+  let test_013 () : bool =
+    let nums1 = init 4 [|10; 20; 30; 40|] in
+    let nums2 = init 5 [|5; 15; 25; 35; 45|] in
+    let r = get_the_maximum_score_array nums1 nums2 in
+    r = 125
+
+  let test_015 () : bool =
+    let nums1 = init 3 [|1; 2; 3|] in
+    let nums2 = init 3 [|4; 5; 6|] in
+    let r = get_the_maximum_score_array nums1 nums2 in
+    r = 15
+
+  let test_016 () : bool =
+    let nums1 = init 2 [|1; 10000000|] in
+    let nums2 = init 2 [|2; 9999999|] in
+    let r = get_the_maximum_score_array nums1 nums2 in
+    r = 10000001
+
+  let test_017 () : bool =
+    let nums1 = init 5 [|10; 20; 30; 40; 50|] in
+    let nums2 = init 5 [|5; 15; 25; 35; 45|] in
+    let r = get_the_maximum_score_array nums1 nums2 in
+    r = 150
+
+  let test_018 () : bool =
+    let nums1 = init 1 [|1|] in
+    let nums2 = init 1 [|1|] in
+    let r = get_the_maximum_score_array nums1 nums2 in
+    r = 1
+
+  let test_019 () : bool =
+    let nums1 = init 4 [|1; 4; 6; 8|] in
+    let nums2 = init 4 [|2; 3; 5; 7|] in
+    let r = get_the_maximum_score_array nums1 nums2 in
+    r = 19
+
+  let test_020 () : bool =
+    let nums1 = init 11 [|1; 2; 4; 8; 16; 32; 64; 128; 256; 512; 1024|] in
+    let nums2 = init 11 [|2; 4; 8; 16; 32; 64; 128; 256; 512; 1024; 2048|] in
+    let r = get_the_maximum_score_array nums1 nums2 in
+    r = 4095
+
+  let run_tests () : bool =
+    if test_000 () then
+    if test_001 () then
+    if test_002 () then
+    if test_003 () then
+    if test_004 () then
+    if test_005 () then
+    if test_006 () then
+    if test_007 () then
+    if test_008 () then
+    if test_009 () then
+    if test_010 () then
+    if test_011 () then
+    if test_012 () then
+    if test_013 () then
+    if test_015 () then
+    if test_016 () then
+    if test_017 () then
+    if test_018 () then
+    if test_019 () then
+    if test_020 () then
+      true
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+
+end

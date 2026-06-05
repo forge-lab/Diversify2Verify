@@ -1,0 +1,222 @@
+module AdvantageShuffle_Array_Spec
+
+  use int.Int
+  use array.Array
+  use array.Init
+  use array.ArrayPermut
+  use array.NumOf
+
+  predicate input_values_in_range (nums1: array int) (nums2: array int) =
+    length nums2 = length nums1 /\
+    forall i: int.
+      0 <= i < length nums1 ->
+        0 <= nums1[i] <= 1000000000 /\ 0 <= nums2[i] <= 1000000000
+
+  predicate beats_at (candidate: array int) (nums2: array int) (i: int) =
+    0 <= i < length candidate /\ 0 <= i < length nums2 /\ candidate[i] > nums2[i]
+
+  function advantage_count (candidate: array int) (nums2: array int) : int =
+    numof (fun i v -> 0 <= i < length nums2 /\ v > nums2[i]) candidate 0 (length candidate)
+
+  predicate valid_permutation_result (nums1: array int) (result: array int) =
+    length result = length nums1 /\ permut_all result nums1
+
+  predicate optimal_advantage_result (nums1: array int) (nums2: array int) (result: array int) =
+    length nums2 = length nums1 /\
+    valid_permutation_result nums1 result /\
+    (forall candidate: array int.
+       valid_permutation_result nums1 candidate ->
+         advantage_count candidate nums2 <= advantage_count result nums2)
+
+  predicate index_values_in_range (idx: array int) (n: int) =
+    forall p: int. 0 <= p < length idx -> 0 <= idx[p] < n
+
+  let rec copy_array_from (src: array int) (dst: array int) (i: int) : unit
+    requires { length dst = length src }
+    requires { 0 <= i <= length src }
+    ensures  { length dst = length src }
+    variant  { length src - i }
+  =
+    if i >= length src then
+      ()
+    else begin
+      dst[i] <- src[i];
+      copy_array_from src dst (i + 1)
+    end
+
+  let copy_array (src: array int) : array int
+    ensures { length result = length src }
+  =
+    let dst = make (length src) 0 in
+    copy_array_from src dst 0;
+    dst
+
+  let rec insert_sorted_prefix (a: array int) (j: int) (key: int) : unit
+    requires { 0 <= j < length a }
+    ensures  { length a = old (length a) }
+    variant  { j }
+  =
+    if j <= 0 then
+      a[0] <- key
+    else if a[j - 1] > key then begin
+      a[j] <- a[j - 1];
+      insert_sorted_prefix a (j - 1) key
+    end else
+      a[j] <- key
+
+  let rec insertion_sort_from (a: array int) (i: int) : unit
+    requires { 0 <= i <= length a }
+    ensures  { length a = old (length a) }
+    variant  { length a - i }
+  =
+    if i >= length a then
+      ()
+    else
+      let key = a[i] in
+      begin
+        insert_sorted_prefix a i key;
+        insertion_sort_from a (i + 1)
+      end
+
+  let rec fill_indices_from (idx: array int) (i: int) : unit
+    requires { 0 <= i <= length idx }
+    ensures  { length idx = old (length idx) }
+    ensures  { forall p: int. i <= p < length idx -> idx[p] = p }
+    variant  { length idx - i }
+  =
+    if i >= length idx then
+      ()
+    else begin
+      assert { 0 <= i < length idx };
+      idx[i] <- i;
+      fill_indices_from idx (i + 1);
+      assert { forall p: int. i <= p < length idx -> idx[p] = p }
+    end
+
+  let make_indices (n: int) : array int
+    requires { 0 <= n }
+    ensures  { length result = n }
+    ensures  { index_values_in_range result n }
+  =
+    let idx = make n 0 in
+    fill_indices_from idx 0;
+    assert { forall p: int. 0 <= p < length idx -> idx[p] = p };
+    assert { index_values_in_range idx n };
+    idx
+
+  let rec insert_index_prefix (idx: array int) (nums2: array int) (j: int) (key_idx: int) : unit
+    requires { length idx = length nums2 }
+    requires { 0 <= j < length idx }
+    requires { 0 <= key_idx < length nums2 }
+    requires { index_values_in_range idx (length nums2) }
+    ensures  { length idx = old (length idx) }
+    ensures  { index_values_in_range idx (length nums2) }
+    variant  { j }
+  =
+    if j <= 0 then begin
+      assert { 0 <= 0 < length idx };
+      idx[0] <- key_idx;
+      assert { index_values_in_range idx (length nums2) }
+    end
+    else if nums2[idx[j - 1]] > nums2[key_idx] then begin
+      assert { 0 <= j - 1 < length idx };
+      assert { 0 <= idx[j - 1] < length nums2 };
+      assert { 0 <= key_idx < length nums2 };
+      idx[j] <- idx[j - 1];
+      assert { index_values_in_range idx (length nums2) };
+      insert_index_prefix idx nums2 (j - 1) key_idx;
+      assert { index_values_in_range idx (length nums2) }
+    end else begin
+      assert { 0 <= j < length idx };
+      idx[j] <- key_idx;
+      assert { index_values_in_range idx (length nums2) }
+    end
+
+  let rec sort_indices_from (idx: array int) (nums2: array int) (i: int) : unit
+    requires { length idx = length nums2 }
+    requires { 0 <= i <= length idx }
+    requires { index_values_in_range idx (length nums2) }
+    ensures  { length idx = old (length idx) }
+    ensures  { index_values_in_range idx (length nums2) }
+    variant  { length idx - i }
+  =
+    if i >= length idx then
+      ()
+    else
+      let key_idx = idx[i] in
+      begin
+        assert { 0 <= i < length idx };
+        assert { 0 <= key_idx < length nums2 };
+        insert_index_prefix idx nums2 i key_idx;
+        assert { index_values_in_range idx (length nums2) };
+        assert { 0 <= i + 1 <= length idx };
+        sort_indices_from idx nums2 (i + 1)
+      end
+
+  let rec assign_advantage
+    (sorted_nums1: array int) (nums2: array int) (idx: array int) (out: array int)
+    (lo: int) (hi: int) (k: int) : unit
+    requires { length sorted_nums1 = length nums2 }
+    requires { length idx = length nums2 }
+    requires { length out = length sorted_nums1 }
+    requires { index_values_in_range idx (length nums2) }
+    requires { -1 <= k < length idx }
+    requires { 0 <= lo <= length sorted_nums1 }
+    requires { -1 <= hi < length sorted_nums1 }
+    requires { hi - lo = k }
+    ensures  { length out = old (length out) }
+    variant  { k + 1 }
+  =
+    if k < 0 then
+      ()
+    else
+      let target = idx[k] in
+      assert { 0 <= k < length idx };
+      assert { 0 <= target < length nums2 };
+      assert { 0 <= lo < length sorted_nums1 };
+      assert { 0 <= hi < length sorted_nums1 };
+      if sorted_nums1[hi] > nums2[target] then begin
+        assert { 0 <= target < length out };
+        out[target] <- sorted_nums1[hi];
+        assert { hi - 1 - lo = k - 1 };
+        assert { -1 <= k - 1 < length idx };
+        assert { -1 <= hi - 1 < length sorted_nums1 };
+        assert { 0 <= lo <= length sorted_nums1 };
+        assert { k - 1 >= 0 -> 0 <= lo <= hi - 1 < length sorted_nums1 };
+        assign_advantage sorted_nums1 nums2 idx out lo (hi - 1) (k - 1)
+      end else begin
+        assert { 0 <= target < length out };
+        out[target] <- sorted_nums1[lo];
+        assert { hi - (lo + 1) = k - 1 };
+        assert { -1 <= k - 1 < length idx };
+        assert { 0 <= lo + 1 <= length sorted_nums1 };
+        assert { -1 <= hi < length sorted_nums1 };
+        assert { k - 1 >= 0 -> 0 <= lo + 1 <= hi < length sorted_nums1 };
+        assign_advantage sorted_nums1 nums2 idx out (lo + 1) hi (k - 1)
+      end
+
+  let advantage_shuffle_array (nums1: array int) (nums2: array int) : array int
+    requires { 1 <= length nums1 }
+    requires { length nums2 = length nums1 }
+    requires { input_values_in_range nums1 nums2 }
+    ensures  { optimal_advantage_result nums1 nums2 result }
+  =
+    assert { 1 <= length nums1 };
+    assert { length nums2 = length nums1 };
+    if length nums1 = 0 then
+      make 0 0
+    else if length nums1 <> length nums2 then
+      copy_array nums1
+    else
+      let sorted_nums1 = copy_array nums1 in
+      let idx = make_indices (length nums2) in
+      let result = make (length nums1) 0 in
+      begin
+        insertion_sort_from sorted_nums1 1;
+        sort_indices_from idx nums2 1;
+        assert { length nums1 - 1 - 0 = length nums1 - 1 };
+        assign_advantage sorted_nums1 nums2 idx result 0 (length nums1 - 1) (length nums1 - 1);
+        result
+      end
+
+end

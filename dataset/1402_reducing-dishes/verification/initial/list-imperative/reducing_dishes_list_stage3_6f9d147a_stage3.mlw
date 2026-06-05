@@ -1,0 +1,102 @@
+module ReducingDishes_List_Stage3_Imperative
+
+  use int.Int
+  use list.List
+  use list.NumOcc
+  use list.Length
+  use ref.Ref
+
+  let rec function like_time_from (time: int) (cooked: list int) : int
+    variant { cooked }
+  =
+    match cooked with
+    | Nil -> 0
+    | Cons x xs -> time * x + like_time_from (time + 1) xs
+    end
+
+  function like_time (cooked: list int) : int =
+    like_time_from 1 cooked
+
+  predicate sub_multiset (chosen: list int) (available: list int) =
+    forall x: int. num_occ x chosen <= num_occ x available
+
+  predicate max_like_time (satisfaction: list int) (best: int) =
+    (exists cooked: list int.
+       sub_multiset cooked satisfaction /\
+       best = like_time cooked) /\
+    (forall other: list int.
+       sub_multiset other satisfaction -> like_time other <= best)
+
+  let rec function insert_sorted (x: int) (l: list int) : list int
+    variant { l }
+  =
+    match l with
+    | Nil -> Cons x Nil
+    | Cons y ys ->
+        if x <= y then
+          Cons x l
+        else
+          Cons y (insert_sorted x ys)
+    end
+
+  let reverse_list (l: list int) : list int =
+    let acc = ref Nil in
+    let cur = ref l in
+    while (match !cur with Nil -> false | Cons _ _ -> true end) do
+      invariant { 0 <= length !cur }
+      variant { length !cur }
+
+      match !cur with
+      | Nil -> ()
+      | Cons x xs ->
+          acc := Cons x !acc;
+          cur := xs
+      end
+    done;
+    !acc
+
+  let sort_list (l: list int) : list int =
+    let sorted = ref Nil in
+    let cur = ref l in
+    while (match !cur with Nil -> false | Cons _ _ -> true end) do
+      invariant { 0 <= length !cur }
+      variant { length !cur }
+
+      match !cur with
+      | Nil -> ()
+      | Cons x xs ->
+          sorted := insert_sorted x !sorted;
+          cur := xs
+      end
+    done;
+    !sorted
+
+  let reducing_dishes_list (satisfaction: list int) : int
+    ensures { max_like_time satisfaction result }
+  =
+    let descending = reverse_list (sort_list satisfaction) in
+    let running_sum = ref 0 in
+    let total = ref 0 in
+    let cur = ref descending in
+    while (match !cur with Nil -> false | Cons _ _ -> true end) do
+      invariant { 0 <= length !cur }
+      variant { length !cur }
+
+      match !cur with
+      | Nil -> ()
+      | Cons x xs ->
+          let next_sum = !running_sum + x in
+          if next_sum > 0 then begin
+            assert { next_sum > 0 };
+            running_sum := next_sum;
+            total := !total + !running_sum;
+            cur := xs
+          end else begin
+            assert { next_sum <= 0 };
+            cur := Nil
+          end
+      end
+    done;
+    !total
+
+end

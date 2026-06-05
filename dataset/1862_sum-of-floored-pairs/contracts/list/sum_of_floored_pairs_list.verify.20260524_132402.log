@@ -1,0 +1,472 @@
+== Stage 1: first prover on whole file ==
+Running in /Users/rubenm/Desktop/Diversify2Verify/codex-runs2/stage1a-list/1862_sum-of-floored-pairs-20260524-090530/generated/why3/list: why3 session create -o /Users/rubenm/Desktop/Diversify2Verify/codex-runs2/stage1a-list/1862_sum-of-floored-pairs-20260524-090530/generated/why3/list/.why3_sessions/sum_of_floored_pairs_list_stage1 -P Z3,4.8.6 -t 10 -m 8192 sum_of_floored_pairs_list.mlw
+Session created successfully
+Running in /Users/rubenm/Desktop/Diversify2Verify/codex-runs2/stage1a-list/1862_sum-of-floored-pairs-20260524-090530/generated/why3/list: why3 bench /Users/rubenm/Desktop/Diversify2Verify/codex-runs2/stage1a-list/1862_sum-of-floored-pairs-20260524-090530/generated/why3/list/.why3_sessions/sum_of_floored_pairs_list_stage1
+Progress: 9/1/0                       Progress: 8/2/0                       Progress: 7/3/0                       Progress: 6/4/0                       Progress: 5/5/0                       Progress: 4/6/0                       Progress: 4/2/2                       Progress: 3/3/2                       Progress: 2/4/2                       Progress: 2/2/2                       Progress: 1/3/2                       Progress: 0/4/2                       Progress: 0/2/2                       
+Stage 1 infrastructure issue; skipping the rest of stage 1 and continuing.
+== Stage 1 stats ==
+= Statistics for session /Users/rubenm/Desktop/Diversify2Verify/codex-runs2/stage1a-list/1862_sum-of-floored-pairs-20260524-090530/generated/why3/list/.why3_sessions/sum_of_floored_pairs_list_stage1
+
+== Number of root goals ==
+  total: 10  proved: 0
+
+== Number of sub goals ==
+  total: 0  proved: 0
+
+== Goals not proved ==
+  +-- file [../../sum_of_floored_pairs_list.mlw]
+    +-- theory SumOfFlooredPairs_List_Spec
+      +-- goal all_values_in_range'vc
+      +-- goal row_floor_sum'vc
+      +-- goal floored_pair_sum'vc
+      +-- goal test_000_python_assertions'vc
+      +-- goal test_001_python_assertions'vc
+      +-- goal test_002_python_assertions'vc
+      +-- goal test_003_python_assertions'vc
+      +-- goal test_004_python_assertions'vc
+      +-- goal test_006_python_assertions'vc
+      +-- goal test_008_python_assertions'vc
+  
+== Goals proved by only one prover ==
+  
+1 session(s) read, with a total of 10 proof goals.
+== Unproved root goals after first prover ==
+SumOfFlooredPairs_List_Spec	all_values_in_range'vc
+SumOfFlooredPairs_List_Spec	row_floor_sum'vc
+SumOfFlooredPairs_List_Spec	floored_pair_sum'vc
+SumOfFlooredPairs_List_Spec	test_000_python_assertions'vc
+SumOfFlooredPairs_List_Spec	test_001_python_assertions'vc
+SumOfFlooredPairs_List_Spec	test_002_python_assertions'vc
+SumOfFlooredPairs_List_Spec	test_003_python_assertions'vc
+SumOfFlooredPairs_List_Spec	test_004_python_assertions'vc
+SumOfFlooredPairs_List_Spec	test_006_python_assertions'vc
+SumOfFlooredPairs_List_Spec	test_008_python_assertions'vc
+== Goals still unproved after stage 1 ==
+SumOfFlooredPairs_List_Spec	all_values_in_range'vc
+SumOfFlooredPairs_List_Spec	row_floor_sum'vc
+SumOfFlooredPairs_List_Spec	floored_pair_sum'vc
+SumOfFlooredPairs_List_Spec	test_000_python_assertions'vc
+SumOfFlooredPairs_List_Spec	test_001_python_assertions'vc
+SumOfFlooredPairs_List_Spec	test_002_python_assertions'vc
+SumOfFlooredPairs_List_Spec	test_003_python_assertions'vc
+SumOfFlooredPairs_List_Spec	test_004_python_assertions'vc
+SumOfFlooredPairs_List_Spec	test_006_python_assertions'vc
+SumOfFlooredPairs_List_Spec	test_008_python_assertions'vc
+== Stage 2: split_vc on unproved goal ==
+Target theory: SumOfFlooredPairs_List_Spec
+Target goal  : all_values_in_range'vc
+---- stage2 | prover: Alt-Ergo,2.4.0 | theory: SumOfFlooredPairs_List_Spec | goal: all_values_in_range'vc ----
+Transforms: split_vc
+File "sum_of_floored_pairs_list.mlw", line 15, characters 44-66:
+Sub-goal Variant decrease of goal all_values_in_range'vc.
+Prover result is: Valid (0.01s, 44 steps).
+Solved with split_vc using prover: Alt-Ergo,2.4.0
+== Stage 2: split_vc on unproved goal ==
+Target theory: SumOfFlooredPairs_List_Spec
+Target goal  : row_floor_sum'vc
+---- stage2 | prover: Alt-Ergo,2.4.0 | theory: SumOfFlooredPairs_List_Spec | goal: row_floor_sum'vc ----
+Transforms: split_vc
+File "sum_of_floored_pairs_list.mlw", line 28, characters 29-47:
+Sub-goal Variant decrease of goal row_floor_sum'vc.
+Prover result is: Valid (0.01s, 34 steps).
+
+File "sum_of_floored_pairs_list.mlw", line 28, characters 19-26:
+Sub-goal Precondition of goal row_floor_sum'vc.
+Prover result is: Timeout (10.00s, 320558 steps).
+---- stage2 | prover: CVC4,1.8 | theory: SumOfFlooredPairs_List_Spec | goal: row_floor_sum'vc ----
+Transforms: split_vc
+File "sum_of_floored_pairs_list.mlw", line 28, characters 29-47:
+Sub-goal Variant decrease of goal row_floor_sum'vc.
+Prover result is: Valid (0.02s, 2332 steps).
+
+File "sum_of_floored_pairs_list.mlw", line 28, characters 19-26:
+Sub-goal Precondition of goal row_floor_sum'vc.
+Prover result is: Unknown (unknown + incomplete) (0.01s, 1893 steps).
+== Stage 2: split_vc on unproved goal ==
+Target theory: SumOfFlooredPairs_List_Spec
+Target goal  : floored_pair_sum'vc
+---- stage2 | prover: Alt-Ergo,2.4.0 | theory: SumOfFlooredPairs_List_Spec | goal: floored_pair_sum'vc ----
+Transforms: split_vc
+File "sum_of_floored_pairs_list.mlw", line 36, characters 44-70:
+Sub-goal Variant decrease of goal floored_pair_sum'vc.
+Prover result is: Valid (0.01s, 34 steps).
+Solved with split_vc using prover: Alt-Ergo,2.4.0
+== Stage 2: split_vc on unproved goal ==
+Target theory: SumOfFlooredPairs_List_Spec
+Target goal  : test_000_python_assertions'vc
+---- stage2 | prover: Alt-Ergo,2.4.0 | theory: SumOfFlooredPairs_List_Spec | goal: test_000_python_assertions'vc ----
+Transforms: split_vc
+File "sum_of_floored_pairs_list.mlw", line 56, characters 13-37:
+Sub-goal Assertion of goal test_000_python_assertions'vc.
+Prover result is: Valid (0.01s, 82 steps).
+
+File "sum_of_floored_pairs_list.mlw", line 57, characters 13-37:
+Sub-goal Assertion of goal test_000_python_assertions'vc.
+Prover result is: Valid (0.01s, 190 steps).
+
+File "sum_of_floored_pairs_list.mlw", line 58, characters 13-41:
+Sub-goal Assertion of goal test_000_python_assertions'vc.
+Prover result is: Valid (0.01s, 110 steps).
+
+File "sum_of_floored_pairs_list.mlw", line 59, characters 13-42:
+Sub-goal Assertion of goal test_000_python_assertions'vc.
+Prover result is: Valid (0.01s, 28 steps).
+
+File "sum_of_floored_pairs_list.mlw", line 60, characters 13-42:
+Sub-goal Assertion of goal test_000_python_assertions'vc.
+Prover result is: Valid (0.01s, 30 steps).
+
+File "sum_of_floored_pairs_list.mlw", line 61, characters 13-42:
+Sub-goal Assertion of goal test_000_python_assertions'vc.
+Prover result is: Valid (0.01s, 33 steps).
+
+File "sum_of_floored_pairs_list.mlw", line 62, characters 13-42:
+Sub-goal Assertion of goal test_000_python_assertions'vc.
+Prover result is: Valid (0.01s, 36 steps).
+
+File "sum_of_floored_pairs_list.mlw", line 63, characters 13-42:
+Sub-goal Assertion of goal test_000_python_assertions'vc.
+Prover result is: Valid (0.01s, 38 steps).
+
+File "sum_of_floored_pairs_list.mlw", line 64, characters 13-44:
+Sub-goal Assertion of goal test_000_python_assertions'vc.
+Prover result is: Valid (0.01s, 40 steps).
+
+File "sum_of_floored_pairs_list.mlw", line 65, characters 13-51:
+Sub-goal Assertion of goal test_000_python_assertions'vc.
+Prover result is: Valid (0.01s, 46 steps).
+Solved with split_vc using prover: Alt-Ergo,2.4.0
+== Stage 2: split_vc on unproved goal ==
+Target theory: SumOfFlooredPairs_List_Spec
+Target goal  : test_001_python_assertions'vc
+---- stage2 | prover: Alt-Ergo,2.4.0 | theory: SumOfFlooredPairs_List_Spec | goal: test_001_python_assertions'vc ----
+Transforms: split_vc
+File "sum_of_floored_pairs_list.mlw", line 77, characters 13-37:
+Sub-goal Assertion of goal test_001_python_assertions'vc.
+Prover result is: Valid (0.01s, 112 steps).
+
+File "sum_of_floored_pairs_list.mlw", line 78, characters 13-38:
+Sub-goal Assertion of goal test_001_python_assertions'vc.
+Prover result is: Valid (0.02s, 300 steps).
+
+File "sum_of_floored_pairs_list.mlw", line 79, characters 13-43:
+Sub-goal Assertion of goal test_001_python_assertions'vc.
+Prover result is: Valid (0.01s, 153 steps).
+
+File "sum_of_floored_pairs_list.mlw", line 80, characters 13-42:
+Sub-goal Assertion of goal test_001_python_assertions'vc.
+Prover result is: Valid (0.01s, 34 steps).
+
+File "sum_of_floored_pairs_list.mlw", line 81, characters 13-42:
+Sub-goal Assertion of goal test_001_python_assertions'vc.
+Prover result is: Valid (0.01s, 37 steps).
+
+File "sum_of_floored_pairs_list.mlw", line 82, characters 13-42:
+Sub-goal Assertion of goal test_001_python_assertions'vc.
+Prover result is: Valid (0.01s, 39 steps).
+
+File "sum_of_floored_pairs_list.mlw", line 83, characters 13-42:
+Sub-goal Assertion of goal test_001_python_assertions'vc.
+Prover result is: Valid (0.01s, 42 steps).
+
+File "sum_of_floored_pairs_list.mlw", line 84, characters 13-42:
+Sub-goal Assertion of goal test_001_python_assertions'vc.
+Prover result is: Valid (0.01s, 44 steps).
+
+File "sum_of_floored_pairs_list.mlw", line 85, characters 13-45:
+Sub-goal Assertion of goal test_001_python_assertions'vc.
+Prover result is: Valid (0.01s, 210 steps).
+
+File "sum_of_floored_pairs_list.mlw", line 86, characters 13-52:
+Sub-goal Assertion of goal test_001_python_assertions'vc.
+Prover result is: Valid (0.01s, 53 steps).
+Solved with split_vc using prover: Alt-Ergo,2.4.0
+== Stage 2: split_vc on unproved goal ==
+Target theory: SumOfFlooredPairs_List_Spec
+Target goal  : test_002_python_assertions'vc
+---- stage2 | prover: Alt-Ergo,2.4.0 | theory: SumOfFlooredPairs_List_Spec | goal: test_002_python_assertions'vc ----
+Transforms: split_vc
+File "sum_of_floored_pairs_list.mlw", line 92, characters 13-37:
+Sub-goal Assertion of goal test_002_python_assertions'vc.
+Prover result is: Valid (0.01s, 44 steps).
+
+File "sum_of_floored_pairs_list.mlw", line 93, characters 13-24:
+Sub-goal Assertion of goal test_002_python_assertions'vc.
+Prover result is: Valid (0.01s, 4 steps).
+
+File "sum_of_floored_pairs_list.mlw", line 94, characters 13-24:
+Sub-goal Assertion of goal test_002_python_assertions'vc.
+Prover result is: Valid (0.01s, 5 steps).
+
+File "sum_of_floored_pairs_list.mlw", line 95, characters 13-24:
+Sub-goal Assertion of goal test_002_python_assertions'vc.
+Prover result is: Valid (0.01s, 6 steps).
+
+File "sum_of_floored_pairs_list.mlw", line 96, characters 13-37:
+Sub-goal Assertion of goal test_002_python_assertions'vc.
+Prover result is: Valid (0.01s, 84 steps).
+
+File "sum_of_floored_pairs_list.mlw", line 97, characters 13-37:
+Sub-goal Assertion of goal test_002_python_assertions'vc.
+Prover result is: Valid (0.01s, 102 steps).
+
+File "sum_of_floored_pairs_list.mlw", line 98, characters 13-37:
+Sub-goal Assertion of goal test_002_python_assertions'vc.
+Prover result is: Valid (0.01s, 122 steps).
+
+File "sum_of_floored_pairs_list.mlw", line 99, characters 13-44:
+Sub-goal Assertion of goal test_002_python_assertions'vc.
+Prover result is: Valid (0.01s, 82 steps).
+
+File "sum_of_floored_pairs_list.mlw", line 100, characters 13-44:
+Sub-goal Assertion of goal test_002_python_assertions'vc.
+Prover result is: Valid (0.01s, 27 steps).
+
+File "sum_of_floored_pairs_list.mlw", line 101, characters 13-44:
+Sub-goal Assertion of goal test_002_python_assertions'vc.
+Prover result is: Valid (0.01s, 29 steps).
+
+File "sum_of_floored_pairs_list.mlw", line 102, characters 13-51:
+Sub-goal Assertion of goal test_002_python_assertions'vc.
+Prover result is: Valid (0.01s, 35 steps).
+Solved with split_vc using prover: Alt-Ergo,2.4.0
+== Stage 2: split_vc on unproved goal ==
+Target theory: SumOfFlooredPairs_List_Spec
+Target goal  : test_003_python_assertions'vc
+---- stage2 | prover: Alt-Ergo,2.4.0 | theory: SumOfFlooredPairs_List_Spec | goal: test_003_python_assertions'vc ----
+Transforms: split_vc
+File "sum_of_floored_pairs_list.mlw", line 108, characters 13-37:
+Sub-goal Assertion of goal test_003_python_assertions'vc.
+Prover result is: Valid (0.01s, 43 steps).
+
+File "sum_of_floored_pairs_list.mlw", line 109, characters 13-34:
+Sub-goal Assertion of goal test_003_python_assertions'vc.
+Prover result is: Valid (0.01s, 4 steps).
+
+File "sum_of_floored_pairs_list.mlw", line 110, characters 13-34:
+Sub-goal Assertion of goal test_003_python_assertions'vc.
+Prover result is: Valid (0.01s, 5 steps).
+
+File "sum_of_floored_pairs_list.mlw", line 111, characters 13-29:
+Sub-goal Assertion of goal test_003_python_assertions'vc.
+Prover result is: Valid (0.01s, 6 steps).
+
+File "sum_of_floored_pairs_list.mlw", line 112, characters 13-47:
+Sub-goal Assertion of goal test_003_python_assertions'vc.
+Prover result is: Valid (0.01s, 82 steps).
+
+File "sum_of_floored_pairs_list.mlw", line 113, characters 13-37:
+Sub-goal Assertion of goal test_003_python_assertions'vc.
+Prover result is: Valid (0.01s, 96 steps).
+
+File "sum_of_floored_pairs_list.mlw", line 114, characters 13-49:
+Sub-goal Assertion of goal test_003_python_assertions'vc.
+Prover result is: Valid (0.01s, 70 steps).
+
+File "sum_of_floored_pairs_list.mlw", line 115, characters 13-49:
+Sub-goal Assertion of goal test_003_python_assertions'vc.
+Prover result is: Valid (0.01s, 24 steps).
+
+File "sum_of_floored_pairs_list.mlw", line 116, characters 13-48:
+Sub-goal Assertion of goal test_003_python_assertions'vc.
+Prover result is: Valid (0.01s, 26 steps).
+
+File "sum_of_floored_pairs_list.mlw", line 117, characters 13-55:
+Sub-goal Assertion of goal test_003_python_assertions'vc.
+Prover result is: Valid (0.01s, 30 steps).
+Solved with split_vc using prover: Alt-Ergo,2.4.0
+== Stage 2: split_vc on unproved goal ==
+Target theory: SumOfFlooredPairs_List_Spec
+Target goal  : test_004_python_assertions'vc
+---- stage2 | prover: Alt-Ergo,2.4.0 | theory: SumOfFlooredPairs_List_Spec | goal: test_004_python_assertions'vc ----
+Transforms: split_vc
+File "sum_of_floored_pairs_list.mlw", line 128, characters 13-37:
+Sub-goal Assertion of goal test_004_python_assertions'vc.
+Prover result is: Valid (0.01s, 68 steps).
+
+File "sum_of_floored_pairs_list.mlw", line 129, characters 13-43:
+Sub-goal Assertion of goal test_004_python_assertions'vc.
+Prover result is: Valid (0.01s, 142 steps).
+
+File "sum_of_floored_pairs_list.mlw", line 130, characters 13-42:
+Sub-goal Assertion of goal test_004_python_assertions'vc.
+Prover result is: Valid (0.01s, 167 steps).
+
+File "sum_of_floored_pairs_list.mlw", line 131, characters 13-41:
+Sub-goal Assertion of goal test_004_python_assertions'vc.
+Prover result is: Valid (0.01s, 193 steps).
+
+File "sum_of_floored_pairs_list.mlw", line 132, characters 13-41:
+Sub-goal Assertion of goal test_004_python_assertions'vc.
+Prover result is: Valid (0.01s, 219 steps).
+
+File "sum_of_floored_pairs_list.mlw", line 133, characters 13-40:
+Sub-goal Assertion of goal test_004_python_assertions'vc.
+Prover result is: Valid (0.01s, 252 steps).
+
+File "sum_of_floored_pairs_list.mlw", line 134, characters 13-44:
+Sub-goal Assertion of goal test_004_python_assertions'vc.
+Prover result is: Valid (0.01s, 116 steps).
+
+File "sum_of_floored_pairs_list.mlw", line 135, characters 13-44:
+Sub-goal Assertion of goal test_004_python_assertions'vc.
+Prover result is: Valid (0.01s, 38 steps).
+
+File "sum_of_floored_pairs_list.mlw", line 136, characters 13-45:
+Sub-goal Assertion of goal test_004_python_assertions'vc.
+Prover result is: Valid (0.01s, 40 steps).
+
+File "sum_of_floored_pairs_list.mlw", line 137, characters 13-45:
+Sub-goal Assertion of goal test_004_python_assertions'vc.
+Prover result is: Valid (0.01s, 44 steps).
+
+File "sum_of_floored_pairs_list.mlw", line 138, characters 13-44:
+Sub-goal Assertion of goal test_004_python_assertions'vc.
+Prover result is: Valid (0.01s, 45 steps).
+
+File "sum_of_floored_pairs_list.mlw", line 139, characters 13-51:
+Sub-goal Assertion of goal test_004_python_assertions'vc.
+Prover result is: Valid (0.01s, 50 steps).
+Solved with split_vc using prover: Alt-Ergo,2.4.0
+== Stage 2: split_vc on unproved goal ==
+Target theory: SumOfFlooredPairs_List_Spec
+Target goal  : test_006_python_assertions'vc
+---- stage2 | prover: Alt-Ergo,2.4.0 | theory: SumOfFlooredPairs_List_Spec | goal: test_006_python_assertions'vc ----
+Transforms: split_vc
+File "sum_of_floored_pairs_list.mlw", line 147, characters 13-37:
+Sub-goal Assertion of goal test_006_python_assertions'vc.
+Prover result is: Valid (0.01s, 68 steps).
+
+File "sum_of_floored_pairs_list.mlw", line 148, characters 13-38:
+Sub-goal Assertion of goal test_006_python_assertions'vc.
+Prover result is: Valid (0.01s, 137 steps).
+
+File "sum_of_floored_pairs_list.mlw", line 149, characters 13-38:
+Sub-goal Assertion of goal test_006_python_assertions'vc.
+Prover result is: Valid (0.01s, 166 steps).
+
+File "sum_of_floored_pairs_list.mlw", line 150, characters 13-38:
+Sub-goal Assertion of goal test_006_python_assertions'vc.
+Prover result is: Valid (0.01s, 195 steps).
+
+File "sum_of_floored_pairs_list.mlw", line 151, characters 13-38:
+Sub-goal Assertion of goal test_006_python_assertions'vc.
+Prover result is: Valid (0.01s, 233 steps).
+
+File "sum_of_floored_pairs_list.mlw", line 152, characters 13-39:
+Sub-goal Assertion of goal test_006_python_assertions'vc.
+Prover result is: Valid (0.01s, 261 steps).
+
+File "sum_of_floored_pairs_list.mlw", line 153, characters 13-45:
+Sub-goal Assertion of goal test_006_python_assertions'vc.
+Prover result is: Valid (0.01s, 122 steps).
+
+File "sum_of_floored_pairs_list.mlw", line 154, characters 13-45:
+Sub-goal Assertion of goal test_006_python_assertions'vc.
+Prover result is: Valid (0.01s, 38 steps).
+
+File "sum_of_floored_pairs_list.mlw", line 155, characters 13-45:
+Sub-goal Assertion of goal test_006_python_assertions'vc.
+Prover result is: Valid (0.01s, 40 steps).
+
+File "sum_of_floored_pairs_list.mlw", line 156, characters 13-45:
+Sub-goal Assertion of goal test_006_python_assertions'vc.
+Prover result is: Valid (0.01s, 44 steps).
+
+File "sum_of_floored_pairs_list.mlw", line 157, characters 13-44:
+Sub-goal Assertion of goal test_006_python_assertions'vc.
+Prover result is: Valid (0.01s, 45 steps).
+
+File "sum_of_floored_pairs_list.mlw", line 158, characters 13-51:
+Sub-goal Assertion of goal test_006_python_assertions'vc.
+Prover result is: Valid (0.01s, 50 steps).
+Solved with split_vc using prover: Alt-Ergo,2.4.0
+== Stage 2: split_vc on unproved goal ==
+Target theory: SumOfFlooredPairs_List_Spec
+Target goal  : test_008_python_assertions'vc
+---- stage2 | prover: Alt-Ergo,2.4.0 | theory: SumOfFlooredPairs_List_Spec | goal: test_008_python_assertions'vc ----
+Transforms: split_vc
+File "sum_of_floored_pairs_list.mlw", line 166, characters 13-37:
+Sub-goal Assertion of goal test_008_python_assertions'vc.
+Prover result is: Valid (0.01s, 68 steps).
+
+File "sum_of_floored_pairs_list.mlw", line 167, characters 13-37:
+Sub-goal Assertion of goal test_008_python_assertions'vc.
+Prover result is: Valid (0.01s, 136 steps).
+
+File "sum_of_floored_pairs_list.mlw", line 168, characters 13-37:
+Sub-goal Assertion of goal test_008_python_assertions'vc.
+Prover result is: Valid (0.01s, 165 steps).
+
+File "sum_of_floored_pairs_list.mlw", line 169, characters 13-37:
+Sub-goal Assertion of goal test_008_python_assertions'vc.
+Prover result is: Valid (0.01s, 195 steps).
+
+File "sum_of_floored_pairs_list.mlw", line 170, characters 13-37:
+Sub-goal Assertion of goal test_008_python_assertions'vc.
+Prover result is: Valid (0.01s, 226 steps).
+
+File "sum_of_floored_pairs_list.mlw", line 171, characters 13-38:
+Sub-goal Assertion of goal test_008_python_assertions'vc.
+Prover result is: Valid (0.01s, 261 steps).
+
+File "sum_of_floored_pairs_list.mlw", line 172, characters 13-45:
+Sub-goal Assertion of goal test_008_python_assertions'vc.
+Prover result is: Valid (0.01s, 122 steps).
+
+File "sum_of_floored_pairs_list.mlw", line 173, characters 13-45:
+Sub-goal Assertion of goal test_008_python_assertions'vc.
+Prover result is: Valid (0.01s, 38 steps).
+
+File "sum_of_floored_pairs_list.mlw", line 174, characters 13-45:
+Sub-goal Assertion of goal test_008_python_assertions'vc.
+Prover result is: Valid (0.01s, 40 steps).
+
+File "sum_of_floored_pairs_list.mlw", line 175, characters 13-45:
+Sub-goal Assertion of goal test_008_python_assertions'vc.
+Prover result is: Valid (0.01s, 44 steps).
+
+File "sum_of_floored_pairs_list.mlw", line 176, characters 13-44:
+Sub-goal Assertion of goal test_008_python_assertions'vc.
+Prover result is: Valid (0.01s, 45 steps).
+
+File "sum_of_floored_pairs_list.mlw", line 177, characters 13-51:
+Sub-goal Assertion of goal test_008_python_assertions'vc.
+Prover result is: Valid (0.01s, 50 steps).
+Solved with split_vc using prover: Alt-Ergo,2.4.0
+== Goals still unproved after stage 2 (split_vc) ==
+SumOfFlooredPairs_List_Spec	row_floor_sum'vc
+== Stage 3: split_vc + inline_all on still-unproved goal ==
+Target theory: SumOfFlooredPairs_List_Spec
+Target goal  : row_floor_sum'vc
+---- stage3 | prover: Alt-Ergo,2.4.0 | theory: SumOfFlooredPairs_List_Spec | goal: row_floor_sum'vc ----
+Transforms: split_vc inline_all
+File "sum_of_floored_pairs_list.mlw", line 28, characters 29-47:
+Sub-goal Variant decrease of goal row_floor_sum'vc.
+Prover result is: Valid (0.01s, 34 steps).
+
+File "sum_of_floored_pairs_list.mlw", line 28, characters 19-26:
+Sub-goal Precondition of goal row_floor_sum'vc.
+Prover result is: Timeout (10.00s, 320830 steps).
+---- stage3 | prover: CVC4,1.8 | theory: SumOfFlooredPairs_List_Spec | goal: row_floor_sum'vc ----
+Transforms: split_vc inline_all
+File "sum_of_floored_pairs_list.mlw", line 28, characters 29-47:
+Sub-goal Variant decrease of goal row_floor_sum'vc.
+Prover result is: Valid (0.02s, 2349 steps).
+
+File "sum_of_floored_pairs_list.mlw", line 28, characters 19-26:
+Sub-goal Precondition of goal row_floor_sum'vc.
+Prover result is: Unknown (unknown + incomplete) (0.01s, 1908 steps).
+== Final summary ==
+Unproved root goals after first prover : 10
+Remaining failures after split_vc      : 1
+Remaining failures after stage 3       : 1
+Detailed logs stored in                : /Users/rubenm/Desktop/Diversify2Verify/codex-runs2/stage1a-list/1862_sum-of-floored-pairs-20260524-090530/generated/why3/list/.why3_sessions/sum_of_floored_pairs_list_logs
+Still unproved goals:
+SumOfFlooredPairs_List_Spec	row_floor_sum'vc
+VERIFY_RESULT: FAILURE
+VERIFY_REASON: unproved_goals_remain
+VERIFY_STAGE: stage3
+VERIFY_ROOT_TOTAL: 10
+VERIFY_ROOT_PROVED: 9
+VERIFY_ROOT_REMAINING: 1

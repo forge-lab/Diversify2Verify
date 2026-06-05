@@ -1,0 +1,226 @@
+module LongestTurbulentSubarray_List_Stage3_Imperative
+
+  use int.Int
+  use int.MinMax
+  use list.List
+  use list.Length
+  use ref.Ref
+
+  let rec function run_len_from (prev: int) (rest: list int) (expect_up: bool) : int
+    variant { rest }
+    ensures { 1 <= result }
+    ensures { result <= length rest + 1 }
+  =
+    match rest with
+    | Nil -> 1
+    | Cons x xs ->
+        if expect_up then
+          if prev < x then 1 + run_len_from x xs false else 1
+        else
+          if prev > x then 1 + run_len_from x xs true else 1
+    end
+
+  let function turbulent_prefix_len (arr: list int) : int
+    ensures { 0 <= result }
+    ensures { result <= length arr }
+  =
+    match arr with
+    | Nil -> 0
+    | Cons x xs ->
+        match xs with
+        | Nil -> 1
+        | Cons y ys ->
+            if x < y then 1 + run_len_from y ys false
+            else if x > y then 1 + run_len_from y ys true
+            else 1
+        end
+    end
+
+  let rec function longest_turbulent_length (arr: list int) : int
+    variant { arr }
+    ensures { 0 <= result }
+    ensures { result <= length arr }
+  =
+    match arr with
+    | Nil -> 0
+    | Cons _ xs -> max (turbulent_prefix_len arr) (longest_turbulent_length xs)
+    end
+
+  let function next_dir (prev: int) (x: int) : int =
+    if x = prev then 0
+    else if prev < x then 1
+    else -1
+
+  let function next_cur_len (prev: int) (x: int) (dir: int) (cur_len: int) : int =
+    if x = prev then 1
+    else
+      let cmp = if prev < x then 1 else -1 in
+      if dir = 0 then 2
+      else if cmp <> dir then cur_len + 1
+      else 2
+
+  let function next_best (prev: int) (x: int) (dir: int) (cur_len: int) (best: int) : int =
+    max best (next_cur_len prev x dir cur_len)
+
+  let rec function scan_best
+      (prev: int) (dir: int) (cur_len: int) (best: int) (cur: list int) : int
+    variant { cur }
+    ensures { best <= result }
+    ensures {
+      dir = 0 /\ cur_len = 1 /\ best = 1 ->
+      result = longest_turbulent_length (Cons prev cur)
+    }
+  =
+    match cur with
+    | Nil -> best
+    | Cons x xs ->
+        scan_best x
+          (next_dir prev x)
+          (next_cur_len prev x dir cur_len)
+          (next_best prev x dir cur_len best)
+          xs
+    end
+
+  let rec lemma run_len_from_bounds (prev: int) (rest: list int) (expect_up: bool)
+    ensures { 1 <= run_len_from prev rest expect_up }
+    ensures { run_len_from prev rest expect_up <= length rest + 1 }
+    variant { rest }
+  =
+    match rest with
+    | Nil -> ()
+    | Cons x xs ->
+        if expect_up then
+          if prev < x then run_len_from_bounds x xs false
+        else
+          if prev > x then run_len_from_bounds x xs true
+    end
+
+  let lemma run_len_from_positive (prev: int) (rest: list int) (expect_up: bool)
+    ensures { run_len_from prev rest expect_up >= 1 }
+  =
+    run_len_from_bounds prev rest expect_up
+
+  let lemma turbulent_prefix_len_bounds (l: list int)
+    ensures { 0 <= turbulent_prefix_len l }
+    ensures { turbulent_prefix_len l <= length l }
+  =
+    match l with
+    | Nil -> ()
+    | Cons x xs ->
+        match xs with
+        | Nil -> ()
+        | Cons y ys ->
+            if x < y then run_len_from_bounds y ys false
+            else if x > y then run_len_from_bounds y ys true
+        end
+    end
+
+  let rec lemma longest_turbulent_length_bounds (l: list int)
+    ensures { 0 <= longest_turbulent_length l }
+    ensures { longest_turbulent_length l <= length l }
+    variant { l }
+  =
+    match l with
+    | Nil -> ()
+    | Cons _ xs ->
+        turbulent_prefix_len_bounds l;
+        longest_turbulent_length_bounds xs;
+        assert { turbulent_prefix_len l <= length l };
+        assert { longest_turbulent_length xs <= length xs };
+        assert { length xs <= length l }
+    end
+
+  let rec lemma scan_best_lower_bound
+      (prev: int) (dir: int) (cur_len: int) (best: int) (cur: list int)
+    ensures { best <= scan_best prev dir cur_len best cur }
+    variant { cur }
+  =
+    match cur with
+    | Nil -> ()
+    | Cons x xs ->
+        let new_dir = next_dir prev x in
+        let new_len = next_cur_len prev x dir cur_len in
+        let new_best = next_best prev x dir cur_len best in
+        assert { best <= new_best };
+        scan_best_lower_bound x new_dir new_len new_best xs
+    end
+
+  let lemma scan_best_initial (first: int) (rest: list int)
+    ensures {
+      scan_best first 0 1 1 rest = longest_turbulent_length (Cons first rest)
+    }
+  =
+    ()
+
+  let longest_turbulent_subarray_list (arr: list int) : int
+    requires { length arr >= 1 }
+    ensures  { result = longest_turbulent_length arr }
+  =
+    match arr with
+    | Nil ->
+        absurd
+    | Cons first rest ->
+        assert { scan_best first 0 1 1 rest = longest_turbulent_length arr };
+        let prev = ref first in
+        let dir = ref 0 in
+        let cur_len = ref 1 in
+        let best = ref 1 in
+        let cur = ref rest in
+        while (match !cur with Nil -> false | Cons _ _ -> true end) do
+          invariant { length !cur >= 0 }
+          invariant { !cur_len >= 1 }
+          invariant { !best >= !cur_len }
+          invariant { scan_best !prev !dir !cur_len !best !cur = longest_turbulent_length arr }
+          variant { length !cur }
+
+          match !cur with
+          | Nil -> absurd
+          | Cons x xs ->
+              let old_prev = !prev in
+              let old_dir = !dir in
+              let old_len = !cur_len in
+              let old_best = !best in
+              assert {
+                scan_best old_prev old_dir old_len old_best !cur =
+                scan_best x
+                  (next_dir old_prev x)
+                  (next_cur_len old_prev x old_dir old_len)
+                  (next_best old_prev x old_dir old_len old_best)
+                  xs
+              };
+              if x = old_prev then (
+                assert { next_cur_len old_prev x old_dir old_len = 1 };
+                assert { next_dir old_prev x = 0 };
+                cur_len := 1;
+                dir := 0
+              ) else (
+                let cmp = if old_prev < x then 1 else (-1) in
+                assert { cmp = next_dir old_prev x };
+                if old_dir = 0 then (
+                  assert { next_cur_len old_prev x old_dir old_len = 2 };
+                  cur_len := 2;
+                  dir := cmp
+                ) else if cmp <> old_dir then (
+                  assert { next_cur_len old_prev x old_dir old_len = old_len + 1 };
+                  cur_len := old_len + 1;
+                  dir := cmp
+                ) else (
+                  assert { next_cur_len old_prev x old_dir old_len = 2 };
+                  cur_len := 2;
+                  dir := cmp
+                )
+              );
+              assert { !dir = next_dir old_prev x };
+              assert { !cur_len = next_cur_len old_prev x old_dir old_len };
+              if !cur_len > !best then best := !cur_len;
+              assert { !best = next_best old_prev x old_dir old_len old_best };
+              prev := x;
+              cur := xs
+          end
+        done;
+        assert { !cur = Nil };
+        assert { scan_best !prev !dir !cur_len !best Nil = !best };
+        !best
+    end
+
+end

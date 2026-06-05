@@ -1,0 +1,165 @@
+module CountTheNumberOfFairPairs_Array_Imperative
+
+  use int.Int
+  use array.Array
+  use array.Init
+  use ref.Ref
+
+  let count_the_number_of_fair_pairs_array
+      (nums: array int) (lower: int) (upper: int) : int =
+    if length nums <= 1 then 0 else
+    let count = ref 0 in
+    for i = 0 to length nums - 2 do
+      for j = i + 1 to length nums - 1 do
+        let pair_sum = nums[i] + nums[j] in
+        if lower <= pair_sum then
+          if pair_sum <= upper then
+            count := !count + 1
+      done
+    done;
+    !count
+
+  let test_000 () : bool =
+    let nums = init 4 [|1000000000; (-1000000000); 500000000; (-500000000)|] in
+    let r = count_the_number_of_fair_pairs_array nums 0 0 in
+    r = 2
+
+  let test_001 () : bool =
+    let nums = init 6 [|0; 1; 7; 4; 4; 5|] in
+    let r = count_the_number_of_fair_pairs_array nums 3 6 in
+    r = 6
+
+  let test_002 () : bool =
+    let nums = init 5 [|5; 5; 5; 5; 5|] in
+    let r = count_the_number_of_fair_pairs_array nums 10 10 in
+    r = 10
+
+  let test_003 () : bool =
+    let nums = init 5 [|(-1); 0; 1; 2; 3|] in
+    let r = count_the_number_of_fair_pairs_array nums 0 4 in
+    r = 8
+
+  let test_004 () : bool =
+    let nums = init 5 [|(-1); 0; 1; 2; 3|] in
+    let r = count_the_number_of_fair_pairs_array nums (-2) 2 in
+    r = 6
+
+  let test_005 () : bool =
+    let nums = init 5 [|10; 20; 30; 40; 50|] in
+    let r = count_the_number_of_fair_pairs_array nums 50 70 in
+    r = 6
+
+  let test_006 () : bool =
+    let nums = init 4 [|1000000000; (-1000000000); 500000000; (-500000000)|] in
+    let r = count_the_number_of_fair_pairs_array nums (-1500000000) 1500000000 in
+    r = 6
+
+  let test_007 () : bool =
+    let nums = init 5 [|(-1); 0; 1; 2; 3|] in
+    let r = count_the_number_of_fair_pairs_array nums 0 2 in
+    r = 5
+
+  let test_008 () : bool =
+    let nums = init 5 [|1; 7; 9; 2; 5|] in
+    let r = count_the_number_of_fair_pairs_array nums 11 11 in
+    r = 1
+
+  let test_009 () : bool =
+    let nums = init 10 [|1; 2; 3; 4; 5; 6; 7; 8; 9; 10|] in
+    let r = count_the_number_of_fair_pairs_array nums 5 15 in
+    r = 37
+
+  let test_012 () : bool =
+    let nums = init 5 [|(-10); (-20); (-30); (-40); (-50)|] in
+    let r = count_the_number_of_fair_pairs_array nums (-80) (-50) in
+    r = 7
+
+  let test_013 () : bool =
+    let nums = init 5 [|1; 2; 3; 4; 5|] in
+    let r = count_the_number_of_fair_pairs_array nums 5 8 in
+    r = 7
+
+  let test_015 () : bool =
+    let nums = init 20 [|1; 2; 3; 4; 5; 6; 7; 8; 9; 10; 11; 12; 13; 14; 15; 16; 17; 18; 19; 20|] in
+    let r = count_the_number_of_fair_pairs_array nums 1 38 in
+    r = 189
+
+  let test_016 () : bool =
+    let nums = init 20 [|0; 0; 0; 0; 0; 0; 0; 0; 0; 0; 0; 0; 0; 0; 0; 0; 0; 0; 0; 0|] in
+    let r = count_the_number_of_fair_pairs_array nums 0 0 in
+    r = 190
+
+  let test_017 () : bool =
+    let nums = init 10 [|10; 20; 30; 40; 50; 60; 70; 80; 90; 100|] in
+    let r = count_the_number_of_fair_pairs_array nums 50 150 in
+    r = 37
+
+  let test_018 () : bool =
+    let nums = init 10 [|(-100); (-90); (-80); (-70); (-60); (-50); (-40); (-30); (-20); (-10)|] in
+    let r = count_the_number_of_fair_pairs_array nums (-150) (-50) in
+    r = 37
+
+  let test_019 () : bool =
+    let nums = init 15 [|1; 2; 3; 4; 5; 6; 7; 8; 9; 10; 11; 12; 13; 14; 15|] in
+    let r = count_the_number_of_fair_pairs_array nums 10 20 in
+    r = 64
+
+  let test_020 () : bool =
+    let nums = init 10 [|1; 3; 5; 7; 9; 11; 13; 15; 17; 19|] in
+    let r = count_the_number_of_fair_pairs_array nums 10 30 in
+    r = 37
+
+  let test_021 () : bool =
+    let nums = init 6 [|1000000000; (-1000000000); 500000000; (-500000000); 250000000; (-250000000)|] in
+    let r = count_the_number_of_fair_pairs_array nums (-1000000000) 1000000000 in
+    r = 11
+
+  let test_022 () : bool =
+    let nums = init 15 [|1; 3; 5; 7; 9; 11; 13; 15; 17; 19; 21; 23; 25; 27; 29|] in
+    let r = count_the_number_of_fair_pairs_array nums 15 35 in
+    r = 57
+
+  let run_tests () : bool =
+    if test_000 () then
+      if test_001 () then
+        if test_002 () then
+          if test_003 () then
+            if test_004 () then
+              if test_005 () then
+                if test_006 () then
+                  if test_007 () then
+                    if test_008 () then
+                      if test_009 () then
+                        if test_012 () then
+                          if test_013 () then
+                            if test_015 () then
+                              if test_016 () then
+                                if test_017 () then
+                                  if test_018 () then
+                                    if test_019 () then
+                                      if test_020 () then
+                                        if test_021 () then
+                                          if test_022 () then
+                                            true
+                                          else false
+                                        else false
+                                      else false
+                                    else false
+                                  else false
+                                else false
+                              else false
+                            else false
+                          else false
+                        else false
+                      else false
+                    else false
+                  else false
+                else false
+              else false
+            else false
+          else false
+        else false
+      else false
+    else false
+
+end

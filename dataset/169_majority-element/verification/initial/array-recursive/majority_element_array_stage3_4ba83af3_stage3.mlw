@@ -1,0 +1,89 @@
+module MajorityElement_Array_Stage3_Recursive
+
+  use int.Int
+  use array.Array
+  use array.Init
+  use array.NumOfEq
+
+  function occurrences (nums: array int) (x: int) : int =
+    NumOfEq.numof nums x 0 (length nums)
+
+  predicate majority_value (nums: array int) (x: int) =
+    (exists i: int. 0 <= i < length nums /\ nums[i] = x) /\
+    2 * occurrences nums x > length nums
+
+  predicate valid_input (nums: array int) =
+    1 <= length nums <= 50000 /\
+    (forall i: int. 0 <= i < length nums ->
+      -1000000000 <= nums[i] <= 1000000000) /\
+    (exists x: int. majority_value nums x)
+
+  predicate majority_element_array_spec (nums: array int) (res: int) =
+    majority_value nums res /\
+    (forall x: int. majority_value nums x -> x = res)
+
+  function majority_balance (nums: array int) (majority: int) (i: int) : int =
+    2 * NumOfEq.numof nums majority 0 i - i
+
+  predicate boyer_moore_state
+    (nums: array int) (majority: int) (i: int) (candidate: int) (count: int) =
+    0 <= i <= length nums /\
+    0 <= count /\
+    (if candidate = majority then
+       count >= majority_balance nums majority i
+     else
+       count <= - majority_balance nums majority i)
+
+  predicate has_boyer_moore_state
+    (nums: array int) (i: int) (candidate: int) (count: int) =
+    exists majority: int.
+      majority_value nums majority /\
+      boyer_moore_state nums majority i candidate count
+
+  let lemma majority_values_unique (nums: array int) (x: int) (y: int)
+    requires { majority_value nums x }
+    requires { majority_value nums y }
+    ensures  { x = y }
+  =
+    if x <> y then
+      (assert { occurrences nums x + occurrences nums y <= length nums };
+       assert { false })
+
+  let rec majority_candidate_from
+    (nums: array int) (i: int) (candidate: int) (count: int) : int
+    requires { valid_input nums }
+    requires { has_boyer_moore_state nums i candidate count }
+    variant  { length nums - i }
+    ensures  { majority_element_array_spec nums result }
+  =
+    if i = length nums then
+      (assert { majority_element_array_spec nums candidate };
+       candidate)
+    else
+      let x = nums[i] in
+      if count = 0 then
+        (assert { has_boyer_moore_state nums (i + 1) x 1 };
+         majority_candidate_from nums (i + 1) x 1)
+      else if x = candidate then
+        (assert { has_boyer_moore_state nums (i + 1) candidate (count + 1) };
+         majority_candidate_from nums (i + 1) candidate (count + 1))
+      else
+        (assert { has_boyer_moore_state nums (i + 1) candidate (count - 1) };
+         majority_candidate_from nums (i + 1) candidate (count - 1))
+
+  let majority_element_array (nums: array int) : int
+    requires { valid_input nums }
+    ensures  { majority_element_array_spec nums result }
+  =
+    if length nums = 0 then
+      (assert { false };
+       0)
+    else
+      (assert { 1 <= length nums };
+       assert { 0 <= 1 <= length nums };
+       assert { has_boyer_moore_state nums 1 nums[0] 1 };
+       let candidate = majority_candidate_from nums 1 nums[0] 1 in
+       assert { majority_element_array_spec nums candidate };
+       candidate)
+
+end

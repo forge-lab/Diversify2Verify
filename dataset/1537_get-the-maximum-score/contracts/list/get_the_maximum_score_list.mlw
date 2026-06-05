@@ -1,0 +1,122 @@
+module GetTheMaximumScore_List_Spec
+
+  use int.Int
+  use int.MinMax
+  use int.EuclideanDivision
+  use list.List
+  use list.Length
+
+  let rec predicate all_values_in_range (l: list int)
+    variant { l }
+  =
+    match l with
+    | Nil -> true
+    | Cons x xs -> 1 <= x && x <= 10000000 && all_values_in_range xs
+    end
+
+  let rec predicate lt_all (x: int) (l: list int)
+    variant { l }
+  =
+    match l with
+    | Nil -> true
+    | Cons y ys -> x < y && lt_all x ys
+    end
+
+  let rec predicate strictly_increasing (l: list int)
+    variant { l }
+  =
+    match l with
+    | Nil -> true
+    | Cons x xs -> lt_all x xs && strictly_increasing xs
+    end
+
+  let rec function max_score_acc (xs: list int) (ys: list int)
+      (acc1: int) (acc2: int) : int
+    variant { xs, ys }
+  =
+    match xs, ys with
+    | Nil, Nil -> max acc1 acc2
+    | Nil, Cons y ys_tail -> max_score_acc Nil ys_tail acc1 (acc2 + y)
+    | Cons x xs_tail, Nil -> max_score_acc xs_tail Nil (acc1 + x) acc2
+    | Cons x xs_tail, Cons y ys_tail ->
+        if x < y then
+          max_score_acc xs_tail ys (acc1 + x) acc2
+        else if y < x then
+          max_score_acc xs ys_tail acc1 (acc2 + y)
+        else
+          let joined = max acc1 acc2 + x in
+          max_score_acc xs_tail ys_tail joined joined
+    end
+
+  function max_score (nums1: list int) (nums2: list int) : int =
+    max_score_acc nums1 nums2 0 0
+
+  val get_the_maximum_score_list (nums1: list int) (nums2: list int) : int
+    requires { nums1 <> Nil /\ nums2 <> Nil }
+    requires { length nums1 <= 100000 /\ length nums2 <= 100000 }
+    requires { all_values_in_range nums1 /\ all_values_in_range nums2 }
+    requires { strictly_increasing nums1 /\ strictly_increasing nums2 }
+    ensures  { result = mod (max_score nums1 nums2) 1000000007 }
+    ensures  { 0 <= result < 1000000007 }
+
+  let lemma test_000_maximum_score () =
+    let nums1 = Cons 10000000 Nil in
+    let nums2 = Cons 10000000 Nil in
+    assert { max_score_acc Nil Nil 10000000 10000000 = 10000000 };
+    assert { max_score nums1 nums2 = 10000000 };
+    assert { mod (max_score nums1 nums2) 1000000007 = 10000000 }
+
+  let lemma test_001_maximum_score () =
+    let nums1 =
+      Cons 2 (Cons 4 (Cons 5 (Cons 8 (Cons 10 Nil)))) in
+    let nums2 =
+      Cons 4 (Cons 6 (Cons 8 (Cons 9 Nil))) in
+    assert { max_score_acc (Cons 10 Nil) (Cons 9 Nil) 20 20 = 30 };
+    assert { max_score_acc Nil Nil 30 29 = 30 };
+    assert { max_score nums1 nums2 = 30 };
+    assert { mod (max_score nums1 nums2) 1000000007 = 30 }
+
+  let lemma test_004_maximum_score () =
+    let nums1 =
+      Cons 1 (Cons 2 (Cons 3 (Cons 4 (Cons 5
+      (Cons 6 (Cons 7 (Cons 8 (Cons 9 (Cons 10 Nil))))))))) in
+    let nums2 =
+      Cons 11 (Cons 12 (Cons 13 (Cons 14 (Cons 15
+      (Cons 16 (Cons 17 (Cons 18 (Cons 19 (Cons 20 Nil))))))))) in
+    assert { max_score_acc Nil nums2 55 0 = 155 };
+    assert { max_score nums1 nums2 = 155 };
+    assert { mod (max_score nums1 nums2) 1000000007 = 155 }
+
+  let lemma test_005_maximum_score () =
+    let nums1 = Cons 1 (Cons 4 (Cons 6 (Cons 8 (Cons 10 Nil)))) in
+    let nums2 = Cons 2 (Cons 4 (Cons 6 (Cons 8 (Cons 12 Nil)))) in
+    assert { max_score_acc (Cons 10 Nil) (Cons 12 Nil) 20 20 = 32 };
+    assert { max_score nums1 nums2 = 32 };
+    assert { mod (max_score nums1 nums2) 1000000007 = 32 }
+
+  let lemma test_006_maximum_score () =
+    let nums1 = Cons 5 (Cons 10 (Cons 15 (Cons 20 Nil))) in
+    let nums2 =
+      Cons 1 (Cons 2 (Cons 3 (Cons 4 (Cons 5
+      (Cons 6 (Cons 7 (Cons 8 (Cons 9 (Cons 10
+      (Cons 11 (Cons 12 (Cons 13 (Cons 14 (Cons 15
+      (Cons 16 (Cons 17 (Cons 18 (Cons 19 (Cons 20 Nil))))))))))))))))))) in
+    assert { max_score_acc Nil Nil 170 210 = 210 };
+    assert { max_score nums1 nums2 = 210 };
+    assert { mod (max_score nums1 nums2) 1000000007 = 210 }
+
+  let lemma test_007_maximum_score () =
+    let nums1 = Cons 1 (Cons 3 (Cons 5 (Cons 7 (Cons 9 Nil)))) in
+    let nums2 = Cons 3 (Cons 5 (Cons 100 Nil)) in
+    assert { max_score_acc (Cons 7 (Cons 9 Nil)) (Cons 100 Nil) 9 9 = 109 };
+    assert { max_score nums1 nums2 = 109 };
+    assert { mod (max_score nums1 nums2) 1000000007 = 109 }
+
+  let lemma test_008_maximum_score () =
+    let nums1 = Cons 1 (Cons 2 (Cons 3 (Cons 4 (Cons 5 Nil)))) in
+    let nums2 = Cons 6 (Cons 7 (Cons 8 (Cons 9 (Cons 10 Nil)))) in
+    assert { max_score_acc Nil nums2 15 0 = 40 };
+    assert { max_score nums1 nums2 = 40 };
+    assert { mod (max_score nums1 nums2) 1000000007 = 40 }
+
+end

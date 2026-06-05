@@ -1,0 +1,231 @@
+module SmallestRangeIi_List_Imperative
+
+  use int.Int
+  use list.List
+  use ref.Ref
+
+  let min2 (a: int) (b: int) : int =
+    if a <= b then a else b
+
+  let max2 (a: int) (b: int) : int =
+    if a >= b then a else b
+
+  let insert_sorted (x: int) (l: list int) : list int =
+    let prefix = ref (Nil: list int) in
+    let suffix = ref l in
+    while (match !suffix with
+           | Nil -> false
+           | Cons y _ -> y < x
+           end) do
+      match !suffix with
+      | Nil -> ()
+      | Cons y ys ->
+          prefix := Cons y !prefix;
+          suffix := ys
+      end
+    done;
+    let result = ref (Cons x !suffix) in
+    let cur = ref !prefix in
+    while (match !cur with Nil -> false | Cons _ _ -> true end) do
+      match !cur with
+      | Nil -> ()
+      | Cons y ys ->
+          result := Cons y !result;
+          cur := ys
+      end
+    done;
+    !result
+
+  let sort_list (l: list int) : list int =
+    let sorted = ref (Nil: list int) in
+    let cur = ref l in
+    while (match !cur with Nil -> false | Cons _ _ -> true end) do
+      match !cur with
+      | Nil -> ()
+      | Cons x xs ->
+          sorted := insert_sorted x !sorted;
+          cur := xs
+      end
+    done;
+    !sorted
+
+  let last_value_with_current (current: int) (xs: list int) : int =
+    let last = ref current in
+    let cur = ref xs in
+    while (match !cur with Nil -> false | Cons _ _ -> true end) do
+      match !cur with
+      | Nil -> ()
+      | Cons y ys ->
+          last := y;
+          cur := ys
+      end
+    done;
+    !last
+
+  let smallest_range_ii_list (nums: list int) (k: int) : int =
+    match sort_list nums with
+    | Nil -> 0
+    | Cons first rest ->
+        let last = last_value_with_current first rest in
+        let best = ref (last - first) in
+        let prev = ref first in
+        let cur = ref rest in
+        while (match !cur with Nil -> false | Cons _ _ -> true end) do
+          match !cur with
+          | Nil -> ()
+          | Cons current tail ->
+              let high = max2 (!prev + k) (last - k) in
+              let low = min2 (first + k) (current - k) in
+              let candidate = high - low in
+              if candidate < !best then best := candidate;
+              prev := current;
+              cur := tail
+          end
+        done;
+        !best
+    end
+
+  let test_test_000 () : bool =
+    let nums = Cons 0 (Cons 10 (Nil)) in
+    let r = smallest_range_ii_list nums 2 in
+    r = 6
+
+  let test_test_001 () : bool =
+    let nums = Cons 1 (Cons 5 (Cons 8 (Nil))) in
+    let r = smallest_range_ii_list nums 2 in
+    r = 3
+
+  let test_test_002 () : bool =
+    let nums = Cons 6 (Cons 3 (Cons 4 (Cons 7 (Nil)))) in
+    let r = smallest_range_ii_list nums 3 in
+    r = 4
+
+  let test_test_003 () : bool =
+    let nums = Cons 6 (Cons 3 (Cons 2 (Cons 18 (Cons 9 (Cons 12 (Cons 3 (Cons 6 (Cons 5 (Cons 0 (Nil)))))))))) in
+    let r = smallest_range_ii_list nums 6 in
+    r = 9
+
+  let test_test_004 () : bool =
+    let nums = Cons 4 (Cons 9 (Cons 6 (Nil))) in
+    let r = smallest_range_ii_list nums 2 in
+    r = 2
+
+  let test_test_005 () : bool =
+    let nums = Cons 1 (Cons 3 (Cons 6 (Nil))) in
+    let r = smallest_range_ii_list nums 3 in
+    r = 3
+
+  let test_test_006 () : bool =
+    let nums = Cons 7 (Cons 8 (Cons 8 (Cons 10 (Nil)))) in
+    let r = smallest_range_ii_list nums 3 in
+    r = 3
+
+  let test_test_007 () : bool =
+    let nums = Cons 1 (Nil) in
+    let r = smallest_range_ii_list nums 0 in
+    r = 0
+
+  let test_test_008 () : bool =
+    let nums = Cons 4 (Cons 1 (Cons 8 (Cons 10 (Nil)))) in
+    let r = smallest_range_ii_list nums 2 in
+    r = 5
+
+  let test_test_009 () : bool =
+    let nums = Cons 6 (Cons 3 (Cons 4 (Cons 2 (Nil)))) in
+    let r = smallest_range_ii_list nums 1 in
+    r = 2
+
+  let test_test_010 () : bool =
+    let nums = Cons 100 (Cons 200 (Cons 300 (Cons 400 (Cons 500 (Nil))))) in
+    let r = smallest_range_ii_list nums 50 in
+    r = 300
+
+  let test_test_011 () : bool =
+    let nums = Cons 30 (Cons 10 (Cons 20 (Cons 40 (Cons 50 (Cons 60 (Nil)))))) in
+    let r = smallest_range_ii_list nums 15 in
+    r = 20
+
+  let test_test_012 () : bool =
+    let nums = Cons 10 (Cons 15 (Cons 3 (Cons 7 (Cons 8 (Cons 12 (Nil)))))) in
+    let r = smallest_range_ii_list nums 4 in
+    r = 6
+
+  let test_test_013 () : bool =
+    let nums = Cons 9999 (Cons 9998 (Cons 9997 (Cons 9996 (Cons 9995 (Cons 9994 (Cons 9993 (Cons 9992 (Cons 9991 (Cons 9990 (Nil)))))))))) in
+    let r = smallest_range_ii_list nums 1000 in
+    r = 9
+
+  let test_test_014 () : bool =
+    let nums = Cons 2 (Cons 4 (Cons 6 (Cons 8 (Cons 10 (Cons 12 (Cons 14 (Cons 16 (Cons 18 (Cons 20 (Nil)))))))))) in
+    let r = smallest_range_ii_list nums 3 in
+    r = 12
+
+  let test_test_015 () : bool =
+    let nums = Cons 10 (Cons 20 (Cons 30 (Cons 40 (Cons 50 (Cons 60 (Cons 70 (Cons 80 (Cons 90 (Cons 100 (Cons 110 (Cons 120 (Nil)))))))))))) in
+    let r = smallest_range_ii_list nums 15 in
+    r = 80
+
+  let test_test_016 () : bool =
+    let nums = Cons 5 (Cons 8 (Cons 12 (Cons 15 (Cons 20 (Cons 25 (Cons 30 (Nil))))))) in
+    let r = smallest_range_ii_list nums 10 in
+    r = 15
+
+  let test_test_017 () : bool =
+    let nums = Cons 1 (Cons 100 (Cons 200 (Cons 300 (Cons 400 (Cons 500 (Cons 600 (Cons 700 (Cons 800 (Cons 900 (Cons 1000 (Nil))))))))))) in
+    let r = smallest_range_ii_list nums 100 in
+    r = 799
+
+  let test_test_018 () : bool =
+    let nums = Cons 1 (Cons 3 (Cons 5 (Cons 7 (Cons 9 (Cons 11 (Cons 13 (Cons 15 (Cons 17 (Cons 19 (Cons 21 (Cons 23 (Cons 25 (Cons 27 (Cons 29 (Cons 31 (Cons 33 (Cons 35 (Cons 37 (Cons 39 (Nil)))))))))))))))))))) in
+    let r = smallest_range_ii_list nums 10 in
+    r = 18
+
+  let test_test_019 () : bool =
+    let nums = Cons 10 (Cons 15 (Cons 20 (Cons 25 (Cons 30 (Cons 35 (Cons 40 (Nil))))))) in
+    let r = smallest_range_ii_list nums 5 in
+    r = 20
+
+  let run_tests () : bool =
+    if test_test_000 () then
+    if test_test_001 () then
+    if test_test_002 () then
+    if test_test_003 () then
+    if test_test_004 () then
+    if test_test_005 () then
+    if test_test_006 () then
+    if test_test_007 () then
+    if test_test_008 () then
+    if test_test_009 () then
+    if test_test_010 () then
+    if test_test_011 () then
+    if test_test_012 () then
+    if test_test_013 () then
+    if test_test_014 () then
+    if test_test_015 () then
+    if test_test_016 () then
+    if test_test_017 () then
+    if test_test_018 () then
+    if test_test_019 () then
+      true
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+
+end

@@ -1,0 +1,292 @@
+== Stage 1: first prover on whole file ==
+Running in /Users/rubenm/Desktop/Diversify2Verify/codex-runs/dataset-merge/870_advantage-shuffle/stage3a/array-imperative/advantage_shuffle_array_stage3_db9a16ee/generated/why3/array: why3 session create -o /Users/rubenm/Desktop/Diversify2Verify/codex-runs/dataset-merge/870_advantage-shuffle/stage3a/array-imperative/advantage_shuffle_array_stage3_db9a16ee/generated/why3/array/.why3_sessions/advantage_shuffle_array_stage3_db9a16ee_stage3_stage1 -P Z3,4.8.6 -t 10 -m 8192 advantage_shuffle_array_stage3_db9a16ee_stage3.mlw
+Session created successfully
+Running in /Users/rubenm/Desktop/Diversify2Verify/codex-runs/dataset-merge/870_advantage-shuffle/stage3a/array-imperative/advantage_shuffle_array_stage3_db9a16ee/generated/why3/array: why3 bench /Users/rubenm/Desktop/Diversify2Verify/codex-runs/dataset-merge/870_advantage-shuffle/stage3a/array-imperative/advantage_shuffle_array_stage3_db9a16ee/generated/why3/array/.why3_sessions/advantage_shuffle_array_stage3_db9a16ee_stage3_stage1
+Progress: 3/1/0                       Progress: 2/2/0                       Progress: 1/3/0                       Progress: 0/4/0                       Progress: 0/0/2                       Progress: 0/0/1                       
+Replay completed, saving session... done
+== Stage 1 stats ==
+= Statistics for session /Users/rubenm/Desktop/Diversify2Verify/codex-runs/dataset-merge/870_advantage-shuffle/stage3a/array-imperative/advantage_shuffle_array_stage3_db9a16ee/generated/why3/array/.why3_sessions/advantage_shuffle_array_stage3_db9a16ee_stage3_stage1
+
+== Number of root goals ==
+  total: 4  proved: 2
+
+== Number of sub goals ==
+  total: 0  proved: 0
+
+== Goals not proved ==
+  +-- file [../../advantage_shuffle_array_stage3_db9a16ee_stage3.mlw]
+    +-- theory AdvantageShuffle_Array_Stage3_Imperative
+      +-- goal sort_array_ascending'vc
+      +-- goal advantage_shuffle_array'vc
+  
+== Goals proved by only one prover ==
+  +-- file [../../advantage_shuffle_array_stage3_db9a16ee_stage3.mlw]
+    +-- theory AdvantageShuffle_Array_Stage3_Imperative
+      +-- goal copy_array'vc: Z3 4.8.6
+      +-- goal sort_values_with_indices'vc: Z3 4.8.6
+  
+1 session(s) read, with a total of 4 proof goals.
+== Unproved root goals after first prover ==
+AdvantageShuffle_Array_Stage3_Imperative	sort_array_ascending'vc
+AdvantageShuffle_Array_Stage3_Imperative	advantage_shuffle_array'vc
+== Stage 1: trying remaining goals with prover Alt-Ergo,2.4.0 ==
+---- stage1 | prover: Alt-Ergo,2.4.0 | theory: AdvantageShuffle_Array_Stage3_Imperative | goal: sort_array_ascending'vc ----
+File advantage_shuffle_array_stage3_db9a16ee_stage3.mlw:
+Goal sort_array_ascending'vc.
+Prover result is: Valid (9.18s, 61190 steps).
+Solved in stage 1 using prover: Alt-Ergo,2.4.0
+---- stage1 | prover: Alt-Ergo,2.4.0 | theory: AdvantageShuffle_Array_Stage3_Imperative | goal: advantage_shuffle_array'vc ----
+File advantage_shuffle_array_stage3_db9a16ee_stage3.mlw:
+Goal advantage_shuffle_array'vc.
+Prover result is: Timeout (10.00s, 31849 steps).
+Remaining after prover Alt-Ergo,2.4.0: 1
+== Stage 1: trying remaining goals with prover CVC4,1.8 ==
+---- stage1 | prover: CVC4,1.8 | theory: AdvantageShuffle_Array_Stage3_Imperative | goal: advantage_shuffle_array'vc ----
+File advantage_shuffle_array_stage3_db9a16ee_stage3.mlw:
+Goal advantage_shuffle_array'vc.
+Prover result is: Timeout (10.00s, 1352561 steps).
+Remaining after prover CVC4,1.8: 1
+== Goals still unproved after stage 1 ==
+AdvantageShuffle_Array_Stage3_Imperative	advantage_shuffle_array'vc
+== Stage 2: split_vc on unproved goal ==
+Target theory: AdvantageShuffle_Array_Stage3_Imperative
+Target goal  : advantage_shuffle_array'vc
+---- stage2 | prover: Z3,4.8.6 | theory: AdvantageShuffle_Array_Stage3_Imperative | goal: advantage_shuffle_array'vc ----
+Transforms: split_vc
+File "advantage_shuffle_array_stage3_db9a16ee_stage3.mlw", line 142, characters 17-25:
+Sub-goal Array creation size of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.01s, 51802 steps).
+
+File "advantage_shuffle_array_stage3_db9a16ee_stage3.mlw", line 146, characters 18-41:
+Sub-goal Loop invariant init of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.01s, 4047 steps).
+
+File "advantage_shuffle_array_stage3_db9a16ee_stage3.mlw", line 147, characters 18-41:
+Sub-goal Loop invariant init of goal advantage_shuffle_array'vc.
+Prover result is: Unknown (unknown) (8.85s, 77550912 steps).
+
+File "advantage_shuffle_array_stage3_db9a16ee_stage3.mlw", line 148, characters 18-43:
+Sub-goal Loop invariant init of goal advantage_shuffle_array'vc.
+Prover result is: Unknown (unknown) (1.30s, 7489651 steps).
+
+File "advantage_shuffle_array_stage3_db9a16ee_stage3.mlw", line 149, characters 18-35:
+Sub-goal Loop invariant init of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.01s, 4074 steps).
+
+File "advantage_shuffle_array_stage3_db9a16ee_stage3.mlw", line 150, characters 18-52:
+Sub-goal Loop invariant init of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.01s, 4079 steps).
+
+File "advantage_shuffle_array_stage3_db9a16ee_stage3.mlw", line 151, characters 18-69:
+Sub-goal Loop invariant init of goal advantage_shuffle_array'vc.
+Prover result is: Unknown (unknown) (0.61s, 7543606 steps).
+
+File "advantage_shuffle_array_stage3_db9a16ee_stage3.mlw", line 152, characters 18-33:
+Sub-goal Loop invariant init of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.01s, 4323 steps).
+
+File "advantage_shuffle_array_stage3_db9a16ee_stage3.mlw", line 153, characters 18-34:
+Sub-goal Loop invariant init of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.01s, 4350 steps).
+
+File "advantage_shuffle_array_stage3_db9a16ee_stage3.mlw", line 154, characters 18-46:
+Sub-goal Loop invariant init of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.01s, 4385 steps).
+
+File "advantage_shuffle_array_stage3_db9a16ee_stage3.mlw", line 155, characters 18-37:
+Sub-goal Loop invariant init of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.01s, 4394 steps).
+
+File "advantage_shuffle_array_stage3_db9a16ee_stage3.mlw", line 156, characters 51-94:
+Sub-goal Loop invariant init of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.01s, 4437 steps).
+
+File "advantage_shuffle_array_stage3_db9a16ee_stage3.mlw", line 157, characters 18-33:
+Sub-goal Index in array bounds of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.01s, 65741 steps).
+
+File "advantage_shuffle_array_stage3_db9a16ee_stage3.mlw", line 158, characters 17-36:
+Sub-goal Index in array bounds of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.01s, 65785 steps).
+
+File "advantage_shuffle_array_stage3_db9a16ee_stage3.mlw", line 159, characters 15-36:
+Sub-goal Index in array bounds of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.01s, 66143 steps).
+
+File "advantage_shuffle_array_stage3_db9a16ee_stage3.mlw", line 159, characters 8-46:
+Sub-goal Index in array bounds of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.01s, 70422 steps).
+
+File "advantage_shuffle_array_stage3_db9a16ee_stage3.mlw", line 146, characters 18-41:
+Sub-goal Loop invariant preservation of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.01s, 5698 steps).
+
+File "advantage_shuffle_array_stage3_db9a16ee_stage3.mlw", line 147, characters 18-41:
+Sub-goal Loop invariant preservation of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.01s, 5707 steps).
+
+File "advantage_shuffle_array_stage3_db9a16ee_stage3.mlw", line 148, characters 18-43:
+Sub-goal Loop invariant preservation of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.01s, 5716 steps).
+
+File "advantage_shuffle_array_stage3_db9a16ee_stage3.mlw", line 149, characters 18-35:
+Sub-goal Loop invariant preservation of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.02s, 85460 steps).
+
+File "advantage_shuffle_array_stage3_db9a16ee_stage3.mlw", line 150, characters 18-52:
+Sub-goal Loop invariant preservation of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.01s, 5728 steps).
+
+File "advantage_shuffle_array_stage3_db9a16ee_stage3.mlw", line 151, characters 18-69:
+Sub-goal Loop invariant preservation of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.01s, 5733 steps).
+
+File "advantage_shuffle_array_stage3_db9a16ee_stage3.mlw", line 152, characters 18-33:
+Sub-goal Loop invariant preservation of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.02s, 86399 steps).
+
+File "advantage_shuffle_array_stage3_db9a16ee_stage3.mlw", line 153, characters 18-34:
+Sub-goal Loop invariant preservation of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.01s, 8327 steps).
+
+File "advantage_shuffle_array_stage3_db9a16ee_stage3.mlw", line 154, characters 18-46:
+Sub-goal Loop invariant preservation of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.01s, 19004 steps).
+
+File "advantage_shuffle_array_stage3_db9a16ee_stage3.mlw", line 155, characters 18-37:
+Sub-goal Loop invariant preservation of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.01s, 26828 steps).
+
+File "advantage_shuffle_array_stage3_db9a16ee_stage3.mlw", line 156, characters 51-94:
+Sub-goal Loop invariant preservation of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.02s, 97926 steps).
+
+File "advantage_shuffle_array_stage3_db9a16ee_stage3.mlw", line 162, characters 15-37:
+Sub-goal Index in array bounds of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.01s, 70056 steps).
+
+File "advantage_shuffle_array_stage3_db9a16ee_stage3.mlw", line 162, characters 8-47:
+Sub-goal Index in array bounds of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.01s, 70332 steps).
+
+File "advantage_shuffle_array_stage3_db9a16ee_stage3.mlw", line 146, characters 18-41:
+Sub-goal Loop invariant preservation of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.01s, 5708 steps).
+
+File "advantage_shuffle_array_stage3_db9a16ee_stage3.mlw", line 147, characters 18-41:
+Sub-goal Loop invariant preservation of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.01s, 5717 steps).
+
+File "advantage_shuffle_array_stage3_db9a16ee_stage3.mlw", line 148, characters 18-43:
+Sub-goal Loop invariant preservation of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.01s, 5726 steps).
+
+File "advantage_shuffle_array_stage3_db9a16ee_stage3.mlw", line 149, characters 18-35:
+Sub-goal Loop invariant preservation of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.02s, 85461 steps).
+
+File "advantage_shuffle_array_stage3_db9a16ee_stage3.mlw", line 150, characters 18-52:
+Sub-goal Loop invariant preservation of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.01s, 5738 steps).
+
+File "advantage_shuffle_array_stage3_db9a16ee_stage3.mlw", line 151, characters 18-69:
+Sub-goal Loop invariant preservation of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.01s, 5743 steps).
+
+File "advantage_shuffle_array_stage3_db9a16ee_stage3.mlw", line 152, characters 18-33:
+Sub-goal Loop invariant preservation of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.02s, 83081 steps).
+
+File "advantage_shuffle_array_stage3_db9a16ee_stage3.mlw", line 153, characters 18-34:
+Sub-goal Loop invariant preservation of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.02s, 85954 steps).
+
+File "advantage_shuffle_array_stage3_db9a16ee_stage3.mlw", line 154, characters 18-46:
+Sub-goal Loop invariant preservation of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.01s, 19066 steps).
+
+File "advantage_shuffle_array_stage3_db9a16ee_stage3.mlw", line 155, characters 18-37:
+Sub-goal Loop invariant preservation of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.01s, 26887 steps).
+
+File "advantage_shuffle_array_stage3_db9a16ee_stage3.mlw", line 156, characters 51-94:
+Sub-goal Loop invariant preservation of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.02s, 91558 steps).
+
+File "advantage_shuffle_array_stage3_db9a16ee_stage3.mlw", line 137, characters 15-58:
+Sub-goal Postcondition of goal advantage_shuffle_array'vc.
+Prover result is: Timeout (10.00s, 82038048 steps).
+
+File "advantage_shuffle_array_stage3_db9a16ee_stage3.mlw", line 137, characters 15-58:
+Goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.01s, 58192 steps).
+---- stage2 | prover: Alt-Ergo,2.4.0 | theory: AdvantageShuffle_Array_Stage3_Imperative | goal: advantage_shuffle_array'vc ----
+Transforms: split_vc
+File "advantage_shuffle_array_stage3_db9a16ee_stage3.mlw", line 142, characters 17-25:
+Sub-goal Array creation size of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.01s, 12 steps).
+
+File "advantage_shuffle_array_stage3_db9a16ee_stage3.mlw", line 146, characters 18-41:
+Sub-goal Loop invariant init of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.01s, 15 steps).
+
+File "advantage_shuffle_array_stage3_db9a16ee_stage3.mlw", line 147, characters 18-41:
+Sub-goal Loop invariant init of goal advantage_shuffle_array'vc.
+Prover result is: Timeout (10.00s, 55179 steps).
+
+File "advantage_shuffle_array_stage3_db9a16ee_stage3.mlw", line 148, characters 18-43:
+Sub-goal Loop invariant init of goal advantage_shuffle_array'vc.
+Prover result is: Timeout (10.00s, 55274 steps).
+
+File "advantage_shuffle_array_stage3_db9a16ee_stage3.mlw", line 149, characters 18-35:
+Sub-goal Loop invariant init of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.01s, 20 steps).
+
+File "advantage_shuffle_array_stage3_db9a16ee_stage3.mlw", line 150, characters 18-52:
+Sub-goal Loop invariant init of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.01s, 20 steps).
+Infrastructure issue in stage 2 with prover Alt-Ergo,2.4.0; aborting rest of stage 2.
+== Goals still unproved after stage 2 (split_vc) ==
+AdvantageShuffle_Array_Stage3_Imperative	advantage_shuffle_array'vc
+== Stage 3: split_vc + inline_all on still-unproved goal ==
+Target theory: AdvantageShuffle_Array_Stage3_Imperative
+Target goal  : advantage_shuffle_array'vc
+---- stage3 | prover: Z3,4.8.6 | theory: AdvantageShuffle_Array_Stage3_Imperative | goal: advantage_shuffle_array'vc ----
+Transforms: split_vc inline_all
+File "advantage_shuffle_array_stage3_db9a16ee_stage3.mlw", line 142, characters 17-25:
+Sub-goal Array creation size of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.03s, 125722 steps).
+
+File "advantage_shuffle_array_stage3_db9a16ee_stage3.mlw", line 146, characters 18-41:
+Sub-goal Loop invariant init of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.01s, 10597 steps).
+
+File "advantage_shuffle_array_stage3_db9a16ee_stage3.mlw", line 147, characters 18-41:
+Sub-goal Loop invariant init of goal advantage_shuffle_array'vc.
+Prover result is: Timeout (10.00s, 79550015 steps).
+
+File "advantage_shuffle_array_stage3_db9a16ee_stage3.mlw", line 148, characters 18-43:
+Sub-goal Loop invariant init of goal advantage_shuffle_array'vc.
+Prover result is: Timeout (10.00s, 74898465 steps).
+
+File "advantage_shuffle_array_stage3_db9a16ee_stage3.mlw", line 149, characters 18-35:
+Sub-goal Loop invariant init of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.01s, 10626 steps).
+
+File "advantage_shuffle_array_stage3_db9a16ee_stage3.mlw", line 150, characters 18-52:
+Sub-goal Loop invariant init of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.02s, 138044 steps).
+Infrastructure issue in stage 3 with prover Z3,4.8.6; aborting rest of stage 3.
+== Final summary ==
+Unproved root goals after first prover : 1
+Remaining failures after split_vc      : 1
+Remaining failures after stage 3       : 1
+Detailed logs stored in                : /Users/rubenm/Desktop/Diversify2Verify/codex-runs/dataset-merge/870_advantage-shuffle/stage3a/array-imperative/advantage_shuffle_array_stage3_db9a16ee/generated/why3/array/.why3_sessions/advantage_shuffle_array_stage3_db9a16ee_stage3_logs
+Still unproved goals:
+AdvantageShuffle_Array_Stage3_Imperative	advantage_shuffle_array'vc
+VERIFY_RESULT: FAILURE
+VERIFY_REASON: unproved_goals_remain
+VERIFY_STAGE: stage3
+VERIFY_ROOT_TOTAL: 4
+VERIFY_ROOT_PROVED: 3
+VERIFY_ROOT_REMAINING: 1

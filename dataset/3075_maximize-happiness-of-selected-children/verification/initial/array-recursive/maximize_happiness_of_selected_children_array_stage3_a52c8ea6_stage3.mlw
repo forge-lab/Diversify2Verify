@@ -1,0 +1,111 @@
+module MaximizeHappinessOfSelectedChildren_Array_Spec
+
+  use int.Int
+  use int.MinMax
+  use int.Sum
+  use array.Array
+  use array.Init
+
+  predicate all_positive (happiness: array int) =
+    forall i: int. 0 <= i < length happiness -> 1 <= happiness[i]
+
+  function adjusted_happiness (h: int) (turn: int) : int =
+    max (h - turn) 0
+
+  predicate valid_pick_order (happiness: array int) (k: int) (picks: array int) =
+    0 <= k <= length happiness /\
+    length picks = k /\
+    (forall t: int. 0 <= t < k -> 0 <= picks[t] < length happiness) /\
+    (forall i j: int. 0 <= i < j < k -> picks[i] <> picks[j])
+
+  function order_score (happiness: array int) (picks: array int) (k: int) : int =
+    sum (fun t -> adjusted_happiness happiness[picks[t]] t) 0 k
+
+  predicate maximized_happiness_score (happiness: array int) (k: int) (score: int) =
+    0 <= k <= length happiness /\
+    (exists picks: array int.
+       valid_pick_order happiness k picks /\
+       score = order_score happiness picks k) /\
+    (forall picks: array int.
+       valid_pick_order happiness k picks ->
+       order_score happiness picks k <= score)
+
+  let rec copy_into (src: array int) (dst: array int) (i: int) : unit
+    variant { length src - i }
+  =
+    if i >= length src then
+      ()
+    else
+      begin
+      dst[i] <- src[i];
+      copy_into src dst (i + 1)
+      end
+
+  let clone_array (src: array int) : array int =
+    let dst = make (length src) 0 in
+    copy_into src dst 0;
+    dst
+
+  let swap (a: array int) (i: int) (j: int) : unit =
+    if i = j then
+      ()
+    else
+      begin
+      let tmp = a[i] in
+      a[i] <- a[j];
+      a[j] <- tmp
+      end
+
+  let rec max_index_from (a: array int) (best: int) (i: int) : int
+    variant { length a - i }
+  =
+    if i >= length a then
+      best
+    else if a[i] > a[best] then
+      max_index_from a i (i + 1)
+    else
+      max_index_from a best (i + 1)
+
+  let rec sort_desc_from (a: array int) (start: int) : unit
+    variant { length a - start }
+  =
+    if start >= length a then
+      ()
+    else
+      begin
+      let best = max_index_from a start (start + 1) in
+      swap a start best;
+      sort_desc_from a (start + 1)
+      end
+
+  let clip_nonnegative (x: int) : int =
+    if x > 0 then x else 0
+
+  let rec score_sorted_from (a: array int) (i: int) (limit: int) : int
+    variant { limit - i }
+  =
+    if i >= limit then
+      0
+    else
+      clip_nonnegative (a[i] - i) + score_sorted_from a (i + 1) limit
+
+  let maximize_happiness_of_selected_children_array
+    (happiness: array int) (k: int) : int
+    requires { 1 <= length happiness }
+    requires { 1 <= k <= length happiness }
+    requires { all_positive happiness }
+    ensures  { maximized_happiness_score happiness k result }
+  =
+    let sorted = clone_array happiness in
+    let limit =
+      if k <= 0 then
+        0
+      else if k <= length sorted then
+        k
+      else
+        length sorted
+    in
+    sort_desc_from sorted 0;
+    score_sorted_from sorted 0 limit
+
+end

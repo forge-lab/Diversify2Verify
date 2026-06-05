@@ -1,0 +1,90 @@
+module ConstrainedSubsequenceSum_List_Stage3_Imperative
+
+  use int.Int
+  use list.List
+  use list.Length
+  use ref.Ref
+
+  let rec predicate constrained_tail_sum (nums: list int) (k: int) (gap: int) (s: int)
+    variant { nums }
+  =
+    match nums with
+    | Nil -> s = 0
+    | Cons x xs ->
+        s = 0 ||
+        (gap > 0 && constrained_tail_sum xs k k (s - x)) ||
+        (gap > 0 && constrained_tail_sum xs k (gap - 1) s)
+    end
+
+  let rec predicate constrained_nonempty_sum (nums: list int) (k: int) (s: int)
+    variant { nums }
+  =
+    match nums with
+    | Nil -> false
+    | Cons x xs ->
+        constrained_tail_sum xs k k (s - x) ||
+        constrained_nonempty_sum xs k s
+    end
+
+  predicate is_constrained_max_sum (nums: list int) (k: int) (m: int) =
+    constrained_nonempty_sum nums k m /\
+    (forall s: int. constrained_nonempty_sum nums k s -> s <= m)
+
+  let is_nonempty (l: list int) : bool =
+    match l with
+    | Nil -> false
+    | Cons _ _ -> true
+    end
+
+  let max_nonnegative_prefix (values: list int) (limit: int) : int
+    requires { 0 <= limit }
+    ensures  { 0 <= result }
+  =
+    let best = ref 0 in
+    let remaining = ref limit in
+    let cur = ref values in
+    while 0 < !remaining do
+      invariant { 0 <= !best }
+      invariant { 0 <= !remaining }
+      variant { !remaining }
+      match !cur with
+      | Nil ->
+          remaining := 0
+      | Cons x xs ->
+          if x > !best then best := x;
+          remaining := !remaining - 1;
+          cur := xs
+      end
+    done;
+    !best
+
+  let constrained_subsequence_sum_list (nums: list int) (k: int) : int
+    requires { nums <> Nil }
+    requires { 1 <= k <= length nums }
+    ensures  { is_constrained_max_sum nums k result }
+  =
+    match nums with
+    | Nil -> 0
+    | Cons x xs ->
+        let best_overall = ref x in
+        let recent = ref (Cons x Nil) in
+        let cur = ref xs in
+        while is_nonempty !cur do
+          invariant { 1 <= k }
+          invariant { 0 <= length !cur }
+          invariant { length !cur <= length xs }
+          variant { length !cur }
+          match !cur with
+          | Nil -> ()
+          | Cons y ys ->
+              let window_best = max_nonnegative_prefix !recent k in
+              let current = y + window_best in
+              recent := Cons current !recent;
+              if current > !best_overall then best_overall := current;
+              cur := ys
+          end
+        done;
+        !best_overall
+    end
+
+end

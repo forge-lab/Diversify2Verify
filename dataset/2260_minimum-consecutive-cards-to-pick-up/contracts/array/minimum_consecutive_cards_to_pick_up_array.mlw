@@ -1,0 +1,169 @@
+module MinimumConsecutiveCardsToPickUp_Array_Spec
+
+  use int.Int
+  use array.Array
+  use array.Init
+
+  predicate valid_cards (cards: array int) =
+    1 <= length cards <= 100000 /\
+    forall i: int. 0 <= i < length cards -> 0 <= cards[i] <= 1000000
+
+  predicate matching_pair (cards: array int) (i: int) (j: int) =
+    0 <= i < j < length cards /\ cards[i] = cards[j]
+
+  predicate no_matching_pair (cards: array int) =
+    forall i j: int. 0 <= i < j < length cards -> cards[i] <> cards[j]
+
+  predicate has_pickup_length (cards: array int) (r: int) =
+    exists i j: int. matching_pair cards i j /\ r = j - i + 1
+
+  predicate minimum_pickup_result (cards: array int) (r: int) =
+    (r = -1 /\ no_matching_pair cards) \/
+    (2 <= r <= length cards /\
+     has_pickup_length cards r /\
+     forall i j: int. matching_pair cards i j -> r <= j - i + 1)
+
+  val minimum_consecutive_cards_to_pick_up_array (cards: array int) : int
+    requires { valid_cards cards }
+    ensures  { minimum_pickup_result cards result }
+
+  let lemma test_004_example_minimum_four () =
+    let cards = init 6 [|3; 4; 2; 3; 4; 7|] in
+    assert { length cards = 6 };
+    assert { cards[0] = 3 };
+    assert { cards[1] = 4 };
+    assert { cards[2] = 2 };
+    assert { cards[3] = 3 };
+    assert { cards[4] = 4 };
+    assert { cards[5] = 7 };
+    assert { valid_cards cards };
+    assert { matching_pair cards 0 3 };
+    assert { matching_pair cards 1 4 };
+    assert { has_pickup_length cards 4 };
+    assert {
+      forall i: int. 0 <= i < length cards ->
+        i = 0 \/ i = 1 \/ i = 2 \/ i = 3 \/ i = 4 \/ i = 5
+    };
+    assert { forall i j: int. matching_pair cards i j -> 4 <= j - i + 1 };
+    assert { minimum_pickup_result cards 4 }
+
+  let lemma test_013_no_matching_pair () =
+    let cards = init 4 [|1; 0; 5; 3|] in
+    assert { length cards = 4 };
+    assert { cards[0] = 1 };
+    assert { cards[1] = 0 };
+    assert { cards[2] = 5 };
+    assert { cards[3] = 3 };
+    assert { valid_cards cards };
+    assert { cards[0] <> cards[1] };
+    assert { cards[0] <> cards[2] };
+    assert { cards[0] <> cards[3] };
+    assert { cards[1] <> cards[2] };
+    assert { cards[1] <> cards[3] };
+    assert { cards[2] <> cards[3] };
+    assert {
+      forall i: int. 0 <= i < length cards ->
+        i = 0 \/ i = 1 \/ i = 2 \/ i = 3
+    };
+    assert { no_matching_pair cards };
+    assert { minimum_pickup_result cards (-1) }
+
+  let lemma test_005_adjacent_zero_pair () =
+    let cards = init 2 [|0; 0|] in
+    assert { length cards = 2 };
+    assert { cards[0] = 0 };
+    assert { cards[1] = 0 };
+    assert { valid_cards cards };
+    assert { matching_pair cards 0 1 };
+    assert { has_pickup_length cards 2 };
+    assert {
+      forall i: int. 0 <= i < length cards ->
+        i = 0 \/ i = 1
+    };
+    assert { forall i j: int. matching_pair cards i j -> 2 <= j - i + 1 };
+    assert { minimum_pickup_result cards 2 }
+
+  let lemma test_009_singleton_impossible () =
+    let cards = init 1 [|5|] in
+    assert { length cards = 1 };
+    assert { cards[0] = 5 };
+    assert { valid_cards cards };
+    assert {
+      forall i: int. 0 <= i < length cards ->
+        i = 0
+    };
+    assert { no_matching_pair cards };
+    assert { minimum_pickup_result cards (-1) }
+
+  let lemma test_011_extreme_values_length_three () =
+    let cards = init 3 [|1000000; 999999; 1000000|] in
+    assert { length cards = 3 };
+    assert { cards[0] = 1000000 };
+    assert { cards[1] = 999999 };
+    assert { cards[2] = 1000000 };
+    assert { valid_cards cards };
+    assert { matching_pair cards 0 2 };
+    assert { has_pickup_length cards 3 };
+    assert {
+      forall i: int. 0 <= i < length cards ->
+        i = 0 \/ i = 1 \/ i = 2
+    };
+    assert { forall i j: int. matching_pair cards i j -> 3 <= j - i + 1 };
+    assert { minimum_pickup_result cards 3 }
+
+  let lemma test_051_interior_length_three_minimum () =
+    let cards = init 10 [|9; 3; 1; 3; 2; 5; 9; 8; 3; 9|] in
+    assert { length cards = 10 };
+    assert { cards[0] = 9 };
+    assert { cards[1] = 3 };
+    assert { cards[2] = 1 };
+    assert { cards[3] = 3 };
+    assert { cards[4] = 2 };
+    assert { cards[5] = 5 };
+    assert { cards[6] = 9 };
+    assert { cards[7] = 8 };
+    assert { cards[8] = 3 };
+    assert { cards[9] = 9 };
+    assert { valid_cards cards };
+    assert { matching_pair cards 1 3 };
+    assert { matching_pair cards 3 8 };
+    assert { matching_pair cards 0 6 };
+    assert { matching_pair cards 6 9 };
+    assert { has_pickup_length cards 3 };
+    assert {
+      forall i: int. 0 <= i < length cards ->
+        i = 0 \/ i = 1 \/ i = 2 \/ i = 3 \/ i = 4 \/
+        i = 5 \/ i = 6 \/ i = 7 \/ i = 8 \/ i = 9
+    };
+    assert { forall i j: int. matching_pair cards i j -> 3 <= j - i + 1 };
+    assert { minimum_pickup_result cards 3 }
+
+  let lemma test_057_extreme_value_length_four () =
+    let cards =
+      init 10 [|1000000; 999999; 999998; 1000000; 999997;
+                999996; 999995; 999994; 999993; 1000000|] in
+    assert { length cards = 10 };
+    assert { cards[0] = 1000000 };
+    assert { cards[1] = 999999 };
+    assert { cards[2] = 999998 };
+    assert { cards[3] = 1000000 };
+    assert { cards[4] = 999997 };
+    assert { cards[5] = 999996 };
+    assert { cards[6] = 999995 };
+    assert { cards[7] = 999994 };
+    assert { cards[8] = 999993 };
+    assert { cards[9] = 1000000 };
+    assert { valid_cards cards };
+    assert { matching_pair cards 0 3 };
+    assert { matching_pair cards 3 9 };
+    assert { matching_pair cards 0 9 };
+    assert { has_pickup_length cards 4 };
+    assert {
+      forall i: int. 0 <= i < length cards ->
+        i = 0 \/ i = 1 \/ i = 2 \/ i = 3 \/ i = 4 \/
+        i = 5 \/ i = 6 \/ i = 7 \/ i = 8 \/ i = 9
+    };
+    assert { forall i j: int. matching_pair cards i j -> 4 <= j - i + 1 };
+    assert { minimum_pickup_result cards 4 }
+
+end

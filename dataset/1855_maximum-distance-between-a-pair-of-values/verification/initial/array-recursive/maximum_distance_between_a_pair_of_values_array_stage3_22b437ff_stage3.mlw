@@ -1,0 +1,146 @@
+module MaximumDistanceBetweenAPairOfValues_Array_Stage3_Recursive
+
+  use int.Int
+  use array.Array
+  use array.Init
+
+  predicate non_increasing (a: array int) =
+    forall i j: int.
+      0 <= i <= j < length a -> a[i] >= a[j]
+
+  predicate values_in_range (a: array int) =
+    forall i: int.
+      0 <= i < length a -> 1 <= a[i] <= 100000
+
+  predicate valid_input (nums1: array int) (nums2: array int) =
+    1 <= length nums1 <= 100000 /\
+    1 <= length nums2 <= 100000 /\
+    values_in_range nums1 /\
+    values_in_range nums2 /\
+    non_increasing nums1 /\
+    non_increasing nums2
+
+  predicate valid_pair (nums1: array int) (nums2: array int) (i: int) (j: int) =
+    0 <= i < length nums1 /\
+    0 <= j < length nums2 /\
+    i <= j /\
+    nums1[i] <= nums2[j]
+
+  function pair_distance (i: int) (j: int) : int =
+    j - i
+
+  predicate has_pair_distance
+    (nums1: array int) (nums2: array int) (d: int) =
+    exists i j: int.
+      valid_pair nums1 nums2 i j /\
+      d = pair_distance i j
+
+  predicate no_positive_distance_pair
+    (nums1: array int) (nums2: array int) =
+    forall i j: int.
+      valid_pair nums1 nums2 i j -> pair_distance i j <= 0
+
+  predicate distance_upper_bound
+    (nums1: array int) (nums2: array int) (d: int) =
+    forall i j: int.
+      valid_pair nums1 nums2 i j -> pair_distance i j <= d
+
+  predicate maximum_distance_spec
+    (nums1: array int) (nums2: array int) (res: int) =
+    (res = 0 /\ no_positive_distance_pair nums1 nums2) \/
+    (0 < res /\
+     has_pair_distance nums1 nums2 res /\
+     distance_upper_bound nums1 nums2 res)
+
+  predicate distance_bound_at
+    (nums1: array int) (nums2: array int) (d: int) (i: int) (j: int) =
+    valid_pair nums1 nums2 i j -> pair_distance i j <= d
+
+  predicate fixed_i_distance_spec
+    (nums1: array int) (nums2: array int) (i: int) (j: int) (res: int) =
+    0 <= res /\
+    (res = 0 \/
+     exists k: int.
+       i <= k <= j /\
+       0 <= k < length nums2 /\
+       nums1[i] <= nums2[k] /\
+       res = pair_distance i k) /\
+    (forall k: int.
+       i <= k <= j /\
+       0 <= k < length nums2 /\
+       nums1[i] <= nums2[k] ->
+       pair_distance i k <= res)
+
+  predicate suffix_distance_spec
+    (nums1: array int) (nums2: array int) (start: int) (res: int) =
+    0 <= res /\
+    (res = 0 \/
+     exists i j: int.
+       start <= i < length nums1 /\
+       valid_pair nums1 nums2 i j /\
+       res = pair_distance i j) /\
+    (forall i j: int.
+       start <= i < length nums1 /\
+       valid_pair nums1 nums2 i j ->
+       pair_distance i j <= res)
+
+  let rec best_distance_for_i
+    (nums1: array int) (nums2: array int) (i: int) (j: int) : int
+    requires { valid_input nums1 nums2 }
+    requires { 0 <= i < length nums1 }
+    requires { -1 <= j < length nums2 }
+    variant  { j + 1 }
+    ensures  { fixed_i_distance_spec nums1 nums2 i j result }
+  =
+    if j < i then
+      0
+    else if nums1[i] <= nums2[j] then (
+      assert { 0 <= i <= j < length nums2 };
+      assert { valid_pair nums1 nums2 i j };
+      j - i
+    ) else (
+      assert { 0 <= i <= j < length nums2 };
+      best_distance_for_i nums1 nums2 i (j - 1)
+    )
+
+  let rec maximum_distance_from
+    (nums1: array int) (nums2: array int) (i: int) : int
+    requires { valid_input nums1 nums2 }
+    requires { 0 <= i <= length nums1 }
+    variant  { length nums1 - i }
+    ensures  { suffix_distance_spec nums1 nums2 i result }
+  =
+    if i >= length nums1 then
+      0
+    else
+      let best_here =
+        if length nums2 = 0 then 0
+        else best_distance_for_i nums1 nums2 i (length nums2 - 1)
+      in
+      let best_rest = maximum_distance_from nums1 nums2 (i + 1) in
+      if best_here >= best_rest then (
+        assert { 0 <= best_here };
+        best_here
+      ) else (
+        assert { 0 <= best_rest };
+        best_rest
+      )
+
+  let maximum_distance_between_a_pair_of_values_array
+    (nums1: array int) (nums2: array int) : int
+    requires { valid_input nums1 nums2 }
+    ensures  { maximum_distance_spec nums1 nums2 result }
+  =
+    let result = maximum_distance_from nums1 nums2 0 in
+    assert { suffix_distance_spec nums1 nums2 0 result };
+    if result = 0 then (
+      assert { no_positive_distance_pair nums1 nums2 };
+      result
+    ) else (
+      assert { 0 < result };
+      assert { has_pair_distance nums1 nums2 result };
+      assert { distance_upper_bound nums1 nums2 result };
+      result
+    )
+
+end

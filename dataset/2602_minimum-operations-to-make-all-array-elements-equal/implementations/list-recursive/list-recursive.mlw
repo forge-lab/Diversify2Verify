@@ -1,0 +1,346 @@
+module MinimumOperationsToMakeAllArrayElementsEqual_List_Recursive_Implementation
+
+  use int.Int
+  use int.Abs
+  use list.List
+
+  let rec operations_for_query (nums: list int) (q: int) : int
+    variant { nums }
+  =
+    match nums with
+    | Nil -> 0
+    | Cons x xs -> abs (x - q) + operations_for_query xs q
+    end
+
+  let rec operation_results (nums: list int) (queries: list int) : list int
+    variant { queries }
+  =
+    match queries with
+    | Nil -> Nil
+    | Cons q qs ->
+        Cons (operations_for_query nums q) (operation_results nums qs)
+    end
+
+  let minimum_operations_to_make_all_array_elements_equal_list
+    (nums: list int) (queries: list int) : list int
+  =
+    operation_results nums queries
+
+  let rec list_eq_int (xs: list int) (ys: list int) : bool
+    variant { xs }
+  =
+    match xs, ys with
+    | Nil, Nil -> true
+    | Cons x xs', Cons y ys' ->
+        if x = y then list_eq_int xs' ys' else false
+    | _, _ -> false
+    end
+
+  let test_000 () : bool =
+    let nums = Cons 1000000000 Nil in
+    let queries = Cons 1000000000 (Cons 1 (Cons 999999999 Nil)) in
+    let expected = Cons 0 (Cons 999999999 (Cons 1 Nil)) in
+    let r = minimum_operations_to_make_all_array_elements_equal_list nums queries in
+    list_eq_int r expected
+
+  let test_001 () : bool =
+    let nums = Cons 2 (Cons 9 (Cons 6 (Cons 3 Nil))) in
+    let queries = Cons 10 Nil in
+    let expected = Cons 20 Nil in
+    let r = minimum_operations_to_make_all_array_elements_equal_list nums queries in
+    list_eq_int r expected
+
+  let test_002 () : bool =
+    let nums = Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 Nil)))) in
+    let queries = Cons 1 (Cons 2 (Cons 3 Nil)) in
+    let expected = Cons 0 (Cons 5 (Cons 10 Nil)) in
+    let r = minimum_operations_to_make_all_array_elements_equal_list nums queries in
+    list_eq_int r expected
+
+  let test_003 () : bool =
+    let nums = Cons 100 (Cons 200 (Cons 300 Nil)) in
+    let queries = Cons 150 (Cons 250 Nil) in
+    let expected = Cons 250 (Cons 250 Nil) in
+    let r = minimum_operations_to_make_all_array_elements_equal_list nums queries in
+    list_eq_int r expected
+
+  let test_004 () : bool =
+    let nums = Cons 1 (Cons 2 (Cons 3 (Cons 4 (Cons 5 Nil)))) in
+    let queries = Cons 3 Nil in
+    let expected = Cons 6 Nil in
+    let r = minimum_operations_to_make_all_array_elements_equal_list nums queries in
+    list_eq_int r expected
+
+  let test_005 () : bool =
+    let nums =
+      Cons 1
+        (Cons 2
+          (Cons 2
+            (Cons 3
+              (Cons 3
+                (Cons 3
+                  (Cons 4
+                    (Cons 4
+                      (Cons 4
+                        (Cons 4 Nil))))))))) in
+    let queries = Cons 2 (Cons 3 (Cons 4 Nil)) in
+    let expected = Cons 12 (Cons 8 (Cons 10 Nil)) in
+    let r = minimum_operations_to_make_all_array_elements_equal_list nums queries in
+    list_eq_int r expected
+
+  let test_006 () : bool =
+    let nums = Cons 1 (Cons 1 (Cons 1 (Cons 1 Nil))) in
+    let queries = Cons 1 Nil in
+    let expected = Cons 0 Nil in
+    let r = minimum_operations_to_make_all_array_elements_equal_list nums queries in
+    list_eq_int r expected
+
+  let test_007 () : bool =
+    let nums = Cons 3 (Cons 1 (Cons 6 (Cons 8 Nil))) in
+    let queries = Cons 1 (Cons 5 Nil) in
+    let expected = Cons 14 (Cons 10 Nil) in
+    let r = minimum_operations_to_make_all_array_elements_equal_list nums queries in
+    list_eq_int r expected
+
+  let test_008 () : bool =
+    let nums = Cons 1000000000 (Cons 1000000000 (Cons 1000000000 Nil)) in
+    let queries = Cons 1000000000 Nil in
+    let expected = Cons 0 Nil in
+    let r = minimum_operations_to_make_all_array_elements_equal_list nums queries in
+    list_eq_int r expected
+
+  let test_009 () : bool =
+    let nums = Cons 1 (Cons 3 (Cons 5 (Cons 7 (Cons 9 Nil)))) in
+    let queries = Cons 2 (Cons 4 (Cons 6 (Cons 8 Nil))) in
+    let expected = Cons 17 (Cons 13 (Cons 13 (Cons 17 Nil))) in
+    let r = minimum_operations_to_make_all_array_elements_equal_list nums queries in
+    list_eq_int r expected
+
+  let test_010 () : bool =
+    let nums =
+      Cons 1
+        (Cons 2
+          (Cons 3
+            (Cons 4
+              (Cons 5
+                (Cons 6
+                  (Cons 7
+                    (Cons 8
+                      (Cons 9
+                        (Cons 10 Nil))))))))) in
+    let queries = Cons 5 (Cons 1 (Cons 10 (Cons 3 Nil))) in
+    let expected = Cons 25 (Cons 45 (Cons 45 (Cons 31 Nil))) in
+    let r = minimum_operations_to_make_all_array_elements_equal_list nums queries in
+    list_eq_int r expected
+
+  let test_011 () : bool =
+    let nums =
+      Cons 50
+        (Cons 50
+          (Cons 50
+            (Cons 50
+              (Cons 50
+                (Cons 50
+                  (Cons 50
+                    (Cons 50
+                      (Cons 50
+                        (Cons 50 Nil))))))))) in
+    let queries = Cons 25 (Cons 50 (Cons 75 Nil)) in
+    let expected = Cons 250 (Cons 0 (Cons 250 Nil)) in
+    let r = minimum_operations_to_make_all_array_elements_equal_list nums queries in
+    list_eq_int r expected
+
+  let test_012 () : bool =
+    let nums = Cons 1000000 (Cons 1000000 (Cons 1000000 (Cons 1000000 (Cons 1000000 Nil)))) in
+    let queries = Cons 500000 (Cons 1500000 Nil) in
+    let expected = Cons 2500000 (Cons 2500000 Nil) in
+    let r = minimum_operations_to_make_all_array_elements_equal_list nums queries in
+    list_eq_int r expected
+
+  let test_013 () : bool =
+    let nums =
+      Cons 3
+        (Cons 1
+          (Cons 4
+            (Cons 1
+              (Cons 5
+                (Cons 9
+                  (Cons 2
+                    (Cons 6
+                      (Cons 5
+                        (Cons 3
+                          (Cons 5 Nil)))))))))) in
+    let queries = Cons 3 (Cons 10 Nil) in
+    let expected = Cons 21 (Cons 66 Nil) in
+    let r = minimum_operations_to_make_all_array_elements_equal_list nums queries in
+    list_eq_int r expected
+
+  let test_014 () : bool =
+    let nums =
+      Cons 1
+        (Cons 1
+          (Cons 2
+            (Cons 2
+              (Cons 3
+                (Cons 3
+                  (Cons 4
+                    (Cons 4
+                      (Cons 5
+                        (Cons 5 Nil))))))))) in
+    let queries = Cons 3 (Cons 5 Nil) in
+    let expected = Cons 12 (Cons 20 Nil) in
+    let r = minimum_operations_to_make_all_array_elements_equal_list nums queries in
+    list_eq_int r expected
+
+  let test_015 () : bool =
+    let nums =
+      Cons 1
+        (Cons 10
+          (Cons 100
+            (Cons 1000
+              (Cons 10000
+                (Cons 100000
+                  (Cons 1000000
+                    (Cons 10000000
+                      (Cons 100000000
+                        (Cons 1000000000 Nil))))))))) in
+    let queries = Cons 500000000 (Cons 1 (Cons 1000000000 Nil)) in
+    let expected = Cons 4888888889 (Cons 1111111101 (Cons 8888888889 Nil)) in
+    let r = minimum_operations_to_make_all_array_elements_equal_list nums queries in
+    list_eq_int r expected
+
+  let test_016 () : bool =
+    let nums =
+      Cons 1
+        (Cons 10
+          (Cons 100
+            (Cons 1000
+              (Cons 10000
+                (Cons 100000
+                  (Cons 1000000
+                    (Cons 10000000
+                      (Cons 100000000
+                        (Cons 1000000000 Nil))))))))) in
+    let queries =
+      Cons 5
+        (Cons 50
+          (Cons 500
+            (Cons 5000
+              (Cons 50000
+                (Cons 500000
+                  (Cons 5000000
+                    (Cons 50000000
+                      (Cons 500000000 Nil)))))))) in
+    let expected =
+      Cons 1111111069
+        (Cons 1111110789
+          (Cons 1111108889
+            (Cons 1111098889
+              (Cons 1111088889
+                (Cons 1111888889
+                  (Cons 1128888889
+                    (Cons 1388888889
+                      (Cons 4888888889 Nil)))))))) in
+    let r = minimum_operations_to_make_all_array_elements_equal_list nums queries in
+    list_eq_int r expected
+
+  let test_017 () : bool =
+    let nums =
+      Cons 9
+        (Cons 8
+          (Cons 7
+            (Cons 6
+              (Cons 5
+                (Cons 4
+                  (Cons 3
+                    (Cons 2
+                      (Cons 1
+                        (Cons 0 Nil))))))))) in
+    let queries = Cons 5 (Cons 0 (Cons 10 (Cons 3 Nil))) in
+    let expected = Cons 25 (Cons 45 (Cons 55 (Cons 27 Nil))) in
+    let r = minimum_operations_to_make_all_array_elements_equal_list nums queries in
+    list_eq_int r expected
+
+  let test_018 () : bool =
+    let nums =
+      Cons 5
+        (Cons 5
+          (Cons 5
+            (Cons 5
+              (Cons 5
+                (Cons 5
+                  (Cons 5
+                    (Cons 5
+                      (Cons 5
+                        (Cons 5 Nil))))))))) in
+    let queries = Cons 5 (Cons 1 (Cons 10 (Cons 3 Nil))) in
+    let expected = Cons 0 (Cons 40 (Cons 50 (Cons 20 Nil))) in
+    let r = minimum_operations_to_make_all_array_elements_equal_list nums queries in
+    list_eq_int r expected
+
+  let test_019 () : bool =
+    let nums =
+      Cons 1
+        (Cons 2
+          (Cons 3
+            (Cons 4
+              (Cons 5
+                (Cons 6
+                  (Cons 7
+                    (Cons 8
+                      (Cons 9
+                        (Cons 10
+                          (Cons 11
+                            (Cons 12
+                              (Cons 13
+                                (Cons 14
+                                  (Cons 15 Nil)))))))))))))) in
+    let queries = Cons 7 (Cons 15 (Cons 1 Nil)) in
+    let expected = Cons 57 (Cons 105 (Cons 105 Nil)) in
+    let r = minimum_operations_to_make_all_array_elements_equal_list nums queries in
+    list_eq_int r expected
+
+  let run_tests () : bool =
+    if test_000 () then
+    if test_001 () then
+    if test_002 () then
+    if test_003 () then
+    if test_004 () then
+    if test_005 () then
+    if test_006 () then
+    if test_007 () then
+    if test_008 () then
+    if test_009 () then
+    if test_010 () then
+    if test_011 () then
+    if test_012 () then
+    if test_013 () then
+    if test_014 () then
+    if test_015 () then
+    if test_016 () then
+    if test_017 () then
+    if test_018 () then
+    if test_019 () then
+      true
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+
+end

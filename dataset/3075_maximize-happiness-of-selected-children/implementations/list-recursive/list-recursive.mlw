@@ -1,0 +1,185 @@
+module MaximizeHappinessOfSelectedChildren_List_Recursive_Implementation
+
+  use int.Int
+  use int.MinMax
+  use list.List
+
+  let function adjusted_happiness (h: int) (turn: int) : int =
+    max (h - turn) 0
+
+  let rec insert_desc (x: int) (l: list int) : list int
+    variant { l }
+  =
+    match l with
+    | Nil -> Cons x Nil
+    | Cons y ys ->
+        if x >= y then Cons x l else Cons y (insert_desc x ys)
+    end
+
+  let rec sort_desc (l: list int) : list int
+    variant { l }
+  =
+    match l with
+    | Nil -> Nil
+    | Cons x xs -> insert_desc x (sort_desc xs)
+    end
+
+  let rec score_top_k (sorted: list int) (k: int) (turn: int) : int
+    variant { k }
+  =
+    if k <= 0 then 0 else
+    match sorted with
+    | Nil -> 0
+    | Cons h rest ->
+        adjusted_happiness h turn + score_top_k rest (k - 1) (turn + 1)
+    end
+
+  let maximize_happiness_of_selected_children_list
+    (happiness: list int) (k: int) : int
+  =
+    score_top_k (sort_desc happiness) k 0
+
+  let test_000 () : bool =
+    let happiness = Cons 10 (Cons 9 (Cons 8 (Cons 7 (Cons 6 (Cons 5 (Cons 4 (Cons 3 (Cons 2 (Cons 1 (Nil)))))))))) in
+    let r = maximize_happiness_of_selected_children_list happiness 10 in
+    r = 30
+
+  let test_001 () : bool =
+    let happiness = Cons 10 (Cons 20 (Cons 30 (Cons 40 (Cons 50 (Nil))))) in
+    let r = maximize_happiness_of_selected_children_list happiness 5 in
+    r = 140
+
+  let test_002 () : bool =
+    let happiness = Cons 5 (Cons 5 (Cons 5 (Cons 5 (Cons 5 (Cons 5 (Cons 5 (Cons 5 (Cons 5 (Cons 5 (Nil)))))))))) in
+    let r = maximize_happiness_of_selected_children_list happiness 5 in
+    r = 15
+
+  let test_003 () : bool =
+    let happiness = Cons 100000000 (Cons 100000000 (Cons 100000000 (Nil))) in
+    let r = maximize_happiness_of_selected_children_list happiness 2 in
+    r = 199999999
+
+  let test_004 () : bool =
+    let happiness = Cons 1 (Cons 2 (Cons 3 (Cons 4 (Cons 5 (Cons 6 (Cons 7 (Cons 8 (Cons 9 (Cons 10 (Nil)))))))))) in
+    let r = maximize_happiness_of_selected_children_list happiness 5 in
+    r = 30
+
+  let test_005 () : bool =
+    let happiness = Cons 1 (Nil) in
+    let r = maximize_happiness_of_selected_children_list happiness 1 in
+    r = 1
+
+  let test_006 () : bool =
+    let happiness = Cons 100000000 (Cons 100000000 (Cons 100000000 (Cons 100000000 (Nil)))) in
+    let r = maximize_happiness_of_selected_children_list happiness 2 in
+    r = 199999999
+
+  let test_007 () : bool =
+    let happiness = Cons 9 (Cons 8 (Cons 7 (Cons 6 (Cons 5 (Cons 4 (Cons 3 (Cons 2 (Cons 1 (Nil))))))))) in
+    let r = maximize_happiness_of_selected_children_list happiness 9 in
+    r = 25
+
+  let test_008 () : bool =
+    let happiness = Cons 10 (Cons 9 (Cons 8 (Cons 7 (Cons 6 (Nil))))) in
+    let r = maximize_happiness_of_selected_children_list happiness 3 in
+    r = 24
+
+  let test_009 () : bool =
+    let happiness = Cons 100 (Cons 100 (Cons 100 (Nil))) in
+    let r = maximize_happiness_of_selected_children_list happiness 1 in
+    r = 100
+
+  let test_010 () : bool =
+    let happiness = Cons 1 (Cons 1 (Cons 1 (Cons 1 (Nil)))) in
+    let r = maximize_happiness_of_selected_children_list happiness 2 in
+    r = 1
+
+  let test_011 () : bool =
+    let happiness = Cons 1 (Cons 1 (Cons 2 (Cons 2 (Cons 3 (Cons 3 (Cons 4 (Cons 4 (Cons 5 (Cons 5 (Nil)))))))))) in
+    let r = maximize_happiness_of_selected_children_list happiness 5 in
+    r = 12
+
+  let test_012 () : bool =
+    let happiness = Cons 1 (Cons 2 (Cons 3 (Nil))) in
+    let r = maximize_happiness_of_selected_children_list happiness 2 in
+    r = 4
+
+  let test_013 () : bool =
+    let happiness = Cons 2 (Cons 3 (Cons 4 (Cons 5 (Nil)))) in
+    let r = maximize_happiness_of_selected_children_list happiness 1 in
+    r = 5
+
+  let test_014 () : bool =
+    let happiness = Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Nil)))))))))) in
+    let r = maximize_happiness_of_selected_children_list happiness 5 in
+    r = 1
+
+  let test_015 () : bool =
+    let happiness = Cons 5 (Cons 4 (Cons 3 (Cons 2 (Cons 1 (Nil))))) in
+    let r = maximize_happiness_of_selected_children_list happiness 3 in
+    r = 9
+
+  let test_016 () : bool =
+    let happiness = Cons 5 (Cons 5 (Cons 5 (Cons 5 (Cons 5 (Cons 5 (Cons 5 (Cons 5 (Cons 5 (Cons 5 (Nil)))))))))) in
+    let r = maximize_happiness_of_selected_children_list happiness 3 in
+    r = 12
+
+  let test_017 () : bool =
+    let happiness = Cons 1 (Cons 10 (Cons 1 (Cons 10 (Cons 1 (Cons 10 (Cons 1 (Cons 10 (Cons 1 (Cons 10 (Nil)))))))))) in
+    let r = maximize_happiness_of_selected_children_list happiness 5 in
+    r = 40
+
+  let test_018 () : bool =
+    let happiness = Cons 1 (Cons 2 (Cons 3 (Cons 4 (Cons 5 (Cons 6 (Cons 7 (Cons 8 (Cons 9 (Cons 10 (Nil)))))))))) in
+    let r = maximize_happiness_of_selected_children_list happiness 3 in
+    r = 24
+
+  let test_019 () : bool =
+    let happiness = Cons 1 (Cons 2 (Cons 2 (Cons 3 (Cons 3 (Cons 3 (Cons 4 (Cons 4 (Cons 4 (Cons 4 (Cons 5 (Cons 5 (Cons 5 (Cons 5 (Cons 5 (Nil))))))))))))))) in
+    let r = maximize_happiness_of_selected_children_list happiness 10 in
+    r = 15
+
+  let run_tests () : bool =
+    if test_000 () then
+    if test_001 () then
+    if test_002 () then
+    if test_003 () then
+    if test_004 () then
+    if test_005 () then
+    if test_006 () then
+    if test_007 () then
+    if test_008 () then
+    if test_009 () then
+    if test_010 () then
+    if test_011 () then
+    if test_012 () then
+    if test_013 () then
+    if test_014 () then
+    if test_015 () then
+    if test_016 () then
+    if test_017 () then
+    if test_018 () then
+    if test_019 () then
+      true
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+
+end

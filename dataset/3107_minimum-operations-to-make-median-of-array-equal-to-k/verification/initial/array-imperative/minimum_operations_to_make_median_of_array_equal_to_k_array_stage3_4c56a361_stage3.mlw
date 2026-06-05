@@ -1,0 +1,96 @@
+module MinimumOperationsToMakeMedianOfArrayEqualToK_Array_Stage3_Imperative
+
+  use int.Int
+  use int.Abs
+  use int.EuclideanDivision
+  use array.Array
+  use array.Init
+  use ref.Ref
+
+  let rec function count_le_from (a: array int) (k: int) (i: int) : int
+    requires { 0 <= i <= length a }
+    variant  { length a - i }
+  =
+    if i = length a then 0
+    else (if a[i] <= k then 1 else 0) + count_le_from a k (i + 1)
+
+  let rec function count_ge_from (a: array int) (k: int) (i: int) : int
+    requires { 0 <= i <= length a }
+    variant  { length a - i }
+  =
+    if i = length a then 0
+    else (if k <= a[i] then 1 else 0) + count_ge_from a k (i + 1)
+
+  predicate median_equal_to_k (a: array int) (k: int) =
+    length a > 0 /\
+    exists mid: int.
+      0 <= mid < length a /\
+      2 * mid <= length a < 2 * (mid + 1) /\
+      count_le_from a k 0 >= mid + 1 /\
+      count_ge_from a k 0 >= length a - mid
+
+  let rec function operation_cost_from
+      (nums: array int) (target: array int) (i: int) : int
+    requires { length target = length nums }
+    requires { 0 <= i <= length nums }
+    variant  { length nums - i }
+  =
+    if i = length nums then 0
+    else abs (nums[i] - target[i]) + operation_cost_from nums target (i + 1)
+
+  let function operation_cost (nums: array int) (target: array int) : int
+    requires { length target = length nums }
+  =
+    operation_cost_from nums target 0
+
+  predicate feasible_target (nums: array int) (k: int) (target: array int) =
+    length target = length nums /\ median_equal_to_k target k
+
+  predicate minimum_operations_result (nums: array int) (k: int) (r: int) =
+    0 <= r /\
+    (exists target: array int.
+      feasible_target nums k target /\ operation_cost nums target = r) /\
+    (forall target: array int.
+      feasible_target nums k target -> r <= operation_cost nums target)
+
+  let sort_int_array (a: array int) : unit
+    ensures { length a = old (length a) }
+  =
+    let n = length a in
+    for i = 1 to n - 1 do
+      let key = a[i] in
+      let j = ref (i - 1) in
+      while !j >= 0 && a[!j] > key do
+        variant { !j + 1 }
+        a[!j + 1] <- a[!j];
+        j := !j - 1
+      done;
+      a[!j + 1] <- key
+    done
+
+  let minimum_operations_to_make_median_of_array_equal_to_k_array
+    (nums: array int) (k: int) : int
+    requires { length nums > 0 }
+    ensures  { minimum_operations_result nums k result }
+  =
+    let sorted = copy nums in
+    let n = length sorted in
+    let mid = div n 2 in
+    sort_int_array sorted;
+    let total = ref 0 in
+    if sorted[mid] < k then (
+      for i = mid to n - 1 do
+        if sorted[i] < k then
+          total := !total + (k - sorted[i])
+      done;
+      !total
+    ) else if sorted[mid] > k then (
+      for i = 0 to mid do
+        if sorted[i] > k then
+          total := !total + (sorted[i] - k)
+      done;
+      !total
+    ) else
+      0
+
+end

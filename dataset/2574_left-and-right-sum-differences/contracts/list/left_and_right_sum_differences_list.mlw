@@ -1,0 +1,146 @@
+module LeftAndRightSumDifferences_List_Spec
+
+  use int.Int
+  use int.Abs
+  use list.List
+  use list.Sum
+
+  let rec predicate left_right_diff_from (left: int) (nums: list int) (out: list int)
+    variant { nums }
+  =
+    match nums with
+    | Nil ->
+        match out with
+        | Nil -> true
+        | Cons _ _ -> false
+        end
+    | Cons x xs ->
+        match out with
+        | Nil -> false
+        | Cons y ys ->
+            y = abs (left - sum xs) &&
+            left_right_diff_from (left + x) xs ys
+        end
+    end
+
+  predicate left_right_diff_result (nums: list int) (out: list int) =
+    left_right_diff_from 0 nums out
+
+  val left_and_right_sum_differences_list (nums: list int) : list int
+    ensures { left_right_diff_result nums result }
+
+  let lemma check_test_001 () =
+    let nums = Cons 1 Nil in
+    let expected = Cons 0 Nil in
+    assert { sum Nil = 0 };
+    assert { 0 = abs (0 - sum Nil) };
+    assert { left_right_diff_from 1 Nil Nil };
+    assert { left_right_diff_from 0 nums expected };
+    assert { left_right_diff_result nums expected }
+
+  let lemma check_test_009 () =
+    let nums = Cons 1 (Cons 2 Nil) in
+    let expected = Cons 2 (Cons 1 Nil) in
+    assert { sum Nil = 0 };
+    assert { sum (Cons 2 Nil) = 2 };
+    assert { 1 = abs (1 - sum Nil) };
+    assert { left_right_diff_from 3 Nil Nil };
+    assert { left_right_diff_from 1 (Cons 2 Nil) (Cons 1 Nil) };
+    assert { 2 = abs (0 - sum (Cons 2 Nil)) };
+    assert { left_right_diff_from 0 nums expected };
+    assert { left_right_diff_result nums expected }
+
+  let lemma check_test_003 () =
+    let nums = Cons 10 (Cons 20 (Cons 30 Nil)) in
+    let expected = Cons 50 (Cons 20 (Cons 30 Nil)) in
+    assert { sum Nil = 0 };
+    assert { sum (Cons 30 Nil) = 30 };
+    assert { sum (Cons 20 (Cons 30 Nil)) = 50 };
+    assert { 30 = abs (30 - sum Nil) };
+    assert { left_right_diff_from 60 Nil Nil };
+    assert { left_right_diff_from 30 (Cons 30 Nil) (Cons 30 Nil) };
+    assert { 20 = abs (10 - sum (Cons 30 Nil)) };
+    assert { left_right_diff_from 10 (Cons 20 (Cons 30 Nil)) (Cons 20 (Cons 30 Nil)) };
+    assert { 50 = abs (0 - sum (Cons 20 (Cons 30 Nil))) };
+    assert { left_right_diff_from 0 nums expected };
+    assert { left_right_diff_result nums expected }
+
+  let lemma check_test_016 () =
+    let nums = Cons 10 (Cons 4 (Cons 8 (Cons 3 Nil))) in
+    let expected = Cons 15 (Cons 1 (Cons 11 (Cons 22 Nil))) in
+    assert { sum Nil = 0 };
+    assert { sum (Cons 3 Nil) = 3 };
+    assert { sum (Cons 8 (Cons 3 Nil)) = 11 };
+    assert { sum (Cons 4 (Cons 8 (Cons 3 Nil))) = 15 };
+    assert { 22 = abs (22 - sum Nil) };
+    assert { left_right_diff_from 25 Nil Nil };
+    assert { left_right_diff_from 22 (Cons 3 Nil) (Cons 22 Nil) };
+    assert { 11 = abs (14 - sum (Cons 3 Nil)) };
+    assert { left_right_diff_from 14 (Cons 8 (Cons 3 Nil)) (Cons 11 (Cons 22 Nil)) };
+    assert { 1 = abs (10 - sum (Cons 8 (Cons 3 Nil))) };
+    assert { left_right_diff_from 10 (Cons 4 (Cons 8 (Cons 3 Nil))) (Cons 1 (Cons 11 (Cons 22 Nil))) };
+    assert { 15 = abs (0 - sum (Cons 4 (Cons 8 (Cons 3 Nil)))) };
+    assert { left_right_diff_from 0 nums expected };
+    assert { left_right_diff_result nums expected }
+
+  let lemma check_test_000 () =
+    let nums = Cons 5 (Cons 4 (Cons 3 (Cons 2 (Cons 1 Nil)))) in
+    let expected = Cons 10 (Cons 1 (Cons 6 (Cons 11 (Cons 14 Nil)))) in
+    assert { sum Nil = 0 };
+    assert { sum (Cons 1 Nil) = 1 };
+    assert { sum (Cons 2 (Cons 1 Nil)) = 3 };
+    assert { sum (Cons 3 (Cons 2 (Cons 1 Nil))) = 6 };
+    assert { sum (Cons 4 (Cons 3 (Cons 2 (Cons 1 Nil)))) = 10 };
+    assert { 14 = abs (14 - sum Nil) };
+    assert { left_right_diff_from 15 Nil Nil };
+    assert { left_right_diff_from 14 (Cons 1 Nil) (Cons 14 Nil) };
+    assert { 11 = abs (12 - sum (Cons 1 Nil)) };
+    assert { left_right_diff_from 12 (Cons 2 (Cons 1 Nil)) (Cons 11 (Cons 14 Nil)) };
+    assert { 6 = abs (9 - sum (Cons 2 (Cons 1 Nil))) };
+    assert { left_right_diff_from 9 (Cons 3 (Cons 2 (Cons 1 Nil))) (Cons 6 (Cons 11 (Cons 14 Nil))) };
+    assert { 1 = abs (5 - sum (Cons 3 (Cons 2 (Cons 1 Nil)))) };
+    assert { left_right_diff_from 5 (Cons 4 (Cons 3 (Cons 2 (Cons 1 Nil)))) (Cons 1 (Cons 6 (Cons 11 (Cons 14 Nil)))) };
+    assert { 10 = abs (0 - sum (Cons 4 (Cons 3 (Cons 2 (Cons 1 Nil))))) };
+    assert { left_right_diff_from 0 nums expected };
+    assert { left_right_diff_result nums expected }
+
+  let lemma check_test_008 () =
+    let nums = Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 Nil)))) in
+    let expected = Cons 4 (Cons 2 (Cons 0 (Cons 2 (Cons 4 Nil)))) in
+    assert { sum Nil = 0 };
+    assert { sum (Cons 1 Nil) = 1 };
+    assert { sum (Cons 1 (Cons 1 Nil)) = 2 };
+    assert { sum (Cons 1 (Cons 1 (Cons 1 Nil))) = 3 };
+    assert { sum (Cons 1 (Cons 1 (Cons 1 (Cons 1 Nil)))) = 4 };
+    assert { 4 = abs (4 - sum Nil) };
+    assert { left_right_diff_from 5 Nil Nil };
+    assert { left_right_diff_from 4 (Cons 1 Nil) (Cons 4 Nil) };
+    assert { 2 = abs (3 - sum (Cons 1 Nil)) };
+    assert { left_right_diff_from 3 (Cons 1 (Cons 1 Nil)) (Cons 2 (Cons 4 Nil)) };
+    assert { 0 = abs (2 - sum (Cons 1 (Cons 1 Nil))) };
+    assert { left_right_diff_from 2 (Cons 1 (Cons 1 (Cons 1 Nil))) (Cons 0 (Cons 2 (Cons 4 Nil))) };
+    assert { 2 = abs (1 - sum (Cons 1 (Cons 1 (Cons 1 Nil)))) };
+    assert { left_right_diff_from 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 Nil)))) (Cons 2 (Cons 0 (Cons 2 (Cons 4 Nil)))) };
+    assert { 4 = abs (0 - sum (Cons 1 (Cons 1 (Cons 1 (Cons 1 Nil))))) };
+    assert { left_right_diff_from 0 nums expected };
+    assert { left_right_diff_result nums expected }
+
+  let lemma check_test_010 () =
+    let nums = Cons 100000 (Cons 1 (Cons 1 (Cons 1 Nil))) in
+    let expected = Cons 3 (Cons 99998 (Cons 100000 (Cons 100002 Nil))) in
+    assert { sum Nil = 0 };
+    assert { sum (Cons 1 Nil) = 1 };
+    assert { sum (Cons 1 (Cons 1 Nil)) = 2 };
+    assert { sum (Cons 1 (Cons 1 (Cons 1 Nil))) = 3 };
+    assert { 100002 = abs (100002 - sum Nil) };
+    assert { left_right_diff_from 100003 Nil Nil };
+    assert { left_right_diff_from 100002 (Cons 1 Nil) (Cons 100002 Nil) };
+    assert { 100000 = abs (100001 - sum (Cons 1 Nil)) };
+    assert { left_right_diff_from 100001 (Cons 1 (Cons 1 Nil)) (Cons 100000 (Cons 100002 Nil)) };
+    assert { 99998 = abs (100000 - sum (Cons 1 (Cons 1 Nil))) };
+    assert { left_right_diff_from 100000 (Cons 1 (Cons 1 (Cons 1 Nil))) (Cons 99998 (Cons 100000 (Cons 100002 Nil))) };
+    assert { 3 = abs (0 - sum (Cons 1 (Cons 1 (Cons 1 Nil)))) };
+    assert { left_right_diff_from 0 nums expected };
+    assert { left_right_diff_result nums expected }
+
+end

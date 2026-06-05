@@ -1,0 +1,267 @@
+module MaximumSumCircularSubarray_Array_Spec
+
+  use int.Int
+  use int.EuclideanDivision
+  use array.Array
+  use ref.Ref
+
+  predicate leetcode_input (nums: array int) =
+    1 <= length nums <= 30000 /\
+    forall i: int. 0 <= i < length nums -> -30000 <= nums[i] <= 30000
+
+  predicate valid_circular_segment (nums: array int) (start: int) (len: int) =
+    0 <= start < length nums /\
+    1 <= len <= length nums
+
+  let rec function circular_segment_sum
+      (nums: array int) (start: int) (len: int) : int
+    requires { 0 <= start < length nums }
+    requires { 0 <= len <= length nums }
+    variant  { len } =
+    if len = 0 then 0 else
+      nums[start] +
+      circular_segment_sum nums (mod (start + 1) (length nums)) (len - 1)
+
+  predicate maximum_circular_subarray_sum (nums: array int) (best: int) =
+    (exists start len: int.
+       valid_circular_segment nums start len /\
+       best = circular_segment_sum nums start len) /\
+    (forall start len: int.
+       valid_circular_segment nums start len ->
+       circular_segment_sum nums start len <= best)
+
+  let rec function linear_segment_sum
+      (nums: array int) (lo: int) (hi: int) : int
+    requires { 0 <= lo <= hi <= length nums }
+    variant  { hi - lo } =
+    if lo = hi then 0 else
+      nums[lo] + linear_segment_sum nums (lo + 1) hi
+
+  predicate total_prefix_sum (nums: array int) (hi: int) (s: int) =
+    1 <= hi <= length nums /\
+    s = linear_segment_sum nums 0 hi
+
+  predicate max_ending_sum (nums: array int) (hi: int) (best: int) =
+    1 <= hi <= length nums /\
+    (exists lo: int.
+       0 <= lo < hi /\
+       best = linear_segment_sum nums lo hi) /\
+    (forall lo: int.
+       0 <= lo < hi ->
+       linear_segment_sum nums lo hi <= best)
+
+  predicate min_ending_sum (nums: array int) (hi: int) (best: int) =
+    1 <= hi <= length nums /\
+    (exists lo: int.
+       0 <= lo < hi /\
+       best = linear_segment_sum nums lo hi) /\
+    (forall lo: int.
+       0 <= lo < hi ->
+       best <= linear_segment_sum nums lo hi)
+
+  predicate max_prefix_subarray_sum (nums: array int) (hi: int) (best: int) =
+    1 <= hi <= length nums /\
+    (exists lo up: int.
+       0 <= lo < up <= hi /\
+       best = linear_segment_sum nums lo up) /\
+    (forall lo up: int.
+       0 <= lo < up <= hi ->
+       linear_segment_sum nums lo up <= best)
+
+  predicate min_prefix_subarray_sum (nums: array int) (hi: int) (best: int) =
+    1 <= hi <= length nums /\
+    (exists lo up: int.
+       0 <= lo < up <= hi /\
+       best = linear_segment_sum nums lo up) /\
+    (forall lo up: int.
+       0 <= lo < up <= hi ->
+       best <= linear_segment_sum nums lo up)
+
+  let rec lemma linear_segment_sum_snoc
+      (nums: array int) (lo: int) (hi: int)
+    requires { 0 <= lo <= hi < length nums }
+    ensures  { linear_segment_sum nums lo (hi + 1) =
+               linear_segment_sum nums lo hi + nums[hi] }
+    variant  { hi - lo }
+  =
+    if lo = hi then begin
+      assert { linear_segment_sum nums lo hi = 0 };
+      assert { linear_segment_sum nums (lo + 1) (hi + 1) = 0 };
+      assert { linear_segment_sum nums lo (hi + 1) = nums[hi] }
+    end else begin
+      assert { lo < hi };
+      linear_segment_sum_snoc nums (lo + 1) hi;
+      assert { linear_segment_sum nums lo (hi + 1) =
+               nums[lo] + linear_segment_sum nums (lo + 1) (hi + 1) };
+      assert { linear_segment_sum nums lo hi =
+               nums[lo] + linear_segment_sum nums (lo + 1) hi };
+      assert { linear_segment_sum nums (lo + 1) (hi + 1) =
+               linear_segment_sum nums (lo + 1) hi + nums[hi] }
+    end
+
+  let maximum_sum_circular_subarray_array (nums: array int) : int
+    requires { leetcode_input nums }
+    ensures  { maximum_circular_subarray_sum nums result }
+  =
+    let n = length nums in
+    let total = ref nums[0] in
+    let current_max = ref nums[0] in
+    let best_max = ref nums[0] in
+    let current_min = ref nums[0] in
+    let best_min = ref nums[0] in
+
+    for i = 1 to n - 1 do
+      invariant { 1 <= i <= n }
+      invariant { total_prefix_sum nums i !total }
+      invariant { max_ending_sum nums i !current_max }
+      invariant { max_prefix_subarray_sum nums i !best_max }
+      invariant { min_ending_sum nums i !current_min }
+      invariant { min_prefix_subarray_sum nums i !best_min }
+
+      let x = nums[i] in
+      assert { 0 <= i < n };
+      assert { n = length nums };
+      assert { x = linear_segment_sum nums i (i + 1) };
+
+      let prev_total = !total in
+      let prev_current_max = !current_max in
+      let prev_current_min = !current_min in
+      total := prev_total + x;
+      linear_segment_sum_snoc nums 0 i;
+      assert { !total = linear_segment_sum nums 0 (i + 1) };
+      assert { total_prefix_sum nums (i + 1) !total };
+
+      if prev_current_max + x > x then begin
+        current_max := prev_current_max + x;
+        assert { max_ending_sum nums i prev_current_max };
+        assert { exists lo: int.
+          0 <= lo < i /\
+          prev_current_max = linear_segment_sum nums lo i };
+        assert { forall lo: int.
+          0 <= lo < i ->
+          linear_segment_sum nums lo i <= prev_current_max };
+        assert { exists lo: int.
+          0 <= lo < i /\
+          !current_max = linear_segment_sum nums lo i + x };
+        assert { exists lo: int.
+          0 <= lo < i /\
+          !current_max = linear_segment_sum nums lo (i + 1) };
+        assert { forall lo: int.
+          0 <= lo < i + 1 ->
+          linear_segment_sum nums lo (i + 1) <= !current_max };
+        assert { max_ending_sum nums (i + 1) !current_max }
+      end else begin
+        current_max := x;
+        assert { !current_max = linear_segment_sum nums i (i + 1) };
+        assert { exists lo: int.
+          0 <= lo < i + 1 /\
+          !current_max = linear_segment_sum nums lo (i + 1) };
+        assert { forall lo: int.
+          0 <= lo < i + 1 ->
+          linear_segment_sum nums lo (i + 1) <= !current_max };
+        assert { max_ending_sum nums (i + 1) !current_max }
+      end;
+      if !current_max > !best_max then begin
+        assert { max_ending_sum nums (i + 1) !current_max };
+        assert { exists lo: int.
+          0 <= lo < i + 1 /\
+          !current_max = linear_segment_sum nums lo (i + 1) };
+        assert { forall lo up: int.
+          0 <= lo < up <= i ->
+          linear_segment_sum nums lo up <= !best_max };
+        best_max := !current_max;
+        assert { exists lo up: int.
+          0 <= lo < up <= i + 1 /\
+          !best_max = linear_segment_sum nums lo up };
+        assert { forall lo up: int.
+          0 <= lo < up <= i + 1 ->
+          linear_segment_sum nums lo up <= !best_max };
+        assert { max_prefix_subarray_sum nums (i + 1) !best_max }
+      end else begin
+        assert { max_prefix_subarray_sum nums i !best_max };
+        assert { max_ending_sum nums (i + 1) !current_max };
+        assert { forall lo up: int.
+          0 <= lo < up <= i ->
+          linear_segment_sum nums lo up <= !best_max };
+        assert { forall lo: int.
+          0 <= lo < i + 1 ->
+          linear_segment_sum nums lo (i + 1) <= !current_max };
+        assert { !current_max <= !best_max };
+        assert { forall lo up: int.
+          0 <= lo < up <= i + 1 ->
+          linear_segment_sum nums lo up <= !best_max };
+        assert { max_prefix_subarray_sum nums (i + 1) !best_max }
+      end;
+
+      if prev_current_min + x < x then begin
+        current_min := prev_current_min + x;
+        assert { min_ending_sum nums i prev_current_min };
+        assert { exists lo: int.
+          0 <= lo < i /\
+          prev_current_min = linear_segment_sum nums lo i };
+        assert { forall lo: int.
+          0 <= lo < i ->
+          prev_current_min <= linear_segment_sum nums lo i };
+        assert { exists lo: int.
+          0 <= lo < i /\
+          !current_min = linear_segment_sum nums lo i + x };
+        assert { exists lo: int.
+          0 <= lo < i /\
+          !current_min = linear_segment_sum nums lo (i + 1) };
+        assert { forall lo: int.
+          0 <= lo < i + 1 ->
+          !current_min <= linear_segment_sum nums lo (i + 1) };
+        assert { min_ending_sum nums (i + 1) !current_min }
+      end else begin
+        current_min := x;
+        assert { !current_min = linear_segment_sum nums i (i + 1) };
+        assert { exists lo: int.
+          0 <= lo < i + 1 /\
+          !current_min = linear_segment_sum nums lo (i + 1) };
+        assert { forall lo: int.
+          0 <= lo < i + 1 ->
+          !current_min <= linear_segment_sum nums lo (i + 1) };
+        assert { min_ending_sum nums (i + 1) !current_min }
+      end;
+      if !current_min < !best_min then begin
+        assert { min_ending_sum nums (i + 1) !current_min };
+        assert { exists lo: int.
+          0 <= lo < i + 1 /\
+          !current_min = linear_segment_sum nums lo (i + 1) };
+        assert { forall lo up: int.
+          0 <= lo < up <= i ->
+          !best_min <= linear_segment_sum nums lo up };
+        best_min := !current_min;
+        assert { exists lo up: int.
+          0 <= lo < up <= i + 1 /\
+          !best_min = linear_segment_sum nums lo up };
+        assert { forall lo up: int.
+          0 <= lo < up <= i + 1 ->
+          !best_min <= linear_segment_sum nums lo up };
+        assert { min_prefix_subarray_sum nums (i + 1) !best_min }
+      end else begin
+        assert { min_prefix_subarray_sum nums i !best_min };
+        assert { min_ending_sum nums (i + 1) !current_min };
+        assert { forall lo up: int.
+          0 <= lo < up <= i ->
+          !best_min <= linear_segment_sum nums lo up };
+        assert { forall lo: int.
+          0 <= lo < i + 1 ->
+          !current_min <= linear_segment_sum nums lo (i + 1) };
+        assert { !best_min <= !current_min };
+        assert { forall lo up: int.
+          0 <= lo < up <= i + 1 ->
+          !best_min <= linear_segment_sum nums lo up };
+        assert { min_prefix_subarray_sum nums (i + 1) !best_min }
+      end
+    done;
+
+    assert { total_prefix_sum nums n !total };
+    assert { max_prefix_subarray_sum nums n !best_max };
+    assert { min_prefix_subarray_sum nums n !best_min };
+
+    if !best_max < 0 then !best_max else
+      let wrap = !total - !best_min in
+      if wrap > !best_max then wrap else !best_max
+
+end

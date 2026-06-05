@@ -1,0 +1,170 @@
+module CountTheNumberOfFairPairs_List_Recursive_Implementation
+
+  use int.Int
+  use list.List
+
+  let rec count_fair_with (x: int) (ys: list int) (lower: int) (upper: int) : int
+    variant { ys }
+  =
+    match ys with
+    | Nil -> 0
+    | Cons y rest ->
+        let pair_sum = x + y in
+        (if lower <= pair_sum && pair_sum <= upper then 1 else 0) +
+        count_fair_with x rest lower upper
+    end
+
+  let rec count_the_number_of_fair_pairs_list (nums: list int) (lower: int) (upper: int) : int
+    variant { nums }
+  =
+    match nums with
+    | Nil -> 0
+    | Cons x rest ->
+        count_fair_with x rest lower upper +
+        count_the_number_of_fair_pairs_list rest lower upper
+    end
+
+  let test_000 () : bool =
+    let nums = Cons 1000000000 (Cons (-1000000000) (Cons 500000000 (Cons (-500000000) Nil))) in
+    let r = count_the_number_of_fair_pairs_list nums 0 0 in
+    r = 2
+
+  let test_001 () : bool =
+    let nums = Cons 0 (Cons 1 (Cons 7 (Cons 4 (Cons 4 (Cons 5 Nil))))) in
+    let r = count_the_number_of_fair_pairs_list nums 3 6 in
+    r = 6
+
+  let test_002 () : bool =
+    let nums = Cons 5 (Cons 5 (Cons 5 (Cons 5 (Cons 5 Nil)))) in
+    let r = count_the_number_of_fair_pairs_list nums 10 10 in
+    r = 10
+
+  let test_003 () : bool =
+    let nums = Cons (-1) (Cons 0 (Cons 1 (Cons 2 (Cons 3 Nil)))) in
+    let r = count_the_number_of_fair_pairs_list nums 0 4 in
+    r = 8
+
+  let test_004 () : bool =
+    let nums = Cons (-1) (Cons 0 (Cons 1 (Cons 2 (Cons 3 Nil)))) in
+    let r = count_the_number_of_fair_pairs_list nums (-2) 2 in
+    r = 6
+
+  let test_005 () : bool =
+    let nums = Cons 10 (Cons 20 (Cons 30 (Cons 40 (Cons 50 Nil)))) in
+    let r = count_the_number_of_fair_pairs_list nums 50 70 in
+    r = 6
+
+  let test_006 () : bool =
+    let nums = Cons 1000000000 (Cons (-1000000000) (Cons 500000000 (Cons (-500000000) Nil))) in
+    let r = count_the_number_of_fair_pairs_list nums (-1500000000) 1500000000 in
+    r = 6
+
+  let test_007 () : bool =
+    let nums = Cons (-1) (Cons 0 (Cons 1 (Cons 2 (Cons 3 Nil)))) in
+    let r = count_the_number_of_fair_pairs_list nums 0 2 in
+    r = 5
+
+  let test_008 () : bool =
+    let nums = Cons 1 (Cons 7 (Cons 9 (Cons 2 (Cons 5 Nil)))) in
+    let r = count_the_number_of_fair_pairs_list nums 11 11 in
+    r = 1
+
+  let test_009 () : bool =
+    let nums = Cons 1 (Cons 2 (Cons 3 (Cons 4 (Cons 5 (Cons 6 (Cons 7 (Cons 8 (Cons 9 (Cons 10 Nil))))))))) in
+    let r = count_the_number_of_fair_pairs_list nums 5 15 in
+    r = 37
+
+  let test_012 () : bool =
+    let nums = Cons (-10) (Cons (-20) (Cons (-30) (Cons (-40) (Cons (-50) Nil)))) in
+    let r = count_the_number_of_fair_pairs_list nums (-80) (-50) in
+    r = 7
+
+  let test_013 () : bool =
+    let nums = Cons 1 (Cons 2 (Cons 3 (Cons 4 (Cons 5 Nil)))) in
+    let r = count_the_number_of_fair_pairs_list nums 5 8 in
+    r = 7
+
+  let test_015 () : bool =
+    let nums = Cons 1 (Cons 2 (Cons 3 (Cons 4 (Cons 5 (Cons 6 (Cons 7 (Cons 8 (Cons 9 (Cons 10 (Cons 11 (Cons 12 (Cons 13 (Cons 14 (Cons 15 (Cons 16 (Cons 17 (Cons 18 (Cons 19 (Cons 20 Nil))))))))))))))))))) in
+    let r = count_the_number_of_fair_pairs_list nums 1 38 in
+    r = 189
+
+  let test_016 () : bool =
+    let nums = Cons 0 (Cons 0 (Cons 0 (Cons 0 (Cons 0 (Cons 0 (Cons 0 (Cons 0 (Cons 0 (Cons 0 (Cons 0 (Cons 0 (Cons 0 (Cons 0 (Cons 0 (Cons 0 (Cons 0 (Cons 0 (Cons 0 (Cons 0 Nil))))))))))))))))))) in
+    let r = count_the_number_of_fair_pairs_list nums 0 0 in
+    r = 190
+
+  let test_017 () : bool =
+    let nums = Cons 10 (Cons 20 (Cons 30 (Cons 40 (Cons 50 (Cons 60 (Cons 70 (Cons 80 (Cons 90 (Cons 100 Nil))))))))) in
+    let r = count_the_number_of_fair_pairs_list nums 50 150 in
+    r = 37
+
+  let test_018 () : bool =
+    let nums = Cons (-100) (Cons (-90) (Cons (-80) (Cons (-70) (Cons (-60) (Cons (-50) (Cons (-40) (Cons (-30) (Cons (-20) (Cons (-10) Nil))))))))) in
+    let r = count_the_number_of_fair_pairs_list nums (-150) (-50) in
+    r = 37
+
+  let test_019 () : bool =
+    let nums = Cons 1 (Cons 2 (Cons 3 (Cons 4 (Cons 5 (Cons 6 (Cons 7 (Cons 8 (Cons 9 (Cons 10 (Cons 11 (Cons 12 (Cons 13 (Cons 14 (Cons 15 Nil)))))))))))))) in
+    let r = count_the_number_of_fair_pairs_list nums 10 20 in
+    r = 64
+
+  let test_020 () : bool =
+    let nums = Cons 1 (Cons 3 (Cons 5 (Cons 7 (Cons 9 (Cons 11 (Cons 13 (Cons 15 (Cons 17 (Cons 19 Nil))))))))) in
+    let r = count_the_number_of_fair_pairs_list nums 10 30 in
+    r = 37
+
+  let test_021 () : bool =
+    let nums = Cons 1000000000 (Cons (-1000000000) (Cons 500000000 (Cons (-500000000) (Cons 250000000 (Cons (-250000000) Nil))))) in
+    let r = count_the_number_of_fair_pairs_list nums (-1000000000) 1000000000 in
+    r = 11
+
+  let test_022 () : bool =
+    let nums = Cons 1 (Cons 3 (Cons 5 (Cons 7 (Cons 9 (Cons 11 (Cons 13 (Cons 15 (Cons 17 (Cons 19 (Cons 21 (Cons 23 (Cons 25 (Cons 27 (Cons 29 Nil)))))))))))))) in
+    let r = count_the_number_of_fair_pairs_list nums 15 35 in
+    r = 57
+
+  let run_tests () : bool =
+    if test_000 () then
+    if test_001 () then
+    if test_002 () then
+    if test_003 () then
+    if test_004 () then
+    if test_005 () then
+    if test_006 () then
+    if test_007 () then
+    if test_008 () then
+    if test_009 () then
+    if test_012 () then
+    if test_013 () then
+    if test_015 () then
+    if test_016 () then
+    if test_017 () then
+    if test_018 () then
+    if test_019 () then
+    if test_020 () then
+    if test_021 () then
+    if test_022 () then
+      true
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+
+end

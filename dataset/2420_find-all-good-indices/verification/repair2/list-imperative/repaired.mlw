@@ -1,0 +1,341 @@
+module FindAllGoodIndices_List_Stage3_Imperative
+
+  use int.Int
+  use list.List
+  use list.Length
+  use list.Mem
+  use list.Nth
+  use list.NthLength
+  use option.Option
+  use ref.Ref
+
+  predicate nth_is (nums: list int) (i: int) (v: int) =
+    nth i nums = Some v
+
+  predicate value_in_constraints (nums: list int) =
+    forall x: int. mem x nums -> 1 <= x <= 1000000
+
+  predicate valid_center (nums: list int) (k: int) (i: int) =
+    k <= i /\ i + k < length nums
+
+  predicate adjacent_nonincreasing (nums: list int) (lo: int) (hi: int) =
+    forall j x y: int.
+      lo <= j < hi ->
+      nth_is nums j x ->
+      nth_is nums (j + 1) y ->
+      x >= y
+
+  predicate adjacent_nondecreasing (nums: list int) (lo: int) (hi: int) =
+    forall j x y: int.
+      lo <= j < hi ->
+      nth_is nums j x ->
+      nth_is nums (j + 1) y ->
+      x <= y
+
+  predicate good_index (nums: list int) (k: int) (i: int) =
+    valid_center nums k i /\
+    adjacent_nonincreasing nums (i - k) (i - 1) /\
+    adjacent_nondecreasing nums (i + 1) (i + k)
+
+  let rec predicate all_greater_than (x: int) (indices: list int)
+    variant { indices }
+  =
+    match indices with
+    | Nil -> true
+    | Cons y ys -> x < y && all_greater_than x ys
+    end
+
+  let rec predicate strictly_increasing (indices: list int)
+    variant { indices }
+  =
+    match indices with
+    | Nil -> true
+    | Cons x xs -> all_greater_than x xs && strictly_increasing xs
+    end
+
+  predicate exact_good_indices (nums: list int) (k: int) (indices: list int) =
+    strictly_increasing indices /\
+    (forall i: int. mem i indices <-> good_index nums k i)
+
+  let rec predicate all_less_than (x: int) (indices: list int)
+    variant { indices }
+  =
+    match indices with
+    | Nil -> true
+    | Cons y ys -> y < x && all_less_than x ys
+    end
+
+  let rec predicate strictly_decreasing (indices: list int)
+    variant { indices }
+  =
+    match indices with
+    | Nil -> true
+    | Cons x xs -> all_less_than x xs && strictly_decreasing xs
+    end
+
+  predicate same_members (xs: list int) (ys: list int) =
+    forall x: int. mem x xs <-> mem x ys
+
+  predicate reverse_acc_exact_until
+    (nums: list int) (k: int) (next_i: int) (acc: list int) =
+    strictly_decreasing acc /\
+    (forall x: int. mem x acc <-> k <= x < next_i /\ good_index nums k x)
+
+  exception BadWindow
+
+  let list_length (l: list int) : int
+    ensures { result = length l }
+  =
+    let cur = ref l in
+    let n = ref 0 in
+    while (match !cur with Nil -> false | Cons _ _ -> true end) do
+      invariant { 0 <= !n }
+      invariant { !n + length !cur = length l }
+      variant { length !cur }
+      match !cur with
+      | Nil -> ()
+      | Cons _ xs ->
+          n := !n + 1;
+          cur := xs
+      end
+    done;
+    assert { !cur = Nil };
+    !n
+
+  let reverse_list (l: list int) : list int
+    ensures { same_members result l }
+    ensures { strictly_decreasing l -> strictly_increasing result }
+  =
+    let cur = ref l in
+    let acc = ref (Nil : list int) in
+    while (match !cur with Nil -> false | Cons _ _ -> true end) do
+      invariant { 0 <= length !cur }
+      invariant { length !acc + length !cur = length l }
+      invariant { forall x: int. (mem x !acc \/ mem x !cur) <-> mem x l }
+      invariant { strictly_decreasing l -> strictly_increasing !acc }
+      invariant {
+        strictly_decreasing l ->
+        match !cur with
+        | Nil -> true
+        | Cons x _ -> all_greater_than x !acc
+        end
+      }
+      variant { length !cur }
+      match !cur with
+      | Nil -> ()
+      | Cons x xs ->
+          assert { mem x !cur };
+          acc := Cons x !acc;
+          cur := xs
+      end
+    done;
+    assert { !cur = Nil };
+    assert { same_members !acc l };
+    !acc
+
+  let drop_prefix (l: list int) (count: int) : list int
+    ensures { count <= 0 -> result = l }
+    ensures { 0 <= count <= length l -> length result = length l - count }
+    ensures {
+      0 <= count <= length l ->
+      forall j v: int. 0 <= j ->
+        (nth_is result j v <-> nth_is l (count + j) v)
+    }
+  =
+    if count <= 0 then l else
+    let cur = ref l in
+    let remaining = ref count in
+    while !remaining > 0 do
+      invariant { !remaining <= count }
+      invariant { 0 <= count <= length l -> 0 <= !remaining <= count }
+      invariant { 0 <= count <= length l -> count - !remaining + length !cur = length l }
+      invariant {
+        0 <= count <= length l ->
+        forall j v: int. 0 <= j ->
+          (nth_is !cur j v <-> nth_is l (count - !remaining + j) v)
+      }
+      variant { !remaining }
+      match !cur with
+      | Nil -> remaining := 0
+      | Cons _ xs ->
+          cur := xs;
+          remaining := !remaining - 1
+      end
+    done;
+    assert { count > 0 };
+    !cur
+
+  let check_nonincreasing_prefix (l: list int) (comparisons: int) : bool
+    ensures {
+      0 <= comparisons ->
+      result = true ->
+      (forall j x y: int.
+        0 <= j < comparisons ->
+        nth_is l j x ->
+        nth_is l (j + 1) y ->
+        x >= y)
+    }
+    ensures {
+      0 <= comparisons ->
+      length l >= comparisons + 1 ->
+      (forall j x y: int.
+        0 <= j < comparisons ->
+        nth_is l j x ->
+        nth_is l (j + 1) y ->
+        x >= y) ->
+      result = true
+    }
+  =
+    if comparisons <= 0 then true else
+    try
+      let cur = ref l in
+      let remaining = ref comparisons in
+      while !remaining > 0 do
+        invariant { 0 <= !remaining <= comparisons }
+        invariant { comparisons - !remaining + length !cur = length l }
+        invariant { length !cur >= !remaining + 1 \/ length !cur < !remaining + 1 }
+        invariant {
+          forall j x y: int.
+            0 <= j < comparisons - !remaining ->
+            nth_is l j x ->
+            nth_is l (j + 1) y ->
+            x >= y
+        }
+        invariant {
+          forall j v: int. 0 <= j ->
+            (nth_is !cur j v <-> nth_is l (comparisons - !remaining + j) v)
+        }
+        variant { !remaining }
+        match !cur with
+        | Cons x (Cons y ys) ->
+            if x < y then raise BadWindow;
+            assert { x >= y };
+            assert { nth_is !cur 0 x };
+            assert { nth_is !cur 1 y };
+            assert { nth_is l (comparisons - !remaining) x };
+            assert { nth_is l (comparisons - !remaining + 1) y };
+            cur := Cons y ys;
+            remaining := !remaining - 1
+        | _ -> raise BadWindow
+        end
+      done;
+      assert { !remaining = 0 };
+      true
+    with BadWindow ->
+      false
+    end
+
+  let check_nondecreasing_prefix (l: list int) (comparisons: int) : bool
+    ensures {
+      0 <= comparisons ->
+      result = true ->
+      (forall j x y: int.
+        0 <= j < comparisons ->
+        nth_is l j x ->
+        nth_is l (j + 1) y ->
+        x <= y)
+    }
+    ensures {
+      0 <= comparisons ->
+      length l >= comparisons + 1 ->
+      (forall j x y: int.
+        0 <= j < comparisons ->
+        nth_is l j x ->
+        nth_is l (j + 1) y ->
+        x <= y) ->
+      result = true
+    }
+  =
+    if comparisons <= 0 then true else
+    try
+      let cur = ref l in
+      let remaining = ref comparisons in
+      while !remaining > 0 do
+        invariant { 0 <= !remaining <= comparisons }
+        invariant { comparisons - !remaining + length !cur = length l }
+        invariant { length !cur >= !remaining + 1 \/ length !cur < !remaining + 1 }
+        invariant {
+          forall j x y: int.
+            0 <= j < comparisons - !remaining ->
+            nth_is l j x ->
+            nth_is l (j + 1) y ->
+            x <= y
+        }
+        invariant {
+          forall j v: int. 0 <= j ->
+            (nth_is !cur j v <-> nth_is l (comparisons - !remaining + j) v)
+        }
+        variant { !remaining }
+        match !cur with
+        | Cons x (Cons y ys) ->
+            if x > y then raise BadWindow;
+            assert { x <= y };
+            assert { nth_is !cur 0 x };
+            assert { nth_is !cur 1 y };
+            assert { nth_is l (comparisons - !remaining) x };
+            assert { nth_is l (comparisons - !remaining + 1) y };
+            cur := Cons y ys;
+            remaining := !remaining - 1
+        | _ -> raise BadWindow
+        end
+      done;
+      assert { !remaining = 0 };
+      true
+    with BadWindow ->
+      false
+    end
+
+  let find_all_good_indices_list (nums: list int) (k: int) : list int
+    requires { 3 <= length nums }
+    requires { 1 <= k }
+    requires { 2 * k <= length nums }
+    requires { value_in_constraints nums }
+    ensures  { exact_good_indices nums k result }
+  =
+    let n = list_length nums in
+    let i = ref k in
+    let acc = ref (Nil : list int) in
+    while !i + k < n do
+      invariant { n = length nums }
+      invariant { k <= !i }
+      invariant { !i <= n - k }
+      invariant { forall x: int. mem x !acc -> k <= x < !i }
+      invariant { reverse_acc_exact_until nums k !i !acc }
+      variant { n - k - !i }
+      let left = drop_prefix nums (!i - k) in
+      let right = drop_prefix nums (!i + 1) in
+      assert { length left = length nums - (!i - k) };
+      assert { length right = length nums - (!i + 1) };
+      assert { length left >= k };
+      assert { length right >= k };
+      if check_nonincreasing_prefix left (k - 1) then
+        if check_nondecreasing_prefix right (k - 1) then begin
+          assert { valid_center nums k !i };
+          assert { adjacent_nonincreasing nums (!i - k) (!i - 1) };
+          assert { adjacent_nondecreasing nums (!i + 1) (!i + k) };
+          assert { good_index nums k !i };
+          assert { all_less_than !i !acc };
+          acc := Cons !i !acc
+        end else begin
+          assert { valid_center nums k !i };
+          assert { not (adjacent_nondecreasing nums (!i + 1) (!i + k)) };
+          assert { not (good_index nums k !i) }
+        end
+      else begin
+        assert { valid_center nums k !i };
+        assert { not (adjacent_nonincreasing nums (!i - k) (!i - 1)) };
+        assert { not (good_index nums k !i) }
+      end;
+      assert { reverse_acc_exact_until nums k (!i + 1) !acc };
+      i := !i + 1
+    done;
+    assert { !i = n - k };
+    assert { reverse_acc_exact_until nums k (n - k) !acc };
+    let result = reverse_list !acc in
+    assert { same_members result !acc };
+    assert { strictly_increasing result };
+    assert { forall x: int. mem x result <-> good_index nums k x };
+    assert { exact_good_indices nums k result };
+    result
+
+end

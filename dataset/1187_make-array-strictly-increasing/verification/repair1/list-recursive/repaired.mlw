@@ -1,0 +1,190 @@
+module MakeArrayStrictlyIncreasing_List_Stage3_Recursive
+
+  use int.Int
+  use list.List
+  use list.Mem
+  use option.Option
+
+  let rec predicate lt_all (x: int) (l: list int)
+    variant { l }
+  =
+    match l with
+    | Nil -> true
+    | Cons y ys -> (x < y) && lt_all x ys
+    end
+
+  let rec predicate strictly_increasing (l: list int)
+    variant { l }
+  =
+    match l with
+    | Nil -> true
+    | Cons x xs -> lt_all x xs && strictly_increasing xs
+    end
+
+  let rec function contains (x: int) (l: list int) : bool
+    variant { l }
+  =
+    match l with
+    | Nil -> false
+    | Cons y ys -> x = y || contains x ys
+    end
+
+  let rec predicate replacement_plan
+      (arr1: list int) (arr2: list int) (candidate: list int) (k: int)
+    variant { arr1 }
+  =
+    match arr1 with
+    | Nil ->
+        match candidate with
+        | Nil -> k = 0
+        | Cons _ _ -> false
+        end
+    | Cons x xs ->
+        match candidate with
+        | Nil -> false
+        | Cons y ys ->
+            if x = y then
+              replacement_plan xs arr2 ys k
+            else
+              contains y arr2 && k >= 1 &&
+              replacement_plan xs arr2 ys (k - 1)
+        end
+    end
+
+  predicate valid_transformation
+      (arr1: list int) (arr2: list int) (candidate: list int) (k: int) =
+    k >= 0 /\ replacement_plan arr1 arr2 candidate k /\
+    strictly_increasing candidate
+
+  predicate make_strict_result (arr1: list int) (arr2: list int) (r: int) =
+    (r = -1 /\
+     (forall candidate: list int, k: int.
+        not (valid_transformation arr1 arr2 candidate k))) \/
+    (r >= 0 /\
+     (exists candidate: list int.
+        valid_transformation arr1 arr2 candidate r) /\
+     (forall candidate: list int, k: int.
+        valid_transformation arr1 arr2 candidate k -> r <= k))
+
+  let min2 (a: int) (b: int) : int
+    ensures { result = a \/ result = b }
+    ensures { result <= a /\ result <= b }
+  =
+    if a <= b then a else b
+
+  let rec length_list (l: list int) : int
+    ensures { result >= 0 }
+    variant { l }
+  =
+    match l with
+    | Nil -> 0
+    | Cons _ xs -> 1 + length_list xs
+    end
+
+  let rec min_with_current (l: list int) (current: int) : int
+    variant { l }
+  =
+    match l with
+    | Nil -> current
+    | Cons x xs ->
+        if x < current then min_with_current xs x
+        else min_with_current xs current
+    end
+
+  let lower_bound (arr1: list int) (arr2: list int) : int =
+    let base =
+      match arr1 with
+      | Nil ->
+          match arr2 with
+          | Nil -> 0
+          | Cons y ys -> min_with_current ys y
+          end
+      | Cons x xs ->
+          let min1 = min_with_current xs x in
+          match arr2 with
+          | Nil -> min1
+          | Cons y ys -> min2 min1 (min_with_current ys y)
+          end
+      end
+    in
+    base - 1
+
+  let rec insert_sorted_unique (x: int) (l: list int) : list int
+    variant { l }
+  =
+    match l with
+    | Nil -> Cons x Nil
+    | Cons y ys ->
+        if x = y then l
+        else if x < y then Cons x l
+        else Cons y (insert_sorted_unique x ys)
+    end
+
+  let rec sort_unique (l: list int) : list int
+    variant { l }
+  =
+    match l with
+    | Nil -> Nil
+    | Cons x xs -> insert_sorted_unique x (sort_unique xs)
+    end
+
+  let rec first_greater (prev: int) (l: list int) : option int
+    ensures {
+      match result with
+      | None -> true
+      | Some y -> y > prev
+      end
+    }
+    variant { l }
+  =
+    match l with
+    | Nil -> None
+    | Cons x xs ->
+        if x > prev then Some x
+        else first_greater prev xs
+    end
+
+  let rec solve_suffix
+      (arr1: list int) (sorted_arr2: list int) (prev: int) (limit: int) : int
+    requires { 0 <= limit }
+    ensures  { 0 <= result }
+    ensures  { result <= limit }
+    variant { arr1 }
+  =
+    match arr1 with
+    | Nil -> 0
+    | Cons x xs ->
+        let keep_cost =
+          if x > prev then solve_suffix xs sorted_arr2 x limit else limit
+        in
+        let replace_cost =
+          match first_greater prev sorted_arr2 with
+          | None -> limit
+          | Some y ->
+              let tail_cost = solve_suffix xs sorted_arr2 y limit in
+              if tail_cost >= limit then limit else 1 + tail_cost
+          end
+        in
+        min2 keep_cost replace_cost
+    end
+
+  let make_array_strictly_increasing_list (arr1: list int) (arr2: list int) : int
+    ensures { make_strict_result arr1 arr2 result }
+  =
+    let sorted_arr2 = sort_unique arr2 in
+    let limit = length_list arr1 + 1 in
+    assert { 0 <= limit };
+    let result = solve_suffix arr1 sorted_arr2 (lower_bound arr1 arr2) limit in
+    assert { 0 <= result };
+    assert { result <= limit };
+    if result >= limit then begin
+      assert { result = limit };
+      assert { make_strict_result arr1 arr2 (-1) };
+      -1
+    end else begin
+      assert { result < limit };
+      assert { make_strict_result arr1 arr2 result };
+      result
+    end
+
+end

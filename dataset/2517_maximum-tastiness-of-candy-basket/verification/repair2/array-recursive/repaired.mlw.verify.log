@@ -1,0 +1,476 @@
+== Stage 1: first prover on whole file ==
+Running in /Users/rubenm/Desktop/Diversify2Verify/codex-runs/repair2-split1/stage3a-rerepair/2517_maximum-tastiness-of-candy-basket/array-recursive/maximum_tastiness_of_candy_basket_array_stage3_16ac0a1f_stage3/repaired/generated/why3: why3 session create -o /Users/rubenm/Desktop/Diversify2Verify/codex-runs/repair2-split1/stage3a-rerepair/2517_maximum-tastiness-of-candy-basket/array-recursive/maximum_tastiness_of_candy_basket_array_stage3_16ac0a1f_stage3/repaired/generated/why3/.why3_sessions/repaired_stage1 -P Z3,4.8.6 -t 10 -m 8192 repaired.mlw
+Session created successfully
+Running in /Users/rubenm/Desktop/Diversify2Verify/codex-runs/repair2-split1/stage3a-rerepair/2517_maximum-tastiness-of-candy-basket/array-recursive/maximum_tastiness_of_candy_basket_array_stage3_16ac0a1f_stage3/repaired/generated/why3: why3 bench /Users/rubenm/Desktop/Diversify2Verify/codex-runs/repair2-split1/stage3a-rerepair/2517_maximum-tastiness-of-candy-basket/array-recursive/maximum_tastiness_of_candy_basket_array_stage3_16ac0a1f_stage3/repaired/generated/why3/.why3_sessions/repaired_stage1
+Progress: 12/1/0                       Progress: 11/2/0                       Progress: 10/3/0                       Progress: 9/4/0                       Progress: 8/5/0                       Progress: 7/6/0                       Progress: 7/3/2                       Progress: 6/4/2                       Progress: 6/1/2                       Progress: 5/2/2                       Progress: 4/3/2                       Progress: 3/4/2                       Progress: 3/2/2                       Progress: 2/3/2                       Progress: 1/4/2                       
+Stage 1 infrastructure issue; skipping the rest of stage 1 and continuing.
+== Stage 1 stats ==
+= Statistics for session /Users/rubenm/Desktop/Diversify2Verify/codex-runs/repair2-split1/stage3a-rerepair/2517_maximum-tastiness-of-candy-basket/array-recursive/maximum_tastiness_of_candy_basket_array_stage3_16ac0a1f_stage3/repaired/generated/why3/.why3_sessions/repaired_stage1
+
+== Number of root goals ==
+  total: 13  proved: 0
+
+== Number of sub goals ==
+  total: 0  proved: 0
+
+== Goals not proved ==
+  +-- file [../../repaired.mlw]
+    +-- theory MaximumTastinessOfCandyBasket_Array_Spec
+      +-- goal array_to_list_from'vc
+      +-- goal insert_sorted'vc
+      +-- goal sort_list'vc
+      +-- goal last_value_from'vc
+      +-- goal can_pick_from'vc
+      +-- goal feasible_tastiness_exec'vc
+      +-- goal sorted_values_create_search_domain'vc
+      +-- goal search_domain_keep_feasible_half'vc
+      +-- goal search_domain_keep_infeasible_half'vc
+      +-- goal search_domain_closed'vc
+      +-- goal search_result_public_bridge'vc
+      +-- goal search_best'vc
+      +-- goal maximum_tastiness_of_candy_basket_array'vc
+  
+== Goals proved by only one prover ==
+  
+1 session(s) read, with a total of 13 proof goals.
+== Unproved root goals after first prover ==
+MaximumTastinessOfCandyBasket_Array_Spec	array_to_list_from'vc
+MaximumTastinessOfCandyBasket_Array_Spec	insert_sorted'vc
+MaximumTastinessOfCandyBasket_Array_Spec	sort_list'vc
+MaximumTastinessOfCandyBasket_Array_Spec	last_value_from'vc
+MaximumTastinessOfCandyBasket_Array_Spec	can_pick_from'vc
+MaximumTastinessOfCandyBasket_Array_Spec	feasible_tastiness_exec'vc
+MaximumTastinessOfCandyBasket_Array_Spec	sorted_values_create_search_domain'vc
+MaximumTastinessOfCandyBasket_Array_Spec	search_domain_keep_feasible_half'vc
+MaximumTastinessOfCandyBasket_Array_Spec	search_domain_keep_infeasible_half'vc
+MaximumTastinessOfCandyBasket_Array_Spec	search_domain_closed'vc
+MaximumTastinessOfCandyBasket_Array_Spec	search_result_public_bridge'vc
+MaximumTastinessOfCandyBasket_Array_Spec	search_best'vc
+MaximumTastinessOfCandyBasket_Array_Spec	maximum_tastiness_of_candy_basket_array'vc
+== Goals still unproved after stage 1 ==
+MaximumTastinessOfCandyBasket_Array_Spec	array_to_list_from'vc
+MaximumTastinessOfCandyBasket_Array_Spec	insert_sorted'vc
+MaximumTastinessOfCandyBasket_Array_Spec	sort_list'vc
+MaximumTastinessOfCandyBasket_Array_Spec	last_value_from'vc
+MaximumTastinessOfCandyBasket_Array_Spec	can_pick_from'vc
+MaximumTastinessOfCandyBasket_Array_Spec	feasible_tastiness_exec'vc
+MaximumTastinessOfCandyBasket_Array_Spec	sorted_values_create_search_domain'vc
+MaximumTastinessOfCandyBasket_Array_Spec	search_domain_keep_feasible_half'vc
+MaximumTastinessOfCandyBasket_Array_Spec	search_domain_keep_infeasible_half'vc
+MaximumTastinessOfCandyBasket_Array_Spec	search_domain_closed'vc
+MaximumTastinessOfCandyBasket_Array_Spec	search_result_public_bridge'vc
+MaximumTastinessOfCandyBasket_Array_Spec	search_best'vc
+MaximumTastinessOfCandyBasket_Array_Spec	maximum_tastiness_of_candy_basket_array'vc
+== Stage 2: split_vc on unproved goal ==
+Target theory: MaximumTastinessOfCandyBasket_Array_Spec
+Target goal  : array_to_list_from'vc
+---- stage2 | prover: Alt-Ergo,2.4.0 | theory: MaximumTastinessOfCandyBasket_Array_Spec | goal: array_to_list_from'vc ----
+Transforms: split_vc
+File "repaired.mlw", line 65, characters 16-33:
+Sub-goal Assertion of goal array_to_list_from'vc.
+Prover result is: Valid (0.01s, 4 steps).
+
+File "repaired.mlw", line 66, characters 16-26:
+Sub-goal Assertion of goal array_to_list_from'vc.
+Prover result is: Valid (0.00s, 5 steps).
+
+File "repaired.mlw", line 67, characters 16-49:
+Sub-goal Assertion of goal array_to_list_from'vc.
+Prover result is: Valid (0.01s, 6 steps).
+
+File "repaired.mlw", line 68, characters 17-47:
+Sub-goal Variant decrease of goal array_to_list_from'vc.
+Prover result is: Valid (0.01s, 7 steps).
+
+File "repaired.mlw", line 68, characters 17-47:
+Sub-goal Precondition of goal array_to_list_from'vc.
+Prover result is: Valid (0.01s, 7 steps).
+
+File "repaired.mlw", line 68, characters 12-16:
+Sub-goal Index in array bounds of goal array_to_list_from'vc.
+Prover result is: Valid (0.01s, 9 steps).
+
+File "repaired.mlw", line 59, characters 15-45:
+Sub-goal Postcondition of goal array_to_list_from'vc.
+Prover result is: Timeout (10.00s, 61031 steps).
+---- stage2 | prover: CVC4,1.8 | theory: MaximumTastinessOfCandyBasket_Array_Spec | goal: array_to_list_from'vc ----
+Transforms: split_vc
+File "repaired.mlw", line 65, characters 16-33:
+Sub-goal Assertion of goal array_to_list_from'vc.
+Prover result is: Valid (0.01s, 1303 steps).
+
+File "repaired.mlw", line 66, characters 16-26:
+Sub-goal Assertion of goal array_to_list_from'vc.
+Prover result is: Valid (0.01s, 1354 steps).
+
+File "repaired.mlw", line 67, characters 16-49:
+Sub-goal Assertion of goal array_to_list_from'vc.
+Prover result is: Valid (0.01s, 1361 steps).
+
+File "repaired.mlw", line 68, characters 17-47:
+Sub-goal Variant decrease of goal array_to_list_from'vc.
+Prover result is: Valid (0.01s, 1422 steps).
+
+File "repaired.mlw", line 68, characters 17-47:
+Sub-goal Precondition of goal array_to_list_from'vc.
+Prover result is: Valid (0.01s, 1368 steps).
+
+File "repaired.mlw", line 68, characters 12-16:
+Sub-goal Index in array bounds of goal array_to_list_from'vc.
+Prover result is: Valid (0.01s, 2089 steps).
+
+File "repaired.mlw", line 59, characters 15-45:
+Sub-goal Postcondition of goal array_to_list_from'vc.
+Prover result is: Unknown (unknown + incomplete) (0.02s, 3618 steps).
+== Stage 2: split_vc on unproved goal ==
+Target theory: MaximumTastinessOfCandyBasket_Array_Spec
+Target goal  : insert_sorted'vc
+---- stage2 | prover: Alt-Ergo,2.4.0 | theory: MaximumTastinessOfCandyBasket_Array_Spec | goal: insert_sorted'vc ----
+Transforms: split_vc
+File "repaired.mlw", line 79, characters 44-64:
+Sub-goal Variant decrease of goal insert_sorted'vc.
+Prover result is: Valid (0.01s, 26 steps).
+
+File "repaired.mlw", line 79, characters 44-64:
+Sub-goal Precondition of goal insert_sorted'vc.
+Prover result is: Timeout (10.00s, 75894 steps).
+
+File "repaired.mlw", line 72, characters 15-35:
+Sub-goal Postcondition of goal insert_sorted'vc.
+Prover result is: Timeout (10.00s, 242123 steps).
+Infrastructure issue in stage 2 with prover Alt-Ergo,2.4.0; aborting rest of stage 2.
+== Goals still unproved after stage 2 (split_vc) ==
+MaximumTastinessOfCandyBasket_Array_Spec	array_to_list_from'vc
+MaximumTastinessOfCandyBasket_Array_Spec	insert_sorted'vc
+MaximumTastinessOfCandyBasket_Array_Spec	sort_list'vc
+MaximumTastinessOfCandyBasket_Array_Spec	last_value_from'vc
+MaximumTastinessOfCandyBasket_Array_Spec	can_pick_from'vc
+MaximumTastinessOfCandyBasket_Array_Spec	feasible_tastiness_exec'vc
+MaximumTastinessOfCandyBasket_Array_Spec	sorted_values_create_search_domain'vc
+MaximumTastinessOfCandyBasket_Array_Spec	search_domain_keep_feasible_half'vc
+MaximumTastinessOfCandyBasket_Array_Spec	search_domain_keep_infeasible_half'vc
+MaximumTastinessOfCandyBasket_Array_Spec	search_domain_closed'vc
+MaximumTastinessOfCandyBasket_Array_Spec	search_result_public_bridge'vc
+MaximumTastinessOfCandyBasket_Array_Spec	search_best'vc
+MaximumTastinessOfCandyBasket_Array_Spec	maximum_tastiness_of_candy_basket_array'vc
+== Stage 3: split_vc + inline_all on still-unproved goal ==
+Target theory: MaximumTastinessOfCandyBasket_Array_Spec
+Target goal  : array_to_list_from'vc
+---- stage3 | prover: CVC4,1.8 | theory: MaximumTastinessOfCandyBasket_Array_Spec | goal: array_to_list_from'vc ----
+Transforms: split_vc inline_all
+File "repaired.mlw", line 65, characters 16-33:
+Sub-goal Assertion of goal array_to_list_from'vc.
+Prover result is: Valid (0.01s, 2082 steps).
+
+File "repaired.mlw", line 66, characters 16-26:
+Sub-goal Assertion of goal array_to_list_from'vc.
+Prover result is: Valid (0.01s, 2140 steps).
+
+File "repaired.mlw", line 67, characters 16-49:
+Sub-goal Assertion of goal array_to_list_from'vc.
+Prover result is: Valid (0.01s, 2099 steps).
+
+File "repaired.mlw", line 68, characters 17-47:
+Sub-goal Variant decrease of goal array_to_list_from'vc.
+Prover result is: Valid (0.01s, 2142 steps).
+
+File "repaired.mlw", line 68, characters 17-47:
+Sub-goal Precondition of goal array_to_list_from'vc.
+Prover result is: Valid (0.01s, 2106 steps).
+
+File "repaired.mlw", line 68, characters 12-16:
+Sub-goal Index in array bounds of goal array_to_list_from'vc.
+Prover result is: Valid (0.01s, 2827 steps).
+
+File "repaired.mlw", line 59, characters 15-45:
+Sub-goal Postcondition of goal array_to_list_from'vc.
+Prover result is: Unknown (unknown + incomplete) (0.02s, 3863 steps).
+== Stage 3: split_vc + inline_all on still-unproved goal ==
+Target theory: MaximumTastinessOfCandyBasket_Array_Spec
+Target goal  : insert_sorted'vc
+---- stage3 | prover: CVC4,1.8 | theory: MaximumTastinessOfCandyBasket_Array_Spec | goal: insert_sorted'vc ----
+Transforms: split_vc inline_all
+File "repaired.mlw", line 79, characters 44-64:
+Sub-goal Variant decrease of goal insert_sorted'vc.
+Prover result is: Valid (0.01s, 2481 steps).
+
+File "repaired.mlw", line 79, characters 44-64:
+Sub-goal Precondition of goal insert_sorted'vc.
+Prover result is: Unknown (unknown + incomplete) (0.01s, 2549 steps).
+
+File "repaired.mlw", line 72, characters 15-35:
+Sub-goal Postcondition of goal insert_sorted'vc.
+Prover result is: Unknown (unknown + incomplete) (0.02s, 3232 steps).
+
+File "repaired.mlw", line 73, characters 15-51:
+Sub-goal Postcondition of goal insert_sorted'vc.
+Prover result is: Unknown (unknown + incomplete) (0.01s, 3232 steps).
+== Stage 3: split_vc + inline_all on still-unproved goal ==
+Target theory: MaximumTastinessOfCandyBasket_Array_Spec
+Target goal  : sort_list'vc
+---- stage3 | prover: CVC4,1.8 | theory: MaximumTastinessOfCandyBasket_Array_Spec | goal: sort_list'vc ----
+Transforms: split_vc inline_all
+File "repaired.mlw", line 89, characters 35-49:
+Sub-goal Variant decrease of goal sort_list'vc.
+Prover result is: Valid (0.01s, 2398 steps).
+
+File "repaired.mlw", line 89, characters 19-49:
+Sub-goal Precondition of goal sort_list'vc.
+Prover result is: Valid (0.01s, 1978 steps).
+
+File "repaired.mlw", line 83, characters 14-34:
+Sub-goal Postcondition of goal sort_list'vc.
+Prover result is: Unknown (unknown + incomplete) (0.01s, 2372 steps).
+
+File "repaired.mlw", line 84, characters 14-41:
+Sub-goal Postcondition of goal sort_list'vc.
+Prover result is: Unknown (unknown + incomplete) (0.01s, 2383 steps).
+== Stage 3: split_vc + inline_all on still-unproved goal ==
+Target theory: MaximumTastinessOfCandyBasket_Array_Spec
+Target goal  : last_value_from'vc
+---- stage3 | prover: CVC4,1.8 | theory: MaximumTastinessOfCandyBasket_Array_Spec | goal: last_value_from'vc ----
+Transforms: split_vc inline_all
+File "repaired.mlw", line 97, characters 19-39:
+Sub-goal Variant decrease of goal last_value_from'vc.
+Prover result is: Valid (0.01s, 2398 steps).
+Solved with split_vc + inline_all using prover: CVC4,1.8
+== Stage 3: split_vc + inline_all on still-unproved goal ==
+Target theory: MaximumTastinessOfCandyBasket_Array_Spec
+Target goal  : can_pick_from'vc
+---- stage3 | prover: CVC4,1.8 | theory: MaximumTastinessOfCandyBasket_Array_Spec | goal: can_pick_from'vc ----
+Transforms: split_vc inline_all
+File "repaired.mlw", line 111, characters 12-48:
+Sub-goal Variant decrease of goal can_pick_from'vc.
+Prover result is: Valid (0.01s, 2594 steps).
+
+File "repaired.mlw", line 111, characters 12-48:
+Sub-goal Precondition of goal can_pick_from'vc.
+Prover result is: Unknown (unknown + incomplete) (0.02s, 2659 steps).
+
+File "repaired.mlw", line 113, characters 12-45:
+Sub-goal Variant decrease of goal can_pick_from'vc.
+Prover result is: Valid (0.01s, 2572 steps).
+
+File "repaired.mlw", line 113, characters 12-45:
+Sub-goal Precondition of goal can_pick_from'vc.
+Prover result is: Unknown (unknown + incomplete) (0.02s, 2640 steps).
+== Stage 3: split_vc + inline_all on still-unproved goal ==
+Target theory: MaximumTastinessOfCandyBasket_Array_Spec
+Target goal  : feasible_tastiness_exec'vc
+---- stage3 | prover: CVC4,1.8 | theory: MaximumTastinessOfCandyBasket_Array_Spec | goal: feasible_tastiness_exec'vc ----
+Transforms: split_vc inline_all
+File "repaired.mlw", line 123, characters 10-38:
+Sub-goal Precondition of goal feasible_tastiness_exec'vc.
+Prover result is: Unknown (unknown + incomplete) (0.01s, 2067 steps).
+== Stage 3: split_vc + inline_all on still-unproved goal ==
+Target theory: MaximumTastinessOfCandyBasket_Array_Spec
+Target goal  : sorted_values_create_search_domain'vc
+---- stage3 | prover: CVC4,1.8 | theory: MaximumTastinessOfCandyBasket_Array_Spec | goal: sorted_values_create_search_domain'vc ----
+Transforms: split_vc inline_all
+File "repaired.mlw", line 134, characters 13-75:
+Sub-goal Assertion of goal sorted_values_create_search_domain'vc.
+Prover result is: Unknown (unknown + incomplete) (0.02s, 3774 steps).
+
+File "repaired.mlw", line 132, characters 15-77:
+Sub-goal Postcondition of goal sorted_values_create_search_domain'vc.
+Prover result is: Valid (0.01s, 3251 steps).
+== Stage 3: split_vc + inline_all on still-unproved goal ==
+Target theory: MaximumTastinessOfCandyBasket_Array_Spec
+Target goal  : search_domain_keep_feasible_half'vc
+---- stage3 | prover: CVC4,1.8 | theory: MaximumTastinessOfCandyBasket_Array_Spec | goal: search_domain_keep_feasible_half'vc ----
+Transforms: split_vc inline_all
+File "repaired.mlw", line 144, characters 13-63:
+Sub-goal Assertion of goal search_domain_keep_feasible_half'vc.
+Prover result is: Unknown (unknown + incomplete) (0.01s, 2323 steps).
+
+File "repaired.mlw", line 142, characters 15-65:
+Sub-goal Postcondition of goal search_domain_keep_feasible_half'vc.
+Prover result is: Valid (0.01s, 2206 steps).
+== Stage 3: split_vc + inline_all on still-unproved goal ==
+Target theory: MaximumTastinessOfCandyBasket_Array_Spec
+Target goal  : search_domain_keep_infeasible_half'vc
+---- stage3 | prover: CVC4,1.8 | theory: MaximumTastinessOfCandyBasket_Array_Spec | goal: search_domain_keep_infeasible_half'vc ----
+Transforms: split_vc inline_all
+File "repaired.mlw", line 154, characters 13-62:
+Sub-goal Assertion of goal search_domain_keep_infeasible_half'vc.
+Prover result is: Unknown (unknown + incomplete) (0.01s, 2510 steps).
+
+File "repaired.mlw", line 152, characters 15-64:
+Sub-goal Postcondition of goal search_domain_keep_infeasible_half'vc.
+Prover result is: Valid (0.01s, 2390 steps).
+== Stage 3: split_vc + inline_all on still-unproved goal ==
+Target theory: MaximumTastinessOfCandyBasket_Array_Spec
+Target goal  : search_domain_closed'vc
+---- stage3 | prover: CVC4,1.8 | theory: MaximumTastinessOfCandyBasket_Array_Spec | goal: search_domain_closed'vc ----
+Transforms: split_vc inline_all
+File "repaired.mlw", line 163, characters 13-43:
+Sub-goal Assertion of goal search_domain_closed'vc.
+Prover result is: Unknown (unknown + incomplete) (0.02s, 5260 steps).
+
+File "repaired.mlw", line 161, characters 15-45:
+Sub-goal Postcondition of goal search_domain_closed'vc.
+Prover result is: Valid (0.03s, 7573 steps).
+== Stage 3: split_vc + inline_all on still-unproved goal ==
+Target theory: MaximumTastinessOfCandyBasket_Array_Spec
+Target goal  : search_result_public_bridge'vc
+---- stage3 | prover: CVC4,1.8 | theory: MaximumTastinessOfCandyBasket_Array_Spec | goal: search_result_public_bridge'vc ----
+Transforms: split_vc inline_all
+File "repaired.mlw", line 169, characters 13-19:
+Sub-goal Assertion of goal search_result_public_bridge'vc.
+Prover result is: Valid (0.02s, 7305 steps).
+
+File "repaired.mlw", line 170, characters 13-41:
+Sub-goal Assertion of goal search_result_public_bridge'vc.
+Prover result is: Valid (0.03s, 8658 steps).
+
+File "repaired.mlw", line 171, characters 60-66:
+Sub-goal Assertion of goal search_result_public_bridge'vc.
+Prover result is: Unknown (unknown + incomplete) (0.04s, 10389 steps).
+
+File "repaired.mlw", line 167, characters 15-47:
+Sub-goal Postcondition of goal search_result_public_bridge'vc.
+Prover result is: Valid (0.03s, 10975 steps).
+== Stage 3: split_vc + inline_all on still-unproved goal ==
+Target theory: MaximumTastinessOfCandyBasket_Array_Spec
+Target goal  : search_best'vc
+---- stage3 | prover: CVC4,1.8 | theory: MaximumTastinessOfCandyBasket_Array_Spec | goal: search_best'vc ----
+Transforms: split_vc inline_all
+File "repaired.mlw", line 180, characters 7-58:
+Sub-goal Precondition of goal search_best'vc.
+Prover result is: Valid (0.02s, 5202 steps).
+
+File "repaired.mlw", line 180, characters 7-58:
+Sub-goal Precondition of goal search_best'vc.
+Prover result is: Valid (0.02s, 5208 steps).
+
+File "repaired.mlw", line 184, characters 22-40:
+Sub-goal Precondition of goal search_best'vc.
+Prover result is: Valid (0.02s, 5213 steps).
+
+File "repaired.mlw", line 186, characters 18-34:
+Sub-goal Assertion of goal search_best'vc.
+Prover result is: Valid (0.03s, 8612 steps).
+
+File "repaired.mlw", line 187, characters 17-56:
+Sub-goal Assertion of goal search_best'vc.
+Prover result is: Unknown (unknown + incomplete) (0.03s, 11558 steps).
+
+File "repaired.mlw", line 188, characters 8-75:
+Sub-goal Precondition of goal search_best'vc.
+Prover result is: Valid (0.02s, 8088 steps).
+
+File "repaired.mlw", line 188, characters 8-75:
+Sub-goal Precondition of goal search_best'vc.
+Prover result is: Valid (0.02s, 8094 steps).
+
+File "repaired.mlw", line 188, characters 8-75:
+Sub-goal Precondition of goal search_best'vc.
+Prover result is: Valid (0.02s, 8097 steps).
+
+File "repaired.mlw", line 189, characters 8-50:
+Sub-goal Variant decrease of goal search_best'vc.
+Prover result is: Valid (0.02s, 8191 steps).
+
+File "repaired.mlw", line 189, characters 8-50:
+Sub-goal Precondition of goal search_best'vc.
+Prover result is: Valid (0.02s, 8122 steps).
+
+File "repaired.mlw", line 192, characters 18-34:
+Sub-goal Assertion of goal search_best'vc.
+Prover result is: Valid (0.03s, 8630 steps).
+
+File "repaired.mlw", line 193, characters 17-60:
+Sub-goal Assertion of goal search_best'vc.
+Prover result is: Unknown (unknown + incomplete) (0.03s, 11564 steps).
+
+File "repaired.mlw", line 194, characters 8-77:
+Sub-goal Precondition of goal search_best'vc.
+Prover result is: Valid (0.02s, 8110 steps).
+
+File "repaired.mlw", line 194, characters 8-77:
+Sub-goal Precondition of goal search_best'vc.
+Prover result is: Valid (0.02s, 8116 steps).
+
+File "repaired.mlw", line 194, characters 8-77:
+Sub-goal Precondition of goal search_best'vc.
+Prover result is: Valid (0.02s, 8114 steps).
+
+File "repaired.mlw", line 195, characters 8-49:
+Sub-goal Variant decrease of goal search_best'vc.
+Prover result is: Valid (0.02s, 8209 steps).
+
+File "repaired.mlw", line 195, characters 8-49:
+Sub-goal Precondition of goal search_best'vc.
+Prover result is: Valid (0.02s, 8144 steps).
+
+File "repaired.mlw", line 176, characters 15-48:
+Sub-goal Postcondition of goal search_best'vc.
+Prover result is: Unknown (unknown + incomplete) (0.05s, 20908 steps).
+== Stage 3: split_vc + inline_all on still-unproved goal ==
+Target theory: MaximumTastinessOfCandyBasket_Array_Spec
+Target goal  : maximum_tastiness_of_candy_basket_array'vc
+---- stage3 | prover: CVC4,1.8 | theory: MaximumTastinessOfCandyBasket_Array_Spec | goal: maximum_tastiness_of_candy_basket_array'vc ----
+Transforms: split_vc inline_all
+File "repaired.mlw", line 202, characters 34-62:
+Sub-goal Precondition of goal maximum_tastiness_of_candy_basket_array'vc.
+Prover result is: Valid (0.02s, 6004 steps).
+
+File "repaired.mlw", line 207, characters 17-56:
+Sub-goal Assertion of goal maximum_tastiness_of_candy_basket_array'vc.
+Prover result is: Unknown (unknown + incomplete) (0.03s, 6982 steps).
+
+File "repaired.mlw", line 208, characters 8-80:
+Sub-goal Precondition of goal maximum_tastiness_of_candy_basket_array'vc.
+Prover result is: Valid (0.02s, 6421 steps).
+
+File "repaired.mlw", line 208, characters 8-80:
+Sub-goal Precondition of goal maximum_tastiness_of_candy_basket_array'vc.
+Prover result is: Valid (0.02s, 6423 steps).
+
+File "repaired.mlw", line 208, characters 8-80:
+Sub-goal Precondition of goal maximum_tastiness_of_candy_basket_array'vc.
+Prover result is: Valid (0.02s, 6426 steps).
+
+File "repaired.mlw", line 209, characters 21-75:
+Sub-goal Precondition of goal maximum_tastiness_of_candy_basket_array'vc.
+Prover result is: Valid (0.02s, 6465 steps).
+
+File "repaired.mlw", line 210, characters 17-50:
+Sub-goal Assertion of goal maximum_tastiness_of_candy_basket_array'vc.
+Prover result is: Valid (0.03s, 9773 steps).
+
+File "repaired.mlw", line 211, characters 8-50:
+Sub-goal Precondition of goal maximum_tastiness_of_candy_basket_array'vc.
+Prover result is: Valid (0.03s, 11590 steps).
+
+File "repaired.mlw", line 212, characters 17-54:
+Sub-goal Assertion of goal maximum_tastiness_of_candy_basket_array'vc.
+Prover result is: Valid (0.04s, 13407 steps).
+
+File "repaired.mlw", line 200, characters 15-52:
+Sub-goal Postcondition of goal maximum_tastiness_of_candy_basket_array'vc.
+Prover result is: Unknown (unknown + incomplete) (0.05s, 16628 steps).
+== Final summary ==
+Unproved root goals after first prover : 13
+Remaining failures after split_vc      : 13
+Remaining failures after stage 3       : 12
+Detailed logs stored in                : /Users/rubenm/Desktop/Diversify2Verify/codex-runs/repair2-split1/stage3a-rerepair/2517_maximum-tastiness-of-candy-basket/array-recursive/maximum_tastiness_of_candy_basket_array_stage3_16ac0a1f_stage3/repaired/generated/why3/.why3_sessions/repaired_logs
+Still unproved goals:
+MaximumTastinessOfCandyBasket_Array_Spec	array_to_list_from'vc
+MaximumTastinessOfCandyBasket_Array_Spec	insert_sorted'vc
+MaximumTastinessOfCandyBasket_Array_Spec	sort_list'vc
+MaximumTastinessOfCandyBasket_Array_Spec	can_pick_from'vc
+MaximumTastinessOfCandyBasket_Array_Spec	feasible_tastiness_exec'vc
+MaximumTastinessOfCandyBasket_Array_Spec	sorted_values_create_search_domain'vc
+MaximumTastinessOfCandyBasket_Array_Spec	search_domain_keep_feasible_half'vc
+MaximumTastinessOfCandyBasket_Array_Spec	search_domain_keep_infeasible_half'vc
+MaximumTastinessOfCandyBasket_Array_Spec	search_domain_closed'vc
+MaximumTastinessOfCandyBasket_Array_Spec	search_result_public_bridge'vc
+MaximumTastinessOfCandyBasket_Array_Spec	search_best'vc
+MaximumTastinessOfCandyBasket_Array_Spec	maximum_tastiness_of_candy_basket_array'vc
+VERIFY_RESULT: FAILURE
+VERIFY_REASON: unproved_goals_remain
+VERIFY_STAGE: stage3
+VERIFY_ROOT_TOTAL: 13
+VERIFY_ROOT_PROVED: 1
+VERIFY_ROOT_REMAINING: 12

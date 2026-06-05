@@ -1,0 +1,101 @@
+== Stage 1: first prover on whole file ==
+Running in /Users/rubenm/Desktop/Diversify2Verify/codex-runs/dataset-merge/410_split-array-largest-sum/stage3a/list-recursive/split_array_largest_sum_list_stage3_451bdfee/generated/why3/list: why3 session create -o /Users/rubenm/Desktop/Diversify2Verify/codex-runs/dataset-merge/410_split-array-largest-sum/stage3a/list-recursive/split_array_largest_sum_list_stage3_451bdfee/generated/why3/list/.why3_sessions/split_array_largest_sum_list_stage3_451bdfee_stage3_stage1 -P Z3,4.8.6 -t 10 -m 8192 split_array_largest_sum_list_stage3_451bdfee_stage3.mlw
+Session created successfully
+Running in /Users/rubenm/Desktop/Diversify2Verify/codex-runs/dataset-merge/410_split-array-largest-sum/stage3a/list-recursive/split_array_largest_sum_list_stage3_451bdfee/generated/why3/list: why3 bench /Users/rubenm/Desktop/Diversify2Verify/codex-runs/dataset-merge/410_split-array-largest-sum/stage3a/list-recursive/split_array_largest_sum_list_stage3_451bdfee/generated/why3/list/.why3_sessions/split_array_largest_sum_list_stage3_451bdfee_stage3_stage1
+Progress: 9/1/0                       Progress: 8/2/0                       Progress: 7/3/0                       Progress: 6/4/0                       Progress: 5/5/0                       Progress: 4/6/0                       Progress: 4/0/1                       Progress: 3/1/1                       Progress: 2/2/1                       Progress: 1/3/1                       Progress: 0/4/1                       Progress: 0/0/2                       Progress: 0/0/1                       
+Replay completed, saving session... done
+== Stage 1 stats ==
+= Statistics for session /Users/rubenm/Desktop/Diversify2Verify/codex-runs/dataset-merge/410_split-array-largest-sum/stage3a/list-recursive/split_array_largest_sum_list_stage3_451bdfee/generated/why3/list/.why3_sessions/split_array_largest_sum_list_stage3_451bdfee_stage3_stage1
+
+== Number of root goals ==
+  total: 10  proved: 9
+
+== Number of sub goals ==
+  total: 0  proved: 0
+
+== Goals not proved ==
+  +-- file [../../split_array_largest_sum_list_stage3_451bdfee_stage3.mlw]
+    +-- theory SplitArrayLargestSum_List_Spec
+      +-- goal split_array_largest_sum_list'vc
+  
+== Goals proved by only one prover ==
+  +-- file [../../split_array_largest_sum_list_stage3_451bdfee_stage3.mlw]
+    +-- theory SplitArrayLargestSum_List_Spec
+      +-- goal bounded_nonnegative_list'vc: Z3 4.8.6
+      +-- goal concat_segments'vc: Z3 4.8.6
+      +-- goal all_nonempty_segments'vc: Z3 4.8.6
+      +-- goal all_segment_sums_le'vc: Z3 4.8.6
+      +-- goal sum_list'vc: Z3 4.8.6
+      +-- goal max_from'vc: Z3 4.8.6
+      +-- goal segments_needed_from'vc: Z3 4.8.6
+      +-- goal can_split_with_bound'vc: Z3 4.8.6
+      +-- goal search_min_bound'vc: Z3 4.8.6
+  
+1 session(s) read, with a total of 10 proof goals.
+== Unproved root goals after first prover ==
+SplitArrayLargestSum_List_Spec	split_array_largest_sum_list'vc
+== Stage 1: trying remaining goals with prover Alt-Ergo,2.4.0 ==
+---- stage1 | prover: Alt-Ergo,2.4.0 | theory: SplitArrayLargestSum_List_Spec | goal: split_array_largest_sum_list'vc ----
+File split_array_largest_sum_list_stage3_451bdfee_stage3.mlw:
+Goal split_array_largest_sum_list'vc.
+Prover result is: Timeout (10.00s, 300789 steps).
+Remaining after prover Alt-Ergo,2.4.0: 1
+== Stage 1: trying remaining goals with prover CVC4,1.8 ==
+---- stage1 | prover: CVC4,1.8 | theory: SplitArrayLargestSum_List_Spec | goal: split_array_largest_sum_list'vc ----
+File split_array_largest_sum_list_stage3_451bdfee_stage3.mlw:
+Goal split_array_largest_sum_list'vc.
+Prover result is: Timeout (10.00s, 2227256 steps).
+Remaining after prover CVC4,1.8: 1
+== Goals still unproved after stage 1 ==
+SplitArrayLargestSum_List_Spec	split_array_largest_sum_list'vc
+== Stage 2: split_vc on unproved goal ==
+Target theory: SplitArrayLargestSum_List_Spec
+Target goal  : split_array_largest_sum_list'vc
+---- stage2 | prover: Z3,4.8.6 | theory: SplitArrayLargestSum_List_Spec | goal: split_array_largest_sum_list'vc ----
+Transforms: split_vc
+File "split_array_largest_sum_list_stage3_451bdfee_stage3.mlw", line 113, characters 15-48:
+Sub-goal Postcondition of goal split_array_largest_sum_list'vc.
+Prover result is: Timeout (10.00s, 99269352 steps).
+---- stage2 | prover: Alt-Ergo,2.4.0 | theory: SplitArrayLargestSum_List_Spec | goal: split_array_largest_sum_list'vc ----
+Transforms: split_vc
+File "split_array_largest_sum_list_stage3_451bdfee_stage3.mlw", line 113, characters 15-48:
+Sub-goal Postcondition of goal split_array_largest_sum_list'vc.
+Prover result is: Timeout (10.00s, 513767 steps).
+---- stage2 | prover: CVC4,1.8 | theory: SplitArrayLargestSum_List_Spec | goal: split_array_largest_sum_list'vc ----
+Transforms: split_vc
+File "split_array_largest_sum_list_stage3_451bdfee_stage3.mlw", line 113, characters 15-48:
+Sub-goal Postcondition of goal split_array_largest_sum_list'vc.
+Prover result is: Timeout (10.00s, 1733733 steps).
+== Goals still unproved after stage 2 (split_vc) ==
+SplitArrayLargestSum_List_Spec	split_array_largest_sum_list'vc
+== Stage 3: split_vc + inline_all on still-unproved goal ==
+Target theory: SplitArrayLargestSum_List_Spec
+Target goal  : split_array_largest_sum_list'vc
+---- stage3 | prover: Z3,4.8.6 | theory: SplitArrayLargestSum_List_Spec | goal: split_array_largest_sum_list'vc ----
+Transforms: split_vc inline_all
+File "split_array_largest_sum_list_stage3_451bdfee_stage3.mlw", line 113, characters 15-48:
+Sub-goal Postcondition of goal split_array_largest_sum_list'vc.
+Prover result is: Timeout (10.00s, 60587250 steps).
+---- stage3 | prover: Alt-Ergo,2.4.0 | theory: SplitArrayLargestSum_List_Spec | goal: split_array_largest_sum_list'vc ----
+Transforms: split_vc inline_all
+File "split_array_largest_sum_list_stage3_451bdfee_stage3.mlw", line 113, characters 15-48:
+Sub-goal Postcondition of goal split_array_largest_sum_list'vc.
+Prover result is: Timeout (10.00s, 464673 steps).
+---- stage3 | prover: CVC4,1.8 | theory: SplitArrayLargestSum_List_Spec | goal: split_array_largest_sum_list'vc ----
+Transforms: split_vc inline_all
+File "split_array_largest_sum_list_stage3_451bdfee_stage3.mlw", line 113, characters 15-48:
+Sub-goal Postcondition of goal split_array_largest_sum_list'vc.
+Prover result is: Timeout (10.00s, 1784695 steps).
+== Final summary ==
+Unproved root goals after first prover : 1
+Remaining failures after split_vc      : 1
+Remaining failures after stage 3       : 1
+Detailed logs stored in                : /Users/rubenm/Desktop/Diversify2Verify/codex-runs/dataset-merge/410_split-array-largest-sum/stage3a/list-recursive/split_array_largest_sum_list_stage3_451bdfee/generated/why3/list/.why3_sessions/split_array_largest_sum_list_stage3_451bdfee_stage3_logs
+Still unproved goals:
+SplitArrayLargestSum_List_Spec	split_array_largest_sum_list'vc
+VERIFY_RESULT: FAILURE
+VERIFY_REASON: unproved_goals_remain
+VERIFY_STAGE: stage3
+VERIFY_ROOT_TOTAL: 10
+VERIFY_ROOT_PROVED: 9
+VERIFY_ROOT_REMAINING: 1

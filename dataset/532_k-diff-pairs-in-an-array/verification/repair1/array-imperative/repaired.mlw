@@ -1,0 +1,184 @@
+module KDiffPairsInAnArray_Array_Stage3_Imperative
+
+  use int.Int
+  use int.NumOf as IntNumOf
+  use array.Array
+  use array.Init
+  use ref.Ref
+
+  predicate value_occurs (nums: array int) (x: int) =
+    exists i: int. 0 <= i < length nums /\ nums[i] = x
+
+  predicate duplicate_value (nums: array int) (x: int) =
+    exists i j: int.
+      0 <= i < j < length nums /\
+      nums[i] = x /\
+      nums[j] = x
+
+  predicate kdiff_base_value (nums: array int) (k: int) (x: int) =
+    (k = 0 /\ duplicate_value nums x) \/
+    (k > 0 /\ value_occurs nums x /\ value_occurs nums (x + k))
+
+  function kdiff_pair_count (nums: array int) (k: int) : int =
+    IntNumOf.numof (fun x -> kdiff_base_value nums k x) (-10000000) 10000001
+
+  predicate first_occurrence (nums: array int) (idx: int) =
+    forall j: int. 0 <= j < idx -> nums[j] <> nums[idx]
+
+  predicate later_duplicate (nums: array int) (idx: int) =
+    exists j: int. idx < j < length nums /\ nums[j] = nums[idx]
+
+  predicate counted_index (nums: array int) (k: int) (idx: int) =
+    0 <= idx < length nums /\
+    first_occurrence nums idx /\
+    kdiff_base_value nums k nums[idx]
+
+  function indexed_kdiff_count (nums: array int) (k: int) (i: int) : int =
+    IntNumOf.numof (fun idx -> counted_index nums k idx) 0 i
+
+  lemma counted_index_step_add:
+    forall nums: array int, k i: int.
+      0 <= i < length nums ->
+      counted_index nums k i ->
+      indexed_kdiff_count nums k (i + 1) =
+      indexed_kdiff_count nums k i + 1
+
+  lemma counted_index_step_skip:
+    forall nums: array int, k i: int.
+      0 <= i < length nums ->
+      not counted_index nums k i ->
+      indexed_kdiff_count nums k (i + 1) =
+      indexed_kdiff_count nums k i
+
+  lemma counted_index_nonnegative:
+    forall nums: array int, k i: int.
+      0 <= i -> 0 <= indexed_kdiff_count nums k i
+
+  lemma first_duplicate_equiv_later:
+    forall nums: array int, idx: int.
+      0 <= idx < length nums ->
+      first_occurrence nums idx ->
+      (duplicate_value nums nums[idx] <-> later_duplicate nums idx)
+
+  lemma first_positive_kdiff_equiv_value:
+    forall nums: array int, k idx: int.
+      0 <= idx < length nums ->
+      k > 0 ->
+      first_occurrence nums idx ->
+      (kdiff_base_value nums k nums[idx] <-> value_occurs nums (nums[idx] + k))
+
+  lemma first_zero_kdiff_equiv_later:
+    forall nums: array int, idx: int.
+      0 <= idx < length nums ->
+      first_occurrence nums idx ->
+      (kdiff_base_value nums 0 nums[idx] <-> later_duplicate nums idx)
+
+  lemma indexed_count_matches_spec:
+    forall nums: array int, k: int.
+      1 <= length nums <= 10000 ->
+      0 <= k <= 10000000 ->
+      (forall i: int. 0 <= i < length nums -> -10000000 <= nums[i] <= 10000000) ->
+      indexed_kdiff_count nums k (length nums) = kdiff_pair_count nums k
+
+  exception SeenEarlier
+  exception FoundValue
+  exception FoundDuplicate
+
+  let is_first_occurrence (nums: array int) (idx: int) : bool
+    requires { 0 <= idx < length nums }
+    ensures  { result <-> first_occurrence nums idx }
+  =
+    try
+      for j = 0 to idx - 1 do
+        invariant { 0 <= j <= idx }
+        invariant { forall p: int. 0 <= p < j -> nums[p] <> nums[idx] }
+        if nums[j] = nums[idx] then
+          raise SeenEarlier
+      done;
+      true
+    with SeenEarlier ->
+      false
+    end
+
+  let has_value (nums: array int) (x: int) : bool
+    ensures { result <-> value_occurs nums x }
+  =
+    try
+      for j = 0 to length nums - 1 do
+        invariant { 0 <= j <= length nums }
+        invariant { forall p: int. 0 <= p < j -> nums[p] <> x }
+        if nums[j] = x then
+          raise FoundValue
+      done;
+      false
+    with FoundValue ->
+      true
+    end
+
+  let has_later_duplicate (nums: array int) (idx: int) : bool
+    requires { 0 <= idx < length nums }
+    ensures  { result <-> later_duplicate nums idx }
+  =
+    try
+      for j = idx + 1 to length nums - 1 do
+        invariant { idx + 1 <= j <= length nums }
+        invariant { forall p: int. idx < p < j -> nums[p] <> nums[idx] }
+        if nums[j] = nums[idx] then
+          raise FoundDuplicate
+      done;
+      false
+    with FoundDuplicate ->
+      true
+    end
+
+  let k_diff_pairs_in_an_array_array (nums: array int) (k: int) : int
+    requires { 1 <= length nums <= 10000 }
+    requires { 0 <= k <= 10000000 }
+    requires { forall i: int. 0 <= i < length nums -> -10000000 <= nums[i] <= 10000000 }
+    ensures  { result = kdiff_pair_count nums k }
+    ensures  { result >= 0 }
+  =
+    if k < 0 then 0 else
+    let count = ref 0 in
+    for i = 0 to length nums - 1 do
+      invariant { 0 <= i <= length nums }
+      invariant { !count >= 0 }
+      invariant { !count = indexed_kdiff_count nums k i }
+      if is_first_occurrence nums i then (
+        assert { first_occurrence nums i };
+        if k = 0 then (
+          if has_later_duplicate nums i then (
+            assert { later_duplicate nums i };
+            assert { kdiff_base_value nums k nums[i] };
+            assert { counted_index nums k i };
+            count := !count + 1
+          ) else (
+            assert { not later_duplicate nums i };
+            assert { not kdiff_base_value nums k nums[i] };
+            assert { not counted_index nums k i }
+          )
+        ) else (
+          assert { k > 0 };
+          if has_value nums (nums[i] + k) then (
+            assert { value_occurs nums (nums[i] + k) };
+            assert { kdiff_base_value nums k nums[i] };
+            assert { counted_index nums k i };
+            count := !count + 1
+          ) else (
+            assert { not value_occurs nums (nums[i] + k) };
+            assert { not kdiff_base_value nums k nums[i] };
+            assert { not counted_index nums k i }
+          )
+        )
+      ) else (
+        assert { not first_occurrence nums i };
+        assert { not counted_index nums k i }
+      );
+      assert { !count = indexed_kdiff_count nums k (i + 1) };
+      assert { !count >= 0 }
+    done;
+    assert { !count = indexed_kdiff_count nums k (length nums) };
+    assert { !count = kdiff_pair_count nums k };
+    !count
+
+end

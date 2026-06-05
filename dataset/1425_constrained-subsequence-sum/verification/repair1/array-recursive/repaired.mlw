@@ -1,0 +1,147 @@
+module ConstrainedSubsequenceSum_Array_Stage3
+
+  use int.Int
+  use array.Array
+  use array.Init
+
+  predicate input_valid (nums: array int) (k: int) =
+    1 <= k <= length nums <= 100000 /\
+    forall i: int. 0 <= i < length nums -> (-10000) <= nums[i] <= 10000
+
+  predicate valid_selection (nums: array int) (k: int) (pick: array int) =
+    length pick > 0 /\
+    (forall t: int. 0 <= t < length pick -> 0 <= pick[t] < length nums) /\
+    (forall t: int. 0 <= t < length pick - 1 ->
+      pick[t] < pick[t + 1] /\ pick[t + 1] - pick[t] <= k)
+
+  let rec function selected_sum_from
+    (nums: array int) (pick: array int) (pos: int) : int
+    requires { 0 <= pos <= length pick }
+    requires { forall t: int. pos <= t < length pick -> 0 <= pick[t] < length nums }
+    variant  { length pick - pos }
+  =
+    if pos = length pick then 0
+    else nums[pick[pos]] + selected_sum_from nums pick (pos + 1)
+
+  let function selected_sum (nums: array int) (pick: array int) : int
+    requires { forall t: int. 0 <= t < length pick -> 0 <= pick[t] < length nums }
+  =
+    selected_sum_from nums pick 0
+
+  predicate constrained_subsequence_sum_spec
+    (nums: array int) (k: int) (best: int) =
+    (exists pick: array int.
+      valid_selection nums k pick /\ selected_sum nums pick = best) /\
+    (forall pick: array int.
+      valid_selection nums k pick -> selected_sum nums pick <= best)
+
+  predicate valid_selection_prefix
+    (nums: array int) (k: int) (pick: array int) (upto: int) =
+    valid_selection nums k pick /\
+    (forall t: int. 0 <= t < length pick -> pick[t] < upto)
+
+  predicate prefix_best
+    (nums: array int) (k: int) (upto: int) (best: int) =
+    0 < upto <= length nums /\
+    (exists pick: array int.
+      valid_selection_prefix nums k pick upto /\ selected_sum nums pick = best) /\
+    (forall pick: array int.
+      valid_selection_prefix nums k pick upto -> selected_sum nums pick <= best)
+
+  let lemma prefix_best_full_spec (nums: array int) (k: int) (best: int)
+    requires { prefix_best nums k (length nums) best }
+    ensures  { constrained_subsequence_sum_spec nums k best }
+  =
+    assert {
+      forall pick: array int.
+        valid_selection nums k pick -> valid_selection_prefix nums k pick (length nums)
+    }
+
+  let lemma prefix_best_base_singleton (nums: array int) (k: int)
+    requires { input_valid nums k }
+    ensures  { prefix_best nums k 1 nums[0] }
+  =
+    let pick0 = make 1 0 in
+    assert { length pick0 = 1 };
+    assert { pick0[0] = 0 };
+    assert { valid_selection_prefix nums k pick0 1 };
+    assert { selected_sum nums pick0 = nums[0] }
+
+  let lemma advance_prefix_best
+    (nums: array int) (k: int) (dp: array int)
+    (i: int) (best_so_far: int) (next_best: int)
+    requires { input_valid nums k }
+    requires { length nums = length dp }
+    requires { 1 <= i < length nums }
+    requires { prefix_best nums k i best_so_far }
+    requires { exists pick: array int.
+      valid_selection_prefix nums k pick (i + 1) /\ selected_sum nums pick = next_best }
+    requires { forall pick: array int.
+      valid_selection_prefix nums k pick (i + 1) -> selected_sum nums pick <= next_best }
+    ensures  { prefix_best nums k (i + 1) next_best }
+  =
+    assert { 0 < i + 1 <= length nums }
+
+  let rec max_prev_from (dp: array int) (j: int) (stop: int) (best: int) : int
+    requires { 0 <= j <= stop <= length dp }
+    ensures  { result >= best }
+    ensures  { forall p: int. j <= p < stop -> result >= dp[p] }
+    variant  { stop - j }
+  =
+    if j >= stop then
+      best
+    else
+      let next_best = if dp[j] > best then dp[j] else best in
+      assert { next_best >= best };
+      assert { next_best >= dp[j] };
+      max_prev_from dp (j + 1) stop next_best
+
+  let rec fill_dp (nums: array int) (k: int) (dp: array int) (i: int) (best_so_far: int) : int
+    requires { length nums = length dp }
+    requires { 0 < length nums }
+    requires { input_valid nums k }
+    requires { 1 <= k }
+    requires { 1 <= i <= length nums }
+    requires { prefix_best nums k i best_so_far }
+    ensures  { result >= best_so_far }
+    ensures  { prefix_best nums k (length nums) result }
+    variant  { length nums - i }
+  =
+    if i >= length nums then
+      begin
+      assert { i = length nums };
+      best_so_far
+      end
+    else
+      let start = if i - k > 0 then i - k else 0 in
+      assert { 0 <= start <= i };
+      let best_prev = max_prev_from dp start i 0 in
+      let current = nums[i] + best_prev in
+      dp[i] <- current;
+      let next_best = if current > best_so_far then current else best_so_far in
+      assert { next_best >= best_so_far };
+      assert { next_best >= current };
+      assert { exists pick: array int.
+        valid_selection_prefix nums k pick (i + 1) /\ selected_sum nums pick = next_best };
+      assert { forall pick: array int.
+        valid_selection_prefix nums k pick (i + 1) -> selected_sum nums pick <= next_best };
+      advance_prefix_best nums k dp i best_so_far next_best;
+      fill_dp nums k dp (i + 1) next_best
+
+  let constrained_subsequence_sum_array (nums: array int) (k: int) : int
+    requires { input_valid nums k }
+    ensures  { constrained_subsequence_sum_spec nums k result }
+  =
+    let n = length nums in
+    if n = 0 then
+      0
+    else
+      let dp = make n 0 in
+      dp[0] <- nums[0];
+      assert { n = length nums };
+      prefix_best_base_singleton nums k;
+      let result = fill_dp nums k dp 1 nums[0] in
+      prefix_best_full_spec nums k result;
+      result
+
+end

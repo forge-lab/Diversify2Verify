@@ -1,0 +1,238 @@
+module MaximumPointsYouCanObtainFromCards_Array_Spec
+
+  use int.Int
+  use array.Array
+  use array.Init
+  use array.ArraySum
+
+  predicate valid_input (cardPoints: array int) (k: int) =
+    1 <= k <= length cardPoints
+
+  predicate valid_split (cardPoints: array int) (k: int) (left: int) =
+    valid_input cardPoints k /\ 0 <= left <= k
+
+  function split_score (cardPoints: array int) (k: int) (left: int) : int =
+    ArraySum.sum cardPoints 0 left +
+    ArraySum.sum cardPoints (length cardPoints - (k - left)) (length cardPoints)
+
+  predicate split_upper_bound_at
+    (cardPoints: array int) (k: int) (res: int) (left: int) =
+    valid_split cardPoints k left -> split_score cardPoints k left <= res
+
+  predicate maximum_points_you_can_obtain_from_cards_array_spec
+    (cardPoints: array int) (k: int) (res: int) =
+    valid_input cardPoints k /\
+    (exists left: int.
+       valid_split cardPoints k left /\
+       split_score cardPoints k left = res) /\
+    (forall left: int.
+       valid_split cardPoints k left ->
+       split_score cardPoints k left <= res)
+
+  val maximum_points_you_can_obtain_from_cards_array
+    (cardPoints: array int) (k: int) : int
+    requires { valid_input cardPoints k }
+    ensures  { maximum_points_you_can_obtain_from_cards_array_spec cardPoints k result }
+
+  let lemma test_000_python_assertions () =
+    let cardPoints = init 5 [|5; 2; 1; 2; 5|] in
+    assert { length cardPoints = 5 };
+    assert { cardPoints[0] = 5 };
+    assert { cardPoints[1] = 2 };
+    assert { cardPoints[2] = 1 };
+    assert { cardPoints[3] = 2 };
+    assert { cardPoints[4] = 5 };
+    assert { valid_input cardPoints 3 };
+    assert { valid_split cardPoints 3 1 };
+    assert { split_score cardPoints 3 0 = 8 };
+    assert { split_score cardPoints 3 1 = 12 };
+    assert { split_score cardPoints 3 2 = 12 };
+    assert { split_score cardPoints 3 3 = 8 };
+    assert { exists left: int.
+      valid_split cardPoints 3 left /\ split_score cardPoints 3 left = 12 };
+    assert { split_upper_bound_at cardPoints 3 12 0 };
+    assert { split_upper_bound_at cardPoints 3 12 1 };
+    assert { split_upper_bound_at cardPoints 3 12 2 };
+    assert { split_upper_bound_at cardPoints 3 12 3 };
+    assert {
+      forall left: int. 0 <= left <= 3 ->
+        left = 0 \/ left = 1 \/ left = 2 \/ left = 3
+    };
+    assert { maximum_points_you_can_obtain_from_cards_array_spec cardPoints 3 12 }
+
+  let lemma test_001_python_assertions () =
+    let cardPoints = init 7 [|9; 7; 7; 9; 7; 7; 9|] in
+    assert { length cardPoints = 7 };
+    assert { cardPoints[0] = 9 };
+    assert { cardPoints[1] = 7 };
+    assert { cardPoints[2] = 7 };
+    assert { cardPoints[3] = 9 };
+    assert { cardPoints[4] = 7 };
+    assert { cardPoints[5] = 7 };
+    assert { cardPoints[6] = 9 };
+    assert { valid_input cardPoints 7 };
+    assert { valid_split cardPoints 7 7 };
+    assert { split_score cardPoints 7 0 = 55 };
+    assert { split_score cardPoints 7 1 = 55 };
+    assert { split_score cardPoints 7 2 = 55 };
+    assert { split_score cardPoints 7 3 = 55 };
+    assert { split_score cardPoints 7 4 = 55 };
+    assert { split_score cardPoints 7 5 = 55 };
+    assert { split_score cardPoints 7 6 = 55 };
+    assert { split_score cardPoints 7 7 = 55 };
+    assert { exists left: int.
+      valid_split cardPoints 7 left /\ split_score cardPoints 7 left = 55 };
+    assert { split_upper_bound_at cardPoints 7 55 0 };
+    assert { split_upper_bound_at cardPoints 7 55 1 };
+    assert { split_upper_bound_at cardPoints 7 55 2 };
+    assert { split_upper_bound_at cardPoints 7 55 3 };
+    assert { split_upper_bound_at cardPoints 7 55 4 };
+    assert { split_upper_bound_at cardPoints 7 55 5 };
+    assert { split_upper_bound_at cardPoints 7 55 6 };
+    assert { split_upper_bound_at cardPoints 7 55 7 };
+    assert {
+      forall left: int. 0 <= left <= 7 ->
+        left = 0 \/ left = 1 \/ left = 2 \/ left = 3 \/
+        left = 4 \/ left = 5 \/ left = 6 \/ left = 7
+    };
+    assert { maximum_points_you_can_obtain_from_cards_array_spec cardPoints 7 55 }
+
+  let lemma test_002_python_assertions () =
+    let cardPoints = init 3 [|1; 1000; 1|] in
+    assert { length cardPoints = 3 };
+    assert { cardPoints[0] = 1 };
+    assert { cardPoints[1] = 1000 };
+    assert { cardPoints[2] = 1 };
+    assert { valid_input cardPoints 1 };
+    assert { valid_split cardPoints 1 0 };
+    assert { split_score cardPoints 1 0 = 1 };
+    assert { split_score cardPoints 1 1 = 1 };
+    assert { exists left: int.
+      valid_split cardPoints 1 left /\ split_score cardPoints 1 left = 1 };
+    assert { split_upper_bound_at cardPoints 1 1 0 };
+    assert { split_upper_bound_at cardPoints 1 1 1 };
+    assert {
+      forall left: int. 0 <= left <= 1 ->
+        left = 0 \/ left = 1
+    };
+    assert { maximum_points_you_can_obtain_from_cards_array_spec cardPoints 1 1 }
+
+  let lemma test_003_python_assertions () =
+    let cardPoints = init 10 [|10; 9; 8; 7; 6; 5; 4; 3; 2; 1|] in
+    assert { length cardPoints = 10 };
+    assert { cardPoints[0] = 10 };
+    assert { cardPoints[1] = 9 };
+    assert { cardPoints[2] = 8 };
+    assert { cardPoints[3] = 7 };
+    assert { cardPoints[4] = 6 };
+    assert { cardPoints[5] = 5 };
+    assert { cardPoints[6] = 4 };
+    assert { cardPoints[7] = 3 };
+    assert { cardPoints[8] = 2 };
+    assert { cardPoints[9] = 1 };
+    assert { valid_input cardPoints 5 };
+    assert { valid_split cardPoints 5 5 };
+    assert { split_score cardPoints 5 0 = 15 };
+    assert { split_score cardPoints 5 1 = 20 };
+    assert { split_score cardPoints 5 2 = 25 };
+    assert { split_score cardPoints 5 3 = 30 };
+    assert { split_score cardPoints 5 4 = 35 };
+    assert { split_score cardPoints 5 5 = 40 };
+    assert { exists left: int.
+      valid_split cardPoints 5 left /\ split_score cardPoints 5 left = 40 };
+    assert { split_upper_bound_at cardPoints 5 40 0 };
+    assert { split_upper_bound_at cardPoints 5 40 1 };
+    assert { split_upper_bound_at cardPoints 5 40 2 };
+    assert { split_upper_bound_at cardPoints 5 40 3 };
+    assert { split_upper_bound_at cardPoints 5 40 4 };
+    assert { split_upper_bound_at cardPoints 5 40 5 };
+    assert {
+      forall left: int. 0 <= left <= 5 ->
+        left = 0 \/ left = 1 \/ left = 2 \/ left = 3 \/
+        left = 4 \/ left = 5
+    };
+    assert { maximum_points_you_can_obtain_from_cards_array_spec cardPoints 5 40 }
+
+  let lemma test_004_python_assertions () =
+    let cardPoints = init 3 [|2; 2; 2|] in
+    assert { length cardPoints = 3 };
+    assert { cardPoints[0] = 2 };
+    assert { cardPoints[1] = 2 };
+    assert { cardPoints[2] = 2 };
+    assert { valid_input cardPoints 2 };
+    assert { valid_split cardPoints 2 0 };
+    assert { split_score cardPoints 2 0 = 4 };
+    assert { split_score cardPoints 2 1 = 4 };
+    assert { split_score cardPoints 2 2 = 4 };
+    assert { exists left: int.
+      valid_split cardPoints 2 left /\ split_score cardPoints 2 left = 4 };
+    assert { split_upper_bound_at cardPoints 2 4 0 };
+    assert { split_upper_bound_at cardPoints 2 4 1 };
+    assert { split_upper_bound_at cardPoints 2 4 2 };
+    assert {
+      forall left: int. 0 <= left <= 2 ->
+        left = 0 \/ left = 1 \/ left = 2
+    };
+    assert { maximum_points_you_can_obtain_from_cards_array_spec cardPoints 2 4 }
+
+  let lemma test_006_python_assertions () =
+    let cardPoints = init 7 [|1; 2; 3; 4; 5; 6; 1|] in
+    assert { length cardPoints = 7 };
+    assert { cardPoints[0] = 1 };
+    assert { cardPoints[1] = 2 };
+    assert { cardPoints[2] = 3 };
+    assert { cardPoints[3] = 4 };
+    assert { cardPoints[4] = 5 };
+    assert { cardPoints[5] = 6 };
+    assert { cardPoints[6] = 1 };
+    assert { valid_input cardPoints 3 };
+    assert { valid_split cardPoints 3 0 };
+    assert { split_score cardPoints 3 0 = 12 };
+    assert { split_score cardPoints 3 1 = 8 };
+    assert { split_score cardPoints 3 2 = 4 };
+    assert { split_score cardPoints 3 3 = 6 };
+    assert { exists left: int.
+      valid_split cardPoints 3 left /\ split_score cardPoints 3 left = 12 };
+    assert { split_upper_bound_at cardPoints 3 12 0 };
+    assert { split_upper_bound_at cardPoints 3 12 1 };
+    assert { split_upper_bound_at cardPoints 3 12 2 };
+    assert { split_upper_bound_at cardPoints 3 12 3 };
+    assert {
+      forall left: int. 0 <= left <= 3 ->
+        left = 0 \/ left = 1 \/ left = 2 \/ left = 3
+    };
+    assert { maximum_points_you_can_obtain_from_cards_array_spec cardPoints 3 12 }
+
+  let lemma test_009_python_assertions () =
+    let cardPoints = init 9 [|100; 400; 300; 100; 200; 500; 600; 300; 400|] in
+    assert { length cardPoints = 9 };
+    assert { cardPoints[0] = 100 };
+    assert { cardPoints[1] = 400 };
+    assert { cardPoints[2] = 300 };
+    assert { cardPoints[3] = 100 };
+    assert { cardPoints[4] = 200 };
+    assert { cardPoints[5] = 500 };
+    assert { cardPoints[6] = 600 };
+    assert { cardPoints[7] = 300 };
+    assert { cardPoints[8] = 400 };
+    assert { valid_input cardPoints 4 };
+    assert { valid_split cardPoints 4 0 };
+    assert { split_score cardPoints 4 0 = 1800 };
+    assert { split_score cardPoints 4 1 = 1400 };
+    assert { split_score cardPoints 4 2 = 1200 };
+    assert { split_score cardPoints 4 3 = 1200 };
+    assert { split_score cardPoints 4 4 = 900 };
+    assert { exists left: int.
+      valid_split cardPoints 4 left /\ split_score cardPoints 4 left = 1800 };
+    assert { split_upper_bound_at cardPoints 4 1800 0 };
+    assert { split_upper_bound_at cardPoints 4 1800 1 };
+    assert { split_upper_bound_at cardPoints 4 1800 2 };
+    assert { split_upper_bound_at cardPoints 4 1800 3 };
+    assert { split_upper_bound_at cardPoints 4 1800 4 };
+    assert {
+      forall left: int. 0 <= left <= 4 ->
+        left = 0 \/ left = 1 \/ left = 2 \/ left = 3 \/ left = 4
+    };
+    assert { maximum_points_you_can_obtain_from_cards_array_spec cardPoints 4 1800 }
+
+end

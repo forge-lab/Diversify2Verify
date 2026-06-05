@@ -1,0 +1,170 @@
+module MaximumNumberOfGroupsWithIncreasingLength_Array_Recursive_Implementation
+
+  use int.Int
+  use array.Array
+  use array.Init
+
+  let rec triangular (k: int) : int
+    variant { k }
+  =
+    if k <= 0 then
+      0
+    else
+      k + triangular (k - 1)
+
+  let rec capped_usage_sum_from (usageLimits: array int) (k: int) (i: int) : int
+    variant { length usageLimits - i }
+  =
+    if i >= length usageLimits then
+      0
+    else
+      (if usageLimits[i] <= k then usageLimits[i] else k) +
+      capped_usage_sum_from usageLimits k (i + 1)
+
+  let feasible_group_count (usageLimits: array int) (k: int) : bool =
+    if k < 0 then
+      false
+    else
+      triangular k <= capped_usage_sum_from usageLimits k 0
+
+  let rec maximum_group_count_down (usageLimits: array int) (k: int) : int
+    variant { k }
+  =
+    if k <= 0 then
+      0
+    else if feasible_group_count usageLimits k then
+      k
+    else
+      maximum_group_count_down usageLimits (k - 1)
+
+  let maximum_number_of_groups_with_increasing_length_array (usageLimits: array int) : int =
+    maximum_group_count_down usageLimits (length usageLimits)
+
+  let check_case (usageLimits: array int) (expected: int) : bool =
+    let r = maximum_number_of_groups_with_increasing_length_array usageLimits in
+    r = expected
+
+  let test_000 () : bool =
+    let a = init 10 [|10; 9; 8; 7; 6; 5; 4; 3; 2; 1|] in
+    check_case a 10
+
+  let test_001 () : bool =
+    let a = init 3 [|1000000000; 1000000000; 1000000000|] in
+    check_case a 3
+
+  let test_002 () : bool =
+    let a = init 10 [|5; 5; 5; 5; 5; 5; 5; 5; 5; 5|] in
+    check_case a 9
+
+  let test_003 () : bool =
+    let a = init 3 [|1; 2; 5|] in
+    check_case a 3
+
+  let test_004 () : bool =
+    let a = init 5 [|1; 2; 3; 4; 5|] in
+    check_case a 5
+
+  let test_005 () : bool =
+    let a = init 3 [|3; 3; 3|] in
+    check_case a 3
+
+  let test_006 () : bool =
+    let a = init 2 [|1; 1|] in
+    check_case a 1
+
+  let test_007 () : bool =
+    let a = init 10 [|1; 1; 1; 1; 1; 1; 1; 1; 1; 1|] in
+    check_case a 4
+
+  let test_008 () : bool =
+    let a = init 1 [|1|] in
+    check_case a 1
+
+  let test_009 () : bool =
+    let a = init 5 [|1; 1000000000; 1; 1000000000; 1|] in
+    check_case a 4
+
+  let test_010 () : bool =
+    let a = init 4 [|3; 3; 3; 3|] in
+    check_case a 4
+
+  let test_011 () : bool =
+    let a = init 5 [|1000000000; 1000000000; 1000000000; 1000000000; 1000000000|] in
+    check_case a 5
+
+  let test_012 () : bool =
+    let a = init 3 [|2; 1; 2|] in
+    check_case a 2
+
+  let test_013 () : bool =
+    let a = init 15 [|1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1000000000|] in
+    check_case a 5
+
+  let test_014 () : bool =
+    let a = init 15 [|5; 5; 5; 5; 5; 5; 5; 5; 5; 5; 5; 5; 5; 5; 5|] in
+    check_case a 11
+
+  let test_015 () : bool =
+    let a = init 20 [|10; 10; 10; 10; 10; 10; 10; 10; 10; 10; 10; 10; 10; 10; 10; 10; 10; 10; 10; 10|] in
+    check_case a 19
+
+  let test_016 () : bool =
+    let a = init 15 [|1; 2; 3; 4; 5; 6; 7; 8; 9; 10; 11; 12; 13; 14; 15|] in
+    check_case a 15
+
+  let test_017 () : bool =
+    let a = init 20 [|1; 1; 2; 2; 3; 3; 4; 4; 5; 5; 6; 6; 7; 7; 8; 8; 9; 9; 10; 10|] in
+    check_case a 14
+
+  let test_018 () : bool =
+    let a = init 10 [|1; 3; 5; 7; 9; 11; 13; 15; 17; 19|] in
+    check_case a 10
+
+  let test_019 () : bool =
+    let a = init 20 [|20; 1; 20; 2; 20; 3; 20; 4; 20; 5; 20; 6; 20; 7; 20; 8; 20; 9; 20; 10|] in
+    check_case a 20
+
+  let run_tests () : bool =
+    if test_000 () then
+    if test_001 () then
+    if test_002 () then
+    if test_003 () then
+    if test_004 () then
+    if test_005 () then
+    if test_006 () then
+    if test_007 () then
+    if test_008 () then
+    if test_009 () then
+    if test_010 () then
+    if test_011 () then
+    if test_012 () then
+    if test_013 () then
+    if test_014 () then
+    if test_015 () then
+    if test_016 () then
+    if test_017 () then
+    if test_018 () then
+    if test_019 () then
+      true
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+
+end

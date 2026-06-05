@@ -1,0 +1,134 @@
+module MaximizeTheBeautyOfTheGarden_Array_Stage3
+
+  use int.Int
+  use array.Array
+
+  predicate bounded_values (flowers: array int) =
+    forall i: int. 0 <= i < length flowers -> -10000 <= flowers[i] <= 10000
+
+  let rec function positive_sum_between (flowers: array int) (lo: int) (hi: int) : int
+    variant  { hi - lo }
+  =
+    if lo >= hi then 0
+    else if lo < 0 then 0
+    else if hi > length flowers then 0
+    else (if flowers[lo] > 0 then flowers[lo] else 0) + positive_sum_between flowers (lo + 1) hi
+
+  predicate valid_endpoint_pair (flowers: array int) (i: int) (j: int) =
+    0 <= i < j < length flowers /\ flowers[i] = flowers[j]
+
+  function candidate_beauty (flowers: array int) (i: int) (j: int) : int
+  =
+    flowers[i] + flowers[j] + positive_sum_between flowers (i + 1) j
+
+  predicate is_maximum_beauty (flowers: array int) (result: int) =
+    (exists i j: int. valid_endpoint_pair flowers i j /\ result = candidate_beauty flowers i j) /\
+    (forall i j: int. valid_endpoint_pair flowers i j -> candidate_beauty flowers i j <= result)
+
+  predicate right_scan_result
+    (flowers: array int) (i: int) (j: int) (best: int) (result: int)
+  =
+    best <= result /\
+    (result = best \/
+      exists k: int.
+        j <= k < length flowers /\
+        flowers[i] = flowers[k] /\
+        result = candidate_beauty flowers i k) /\
+    (forall k: int.
+      j <= k < length flowers /\ flowers[i] = flowers[k] ->
+        candidate_beauty flowers i k <= result)
+
+  predicate left_scan_result
+    (flowers: array int) (i: int) (best: int) (result: int)
+  =
+    best <= result /\
+    (result = best \/
+      exists p q: int.
+        i <= p < q < length flowers /\
+        valid_endpoint_pair flowers p q /\
+        result = candidate_beauty flowers p q) /\
+    (forall p q: int.
+      i <= p < q < length flowers /\ valid_endpoint_pair flowers p q ->
+        candidate_beauty flowers p q <= result)
+
+  let rec lemma positive_sum_between_nonnegative
+    (flowers: array int) (lo: int) (hi: int)
+    requires { 0 <= lo <= hi <= length flowers }
+    ensures  { 0 <= positive_sum_between flowers lo hi }
+    variant  { hi - lo }
+  =
+    if lo < hi then
+      positive_sum_between_nonnegative flowers (lo + 1) hi
+
+  let lemma candidate_above_sentinel (flowers: array int) (i: int) (j: int)
+    requires { bounded_values flowers }
+    requires { valid_endpoint_pair flowers i j }
+    ensures  { -1000000001 < candidate_beauty flowers i j }
+  =
+    positive_sum_between_nonnegative flowers (i + 1) j
+
+  let positive_part (x: int) : int
+    ensures { result = (if x > 0 then x else 0) }
+    ensures { 0 <= result }
+  =
+    if x > 0 then x else 0
+
+  let rec scan_right
+    (flowers: array int) (i: int) (j: int) (positive_between: int) (best: int) : int
+    requires { 0 <= i < length flowers }
+    requires { i < j <= length flowers }
+    requires { positive_between = positive_sum_between flowers (i + 1) j }
+    ensures  { right_scan_result flowers i j best result }
+    variant  { length flowers - j }
+  =
+    if j >= length flowers then
+      best
+    else
+      let best_here =
+        if flowers[i] = flowers[j] then
+          let candidate = flowers[i] + flowers[j] + positive_between in
+          assert { candidate = candidate_beauty flowers i j };
+          if candidate > best then candidate else best
+        else
+          best
+      in
+      let next_positive_between = positive_between + positive_part (flowers[j]) in
+      assert { next_positive_between = positive_sum_between flowers (i + 1) (j + 1) };
+      scan_right flowers i (j + 1) next_positive_between best_here
+
+  let rec scan_left (flowers: array int) (i: int) (best: int) : int
+    requires { 0 <= i <= length flowers }
+    ensures  { left_scan_result flowers i best result }
+    variant  { length flowers - i }
+  =
+    if i + 1 >= length flowers then
+      best
+    else
+      let best_after_i = scan_right flowers i (i + 1) 0 best in
+      assert { right_scan_result flowers i (i + 1) best best_after_i };
+      scan_left flowers (i + 1) best_after_i
+
+  let maximize_the_beauty_of_the_garden_array (flowers: array int) : int
+    requires { 2 <= length flowers <= 100000 }
+    requires { bounded_values flowers }
+    requires { exists i j: int. valid_endpoint_pair flowers i j }
+    ensures  { is_maximum_beauty flowers result }
+  =
+    let result = scan_left flowers 0 (-1000000001) in
+    assert { left_scan_result flowers 0 (-1000000001) result };
+    assert {
+      forall i j: int.
+        valid_endpoint_pair flowers i j -> candidate_beauty flowers i j <= result
+    };
+    assert {
+      forall i j: int.
+        valid_endpoint_pair flowers i j -> -1000000001 < candidate_beauty flowers i j
+    };
+    assert { -1000000001 < result };
+    assert {
+      exists i j: int.
+        valid_endpoint_pair flowers i j /\ result = candidate_beauty flowers i j
+    };
+    result
+
+end

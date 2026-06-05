@@ -1,0 +1,133 @@
+== Stage 1: first prover on whole file ==
+Running in /Users/rubenm/Desktop/Diversify2Verify/codex-runs/dataset-merge-verification/stage3a-repair/2420_find-all-good-indices/list-recursive/find_all_good_indices_list_stage3_8d7f9db0_stage3/generated/why3: why3 session create -o /Users/rubenm/Desktop/Diversify2Verify/codex-runs/dataset-merge-verification/stage3a-repair/2420_find-all-good-indices/list-recursive/find_all_good_indices_list_stage3_8d7f9db0_stage3/generated/why3/.why3_sessions/repaired_stage1 -P Z3,4.8.6 -t 10 -m 8192 repaired.mlw
+Session created successfully
+Running in /Users/rubenm/Desktop/Diversify2Verify/codex-runs/dataset-merge-verification/stage3a-repair/2420_find-all-good-indices/list-recursive/find_all_good_indices_list_stage3_8d7f9db0_stage3/generated/why3: why3 bench /Users/rubenm/Desktop/Diversify2Verify/codex-runs/dataset-merge-verification/stage3a-repair/2420_find-all-good-indices/list-recursive/find_all_good_indices_list_stage3_8d7f9db0_stage3/generated/why3/.why3_sessions/repaired_stage1
+Progress: 11/1/0                       Progress: 10/2/0                       Progress: 9/3/0                       Progress: 8/4/0                       Progress: 7/5/0                       Progress: 6/6/0                       Progress: 6/0/1                       Progress: 5/1/1                       Progress: 4/2/1                       Progress: 3/3/1                       Progress: 2/4/1                       Progress: 1/5/1                       Progress: 1/1/2                       Progress: 0/2/2                       Progress: 0/1/2                       Progress: 0/0/1                       
+Replay completed, saving session... done
+== Stage 1 stats ==
+= Statistics for session /Users/rubenm/Desktop/Diversify2Verify/codex-runs/dataset-merge-verification/stage3a-repair/2420_find-all-good-indices/list-recursive/find_all_good_indices_list_stage3_8d7f9db0_stage3/generated/why3/.why3_sessions/repaired_stage1
+
+== Number of root goals ==
+  total: 12  proved: 10
+
+== Number of sub goals ==
+  total: 0  proved: 0
+
+== Goals not proved ==
+  +-- file [../../repaired.mlw]
+    +-- theory FindAllGoodIndices_List_Stage3_Recursive
+      +-- goal good_index_at'vc
+      +-- goal collect_good_indices'vc
+  
+== Goals proved by only one prover ==
+  +-- file [../../repaired.mlw]
+    +-- theory FindAllGoodIndices_List_Stage3_Recursive
+      +-- goal all_greater_than'vc: Z3 4.8.6
+      +-- goal strictly_increasing'vc: Z3 4.8.6
+      +-- goal all_greater_from_lower_bound'vc: Z3 4.8.6
+      +-- goal valid_center_iff_range'vc: Z3 4.8.6
+      +-- goal list_length'vc: Z3 4.8.6
+      +-- goal drop'vc: Z3 4.8.6
+      +-- goal take'vc: Z3 4.8.6
+      +-- goal is_nonincreasing'vc: Z3 4.8.6
+      +-- goal is_nondecreasing'vc: Z3 4.8.6
+      +-- goal find_all_good_indices_list'vc: Z3 4.8.6
+  
+1 session(s) read, with a total of 12 proof goals.
+== Unproved root goals after first prover ==
+FindAllGoodIndices_List_Stage3_Recursive	good_index_at'vc
+FindAllGoodIndices_List_Stage3_Recursive	collect_good_indices'vc
+== Stage 1: trying remaining goals with prover Alt-Ergo,2.4.0 ==
+---- stage1 | prover: Alt-Ergo,2.4.0 | theory: FindAllGoodIndices_List_Stage3_Recursive | goal: good_index_at'vc ----
+File repaired.mlw:
+Goal good_index_at'vc.
+Prover result is: Timeout (10.00s, 185865 steps).
+---- stage1 | prover: Alt-Ergo,2.4.0 | theory: FindAllGoodIndices_List_Stage3_Recursive | goal: collect_good_indices'vc ----
+File repaired.mlw:
+Goal collect_good_indices'vc.
+Prover result is: Valid (0.03s, 651 steps).
+Solved in stage 1 using prover: Alt-Ergo,2.4.0
+Remaining after prover Alt-Ergo,2.4.0: 1
+== Stage 1: trying remaining goals with prover CVC4,1.8 ==
+---- stage1 | prover: CVC4,1.8 | theory: FindAllGoodIndices_List_Stage3_Recursive | goal: good_index_at'vc ----
+File repaired.mlw:
+Goal good_index_at'vc.
+Prover result is: Timeout (8.38s, 10988702 steps).
+Remaining after prover CVC4,1.8: 1
+== Goals still unproved after stage 1 ==
+FindAllGoodIndices_List_Stage3_Recursive	good_index_at'vc
+== Stage 2: split_vc on unproved goal ==
+Target theory: FindAllGoodIndices_List_Stage3_Recursive
+Target goal  : good_index_at'vc
+---- stage2 | prover: Z3,4.8.6 | theory: FindAllGoodIndices_List_Stage3_Recursive | goal: good_index_at'vc ----
+Transforms: split_vc
+File "repaired.mlw", line 135, characters 15-45:
+Sub-goal Postcondition of goal good_index_at'vc.
+Prover result is: Timeout (10.00s, 129767940 steps).
+
+File "repaired.mlw", line 135, characters 15-45:
+Sub-goal Postcondition of goal good_index_at'vc.
+Prover result is: Timeout (10.00s, 142340329 steps).
+---- stage2 | prover: Alt-Ergo,2.4.0 | theory: FindAllGoodIndices_List_Stage3_Recursive | goal: good_index_at'vc ----
+Transforms: split_vc
+File "repaired.mlw", line 135, characters 15-45:
+Sub-goal Postcondition of goal good_index_at'vc.
+Prover result is: Timeout (10.00s, 196396 steps).
+
+File "repaired.mlw", line 135, characters 15-45:
+Sub-goal Postcondition of goal good_index_at'vc.
+Prover result is: Timeout (10.00s, 199071 steps).
+---- stage2 | prover: CVC4,1.8 | theory: FindAllGoodIndices_List_Stage3_Recursive | goal: good_index_at'vc ----
+Transforms: split_vc
+File "repaired.mlw", line 135, characters 15-45:
+Sub-goal Postcondition of goal good_index_at'vc.
+Prover result is: Timeout (8.83s, 11616811 steps).
+
+File "repaired.mlw", line 135, characters 15-45:
+Sub-goal Postcondition of goal good_index_at'vc.
+Prover result is: Timeout (8.35s, 11614460 steps).
+== Goals still unproved after stage 2 (split_vc) ==
+FindAllGoodIndices_List_Stage3_Recursive	good_index_at'vc
+== Stage 3: split_vc + inline_all on still-unproved goal ==
+Target theory: FindAllGoodIndices_List_Stage3_Recursive
+Target goal  : good_index_at'vc
+---- stage3 | prover: Z3,4.8.6 | theory: FindAllGoodIndices_List_Stage3_Recursive | goal: good_index_at'vc ----
+Transforms: split_vc inline_all
+File "repaired.mlw", line 135, characters 15-45:
+Sub-goal Postcondition of goal good_index_at'vc.
+Prover result is: Timeout (10.00s, 139724947 steps).
+
+File "repaired.mlw", line 135, characters 15-45:
+Sub-goal Postcondition of goal good_index_at'vc.
+Prover result is: Timeout (10.00s, 151432682 steps).
+---- stage3 | prover: Alt-Ergo,2.4.0 | theory: FindAllGoodIndices_List_Stage3_Recursive | goal: good_index_at'vc ----
+Transforms: split_vc inline_all
+File "repaired.mlw", line 135, characters 15-45:
+Sub-goal Postcondition of goal good_index_at'vc.
+Prover result is: Timeout (10.00s, 302107 steps).
+
+File "repaired.mlw", line 135, characters 15-45:
+Sub-goal Postcondition of goal good_index_at'vc.
+Prover result is: Timeout (10.00s, 314931 steps).
+---- stage3 | prover: CVC4,1.8 | theory: FindAllGoodIndices_List_Stage3_Recursive | goal: good_index_at'vc ----
+Transforms: split_vc inline_all
+File "repaired.mlw", line 135, characters 15-45:
+Sub-goal Postcondition of goal good_index_at'vc.
+Prover result is: Timeout (8.71s, 11229068 steps).
+
+File "repaired.mlw", line 135, characters 15-45:
+Sub-goal Postcondition of goal good_index_at'vc.
+Prover result is: Timeout (8.50s, 11229464 steps).
+== Final summary ==
+Unproved root goals after first prover : 1
+Remaining failures after split_vc      : 1
+Remaining failures after stage 3       : 1
+Detailed logs stored in                : /Users/rubenm/Desktop/Diversify2Verify/codex-runs/dataset-merge-verification/stage3a-repair/2420_find-all-good-indices/list-recursive/find_all_good_indices_list_stage3_8d7f9db0_stage3/generated/why3/.why3_sessions/repaired_logs
+Still unproved goals:
+FindAllGoodIndices_List_Stage3_Recursive	good_index_at'vc
+VERIFY_RESULT: FAILURE
+VERIFY_REASON: unproved_goals_remain
+VERIFY_STAGE: stage3
+VERIFY_ROOT_TOTAL: 12
+VERIFY_ROOT_PROVED: 11
+VERIFY_ROOT_REMAINING: 1

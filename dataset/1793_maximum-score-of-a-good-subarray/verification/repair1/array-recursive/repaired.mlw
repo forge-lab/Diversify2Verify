@@ -1,0 +1,271 @@
+module MaximumScoreOfAGoodSubarray_Array_Stage3_Recursive
+
+  use int.Int
+  use array.Array
+
+  predicate valid_good_subarray (nums: array int) (k: int) (l: int) (r: int) =
+    0 <= l <= k <= r < length nums
+
+  predicate segment_min (nums: array int) (l: int) (r: int) (m: int) =
+    0 <= l <= r < length nums /\
+    (forall i: int. l <= i <= r -> m <= nums[i]) /\
+    (exists p: int. l <= p <= r /\ nums[p] = m)
+
+  function segment_score (l: int) (r: int) (m: int) : int =
+    m * (r - l + 1)
+
+  predicate maximum_good_subarray_score (nums: array int) (k: int) (score: int) =
+    (exists l r m: int.
+       valid_good_subarray nums k l r /\
+       segment_min nums l r m /\
+       score = segment_score l r m) /\
+    (forall l r m: int.
+       valid_good_subarray nums k l r ->
+       segment_min nums l r m ->
+       segment_score l r m <= score)
+
+  predicate right_range_scores_bounded
+    (nums: array int) (k: int) (l: int) (lo: int) (hi: int) (bound: int) =
+    forall r m: int.
+      lo <= r < hi ->
+      valid_good_subarray nums k l r ->
+      segment_min nums l r m ->
+      segment_score l r m <= bound
+
+  predicate right_range_has_witness
+    (nums: array int) (k: int) (l: int) (lo: int) (hi: int) (score: int) =
+    exists r m: int.
+      lo <= r < hi /\
+      valid_good_subarray nums k l r /\
+      segment_min nums l r m /\
+      score = segment_score l r m
+
+  predicate left_range_scores_bounded
+    (nums: array int) (k: int) (lo: int) (hi: int) (bound: int) =
+    forall l r m: int.
+      lo <= l < hi ->
+      valid_good_subarray nums k l r ->
+      segment_min nums l r m ->
+      segment_score l r m <= bound
+
+  predicate left_range_has_witness
+    (nums: array int) (k: int) (lo: int) (hi: int) (score: int) =
+    exists l r m: int.
+      lo <= l < hi /\
+      valid_good_subarray nums k l r /\
+      segment_min nums l r m /\
+      score = segment_score l r m
+
+  let min2 (x: int) (y: int) : int
+    ensures { result = x \/ result = y }
+    ensures { result <= x /\ result <= y }
+    ensures { x <= y -> result = x }
+    ensures { y <= x -> result = y }
+  =
+    if x <= y then x else y
+
+  let max2 (x: int) (y: int) : int
+    ensures { result = x \/ result = y }
+    ensures { x <= result /\ y <= result }
+    ensures { x >= y -> result = x }
+    ensures { y >= x -> result = y }
+  =
+    if x >= y then x else y
+
+  let lemma singleton_segment_min (nums: array int) (i: int)
+    requires { 0 <= i < length nums }
+    ensures  { segment_min nums i i nums[i] }
+  =
+    assert { forall j: int. i <= j <= i -> nums[i] <= nums[j] };
+    assert { exists p: int. i <= p <= i /\ nums[p] = nums[i] }
+
+  let lemma segment_min_unique (nums: array int) (l: int) (r: int) (m1: int) (m2: int)
+    requires { segment_min nums l r m1 }
+    requires { segment_min nums l r m2 }
+    ensures  { m1 = m2 }
+  =
+    assert { exists p: int. l <= p <= r /\ nums[p] = m1 };
+    assert { exists q: int. l <= q <= r /\ nums[q] = m2 };
+    assert { m2 <= m1 };
+    assert { m1 <= m2 }
+
+  let lemma extend_segment_min_right
+    (nums: array int) (l: int) (r: int) (old_min: int) (new_min: int)
+    requires { 0 <= l < r < length nums }
+    requires { segment_min nums l (r - 1) old_min }
+    requires { new_min = old_min \/ new_min = nums[r] }
+    requires { new_min <= old_min /\ new_min <= nums[r] }
+    ensures  { segment_min nums l r new_min }
+  =
+    assert { forall i: int. l <= i <= r -> new_min <= nums[i] };
+    if new_min = nums[r] then
+      assert { exists p: int. l <= p <= r /\ nums[p] = new_min }
+    else
+      assert { exists p: int. l <= p <= r /\ nums[p] = new_min }
+
+  let lemma extend_right_scores_bounded
+    (nums: array int) (k: int) (l: int) (r: int)
+    (best: int) (score: int) (next_best: int) (m0: int)
+    requires { right_range_scores_bounded nums k l k r best }
+    requires { valid_good_subarray nums k l r }
+    requires { segment_min nums l r m0 }
+    requires { score = segment_score l r m0 }
+    requires { best <= next_best }
+    requires { score <= next_best }
+    ensures  { right_range_scores_bounded nums k l k (r + 1) next_best }
+  =
+    assert { forall rr m: int.
+      k <= rr < r ->
+      valid_good_subarray nums k l rr ->
+      segment_min nums l rr m ->
+      segment_score l rr m <= next_best };
+    assert { forall m: int.
+      valid_good_subarray nums k l r ->
+      segment_min nums l r m ->
+      segment_score l r m <= next_best };
+    assert { forall rr m: int.
+      k <= rr < r + 1 ->
+      valid_good_subarray nums k l rr ->
+      segment_min nums l rr m ->
+      segment_score l rr m <= next_best }
+
+  let lemma extend_left_scores_bounded
+    (nums: array int) (k: int) (l: int) (best: int) (next_best: int)
+    requires { left_range_scores_bounded nums k (l + 1) (k + 1) best }
+    requires { right_range_scores_bounded nums k l k (length nums) next_best }
+    requires { best <= next_best }
+    ensures  { left_range_scores_bounded nums k l (k + 1) next_best }
+  =
+    assert { forall ll r m: int.
+      l + 1 <= ll < k + 1 ->
+      valid_good_subarray nums k ll r ->
+      segment_min nums ll r m ->
+      segment_score ll r m <= next_best };
+    assert { forall r m: int.
+      valid_good_subarray nums k l r ->
+      segment_min nums l r m ->
+      segment_score l r m <= next_best };
+    assert { forall ll r m: int.
+      l <= ll < k + 1 ->
+      valid_good_subarray nums k ll r ->
+      segment_min nums ll r m ->
+      segment_score ll r m <= next_best }
+
+  let rec best_with_right
+    (nums: array int) (k: int) (l: int) (r: int) (current_min: int) (best: int) : int
+    requires { 0 <= l <= k < length nums }
+    requires { k <= r <= length nums }
+    requires { r = k -> segment_min nums l k current_min }
+    requires { k < r -> segment_min nums l (r - 1) current_min }
+    requires { right_range_scores_bounded nums k l k r best }
+    requires { r = k \/ right_range_has_witness nums k l k r best }
+    variant  { length nums - r }
+    ensures  { best <= result }
+    ensures  { right_range_scores_bounded nums k l k (length nums) result }
+    ensures  { right_range_has_witness nums k l k (length nums) result }
+  =
+    if r >= length nums then begin
+      assert { r = length nums };
+      assert { k < r };
+      assert { right_range_has_witness nums k l k (length nums) best };
+      best
+    end else begin
+      assert { k <= r < length nums };
+      let next_min = min2 current_min nums[r] in
+      if r = k then begin
+        assert { segment_min nums l k current_min };
+        assert { current_min <= nums[r] };
+        assert { next_min = current_min };
+        assert { segment_min nums l r next_min }
+      end else begin
+        assert { k < r };
+        assert { segment_min nums l (r - 1) current_min };
+        extend_segment_min_right nums l r current_min next_min;
+        assert { segment_min nums l r next_min }
+      end;
+      assert { valid_good_subarray nums k l r };
+      let score = next_min * (r - l + 1) in
+      assert { score = segment_score l r next_min };
+      let next_best = max2 best score in
+      assert { best <= next_best };
+      assert { score <= next_best };
+      extend_right_scores_bounded nums k l r best score next_best next_min;
+      assert { right_range_scores_bounded nums k l k (r + 1) next_best };
+      if next_best = best then begin
+        if r = k then begin
+          assert { k <= r < r + 1 };
+          assert { right_range_has_witness nums k l k (r + 1) next_best }
+        end else begin
+          assert { right_range_has_witness nums k l k r best };
+          assert { right_range_has_witness nums k l k (r + 1) next_best }
+        end
+      end else begin
+        assert { next_best = score };
+        assert { k <= r < r + 1 };
+        assert { right_range_has_witness nums k l k (r + 1) next_best }
+      end;
+      assert { k < r + 1 };
+      assert { segment_min nums l ((r + 1) - 1) next_min };
+      best_with_right nums k l (r + 1) next_min next_best
+    end
+
+  let rec best_from_left
+    (nums: array int) (k: int) (l: int) (left_min: int) (best: int) : int
+    requires { 0 <= k < length nums }
+    requires { -1 <= l <= k }
+    requires { l = k -> segment_min nums k k left_min }
+    requires { l < k -> segment_min nums (l + 1) k left_min }
+    requires { left_range_scores_bounded nums k (l + 1) (k + 1) best }
+    requires { l = k \/ left_range_has_witness nums k (l + 1) (k + 1) best }
+    variant  { l + 1 }
+    ensures  { best <= result }
+    ensures  { left_range_scores_bounded nums k 0 (k + 1) result }
+    ensures  { left_range_has_witness nums k 0 (k + 1) result }
+  =
+    if l < 0 then begin
+      assert { l = -1 };
+      assert { l < k };
+      assert { left_range_scores_bounded nums k 0 (k + 1) best };
+      assert { left_range_has_witness nums k 0 (k + 1) best };
+      best
+    end else begin
+      assert { 0 <= l <= k };
+      let next_left_min = min2 left_min nums[l] in
+      if l = k then begin
+        assert { segment_min nums k k left_min };
+        assert { left_min <= nums[l] };
+        assert { next_left_min = left_min };
+        assert { segment_min nums l k next_left_min }
+      end else begin
+        assert { l < k };
+        assert { segment_min nums (l + 1) k left_min };
+        extend_segment_min_right nums l k left_min next_left_min;
+        assert { segment_min nums l k next_left_min }
+      end;
+      assert { right_range_scores_bounded nums k l k k best };
+      let best_for_l = best_with_right nums k l k next_left_min best in
+      assert { best <= best_for_l };
+      assert { right_range_scores_bounded nums k l k (length nums) best_for_l };
+      assert { right_range_has_witness nums k l k (length nums) best_for_l };
+      extend_left_scores_bounded nums k l best best_for_l;
+      assert { left_range_scores_bounded nums k l (k + 1) best_for_l };
+      assert { left_range_has_witness nums k l (k + 1) best_for_l };
+      assert { l - 1 < k };
+      assert { segment_min nums ((l - 1) + 1) k next_left_min };
+      best_from_left nums k (l - 1) next_left_min best_for_l
+    end
+
+  let maximum_score_of_a_good_subarray_array (nums: array int) (k: int) : int
+    requires { 1 <= length nums }
+    requires { 0 <= k < length nums }
+    requires { forall i: int. 0 <= i < length nums -> 1 <= nums[i] <= 20000 }
+    ensures  { maximum_good_subarray_score nums k result }
+  =
+    let initial = nums[k] in
+    singleton_segment_min nums k;
+    assert { segment_min nums k k initial };
+    assert { left_range_scores_bounded nums k (k + 1) (k + 1) initial };
+    let initial_best = initial * 1 in
+    best_from_left nums k k initial initial_best
+
+end

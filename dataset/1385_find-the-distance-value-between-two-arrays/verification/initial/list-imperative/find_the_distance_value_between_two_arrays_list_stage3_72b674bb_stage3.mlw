@@ -1,0 +1,93 @@
+module FindTheDistanceValueBetweenTwoArrays_List_Stage3_Imperative
+
+  use int.Int
+  use int.Abs
+  use list.List
+  use list.Length
+  use ref.Ref
+
+  exception TooClose
+
+  let rec function far_from_all (arr2: list int) (x: int) (d: int) : bool
+    variant { arr2 }
+  =
+    match arr2 with
+    | Nil -> true
+    | Cons y ys ->
+        if abs (x - y) > d then far_from_all ys x d else false
+    end
+
+  let rec function distance_value_list
+    (arr1: list int) (arr2: list int) (d: int) : int
+    variant { arr1 }
+  =
+    match arr1 with
+    | Nil -> 0
+    | Cons x xs ->
+        (if far_from_all arr2 x d then 1 else 0) +
+        distance_value_list xs arr2 d
+    end
+
+  let far_from_all_list (arr2: list int) (x: int) (d: int) : bool
+    ensures { result = far_from_all arr2 x d }
+  =
+    try
+      let cur = ref arr2 in
+      while (match !cur with Nil -> false | Cons _ _ -> true end) do
+        invariant { far_from_all arr2 x d = far_from_all !cur x d }
+        variant { length !cur }
+
+        match !cur with
+        | Nil ->
+            absurd
+        | Cons y ys ->
+            if abs (x - y) <= d then begin
+              assert { not (abs (x - y) > d) };
+              assert { far_from_all !cur x d = false };
+              assert { far_from_all arr2 x d = false };
+              raise TooClose
+            end;
+            assert { abs (x - y) > d };
+            assert { far_from_all !cur x d = far_from_all ys x d };
+            cur := ys
+        end
+      done;
+      assert { !cur = Nil };
+      assert { far_from_all !cur x d = true };
+      assert { far_from_all arr2 x d = true };
+      true
+    with TooClose ->
+      assert { far_from_all arr2 x d = false };
+      false
+    end
+
+  let find_the_distance_value_between_two_arrays_list
+    (arr1: list int) (arr2: list int) (d: int) : int
+    ensures { result = distance_value_list arr1 arr2 d }
+  =
+    let count = ref 0 in
+    let cur = ref arr1 in
+    while (match !cur with Nil -> false | Cons _ _ -> true end) do
+      invariant { !count + distance_value_list !cur arr2 d = distance_value_list arr1 arr2 d }
+      variant { length !cur }
+
+      match !cur with
+      | Nil ->
+          absurd
+      | Cons x xs ->
+          let far = far_from_all_list arr2 x d in
+          assert { far = far_from_all arr2 x d };
+          if far then begin
+            assert { distance_value_list !cur arr2 d = 1 + distance_value_list xs arr2 d };
+            count := !count + 1
+          end else begin
+            assert { distance_value_list !cur arr2 d = distance_value_list xs arr2 d }
+          end;
+          cur := xs
+      end
+    done;
+    assert { !cur = Nil };
+    assert { distance_value_list !cur arr2 d = 0 };
+    !count
+
+end

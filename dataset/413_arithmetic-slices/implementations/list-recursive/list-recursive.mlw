@@ -1,0 +1,199 @@
+module ArithmeticSlices_List_Recursive_Implementation
+
+  use int.Int
+  use list.List
+
+  let rec count_arithmetic_extensions
+      (a: int) (b: int) (streak: int) (rest: list int) : int
+    variant { rest }
+  =
+    match rest with
+    | Nil -> 0
+    | Cons c cs ->
+        if b - a = c - b then
+          let next = streak + 1 in
+          next + count_arithmetic_extensions b c next cs
+        else
+          count_arithmetic_extensions b c 0 cs
+    end
+
+  let arithmetic_slices_list (nums: list int) : int =
+    match nums with
+    | Nil -> 0
+    | Cons a tail ->
+        match tail with
+        | Nil -> 0
+        | Cons b rest -> count_arithmetic_extensions a b 0 rest
+        end
+    end
+
+  let test_000 () : bool =
+    let nums =
+      Cons 1
+        (Cons 1
+           (Cons 1
+              (Cons 1
+                 (Cons 1
+                    (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 Nil))))))))) in
+    let r = arithmetic_slices_list nums in
+    r = 36
+
+  let test_001 () : bool =
+    let nums = Cons 1 (Cons 2 (Cons 4 (Cons 5 (Cons 6 (Cons 7 Nil))))) in
+    let r = arithmetic_slices_list nums in
+    r = 3
+
+  let test_002 () : bool =
+    let nums = Cons 3 (Cons (-1) (Cons (-5) (Cons (-9) Nil))) in
+    let r = arithmetic_slices_list nums in
+    r = 3
+
+  let test_003 () : bool =
+    let nums =
+      Cons 10
+        (Cons 9
+           (Cons 8
+              (Cons 7
+                 (Cons 6 (Cons 5 (Cons 4 (Cons 3 (Cons 2 (Cons 1 Nil))))))))) in
+    let r = arithmetic_slices_list nums in
+    r = 36
+
+  let test_004 () : bool =
+    let nums = Cons 1 (Cons 3 (Cons 5 (Cons 7 (Cons 9 Nil)))) in
+    let r = arithmetic_slices_list nums in
+    r = 6
+
+  let test_005 () : bool =
+    let nums =
+      Cons 1
+        (Cons 2
+           (Cons 3
+              (Cons 4
+                 (Cons 5 (Cons 6 (Cons 7 (Cons 8 (Cons 9 (Cons 10 Nil))))))))) in
+    let r = arithmetic_slices_list nums in
+    r = 36
+
+  let test_006 () : bool =
+    let nums = Cons 1 Nil in
+    let r = arithmetic_slices_list nums in
+    r = 0
+
+  let test_007 () : bool =
+    let nums = Cons 10 (Cons 7 (Cons 4 (Cons 3 (Cons 2 (Cons 1 Nil))))) in
+    let r = arithmetic_slices_list nums in
+    r = 4
+
+  let test_008 () : bool =
+    let nums = Cons 1 (Cons 2 (Cons 3 (Cons 4 Nil))) in
+    let r = arithmetic_slices_list nums in
+    r = 3
+
+  let test_009 () : bool =
+    let nums = Cons 7 (Cons 7 (Cons 7 (Cons 7 Nil))) in
+    let r = arithmetic_slices_list nums in
+    r = 3
+
+  let test_010 () : bool =
+    let nums = Cons 10 (Cons 7 (Cons 7 (Cons 7 (Cons 7 (Cons 7 (Cons 10 Nil)))))) in
+    let r = arithmetic_slices_list nums in
+    r = 6
+
+  let test_011 () : bool =
+    let nums = Cons 3 (Cons (-1) (Cons (-5) (Cons (-9) Nil))) in
+    let r = arithmetic_slices_list nums in
+    r = 3
+
+  let test_012 () : bool =
+    let nums =
+      Cons 1
+        (Cons 1
+           (Cons 2
+              (Cons 3
+                 (Cons 4
+                    (Cons 5 (Cons 6 (Cons 7 (Cons 8 (Cons 9 (Cons 10 Nil)))))))))) in
+    let r = arithmetic_slices_list nums in
+    r = 36
+
+  let test_013 () : bool =
+    let nums = Cons 2 Nil in
+    let r = arithmetic_slices_list nums in
+    r = 0
+
+  let test_014 () : bool =
+    let nums = Cons 5 (Cons 5 (Cons 5 (Cons 5 (Cons 5 Nil)))) in
+    let r = arithmetic_slices_list nums in
+    r = 6
+
+  let test_015 () : bool =
+    let nums = Cons 1 (Cons 3 (Cons 5 (Cons 7 (Cons 9 Nil)))) in
+    let r = arithmetic_slices_list nums in
+    r = 6
+
+  let test_016 () : bool =
+    let nums = Cons 1 (Cons 2 (Cons 3 (Cons 4 (Cons 5 Nil)))) in
+    let r = arithmetic_slices_list nums in
+    r = 6
+
+  let test_017 () : bool =
+    let nums = Cons 1 (Cons 3 (Cons 5 (Cons 7 (Cons 9 (Cons 11 (Cons 13 Nil)))))) in
+    let r = arithmetic_slices_list nums in
+    r = 15
+
+  let test_018 () : bool =
+    let nums =
+      Cons 1
+        (Cons 2
+           (Cons 3
+              (Cons 4 (Cons 5 (Cons 6 (Cons 7 (Cons 8 (Cons 9 Nil)))))))) in
+    let r = arithmetic_slices_list nums in
+    r = 28
+
+  let test_019 () : bool =
+    let nums = Cons 1 (Cons 2 (Cons 2 (Cons 3 Nil))) in
+    let r = arithmetic_slices_list nums in
+    r = 0
+
+  let run_tests () : bool =
+    if test_000 () then
+    if test_001 () then
+    if test_002 () then
+    if test_003 () then
+    if test_004 () then
+    if test_005 () then
+    if test_006 () then
+    if test_007 () then
+    if test_008 () then
+    if test_009 () then
+    if test_010 () then
+    if test_011 () then
+    if test_012 () then
+    if test_013 () then
+    if test_014 () then
+    if test_015 () then
+    if test_016 () then
+    if test_017 () then
+    if test_018 () then
+    if test_019 () then
+      true
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+
+end

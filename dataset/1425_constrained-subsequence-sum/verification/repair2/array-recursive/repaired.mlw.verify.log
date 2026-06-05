@@ -1,0 +1,1087 @@
+== Stage 1: first prover on whole file ==
+Running in /Users/rubenm/Desktop/Diversify2Verify/codex-runs/repair2-split2/stage3a-rerepair/1425_constrained-subsequence-sum/array-recursive/constrained_subsequence_sum_array_stage3_d9dc7133_stage3/repaired/generated/why3: why3 session create -o /Users/rubenm/Desktop/Diversify2Verify/codex-runs/repair2-split2/stage3a-rerepair/1425_constrained-subsequence-sum/array-recursive/constrained_subsequence_sum_array_stage3_d9dc7133_stage3/repaired/generated/why3/.why3_sessions/repaired_stage1 -P Z3,4.8.6 -t 10 -m 8192 repaired.mlw
+Session created successfully
+Running in /Users/rubenm/Desktop/Diversify2Verify/codex-runs/repair2-split2/stage3a-rerepair/1425_constrained-subsequence-sum/array-recursive/constrained_subsequence_sum_array_stage3_d9dc7133_stage3/repaired/generated/why3: why3 bench /Users/rubenm/Desktop/Diversify2Verify/codex-runs/repair2-split2/stage3a-rerepair/1425_constrained-subsequence-sum/array-recursive/constrained_subsequence_sum_array_stage3_d9dc7133_stage3/repaired/generated/why3/.why3_sessions/repaired_stage1
+Progress: 10/1/0                       Progress: 9/2/0                       Progress: 8/3/0                       Progress: 7/4/0                       Progress: 6/5/0                       Progress: 5/6/0                       Progress: 5/0/1                       Progress: 4/1/1                       Progress: 3/2/1                       Progress: 2/3/1                       Progress: 1/4/1                       Progress: 0/5/1                       Progress: 0/1/2                       Progress: 0/0/2                       Progress: 0/0/1                       
+Replay completed, saving session... done
+== Stage 1 stats ==
+= Statistics for session /Users/rubenm/Desktop/Diversify2Verify/codex-runs/repair2-split2/stage3a-rerepair/1425_constrained-subsequence-sum/array-recursive/constrained_subsequence_sum_array_stage3_d9dc7133_stage3/repaired/generated/why3/.why3_sessions/repaired_stage1
+
+== Number of root goals ==
+  total: 11  proved: 9
+
+== Number of sub goals ==
+  total: 0  proved: 0
+
+== Goals not proved ==
+  +-- file [../../repaired.mlw]
+    +-- theory ConstrainedSubsequenceSum_Array_Stage3
+      +-- goal current_step_upper_bound'vc
+      +-- goal fill_dp'vc
+  
+== Goals proved by only one prover ==
+  +-- file [../../repaired.mlw]
+    +-- theory ConstrainedSubsequenceSum_Array_Stage3
+      +-- goal selected_sum_from'vc: Z3 4.8.6
+      +-- goal selected_sum'vc: Z3 4.8.6
+      +-- goal prefix_bound_carry'vc: Z3 4.8.6
+      +-- goal prefix_bound_split'vc: Z3 4.8.6
+      +-- goal prefix_best_full_spec'vc: Z3 4.8.6
+      +-- goal prefix_best_base_singleton'vc: Z3 4.8.6
+      +-- goal advance_prefix_best'vc: Z3 4.8.6
+      +-- goal max_prev_from'vc: Z3 4.8.6
+      +-- goal constrained_subsequence_sum_array'vc: Z3 4.8.6
+  
+1 session(s) read, with a total of 11 proof goals.
+== Unproved root goals after first prover ==
+ConstrainedSubsequenceSum_Array_Stage3	current_step_upper_bound'vc
+ConstrainedSubsequenceSum_Array_Stage3	fill_dp'vc
+== Stage 1: trying remaining goals with prover Alt-Ergo,2.4.0 ==
+---- stage1 | prover: Alt-Ergo,2.4.0 | theory: ConstrainedSubsequenceSum_Array_Stage3 | goal: current_step_upper_bound'vc ----
+File repaired.mlw:
+Goal current_step_upper_bound'vc.
+Prover result is: Timeout (10.00s, 107883 steps).
+---- stage1 | prover: Alt-Ergo,2.4.0 | theory: ConstrainedSubsequenceSum_Array_Stage3 | goal: fill_dp'vc ----
+File repaired.mlw:
+Goal fill_dp'vc.
+Prover result is: Timeout (10.00s, 183500 steps).
+Remaining after prover Alt-Ergo,2.4.0: 2
+== Stage 1: trying remaining goals with prover CVC4,1.8 ==
+---- stage1 | prover: CVC4,1.8 | theory: ConstrainedSubsequenceSum_Array_Stage3 | goal: current_step_upper_bound'vc ----
+File repaired.mlw:
+Goal current_step_upper_bound'vc.
+Prover result is: Timeout (10.00s, 1341745 steps).
+---- stage1 | prover: CVC4,1.8 | theory: ConstrainedSubsequenceSum_Array_Stage3 | goal: fill_dp'vc ----
+File repaired.mlw:
+Goal fill_dp'vc.
+Prover result is: Timeout (10.00s, 1204962 steps).
+Remaining after prover CVC4,1.8: 2
+== Goals still unproved after stage 1 ==
+ConstrainedSubsequenceSum_Array_Stage3	current_step_upper_bound'vc
+ConstrainedSubsequenceSum_Array_Stage3	fill_dp'vc
+== Stage 2: split_vc on unproved goal ==
+Target theory: ConstrainedSubsequenceSum_Array_Stage3
+Target goal  : current_step_upper_bound'vc
+---- stage2 | prover: Z3,4.8.6 | theory: ConstrainedSubsequenceSum_Array_Stage3 | goal: current_step_upper_bound'vc ----
+Transforms: split_vc
+File "repaired.mlw", line 96, characters 45-78:
+Sub-goal Assertion of goal current_step_upper_bound'vc.
+Prover result is: Unknown (unknown) (1.25s, 24926380 steps).
+
+File "repaired.mlw", line 93, characters 45-78:
+Sub-goal Postcondition of goal current_step_upper_bound'vc.
+Prover result is: Valid (0.01s, 24567 steps).
+---- stage2 | prover: Alt-Ergo,2.4.0 | theory: ConstrainedSubsequenceSum_Array_Stage3 | goal: current_step_upper_bound'vc ----
+Transforms: split_vc
+File "repaired.mlw", line 96, characters 45-78:
+Sub-goal Assertion of goal current_step_upper_bound'vc.
+Prover result is: Timeout (10.00s, 120963 steps).
+
+File "repaired.mlw", line 93, characters 45-78:
+Sub-goal Postcondition of goal current_step_upper_bound'vc.
+Prover result is: Valid (0.01s, 20 steps).
+---- stage2 | prover: CVC4,1.8 | theory: ConstrainedSubsequenceSum_Array_Stage3 | goal: current_step_upper_bound'vc ----
+Transforms: split_vc
+File "repaired.mlw", line 96, characters 45-78:
+Sub-goal Assertion of goal current_step_upper_bound'vc.
+Prover result is: Timeout (10.00s, 1341506 steps).
+
+File "repaired.mlw", line 93, characters 45-78:
+Sub-goal Postcondition of goal current_step_upper_bound'vc.
+Prover result is: Valid (0.02s, 4683 steps).
+== Stage 2: split_vc on unproved goal ==
+Target theory: ConstrainedSubsequenceSum_Array_Stage3
+Target goal  : fill_dp'vc
+---- stage2 | prover: Z3,4.8.6 | theory: ConstrainedSubsequenceSum_Array_Stage3 | goal: fill_dp'vc ----
+Transforms: split_vc
+File "repaired.mlw", line 159, characters 15-30:
+Sub-goal Assertion of goal fill_dp'vc.
+Prover result is: Valid (0.01s, 28837 steps).
+
+File "repaired.mlw", line 153, characters 15-36:
+Sub-goal Postcondition of goal fill_dp'vc.
+Prover result is: Valid (0.01s, 1774 steps).
+
+File "repaired.mlw", line 154, characters 15-54:
+Sub-goal Postcondition of goal fill_dp'vc.
+Prover result is: Valid (0.01s, 10572 steps).
+
+File "repaired.mlw", line 164, characters 15-30:
+Sub-goal Assertion of goal fill_dp'vc.
+Prover result is: Valid (0.01s, 35186 steps).
+
+File "repaired.mlw", line 165, characters 22-48:
+Sub-goal Precondition of goal fill_dp'vc.
+Prover result is: Valid (0.01s, 32262 steps).
+
+File "repaired.mlw", line 166, characters 20-27:
+Sub-goal Index in array bounds of goal fill_dp'vc.
+Prover result is: Valid (0.01s, 33025 steps).
+
+File "repaired.mlw", line 167, characters 6-22:
+Sub-goal Index in array bounds of goal fill_dp'vc.
+Prover result is: Valid (0.01s, 33723 steps).
+
+File "repaired.mlw", line 169, characters 15-39:
+Sub-goal Assertion of goal fill_dp'vc.
+Prover result is: Valid (0.01s, 35956 steps).
+
+File "repaired.mlw", line 170, characters 15-35:
+Sub-goal Assertion of goal fill_dp'vc.
+Prover result is: Valid (0.01s, 36056 steps).
+
+File "repaired.mlw", line 171, characters 6-55:
+Sub-goal Precondition of goal fill_dp'vc.
+Prover result is: Valid (0.01s, 2022 steps).
+
+File "repaired.mlw", line 171, characters 6-55:
+Sub-goal Precondition of goal fill_dp'vc.
+Prover result is: Valid (0.01s, 2027 steps).
+
+File "repaired.mlw", line 173, characters 48-83:
+Sub-goal Assertion of goal fill_dp'vc.
+Prover result is: Valid (0.01s, 34956 steps).
+
+File "repaired.mlw", line 174, characters 15-29:
+Sub-goal Assertion of goal fill_dp'vc.
+Prover result is: Valid (0.01s, 2064 steps).
+
+File "repaired.mlw", line 175, characters 48-66:
+Sub-goal Assertion of goal fill_dp'vc.
+Prover result is: Valid (0.01s, 36756 steps).
+
+File "repaired.mlw", line 176, characters 6-66:
+Sub-goal Precondition of goal fill_dp'vc.
+Prover result is: Valid (0.01s, 2106 steps).
+
+File "repaired.mlw", line 176, characters 6-66:
+Sub-goal Precondition of goal fill_dp'vc.
+Prover result is: Valid (0.01s, 35384 steps).
+
+File "repaired.mlw", line 176, characters 6-66:
+Sub-goal Precondition of goal fill_dp'vc.
+Prover result is: Valid (0.01s, 3226 steps).
+
+File "repaired.mlw", line 176, characters 6-66:
+Sub-goal Precondition of goal fill_dp'vc.
+Prover result is: Valid (0.01s, 3213 steps).
+
+File "repaired.mlw", line 176, characters 6-66:
+Sub-goal Precondition of goal fill_dp'vc.
+Prover result is: Valid (0.01s, 2148 steps).
+
+File "repaired.mlw", line 176, characters 6-66:
+Sub-goal Precondition of goal fill_dp'vc.
+Prover result is: Valid (0.01s, 35961 steps).
+
+File "repaired.mlw", line 176, characters 6-66:
+Sub-goal Precondition of goal fill_dp'vc.
+Prover result is: Valid (0.01s, 2186 steps).
+
+File "repaired.mlw", line 178, characters 47-80:
+Sub-goal Assertion of goal fill_dp'vc.
+Prover result is: Valid (0.01s, 36140 steps).
+
+File "repaired.mlw", line 180, characters 47-82:
+Sub-goal Assertion of goal fill_dp'vc.
+Prover result is: Valid (0.01s, 36280 steps).
+
+File "repaired.mlw", line 181, characters 6-43:
+Sub-goal Precondition of goal fill_dp'vc.
+Prover result is: Valid (0.01s, 36832 steps).
+
+File "repaired.mlw", line 181, characters 6-43:
+Sub-goal Precondition of goal fill_dp'vc.
+Prover result is: Valid (0.01s, 36743 steps).
+
+File "repaired.mlw", line 182, character 15 to line 183, character 88:
+Sub-goal Assertion of goal fill_dp'vc.
+Prover result is: Timeout (10.00s, 464289857 steps).
+
+File "repaired.mlw", line 185, characters 54-89:
+Sub-goal Assertion of goal fill_dp'vc.
+Prover result is: Valid (0.01s, 38310 steps).
+
+File "repaired.mlw", line 186, characters 6-59:
+Sub-goal Precondition of goal fill_dp'vc.
+Prover result is: Valid (0.01s, 2260 steps).
+
+File "repaired.mlw", line 186, characters 6-59:
+Sub-goal Precondition of goal fill_dp'vc.
+Prover result is: Valid (0.01s, 37861 steps).
+
+File "repaired.mlw", line 186, characters 6-59:
+Sub-goal Precondition of goal fill_dp'vc.
+Prover result is: Valid (0.01s, 3488 steps).
+
+File "repaired.mlw", line 186, characters 6-59:
+Sub-goal Precondition of goal fill_dp'vc.
+Prover result is: Valid (0.01s, 2291 steps).
+
+File "repaired.mlw", line 186, characters 6-59:
+Sub-goal Precondition of goal fill_dp'vc.
+Prover result is: Valid (0.01s, 2316 steps).
+
+File "repaired.mlw", line 186, characters 6-59:
+Sub-goal Precondition of goal fill_dp'vc.
+Prover result is: Valid (0.01s, 38529 steps).
+
+File "repaired.mlw", line 187, characters 6-41:
+Sub-goal Variant decrease of goal fill_dp'vc.
+Prover result is: Valid (0.01s, 16951 steps).
+
+File "repaired.mlw", line 187, characters 6-41:
+Sub-goal Precondition of goal fill_dp'vc.
+Prover result is: Valid (0.01s, 38578 steps).
+
+File "repaired.mlw", line 187, characters 6-41:
+Sub-goal Precondition of goal fill_dp'vc.
+Prover result is: Valid (0.01s, 2276 steps).
+
+File "repaired.mlw", line 187, characters 6-41:
+Sub-goal Precondition of goal fill_dp'vc.
+Prover result is: Valid (0.01s, 2281 steps).
+
+File "repaired.mlw", line 187, characters 6-41:
+Sub-goal Precondition of goal fill_dp'vc.
+Prover result is: Valid (0.01s, 2286 steps).
+
+File "repaired.mlw", line 187, characters 6-41:
+Sub-goal Precondition of goal fill_dp'vc.
+Prover result is: Valid (0.01s, 38820 steps).
+
+File "repaired.mlw", line 187, characters 6-41:
+Sub-goal Precondition of goal fill_dp'vc.
+Prover result is: Valid (0.01s, 2302 steps).
+
+File "repaired.mlw", line 153, characters 15-36:
+Sub-goal Postcondition of goal fill_dp'vc.
+Prover result is: Valid (0.01s, 37205 steps).
+
+File "repaired.mlw", line 154, characters 15-54:
+Sub-goal Postcondition of goal fill_dp'vc.
+Prover result is: Valid (0.01s, 2284 steps).
+---- stage2 | prover: Alt-Ergo,2.4.0 | theory: ConstrainedSubsequenceSum_Array_Stage3 | goal: fill_dp'vc ----
+Transforms: split_vc
+File "repaired.mlw", line 159, characters 15-30:
+Sub-goal Assertion of goal fill_dp'vc.
+Prover result is: Valid (0.01s, 16 steps).
+
+File "repaired.mlw", line 153, characters 15-36:
+Sub-goal Postcondition of goal fill_dp'vc.
+Prover result is: Valid (0.01s, 17 steps).
+
+File "repaired.mlw", line 154, characters 15-54:
+Sub-goal Postcondition of goal fill_dp'vc.
+Prover result is: Valid (0.01s, 18 steps).
+
+File "repaired.mlw", line 164, characters 15-30:
+Sub-goal Assertion of goal fill_dp'vc.
+Prover result is: Valid (0.01s, 19 steps).
+
+File "repaired.mlw", line 165, characters 22-48:
+Sub-goal Precondition of goal fill_dp'vc.
+Prover result is: Valid (0.01s, 20 steps).
+
+File "repaired.mlw", line 166, characters 20-27:
+Sub-goal Index in array bounds of goal fill_dp'vc.
+Prover result is: Valid (0.01s, 22 steps).
+
+File "repaired.mlw", line 167, characters 6-22:
+Sub-goal Index in array bounds of goal fill_dp'vc.
+Prover result is: Valid (0.01s, 22 steps).
+
+File "repaired.mlw", line 169, characters 15-39:
+Sub-goal Assertion of goal fill_dp'vc.
+Prover result is: Valid (0.01s, 30 steps).
+
+File "repaired.mlw", line 170, characters 15-35:
+Sub-goal Assertion of goal fill_dp'vc.
+Prover result is: Valid (0.01s, 32 steps).
+
+File "repaired.mlw", line 171, characters 6-55:
+Sub-goal Precondition of goal fill_dp'vc.
+Prover result is: Valid (0.01s, 32 steps).
+
+File "repaired.mlw", line 171, characters 6-55:
+Sub-goal Precondition of goal fill_dp'vc.
+Prover result is: Valid (0.01s, 32 steps).
+
+File "repaired.mlw", line 173, characters 48-83:
+Sub-goal Assertion of goal fill_dp'vc.
+Prover result is: Valid (0.01s, 43 steps).
+
+File "repaired.mlw", line 174, characters 15-29:
+Sub-goal Assertion of goal fill_dp'vc.
+Prover result is: Valid (0.01s, 32 steps).
+
+File "repaired.mlw", line 175, characters 48-66:
+Sub-goal Assertion of goal fill_dp'vc.
+Prover result is: Valid (0.02s, 235 steps).
+
+File "repaired.mlw", line 176, characters 6-66:
+Sub-goal Precondition of goal fill_dp'vc.
+Prover result is: Valid (0.01s, 32 steps).
+
+File "repaired.mlw", line 176, characters 6-66:
+Sub-goal Precondition of goal fill_dp'vc.
+Prover result is: Valid (0.01s, 32 steps).
+
+File "repaired.mlw", line 176, characters 6-66:
+Sub-goal Precondition of goal fill_dp'vc.
+Prover result is: Valid (0.01s, 33 steps).
+
+File "repaired.mlw", line 176, characters 6-66:
+Sub-goal Precondition of goal fill_dp'vc.
+Prover result is: Valid (0.01s, 34 steps).
+
+File "repaired.mlw", line 176, characters 6-66:
+Sub-goal Precondition of goal fill_dp'vc.
+Prover result is: Valid (0.01s, 34 steps).
+
+File "repaired.mlw", line 176, characters 6-66:
+Sub-goal Precondition of goal fill_dp'vc.
+Prover result is: Valid (0.01s, 45 steps).
+
+File "repaired.mlw", line 176, characters 6-66:
+Sub-goal Precondition of goal fill_dp'vc.
+Prover result is: Valid (0.01s, 34 steps).
+
+File "repaired.mlw", line 178, characters 47-80:
+Sub-goal Assertion of goal fill_dp'vc.
+Prover result is: Valid (0.01s, 44 steps).
+
+File "repaired.mlw", line 180, characters 47-82:
+Sub-goal Assertion of goal fill_dp'vc.
+Prover result is: Valid (0.01s, 55 steps).
+
+File "repaired.mlw", line 181, characters 6-43:
+Sub-goal Precondition of goal fill_dp'vc.
+Prover result is: Valid (0.01s, 44 steps).
+
+File "repaired.mlw", line 181, characters 6-43:
+Sub-goal Precondition of goal fill_dp'vc.
+Prover result is: Valid (0.01s, 44 steps).
+
+File "repaired.mlw", line 182, character 15 to line 183, character 88:
+Sub-goal Assertion of goal fill_dp'vc.
+Prover result is: Timeout (10.00s, 46425 steps).
+
+File "repaired.mlw", line 185, characters 54-89:
+Sub-goal Assertion of goal fill_dp'vc.
+Prover result is: Valid (0.01s, 51 steps).
+
+File "repaired.mlw", line 186, characters 6-59:
+Sub-goal Precondition of goal fill_dp'vc.
+Prover result is: Valid (0.01s, 38 steps).
+
+File "repaired.mlw", line 186, characters 6-59:
+Sub-goal Precondition of goal fill_dp'vc.
+Prover result is: Valid (0.01s, 38 steps).
+
+File "repaired.mlw", line 186, characters 6-59:
+Sub-goal Precondition of goal fill_dp'vc.
+Prover result is: Valid (0.01s, 39 steps).
+
+File "repaired.mlw", line 186, characters 6-59:
+Sub-goal Precondition of goal fill_dp'vc.
+Prover result is: Valid (0.01s, 40 steps).
+
+File "repaired.mlw", line 186, characters 6-59:
+Sub-goal Precondition of goal fill_dp'vc.
+Prover result is: Valid (0.01s, 49 steps).
+
+File "repaired.mlw", line 186, characters 6-59:
+Sub-goal Precondition of goal fill_dp'vc.
+Prover result is: Valid (0.01s, 60 steps).
+
+File "repaired.mlw", line 187, characters 6-41:
+Sub-goal Variant decrease of goal fill_dp'vc.
+Prover result is: Valid (0.01s, 40 steps).
+
+File "repaired.mlw", line 187, characters 6-41:
+Sub-goal Precondition of goal fill_dp'vc.
+Prover result is: Valid (0.01s, 40 steps).
+
+File "repaired.mlw", line 187, characters 6-41:
+Sub-goal Precondition of goal fill_dp'vc.
+Prover result is: Valid (0.01s, 41 steps).
+
+File "repaired.mlw", line 187, characters 6-41:
+Sub-goal Precondition of goal fill_dp'vc.
+Prover result is: Valid (0.01s, 41 steps).
+
+File "repaired.mlw", line 187, characters 6-41:
+Sub-goal Precondition of goal fill_dp'vc.
+Prover result is: Valid (0.01s, 41 steps).
+
+File "repaired.mlw", line 187, characters 6-41:
+Sub-goal Precondition of goal fill_dp'vc.
+Prover result is: Valid (0.01s, 41 steps).
+
+File "repaired.mlw", line 187, characters 6-41:
+Sub-goal Precondition of goal fill_dp'vc.
+Prover result is: Valid (0.01s, 43 steps).
+
+File "repaired.mlw", line 153, characters 15-36:
+Sub-goal Postcondition of goal fill_dp'vc.
+Prover result is: Valid (0.01s, 44 steps).
+
+File "repaired.mlw", line 154, characters 15-54:
+Sub-goal Postcondition of goal fill_dp'vc.
+Prover result is: Valid (0.01s, 46 steps).
+---- stage2 | prover: CVC4,1.8 | theory: ConstrainedSubsequenceSum_Array_Stage3 | goal: fill_dp'vc ----
+Transforms: split_vc
+File "repaired.mlw", line 159, characters 15-30:
+Sub-goal Assertion of goal fill_dp'vc.
+Prover result is: Valid (0.02s, 5430 steps).
+
+File "repaired.mlw", line 153, characters 15-36:
+Sub-goal Postcondition of goal fill_dp'vc.
+Prover result is: Valid (0.02s, 5371 steps).
+
+File "repaired.mlw", line 154, characters 15-54:
+Sub-goal Postcondition of goal fill_dp'vc.
+Prover result is: Valid (0.02s, 5447 steps).
+
+File "repaired.mlw", line 164, characters 15-30:
+Sub-goal Assertion of goal fill_dp'vc.
+Prover result is: Valid (0.02s, 5602 steps).
+
+File "repaired.mlw", line 165, characters 22-48:
+Sub-goal Precondition of goal fill_dp'vc.
+Prover result is: Valid (0.02s, 5598 steps).
+
+File "repaired.mlw", line 166, characters 20-27:
+Sub-goal Index in array bounds of goal fill_dp'vc.
+Prover result is: Valid (0.02s, 5791 steps).
+
+File "repaired.mlw", line 167, characters 6-22:
+Sub-goal Index in array bounds of goal fill_dp'vc.
+Prover result is: Valid (0.02s, 5816 steps).
+
+File "repaired.mlw", line 169, characters 15-39:
+Sub-goal Assertion of goal fill_dp'vc.
+Prover result is: Valid (0.02s, 6222 steps).
+
+File "repaired.mlw", line 170, characters 15-35:
+Sub-goal Assertion of goal fill_dp'vc.
+Prover result is: Valid (0.02s, 6256 steps).
+
+File "repaired.mlw", line 171, characters 6-55:
+Sub-goal Precondition of goal fill_dp'vc.
+Prover result is: Valid (0.02s, 6121 steps).
+
+File "repaired.mlw", line 171, characters 6-55:
+Sub-goal Precondition of goal fill_dp'vc.
+Prover result is: Valid (0.02s, 6124 steps).
+
+File "repaired.mlw", line 173, characters 48-83:
+Sub-goal Assertion of goal fill_dp'vc.
+Prover result is: Valid (0.02s, 7203 steps).
+
+File "repaired.mlw", line 174, characters 15-29:
+Sub-goal Assertion of goal fill_dp'vc.
+Prover result is: Valid (0.02s, 6268 steps).
+
+File "repaired.mlw", line 175, characters 48-66:
+Sub-goal Assertion of goal fill_dp'vc.
+Prover result is: Valid (0.04s, 14381 steps).
+
+File "repaired.mlw", line 176, characters 6-66:
+Sub-goal Precondition of goal fill_dp'vc.
+Prover result is: Valid (0.02s, 6378 steps).
+
+File "repaired.mlw", line 176, characters 6-66:
+Sub-goal Precondition of goal fill_dp'vc.
+Prover result is: Valid (0.02s, 6540 steps).
+
+File "repaired.mlw", line 176, characters 6-66:
+Sub-goal Precondition of goal fill_dp'vc.
+Prover result is: Valid (0.02s, 6415 steps).
+
+File "repaired.mlw", line 176, characters 6-66:
+Sub-goal Precondition of goal fill_dp'vc.
+Prover result is: Valid (0.02s, 6420 steps).
+
+File "repaired.mlw", line 176, characters 6-66:
+Sub-goal Precondition of goal fill_dp'vc.
+Prover result is: Valid (0.02s, 6423 steps).
+
+File "repaired.mlw", line 176, characters 6-66:
+Sub-goal Precondition of goal fill_dp'vc.
+Prover result is: Valid (0.02s, 7218 steps).
+
+File "repaired.mlw", line 176, characters 6-66:
+Sub-goal Precondition of goal fill_dp'vc.
+Prover result is: Valid (0.02s, 6531 steps).
+
+File "repaired.mlw", line 178, characters 47-80:
+Sub-goal Assertion of goal fill_dp'vc.
+Prover result is: Valid (0.02s, 7459 steps).
+
+File "repaired.mlw", line 180, characters 47-82:
+Sub-goal Assertion of goal fill_dp'vc.
+Prover result is: Valid (0.02s, 7558 steps).
+
+File "repaired.mlw", line 181, characters 6-43:
+Sub-goal Precondition of goal fill_dp'vc.
+Prover result is: Valid (0.03s, 7689 steps).
+
+File "repaired.mlw", line 181, characters 6-43:
+Sub-goal Precondition of goal fill_dp'vc.
+Prover result is: Valid (0.02s, 7710 steps).
+
+File "repaired.mlw", line 182, character 15 to line 183, character 88:
+Sub-goal Assertion of goal fill_dp'vc.
+Prover result is: Timeout (10.00s, 1295927 steps).
+
+File "repaired.mlw", line 185, characters 54-89:
+Sub-goal Assertion of goal fill_dp'vc.
+Prover result is: Valid (0.03s, 8340 steps).
+
+File "repaired.mlw", line 186, characters 6-59:
+Sub-goal Precondition of goal fill_dp'vc.
+Prover result is: Valid (0.02s, 6859 steps).
+
+File "repaired.mlw", line 186, characters 6-59:
+Sub-goal Precondition of goal fill_dp'vc.
+Prover result is: Valid (0.02s, 7037 steps).
+
+File "repaired.mlw", line 186, characters 6-59:
+Sub-goal Precondition of goal fill_dp'vc.
+Prover result is: Valid (0.02s, 6896 steps).
+
+File "repaired.mlw", line 186, characters 6-59:
+Sub-goal Precondition of goal fill_dp'vc.
+Prover result is: Valid (0.02s, 6898 steps).
+
+File "repaired.mlw", line 186, characters 6-59:
+Sub-goal Precondition of goal fill_dp'vc.
+Prover result is: Valid (0.02s, 7155 steps).
+
+File "repaired.mlw", line 186, characters 6-59:
+Sub-goal Precondition of goal fill_dp'vc.
+Prover result is: Valid (0.03s, 8568 steps).
+
+File "repaired.mlw", line 187, characters 6-41:
+Sub-goal Variant decrease of goal fill_dp'vc.
+Prover result is: Valid (0.02s, 6927 steps).
+
+File "repaired.mlw", line 187, characters 6-41:
+Sub-goal Precondition of goal fill_dp'vc.
+Prover result is: Valid (0.02s, 7060 steps).
+
+File "repaired.mlw", line 187, characters 6-41:
+Sub-goal Precondition of goal fill_dp'vc.
+Prover result is: Valid (0.02s, 6898 steps).
+
+File "repaired.mlw", line 187, characters 6-41:
+Sub-goal Precondition of goal fill_dp'vc.
+Prover result is: Valid (0.02s, 6902 steps).
+
+File "repaired.mlw", line 187, characters 6-41:
+Sub-goal Precondition of goal fill_dp'vc.
+Prover result is: Valid (0.02s, 6908 steps).
+
+File "repaired.mlw", line 187, characters 6-41:
+Sub-goal Precondition of goal fill_dp'vc.
+Prover result is: Valid (0.02s, 7122 steps).
+
+File "repaired.mlw", line 187, characters 6-41:
+Sub-goal Precondition of goal fill_dp'vc.
+Prover result is: Valid (0.02s, 6945 steps).
+
+File "repaired.mlw", line 153, characters 15-36:
+Sub-goal Postcondition of goal fill_dp'vc.
+Prover result is: Valid (0.02s, 7138 steps).
+
+File "repaired.mlw", line 154, characters 15-54:
+Sub-goal Postcondition of goal fill_dp'vc.
+Prover result is: Valid (0.02s, 6951 steps).
+== Goals still unproved after stage 2 (split_vc) ==
+ConstrainedSubsequenceSum_Array_Stage3	current_step_upper_bound'vc
+ConstrainedSubsequenceSum_Array_Stage3	fill_dp'vc
+== Stage 3: split_vc + inline_all on still-unproved goal ==
+Target theory: ConstrainedSubsequenceSum_Array_Stage3
+Target goal  : current_step_upper_bound'vc
+---- stage3 | prover: Z3,4.8.6 | theory: ConstrainedSubsequenceSum_Array_Stage3 | goal: current_step_upper_bound'vc ----
+Transforms: split_vc inline_all
+File "repaired.mlw", line 96, characters 45-78:
+Sub-goal Assertion of goal current_step_upper_bound'vc.
+Prover result is: Timeout (10.00s, 244606087 steps).
+
+File "repaired.mlw", line 93, characters 45-78:
+Sub-goal Postcondition of goal current_step_upper_bound'vc.
+Prover result is: Valid (0.01s, 64003 steps).
+---- stage3 | prover: Alt-Ergo,2.4.0 | theory: ConstrainedSubsequenceSum_Array_Stage3 | goal: current_step_upper_bound'vc ----
+Transforms: split_vc inline_all
+File "repaired.mlw", line 96, characters 45-78:
+Sub-goal Assertion of goal current_step_upper_bound'vc.
+Prover result is: Timeout (10.00s, 127742 steps).
+
+File "repaired.mlw", line 93, characters 45-78:
+Sub-goal Postcondition of goal current_step_upper_bound'vc.
+Prover result is: Valid (0.04s, 876 steps).
+---- stage3 | prover: CVC4,1.8 | theory: ConstrainedSubsequenceSum_Array_Stage3 | goal: current_step_upper_bound'vc ----
+Transforms: split_vc inline_all
+File "repaired.mlw", line 96, characters 45-78:
+Sub-goal Assertion of goal current_step_upper_bound'vc.
+Prover result is: Timeout (10.00s, 1430182 steps).
+
+File "repaired.mlw", line 93, characters 45-78:
+Sub-goal Postcondition of goal current_step_upper_bound'vc.
+Prover result is: Timeout (10.00s, 1296372 steps).
+== Stage 3: split_vc + inline_all on still-unproved goal ==
+Target theory: ConstrainedSubsequenceSum_Array_Stage3
+Target goal  : fill_dp'vc
+---- stage3 | prover: Z3,4.8.6 | theory: ConstrainedSubsequenceSum_Array_Stage3 | goal: fill_dp'vc ----
+Transforms: split_vc inline_all
+File "repaired.mlw", line 159, characters 15-30:
+Sub-goal Assertion of goal fill_dp'vc.
+Prover result is: Valid (0.02s, 120371 steps).
+
+File "repaired.mlw", line 153, characters 15-36:
+Sub-goal Postcondition of goal fill_dp'vc.
+Prover result is: Valid (0.01s, 8720 steps).
+
+File "repaired.mlw", line 154, characters 15-54:
+Sub-goal Postcondition of goal fill_dp'vc.
+Prover result is: Valid (0.01s, 70272 steps).
+
+File "repaired.mlw", line 164, characters 15-30:
+Sub-goal Assertion of goal fill_dp'vc.
+Prover result is: Valid (0.02s, 130238 steps).
+
+File "repaired.mlw", line 165, characters 22-48:
+Sub-goal Precondition of goal fill_dp'vc.
+Prover result is: Valid (0.02s, 128910 steps).
+
+File "repaired.mlw", line 166, characters 20-27:
+Sub-goal Index in array bounds of goal fill_dp'vc.
+Prover result is: Valid (0.01s, 31652 steps).
+
+File "repaired.mlw", line 167, characters 6-22:
+Sub-goal Index in array bounds of goal fill_dp'vc.
+Prover result is: Valid (0.02s, 123158 steps).
+
+File "repaired.mlw", line 169, characters 15-39:
+Sub-goal Assertion of goal fill_dp'vc.
+Prover result is: Valid (0.02s, 128459 steps).
+
+File "repaired.mlw", line 170, characters 15-35:
+Sub-goal Assertion of goal fill_dp'vc.
+Prover result is: Valid (0.02s, 128832 steps).
+
+File "repaired.mlw", line 171, characters 6-55:
+Sub-goal Precondition of goal fill_dp'vc.
+Prover result is: Valid (0.01s, 14395 steps).
+
+File "repaired.mlw", line 171, characters 6-55:
+Sub-goal Precondition of goal fill_dp'vc.
+Prover result is: Valid (0.01s, 13720 steps).
+
+File "repaired.mlw", line 173, characters 48-83:
+Sub-goal Assertion of goal fill_dp'vc.
+Prover result is: Valid (0.02s, 149377 steps).
+
+File "repaired.mlw", line 174, characters 15-29:
+Sub-goal Assertion of goal fill_dp'vc.
+Prover result is: Valid (0.01s, 14085 steps).
+
+File "repaired.mlw", line 175, characters 48-66:
+Sub-goal Assertion of goal fill_dp'vc.
+Prover result is: Valid (0.02s, 138200 steps).
+
+File "repaired.mlw", line 176, characters 6-66:
+Sub-goal Precondition of goal fill_dp'vc.
+Prover result is: Valid (0.01s, 14813 steps).
+
+File "repaired.mlw", line 176, characters 6-66:
+Sub-goal Precondition of goal fill_dp'vc.
+Prover result is: Valid (0.02s, 135292 steps).
+
+File "repaired.mlw", line 176, characters 6-66:
+Sub-goal Precondition of goal fill_dp'vc.
+Prover result is: Valid (0.01s, 34978 steps).
+
+File "repaired.mlw", line 176, characters 6-66:
+Sub-goal Precondition of goal fill_dp'vc.
+Prover result is: Valid (0.01s, 14442 steps).
+
+File "repaired.mlw", line 176, characters 6-66:
+Sub-goal Precondition of goal fill_dp'vc.
+Prover result is: Valid (0.01s, 14433 steps).
+
+File "repaired.mlw", line 176, characters 6-66:
+Sub-goal Precondition of goal fill_dp'vc.
+Prover result is: Valid (0.02s, 135511 steps).
+
+File "repaired.mlw", line 176, characters 6-66:
+Sub-goal Precondition of goal fill_dp'vc.
+Prover result is: Valid (0.01s, 10253 steps).
+
+File "repaired.mlw", line 178, characters 47-80:
+Sub-goal Assertion of goal fill_dp'vc.
+Prover result is: Valid (0.02s, 162966 steps).
+
+File "repaired.mlw", line 180, characters 47-82:
+Sub-goal Assertion of goal fill_dp'vc.
+Prover result is: Valid (0.02s, 162872 steps).
+
+File "repaired.mlw", line 181, characters 6-43:
+Sub-goal Precondition of goal fill_dp'vc.
+Prover result is: Valid (0.02s, 165890 steps).
+
+File "repaired.mlw", line 181, characters 6-43:
+Sub-goal Precondition of goal fill_dp'vc.
+Prover result is: Valid (0.02s, 168636 steps).
+
+File "repaired.mlw", line 182, character 15 to line 183, character 88:
+Sub-goal Assertion of goal fill_dp'vc.
+Prover result is: Timeout (10.00s, 426060380 steps).
+
+File "repaired.mlw", line 185, characters 54-89:
+Sub-goal Assertion of goal fill_dp'vc.
+Prover result is: Valid (0.02s, 177091 steps).
+
+File "repaired.mlw", line 186, characters 6-59:
+Sub-goal Precondition of goal fill_dp'vc.
+Prover result is: Valid (0.01s, 18439 steps).
+
+File "repaired.mlw", line 186, characters 6-59:
+Sub-goal Precondition of goal fill_dp'vc.
+Prover result is: Valid (0.02s, 162352 steps).
+
+File "repaired.mlw", line 186, characters 6-59:
+Sub-goal Precondition of goal fill_dp'vc.
+Prover result is: Valid (0.01s, 41184 steps).
+
+File "repaired.mlw", line 186, characters 6-59:
+Sub-goal Precondition of goal fill_dp'vc.
+Prover result is: Valid (0.01s, 19316 steps).
+
+File "repaired.mlw", line 186, characters 6-59:
+Sub-goal Precondition of goal fill_dp'vc.
+Prover result is: Valid (0.01s, 13503 steps).
+
+File "repaired.mlw", line 186, characters 6-59:
+Sub-goal Precondition of goal fill_dp'vc.
+Prover result is: Valid (0.02s, 177926 steps).
+
+File "repaired.mlw", line 187, characters 6-41:
+Sub-goal Variant decrease of goal fill_dp'vc.
+Prover result is: Valid (0.01s, 73886 steps).
+
+File "repaired.mlw", line 187, characters 6-41:
+Sub-goal Precondition of goal fill_dp'vc.
+Prover result is: Valid (0.02s, 163327 steps).
+
+File "repaired.mlw", line 187, characters 6-41:
+Sub-goal Precondition of goal fill_dp'vc.
+Prover result is: Valid (0.01s, 13055 steps).
+
+File "repaired.mlw", line 187, characters 6-41:
+Sub-goal Precondition of goal fill_dp'vc.
+Prover result is: Valid (0.01s, 19210 steps).
+
+File "repaired.mlw", line 187, characters 6-41:
+Sub-goal Precondition of goal fill_dp'vc.
+Prover result is: Valid (0.01s, 19157 steps).
+
+File "repaired.mlw", line 187, characters 6-41:
+Sub-goal Precondition of goal fill_dp'vc.
+Prover result is: Valid (0.01s, 19140 steps).
+
+File "repaired.mlw", line 187, characters 6-41:
+Sub-goal Precondition of goal fill_dp'vc.
+Prover result is: Valid (0.01s, 19785 steps).
+
+File "repaired.mlw", line 153, characters 15-36:
+Sub-goal Postcondition of goal fill_dp'vc.
+Prover result is: Valid (0.02s, 174499 steps).
+
+File "repaired.mlw", line 154, characters 15-54:
+Sub-goal Postcondition of goal fill_dp'vc.
+Prover result is: Valid (0.01s, 21303 steps).
+---- stage3 | prover: Alt-Ergo,2.4.0 | theory: ConstrainedSubsequenceSum_Array_Stage3 | goal: fill_dp'vc ----
+Transforms: split_vc inline_all
+File "repaired.mlw", line 159, characters 15-30:
+Sub-goal Assertion of goal fill_dp'vc.
+Prover result is: Valid (0.01s, 20 steps).
+
+File "repaired.mlw", line 153, characters 15-36:
+Sub-goal Postcondition of goal fill_dp'vc.
+Prover result is: Valid (0.01s, 22 steps).
+
+File "repaired.mlw", line 154, characters 15-54:
+Sub-goal Postcondition of goal fill_dp'vc.
+Prover result is: Valid (0.04s, 648 steps).
+
+File "repaired.mlw", line 164, characters 15-30:
+Sub-goal Assertion of goal fill_dp'vc.
+Prover result is: Valid (0.01s, 47 steps).
+
+File "repaired.mlw", line 165, characters 22-48:
+Sub-goal Precondition of goal fill_dp'vc.
+Prover result is: Valid (0.01s, 25 steps).
+
+File "repaired.mlw", line 166, characters 20-27:
+Sub-goal Index in array bounds of goal fill_dp'vc.
+Prover result is: Valid (0.01s, 26 steps).
+
+File "repaired.mlw", line 167, characters 6-22:
+Sub-goal Index in array bounds of goal fill_dp'vc.
+Prover result is: Valid (0.01s, 26 steps).
+
+File "repaired.mlw", line 169, characters 15-39:
+Sub-goal Assertion of goal fill_dp'vc.
+Prover result is: Valid (0.01s, 35 steps).
+
+File "repaired.mlw", line 170, characters 15-35:
+Sub-goal Assertion of goal fill_dp'vc.
+Prover result is: Valid (0.01s, 35 steps).
+
+File "repaired.mlw", line 171, characters 6-55:
+Sub-goal Precondition of goal fill_dp'vc.
+Prover result is: Valid (0.05s, 977 steps).
+
+File "repaired.mlw", line 171, characters 6-55:
+Sub-goal Precondition of goal fill_dp'vc.
+Prover result is: Valid (0.01s, 40 steps).
+
+File "repaired.mlw", line 173, characters 48-83:
+Sub-goal Assertion of goal fill_dp'vc.
+Prover result is: Valid (0.04s, 625 steps).
+
+File "repaired.mlw", line 174, characters 15-29:
+Sub-goal Assertion of goal fill_dp'vc.
+Prover result is: Valid (0.01s, 34 steps).
+
+File "repaired.mlw", line 175, characters 48-66:
+Sub-goal Assertion of goal fill_dp'vc.
+Prover result is: Valid (0.03s, 314 steps).
+
+File "repaired.mlw", line 176, characters 6-66:
+Sub-goal Precondition of goal fill_dp'vc.
+Prover result is: Valid (0.02s, 92 steps).
+
+File "repaired.mlw", line 176, characters 6-66:
+Sub-goal Precondition of goal fill_dp'vc.
+Prover result is: Valid (0.01s, 34 steps).
+
+File "repaired.mlw", line 176, characters 6-66:
+Sub-goal Precondition of goal fill_dp'vc.
+Prover result is: Valid (0.01s, 34 steps).
+
+File "repaired.mlw", line 176, characters 6-66:
+Sub-goal Precondition of goal fill_dp'vc.
+Prover result is: Valid (0.01s, 34 steps).
+
+File "repaired.mlw", line 176, characters 6-66:
+Sub-goal Precondition of goal fill_dp'vc.
+Prover result is: Valid (0.01s, 34 steps).
+
+File "repaired.mlw", line 176, characters 6-66:
+Sub-goal Precondition of goal fill_dp'vc.
+Prover result is: Valid (0.02s, 86 steps).
+
+File "repaired.mlw", line 176, characters 6-66:
+Sub-goal Precondition of goal fill_dp'vc.
+Prover result is: Valid (0.01s, 34 steps).
+
+File "repaired.mlw", line 178, characters 47-80:
+Sub-goal Assertion of goal fill_dp'vc.
+Prover result is: Valid (0.20s, 4502 steps).
+
+File "repaired.mlw", line 180, characters 47-82:
+Sub-goal Assertion of goal fill_dp'vc.
+Prover result is: Valid (0.18s, 3835 steps).
+
+File "repaired.mlw", line 181, characters 6-43:
+Sub-goal Precondition of goal fill_dp'vc.
+Prover result is: Valid (0.09s, 1151 steps).
+
+File "repaired.mlw", line 181, characters 6-43:
+Sub-goal Precondition of goal fill_dp'vc.
+Prover result is: Valid (0.22s, 4032 steps).
+
+File "repaired.mlw", line 182, character 15 to line 183, character 88:
+Sub-goal Assertion of goal fill_dp'vc.
+Prover result is: Timeout (10.00s, 181667 steps).
+
+File "repaired.mlw", line 185, characters 54-89:
+Sub-goal Assertion of goal fill_dp'vc.
+Prover result is: Valid (0.11s, 1543 steps).
+
+File "repaired.mlw", line 186, characters 6-59:
+Sub-goal Precondition of goal fill_dp'vc.
+Prover result is: Valid (0.02s, 118 steps).
+
+File "repaired.mlw", line 186, characters 6-59:
+Sub-goal Precondition of goal fill_dp'vc.
+Prover result is: Valid (0.01s, 40 steps).
+
+File "repaired.mlw", line 186, characters 6-59:
+Sub-goal Precondition of goal fill_dp'vc.
+Prover result is: Valid (0.01s, 41 steps).
+
+File "repaired.mlw", line 186, characters 6-59:
+Sub-goal Precondition of goal fill_dp'vc.
+Prover result is: Valid (0.55s, 6279 steps).
+
+File "repaired.mlw", line 186, characters 6-59:
+Sub-goal Precondition of goal fill_dp'vc.
+Prover result is: Valid (0.12s, 1465 steps).
+
+File "repaired.mlw", line 186, characters 6-59:
+Sub-goal Precondition of goal fill_dp'vc.
+Prover result is: Valid (0.17s, 2084 steps).
+
+File "repaired.mlw", line 187, characters 6-41:
+Sub-goal Variant decrease of goal fill_dp'vc.
+Prover result is: Valid (0.01s, 53 steps).
+
+File "repaired.mlw", line 187, characters 6-41:
+Sub-goal Precondition of goal fill_dp'vc.
+Prover result is: Valid (0.01s, 53 steps).
+
+File "repaired.mlw", line 187, characters 6-41:
+Sub-goal Precondition of goal fill_dp'vc.
+Prover result is: Valid (0.01s, 54 steps).
+
+File "repaired.mlw", line 187, characters 6-41:
+Sub-goal Precondition of goal fill_dp'vc.
+Prover result is: Valid (0.02s, 137 steps).
+
+File "repaired.mlw", line 187, characters 6-41:
+Sub-goal Precondition of goal fill_dp'vc.
+Prover result is: Valid (0.01s, 54 steps).
+
+File "repaired.mlw", line 187, characters 6-41:
+Sub-goal Precondition of goal fill_dp'vc.
+Prover result is: Valid (0.01s, 54 steps).
+
+File "repaired.mlw", line 187, characters 6-41:
+Sub-goal Precondition of goal fill_dp'vc.
+Prover result is: Valid (0.76s, 9863 steps).
+
+File "repaired.mlw", line 153, characters 15-36:
+Sub-goal Postcondition of goal fill_dp'vc.
+Prover result is: Valid (0.02s, 75 steps).
+
+File "repaired.mlw", line 154, characters 15-54:
+Sub-goal Postcondition of goal fill_dp'vc.
+Prover result is: Valid (1.16s, 18290 steps).
+---- stage3 | prover: CVC4,1.8 | theory: ConstrainedSubsequenceSum_Array_Stage3 | goal: fill_dp'vc ----
+Transforms: split_vc inline_all
+File "repaired.mlw", line 159, characters 15-30:
+Sub-goal Assertion of goal fill_dp'vc.
+Prover result is: Valid (0.06s, 24078 steps).
+
+File "repaired.mlw", line 153, characters 15-36:
+Sub-goal Postcondition of goal fill_dp'vc.
+Prover result is: Valid (0.05s, 23971 steps).
+
+File "repaired.mlw", line 154, characters 15-54:
+Sub-goal Postcondition of goal fill_dp'vc.
+Prover result is: Valid (0.06s, 25568 steps).
+
+File "repaired.mlw", line 164, characters 15-30:
+Sub-goal Assertion of goal fill_dp'vc.
+Prover result is: Valid (0.06s, 24640 steps).
+
+File "repaired.mlw", line 165, characters 22-48:
+Sub-goal Precondition of goal fill_dp'vc.
+Prover result is: Valid (0.06s, 24362 steps).
+
+File "repaired.mlw", line 166, characters 20-27:
+Sub-goal Index in array bounds of goal fill_dp'vc.
+Prover result is: Valid (0.05s, 24390 steps).
+
+File "repaired.mlw", line 167, characters 6-22:
+Sub-goal Index in array bounds of goal fill_dp'vc.
+Prover result is: Valid (0.06s, 24578 steps).
+
+File "repaired.mlw", line 169, characters 15-39:
+Sub-goal Assertion of goal fill_dp'vc.
+Prover result is: Valid (0.06s, 25369 steps).
+
+File "repaired.mlw", line 170, characters 15-35:
+Sub-goal Assertion of goal fill_dp'vc.
+Prover result is: Valid (0.06s, 25425 steps).
+
+File "repaired.mlw", line 171, characters 6-55:
+Sub-goal Precondition of goal fill_dp'vc.
+Prover result is: Valid (0.06s, 26746 steps).
+
+File "repaired.mlw", line 171, characters 6-55:
+Sub-goal Precondition of goal fill_dp'vc.
+Prover result is: Valid (0.06s, 26542 steps).
+
+File "repaired.mlw", line 173, characters 48-83:
+Sub-goal Assertion of goal fill_dp'vc.
+Prover result is: Valid (0.07s, 29602 steps).
+
+File "repaired.mlw", line 174, characters 15-29:
+Sub-goal Assertion of goal fill_dp'vc.
+Prover result is: Valid (0.05s, 26534 steps).
+
+File "repaired.mlw", line 175, characters 48-66:
+Sub-goal Assertion of goal fill_dp'vc.
+Prover result is: Valid (0.08s, 32493 steps).
+
+File "repaired.mlw", line 176, characters 6-66:
+Sub-goal Precondition of goal fill_dp'vc.
+Prover result is: Valid (0.06s, 27140 steps).
+
+File "repaired.mlw", line 176, characters 6-66:
+Sub-goal Precondition of goal fill_dp'vc.
+Prover result is: Valid (0.06s, 27158 steps).
+
+File "repaired.mlw", line 176, characters 6-66:
+Sub-goal Precondition of goal fill_dp'vc.
+Prover result is: Valid (0.06s, 26917 steps).
+
+File "repaired.mlw", line 176, characters 6-66:
+Sub-goal Precondition of goal fill_dp'vc.
+Prover result is: Valid (0.06s, 26922 steps).
+
+File "repaired.mlw", line 176, characters 6-66:
+Sub-goal Precondition of goal fill_dp'vc.
+Prover result is: Valid (0.06s, 26925 steps).
+
+File "repaired.mlw", line 176, characters 6-66:
+Sub-goal Precondition of goal fill_dp'vc.
+Prover result is: Valid (0.08s, 29963 steps).
+
+File "repaired.mlw", line 176, characters 6-66:
+Sub-goal Precondition of goal fill_dp'vc.
+Prover result is: Valid (0.06s, 27077 steps).
+
+File "repaired.mlw", line 178, characters 47-80:
+Sub-goal Assertion of goal fill_dp'vc.
+Prover result is: Timeout (10.00s, 1414115 steps).
+
+File "repaired.mlw", line 180, characters 47-82:
+Sub-goal Assertion of goal fill_dp'vc.
+Prover result is: Timeout (10.00s, 1356002 steps).
+
+File "repaired.mlw", line 181, characters 6-43:
+Sub-goal Precondition of goal fill_dp'vc.
+Prover result is: Valid (0.08s, 35517 steps).
+Infrastructure issue in stage 3 with prover CVC4,1.8; aborting rest of stage 3.
+== Final summary ==
+Unproved root goals after first prover : 2
+Remaining failures after split_vc      : 2
+Remaining failures after stage 3       : 2
+Detailed logs stored in                : /Users/rubenm/Desktop/Diversify2Verify/codex-runs/repair2-split2/stage3a-rerepair/1425_constrained-subsequence-sum/array-recursive/constrained_subsequence_sum_array_stage3_d9dc7133_stage3/repaired/generated/why3/.why3_sessions/repaired_logs
+Still unproved goals:
+ConstrainedSubsequenceSum_Array_Stage3	current_step_upper_bound'vc
+ConstrainedSubsequenceSum_Array_Stage3	fill_dp'vc
+VERIFY_RESULT: FAILURE
+VERIFY_REASON: unproved_goals_remain
+VERIFY_STAGE: stage3
+VERIFY_ROOT_TOTAL: 11
+VERIFY_ROOT_PROVED: 9
+VERIFY_ROOT_REMAINING: 2

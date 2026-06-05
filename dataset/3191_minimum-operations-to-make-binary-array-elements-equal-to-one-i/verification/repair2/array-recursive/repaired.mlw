@@ -1,0 +1,307 @@
+module MinimumOperationsToMakeBinaryArrayElementsEqualToOneI_Array_Stage3
+
+  use int.Int
+  use int.EuclideanDivision
+  use array.Array
+  use array.Init
+
+  predicate valid_input (nums: array int) =
+    3 <= length nums <= 100000 /\
+    forall i: int. 0 <= i < length nums -> nums[i] = 0 \/ nums[i] = 1
+
+  predicate valid_operation_plan (nums: array int) (ops: array int) =
+    length ops = length nums - 2 /\
+    forall i: int. 0 <= i < length ops -> ops[i] = 0 \/ ops[i] = 1
+
+  let function selected_operation_at (ops: array int) (i: int) : int =
+    if 0 <= i < length ops then
+      if ops[i] = 1 then 1 else 0
+    else 0
+
+  let rec function operation_count_from (ops: array int) (i: int) : int
+    requires { 0 <= i <= length ops }
+    variant  { length ops - i }
+  =
+    if i = length ops then 0
+    else selected_operation_at ops i + operation_count_from ops (i + 1)
+
+  function operation_count (ops: array int) : int =
+    operation_count_from ops 0
+
+  function affecting_flip_count (ops: array int) (i: int) : int =
+    selected_operation_at ops i +
+    selected_operation_at ops (i - 1) +
+    selected_operation_at ops (i - 2)
+
+  predicate final_one_at (nums: array int) (ops: array int) (i: int) =
+    0 <= i < length nums /\
+    ((mod (affecting_flip_count ops i) 2 = 0 -> nums[i] = 1) /\
+     (mod (affecting_flip_count ops i) 2 = 1 -> nums[i] = 0))
+
+  predicate makes_all_one (nums: array int) (ops: array int) =
+    valid_operation_plan nums ops /\
+    forall i: int. 0 <= i < length nums -> final_one_at nums ops i
+
+  predicate feasible_with_operations (nums: array int) (k: int) =
+    exists ops: array int.
+      valid_operation_plan nums ops /\
+      makes_all_one nums ops /\
+      operation_count ops = k
+
+  predicate no_feasible_operation_plan (nums: array int) =
+    forall ops: array int.
+      valid_operation_plan nums ops -> not (makes_all_one nums ops)
+
+  predicate minimum_operation_result (nums: array int) (res: int) =
+    (res = -1 /\ no_feasible_operation_plan nums) \/
+    (0 <= res /\
+     feasible_with_operations nums res /\
+     forall k: int. feasible_with_operations nums k -> res <= k)
+
+  let function compose_count (count: int) (rest: int) : int =
+    if rest = -1 then -1 else count + rest
+
+  predicate suffix_range_result
+    (nums: array int) (i: int) (res: int) =
+    (res = -1) \/
+    (0 <= res /\ res <= length nums - 2 - i)
+
+  predicate suffix_semantic_result
+    (nums: array int) (i: int) (prev2: int) (prev1: int) (res: int) =
+    (prev2 = 0 \/ prev2 = 1) /\
+    (prev1 = 0 \/ prev1 = 1) /\
+    suffix_range_result nums i res /\
+    (i = 0 /\ prev2 = 0 /\ prev1 = 0 -> minimum_operation_result nums res)
+
+  let rec function min_ops_suffix
+    (nums: array int) (i: int) (prev2: int) (prev1: int) : int
+    requires { valid_input nums }
+    requires { 0 <= i <= length nums }
+    requires { prev2 = 0 \/ prev2 = 1 }
+    requires { prev1 = 0 \/ prev1 = 1 }
+    variant  { length nums - i }
+  =
+    if i >= length nums then
+      0
+    else
+      let bit = mod (nums[i] + prev2 + prev1) 2 in
+      if i <= length nums - 3 then
+        if bit = 1 then
+          min_ops_suffix nums (i + 1) prev1 0
+        else
+          compose_count 1 (min_ops_suffix nums (i + 1) prev1 1)
+      else if bit = 1 then
+        min_ops_suffix nums (i + 1) prev1 0
+      else
+        -1
+
+  let function minimum_operations_spec (nums: array int) : int
+    requires { valid_input nums }
+  =
+    min_ops_suffix nums 0 0 0
+
+  let lemma compose_count_minus_one (count: int)
+    ensures { compose_count count (-1) = -1 }
+  =
+    ()
+
+  let lemma compose_count_zero (count: int)
+    ensures { compose_count count 0 = count }
+  =
+    ()
+
+  let lemma compose_count_step (count: int) (rest: int)
+    requires { 0 <= count }
+    requires { rest = -1 \/ 0 <= rest }
+    ensures  { compose_count (count + 1) rest =
+               compose_count count (compose_count 1 rest) }
+  =
+    if rest = -1 then
+      assert { compose_count 1 rest = -1 }
+    else begin
+      assert { 0 <= rest };
+      assert { compose_count 1 rest = 1 + rest };
+      assert { 1 + rest <> -1 };
+      assert { compose_count count (compose_count 1 rest) = count + (1 + rest) };
+      assert { compose_count (count + 1) rest = (count + 1) + rest }
+    end
+
+  let rec lemma min_ops_suffix_range
+    (nums: array int) (i: int) (prev2: int) (prev1: int)
+    requires { valid_input nums }
+    requires { 0 <= i <= length nums }
+    requires { prev2 = 0 \/ prev2 = 1 }
+    requires { prev1 = 0 \/ prev1 = 1 }
+    ensures  { min_ops_suffix nums i prev2 prev1 = -1 \/
+               0 <= min_ops_suffix nums i prev2 prev1 }
+    ensures  { i <= length nums - 2 ->
+               suffix_range_result nums i (min_ops_suffix nums i prev2 prev1) }
+    ensures  { length nums - 2 < i ->
+               min_ops_suffix nums i prev2 prev1 = -1 \/
+               min_ops_suffix nums i prev2 prev1 = 0 }
+    variant  { length nums - i }
+  =
+    if i >= length nums then
+      ()
+    else begin
+      assert { 0 <= i < length nums };
+      let bit = mod (nums[i] + prev2 + prev1) 2 in
+      assert { 0 <= bit < 2 };
+      if i <= length nums - 3 then begin
+        assert { 0 <= i + 1 <= length nums };
+        if bit = 1 then
+          min_ops_suffix_range nums (i + 1) prev1 0
+        else begin
+          min_ops_suffix_range nums (i + 1) prev1 1;
+          assert { min_ops_suffix nums i prev2 prev1 =
+                   compose_count 1 (min_ops_suffix nums (i + 1) prev1 1) }
+        end
+      end else if bit = 1 then begin
+        assert { 0 <= i + 1 <= length nums };
+        min_ops_suffix_range nums (i + 1) prev1 0
+      end else
+        ()
+    end
+
+  let rec lemma min_ops_suffix_semantic_bridge
+    (nums: array int) (i: int) (prev2: int) (prev1: int)
+    requires { valid_input nums }
+    requires { 0 <= i <= length nums }
+    requires { prev2 = 0 \/ prev2 = 1 }
+    requires { prev1 = 0 \/ prev1 = 1 }
+    ensures  { suffix_semantic_result nums i prev2 prev1
+                 (min_ops_suffix nums i prev2 prev1) }
+    variant  { length nums - i }
+  =
+    min_ops_suffix_range nums i prev2 prev1;
+    if i >= length nums then
+      assert { suffix_semantic_result nums i prev2 prev1
+                 (min_ops_suffix nums i prev2 prev1) }
+    else begin
+      assert { 0 <= i < length nums };
+      let bit = mod (nums[i] + prev2 + prev1) 2 in
+      assert { 0 <= bit < 2 };
+      if i <= length nums - 3 then begin
+        assert { 0 <= i + 1 <= length nums };
+        if bit = 1 then
+          min_ops_suffix_semantic_bridge nums (i + 1) prev1 0
+        else begin
+          min_ops_suffix_semantic_bridge nums (i + 1) prev1 1;
+          assert { min_ops_suffix nums i prev2 prev1 =
+                   compose_count 1 (min_ops_suffix nums (i + 1) prev1 1) }
+        end
+      end else if bit = 1 then begin
+        assert { 0 <= i + 1 <= length nums };
+        min_ops_suffix_semantic_bridge nums (i + 1) prev1 0
+      end else
+        assert { min_ops_suffix nums i prev2 prev1 = -1 }
+    end
+
+  let lemma minimum_operations_spec_range_bridge (nums: array int)
+    requires { valid_input nums }
+    ensures  { minimum_operations_spec nums = -1 \/
+               0 <= minimum_operations_spec nums <= length nums - 2 }
+  =
+    min_ops_suffix_range nums 0 0 0;
+    assert { 0 <= length nums - 2 };
+    assert { suffix_range_result nums 0 (minimum_operations_spec nums) }
+
+  let lemma minimum_operations_spec_public_bridge (nums: array int)
+    requires { valid_input nums }
+    ensures  { minimum_operation_result nums (minimum_operations_spec nums) }
+  =
+    min_ops_suffix_semantic_bridge nums 0 0 0;
+    assert { suffix_semantic_result nums 0 0 0 (minimum_operations_spec nums) };
+    assert { minimum_operation_result nums (minimum_operations_spec nums) }
+
+  let lemma minimum_operations_spec_matches_stage1 (nums: array int)
+    requires { valid_input nums }
+    ensures  { minimum_operations_spec nums = -1 \/
+               0 <= minimum_operations_spec nums <= length nums - 2 }
+    ensures  { minimum_operation_result nums (minimum_operations_spec nums) }
+  =
+    minimum_operations_spec_range_bridge nums;
+    minimum_operations_spec_public_bridge nums
+
+  let current_bit (nums: array int) (i: int) (prev2: int) (prev1: int) : int
+    requires { valid_input nums }
+    requires { 0 <= i < length nums }
+    requires { prev2 = 0 \/ prev2 = 1 }
+    requires { prev1 = 0 \/ prev1 = 1 }
+    ensures  { result = 0 \/ result = 1 }
+    ensures  { result = mod (nums[i] + prev2 + prev1) 2 }
+  =
+    mod (nums[i] + prev2 + prev1) 2
+
+  let rec minimum_operations_from
+    (nums: array int) (i: int) (prev2: int) (prev1: int) (count: int) : int
+    requires { valid_input nums }
+    requires { 0 <= i <= length nums }
+    requires { prev2 = 0 \/ prev2 = 1 }
+    requires { prev1 = 0 \/ prev1 = 1 }
+    requires { 0 <= count }
+    ensures  { result = -1 \/ count <= result }
+    ensures  { result = compose_count count (min_ops_suffix nums i prev2 prev1) }
+    variant  { length nums - i }
+  =
+    if i >= length nums then
+      begin
+        assert { min_ops_suffix nums i prev2 prev1 = 0 };
+        assert { compose_count count (min_ops_suffix nums i prev2 prev1) = count };
+        count
+      end
+    else
+      begin
+      assert { 0 <= i < length nums };
+      let bit = current_bit nums i prev2 prev1 in
+      assert { bit = mod (nums[i] + prev2 + prev1) 2 };
+      assert { min_ops_suffix nums i prev2 prev1 =
+               if i <= length nums - 3 then
+                 if bit = 1 then
+                   min_ops_suffix nums (i + 1) prev1 0
+                 else
+                   compose_count 1 (min_ops_suffix nums (i + 1) prev1 1)
+               else if bit = 1 then
+                 min_ops_suffix nums (i + 1) prev1 0
+               else
+                 -1 };
+      if i <= length nums - 3 then
+        if bit = 1 then
+          begin
+          assert { 0 <= i + 1 <= length nums };
+          minimum_operations_from nums (i + 1) prev1 0 count
+          end
+        else
+          begin
+          assert { 0 <= i + 1 <= length nums };
+          min_ops_suffix_range nums (i + 1) prev1 1;
+          compose_count_step count (min_ops_suffix nums (i + 1) prev1 1);
+          minimum_operations_from nums (i + 1) prev1 1 (count + 1)
+          end
+      else if bit = 1 then
+        begin
+        assert { 0 <= i + 1 <= length nums };
+        minimum_operations_from nums (i + 1) prev1 0 count
+        end
+      else
+        begin
+        assert { min_ops_suffix nums i prev2 prev1 = -1 };
+        assert { compose_count count (min_ops_suffix nums i prev2 prev1) = -1 };
+        -1
+        end
+      end
+
+  let minimum_operations_to_make_binary_array_elements_equal_to_one_i_array
+    (nums: array int) : int
+    requires { valid_input nums }
+    ensures  { result = -1 \/ 0 <= result <= length nums - 2 }
+    ensures  { minimum_operation_result nums result }
+  =
+    let result = minimum_operations_from nums 0 0 0 0 in
+    assert { result = minimum_operations_spec nums };
+    minimum_operations_spec_matches_stage1 nums;
+    assert { result = -1 \/ 0 <= result <= length nums - 2 };
+    assert { minimum_operation_result nums result };
+    result
+
+end

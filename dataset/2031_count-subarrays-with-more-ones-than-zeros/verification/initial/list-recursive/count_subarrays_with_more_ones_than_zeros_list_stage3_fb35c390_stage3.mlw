@@ -1,0 +1,63 @@
+module CountSubarraysWithMoreOnesThanZeros_List_Stage3_Recursive
+
+  use int.Int
+  use int.EuclideanDivision
+  use list.List
+  use list.Length
+
+  function result_modulus : int = 1000000007
+
+  let rec predicate binary_list (nums: list int)
+    variant { nums }
+  =
+    match nums with
+    | Nil -> true
+    | Cons x xs -> (x = 0 || x = 1) && binary_list xs
+    end
+
+  predicate valid_input (nums: list int) =
+    1 <= length nums <= 100000 /\
+    binary_list nums
+
+  let function bit_score (x: int) : int =
+    if x = 1 then 1 else -1
+
+  let function positive_indicator (balance: int) : int =
+    if balance > 0 then 1 else 0
+
+  let rec function count_good_prefixes_aux
+      (nums: list int) (balance: int) : int
+    variant { nums }
+  =
+    match nums with
+    | Nil -> 0
+    | Cons x xs ->
+        let next_balance = balance + bit_score x in
+        positive_indicator next_balance +
+        count_good_prefixes_aux xs next_balance
+    end
+
+  let function count_good_prefixes (nums: list int) : int =
+    count_good_prefixes_aux nums 0
+
+  let rec function count_good_subarrays (nums: list int) : int
+    variant { nums }
+  =
+    match nums with
+    | Nil -> 0
+    | Cons _ xs ->
+        count_good_prefixes nums + count_good_subarrays xs
+    end
+
+  predicate count_subarrays_with_more_ones_than_zeros_list_spec
+      (nums: list int) (result: int) =
+    result = mod (count_good_subarrays nums) result_modulus
+
+  let count_subarrays_with_more_ones_than_zeros_list (nums: list int) : int
+    requires { valid_input nums }
+    ensures  { count_subarrays_with_more_ones_than_zeros_list_spec nums result }
+    ensures  { 0 <= result < result_modulus }
+  =
+    mod (count_good_subarrays nums) 1000000007
+
+end

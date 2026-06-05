@@ -1,0 +1,214 @@
+module MinimumOperationsToMakeTheArrayAlternating_List_Recursive_Implementation
+
+  use int.Int
+  use list.List
+  use list.Length
+
+  type freq = Freq int int
+  type parity_counts = ParityCounts (list freq) (list freq)
+
+  let rec increment_count (counts: list freq) (x: int) : list freq
+    variant { counts }
+  =
+    match counts with
+    | Nil -> Cons (Freq x 1) Nil
+    | Cons (Freq y c) ys ->
+        if x = y then Cons (Freq y (c + 1)) ys
+        else Cons (Freq y c) (increment_count ys x)
+    end
+
+  let rec collect_even_odd_counts (nums: list int) : parity_counts
+    variant { nums }
+  =
+    match nums with
+    | Nil -> ParityCounts Nil Nil
+    | Cons x xs ->
+        let ParityCounts even_counts odd_counts = collect_odd_even_counts xs in
+        ParityCounts (increment_count even_counts x) odd_counts
+    end
+
+  with collect_odd_even_counts (nums: list int) : parity_counts
+    variant { nums }
+  =
+    match nums with
+    | Nil -> ParityCounts Nil Nil
+    | Cons x xs ->
+        let ParityCounts even_counts odd_counts = collect_even_odd_counts xs in
+        ParityCounts even_counts (increment_count odd_counts x)
+    end
+
+  let rec best_freq_except (counts: list freq) (excluded: int) : freq
+    variant { counts }
+  =
+    match counts with
+    | Nil -> Freq 0 0
+    | Cons (Freq value count) rest ->
+        let Freq best_value best_count = best_freq_except rest excluded in
+        if value = excluded then Freq best_value best_count
+        else if count > best_count then Freq value count
+        else Freq best_value best_count
+    end
+
+  let minimum_operations_to_make_the_array_alternating_list (nums: list int) : int =
+    let len = length nums in
+    let ParityCounts even_counts odd_counts = collect_even_odd_counts nums in
+    let Freq even_value_1 even_count_1 = best_freq_except even_counts 0 in
+    let Freq even_value_2 even_count_2 = best_freq_except even_counts even_value_1 in
+    let Freq odd_value_1 odd_count_1 = best_freq_except odd_counts 0 in
+    let Freq odd_value_2 odd_count_2 = best_freq_except odd_counts odd_value_1 in
+    let kept =
+      if even_value_1 <> odd_value_1 then even_count_1 + odd_count_1
+      else
+        let keep_even_first = even_count_1 + odd_count_2 in
+        let keep_odd_first = even_count_2 + odd_count_1 in
+        if keep_even_first >= keep_odd_first then keep_even_first else keep_odd_first
+    in
+    len - kept
+
+  let test_000 () : bool =
+    let l = Cons 5 (Cons 5 (Cons 5 (Cons 5 (Cons 5 (Cons 5 (Cons 5 (Cons 5 Nil))))))) in
+    let r = minimum_operations_to_make_the_array_alternating_list l in
+    r = 4
+
+  let test_001 () : bool =
+    let l = Cons 5 (Cons 6 (Cons 5 (Cons 6 (Cons 5 (Cons 6 (Cons 5 (Cons 6 (Cons 5 (Cons 6 (Cons 5 Nil)))))))))) in
+    let r = minimum_operations_to_make_the_array_alternating_list l in
+    r = 0
+
+  let test_002 () : bool =
+    let l = Cons 2 (Cons 2 (Cons 2 (Cons 2 (Cons 2 (Cons 1 Nil))))) in
+    let r = minimum_operations_to_make_the_array_alternating_list l in
+    r = 2
+
+  let test_003 () : bool =
+    let l = Cons 1 (Cons 3 (Cons 1 (Cons 3 (Cons 2 (Cons 3 (Cons 1 (Cons 3 (Cons 1 (Cons 3 Nil))))))))) in
+    let r = minimum_operations_to_make_the_array_alternating_list l in
+    r = 1
+
+  let test_004 () : bool =
+    let l = Cons 1 Nil in
+    let r = minimum_operations_to_make_the_array_alternating_list l in
+    r = 0
+
+  let test_005 () : bool =
+    let l = Cons 1 (Cons 2 (Cons 1 (Cons 2 (Cons 1 (Cons 2 (Cons 1 (Cons 2 (Cons 1 Nil)))))))) in
+    let r = minimum_operations_to_make_the_array_alternating_list l in
+    r = 0
+
+  let test_006 () : bool =
+    let l = Cons 1 (Cons 3 (Cons 2 (Cons 3 (Cons 2 (Cons 3 Nil))))) in
+    let r = minimum_operations_to_make_the_array_alternating_list l in
+    r = 1
+
+  let test_007 () : bool =
+    let l = Cons 100000 (Cons 1 (Cons 100000 (Cons 1 (Cons 100000 (Cons 1 Nil))))) in
+    let r = minimum_operations_to_make_the_array_alternating_list l in
+    r = 0
+
+  let test_008 () : bool =
+    let l = Cons 3 (Cons 1 (Cons 3 (Cons 2 (Cons 4 (Cons 3 Nil))))) in
+    let r = minimum_operations_to_make_the_array_alternating_list l in
+    r = 3
+
+  let test_009 () : bool =
+    let l =
+      Cons 1 (Cons 1 (Cons 2 (Cons 2 (Cons 3 (Cons 3 (Cons 4 (Cons 4 (Cons 5 (Cons 5
+      (Cons 6 (Cons 6 (Cons 7 (Cons 7 (Cons 8 (Cons 8 (Cons 9 (Cons 9 (Cons 10
+      (Cons 10 Nil))))))))))))))))))) in
+    let r = minimum_operations_to_make_the_array_alternating_list l in
+    r = 18
+
+  let test_010 () : bool =
+    let l = Cons 1 (Cons 2 (Cons 3 (Cons 4 (Cons 5 Nil)))) in
+    let r = minimum_operations_to_make_the_array_alternating_list l in
+    r = 3
+
+  let test_011 () : bool =
+    let l = Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 Nil)))))) in
+    let r = minimum_operations_to_make_the_array_alternating_list l in
+    r = 3
+
+  let test_012 () : bool =
+    let l = Cons 2 (Cons 1 (Cons 2 (Cons 1 (Cons 2 (Cons 1 (Cons 2 Nil)))))) in
+    let r = minimum_operations_to_make_the_array_alternating_list l in
+    r = 0
+
+  let test_013 () : bool =
+    let l = Cons 2 (Cons 3 (Cons 2 (Cons 3 (Cons 2 (Cons 3 Nil))))) in
+    let r = minimum_operations_to_make_the_array_alternating_list l in
+    r = 0
+
+  let test_014 () : bool =
+    let l = Cons 1 (Cons 2 (Cons 3 (Cons 4 (Cons 5 (Cons 6 (Cons 7 (Cons 8 (Cons 9 Nil)))))))) in
+    let r = minimum_operations_to_make_the_array_alternating_list l in
+    r = 7
+
+  let test_015 () : bool =
+    let l = Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 Nil)))) in
+    let r = minimum_operations_to_make_the_array_alternating_list l in
+    r = 2
+
+  let test_016 () : bool =
+    let l = Cons 1 (Cons 2 (Cons 3 (Cons 4 (Cons 5 (Cons 6 Nil))))) in
+    let r = minimum_operations_to_make_the_array_alternating_list l in
+    r = 4
+
+  let test_017 () : bool =
+    let l = Cons 1 (Cons 2 (Cons 2 (Cons 2 (Cons 2 Nil)))) in
+    let r = minimum_operations_to_make_the_array_alternating_list l in
+    r = 2
+
+  let test_018 () : bool =
+    let l = Cons 1 (Cons 3 (Cons 1 (Cons 3 (Cons 1 (Cons 3 Nil))))) in
+    let r = minimum_operations_to_make_the_array_alternating_list l in
+    r = 0
+
+  let test_019 () : bool =
+    let l = Cons 100000 (Cons 99999 (Cons 100000 (Cons 99999 (Cons 100000 Nil)))) in
+    let r = minimum_operations_to_make_the_array_alternating_list l in
+    r = 0
+
+  let run_tests () : bool =
+    if test_000 () then
+    if test_001 () then
+    if test_002 () then
+    if test_003 () then
+    if test_004 () then
+    if test_005 () then
+    if test_006 () then
+    if test_007 () then
+    if test_008 () then
+    if test_009 () then
+    if test_010 () then
+    if test_011 () then
+    if test_012 () then
+    if test_013 () then
+    if test_014 () then
+    if test_015 () then
+    if test_016 () then
+    if test_017 () then
+    if test_018 () then
+    if test_019 () then
+      true
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+
+end

@@ -1,0 +1,154 @@
+module LongestIncreasingSubsequence_Array_Stage3_Imperative
+
+  use int.Int
+  use array.Array
+  use array.Init
+  use ref.Ref
+
+  predicate valid_input (nums: array int) =
+    1 <= length nums <= 2500 /\
+    forall i: int. 0 <= i < length nums -> -10000 <= nums[i] <= 10000
+
+  predicate valid_index_sequence (nums: array int) (idxs: array int) (k: int) =
+    0 <= k /\
+    length idxs = k /\
+    (forall p: int.
+      0 <= p < k ->
+      0 <= idxs[p] < length nums) /\
+    (forall p q: int.
+      0 <= p < q < k ->
+      idxs[p] < idxs[q])
+
+  predicate strictly_increasing_values
+    (nums: array int) (idxs: array int) (k: int) =
+    forall p q: int.
+      0 <= p < q < k ->
+      nums[idxs[p]] < nums[idxs[q]]
+
+  predicate increasing_subsequence
+    (nums: array int) (idxs: array int) (k: int) =
+    valid_index_sequence nums idxs k /\
+    strictly_increasing_values nums idxs k
+
+  predicate has_increasing_subsequence_length (nums: array int) (k: int) =
+    exists idxs: array int. increasing_subsequence nums idxs k
+
+  predicate longest_increasing_subsequence_length
+    (nums: array int) (answer: int) =
+    1 <= answer <= length nums /\
+    has_increasing_subsequence_length nums answer /\
+    (forall idxs: array int, k: int.
+      increasing_subsequence nums idxs k -> k <= answer)
+
+  predicate increasing_subsequence_ending_at
+    (nums: array int) (idxs: array int) (k: int) (last: int) =
+    increasing_subsequence nums idxs k /\
+    1 <= k /\
+    0 <= last < length nums /\
+    idxs[k - 1] = last
+
+  predicate dp_cell_witness
+    (nums: array int) (dp: array int) (i: int) =
+    0 <= i < length nums ->
+    1 <= dp[i] <= length nums /\
+    exists idxs: array int.
+      increasing_subsequence_ending_at nums idxs dp[i] i
+
+  predicate dp_prefix_witnesses
+    (nums: array int) (dp: array int) (processed: int) =
+    forall i: int. 0 <= i < processed -> dp_cell_witness nums dp i
+
+  predicate dp_prefix_upper_bounds
+    (nums: array int) (dp: array int) (processed: int) =
+    forall idxs: array int, k last: int.
+      increasing_subsequence_ending_at nums idxs k last /\
+      0 <= last < processed ->
+      k <= dp[last]
+
+  predicate best_prefix_witness
+    (nums: array int) (answer: int) =
+    1 <= answer <= length nums /\
+    has_increasing_subsequence_length nums answer
+
+  predicate best_prefix_upper_bound
+    (nums: array int) (answer: int) (processed: int) =
+    forall idxs: array int, k last: int.
+      increasing_subsequence_ending_at nums idxs k last /\
+      0 <= last < processed ->
+      k <= answer
+
+  let longest_increasing_subsequence_array (nums: array int) : int
+    requires { valid_input nums }
+    ensures  { longest_increasing_subsequence_length nums result }
+  =
+    let n = length nums in
+    if n = 0 then begin
+      assert { false };
+      0
+    end else begin
+      let dp = make n 1 in
+      let best = ref 1 in
+      assert { n = length nums };
+      assert { 1 <= n };
+      for i = 0 to n - 1 do
+        invariant { n = length nums }
+        invariant { length dp = n }
+        invariant { 0 <= i <= n }
+        invariant { 1 <= !best <= n }
+        invariant { forall t: int. 0 <= t < n -> 1 <= dp[t] <= n }
+        invariant { dp_prefix_witnesses nums dp i }
+        invariant { dp_prefix_upper_bounds nums dp i }
+        invariant { best_prefix_witness nums !best }
+        invariant { best_prefix_upper_bound nums !best i }
+        for j = 0 to i - 1 do
+          invariant { n = length nums }
+          invariant { length dp = n }
+          invariant { 0 <= i < n }
+          invariant { 0 <= j <= i }
+          invariant { 1 <= dp[i] <= n }
+          invariant { forall t: int. 0 <= t < n -> 1 <= dp[t] <= n }
+          invariant { dp_prefix_witnesses nums dp i }
+          invariant { dp_prefix_upper_bounds nums dp i }
+          invariant { best_prefix_witness nums !best }
+          invariant { best_prefix_upper_bound nums !best i }
+          invariant {
+            forall idxs: array int, k: int.
+              increasing_subsequence nums idxs k /\
+              2 <= k /\
+              idxs[k - 1] = i /\
+              idxs[k - 2] < j ->
+              k <= dp[i]
+          }
+          if nums[j] < nums[i] then begin
+            let candidate = dp[j] + 1 in
+            assert { 1 <= candidate };
+            if candidate > dp[i] then begin
+              dp[i] <- candidate;
+              assert { dp[i] = candidate }
+            end
+          end
+        done;
+        assert { 1 <= dp[i] <= n };
+        assert { dp_cell_witness nums dp i };
+        assert { dp_prefix_witnesses nums dp (i + 1) };
+        assert { dp_prefix_upper_bounds nums dp (i + 1) };
+        if dp[i] > !best then begin
+          best := dp[i];
+          assert { best_prefix_witness nums !best };
+          assert { best_prefix_upper_bound nums !best (i + 1) }
+        end;
+        assert { best_prefix_witness nums !best };
+        assert { best_prefix_upper_bound nums !best (i + 1) }
+      done;
+      assert { best_prefix_witness nums !best };
+      assert { best_prefix_upper_bound nums !best n };
+      assert { has_increasing_subsequence_length nums !best };
+      assert {
+        forall idxs: array int, k: int.
+          increasing_subsequence nums idxs k -> k <= !best
+      };
+      assert { longest_increasing_subsequence_length nums !best };
+      !best
+    end
+
+end

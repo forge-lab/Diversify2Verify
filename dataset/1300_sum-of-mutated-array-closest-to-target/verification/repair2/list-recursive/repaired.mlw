@@ -1,0 +1,423 @@
+module SumOfMutatedArrayClosestToTarget_List_Stage3_Recursive
+
+  use int.Int
+  use int.Abs
+  use int.MinMax
+  use int.EuclideanDivision
+  use list.List
+  use list.Mem
+
+  let rec predicate values_in_range (l: list int)
+    variant { l }
+  =
+    match l with
+    | Nil -> true
+    | Cons x xs -> 1 <= x && x <= 100000 && values_in_range xs
+    end
+
+  let rec function mutated_sum (l: list int) (v: int) : int
+    variant { l }
+  =
+    match l with
+    | Nil -> 0
+    | Cons x xs -> min x v + mutated_sum xs v
+    end
+
+  let rec predicate upper_bound_list (l: list int) (bound: int)
+    variant { l }
+  =
+    match l with
+    | Nil -> true
+    | Cons x xs -> x <= bound && upper_bound_list xs bound
+    end
+
+  function distance_to_target (l: list int) (target: int) (v: int) : int =
+    abs (mutated_sum l v - target)
+
+  predicate best_mutation_value (l: list int) (target: int) (chosen: int) =
+    (forall v: int. distance_to_target l target chosen <= distance_to_target l target v) /\
+    (forall v: int.
+       distance_to_target l target chosen = distance_to_target l target v ->
+       chosen <= v)
+
+  predicate pair_choice (l: list int) (target: int) (left: int) (right: int) (chosen: int) =
+    (chosen = left \/ chosen = right) /\
+    distance_to_target l target chosen <= distance_to_target l target left /\
+    distance_to_target l target chosen <= distance_to_target l target right /\
+    (distance_to_target l target left = distance_to_target l target right ->
+       chosen <= left /\ chosen <= right)
+
+  let rec lemma mutated_sum_nonnegative (l: list int) (v: int)
+    requires { values_in_range l }
+    requires { 0 <= v }
+    ensures  { 0 <= mutated_sum l v }
+    variant  { l }
+  =
+    match l with
+    | Nil -> ()
+    | Cons _ xs -> mutated_sum_nonnegative xs v
+    end
+
+  let rec lemma mutated_sum_zero (l: list int)
+    requires { values_in_range l }
+    ensures  { mutated_sum l 0 = 0 }
+    variant  { l }
+  =
+    match l with
+    | Nil -> ()
+    | Cons _ xs -> mutated_sum_zero xs
+    end
+
+  let rec lemma mutated_sum_monotone_value (l: list int) (a: int) (b: int)
+    requires { values_in_range l }
+    requires { a <= b }
+    ensures  { mutated_sum l a <= mutated_sum l b }
+    variant  { l }
+  =
+    match l with
+    | Nil -> ()
+    | Cons _ xs -> mutated_sum_monotone_value xs a b
+    end
+
+  let rec lemma mutated_sum_nonpositive_at_nonpositive_value (l: list int) (v: int)
+    requires { values_in_range l }
+    requires { v <= 0 }
+    ensures  { mutated_sum l v <= 0 }
+    variant  { l }
+  =
+    match l with
+    | Nil -> ()
+    | Cons _ xs -> mutated_sum_nonpositive_at_nonpositive_value xs v
+    end
+
+  let rec lemma mutated_sum_stable_above_upper_bound (l: list int) (bound: int) (v: int)
+    requires { upper_bound_list l bound }
+    requires { bound <= v }
+    ensures  { mutated_sum l v = mutated_sum l bound }
+    variant  { l }
+  =
+    match l with
+    | Nil -> ()
+    | Cons _ xs -> mutated_sum_stable_above_upper_bound xs bound v
+    end
+
+  let rec lemma mutated_sum_strict_below_member_upper
+      (l: list int) (bound: int) (v: int)
+    requires { values_in_range l }
+    requires { mem bound l }
+    requires { upper_bound_list l bound }
+    requires { v < bound }
+    ensures  { mutated_sum l v < mutated_sum l bound }
+    variant  { l }
+  =
+    match l with
+    | Nil -> absurd
+    | Cons x xs ->
+        mutated_sum_monotone_value xs v bound;
+        if x = bound then
+          assert { min x v < min x bound }
+        else
+        (
+          assert { mem bound xs };
+          assert { upper_bound_list xs bound };
+          mutated_sum_strict_below_member_upper xs bound v;
+          assert { min x v <= min x bound }
+        )
+    end
+
+  let rec lemma mutated_sum_strict_between_before_member_upper
+      (l: list int) (bound: int) (a: int) (b: int)
+    requires { values_in_range l }
+    requires { mem bound l }
+    requires { upper_bound_list l bound }
+    requires { a < b <= bound }
+    ensures  { mutated_sum l a < mutated_sum l b }
+    variant  { l }
+  =
+    match l with
+    | Nil -> absurd
+    | Cons x xs ->
+        mutated_sum_monotone_value xs a b;
+        if x = bound then
+        (
+          assert { min x a = a };
+          assert { min x b = b }
+        )
+        else
+        (
+          assert { mem bound xs };
+          assert { upper_bound_list xs bound };
+          mutated_sum_strict_between_before_member_upper xs bound a b;
+          assert { min x a <= min x b }
+        )
+    end
+
+  let lemma lower_side_distance_bound
+      (l: list int) (target: int) (left: int) (right: int) (hi: int) (v: int)
+    requires { values_in_range l }
+    requires { 1 <= target }
+    requires { mem hi l }
+    requires { upper_bound_list l hi }
+    requires { left = 0 /\ right = 0 \/ left + 1 = right }
+    requires { v < right }
+    requires { forall u: int. u < right -> mutated_sum l u < target }
+    ensures  { distance_to_target l target left <= distance_to_target l target v }
+    ensures  { distance_to_target l target left = distance_to_target l target v -> left <= v }
+  =
+    mutated_sum_monotone_value l v left;
+    if v < left then
+    (
+      assert { v < hi };
+      mutated_sum_strict_between_before_member_upper l hi v left;
+      assert { mutated_sum l v < mutated_sum l left }
+    )
+    else
+      assert { left <= v };
+    assert { mutated_sum l v <= mutated_sum l left };
+    if left = 0 && right = 0 then
+    (
+      mutated_sum_zero l;
+      assert { mutated_sum l left < target }
+    )
+    else
+    (
+      assert { left < right };
+      assert { mutated_sum l left < target }
+    );
+    assert { mutated_sum l v < target };
+    assert { distance_to_target l target left = target - mutated_sum l left };
+    assert { distance_to_target l target v = target - mutated_sum l v }
+
+  let lemma upper_side_distance_bound
+      (l: list int) (target: int) (right: int) (hi: int) (v: int)
+    requires { values_in_range l }
+    requires { upper_bound_list l hi }
+    requires { right <= hi }
+    requires { right <= v }
+    requires { target <= mutated_sum l right \/ right = hi }
+    requires { forall u: int. hi <= u -> mutated_sum l u = mutated_sum l hi }
+    ensures  { distance_to_target l target right <= distance_to_target l target v }
+    ensures  { distance_to_target l target right = distance_to_target l target v -> right <= v }
+  =
+    if target <= mutated_sum l right then
+    (
+      mutated_sum_monotone_value l right v;
+      assert { target <= mutated_sum l right <= mutated_sum l v };
+      assert { distance_to_target l target right = mutated_sum l right - target };
+      assert { distance_to_target l target v = mutated_sum l v - target }
+    )
+    else
+    (
+      assert { right = hi };
+      assert { hi <= v };
+      assert { mutated_sum l v = mutated_sum l hi };
+      assert { distance_to_target l target right = distance_to_target l target v }
+    )
+
+  let lemma lower_bound_chosen_no_worse_than_value
+      (l: list int) (target: int) (left: int) (right: int) (hi: int) (chosen: int)
+      (v: int)
+    requires { values_in_range l }
+    requires { 1 <= target }
+    requires { mem hi l }
+    requires { 0 <= left <= right <= hi }
+    requires { upper_bound_list l hi }
+    requires { left = 0 /\ right = 0 \/ left + 1 = right }
+    requires { forall u: int. u < right -> mutated_sum l u < target }
+    requires { target <= mutated_sum l right \/ right = hi }
+    requires { forall u: int. hi <= u -> mutated_sum l u = mutated_sum l hi }
+    requires { pair_choice l target left right chosen }
+    ensures  { distance_to_target l target chosen <= distance_to_target l target v }
+  =
+    if v < right then
+    (
+      lower_side_distance_bound l target left right hi v;
+      assert { distance_to_target l target chosen <= distance_to_target l target left }
+    )
+    else
+    (
+      upper_side_distance_bound l target right hi v;
+      assert { distance_to_target l target chosen <= distance_to_target l target right }
+    )
+
+  let lemma lower_bound_chosen_tie_is_smallest
+      (l: list int) (target: int) (left: int) (right: int) (hi: int) (chosen: int)
+      (v: int)
+    requires { values_in_range l }
+    requires { 1 <= target }
+    requires { mem hi l }
+    requires { 0 <= left <= right <= hi }
+    requires { upper_bound_list l hi }
+    requires { left = 0 /\ right = 0 \/ left + 1 = right }
+    requires { forall u: int. u < right -> mutated_sum l u < target }
+    requires { target <= mutated_sum l right \/ right = hi }
+    requires { forall u: int. hi <= u -> mutated_sum l u = mutated_sum l hi }
+    requires { pair_choice l target left right chosen }
+    requires { distance_to_target l target chosen = distance_to_target l target v }
+    ensures  { chosen <= v }
+  =
+    if v < right then
+    (
+      lower_side_distance_bound l target left right hi v;
+      lower_bound_chosen_no_worse_than_value l target left right hi chosen v;
+      assert { distance_to_target l target left = distance_to_target l target v };
+      assert { left <= v };
+      if chosen = left then
+        ()
+      else
+      (
+        assert { chosen = right };
+        assert { distance_to_target l target right <= distance_to_target l target left };
+        assert { distance_to_target l target right = distance_to_target l target left };
+        assert { distance_to_target l target left = distance_to_target l target right };
+        assert { chosen <= left /\ chosen <= right }
+      )
+    )
+    else
+    (
+      assert { chosen = left \/ chosen = right };
+      assert { chosen <= right };
+      assert { chosen <= v }
+    )
+
+  let lemma lower_bound_neighbor_choice_is_best
+      (l: list int) (target: int) (left: int) (right: int) (hi: int) (chosen: int)
+    requires { l <> Nil }
+    requires { values_in_range l }
+    requires { 1 <= target }
+    requires { 0 <= left <= right <= hi }
+    requires { upper_bound_list l hi }
+    requires { mem hi l }
+    requires { left = 0 /\ right = 0 \/ left + 1 = right }
+    requires { forall v: int. v < right -> mutated_sum l v < target }
+    requires { target <= mutated_sum l right \/ right = hi }
+    requires { forall v: int. hi <= v -> mutated_sum l v = mutated_sum l hi }
+    requires { pair_choice l target left right chosen }
+    ensures  { best_mutation_value l target chosen }
+  =
+    assert { forall v: int.
+      distance_to_target l target chosen <= distance_to_target l target v };
+    assert { forall v: int.
+      distance_to_target l target chosen = distance_to_target l target v -> chosen <= v }
+
+  let abs_int (x: int) : int
+    ensures { result = abs x }
+    ensures { 0 <= result }
+  =
+    if x < 0 then -x else x
+
+  let rec capped_sum (l: list int) (value: int) : int
+    ensures { result = mutated_sum l value }
+    variant { l }
+  =
+    match l with
+    | Nil -> 0
+    | Cons x xs ->
+        (if x <= value then x else value) + capped_sum xs value
+    end
+
+  let distance_for_value (l: list int) (target: int) (value: int) : int
+    ensures { result = distance_to_target l target value }
+    ensures { 0 <= result }
+  =
+    abs_int (capped_sum l value - target)
+
+  let rec max_from (l: list int) (best: int) : int
+    requires { 0 <= best }
+    requires { values_in_range l }
+    ensures  { 0 <= result }
+    ensures  { best <= result }
+    ensures  { mem result (Cons best l) }
+    ensures  { forall y: int. mem y (Cons best l) -> y <= result }
+    ensures  { upper_bound_list l result }
+    variant { l }
+  =
+    match l with
+    | Nil -> best
+    | Cons x xs ->
+        if x > best then max_from xs x else max_from xs best
+    end
+
+  let max_value (l: list int) : int
+    requires { values_in_range l }
+    ensures  { 0 <= result }
+    ensures  { upper_bound_list l result }
+    ensures  { l <> Nil -> mem result l }
+    ensures  { forall y: int. mem y l -> y <= result }
+    ensures  { l <> Nil -> 1 <= result }
+  =
+    match l with
+    | Nil -> 0
+    | Cons x xs -> max_from xs x
+    end
+
+  let rec lower_bound_value (l: list int) (target: int) (lo: int) (hi: int) : int
+    requires { values_in_range l }
+    requires { 0 <= lo <= hi }
+    requires { upper_bound_list l hi }
+    requires { forall v: int. v < lo -> mutated_sum l v < target }
+    ensures  { lo <= result <= hi }
+    ensures  { forall v: int. v < result -> mutated_sum l v < target }
+    ensures  { target <= mutated_sum l result \/ result = hi }
+    variant { hi - lo }
+  =
+    if lo >= hi then
+      lo
+    else
+      let mid = lo + div (hi - lo) 2 in
+      let s = capped_sum l mid in
+      if s < target then
+      (
+        assert { mutated_sum l mid < target };
+        assert { forall v: int. v < mid + 1 -> mutated_sum l v < target };
+        lower_bound_value l target (mid + 1) hi
+      )
+      else
+      (
+        assert { target <= mutated_sum l mid };
+        lower_bound_value l target lo mid
+      )
+
+  let choose_better_value (l: list int) (target: int) (left: int) (right: int) : int
+    requires { 0 <= left }
+    requires { 0 <= right }
+    ensures  { result = left \/ result = right }
+    ensures  { 0 <= result }
+    ensures  { pair_choice l target left right result }
+  =
+    let left_distance = distance_for_value l target left in
+    let right_distance = distance_for_value l target right in
+    if left_distance < right_distance then
+      left
+    else if right_distance < left_distance then
+      right
+    else if left <= right then
+      left
+    else
+      right
+
+  let sum_of_mutated_array_closest_to_target_list (arr: list int) (target: int) : int
+    requires { arr <> Nil }
+    requires { values_in_range arr }
+    requires { 1 <= target /\ target <= 100000 }
+    ensures  { 0 <= result }
+    ensures  { best_mutation_value arr target result }
+  =
+    match arr with
+    | Nil -> 0
+    | Cons _ _ ->
+        let hi = max_value arr in
+        mutated_sum_zero arr;
+        assert { forall v: int. v < 0 -> mutated_sum arr v < target };
+        assert { forall v: int. hi <= v -> mutated_sum arr v = mutated_sum arr hi };
+        let right = lower_bound_value arr target 0 hi in
+        let left = if right = 0 then 0 else right - 1 in
+        assert { 0 <= left <= right <= hi };
+        assert { left = 0 /\ right = 0 \/ left + 1 = right };
+        let chosen = choose_better_value arr target left right in
+        assert { pair_choice arr target left right chosen };
+        lower_bound_neighbor_choice_is_best arr target left right hi chosen;
+        chosen
+    end
+
+end

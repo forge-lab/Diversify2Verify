@@ -1,0 +1,217 @@
+module MinimumMovesToPickKOnes_Array_Spec
+
+  use int.Int
+  use int.Abs
+  use int.EuclideanDivision
+  use array.Array
+  use array.Init
+  use ref.Ref
+
+  predicate binary_array (nums: array int) =
+    forall i: int. 0 <= i < length nums -> nums[i] = 0 \/ nums[i] = 1
+
+  let rec function ones_count_from (nums: array int) (i: int) : int
+    requires { 0 <= i <= length nums }
+    variant  { length nums - i }
+  =
+    if i = length nums then 0
+    else (if nums[i] = 1 then 1 else 0) + ones_count_from nums (i + 1)
+
+  function ones_count (nums: array int) : int =
+    ones_count_from nums 0
+
+  let rec function ones_count_prefix (nums: array int) (i: int) : int
+    requires { 0 <= i <= length nums }
+    variant  { i }
+  =
+    if i = 0 then 0
+    else ones_count_prefix nums (i - 1) + (if nums[i - 1] = 1 then 1 else 0)
+
+  let rec lemma ones_count_prefix_monotone (nums: array int) (i: int) (j: int)
+    requires { 0 <= i <= j <= length nums }
+    ensures  { ones_count_prefix nums i <= ones_count_prefix nums j }
+    variant  { j - i }
+  =
+    if i < j then begin
+      assert { 0 <= i <= j - 1 <= length nums };
+      ones_count_prefix_monotone nums i (j - 1);
+      assert { ones_count_prefix nums j =
+        ones_count_prefix nums (j - 1) + (if nums[j - 1] = 1 then 1 else 0) };
+      assert { 0 <= (if nums[j - 1] = 1 then 1 else 0) }
+    end
+
+  let rec function selected_count_from (take: array int) (i: int) : int
+    requires { 0 <= i <= length take }
+    variant  { length take - i }
+  =
+    if i = length take then 0
+    else (if take[i] = 1 then 1 else 0) + selected_count_from take (i + 1)
+
+  let rec function selected_distance_from (take: array int) (center: int) (i: int) : int
+    requires { 0 <= i <= length take }
+    variant  { length take - i }
+  =
+    if i = length take then 0
+    else (if take[i] = 1 then abs (i - center) else 0) +
+         selected_distance_from take center (i + 1)
+
+  predicate valid_original_selection (nums: array int) (take: array int) =
+    length take = length nums /\
+    (forall i: int.
+       0 <= i < length nums ->
+       (take[i] = 0 \/ take[i] = 1) /\ (take[i] = 1 -> nums[i] = 1))
+
+  predicate feasible_input (nums: array int) (k: int) (maxChanges: int) =
+    length nums >= 2 /\
+    binary_array nums /\
+    k >= 1 /\
+    maxChanges >= 0 /\
+    k <= maxChanges + ones_count nums
+
+  predicate feasible_pickup_plan
+    (nums: array int) (k: int) (maxChanges: int)
+    (center: int) (take: array int) (changes: int) (moves: int) =
+    feasible_input nums k maxChanges /\
+    0 <= center < length nums /\
+    valid_original_selection nums take /\
+    (nums[center] = 1 -> take[center] = 1) /\
+    0 <= changes <= maxChanges /\
+    selected_count_from take 0 + changes = k /\
+    moves = selected_distance_from take center 0 + 2 * changes
+
+  predicate optimal_pickup_cost (nums: array int) (k: int) (maxChanges: int) (result: int) =
+    feasible_input nums k maxChanges /\
+    (exists center: int. exists take: array int. exists changes: int.
+       feasible_pickup_plan nums k maxChanges center take changes result) /\
+    (forall center: int. forall take: array int. forall changes: int. forall moves: int.
+       feasible_pickup_plan nums k maxChanges center take changes moves -> result <= moves)
+
+  predicate positions_prefix (nums: array int) (positions: array int) (filled: int) =
+    0 <= filled <= length positions /\
+    (forall j: int.
+       0 <= j < filled ->
+       0 <= positions[j] < length nums /\ nums[positions[j]] = 1) /\
+    (forall j: int.
+       0 <= j < filled - 1 -> positions[j] < positions[j + 1])
+
+  predicate prefix_sums_shape (positions: array int) (pref: array int) (filled: int) =
+    length pref = length positions + 1 /\
+    0 <= filled <= length positions /\
+    pref[0] = 0 /\
+    (forall j: int.
+       0 <= j < filled -> pref[j + 1] = pref[j] + positions[j])
+
+  let collect_one_positions (nums: array int) : array int
+    ensures { 0 <= length result <= length nums }
+    ensures { positions_prefix nums result (length result) }
+  =
+    let count = ref 0 in
+    for i = 0 to length nums - 1 do
+      invariant { 0 <= !count <= i }
+      invariant { i <= length nums }
+      invariant { !count = ones_count_prefix nums i }
+      if nums[i] = 1 then
+        begin
+          assert { ones_count_prefix nums (i + 1) = ones_count_prefix nums i + 1 };
+          count := !count + 1
+        end
+      else
+        assert { ones_count_prefix nums (i + 1) = ones_count_prefix nums i }
+    done;
+    assert { !count = ones_count_prefix nums (length nums) };
+    let positions = make !count 0 in
+    assert { length positions = ones_count_prefix nums (length nums) };
+    let next = ref 0 in
+    for i = 0 to length nums - 1 do
+      invariant { 0 <= !next <= length positions }
+      invariant { !next <= i }
+      invariant { !next = ones_count_prefix nums i }
+      invariant { length positions = ones_count_prefix nums (length nums) }
+      invariant { forall j: int. 0 <= j < !next -> positions[j] < i }
+      invariant { positions_prefix nums positions !next }
+      if nums[i] = 1 then begin
+        let old_next = !next in
+        assert { old_next = ones_count_prefix nums i };
+        assert { ones_count_prefix nums (i + 1) = ones_count_prefix nums i + 1 };
+        ones_count_prefix_monotone nums (i + 1) (length nums);
+        assert { old_next < length positions };
+        positions[old_next] <- i;
+        assert { positions[old_next] = i };
+        assert { forall j: int. 0 <= j < old_next -> positions[j] < i };
+        assert { positions_prefix nums positions (old_next + 1) };
+        next := old_next + 1
+      end else begin
+        assert { ones_count_prefix nums (i + 1) = ones_count_prefix nums i };
+        assert { forall j: int. 0 <= j < !next -> positions[j] < i + 1 }
+      end
+    done;
+    assert { !next = length positions };
+    assert { positions_prefix nums positions (length positions) };
+    positions
+
+  let build_prefix_sums (positions: array int) : array int
+    ensures { length result = length positions + 1 }
+    ensures { prefix_sums_shape positions result (length positions) }
+  =
+    let pref = make (length positions + 1) 0 in
+    for i = 0 to length positions - 1 do
+      invariant { 0 <= i <= length positions }
+      invariant { length pref = length positions + 1 }
+      invariant { prefix_sums_shape positions pref i }
+      pref[i + 1] <- pref[i] + positions[i]
+    done;
+    pref
+
+  let window_cost (positions: array int) (pref: array int) (left: int) (size: int) : int
+    requires { 0 < size }
+    requires { 0 <= left }
+    requires { left + size <= length positions }
+    requires { length pref = length positions + 1 }
+    ensures  { result >= 0 }
+  =
+    let right = left + size - 1 in
+    let mid = div (left + right) 2 in
+    let median = positions[mid] in
+    let left_sum = pref[mid] - pref[left] in
+    let right_sum = pref[right + 1] - pref[mid + 1] in
+    let left_cost = median * (mid - left) - left_sum in
+    let right_cost = right_sum - median * (right - mid) in
+    left_cost + right_cost
+
+  let minimum_moves_to_pick_k_ones_array (nums: array int) (k: int) (maxChanges: int) : int
+    requires { feasible_input nums k maxChanges }
+    ensures  { optimal_pickup_cost nums k maxChanges result }
+  =
+    let positions = collect_one_positions nums in
+    let pref = build_prefix_sums positions in
+    let lower = if k - maxChanges > 0 then k - maxChanges else 0 in
+    let upper = if k < length positions then k else length positions in
+    let initial_best = length nums * k + 2 * k in
+    let best = ref initial_best in
+    for s = lower to upper do
+      invariant { lower <= s <= upper + 1 }
+      invariant { 0 <= lower <= upper }
+      invariant { upper <= length positions }
+      invariant { !best >= 0 }
+      let move_cost =
+        if s = 0 then 0
+        else begin
+          let window_best = ref initial_best in
+          for left = 0 to length positions - s do
+            invariant { 0 <= left <= length positions - s + 1 }
+            invariant { 0 < s }
+            invariant { s <= length positions }
+            invariant { !window_best >= 0 }
+            let current = window_cost positions pref left s in
+            if current < !window_best then
+              window_best := current
+          done;
+          !window_best
+        end in
+      let total = move_cost + 2 * (k - s) in
+      if total < !best then
+        best := total
+    done;
+    !best
+
+end

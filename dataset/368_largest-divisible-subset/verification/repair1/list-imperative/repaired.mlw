@@ -1,0 +1,268 @@
+module LargestDivisibleSubset_List_Stage3_Imperative
+
+  use int.Int
+  use int.EuclideanDivision
+  use array.Array
+  use list.List
+  use list.Length
+  use list.Mem
+  use list.NumOcc
+  use ref.Ref
+
+  exception StopShift
+
+  let rec predicate all_positive (l: list int)
+    variant { l }
+  =
+    match l with
+    | Nil -> true
+    | Cons x xs -> 1 <= x && x <= 2000000000 && all_positive xs
+    end
+
+  let rec lemma all_positive_mem_bounds (l: list int)
+    ensures { all_positive l ->
+      forall x: int. mem x l -> 1 <= x /\ x <= 2000000000 }
+    variant { l }
+  =
+    match l with
+    | Nil -> ()
+    | Cons _ xs -> all_positive_mem_bounds xs
+    end
+
+  predicate no_duplicates (l: list int) =
+    forall x: int. num_occ x l <= 1
+
+  predicate valid_input (nums: list int) =
+    1 <= length nums <= 1000 /\
+    all_positive nums /\
+    no_duplicates nums
+
+  predicate all_from_input (nums: list int) (answer: list int) =
+    forall x: int. mem x answer -> mem x nums
+
+  predicate divides (x: int) (y: int) =
+    x > 0 /\ y > 0 /\ mod y x = 0
+
+  predicate comparable_by_divisibility (x: int) (y: int) =
+    divides x y \/ divides y x
+
+  let rec predicate divisible_with_all (x: int) (l: list int)
+    variant { l }
+  =
+    match l with
+    | Nil -> true
+    | Cons y ys ->
+        ((x > 0 && y > 0 && mod y x = 0) ||
+         (y > 0 && x > 0 && mod x y = 0)) &&
+        divisible_with_all x ys
+    end
+
+  let rec predicate pairwise_divisible (l: list int)
+    variant { l }
+  =
+    match l with
+    | Nil -> true
+    | Cons x xs -> divisible_with_all x xs && pairwise_divisible xs
+    end
+
+  predicate divisible_subset (nums: list int) (answer: list int) =
+    length answer <= length nums /\
+    no_duplicates answer /\
+    all_from_input nums answer /\
+    pairwise_divisible answer
+
+  predicate largest_divisible_subset_list_spec
+      (nums: list int) (answer: list int) =
+    divisible_subset nums answer /\
+    forall candidate: list int.
+      divisible_subset nums candidate -> length candidate <= length answer
+
+  let rec function list_length (l: list int) : int
+    ensures { result = length l }
+    variant { l }
+  =
+    match l with
+    | Nil -> 0
+    | Cons _ tl -> 1 + list_length tl
+    end
+
+  let rec function snoc (l: list int) (x: int) : list int
+    ensures { length result = length l + 1 }
+    variant { l }
+  =
+    match l with
+    | Nil -> Cons x Nil
+    | Cons y ys -> Cons y (snoc ys x)
+    end
+
+  predicate list_prefix_loaded (nums cur: list int) (a: array int) (i: int) =
+    0 <= i <= length nums /\
+    Array.length a = length nums /\
+    length cur + i = length nums /\
+    forall x: int. mem x cur -> mem x nums
+
+  let list_to_array (nums: list int) : array int
+    ensures { Array.length result = length nums }
+    ensures { forall k: int. 0 <= k < Array.length result -> mem result[k] nums }
+  =
+    let a = make (list_length nums) 0 in
+    let cur = ref nums in
+    let i = ref 0 in
+    while (match !cur with Nil -> false | Cons _ _ -> true end) do
+      invariant { 0 <= !i <= length nums }
+      invariant { length !cur + !i = length nums }
+      invariant { list_prefix_loaded nums !cur a !i }
+      invariant { forall k: int. 0 <= k < !i -> mem a[k] nums }
+      variant { length !cur }
+      match !cur with
+      | Nil ->
+          absurd
+      | Cons x xs ->
+          assert { mem x nums };
+          a[!i] <- x;
+          i := !i + 1;
+          cur := xs
+      end
+    done;
+    assert { !cur = Nil };
+    assert { length !cur = 0 };
+    a
+
+  predicate sorted_prefix (a: array int) (hi: int) =
+    forall p q: int. 0 <= p <= q < hi -> a[p] <= a[q]
+
+  let insertion_sort_array (a: array int) : unit
+    ensures { sorted_prefix a (Array.length a) }
+  =
+    for i = 1 to Array.length a - 1 do
+      invariant { 1 <= i <= Array.length a }
+      invariant { sorted_prefix a i }
+      let key = a[i] in
+      let j = ref (i - 1) in
+      try
+        while !j >= 0 do
+          invariant { -1 <= !j < i }
+          variant { !j + 1 }
+          if a[!j] > key then begin
+            a[!j + 1] <- a[!j];
+            j := !j - 1
+          end else begin
+            assert { a[!j] <= key };
+            raise StopShift
+          end
+        done
+      with StopShift -> ()
+      end;
+      assert { -1 <= !j < i };
+      a[!j + 1] <- key
+    done
+
+  predicate reconstruction_state
+      (values: array int) (prev: array int) (result: list int) (k: int) =
+    -1 <= k < Array.length values /\
+    Array.length prev = Array.length values /\
+    (k >= 0 -> -1 <= prev[k] < k) /\
+    pairwise_divisible result
+
+  let reconstruct_subset (values: array int) (prev: array int) (best_idx: int)
+      : list int
+    requires { 0 <= best_idx < Array.length values }
+    requires { Array.length prev = Array.length values }
+    requires { forall k: int. 0 <= k < Array.length prev -> -1 <= prev[k] < k }
+    ensures  { length result <= Array.length values }
+    ensures  { pairwise_divisible result }
+  =
+    let result = ref (Nil : list int) in
+    let k = ref best_idx in
+    while !k >= 0 do
+      invariant { -1 <= !k < Array.length values }
+      invariant { length !result <= Array.length values }
+      invariant { length !result + !k + 1 <= Array.length values }
+      invariant { forall p: int. 0 <= p < Array.length prev -> -1 <= prev[p] < p }
+      invariant { reconstruction_state values prev !result !k }
+      variant { !k + 1 }
+      assert { -1 <= prev[!k] < !k };
+      result := snoc !result values[!k];
+      let next = prev[!k] in
+      assert { -1 <= next < !k };
+      k := next
+    done;
+    assert { !k < 0 };
+    !result
+
+  predicate dp_arrays_well_formed
+      (values dp prev: array int) (n i: int) =
+    n = Array.length values /\
+    Array.length dp = n /\
+    Array.length prev = n /\
+    0 <= i <= n /\
+    forall k: int. 0 <= k < i -> 1 <= dp[k] <= n /\ -1 <= prev[k] < k
+
+  predicate best_index_valid (dp: array int) (best_idx n i: int) =
+    0 <= best_idx < n /\
+    0 <= i <= n /\
+    forall k: int. 0 <= k < i -> dp[k] <= dp[best_idx]
+
+  let largest_divisible_subset_list (nums: list int) : list int
+    requires { valid_input nums }
+    ensures  { largest_divisible_subset_list_spec nums result }
+  =
+    match nums with
+    | Nil ->
+        absurd
+    | Cons _ _ ->
+        let values = list_to_array nums in
+        insertion_sort_array values;
+        let n = Array.length values in
+        assert { n = length nums };
+        assert { 1 <= n };
+        let dp = make n 1 in
+        let prev = make n (-1) in
+        let best_idx = ref 0 in
+        for i = 0 to n - 1 do
+          invariant { 0 <= i <= n }
+          invariant { dp_arrays_well_formed values dp prev n i }
+          invariant { best_index_valid dp !best_idx n i }
+          invariant { forall k: int. i <= k < n -> dp[k] = 1 /\ prev[k] = -1 }
+          assert { 0 <= i < n };
+          assert { 1 <= dp[i] <= n };
+          assert { -1 <= prev[i] < i };
+          for j = 0 to i - 1 do
+            invariant { 0 <= j <= i }
+            invariant { 1 <= dp[i] <= n }
+            invariant { -1 <= prev[i] < i }
+            invariant { dp_arrays_well_formed values dp prev n i }
+            invariant { forall k: int. 0 <= k < i -> 1 <= dp[k] <= n }
+            invariant { forall k: int. 0 <= k < i -> -1 <= prev[k] < k }
+            assert { 0 <= j < n };
+            assert { 0 <= i < n };
+            assert { mem values[j] nums };
+            assert { mem values[i] nums };
+            all_positive_mem_bounds nums;
+            assert { 1 <= values[j] };
+            assert { 1 <= values[i] };
+            if mod values[i] values[j] = 0 then begin
+              let candidate = dp[j] + 1 in
+              assert { 2 <= candidate };
+              if candidate >= dp[i] then begin
+                dp[i] <- candidate;
+                prev[i] <- j
+              end
+            end
+          done;
+          assert { 1 <= dp[i] <= n };
+          assert { -1 <= prev[i] < i };
+          if dp[i] > dp[!best_idx] then begin
+            best_idx := i;
+            assert { best_index_valid dp !best_idx n (i + 1) }
+          end else begin
+            assert { dp[i] <= dp[!best_idx] };
+            assert { best_index_valid dp !best_idx n (i + 1) }
+          end
+        done;
+        assert { 0 <= !best_idx < n };
+        assert { forall k: int. 0 <= k < Array.length prev -> -1 <= prev[k] < k };
+        reconstruct_subset values prev !best_idx
+    end
+
+end

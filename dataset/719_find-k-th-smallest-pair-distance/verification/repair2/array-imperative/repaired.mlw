@@ -1,0 +1,353 @@
+module FindKThSmallestPairDistance_Array_Stage3_Imperative
+
+  use int.Int
+  use int.Abs
+  use int.EuclideanDivision
+  use array.Array
+  use array.Init
+  use ref.Ref
+
+  predicate valid_pair (nums: array int) (i: int) (j: int) =
+    0 <= i < j < length nums
+
+  function pair_distance (nums: array int) (i: int) (j: int) : int =
+    abs (nums[i] - nums[j])
+
+  let rec function count_pairs_lt_from_j
+    (nums: array int) (i: int) (j: int) (d: int) : int
+    requires { 0 <= i < length nums }
+    requires { i < j <= length nums }
+    variant  { length nums - j }
+  =
+    if j = length nums then 0
+    else
+      (if abs (nums[i] - nums[j]) < d then 1 else 0) +
+      count_pairs_lt_from_j nums i (j + 1) d
+
+  let rec function count_pairs_lt_from_i
+    (nums: array int) (i: int) (d: int) : int
+    requires { 0 <= i <= length nums }
+    variant  { length nums - i }
+  =
+    if i + 1 >= length nums then 0
+    else
+      count_pairs_lt_from_j nums i (i + 1) d +
+      count_pairs_lt_from_i nums (i + 1) d
+
+  let function count_pairs_less (nums: array int) (d: int) : int =
+    count_pairs_lt_from_i nums 0 d
+
+  let rec function count_pairs_le_from_j
+    (nums: array int) (i: int) (j: int) (d: int) : int
+    requires { 0 <= i < length nums }
+    requires { i < j <= length nums }
+    variant  { length nums - j }
+  =
+    if j = length nums then 0
+    else
+      (if abs (nums[i] - nums[j]) <= d then 1 else 0) +
+      count_pairs_le_from_j nums i (j + 1) d
+
+  let rec function count_pairs_le_from_i
+    (nums: array int) (i: int) (d: int) : int
+    requires { 0 <= i <= length nums }
+    variant  { length nums - i }
+  =
+    if i + 1 >= length nums then 0
+    else
+      count_pairs_le_from_j nums i (i + 1) d +
+      count_pairs_le_from_i nums (i + 1) d
+
+  let function count_pairs_at_most (nums: array int) (d: int) : int =
+    count_pairs_le_from_i nums 0 d
+
+  let rec lemma count_pairs_le_from_j_nonnegative
+    (nums: array int) (i: int) (j: int) (d: int)
+    requires { 0 <= i < length nums }
+    requires { i < j <= length nums }
+    ensures  { 0 <= count_pairs_le_from_j nums i j d }
+    variant  { length nums - j }
+  =
+    if j < length nums then
+      count_pairs_le_from_j_nonnegative nums i (j + 1) d
+
+  let rec lemma count_pairs_le_from_i_nonnegative
+    (nums: array int) (i: int) (d: int)
+    requires { 0 <= i <= length nums }
+    ensures  { 0 <= count_pairs_le_from_i nums i d }
+    variant  { length nums - i }
+  =
+    if i + 1 < length nums then begin
+      count_pairs_le_from_j_nonnegative nums i (i + 1) d;
+      count_pairs_le_from_i_nonnegative nums (i + 1) d
+    end
+
+  let rec lemma count_pairs_lt_from_j_zero
+    (nums: array int) (i: int) (j: int)
+    requires { 0 <= i < length nums }
+    requires { i < j <= length nums }
+    ensures  { count_pairs_lt_from_j nums i j 0 = 0 }
+    variant  { length nums - j }
+  =
+    if j < length nums then
+      count_pairs_lt_from_j_zero nums i (j + 1)
+
+  let rec lemma count_pairs_lt_from_i_zero
+    (nums: array int) (i: int)
+    requires { 0 <= i <= length nums }
+    ensures  { count_pairs_lt_from_i nums i 0 = 0 }
+    variant  { length nums - i }
+  =
+    if i + 1 < length nums then begin
+      count_pairs_lt_from_j_zero nums i (i + 1);
+      count_pairs_lt_from_i_zero nums (i + 1)
+    end
+
+  let lemma count_pairs_less_zero (nums: array int)
+    ensures { count_pairs_less nums 0 = 0 }
+  =
+    count_pairs_lt_from_i_zero nums 0
+
+  let rec lemma count_pairs_lt_succ_eq_le_from_j
+    (nums: array int) (i: int) (j: int) (d: int)
+    requires { 0 <= i < length nums }
+    requires { i < j <= length nums }
+    ensures  { count_pairs_lt_from_j nums i j (d + 1) =
+               count_pairs_le_from_j nums i j d }
+    variant  { length nums - j }
+  =
+    if j < length nums then begin
+      assert { abs (nums[i] - nums[j]) < d + 1 <->
+               abs (nums[i] - nums[j]) <= d };
+      count_pairs_lt_succ_eq_le_from_j nums i (j + 1) d
+    end
+
+  let rec lemma count_pairs_lt_succ_eq_le_from_i
+    (nums: array int) (i: int) (d: int)
+    requires { 0 <= i <= length nums }
+    ensures  { count_pairs_lt_from_i nums i (d + 1) =
+               count_pairs_le_from_i nums i d }
+    variant  { length nums - i }
+  =
+    if i + 1 < length nums then begin
+      count_pairs_lt_succ_eq_le_from_j nums i (i + 1) d;
+      count_pairs_lt_succ_eq_le_from_i nums (i + 1) d
+    end
+
+  let lemma count_pairs_less_succ_eq_at_most (nums: array int) (d: int)
+    ensures { count_pairs_less nums (d + 1) = count_pairs_at_most nums d }
+  =
+    count_pairs_lt_succ_eq_le_from_i nums 0 d
+
+  let lemma pair_distance_within_bounds
+    (nums: array int) (minv: int) (maxv: int) (i: int) (j: int)
+    requires { 0 <= i < length nums }
+    requires { 0 <= j < length nums }
+    requires { forall p: int. 0 <= p < length nums -> minv <= nums[p] }
+    requires { forall p: int. 0 <= p < length nums -> nums[p] <= maxv }
+    ensures  { abs (nums[i] - nums[j]) <= maxv - minv }
+  =
+    assert { minv <= nums[i] };
+    assert { nums[i] <= maxv };
+    assert { minv <= nums[j] };
+    assert { nums[j] <= maxv };
+    assert { nums[i] - nums[j] <= maxv - minv };
+    assert { nums[j] - nums[i] <= maxv - minv };
+    assert { - (maxv - minv) <= nums[i] - nums[j] };
+    assert { abs (nums[i] - nums[j]) <= maxv - minv }
+
+  let rec lemma count_pairs_le_from_j_all_within_bounds
+    (nums: array int) (minv: int) (maxv: int) (i: int) (j: int)
+    requires { 0 <= i < length nums }
+    requires { i < j <= length nums }
+    requires { forall p: int. 0 <= p < length nums -> minv <= nums[p] }
+    requires { forall p: int. 0 <= p < length nums -> nums[p] <= maxv }
+    ensures  { count_pairs_le_from_j nums i j (maxv - minv) = length nums - j }
+    variant  { length nums - j }
+  =
+    if j < length nums then begin
+      pair_distance_within_bounds nums minv maxv i j;
+      assert { abs (nums[i] - nums[j]) <= maxv - minv };
+      count_pairs_le_from_j_all_within_bounds nums minv maxv i (j + 1);
+      assert { count_pairs_le_from_j nums i j (maxv - minv) =
+               1 + count_pairs_le_from_j nums i (j + 1) (maxv - minv) }
+    end
+
+  let rec lemma count_pairs_le_from_i_all_within_bounds
+    (nums: array int) (minv: int) (maxv: int) (i: int)
+    requires { 0 <= i <= length nums }
+    requires { forall p: int. 0 <= p < length nums -> minv <= nums[p] }
+    requires { forall p: int. 0 <= p < length nums -> nums[p] <= maxv }
+    ensures  { 2 * count_pairs_le_from_i nums i (maxv - minv) =
+               (length nums - i) * (length nums - i - 1) }
+    variant  { length nums - i }
+  =
+    if i + 1 < length nums then begin
+      count_pairs_le_from_j_all_within_bounds nums minv maxv i (i + 1);
+      count_pairs_le_from_i_all_within_bounds nums minv maxv (i + 1);
+      assert { count_pairs_le_from_j nums i (i + 1) (maxv - minv) =
+               length nums - (i + 1) };
+      assert { count_pairs_le_from_i nums i (maxv - minv) =
+               count_pairs_le_from_j nums i (i + 1) (maxv - minv) +
+               count_pairs_le_from_i nums (i + 1) (maxv - minv) };
+      assert { 2 * count_pairs_le_from_i nums i (maxv - minv) =
+               2 * (length nums - (i + 1)) +
+               (length nums - (i + 1)) * (length nums - (i + 1) - 1) };
+      assert { 2 * (length nums - (i + 1)) +
+               (length nums - (i + 1)) * (length nums - (i + 1) - 1) =
+               (length nums - i) * (length nums - i - 1) }
+    end else begin
+      assert { count_pairs_le_from_i nums i (maxv - minv) = 0 };
+      assert { length nums - i = 0 \/ length nums - i = 1 };
+      assert { (length nums - i) * (length nums - i - 1) = 0 }
+    end
+
+  predicate input_constraints (nums: array int) (k: int) =
+    2 <= length nums /\
+    (forall i: int. 0 <= i < length nums -> 0 <= nums[i] <= 1000000) /\
+    1 <= k /\
+    2 * k <= length nums * (length nums - 1)
+
+  predicate kth_pair_distance_spec (nums: array int) (k: int) (d: int) =
+    0 <= d /\
+    count_pairs_less nums d < k /\
+    k <= count_pairs_at_most nums d
+
+  let lemma initial_high_covers_rank
+    (nums: array int) (k: int) (minv: int) (maxv: int)
+    requires { input_constraints nums k }
+    requires { (forall i: int. 0 <= i < length nums -> minv <= nums[i]) }
+    requires { (forall i: int. 0 <= i < length nums -> nums[i] <= maxv) }
+    requires { exists i: int. 0 <= i < length nums /\ minv = nums[i] }
+    requires { exists i: int. 0 <= i < length nums /\ maxv = nums[i] }
+    ensures  { 0 <= maxv - minv }
+    ensures  { k <= count_pairs_at_most nums (maxv - minv) }
+  =
+    assert { minv <= maxv };
+    assert { 0 <= maxv - minv };
+    count_pairs_le_from_i_all_within_bounds nums minv maxv 0;
+    assert { count_pairs_at_most nums (maxv - minv) =
+             count_pairs_le_from_i nums 0 (maxv - minv) };
+    assert { 2 * count_pairs_at_most nums (maxv - minv) =
+             length nums * (length nums - 1) };
+    assert { 2 * k <= length nums * (length nums - 1) };
+    assert { 2 * k <= 2 * count_pairs_at_most nums (maxv - minv) };
+    assert { k <= count_pairs_at_most nums (maxv - minv) }
+
+  let count_pairs_at_most_exec (nums: array int) (d: int) : int
+    ensures { result = count_pairs_at_most nums d }
+    ensures { 0 <= result }
+  =
+    let n = length nums in
+    let count = ref 0 in
+    if n >= 2 then begin
+      for i = 0 to n - 2 do
+        invariant { 0 <= i <= n - 1 }
+        invariant { 0 <= !count }
+        invariant { !count + count_pairs_le_from_i nums i d =
+                    count_pairs_at_most nums d }
+        for j = i + 1 to n - 1 do
+          invariant { i + 1 <= j <= n }
+          invariant { 0 <= !count }
+          invariant { !count + count_pairs_le_from_j nums i j d +
+                      count_pairs_le_from_i nums (i + 1) d =
+                      count_pairs_at_most nums d }
+          if abs (nums[i] - nums[j]) <= d then begin
+            assert { count_pairs_le_from_j nums i j d =
+                     1 + count_pairs_le_from_j nums i (j + 1) d };
+            count := !count + 1
+          end else begin
+            assert { count_pairs_le_from_j nums i j d =
+                     count_pairs_le_from_j nums i (j + 1) d }
+          end
+        done
+        ;
+        assert { count_pairs_le_from_j nums i n d = 0 };
+        assert { !count + count_pairs_le_from_i nums (i + 1) d =
+                 count_pairs_at_most nums d }
+      done
+    end;
+    if n >= 2 then begin
+      assert { !count + count_pairs_le_from_i nums (n - 1) d =
+               count_pairs_at_most nums d };
+      assert { count_pairs_le_from_i nums (n - 1) d = 0 };
+      assert { !count = count_pairs_at_most nums d }
+    end else begin
+      assert { count_pairs_at_most nums d = 0 };
+      assert { !count = count_pairs_at_most nums d }
+    end;
+    !count
+
+  let array_min (nums: array int) : int
+    requires { 1 <= length nums }
+    ensures  { exists i: int. 0 <= i < length nums /\ result = nums[i] }
+    ensures  { forall i: int. 0 <= i < length nums -> result <= nums[i] }
+  =
+    let current = ref nums[0] in
+    for i = 1 to length nums - 1 do
+      invariant { exists j: int. 0 <= j < i /\ !current = nums[j] }
+      invariant { forall j: int. 0 <= j < i -> !current <= nums[j] }
+      if nums[i] < !current then
+        current := nums[i]
+    done;
+    !current
+
+  let array_max (nums: array int) : int
+    requires { 1 <= length nums }
+    ensures  { exists i: int. 0 <= i < length nums /\ result = nums[i] }
+    ensures  { forall i: int. 0 <= i < length nums -> nums[i] <= result }
+  =
+    let current = ref nums[0] in
+    for i = 1 to length nums - 1 do
+      invariant { exists j: int. 0 <= j < i /\ !current = nums[j] }
+      invariant { forall j: int. 0 <= j < i -> nums[j] <= !current }
+      if nums[i] > !current then
+        current := nums[i]
+    done;
+    !current
+
+  let find_k_th_smallest_pair_distance_array (nums: array int) (k: int) : int
+    requires { input_constraints nums k }
+    ensures  { kth_pair_distance_spec nums k result }
+  =
+    let minv = array_min nums in
+    let maxv = array_max nums in
+    assert { minv <= maxv };
+    initial_high_covers_rank nums k minv maxv;
+    let low = ref 0 in
+    let high = ref (maxv - minv) in
+    count_pairs_less_zero nums;
+    assert { count_pairs_less nums !low = 0 };
+    assert { count_pairs_less nums !low < k };
+    assert { k <= count_pairs_at_most nums !high };
+    while !low < !high do
+      invariant { 0 <= !low }
+      invariant { !low <= !high }
+      invariant { !high <= maxv - minv }
+      invariant { count_pairs_less nums !low < k }
+      invariant { k <= count_pairs_at_most nums !high }
+      variant   { !high - !low }
+      let mid = !low + div (!high - !low) 2 in
+      assert { !low <= mid < !high };
+      let count = count_pairs_at_most_exec nums mid in
+      assert { count = count_pairs_at_most nums mid };
+      if count < k then
+        begin
+          assert { count_pairs_at_most nums mid < k };
+          count_pairs_less_succ_eq_at_most nums mid;
+          assert { count_pairs_less nums (mid + 1) < k };
+        low := mid + 1
+        end
+      else
+        begin
+          assert { k <= count_pairs_at_most nums mid };
+        high := mid
+        end
+    done;
+    assert { !low = !high };
+    assert { count_pairs_less nums !low < k };
+    assert { k <= count_pairs_at_most nums !low };
+    assert { kth_pair_distance_spec nums k !low };
+    !low
+
+end

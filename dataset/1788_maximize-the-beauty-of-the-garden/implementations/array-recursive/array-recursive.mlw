@@ -1,0 +1,219 @@
+module MaximizeTheBeautyOfTheGarden_Array_Recursive_Implementation
+
+  use int.Int
+  use array.Array
+  use array.Init
+
+  let positive_part (x: int) : int =
+    if x > 0 then x else 0
+
+  (* Scan all right endpoints for a fixed left endpoint while maintaining the
+     positive interior sum for the current open interval. *)
+  let rec scan_right
+    (flowers: array int) (i: int) (j: int) (positive_between: int) (best: int) : int
+    variant { length flowers - j }
+  =
+    if j >= length flowers then
+      best
+    else
+      let best_here =
+        if flowers[i] = flowers[j] then
+          let candidate = flowers[i] + flowers[j] + positive_between in
+          if candidate > best then candidate else best
+        else
+          best
+      in
+      let next_positive_between = positive_between + positive_part (flowers[j]) in
+      scan_right flowers i (j + 1) next_positive_between best_here
+
+  let rec scan_left (flowers: array int) (i: int) (best: int) : int
+    variant { length flowers - i }
+  =
+    if i + 1 >= length flowers then
+      best
+    else
+      let best_after_i = scan_right flowers i (i + 1) 0 best in
+      scan_left flowers (i + 1) best_after_i
+
+  let maximize_the_beauty_of_the_garden_array (flowers: array int) : int =
+    scan_left flowers 0 (-1000000001)
+
+  let test_000 () : bool =
+    let flowers = init 6 [|-10000; 10000; -10000; 10000; -10000; 10000|] in
+    let r = maximize_the_beauty_of_the_garden_array flowers in
+    r = 30000
+
+  let test_001 () : bool =
+    let flowers = init 7 [|5; 8; 5; 3; 5; 2; 5|] in
+    let r = maximize_the_beauty_of_the_garden_array flowers in
+    r = 33
+
+  let test_002 () : bool =
+    let flowers = init 5 [|100; 1; 1; -3; 1|] in
+    let r = maximize_the_beauty_of_the_garden_array flowers in
+    r = 3
+
+  let test_003 () : bool =
+    let flowers = init 9 [|2; 3; 4; 5; 4; 3; 2; 1; 2|] in
+    let r = maximize_the_beauty_of_the_garden_array flowers in
+    r = 26
+
+  let test_004 () : bool =
+    let flowers = init 5 [|5; 3; 5; 2; 5|] in
+    let r = maximize_the_beauty_of_the_garden_array flowers in
+    r = 20
+
+  let test_005 () : bool =
+    let flowers = init 5 [|1; 2; 3; 1; 2|] in
+    let r = maximize_the_beauty_of_the_garden_array flowers in
+    r = 8
+
+  let test_006 () : bool =
+    let flowers = init 7 [|3; 2; 1; 2; 3; 2; 1|] in
+    let r = maximize_the_beauty_of_the_garden_array flowers in
+    r = 11
+
+  let test_007 () : bool =
+    let flowers = init 10 [|1; 2; 3; 4; 5; 6; 7; 8; 9; 1|] in
+    let r = maximize_the_beauty_of_the_garden_array flowers in
+    r = 46
+
+  let test_008 () : bool =
+    let flowers = init 8 [|2; 3; 2; 1; 2; 3; 2; 2|] in
+    let r = maximize_the_beauty_of_the_garden_array flowers in
+    r = 17
+
+  let test_009 () : bool =
+    let flowers = init 5 [|1; -1; 1; -1; 1|] in
+    let r = maximize_the_beauty_of_the_garden_array flowers in
+    r = 3
+
+  let test_010 () : bool =
+    let flowers = init 4 [|-1; -2; 0; -1|] in
+    let r = maximize_the_beauty_of_the_garden_array flowers in
+    r = -2
+
+  let test_011 () : bool =
+    let flowers = init 5 [|-1; -2; -3; -4; -1|] in
+    let r = maximize_the_beauty_of_the_garden_array flowers in
+    r = -2
+
+  let test_012 () : bool =
+    let flowers = init 11 [|1; -2; 3; -4; 5; -6; 7; -8; 9; -10; 1|] in
+    let r = maximize_the_beauty_of_the_garden_array flowers in
+    r = 26
+
+  let test_013 () : bool =
+    let flowers = init 5 [|-10000; 0; 10000; 0; -10000|] in
+    let r = maximize_the_beauty_of_the_garden_array flowers in
+    r = 10000
+
+  let test_014 () : bool =
+    let flowers = init 5 [|5; 5; 5; 5; 5|] in
+    let r = maximize_the_beauty_of_the_garden_array flowers in
+    r = 25
+
+  let test_015 () : bool =
+    let flowers = init 4 [|-10000; 10000; -10000; 10000|] in
+    let r = maximize_the_beauty_of_the_garden_array flowers in
+    r = 20000
+
+  let test_016 () : bool =
+    let flowers = init 6 [|1; -1; 2; -2; 1; -1|] in
+    let r = maximize_the_beauty_of_the_garden_array flowers in
+    r = 4
+
+  let test_017 () : bool =
+    let flowers = init 3 [|-10000; 10000; -10000|] in
+    let r = maximize_the_beauty_of_the_garden_array flowers in
+    r = -10000
+
+  let test_018 () : bool =
+    let flowers = init 5 [|-5; -5; -5; -5; -5|] in
+    let r = maximize_the_beauty_of_the_garden_array flowers in
+    r = -10
+
+  let test_019 () : bool =
+    let flowers = init 10 [|1; 1; 1; 1; 1; 1; 1; 1; 1; 1|] in
+    let r = maximize_the_beauty_of_the_garden_array flowers in
+    r = 10
+
+  let test_020 () : bool =
+    let flowers = init 3 [|10000; 10000; 10000|] in
+    let r = maximize_the_beauty_of_the_garden_array flowers in
+    r = 30000
+
+  let test_021 () : bool =
+    let flowers = init 9 [|2; 4; 6; 8; 10; 8; 6; 4; 2|] in
+    let r = maximize_the_beauty_of_the_garden_array flowers in
+    r = 50
+
+  let test_022 () : bool =
+    let flowers = init 10 [|0; 0; 0; 0; 0; 0; 0; 0; 0; 0|] in
+    let r = maximize_the_beauty_of_the_garden_array flowers in
+    r = 0
+
+  let test_023 () : bool =
+    let flowers = init 7 [|5; 1; 5; 2; 5; 3; 5|] in
+    let r = maximize_the_beauty_of_the_garden_array flowers in
+    r = 26
+
+  let test_024 () : bool =
+    let flowers = init 21 [|10; 9; 8; 7; 6; 5; 4; 3; 2; 1; 0; 1; 2; 3; 4; 5; 6; 7; 8; 9; 10|] in
+    let r = maximize_the_beauty_of_the_garden_array flowers in
+    r = 110
+
+  let run_tests () : bool =
+    if test_000 () then
+    if test_001 () then
+    if test_002 () then
+    if test_003 () then
+    if test_004 () then
+    if test_005 () then
+    if test_006 () then
+    if test_007 () then
+    if test_008 () then
+    if test_009 () then
+    if test_010 () then
+    if test_011 () then
+    if test_012 () then
+    if test_013 () then
+    if test_014 () then
+    if test_015 () then
+    if test_016 () then
+    if test_017 () then
+    if test_018 () then
+    if test_019 () then
+    if test_020 () then
+    if test_021 () then
+    if test_022 () then
+    if test_023 () then
+    if test_024 () then
+      true
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+
+end

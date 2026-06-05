@@ -1,0 +1,187 @@
+module CountNumberOfNiceSubarrays_List_Spec
+
+  use int.Int
+  use int.EuclideanDivision
+  use list.List
+  use list.Length
+  use ref.Ref
+
+  let rec predicate all_between (nums: list int) (lo: int) (hi: int)
+    variant { nums }
+  =
+    match nums with
+    | Nil -> true
+    | Cons x xs -> lo <= x && x <= hi && all_between xs lo hi
+    end
+
+  let function odd_indicator (x: int) : int =
+    if mod x 2 = 1 then 1 else 0
+
+  let rec function count_prefixes_with_odd_count (nums: list int) (k: int) : int
+    variant { nums }
+  =
+    match nums with
+    | Nil -> if k = 0 then 1 else 0
+    | Cons x xs ->
+        (if k = 0 then 1 else 0) +
+        count_prefixes_with_odd_count xs (k - odd_indicator x)
+    end
+
+  let rec function count_nice_subarrays (nums: list int) (k: int) : int
+    variant { nums }
+  =
+    match nums with
+    | Nil -> 0
+    | Cons _ xs ->
+        count_prefixes_with_odd_count nums k + count_nice_subarrays xs k
+    end
+
+  predicate valid_input (nums: list int) (k: int) =
+    1 <= length nums <= 50000 /\
+    all_between nums 1 100000 /\
+    1 <= k <= length nums
+
+  let has_elements (xs: list int) : bool
+    ensures { result <-> xs <> Nil }
+  =
+    match xs with
+    | Nil -> false
+    | Cons _ _ -> true
+    end
+
+  let rec function count_nonempty_prefixes_with_odd_count
+    (nums: list int) (k: int) : int
+    variant { nums }
+  =
+    match nums with
+    | Nil -> 0
+    | Cons x xs -> count_prefixes_with_odd_count xs (k - odd_indicator x)
+    end
+
+  let rec lemma count_prefixes_nonnegative (nums: list int) (k: int)
+    ensures { count_prefixes_with_odd_count nums k >= 0 }
+    variant { nums }
+  =
+    match nums with
+    | Nil -> ()
+    | Cons x xs ->
+        count_prefixes_nonnegative xs (k - odd_indicator x)
+    end
+
+  let rec lemma count_nice_subarrays_nonnegative (nums: list int) (k: int)
+    ensures { count_nice_subarrays nums k >= 0 }
+    variant { nums }
+  =
+    match nums with
+    | Nil -> ()
+    | Cons _ xs ->
+        count_prefixes_nonnegative nums k;
+        count_nice_subarrays_nonnegative xs k
+    end
+
+  let rec lemma count_nonempty_prefixes_decompose
+    (nums: list int) (k: int)
+    ensures {
+      count_nonempty_prefixes_with_odd_count nums k =
+      match nums with
+      | Nil -> 0
+      | Cons x xs ->
+          (if k - odd_indicator x = 0 then 1 else 0) +
+          count_nonempty_prefixes_with_odd_count xs (k - odd_indicator x)
+      end
+    }
+    variant { nums }
+  =
+    match nums with
+    | Nil -> ()
+    | Cons x xs ->
+        count_nonempty_prefixes_decompose xs (k - odd_indicator x)
+    end
+
+  let rec lemma positive_prefixes_are_nonempty (nums: list int) (k: int)
+    requires { k <> 0 }
+    ensures {
+      count_prefixes_with_odd_count nums k =
+      count_nonempty_prefixes_with_odd_count nums k
+    }
+    variant { nums }
+  =
+    match nums with
+    | Nil -> ()
+    | Cons _ _ -> ()
+    end
+
+  let count_number_of_nice_subarrays_list (nums: list int) (k: int) : int
+    requires { valid_input nums k }
+    ensures  { result = count_nice_subarrays nums k }
+    ensures  { result >= 0 }
+  =
+    assert { k <> 0 };
+    let total = ref 0 in
+    let start = ref nums in
+    while has_elements !start do
+      invariant { !total + count_nice_subarrays !start k = count_nice_subarrays nums k }
+      invariant { !total >= 0 }
+      variant { length !start }
+
+      let start_snapshot = !start in
+      let total_before = !total in
+      positive_prefixes_are_nonempty start_snapshot k;
+      assert {
+        count_prefixes_with_odd_count start_snapshot k =
+        count_nonempty_prefixes_with_odd_count start_snapshot k
+      };
+
+      let odd_count = ref 0 in
+      let suffix = ref start_snapshot in
+      while has_elements !suffix do
+        invariant {
+          !total + count_nonempty_prefixes_with_odd_count !suffix (k - !odd_count) =
+          total_before + count_nonempty_prefixes_with_odd_count start_snapshot k
+        }
+        invariant { !total >= total_before }
+        variant { length !suffix }
+
+        match !suffix with
+        | Nil -> ()
+        | Cons x xs ->
+            count_nonempty_prefixes_decompose !suffix (k - !odd_count);
+            let previous_odd_count = !odd_count in
+            odd_count := !odd_count + odd_indicator x;
+            assert { k - previous_odd_count - odd_indicator x = k - !odd_count };
+            if !odd_count = k then begin
+              total := !total + 1
+            end;
+            suffix := xs
+        end
+      done;
+
+      assert { !suffix = Nil };
+      assert {
+        !total =
+        total_before + count_nonempty_prefixes_with_odd_count start_snapshot k
+      };
+      assert {
+        !total =
+        total_before + count_prefixes_with_odd_count start_snapshot k
+      };
+
+      match !start with
+      | Nil -> ()
+      | Cons _ xs ->
+          assert {
+            count_nice_subarrays start_snapshot k =
+            count_prefixes_with_odd_count start_snapshot k +
+            count_nice_subarrays xs k
+          };
+          start := xs
+      end
+    done;
+
+    assert { !start = Nil };
+    assert { !total = count_nice_subarrays nums k };
+    count_nice_subarrays_nonnegative nums k;
+    assert { count_nice_subarrays nums k >= 0 };
+    !total
+
+end

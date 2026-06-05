@@ -1,0 +1,110 @@
+module SumOfDistances_List_Stage3_Imperative
+
+  use int.Int
+  use int.Abs
+  use list.List
+  use list.Length
+  use list.Mem
+  use list.Append
+  use list.Reverse
+  use ref.Ref
+
+  predicate valid_input (nums: list int) =
+    length nums >= 1 /\
+    (forall x: int. mem x nums -> 0 <= x <= 1000000000)
+
+  let rec function distance_sum_from
+      (target: int) (target_index: int) (current_index: int) (nums: list int) : int
+    variant { nums }
+  =
+    match nums with
+    | Nil -> 0
+    | Cons x xs ->
+        (if x = target then
+           if current_index = target_index then 0
+           else abs (target_index - current_index)
+         else 0) + distance_sum_from target target_index (current_index + 1) xs
+    end
+
+  let rec function distances_for
+      (all_nums: list int) (current_index: int) (suffix: list int) : list int
+    variant { suffix }
+  =
+    match suffix with
+    | Nil -> Nil
+    | Cons x xs ->
+        Cons (distance_sum_from x current_index 0 all_nums)
+          (distances_for all_nums (current_index + 1) xs)
+    end
+
+  let reverse_list (l: list int) : list int
+    ensures { result = reverse l }
+    ensures { length result = length l }
+  =
+    let acc = ref Nil in
+    let cur = ref l in
+    while (match !cur with Nil -> false | Cons _ _ -> true end) do
+      invariant { reverse !acc ++ !cur = l }
+      invariant { length !acc + length !cur = length l }
+      variant { length !cur }
+      match !cur with
+      | Nil -> ()
+      | Cons x xs ->
+          acc := Cons x !acc;
+          cur := xs
+      end
+    done;
+    assert { !cur = Nil };
+    !acc
+
+  let sum_of_distances_list (nums: list int) : list int
+    requires { valid_input nums }
+    ensures  { result = distances_for nums 0 nums }
+    ensures  { length result = length nums }
+  =
+    let rev_result = ref Nil in
+    let outer = ref nums in
+    let target_index = ref 0 in
+    while (match !outer with Nil -> false | Cons _ _ -> true end) do
+      invariant { 0 <= !target_index }
+      invariant { !target_index + length !outer = length nums }
+      invariant { length !rev_result = !target_index }
+      invariant { reverse !rev_result ++ distances_for nums !target_index !outer =
+                  distances_for nums 0 nums }
+      variant { length !outer }
+      match !outer with
+      | Nil -> ()
+      | Cons target rest_outer ->
+          let total = ref 0 in
+          let inner = ref nums in
+          let current_index = ref 0 in
+          while (match !inner with Nil -> false | Cons _ _ -> true end) do
+            invariant { 0 <= !current_index }
+            invariant { !current_index + length !inner = length nums }
+            invariant { !total +
+                        distance_sum_from target !target_index !current_index !inner =
+                        distance_sum_from target !target_index 0 nums }
+            variant { length !inner }
+            match !inner with
+            | Nil -> ()
+            | Cons x xs ->
+                if x = target then
+                  if !current_index = !target_index then ()
+                  else total := !total + abs (!target_index - !current_index);
+                inner := xs;
+                current_index := !current_index + 1
+            end
+          done;
+          assert { !inner = Nil };
+          assert { distance_sum_from target !target_index !current_index !inner = 0 };
+          assert { !total = distance_sum_from target !target_index 0 nums };
+          rev_result := Cons !total !rev_result;
+          outer := rest_outer;
+          target_index := !target_index + 1
+      end
+    done;
+    assert { !outer = Nil };
+    assert { reverse !rev_result ++ Nil = distances_for nums 0 nums };
+    reverse_list !rev_result
+
+end

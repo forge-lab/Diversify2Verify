@@ -1,0 +1,100 @@
+module SumOfFlooredPairs_List_Stage3_Imperative
+
+  use int.Int
+  use int.EuclideanDivision
+  use list.List
+  use list.Length
+  use ref.Ref
+
+  function result_modulus : int = 1000000007
+
+  let rec predicate all_values_in_range (l: list int)
+    variant { l }
+  =
+    match l with
+    | Nil -> true
+    | Cons x xs -> 1 <= x && x <= 100000 && all_values_in_range xs
+    end
+
+  predicate valid_problem_input (nums: list int) =
+    nums <> Nil /\
+    length nums <= 100000 /\
+    all_values_in_range nums
+
+  let rec function row_floor_sum (x: int) (denoms: list int) : int
+    requires { all_values_in_range denoms }
+    variant { denoms }
+  =
+    match denoms with
+    | Nil -> 0
+    | Cons y ys -> div x y + row_floor_sum x ys
+    end
+
+  let rec function floored_pair_sum (nums: list int) (denoms: list int) : int
+    requires { all_values_in_range denoms }
+    variant { nums }
+  =
+    match nums with
+    | Nil -> 0
+    | Cons x xs -> row_floor_sum x denoms + floored_pair_sum xs denoms
+    end
+
+  predicate sum_of_floored_pairs_list_spec (nums: list int) (res: int) =
+    res = mod (floored_pair_sum nums nums) result_modulus
+
+  let lemma all_values_in_range_tail (x: int) (xs: list int)
+    requires { all_values_in_range (Cons x xs) }
+    ensures  { all_values_in_range xs }
+  =
+    ()
+
+  let sum_of_floored_pairs_list (nums: list int) : int
+    requires { valid_problem_input nums }
+    ensures  { sum_of_floored_pairs_list_spec nums result }
+    ensures  { 0 <= result < result_modulus }
+  =
+    let total = ref 0 in
+    let outer = ref nums in
+    while (match !outer with Nil -> false | Cons _ _ -> true end) do
+      invariant { !total + floored_pair_sum !outer nums = floored_pair_sum nums nums }
+      invariant { all_values_in_range !outer }
+      variant { length !outer }
+
+      match !outer with
+      | Nil -> ()
+      | Cons x xs ->
+          let before = !total in
+          let inner = ref nums in
+          while (match !inner with Nil -> false | Cons _ _ -> true end) do
+            invariant { !total + row_floor_sum x !inner = before + row_floor_sum x nums }
+            invariant { all_values_in_range !inner }
+            variant { length !inner }
+
+            match !inner with
+            | Nil -> ()
+            | Cons y ys ->
+                assert { row_floor_sum x !inner = div x y + row_floor_sum x ys };
+                assert { all_values_in_range ys };
+                total := !total + div x y;
+                inner := ys
+            end
+          done;
+          assert { !inner = Nil };
+          assert { row_floor_sum x !inner = 0 };
+          assert { !total = before + row_floor_sum x nums };
+          assert { floored_pair_sum !outer nums = row_floor_sum x nums + floored_pair_sum xs nums };
+          assert { all_values_in_range xs };
+          outer := xs
+      end
+    done;
+    assert { !outer = Nil };
+    assert { floored_pair_sum !outer nums = 0 };
+    assert { !total = floored_pair_sum nums nums };
+    let modulus = 1000000007 in
+    let answer = mod !total modulus in
+    assert { modulus = result_modulus };
+    assert { answer = mod (floored_pair_sum nums nums) result_modulus };
+    assert { 0 <= answer < result_modulus };
+    answer
+
+end

@@ -1,0 +1,64 @@
+module FindTheScoreOfAllPrefixesOfAnArray_Array_Stage3_Imperative
+
+  use int.Int
+  use int.MinMax
+  use array.Array
+  use ref.Ref
+
+  predicate valid_input (nums: array int) =
+    length nums >= 1 /\
+    forall i: int. 0 <= i < length nums -> 1 <= nums[i] <= 1000000000
+
+  let rec function prefix_max (nums: array int) (i: int) : int
+    requires { 0 <= i < length nums }
+    variant  { i }
+  =
+    if i = 0 then nums[0]
+    else max (prefix_max nums (i - 1)) nums[i]
+
+  let rec function prefix_score (nums: array int) (i: int) : int
+    requires { 0 <= i < length nums }
+    variant  { i }
+  =
+    if i = 0 then nums[0] + prefix_max nums 0
+    else prefix_score nums (i - 1) + nums[i] + prefix_max nums i
+
+  predicate result_matches (nums: array int) (ans: array int) =
+    valid_input nums /\
+    length ans = length nums /\
+    forall i: int. 0 <= i < length nums -> ans[i] = prefix_score nums i
+
+  let find_the_score_of_all_prefixes_of_an_array_array (nums: array int) : array int
+    requires { valid_input nums }
+    ensures  { result_matches nums result }
+  =
+    let n = length nums in
+    let ans = make n 0 in
+    let current_max = ref nums[0] in
+    let running_score = ref 0 in
+    for i = 0 to n - 1 do
+      invariant { valid_input nums }
+      invariant { n = length nums }
+      invariant { length ans = n }
+      invariant { 0 <= i <= n }
+      invariant { i = 0 -> !current_max = nums[0] }
+      invariant { i > 0 -> !current_max = prefix_max nums (i - 1) }
+      invariant { i = 0 -> !running_score = 0 }
+      invariant { i > 0 -> !running_score = prefix_score nums (i - 1) }
+      invariant { forall j: int. 0 <= j < i -> ans[j] = prefix_score nums j }
+
+      if nums[i] > !current_max then
+        current_max := nums[i];
+
+      assert { !current_max = prefix_max nums i };
+
+      running_score := !running_score + nums[i] + !current_max;
+      assert { !running_score = prefix_score nums i };
+
+      ans[i] <- !running_score;
+      assert { ans[i] = prefix_score nums i }
+    done;
+    assert { result_matches nums ans };
+    ans
+
+end

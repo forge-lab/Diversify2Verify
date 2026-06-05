@@ -1,0 +1,208 @@
+module FindTheDistanceValueBetweenTwoArrays_List_Imperative_Implementation
+
+  use int.Int
+  use int.Abs
+  use list.List
+  use ref.Ref
+
+  exception TooClose
+
+  let far_from_all_list (arr2: list int) (x: int) (d: int) : bool =
+    try
+      let cur = ref arr2 in
+      while (match !cur with Nil -> false | Cons _ _ -> true end) do
+        match !cur with
+        | Nil -> ()
+        | Cons y ys ->
+            if abs (x - y) <= d then raise TooClose;
+            cur := ys
+        end
+      done;
+      true
+    with TooClose ->
+      false
+    end
+
+  let find_the_distance_value_between_two_arrays_list
+    (arr1: list int) (arr2: list int) (d: int) : int =
+    let count = ref 0 in
+    let cur = ref arr1 in
+    while (match !cur with Nil -> false | Cons _ _ -> true end) do
+      match !cur with
+      | Nil -> ()
+      | Cons x xs ->
+          if far_from_all_list arr2 x d then count := !count + 1;
+          cur := xs
+      end
+    done;
+    !count
+
+  let test_000 () : bool =
+    let arr1 = Cons 10 (Cons 20 (Cons 30 Nil)) in
+    let arr2 = Cons 5 (Cons 15 (Cons 25 Nil)) in
+    let r = find_the_distance_value_between_two_arrays_list arr1 arr2 4 in
+    r = 3
+
+  let test_001 () : bool =
+    let arr1 = Cons (-1000) (Cons 1000 Nil) in
+    let arr2 = Cons (-500) (Cons 500 Nil) in
+    let r = find_the_distance_value_between_two_arrays_list arr1 arr2 499 in
+    r = 2
+
+  let test_002 () : bool =
+    let arr1 = Cons 4 (Cons 5 (Cons 8 Nil)) in
+    let arr2 = Cons 10 (Cons 9 (Cons 1 (Cons 8 Nil))) in
+    let r = find_the_distance_value_between_two_arrays_list arr1 arr2 2 in
+    r = 2
+
+  let test_003 () : bool =
+    let arr1 = Cons 1 (Cons 4 (Cons 2 (Cons 3 Nil))) in
+    let arr2 = Cons (-4) (Cons (-3) (Cons 6 (Cons 10 (Cons 20 (Cons 30 Nil))))) in
+    let r = find_the_distance_value_between_two_arrays_list arr1 arr2 3 in
+    r = 2
+
+  let test_004 () : bool =
+    let arr1 = Cons (-1) (Cons (-2) (Cons (-3) Nil)) in
+    let arr2 = Cons 1 (Cons 2 (Cons 3 Nil)) in
+    let r = find_the_distance_value_between_two_arrays_list arr1 arr2 2 in
+    r = 2
+
+  let test_005 () : bool =
+    let arr1 = Cons 0 (Cons 0 (Cons 0 (Cons 0 Nil))) in
+    let arr2 = Cons 1 (Cons 2 (Cons 3 (Cons 4 Nil))) in
+    let r = find_the_distance_value_between_two_arrays_list arr1 arr2 0 in
+    r = 4
+
+  let test_006 () : bool =
+    let arr1 = Cons 1000 Nil in
+    let arr2 = Cons (-1000) Nil in
+    let r = find_the_distance_value_between_two_arrays_list arr1 arr2 1999 in
+    r = 1
+
+  let test_007 () : bool =
+    let arr1 = Cons 1 Nil in
+    let arr2 = Cons 1 Nil in
+    let r = find_the_distance_value_between_two_arrays_list arr1 arr2 0 in
+    r = 0
+
+  let test_008 () : bool =
+    let arr1 = Cons 2 (Cons 1 (Cons 100 (Cons 3 Nil))) in
+    let arr2 = Cons (-5) (Cons (-2) (Cons 10 (Cons (-3) (Cons 7 Nil)))) in
+    let r = find_the_distance_value_between_two_arrays_list arr1 arr2 6 in
+    r = 1
+
+  let test_009 () : bool =
+    let arr1 = Cons 1 (Cons 2 (Cons 3 Nil)) in
+    let arr2 = Cons 4 (Cons 5 (Cons 6 Nil)) in
+    let r = find_the_distance_value_between_two_arrays_list arr1 arr2 0 in
+    r = 3
+
+  let test_010 () : bool =
+    let arr1 = Cons 1 (Cons 2 (Cons 3 (Cons 4 (Cons 5 Nil)))) in
+    let arr2 = Cons 6 (Cons 7 (Cons 8 (Cons 9 (Cons 10 Nil)))) in
+    let r = find_the_distance_value_between_two_arrays_list arr1 arr2 1 in
+    r = 4
+
+  let test_011 () : bool =
+    let arr1 = Cons 100 (Cons 200 (Cons 300 (Cons 400 (Cons 500 Nil)))) in
+    let arr2 =
+      Cons 50
+        (Cons 100
+          (Cons 150
+            (Cons 200
+              (Cons 250 (Cons 300 (Cons 350 (Cons 400 (Cons 450 (Cons 500 Nil))))))))) in
+    let r = find_the_distance_value_between_two_arrays_list arr1 arr2 49 in
+    r = 0
+
+  let test_012 () : bool =
+    let arr1 = Cons (-1000) (Cons (-900) (Cons (-800) (Cons (-700) (Cons (-600) Nil)))) in
+    let arr2 = Cons 600 (Cons 700 (Cons 800 (Cons 900 (Cons 1000 Nil)))) in
+    let r = find_the_distance_value_between_two_arrays_list arr1 arr2 100 in
+    r = 5
+
+  let test_013 () : bool =
+    let arr1 = Cons (-100) (Cons (-200) (Cons (-300) Nil)) in
+    let arr2 = Cons (-50) (Cons (-150) (Cons (-250) Nil)) in
+    let r = find_the_distance_value_between_two_arrays_list arr1 arr2 49 in
+    r = 3
+
+  let test_014 () : bool =
+    let arr1 = Cons 500 (Cons 500 (Cons 500 (Cons 500 (Cons 500 Nil)))) in
+    let arr2 = Cons 500 (Cons 500 (Cons 500 (Cons 500 (Cons 500 Nil)))) in
+    let r = find_the_distance_value_between_two_arrays_list arr1 arr2 0 in
+    r = 0
+
+  let test_015 () : bool =
+    let arr1 = Cons 10 (Cons 20 (Cons 30 (Cons 40 (Cons 50 Nil)))) in
+    let arr2 = Cons 1 (Cons 2 (Cons 3 (Cons 4 (Cons 5 Nil)))) in
+    let r = find_the_distance_value_between_two_arrays_list arr1 arr2 5 in
+    r = 4
+
+  let test_016 () : bool =
+    let arr1 = Cons 1 (Cons 2 (Cons 3 (Cons 4 (Cons 5 Nil)))) in
+    let arr2 = Cons 10 (Cons 20 (Cons 30 (Cons 40 (Cons 50 Nil)))) in
+    let r = find_the_distance_value_between_two_arrays_list arr1 arr2 10 in
+    r = 0
+
+  let test_017 () : bool =
+    let arr1 = Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 Nil)))) in
+    let arr2 = Cons 2 (Cons 4 (Cons 6 (Cons 8 (Cons 10 Nil)))) in
+    let r = find_the_distance_value_between_two_arrays_list arr1 arr2 1 in
+    r = 0
+
+  let test_018 () : bool =
+    let arr1 = Cons 500 (Cons 1000 (Cons 1500 (Cons 2000 Nil))) in
+    let arr2 = Cons 400 (Cons 900 (Cons 1400 (Cons 1900 Nil))) in
+    let r = find_the_distance_value_between_two_arrays_list arr1 arr2 100 in
+    r = 0
+
+  let test_019 () : bool =
+    let arr1 = Cons 0 (Cons 100 (Cons 200 (Cons 300 (Cons 400 Nil)))) in
+    let arr2 = Cons 50 (Cons 150 (Cons 250 (Cons 350 (Cons 450 Nil)))) in
+    let r = find_the_distance_value_between_two_arrays_list arr1 arr2 50 in
+    r = 0
+
+  let run_tests () : bool =
+    if test_000 () then
+    if test_001 () then
+    if test_002 () then
+    if test_003 () then
+    if test_004 () then
+    if test_005 () then
+    if test_006 () then
+    if test_007 () then
+    if test_008 () then
+    if test_009 () then
+    if test_010 () then
+    if test_011 () then
+    if test_012 () then
+    if test_013 () then
+    if test_014 () then
+    if test_015 () then
+    if test_016 () then
+    if test_017 () then
+    if test_018 () then
+    if test_019 () then
+      true
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+
+end

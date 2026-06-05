@@ -1,0 +1,395 @@
+== Stage 1: first prover on whole file ==
+Running in /Users/rubenm/Desktop/Diversify2Verify/codex-runs/dataset-merge-verification/stage3a-repair/1099_two-sum-less-than-k/list-imperative/two_sum_less_than_k_list_stage3_a6883194_stage3/generated/why3: why3 session create -o /Users/rubenm/Desktop/Diversify2Verify/codex-runs/dataset-merge-verification/stage3a-repair/1099_two-sum-less-than-k/list-imperative/two_sum_less_than_k_list_stage3_a6883194_stage3/generated/why3/.why3_sessions/repaired_stage1 -P Z3,4.8.6 -t 10 -m 8192 repaired.mlw
+Session created successfully
+Running in /Users/rubenm/Desktop/Diversify2Verify/codex-runs/dataset-merge-verification/stage3a-repair/1099_two-sum-less-than-k/list-imperative/two_sum_less_than_k_list_stage3_a6883194_stage3/generated/why3: why3 bench /Users/rubenm/Desktop/Diversify2Verify/codex-runs/dataset-merge-verification/stage3a-repair/1099_two-sum-less-than-k/list-imperative/two_sum_less_than_k_list_stage3_a6883194_stage3/generated/why3/.why3_sessions/repaired_stage1
+Progress: 13/1/0                       Progress: 12/2/0                       Progress: 11/3/0                       Progress: 10/4/0                       Progress: 9/5/0                       Progress: 8/6/0                       Progress: 8/0/0                       Progress: 7/1/0                       Progress: 6/2/0                       Progress: 5/3/0                       Progress: 4/4/0                       Progress: 3/5/0                       Progress: 2/6/0                       Progress: 2/1/2                       Progress: 1/2/2                       Progress: 0/3/2                       Progress: 0/0/1                       
+Replay completed, saving session... done
+== Stage 1 stats ==
+= Statistics for session /Users/rubenm/Desktop/Diversify2Verify/codex-runs/dataset-merge-verification/stage3a-repair/1099_two-sum-less-than-k/list-imperative/two_sum_less_than_k_list_stage3_a6883194_stage3/generated/why3/.why3_sessions/repaired_stage1
+
+== Number of root goals ==
+  total: 14  proved: 11
+
+== Number of sub goals ==
+  total: 0  proved: 0
+
+== Goals not proved ==
+  +-- file [../../repaired.mlw]
+    +-- theory TwoSumLessThanK_List_Spec
+      +-- goal best_with_first_bounds'vc
+      +-- goal best_pair_sum_bounds'vc
+      +-- goal two_sum_less_than_k_list'vc
+  
+== Goals proved by only one prover ==
+  +-- file [../../repaired.mlw]
+    +-- theory TwoSumLessThanK_List_Spec
+      +-- goal all_between'vc: Z3 4.8.6
+      +-- goal has_sum_with'vc: Z3 4.8.6
+      +-- goal has_pair_sum'vc: Z3 4.8.6
+      +-- goal best_with_first'vc: Z3 4.8.6
+      +-- goal best_pair_sum_less_than'vc: Z3 4.8.6
+      +-- goal max_int_right_identity'vc: Z3 4.8.6
+      +-- goal max_int_left_identity'vc: Z3 4.8.6
+      +-- goal max_int_upper_bound'vc: Z3 4.8.6
+      +-- goal max_int_lower_bound'vc: Z3 4.8.6
+      +-- goal best_with_first_before_suffix'vc: Z3 4.8.6
+      +-- goal best_before_suffix'vc: Z3 4.8.6
+  
+1 session(s) read, with a total of 14 proof goals.
+== Unproved root goals after first prover ==
+TwoSumLessThanK_List_Spec	best_with_first_bounds'vc
+TwoSumLessThanK_List_Spec	best_pair_sum_bounds'vc
+TwoSumLessThanK_List_Spec	two_sum_less_than_k_list'vc
+== Stage 1: trying remaining goals with prover Alt-Ergo,2.4.0 ==
+---- stage1 | prover: Alt-Ergo,2.4.0 | theory: TwoSumLessThanK_List_Spec | goal: best_with_first_bounds'vc ----
+File repaired.mlw:
+Goal best_with_first_bounds'vc.
+Prover result is: Valid (0.01s, 208 steps).
+Solved in stage 1 using prover: Alt-Ergo,2.4.0
+---- stage1 | prover: Alt-Ergo,2.4.0 | theory: TwoSumLessThanK_List_Spec | goal: best_pair_sum_bounds'vc ----
+File repaired.mlw:
+Goal best_pair_sum_bounds'vc.
+Prover result is: Valid (0.01s, 170 steps).
+Solved in stage 1 using prover: Alt-Ergo,2.4.0
+---- stage1 | prover: Alt-Ergo,2.4.0 | theory: TwoSumLessThanK_List_Spec | goal: two_sum_less_than_k_list'vc ----
+File repaired.mlw:
+Goal two_sum_less_than_k_list'vc.
+Prover result is: Timeout (10.00s, 210263 steps).
+Remaining after prover Alt-Ergo,2.4.0: 1
+== Stage 1: trying remaining goals with prover CVC4,1.8 ==
+---- stage1 | prover: CVC4,1.8 | theory: TwoSumLessThanK_List_Spec | goal: two_sum_less_than_k_list'vc ----
+File repaired.mlw:
+Goal two_sum_less_than_k_list'vc.
+Prover result is: Unknown (unknown + incomplete) (0.06s, 21470 steps).
+Remaining after prover CVC4,1.8: 1
+== Goals still unproved after stage 1 ==
+TwoSumLessThanK_List_Spec	two_sum_less_than_k_list'vc
+== Stage 2: split_vc on unproved goal ==
+Target theory: TwoSumLessThanK_List_Spec
+Target goal  : two_sum_less_than_k_list'vc
+---- stage2 | prover: Z3,4.8.6 | theory: TwoSumLessThanK_List_Spec | goal: two_sum_less_than_k_list'vc ----
+Transforms: split_vc
+File "repaired.mlw", line 167, characters 4-31:
+Sub-goal Precondition of goal two_sum_less_than_k_list'vc.
+Prover result is: Valid (0.01s, 1157 steps).
+
+File "repaired.mlw", line 167, characters 4-31:
+Sub-goal Precondition of goal two_sum_less_than_k_list'vc.
+Prover result is: Valid (0.01s, 1162 steps).
+
+File "repaired.mlw", line 168, characters 13-49:
+Sub-goal Assertion of goal two_sum_less_than_k_list'vc.
+Prover result is: Valid (0.01s, 1185 steps).
+
+File "repaired.mlw", line 169, characters 4-64:
+Sub-goal Precondition of goal two_sum_less_than_k_list'vc.
+Prover result is: Valid (0.01s, 1190 steps).
+
+File "repaired.mlw", line 170, character 13 to line 171, character 43:
+Sub-goal Assertion of goal two_sum_less_than_k_list'vc.
+Prover result is: Valid (0.01s, 1203 steps).
+
+File "repaired.mlw", line 172, characters 13-48:
+Sub-goal Assertion of goal two_sum_less_than_k_list'vc.
+Prover result is: Timeout (10.00s, 164150628 steps).
+
+File "repaired.mlw", line 174, characters 18-29:
+Sub-goal Loop invariant init of goal two_sum_less_than_k_list'vc.
+Prover result is: Valid (0.01s, 1310 steps).
+
+File "repaired.mlw", line 175, characters 18-27:
+Sub-goal Loop invariant init of goal two_sum_less_than_k_list'vc.
+Prover result is: Valid (0.01s, 15549 steps).
+
+File "repaired.mlw", line 176, characters 18-43:
+Sub-goal Loop invariant init of goal two_sum_less_than_k_list'vc.
+Prover result is: Valid (0.01s, 1328 steps).
+
+File "repaired.mlw", line 177, characters 18-99:
+Sub-goal Loop invariant init of goal two_sum_less_than_k_list'vc.
+Prover result is: Valid (0.01s, 1337 steps).
+
+File "repaired.mlw", line 178, characters 18-58:
+Sub-goal Loop invariant init of goal two_sum_less_than_k_list'vc.
+Prover result is: Valid (0.01s, 1932 steps).
+
+File "repaired.mlw", line 179, characters 16-29:
+Sub-goal Loop variant decrease of goal two_sum_less_than_k_list'vc.
+Prover result is: Valid (0.01s, 1424 steps).
+
+File "repaired.mlw", line 174, characters 18-29:
+Sub-goal Loop invariant preservation of goal two_sum_less_than_k_list'vc.
+Prover result is: Valid (0.01s, 1404 steps).
+
+File "repaired.mlw", line 175, characters 18-27:
+Sub-goal Loop invariant preservation of goal two_sum_less_than_k_list'vc.
+Prover result is: Valid (0.01s, 1409 steps).
+
+File "repaired.mlw", line 176, characters 18-43:
+Sub-goal Loop invariant preservation of goal two_sum_less_than_k_list'vc.
+Prover result is: Valid (0.01s, 1414 steps).
+
+File "repaired.mlw", line 177, characters 18-99:
+Sub-goal Loop invariant preservation of goal two_sum_less_than_k_list'vc.
+Prover result is: Valid (0.01s, 1427 steps).
+
+File "repaired.mlw", line 178, characters 18-58:
+Sub-goal Loop invariant preservation of goal two_sum_less_than_k_list'vc.
+Prover result is: Valid (0.01s, 1436 steps).
+
+File "repaired.mlw", line 184, characters 19-37:
+Sub-goal Assertion of goal two_sum_less_than_k_list'vc.
+Prover result is: Valid (0.01s, 1462 steps).
+
+File "repaired.mlw", line 185, characters 19-40:
+Sub-goal Assertion of goal two_sum_less_than_k_list'vc.
+Prover result is: Timeout (10.00s, 90725784 steps).
+
+File "repaired.mlw", line 186, characters 10-39:
+Sub-goal Precondition of goal two_sum_less_than_k_list'vc.
+Prover result is: Valid (0.01s, 1472 steps).
+
+File "repaired.mlw", line 186, characters 10-39:
+Sub-goal Precondition of goal two_sum_less_than_k_list'vc.
+Prover result is: Valid (0.01s, 1477 steps).
+Infrastructure issue in stage 2 with prover Z3,4.8.6; aborting rest of stage 2.
+== Goals still unproved after stage 2 (split_vc) ==
+TwoSumLessThanK_List_Spec	two_sum_less_than_k_list'vc
+== Stage 3: split_vc + inline_all on still-unproved goal ==
+Target theory: TwoSumLessThanK_List_Spec
+Target goal  : two_sum_less_than_k_list'vc
+---- stage3 | prover: Alt-Ergo,2.4.0 | theory: TwoSumLessThanK_List_Spec | goal: two_sum_less_than_k_list'vc ----
+Transforms: split_vc inline_all
+File "repaired.mlw", line 167, characters 4-31:
+Sub-goal Precondition of goal two_sum_less_than_k_list'vc.
+Prover result is: Valid (0.01s, 6 steps).
+
+File "repaired.mlw", line 167, characters 4-31:
+Sub-goal Precondition of goal two_sum_less_than_k_list'vc.
+Prover result is: Valid (0.01s, 6 steps).
+
+File "repaired.mlw", line 168, characters 13-49:
+Sub-goal Assertion of goal two_sum_less_than_k_list'vc.
+Prover result is: Valid (0.01s, 7 steps).
+
+File "repaired.mlw", line 169, characters 4-64:
+Sub-goal Precondition of goal two_sum_less_than_k_list'vc.
+Prover result is: Valid (0.01s, 7 steps).
+
+File "repaired.mlw", line 170, character 13 to line 171, character 43:
+Sub-goal Assertion of goal two_sum_less_than_k_list'vc.
+Prover result is: Valid (0.01s, 16 steps).
+
+File "repaired.mlw", line 172, characters 13-48:
+Sub-goal Assertion of goal two_sum_less_than_k_list'vc.
+Prover result is: Timeout (10.00s, 289134 steps).
+
+File "repaired.mlw", line 174, characters 18-29:
+Sub-goal Loop invariant init of goal two_sum_less_than_k_list'vc.
+Prover result is: Valid (0.01s, 19 steps).
+
+File "repaired.mlw", line 175, characters 18-27:
+Sub-goal Loop invariant init of goal two_sum_less_than_k_list'vc.
+Prover result is: Valid (0.01s, 22 steps).
+
+File "repaired.mlw", line 176, characters 18-43:
+Sub-goal Loop invariant init of goal two_sum_less_than_k_list'vc.
+Prover result is: Valid (0.01s, 20 steps).
+
+File "repaired.mlw", line 177, characters 18-99:
+Sub-goal Loop invariant init of goal two_sum_less_than_k_list'vc.
+Prover result is: Valid (0.01s, 23 steps).
+
+File "repaired.mlw", line 178, characters 18-58:
+Sub-goal Loop invariant init of goal two_sum_less_than_k_list'vc.
+Prover result is: Valid (0.01s, 23 steps).
+
+File "repaired.mlw", line 179, characters 16-29:
+Sub-goal Loop variant decrease of goal two_sum_less_than_k_list'vc.
+Prover result is: Valid (0.01s, 30 steps).
+
+File "repaired.mlw", line 174, characters 18-29:
+Sub-goal Loop invariant preservation of goal two_sum_less_than_k_list'vc.
+Prover result is: Valid (0.01s, 30 steps).
+
+File "repaired.mlw", line 175, characters 18-27:
+Sub-goal Loop invariant preservation of goal two_sum_less_than_k_list'vc.
+Prover result is: Valid (0.01s, 30 steps).
+
+File "repaired.mlw", line 176, characters 18-43:
+Sub-goal Loop invariant preservation of goal two_sum_less_than_k_list'vc.
+Prover result is: Valid (0.01s, 30 steps).
+
+File "repaired.mlw", line 177, characters 18-99:
+Sub-goal Loop invariant preservation of goal two_sum_less_than_k_list'vc.
+Prover result is: Valid (0.01s, 30 steps).
+
+File "repaired.mlw", line 178, characters 18-58:
+Sub-goal Loop invariant preservation of goal two_sum_less_than_k_list'vc.
+Prover result is: Valid (0.01s, 30 steps).
+
+File "repaired.mlw", line 184, characters 19-37:
+Sub-goal Assertion of goal two_sum_less_than_k_list'vc.
+Prover result is: Valid (0.01s, 32 steps).
+
+File "repaired.mlw", line 185, characters 19-40:
+Sub-goal Assertion of goal two_sum_less_than_k_list'vc.
+Prover result is: Valid (0.01s, 64 steps).
+
+File "repaired.mlw", line 186, characters 10-39:
+Sub-goal Precondition of goal two_sum_less_than_k_list'vc.
+Prover result is: Valid (0.01s, 33 steps).
+
+File "repaired.mlw", line 186, characters 10-39:
+Sub-goal Precondition of goal two_sum_less_than_k_list'vc.
+Prover result is: Valid (0.01s, 33 steps).
+
+File "repaired.mlw", line 187, characters 10-39:
+Sub-goal Precondition of goal two_sum_less_than_k_list'vc.
+Prover result is: Valid (0.01s, 76 steps).
+
+File "repaired.mlw", line 187, characters 10-39:
+Sub-goal Precondition of goal two_sum_less_than_k_list'vc.
+Prover result is: Valid (0.01s, 36 steps).
+
+File "repaired.mlw", line 187, characters 10-39:
+Sub-goal Precondition of goal two_sum_less_than_k_list'vc.
+Prover result is: Valid (0.01s, 36 steps).
+
+File "repaired.mlw", line 188, characters 10-35:
+Sub-goal Precondition of goal two_sum_less_than_k_list'vc.
+Prover result is: Valid (0.01s, 38 steps).
+
+File "repaired.mlw", line 188, characters 10-35:
+Sub-goal Precondition of goal two_sum_less_than_k_list'vc.
+Prover result is: Valid (0.01s, 38 steps).
+
+File "repaired.mlw", line 189, character 19 to line 190, character 82:
+Sub-goal Assertion of goal two_sum_less_than_k_list'vc.
+Prover result is: Valid (0.01s, 116 steps).
+
+File "repaired.mlw", line 193, characters 24-35:
+Sub-goal Loop invariant init of goal two_sum_less_than_k_list'vc.
+Prover result is: Valid (0.01s, 44 steps).
+
+File "repaired.mlw", line 194, characters 24-33:
+Sub-goal Loop invariant init of goal two_sum_less_than_k_list'vc.
+Prover result is: Valid (0.01s, 44 steps).
+
+File "repaired.mlw", line 195, characters 24-42:
+Sub-goal Loop invariant init of goal two_sum_less_than_k_list'vc.
+Prover result is: Valid (0.01s, 44 steps).
+
+File "repaired.mlw", line 196, characters 24-49:
+Sub-goal Loop invariant init of goal two_sum_less_than_k_list'vc.
+Prover result is: Valid (0.01s, 44 steps).
+
+File "repaired.mlw", line 197, character 24 to line 198, character 54:
+Sub-goal Loop invariant init of goal two_sum_less_than_k_list'vc.
+Prover result is: Valid (0.01s, 51 steps).
+
+File "repaired.mlw", line 199, character 24 to line 201, character 77:
+Sub-goal Loop invariant init of goal two_sum_less_than_k_list'vc.
+Prover result is: Valid (2.28s, 75180 steps).
+
+File "repaired.mlw", line 202, characters 22-35:
+Sub-goal Loop variant decrease of goal two_sum_less_than_k_list'vc.
+Prover result is: Valid (0.01s, 67 steps).
+
+File "repaired.mlw", line 193, characters 24-35:
+Sub-goal Loop invariant preservation of goal two_sum_less_than_k_list'vc.
+Prover result is: Valid (0.01s, 67 steps).
+
+File "repaired.mlw", line 194, characters 24-33:
+Sub-goal Loop invariant preservation of goal two_sum_less_than_k_list'vc.
+Prover result is: Valid (0.01s, 67 steps).
+
+File "repaired.mlw", line 195, characters 24-42:
+Sub-goal Loop invariant preservation of goal two_sum_less_than_k_list'vc.
+Prover result is: Valid (0.01s, 67 steps).
+
+File "repaired.mlw", line 196, characters 24-49:
+Sub-goal Loop invariant preservation of goal two_sum_less_than_k_list'vc.
+Prover result is: Valid (0.01s, 67 steps).
+
+File "repaired.mlw", line 197, character 24 to line 198, character 54:
+Sub-goal Loop invariant preservation of goal two_sum_less_than_k_list'vc.
+Prover result is: Valid (0.01s, 67 steps).
+
+File "repaired.mlw", line 199, character 24 to line 201, character 77:
+Sub-goal Loop invariant preservation of goal two_sum_less_than_k_list'vc.
+Prover result is: Valid (0.01s, 67 steps).
+
+File "repaired.mlw", line 207, characters 25-43:
+Sub-goal Assertion of goal two_sum_less_than_k_list'vc.
+Prover result is: Valid (0.01s, 70 steps).
+
+File "repaired.mlw", line 208, characters 25-31:
+Sub-goal Assertion of goal two_sum_less_than_k_list'vc.
+Prover result is: Valid (0.01s, 154 steps).
+
+File "repaired.mlw", line 209, characters 25-46:
+Sub-goal Assertion of goal two_sum_less_than_k_list'vc.
+Prover result is: Valid (0.01s, 152 steps).
+
+File "repaired.mlw", line 212, characters 27-40:
+Sub-goal Assertion of goal two_sum_less_than_k_list'vc.
+Prover result is: Valid (0.01s, 73 steps).
+
+File "repaired.mlw", line 213, characters 27-44:
+Sub-goal Assertion of goal two_sum_less_than_k_list'vc.
+Prover result is: Valid (0.01s, 73 steps).
+
+File "repaired.mlw", line 214, characters 27-66:
+Sub-goal Assertion of goal two_sum_less_than_k_list'vc.
+Prover result is: Valid (0.02s, 178 steps).
+
+File "repaired.mlw", line 215, characters 27-62:
+Sub-goal Assertion of goal two_sum_less_than_k_list'vc.
+Prover result is: Timeout (10.00s, 149226 steps).
+
+File "repaired.mlw", line 216, characters 27-72:
+Sub-goal Assertion of goal two_sum_less_than_k_list'vc.
+Prover result is: Valid (0.01s, 137 steps).
+
+File "repaired.mlw", line 217, character 27 to line 218, character 59:
+Sub-goal Assertion of goal two_sum_less_than_k_list'vc.
+Prover result is: Valid (0.01s, 84 steps).
+
+File "repaired.mlw", line 202, characters 22-35:
+Sub-goal Loop variant decrease of goal two_sum_less_than_k_list'vc.
+Prover result is: Valid (0.02s, 200 steps).
+
+File "repaired.mlw", line 193, characters 24-35:
+Sub-goal Loop invariant preservation of goal two_sum_less_than_k_list'vc.
+Prover result is: Valid (0.01s, 114 steps).
+
+File "repaired.mlw", line 194, characters 24-33:
+Sub-goal Loop invariant preservation of goal two_sum_less_than_k_list'vc.
+Prover result is: Valid (0.01s, 86 steps).
+
+File "repaired.mlw", line 195, characters 24-42:
+Sub-goal Loop invariant preservation of goal two_sum_less_than_k_list'vc.
+Prover result is: Valid (0.01s, 87 steps).
+
+File "repaired.mlw", line 196, characters 24-49:
+Sub-goal Loop invariant preservation of goal two_sum_less_than_k_list'vc.
+Prover result is: Valid (0.01s, 87 steps).
+
+File "repaired.mlw", line 197, character 24 to line 198, character 54:
+Sub-goal Loop invariant preservation of goal two_sum_less_than_k_list'vc.
+Prover result is: Valid (0.01s, 141 steps).
+Infrastructure issue in stage 3 with prover Alt-Ergo,2.4.0; aborting rest of stage 3.
+== Final summary ==
+Unproved root goals after first prover : 1
+Remaining failures after split_vc      : 1
+Remaining failures after stage 3       : 1
+Detailed logs stored in                : /Users/rubenm/Desktop/Diversify2Verify/codex-runs/dataset-merge-verification/stage3a-repair/1099_two-sum-less-than-k/list-imperative/two_sum_less_than_k_list_stage3_a6883194_stage3/generated/why3/.why3_sessions/repaired_logs
+Still unproved goals:
+TwoSumLessThanK_List_Spec	two_sum_less_than_k_list'vc
+VERIFY_RESULT: FAILURE
+VERIFY_REASON: unproved_goals_remain
+VERIFY_STAGE: stage3
+VERIFY_ROOT_TOTAL: 14
+VERIFY_ROOT_PROVED: 13
+VERIFY_ROOT_REMAINING: 1

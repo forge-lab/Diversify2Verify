@@ -1,0 +1,106 @@
+module LongestIncreasingSubsequence_List_Stage3_Imperative
+
+  use int.Int
+  use list.List
+  use list.Length
+  use list.Mem
+  use ref.Ref
+
+  predicate valid_input (nums: list int) =
+    1 <= length nums <= 2500 /\
+    (forall x: int. mem x nums -> -10000 <= x <= 10000)
+
+  let rec predicate is_subsequence (sub: list int) (nums: list int)
+    variant { nums }
+  =
+    match sub with
+    | Nil -> true
+    | Cons x xs ->
+        match nums with
+        | Nil -> false
+        | Cons y ys ->
+            (x = y && is_subsequence xs ys) || is_subsequence sub ys
+        end
+    end
+
+  let rec predicate strictly_increasing (seq: list int)
+    variant { seq }
+  =
+    match seq with
+    | Nil -> true
+    | Cons _ Nil -> true
+    | Cons x xs ->
+        match xs with
+        | Nil -> true
+        | Cons y _ -> x < y && strictly_increasing xs
+        end
+    end
+
+  predicate valid_increasing_subsequence (seq: list int) (nums: list int) =
+    seq <> Nil /\
+    is_subsequence seq nums /\
+    strictly_increasing seq
+
+  predicate has_increasing_subsequence_length (nums: list int) (k: int) =
+    exists seq: list int.
+      valid_increasing_subsequence seq nums /\ length seq = k
+
+  predicate longest_increasing_subsequence_length
+    (nums: list int) (answer: int) =
+    1 <= answer <= length nums /\
+    has_increasing_subsequence_length nums answer /\
+    (forall seq: list int.
+      valid_increasing_subsequence seq nums -> length seq <= answer)
+
+  let longest_increasing_subsequence_list (nums: list int) : int
+    requires { valid_input nums }
+    ensures  { longest_increasing_subsequence_length nums result }
+  =
+    let seen = ref Nil in
+    let lengths = ref Nil in
+    let best_overall = ref 0 in
+    let cur = ref nums in
+    while (match !cur with Nil -> false | Cons _ _ -> true end) do
+      invariant { 0 <= length !cur <= length nums }
+      invariant { 0 <= length !seen <= length nums }
+      invariant { length !seen = length !lengths }
+      invariant { 0 <= !best_overall <= length nums }
+      variant   { length !cur }
+
+      match !cur with
+      | Nil -> ()
+      | Cons x xs ->
+          let best_here = ref 1 in
+          let prev_nums = ref !seen in
+          let prev_lengths = ref !lengths in
+          while (match !prev_nums with Nil -> false | Cons _ _ -> true end) do
+            invariant { 0 <= length !prev_nums <= length !seen }
+            invariant { 0 <= length !prev_lengths <= length !lengths }
+            invariant { length !prev_nums = length !prev_lengths }
+            invariant { 1 <= !best_here <= length !seen + 1 }
+            variant   { length !prev_nums }
+
+            match !prev_nums, !prev_lengths with
+            | Cons y ys, Cons d ds ->
+                if y < x then begin
+                  let candidate = d + 1 in
+                  if candidate > !best_here then best_here := candidate
+                end else ();
+                prev_nums := ys;
+                prev_lengths := ds
+            | _, _ ->
+                prev_nums := Nil;
+                prev_lengths := Nil
+            end
+          done;
+          seen := Cons x !seen;
+          lengths := Cons !best_here !lengths;
+          if !best_here > !best_overall then
+            best_overall := !best_here
+          else ();
+          cur := xs
+      end
+    done;
+    !best_overall
+
+end

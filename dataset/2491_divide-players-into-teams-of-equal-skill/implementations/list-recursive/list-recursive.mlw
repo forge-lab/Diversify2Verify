@@ -1,0 +1,211 @@
+module DividePlayersIntoTeamsOfEqualSkill_List_Recursive
+
+  use int.Int
+  use list.List
+
+  let rec insert_sorted (l: list int) (x: int) : list int
+    variant { l }
+  =
+    match l with
+    | Nil -> Cons x Nil
+    | Cons y ys ->
+        if x <= y then Cons x l else Cons y (insert_sorted ys x)
+    end
+
+  let rec insertion_sort (l: list int) : list int
+    variant { l }
+  =
+    match l with
+    | Nil -> Nil
+    | Cons x xs -> insert_sorted (insertion_sort xs) x
+    end
+
+  let rec reverse_append (l: list int) (acc: list int) : list int
+    variant { l }
+  =
+    match l with
+    | Nil -> acc
+    | Cons x xs -> reverse_append xs (Cons x acc)
+    end
+
+  let reverse (l: list int) : list int =
+    reverse_append l Nil
+
+  let rec pair_count (l: list int) : int
+    variant { l }
+  =
+    match l with
+    | Nil -> 0
+    | Cons _ Nil -> 0
+    | Cons _ (Cons _ rest) -> 1 + pair_count rest
+    end
+
+  let rec pair_chemistry
+    (left: list int) (right: list int) (remaining: int) (target: int) : int
+    variant { remaining }
+  =
+    if remaining <= 0 then 0 else
+    match left, right with
+    | Cons x xs, Cons y ys ->
+        if x + y = target then
+          let sub = pair_chemistry xs ys (remaining - 1) target in
+          if sub = -1 then -1 else x * y + sub
+        else -1
+    | _, _ -> -1
+    end
+
+  let divide_players_into_teams_of_equal_skill_list (skill: list int) : int =
+    let sorted = insertion_sort skill in
+    let reversed = reverse sorted in
+    let remaining = pair_count sorted in
+    match sorted, reversed with
+    | Cons first _, Cons last _ ->
+        let target = first + last in
+        pair_chemistry sorted reversed remaining target
+    | _, _ -> -1
+    end
+
+  let test_test_000 () : bool =
+    let skill = Cons 1 (Cons 1000 (Cons 1 (Cons 1000 (Cons 1 (Cons 1000 (Cons 1 (Cons 1000 Nil))))))) in
+    let r = divide_players_into_teams_of_equal_skill_list skill in
+    r = 4000
+
+  let test_test_001 () : bool =
+    let skill = Cons 1 (Cons 1 (Cons 2 (Cons 2 (Cons 3 (Cons 3 (Cons 4 (Cons 4 Nil))))))) in
+    let r = divide_players_into_teams_of_equal_skill_list skill in
+    r = 20
+
+  let test_test_002 () : bool =
+    let skill = Cons 1 (Cons 1 (Cons 2 (Cons 3 Nil))) in
+    let r = divide_players_into_teams_of_equal_skill_list skill in
+    r = -1
+
+  let test_test_003 () : bool =
+    let skill = Cons 1 (Cons 2 (Cons 3 (Cons 4 (Cons 5 (Cons 6 (Cons 7 (Cons 8 Nil))))))) in
+    let r = divide_players_into_teams_of_equal_skill_list skill in
+    r = 60
+
+  let test_test_004 () : bool =
+    let skill = Cons 5 (Cons 5 (Cons 5 (Cons 5 (Cons 5 (Cons 5 Nil))))) in
+    let r = divide_players_into_teams_of_equal_skill_list skill in
+    r = 75
+
+  let test_test_005 () : bool =
+    let skill = Cons 15 (Cons 15 (Cons 15 (Cons 15 (Cons 15 (Cons 15 (Cons 15 (Cons 15 Nil))))))) in
+    let r = divide_players_into_teams_of_equal_skill_list skill in
+    r = 900
+
+  let test_test_006 () : bool =
+    let skill = Cons 3 (Cons 4 Nil) in
+    let r = divide_players_into_teams_of_equal_skill_list skill in
+    r = 12
+
+  let test_test_007 () : bool =
+    let skill = Cons 2 (Cons 3 (Cons 3 (Cons 2 (Cons 2 (Cons 3 Nil))))) in
+    let r = divide_players_into_teams_of_equal_skill_list skill in
+    r = 18
+
+  let test_test_008 () : bool =
+    let skill = Cons 4 (Cons 4 (Cons 4 (Cons 4 Nil))) in
+    let r = divide_players_into_teams_of_equal_skill_list skill in
+    r = 32
+
+  let test_test_009 () : bool =
+    let skill = Cons 3 (Cons 2 (Cons 5 (Cons 1 (Cons 3 (Cons 4 Nil))))) in
+    let r = divide_players_into_teams_of_equal_skill_list skill in
+    r = 22
+
+  let test_test_010 () : bool =
+    let skill = Cons 10 (Cons 10 (Cons 10 (Cons 10 Nil))) in
+    let r = divide_players_into_teams_of_equal_skill_list skill in
+    r = 200
+
+  let test_test_011 () : bool =
+    let skill = Cons 1000 (Cons 1000 (Cons 1 (Cons 1 (Cons 2 (Cons 2 Nil))))) in
+    let r = divide_players_into_teams_of_equal_skill_list skill in
+    r = -1
+
+  let test_test_012 () : bool =
+    let skill = Cons 1 (Cons 2 (Cons 3 (Cons 4 (Cons 5 (Cons 6 Nil))))) in
+    let r = divide_players_into_teams_of_equal_skill_list skill in
+    r = 28
+
+  let test_test_013 () : bool =
+    let skill = Cons 1 (Cons 2 (Cons 3 (Cons 3 (Cons 2 (Cons 1 Nil))))) in
+    let r = divide_players_into_teams_of_equal_skill_list skill in
+    r = 10
+
+  let test_test_014 () : bool =
+    let skill = Cons 1000 (Cons 1 (Cons 1000 (Cons 1 (Cons 1000 (Cons 1 (Cons 1000 (Cons 1 Nil))))))) in
+    let r = divide_players_into_teams_of_equal_skill_list skill in
+    r = 4000
+
+  let test_test_015 () : bool =
+    let skill = Cons 10 (Cons 20 (Cons 30 (Cons 40 (Cons 50 (Cons 60 Nil))))) in
+    let r = divide_players_into_teams_of_equal_skill_list skill in
+    r = 2800
+
+  let test_test_016 () : bool =
+    let skill = Cons 500 (Cons 500 (Cons 500 (Cons 500 (Cons 500 (Cons 500 (Cons 500 (Cons 500 Nil))))))) in
+    let r = divide_players_into_teams_of_equal_skill_list skill in
+    r = 1000000
+
+  let test_test_017 () : bool =
+    let skill = Cons 1 (Cons 3 (Cons 5 (Cons 7 (Cons 9 (Cons 11 Nil))))) in
+    let r = divide_players_into_teams_of_equal_skill_list skill in
+    r = 73
+
+  let test_test_018 () : bool =
+    let skill = Cons 1000 (Cons 1 (Cons 999 (Cons 2 (Cons 500 (Cons 501 Nil))))) in
+    let r = divide_players_into_teams_of_equal_skill_list skill in
+    r = 253498
+
+  let test_test_019 () : bool =
+    let skill = Cons 500 (Cons 500 (Cons 1 (Cons 999 (Cons 2 (Cons 998 (Cons 3 (Cons 997 Nil))))))) in
+    let r = divide_players_into_teams_of_equal_skill_list skill in
+    r = 255986
+
+  let run_tests () : bool =
+    if test_test_000 () then
+    if test_test_001 () then
+    if test_test_002 () then
+    if test_test_003 () then
+    if test_test_004 () then
+    if test_test_005 () then
+    if test_test_006 () then
+    if test_test_007 () then
+    if test_test_008 () then
+    if test_test_009 () then
+    if test_test_010 () then
+    if test_test_011 () then
+    if test_test_012 () then
+    if test_test_013 () then
+    if test_test_014 () then
+    if test_test_015 () then
+    if test_test_016 () then
+    if test_test_017 () then
+    if test_test_018 () then
+    if test_test_019 () then
+      true
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+
+end

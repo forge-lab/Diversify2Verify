@@ -1,0 +1,179 @@
+module FindIndicesWithIndexAndValueDifferenceI_List_Stage3_Recursive
+
+  use int.Int
+  use int.Abs
+  use list.List
+  use list.Length
+  use list.NthNoOpt
+
+  predicate input_constraints (nums: list int) (indexDifference: int) (valueDifference: int) =
+    1 <= length nums <= 100 /\
+    0 <= indexDifference <= 100 /\
+    0 <= valueDifference <= 50 /\
+    (forall k: int. 0 <= k < length nums -> 0 <= nth k nums <= 50)
+
+  function answer_pair (i: int) (j: int) : list int =
+    Cons i (Cons j Nil)
+
+  predicate valid_pair (nums: list int) (indexDifference: int) (valueDifference: int)
+                       (i: int) (j: int) =
+    0 <= i < length nums /\
+    0 <= j < length nums /\
+    abs (i - j) >= indexDifference /\
+    abs (nth i nums - nth j nums) >= valueDifference
+
+  predicate no_valid_pair (nums: list int) (indexDifference: int) (valueDifference: int) =
+    forall i j: int. not (valid_pair nums indexDifference valueDifference i j)
+
+  predicate valid_answer (nums: list int) (indexDifference: int) (valueDifference: int)
+                         (answer: list int) =
+    (no_valid_pair nums indexDifference valueDifference /\
+     answer = answer_pair (-1) (-1)) \/
+    (exists i j: int.
+       answer = answer_pair i j /\
+       valid_pair nums indexDifference valueDifference i j)
+
+  predicate suffix_at (all_nums: list int) (rest: list int) (start: int) =
+    0 <= start <= length all_nums /\
+    length rest = length all_nums - start /\
+    (forall k: int. 0 <= k < length rest ->
+       nth k rest = nth (start + k) all_nums)
+
+  let lemma suffix_at_self (nums: list int)
+    ensures { suffix_at nums nums 0 }
+  =
+    assert { length nums = length nums - 0 };
+    assert { forall k: int. 0 <= k < length nums -> nth k nums = nth (0 + k) nums }
+
+  let lemma suffix_at_cons (all_nums: list int) (x: int) (xs: list int) (start: int)
+    requires { suffix_at all_nums (Cons x xs) start }
+    ensures  { 0 <= start < length all_nums }
+    ensures  { x = nth start all_nums }
+    ensures  { suffix_at all_nums xs (start + 1) }
+  =
+    assert { length (Cons x xs) = 1 + length xs };
+    assert { length xs = length all_nums - (start + 1) };
+    assert { nth 0 (Cons x xs) = x };
+    assert { x = nth (start + 0) all_nums };
+    assert { forall k: int. 0 <= k < length xs ->
+      nth k xs = nth ((start + 1) + k) all_nums }
+
+  let make_answer (i: int) (j: int) : list int
+    ensures { result = answer_pair i j }
+  =
+    Cons i (Cons j Nil)
+
+  let rec same_answer (left: list int) (right: list int) : bool
+    ensures { result <-> left = right }
+    variant { left }
+  =
+    match left, right with
+    | Nil, Nil ->
+        true
+    | Cons x xs, Cons y ys ->
+        if x = y then same_answer xs ys else false
+    | _, _ ->
+        false
+    end
+
+  let is_not_found (answer: list int) : bool
+    ensures { result <-> answer = answer_pair (-1) (-1) }
+  =
+    same_answer answer (make_answer (-1) (-1))
+
+  let rec search_j
+      (all_nums: list int) (value_i: int) (i: int) (j: int) (rest: list int)
+      (indexDifference: int) (valueDifference: int) : list int
+    requires { suffix_at all_nums rest j }
+    requires { 0 <= i < length all_nums }
+    requires { value_i = nth i all_nums }
+    ensures  {
+      (result = answer_pair (-1) (-1) /\
+       (forall q: int. j <= q < length all_nums ->
+          not (valid_pair all_nums indexDifference valueDifference i q))) \/
+      (exists q: int.
+         result = answer_pair i q /\
+         j <= q < length all_nums /\
+         valid_pair all_nums indexDifference valueDifference i q)
+    }
+    variant { rest }
+  =
+    match rest with
+    | Nil ->
+        assert { length rest = 0 };
+        assert { j = length all_nums };
+        make_answer (-1) (-1)
+    | Cons value_j tail ->
+        suffix_at_cons all_nums value_j tail j;
+        if abs (i - j) >= indexDifference && abs (value_i - value_j) >= valueDifference then
+          begin
+            assert { 0 <= j < length all_nums };
+            assert { value_j = nth j all_nums };
+            assert { valid_pair all_nums indexDifference valueDifference i j };
+            make_answer i j
+          end
+        else
+          begin
+            assert { not (valid_pair all_nums indexDifference valueDifference i j) };
+            let candidate =
+              search_j all_nums value_i i (j + 1) tail indexDifference valueDifference in
+            candidate
+          end
+    end
+
+  let rec search_i
+      (all_nums: list int) (remaining_i: list int) (i: int)
+      (indexDifference: int) (valueDifference: int) : list int
+    requires { suffix_at all_nums remaining_i i }
+    ensures  {
+      (result = answer_pair (-1) (-1) /\
+       (forall p q: int. i <= p < length all_nums ->
+          not (valid_pair all_nums indexDifference valueDifference p q))) \/
+      (exists p q: int.
+         result = answer_pair p q /\
+         valid_pair all_nums indexDifference valueDifference p q)
+    }
+    variant { remaining_i }
+  =
+    match remaining_i with
+    | Nil ->
+        assert { length remaining_i = 0 };
+        assert { i = length all_nums };
+        make_answer (-1) (-1)
+    | Cons value_i tail_i ->
+        suffix_at_cons all_nums value_i tail_i i;
+        suffix_at_self all_nums;
+        let candidate =
+          search_j all_nums value_i i 0 all_nums indexDifference valueDifference in
+        if is_not_found candidate then
+          begin
+            assert { candidate = answer_pair (-1) (-1) };
+            let later =
+              search_i all_nums tail_i (i + 1) indexDifference valueDifference in
+            later
+          end
+        else
+          begin
+            assert { candidate <> answer_pair (-1) (-1) };
+            candidate
+          end
+    end
+
+  let find_indices_with_index_and_value_difference_i_list
+      (nums: list int) (indexDifference: int) (valueDifference: int) : list int
+    requires { input_constraints nums indexDifference valueDifference }
+    ensures  { valid_answer nums indexDifference valueDifference result }
+  =
+    suffix_at_self nums;
+    let answer = search_i nums nums 0 indexDifference valueDifference in
+    assert {
+      (answer = answer_pair (-1) (-1) /\
+       (forall p q: int. 0 <= p < length nums ->
+          not (valid_pair nums indexDifference valueDifference p q))) \/
+      (exists p q: int.
+         answer = answer_pair p q /\
+         valid_pair nums indexDifference valueDifference p q)
+    };
+    answer
+
+end

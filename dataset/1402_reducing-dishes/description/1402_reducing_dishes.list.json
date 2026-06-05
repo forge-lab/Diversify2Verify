@@ -1,0 +1,2347 @@
+{
+  "task": {
+    "task_id": "reducing-dishes",
+    "question_id": 1402,
+    "difficulty": "Hard",
+    "source_file": "bench2/1402.json"
+  },
+  "target": {
+    "name": "list",
+    "language": "why3",
+    "module_name": "ReducingDishes_List_Spec",
+    "output_file": "generated/why3/list/reducing_dishes_list.mlw",
+    "signature": {
+      "raw": "val reducing_dishes_list (satisfaction: list int) : int",
+      "function_name": "reducing_dishes_list",
+      "parameters": [
+        {
+          "name": "satisfaction",
+          "why3_type": "list int",
+          "semantic_type": "int_sequence"
+        }
+      ],
+      "return": {
+        "why3_type": "int",
+        "semantic_type": "int"
+      }
+    }
+  },
+  "problem": {
+    "description": "A chef has collected data on the satisfaction level of his n dishes. Chef can cook any dish in 1 unit of time.\nLike-time coefficient of a dish is defined as the time taken to cook that dish including previous dishes multiplied by its satisfaction level i.e. time[i] * satisfaction[i].\nReturn the maximum sum of like-time coefficient that the chef can obtain after preparing some amount of dishes.\nDishes can be prepared in any order and the chef can discard some dishes to get this maximum value.\n \nExample 1:\n\nInput: satisfaction = [-1,-8,0,5,-9]\nOutput: 14\nExplanation: After Removing the second and last dish, the maximum total like-time coefficient will be equal to (-1*1 + 0*2 + 5*3 = 14).\nEach dish is prepared in one unit of time.\nExample 2:\n\nInput: satisfaction = [4,3,2]\nOutput: 20\nExplanation: Dishes can be prepared in any order, (2*1 + 3*2 + 4*3 = 20)\n\nExample 3:\n\nInput: satisfaction = [-1,-4,-5]\nOutput: 0\nExplanation: People do not like the dishes. No dish is prepared.\n\n \nConstraints:\n\nn == satisfaction.length\n1 <= n <= 500\n-1000 <= satisfaction[i] <= 1000\n\n"
+  },
+  "tests": [
+    {
+      "id": "test_000",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "satisfaction": [
+          1,
+          -1,
+          2,
+          -2,
+          3,
+          -3
+        ]
+      },
+      "expected": 22,
+      "warnings": []
+    },
+    {
+      "id": "test_001",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "satisfaction": [
+          0
+        ]
+      },
+      "expected": 0,
+      "warnings": []
+    },
+    {
+      "id": "test_002",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "satisfaction": [
+          -1
+        ]
+      },
+      "expected": 0,
+      "warnings": []
+    },
+    {
+      "id": "test_003",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "satisfaction": [
+          -500,
+          -500,
+          -500,
+          -500,
+          -500
+        ]
+      },
+      "expected": 0,
+      "warnings": []
+    },
+    {
+      "id": "test_004",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "satisfaction": [
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "expected": 0,
+      "warnings": []
+    },
+    {
+      "id": "test_005",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "satisfaction": [
+          -1000,
+          1000,
+          -500,
+          500
+        ]
+      },
+      "expected": 3500,
+      "warnings": []
+    },
+    {
+      "id": "test_006",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "satisfaction": [
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "expected": 0,
+      "warnings": []
+    },
+    {
+      "id": "test_007",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "satisfaction": [
+          1000,
+          -1000,
+          1000,
+          -1000,
+          1000
+        ]
+      },
+      "expected": 9000,
+      "warnings": []
+    },
+    {
+      "id": "test_008",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "satisfaction": [
+          -1,
+          -8,
+          0,
+          5,
+          -9
+        ]
+      },
+      "expected": 14,
+      "warnings": []
+    },
+    {
+      "id": "test_009",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "satisfaction": [
+          -10,
+          -20,
+          -30,
+          10,
+          20,
+          30
+        ]
+      },
+      "expected": 220,
+      "warnings": []
+    },
+    {
+      "id": "test_010",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "satisfaction": [
+          1,
+          2,
+          3,
+          4,
+          5
+        ]
+      },
+      "expected": 55,
+      "warnings": []
+    },
+    {
+      "id": "test_011",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "satisfaction": [
+          100,
+          200,
+          300,
+          400,
+          500
+        ]
+      },
+      "expected": 5500,
+      "warnings": []
+    },
+    {
+      "id": "test_012",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "satisfaction": [
+          -10,
+          -20,
+          -30,
+          -40,
+          -50
+        ]
+      },
+      "expected": 0,
+      "warnings": []
+    },
+    {
+      "id": "test_013",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "satisfaction": [
+          4,
+          3,
+          2
+        ]
+      },
+      "expected": 20,
+      "warnings": []
+    },
+    {
+      "id": "test_014",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "satisfaction": [
+          500,
+          500,
+          500,
+          500,
+          500
+        ]
+      },
+      "expected": 7500,
+      "warnings": []
+    },
+    {
+      "id": "test_015",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "satisfaction": [
+          -1000,
+          1000
+        ]
+      },
+      "expected": 1000,
+      "warnings": []
+    },
+    {
+      "id": "test_016",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "satisfaction": [
+          -1,
+          -4,
+          -5
+        ]
+      },
+      "expected": 0,
+      "warnings": []
+    },
+    {
+      "id": "test_017",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "satisfaction": [
+          -5,
+          -4,
+          -3,
+          -2,
+          -1
+        ]
+      },
+      "expected": 0,
+      "warnings": []
+    },
+    {
+      "id": "test_018",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "satisfaction": [
+          -500,
+          -400,
+          -300,
+          -200,
+          -100
+        ]
+      },
+      "expected": 0,
+      "warnings": []
+    },
+    {
+      "id": "test_019",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "satisfaction": [
+          1000,
+          -1000,
+          1000,
+          -1000,
+          1000
+        ]
+      },
+      "expected": 9000,
+      "warnings": []
+    },
+    {
+      "id": "test_020",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "satisfaction": [
+          1
+        ]
+      },
+      "expected": 1,
+      "warnings": []
+    },
+    {
+      "id": "test_021",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "satisfaction": [
+          -1,
+          1,
+          -2,
+          2,
+          -3,
+          3
+        ]
+      },
+      "expected": 22,
+      "warnings": []
+    },
+    {
+      "id": "test_022",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "satisfaction": [
+          1000,
+          -1000,
+          1000,
+          -1000
+        ]
+      },
+      "expected": 4000,
+      "warnings": []
+    },
+    {
+      "id": "test_023",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "satisfaction": [
+          5,
+          -1,
+          3,
+          2,
+          -2,
+          1
+        ]
+      },
+      "expected": 52,
+      "warnings": []
+    },
+    {
+      "id": "test_024",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "satisfaction": [
+          10,
+          9,
+          8,
+          7,
+          6,
+          5,
+          -1,
+          -2,
+          -3,
+          -4,
+          -5,
+          -6,
+          -7,
+          -8,
+          -9,
+          -10
+        ]
+      },
+      "expected": 415,
+      "warnings": []
+    },
+    {
+      "id": "test_025",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "satisfaction": [
+          100,
+          -90,
+          50,
+          -40,
+          30,
+          -20,
+          10,
+          -5,
+          0
+        ]
+      },
+      "expected": 1320,
+      "warnings": []
+    },
+    {
+      "id": "test_026",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "satisfaction": [
+          100,
+          100,
+          100,
+          100,
+          100,
+          100,
+          100,
+          100,
+          100,
+          100,
+          100,
+          100,
+          100,
+          100,
+          100,
+          100
+        ]
+      },
+      "expected": 13600,
+      "warnings": []
+    },
+    {
+      "id": "test_027",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "satisfaction": [
+          1,
+          -1,
+          2,
+          -2,
+          3,
+          -3,
+          4,
+          -4,
+          5,
+          -5,
+          6,
+          -6,
+          7,
+          -7,
+          8,
+          -8,
+          9,
+          -9,
+          10,
+          -10
+        ]
+      },
+      "expected": 715,
+      "warnings": []
+    },
+    {
+      "id": "test_028",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "satisfaction": [
+          -500,
+          -499,
+          -498,
+          -497,
+          -496,
+          -495,
+          -494,
+          -493,
+          -492,
+          -491,
+          -490,
+          -489,
+          -488,
+          -487,
+          -486
+        ]
+      },
+      "expected": 0,
+      "warnings": []
+    },
+    {
+      "id": "test_029",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "satisfaction": [
+          1,
+          -2,
+          3,
+          -4,
+          5,
+          -6,
+          7,
+          -8,
+          9,
+          -10
+        ]
+      },
+      "expected": 155,
+      "warnings": []
+    },
+    {
+      "id": "test_030",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "satisfaction": [
+          999,
+          -999,
+          998,
+          -998,
+          997,
+          -997,
+          996,
+          -996,
+          995,
+          -995
+        ]
+      },
+      "expected": 24945,
+      "warnings": []
+    },
+    {
+      "id": "test_031",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "satisfaction": [
+          999,
+          1000,
+          998,
+          -1000,
+          500,
+          499,
+          501,
+          -499,
+          -501,
+          0,
+          1,
+          -1,
+          2,
+          -2,
+          3,
+          -3
+        ]
+      },
+      "expected": 59488,
+      "warnings": []
+    },
+    {
+      "id": "test_032",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "satisfaction": [
+          1,
+          -1,
+          2,
+          -2,
+          3,
+          -3,
+          4,
+          -4,
+          5,
+          -5,
+          6,
+          -6,
+          7,
+          -7,
+          8,
+          -8,
+          9,
+          -9
+        ]
+      },
+      "expected": 525,
+      "warnings": []
+    },
+    {
+      "id": "test_033",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "satisfaction": [
+          -1,
+          -2,
+          -3,
+          4,
+          5,
+          6,
+          7,
+          8
+        ]
+      },
+      "expected": 180,
+      "warnings": []
+    },
+    {
+      "id": "test_034",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "satisfaction": [
+          -1,
+          0,
+          1,
+          -2,
+          2,
+          -3,
+          3,
+          -4,
+          4,
+          -5,
+          5
+        ]
+      },
+      "expected": 110,
+      "warnings": []
+    },
+    {
+      "id": "test_035",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "satisfaction": [
+          -10,
+          -20,
+          -30,
+          -40,
+          -50,
+          -60,
+          -70,
+          -80,
+          -90,
+          -100,
+          1,
+          2,
+          3,
+          4,
+          5
+        ]
+      },
+      "expected": 60,
+      "warnings": []
+    },
+    {
+      "id": "test_036",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "satisfaction": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          -1,
+          -2,
+          -3,
+          -4,
+          -5,
+          6,
+          7,
+          8,
+          9,
+          10
+        ]
+      },
+      "expected": 625,
+      "warnings": []
+    },
+    {
+      "id": "test_037",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "satisfaction": [
+          5,
+          4,
+          3,
+          2,
+          1,
+          -1,
+          -2,
+          -3,
+          -4,
+          -5,
+          6,
+          7,
+          8,
+          9,
+          10
+        ]
+      },
+      "expected": 625,
+      "warnings": []
+    },
+    {
+      "id": "test_038",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "satisfaction": [
+          -500,
+          -400,
+          -300,
+          -200,
+          -100,
+          100,
+          200,
+          300,
+          400,
+          500
+        ]
+      },
+      "expected": 9500,
+      "warnings": []
+    },
+    {
+      "id": "test_039",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "satisfaction": [
+          -10,
+          0,
+          10,
+          -20,
+          0,
+          20,
+          -30,
+          0,
+          30,
+          -40
+        ]
+      },
+      "expected": 400,
+      "warnings": []
+    },
+    {
+      "id": "test_040",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "satisfaction": [
+          10,
+          20,
+          30,
+          40,
+          50,
+          -10,
+          -20,
+          -30,
+          -40,
+          -50,
+          60,
+          70,
+          80,
+          90,
+          100
+        ]
+      },
+      "expected": 6250,
+      "warnings": []
+    },
+    {
+      "id": "test_041",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "satisfaction": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "expected": 0,
+      "warnings": []
+    },
+    {
+      "id": "test_042",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "satisfaction": [
+          -500,
+          500,
+          -250,
+          250,
+          0,
+          100,
+          -100,
+          150
+        ]
+      },
+      "expected": 5850,
+      "warnings": []
+    },
+    {
+      "id": "test_043",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "satisfaction": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          -1,
+          -2,
+          -3,
+          -4,
+          -5
+        ]
+      },
+      "expected": 95,
+      "warnings": []
+    },
+    {
+      "id": "test_044",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "satisfaction": [
+          9,
+          8,
+          7,
+          6,
+          5,
+          4,
+          3,
+          2,
+          1,
+          0,
+          -1,
+          -2,
+          -3,
+          -4,
+          -5,
+          -6,
+          -7,
+          -8,
+          -9
+        ]
+      },
+      "expected": 570,
+      "warnings": []
+    },
+    {
+      "id": "test_045",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "satisfaction": [
+          -10,
+          10,
+          -20,
+          20,
+          -30,
+          30,
+          -40,
+          40,
+          -50,
+          50
+        ]
+      },
+      "expected": 950,
+      "warnings": []
+    },
+    {
+      "id": "test_046",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "satisfaction": [
+          1000,
+          999,
+          998,
+          997,
+          996,
+          995,
+          994,
+          993,
+          992,
+          991,
+          990,
+          989,
+          988,
+          987,
+          986,
+          985,
+          984,
+          983,
+          982,
+          981,
+          980
+        ]
+      },
+      "expected": 229460,
+      "warnings": []
+    },
+    {
+      "id": "test_047",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "satisfaction": [
+          -100,
+          -200,
+          -300,
+          50,
+          100,
+          150,
+          200,
+          250
+        ]
+      },
+      "expected": 4000,
+      "warnings": []
+    },
+    {
+      "id": "test_048",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "satisfaction": [
+          50,
+          20,
+          -10,
+          0,
+          -30,
+          100,
+          -200,
+          300,
+          -400,
+          500
+        ]
+      },
+      "expected": 8040,
+      "warnings": []
+    },
+    {
+      "id": "test_049",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "satisfaction": [
+          -100,
+          -200,
+          -300,
+          -400,
+          100,
+          200,
+          300,
+          400,
+          500
+        ]
+      },
+      "expected": 9500,
+      "warnings": []
+    },
+    {
+      "id": "test_050",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "satisfaction": [
+          -1,
+          -2,
+          -3,
+          -4,
+          -5,
+          0,
+          1,
+          2,
+          3,
+          4,
+          5
+        ]
+      },
+      "expected": 110,
+      "warnings": []
+    },
+    {
+      "id": "test_051",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "satisfaction": [
+          500,
+          499,
+          498,
+          497,
+          496,
+          495,
+          494,
+          493,
+          492,
+          491,
+          490,
+          489,
+          488,
+          487,
+          486
+        ]
+      },
+      "expected": 59440,
+      "warnings": []
+    },
+    {
+      "id": "test_052",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "satisfaction": [
+          500,
+          -1,
+          -2,
+          -3,
+          0,
+          1,
+          2,
+          3,
+          4,
+          5
+        ]
+      },
+      "expected": 5105,
+      "warnings": []
+    },
+    {
+      "id": "test_053",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "satisfaction": [
+          -999,
+          -998,
+          -997,
+          -996,
+          999,
+          998,
+          997,
+          996
+        ]
+      },
+      "expected": 15970,
+      "warnings": []
+    },
+    {
+      "id": "test_054",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "satisfaction": [
+          -1,
+          1,
+          -2,
+          2,
+          -3,
+          3,
+          -4,
+          4,
+          -5,
+          5
+        ]
+      },
+      "expected": 95,
+      "warnings": []
+    },
+    {
+      "id": "test_055",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "satisfaction": [
+          5,
+          -5,
+          15,
+          -15,
+          25,
+          -25,
+          35,
+          -35
+        ]
+      },
+      "expected": 420,
+      "warnings": []
+    },
+    {
+      "id": "test_056",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "satisfaction": [
+          5,
+          -1,
+          3,
+          -2,
+          4,
+          -3,
+          2
+        ]
+      },
+      "expected": 72,
+      "warnings": []
+    },
+    {
+      "id": "test_057",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "satisfaction": [
+          -100,
+          0,
+          100,
+          -200,
+          200,
+          -300,
+          300,
+          -400,
+          400,
+          -500,
+          500
+        ]
+      },
+      "expected": 11000,
+      "warnings": []
+    },
+    {
+      "id": "test_058",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "satisfaction": [
+          999,
+          1000,
+          -999,
+          -1000,
+          998,
+          997,
+          -998,
+          -997,
+          996,
+          -996
+        ]
+      },
+      "expected": 24970,
+      "warnings": []
+    },
+    {
+      "id": "test_059",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "satisfaction": [
+          -100,
+          -90,
+          -80,
+          -70,
+          -60,
+          -50,
+          -40,
+          -30,
+          -20,
+          -10
+        ]
+      },
+      "expected": 0,
+      "warnings": []
+    },
+    {
+      "id": "test_060",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "satisfaction": [
+          10,
+          -1,
+          2,
+          5,
+          -7,
+          8,
+          -2
+        ]
+      },
+      "expected": 137,
+      "warnings": []
+    },
+    {
+      "id": "test_061",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "satisfaction": [
+          1,
+          -1,
+          1,
+          -1,
+          1,
+          -1,
+          1,
+          -1,
+          1,
+          -1,
+          1,
+          -1,
+          1,
+          -1,
+          1,
+          -1,
+          1,
+          -1,
+          1,
+          -1
+        ]
+      },
+      "expected": 100,
+      "warnings": []
+    },
+    {
+      "id": "test_062",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "satisfaction": [
+          -5,
+          -2,
+          0,
+          1,
+          3,
+          6
+        ]
+      },
+      "expected": 46,
+      "warnings": []
+    },
+    {
+      "id": "test_063",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "satisfaction": [
+          100,
+          90,
+          80,
+          70,
+          60,
+          50,
+          40,
+          30,
+          20,
+          10,
+          -1,
+          -2,
+          -3,
+          -4,
+          -5
+        ]
+      },
+      "expected": 6565,
+      "warnings": []
+    },
+    {
+      "id": "test_064",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "satisfaction": [
+          -1,
+          -1,
+          -1,
+          -1,
+          -1,
+          -1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1
+        ]
+      },
+      "expected": 36,
+      "warnings": []
+    },
+    {
+      "id": "test_065",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "satisfaction": [
+          -500,
+          500,
+          -499,
+          499,
+          -498,
+          498,
+          -497,
+          497,
+          -496,
+          496
+        ]
+      },
+      "expected": 12470,
+      "warnings": []
+    },
+    {
+      "id": "test_066",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "satisfaction": [
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          -1,
+          -1,
+          -1,
+          -1,
+          -1,
+          -1,
+          -1,
+          -1,
+          -1,
+          -1
+        ]
+      },
+      "expected": 100,
+      "warnings": []
+    },
+    {
+      "id": "test_067",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "satisfaction": [
+          9,
+          -1,
+          -2,
+          3,
+          -4,
+          5,
+          -6,
+          7,
+          -8,
+          9
+        ]
+      },
+      "expected": 235,
+      "warnings": []
+    },
+    {
+      "id": "test_068",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "satisfaction": [
+          10,
+          -10,
+          20,
+          -20,
+          30,
+          -30,
+          40,
+          -40,
+          50,
+          -50
+        ]
+      },
+      "expected": 950,
+      "warnings": []
+    },
+    {
+      "id": "test_069",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "satisfaction": [
+          -5,
+          -4,
+          -3,
+          -2,
+          -1,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10
+        ]
+      },
+      "expected": 625,
+      "warnings": []
+    },
+    {
+      "id": "test_070",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "satisfaction": [
+          -5,
+          -3,
+          -2,
+          1,
+          4,
+          6
+        ]
+      },
+      "expected": 43,
+      "warnings": []
+    },
+    {
+      "id": "test_071",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "satisfaction": [
+          -1,
+          -2,
+          -3,
+          -4,
+          -5,
+          -6,
+          -7,
+          -8,
+          -9,
+          -10
+        ]
+      },
+      "expected": 0,
+      "warnings": []
+    },
+    {
+      "id": "test_072",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "satisfaction": [
+          10,
+          20,
+          30,
+          40,
+          50,
+          60,
+          70,
+          80,
+          90,
+          100
+        ]
+      },
+      "expected": 3850,
+      "warnings": []
+    },
+    {
+      "id": "test_073",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "satisfaction": [
+          900,
+          100,
+          200,
+          -900,
+          50,
+          -50,
+          300,
+          -300,
+          400,
+          -400
+        ]
+      },
+      "expected": 14450,
+      "warnings": []
+    },
+    {
+      "id": "test_074",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "satisfaction": [
+          10,
+          20,
+          30,
+          40,
+          50,
+          -10,
+          -20,
+          -30,
+          -40,
+          -50
+        ]
+      },
+      "expected": 950,
+      "warnings": []
+    },
+    {
+      "id": "test_075",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "satisfaction": [
+          -5,
+          -4,
+          -3,
+          -2,
+          -1,
+          1,
+          2,
+          3,
+          4,
+          5
+        ]
+      },
+      "expected": 95,
+      "warnings": []
+    },
+    {
+      "id": "test_076",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "satisfaction": [
+          -100,
+          -200,
+          -300,
+          -400,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10
+        ]
+      },
+      "expected": 385,
+      "warnings": []
+    },
+    {
+      "id": "test_077",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "satisfaction": [
+          1,
+          -1,
+          2,
+          -2,
+          3,
+          -3,
+          4,
+          -4,
+          5,
+          -5,
+          6,
+          -6
+        ]
+      },
+      "expected": 161,
+      "warnings": []
+    },
+    {
+      "id": "test_078",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "satisfaction": [
+          -999,
+          -998,
+          -997,
+          -996,
+          -995,
+          995,
+          996,
+          997,
+          998,
+          999
+        ]
+      },
+      "expected": 24945,
+      "warnings": []
+    },
+    {
+      "id": "test_079",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "satisfaction": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          1,
+          1,
+          1,
+          1,
+          1
+        ]
+      },
+      "expected": 40,
+      "warnings": []
+    },
+    {
+      "id": "test_080",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "satisfaction": [
+          -1,
+          0,
+          1,
+          -2,
+          0,
+          2,
+          -3,
+          0,
+          3
+        ]
+      },
+      "expected": 40,
+      "warnings": []
+    },
+    {
+      "id": "test_081",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "satisfaction": [
+          -5,
+          -3,
+          -1,
+          1,
+          3,
+          5
+        ]
+      },
+      "expected": 35,
+      "warnings": []
+    },
+    {
+      "id": "test_082",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "satisfaction": [
+          -50,
+          -50,
+          50,
+          50,
+          -25,
+          -25,
+          25,
+          25,
+          -75,
+          75
+        ]
+      },
+      "expected": 1375,
+      "warnings": []
+    },
+    {
+      "id": "test_083",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "satisfaction": [
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1
+        ]
+      },
+      "expected": 465,
+      "warnings": []
+    },
+    {
+      "id": "test_084",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "satisfaction": [
+          -10,
+          -20,
+          -30,
+          -40,
+          -50,
+          5,
+          15,
+          25,
+          35,
+          45
+        ]
+      },
+      "expected": 775,
+      "warnings": []
+    },
+    {
+      "id": "test_085",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "satisfaction": [
+          -9,
+          -8,
+          -7,
+          -6,
+          -5,
+          1,
+          2,
+          3,
+          4,
+          5
+        ]
+      },
+      "expected": 69,
+      "warnings": []
+    },
+    {
+      "id": "test_086",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "satisfaction": [
+          -100,
+          -200,
+          -300,
+          100,
+          200,
+          300,
+          400,
+          500
+        ]
+      },
+      "expected": 9000,
+      "warnings": []
+    },
+    {
+      "id": "test_087",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "satisfaction": [
+          -1,
+          -2,
+          -3,
+          -4,
+          -5,
+          6,
+          7,
+          8,
+          9,
+          10
+        ]
+      },
+      "expected": 295,
+      "warnings": []
+    },
+    {
+      "id": "test_088",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "satisfaction": [
+          -100,
+          -90,
+          -80,
+          70,
+          80,
+          90,
+          100
+        ]
+      },
+      "expected": 1400,
+      "warnings": []
+    },
+    {
+      "id": "test_089",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "satisfaction": [
+          -1,
+          -1,
+          -1,
+          -1,
+          -1,
+          -1,
+          -1,
+          -1,
+          -1,
+          -1,
+          -1,
+          -1,
+          -1,
+          -1,
+          -1
+        ]
+      },
+      "expected": 0,
+      "warnings": []
+    },
+    {
+      "id": "test_090",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "satisfaction": [
+          -5,
+          -4,
+          -3,
+          -2,
+          -1,
+          0,
+          1,
+          2,
+          3,
+          4,
+          5
+        ]
+      },
+      "expected": 110,
+      "warnings": []
+    },
+    {
+      "id": "test_091",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "satisfaction": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10
+        ]
+      },
+      "expected": 385,
+      "warnings": []
+    },
+    {
+      "id": "test_092",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "satisfaction": [
+          50,
+          100,
+          150,
+          200,
+          -10,
+          -20,
+          -30,
+          -40,
+          -50,
+          -60
+        ]
+      },
+      "expected": 3940,
+      "warnings": []
+    },
+    {
+      "id": "test_093",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "satisfaction": [
+          -10,
+          -9,
+          -8,
+          -7,
+          -6,
+          -5,
+          -4,
+          -3,
+          -2,
+          -1,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10
+        ]
+      },
+      "expected": 715,
+      "warnings": []
+    },
+    {
+      "id": "test_094",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "satisfaction": [
+          100,
+          100,
+          100,
+          -1,
+          -1,
+          -1,
+          -1,
+          -1,
+          -1,
+          -1
+        ]
+      },
+      "expected": 2672,
+      "warnings": []
+    },
+    {
+      "id": "test_095",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "satisfaction": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "expected": 0,
+      "warnings": []
+    },
+    {
+      "id": "test_096",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "satisfaction": [
+          -1000,
+          -999,
+          -998,
+          -997,
+          -996,
+          -995,
+          -994,
+          -993,
+          -992,
+          -991,
+          -990,
+          -989,
+          -988,
+          -987,
+          -986,
+          -985,
+          -984,
+          -983,
+          -982,
+          -981,
+          -980
+        ]
+      },
+      "expected": 0,
+      "warnings": []
+    },
+    {
+      "id": "test_097",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "satisfaction": [
+          -1,
+          -1,
+          -1,
+          -1,
+          -1,
+          -1,
+          -1,
+          -1,
+          -1,
+          -1
+        ]
+      },
+      "expected": 0,
+      "warnings": []
+    },
+    {
+      "id": "test_098",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "satisfaction": [
+          -10,
+          -9,
+          -8,
+          -7,
+          -6,
+          -5,
+          -4,
+          -3,
+          -2,
+          -1
+        ]
+      },
+      "expected": 0,
+      "warnings": []
+    },
+    {
+      "id": "test_099",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "satisfaction": [
+          -1000,
+          1000,
+          -999,
+          999,
+          -998,
+          998,
+          -997,
+          997,
+          -996,
+          996,
+          -995,
+          995,
+          -994,
+          994
+        ]
+      },
+      "expected": 48909,
+      "warnings": []
+    },
+    {
+      "id": "test_100",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "satisfaction": [
+          -1,
+          -2,
+          -3,
+          4,
+          5,
+          6
+        ]
+      },
+      "expected": 67,
+      "warnings": []
+    },
+    {
+      "id": "test_101",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "satisfaction": [
+          -1,
+          2,
+          -3,
+          4,
+          -5,
+          6,
+          -7,
+          8,
+          -9,
+          10,
+          -11,
+          12,
+          -13,
+          14,
+          -15,
+          16
+        ]
+      },
+      "expected": 780,
+      "warnings": []
+    },
+    {
+      "id": "test_102",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "satisfaction": [
+          -500,
+          500,
+          -400,
+          400,
+          -300,
+          300,
+          -200,
+          200,
+          -100,
+          100
+        ]
+      },
+      "expected": 9500,
+      "warnings": []
+    },
+    {
+      "id": "test_103",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "satisfaction": [
+          500,
+          -500,
+          250,
+          -250,
+          125,
+          -125,
+          62,
+          -62,
+          31,
+          -31
+        ]
+      },
+      "expected": 7092,
+      "warnings": []
+    },
+    {
+      "id": "test_104",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "satisfaction": [
+          -1000,
+          -500,
+          0,
+          500,
+          1000,
+          1500,
+          2000
+        ]
+      },
+      "expected": 28000,
+      "warnings": []
+    },
+    {
+      "id": "test_105",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "satisfaction": [
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1
+        ]
+      },
+      "expected": 55,
+      "warnings": []
+    },
+    {
+      "id": "test_106",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "satisfaction": [
+          -100,
+          -100,
+          -100,
+          -100,
+          -100,
+          -100,
+          -100,
+          -100,
+          -100,
+          -100,
+          -100,
+          -100,
+          -100,
+          -100,
+          -100,
+          -100
+        ]
+      },
+      "expected": 0,
+      "warnings": []
+    },
+    {
+      "id": "test_107",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "satisfaction": [
+          5,
+          1,
+          3,
+          7,
+          -5,
+          -3,
+          2,
+          6,
+          -2,
+          4
+        ]
+      },
+      "expected": 207,
+      "warnings": []
+    },
+    {
+      "id": "test_108",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "satisfaction": [
+          -999,
+          -998,
+          -997,
+          -996,
+          996,
+          997,
+          998,
+          999
+        ]
+      },
+      "expected": 15970,
+      "warnings": []
+    },
+    {
+      "id": "test_109",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "satisfaction": [
+          -999,
+          999,
+          -998,
+          998,
+          -997,
+          997,
+          -996,
+          996,
+          -995,
+          995,
+          -994,
+          994,
+          -993,
+          993,
+          -992,
+          992
+        ]
+      },
+      "expected": 63796,
+      "warnings": []
+    },
+    {
+      "id": "test_110",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "satisfaction": [
+          500,
+          -500,
+          400,
+          -400,
+          300,
+          -300,
+          200,
+          -200,
+          100,
+          -100,
+          0
+        ]
+      },
+      "expected": 11000,
+      "warnings": []
+    },
+    {
+      "id": "test_111",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "satisfaction": [
+          -5,
+          -3,
+          -1,
+          2,
+          4,
+          6
+        ]
+      },
+      "expected": 50,
+      "warnings": []
+    },
+    {
+      "id": "test_112",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "satisfaction": [
+          -999,
+          -1000,
+          1000,
+          999,
+          -998,
+          998,
+          0,
+          0,
+          0,
+          0,
+          0
+        ]
+      },
+      "expected": 23980,
+      "warnings": []
+    },
+    {
+      "id": "test_113",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "satisfaction": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15
+        ]
+      },
+      "expected": 1240,
+      "warnings": []
+    }
+  ],
+  "normalization": {
+    "test_source": "python_assertions",
+    "test_count": 114,
+    "raw_test_sha256": "4cb0512f06fdb669e092c76f92cc17975209e3d18709156c54ab3ca32cad8843",
+    "generated_by": "scripts/d2v-normalize-json.py",
+    "allow_extra_tests": false
+  }
+}

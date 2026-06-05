@@ -1,0 +1,132 @@
+module CountOfInterestingSubarrays_List_Stage3_Imperative
+
+  use int.Int
+  use int.EuclideanDivision
+  use list.List
+  use list.Length
+  use ref.Ref
+
+  let rec predicate all_between (nums: list int) (lo: int) (hi: int)
+    variant { nums }
+  =
+    match nums with
+    | Nil -> true
+    | Cons x xs -> lo <= x <= hi && all_between xs lo hi
+    end
+
+  predicate valid_input (nums: list int) (modulo: int) (k: int) =
+    1 <= length nums <= 100000 /\
+    all_between nums 1 1000000000 /\
+    1 <= modulo <= 1000000000 /\
+    0 <= k < modulo
+
+  let function interesting_element_indicator
+      (x: int) (modulo: int) (k: int) : int =
+    if 0 < modulo then
+      if mod x modulo = k then 1 else 0
+    else 0
+
+  let rec function count_interesting_prefixes_aux
+      (nums: list int) (modulo: int) (k: int) (running_count: int) : int
+    variant { nums }
+  =
+    match nums with
+    | Nil -> 0
+    | Cons x xs ->
+        let next_count =
+          running_count + interesting_element_indicator x modulo k in
+        (if 0 < modulo then
+           if mod next_count modulo = k then 1 else 0
+         else 0) +
+        count_interesting_prefixes_aux xs modulo k next_count
+    end
+
+  let function count_interesting_prefixes
+      (nums: list int) (modulo: int) (k: int) : int =
+    count_interesting_prefixes_aux nums modulo k 0
+
+  let rec function count_interesting_subarrays
+      (nums: list int) (modulo: int) (k: int) : int
+    variant { nums }
+  =
+    match nums with
+    | Nil -> 0
+    | Cons _ xs ->
+        count_interesting_prefixes nums modulo k +
+        count_interesting_subarrays xs modulo k
+    end
+
+  predicate count_of_interesting_subarrays_list_spec
+      (nums: list int) (modulo: int) (k: int) (result: int) =
+    result = count_interesting_subarrays nums modulo k
+
+  let count_of_interesting_subarrays_list
+      (nums: list int) (modulo: int) (k: int) : int
+    requires { valid_input nums modulo k }
+    ensures  { count_of_interesting_subarrays_list_spec nums modulo k result }
+    ensures  { result >= 0 }
+  =
+    let total = ref 0 in
+    let outer = ref nums in
+    while (match !outer with Nil -> false | Cons _ _ -> true end) do
+      invariant {
+        !total + count_interesting_subarrays !outer modulo k =
+        count_interesting_subarrays nums modulo k
+      }
+      invariant { !total >= 0 }
+      variant { length !outer }
+
+      let outer_start = !outer in
+      let base_total = !total in
+      let inner = ref outer_start in
+      let running_count = ref 0 in
+      while (match !inner with Nil -> false | Cons _ _ -> true end) do
+        invariant {
+          !total +
+          count_interesting_prefixes_aux !inner modulo k !running_count =
+          base_total + count_interesting_prefixes outer_start modulo k
+        }
+        invariant { !total >= base_total }
+        invariant { !running_count >= 0 }
+        variant { length !inner }
+
+        match !inner with
+        | Nil -> ()
+        | Cons x xs ->
+            let old_running_count = !running_count in
+            let next_count =
+              old_running_count + interesting_element_indicator x modulo k in
+            assert {
+              count_interesting_prefixes_aux !inner modulo k old_running_count =
+              (if 0 < modulo then
+                 if mod next_count modulo = k then 1 else 0
+               else 0) +
+              count_interesting_prefixes_aux xs modulo k next_count
+            };
+            if mod x modulo = k then running_count := !running_count + 1;
+            assert { !running_count = next_count };
+            if mod !running_count modulo = k then total := !total + 1;
+            inner := xs
+        end
+      done;
+      assert { !inner = Nil };
+      assert { count_interesting_prefixes_aux !inner modulo k !running_count = 0 };
+      assert { !total = base_total + count_interesting_prefixes outer_start modulo k };
+      match !outer with
+      | Nil -> ()
+      | Cons _ xs ->
+          assert { !outer = outer_start };
+          assert {
+            count_interesting_subarrays outer_start modulo k =
+            count_interesting_prefixes outer_start modulo k +
+            count_interesting_subarrays xs modulo k
+          };
+          outer := xs
+      end
+    done;
+    assert { !outer = Nil };
+    assert { count_interesting_subarrays !outer modulo k = 0 };
+    assert { !total = count_interesting_subarrays nums modulo k };
+    !total
+
+end

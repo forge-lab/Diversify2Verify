@@ -1,0 +1,109 @@
+module MaximumGoodSubarraySum_Array_Stage3_Imperative
+
+  use int.Int
+  use int.Abs
+  use array.Array
+  use array.ArraySum
+  use ref.Ref
+
+  predicate valid_subarray (nums: array int) (i: int) (j: int) =
+    0 <= i <= j < length nums
+
+  function subarray_sum (nums: array int) (i: int) (j: int) : int =
+    sum nums i (j + 1)
+
+  predicate good_subarray (nums: array int) (k: int) (i: int) (j: int) =
+    valid_subarray nums i j /\ abs (nums[i] - nums[j]) = k
+
+  predicate no_good_subarray (nums: array int) (k: int) =
+    forall i j: int. not (good_subarray nums k i j)
+
+  predicate has_good_subarray_with_sum
+    (nums: array int) (k: int) (candidate: int) =
+    exists i j: int.
+      good_subarray nums k i j /\ subarray_sum nums i j = candidate
+
+  predicate dominates_all_good_subarrays
+    (nums: array int) (k: int) (candidate: int) =
+    forall i j: int.
+      good_subarray nums k i j -> subarray_sum nums i j <= candidate
+
+  predicate maximum_good_subarray_sum_spec
+    (nums: array int) (k: int) (result: int) =
+    (has_good_subarray_with_sum nums k result /\
+     dominates_all_good_subarrays nums k result) \/
+    (result = 0 /\ no_good_subarray nums k)
+
+  predicate processed_good_subarray
+    (nums: array int) (k: int) (outer: int) (inner: int)
+    (i: int) (j: int) =
+    good_subarray nums k i j /\
+    (i < outer \/ (i = outer /\ j < inner))
+
+  predicate best_for_processed
+    (nums: array int) (k: int) (found: bool) (best: int)
+    (outer: int) (inner: int) =
+    (found = true ->
+       exists i j: int.
+         processed_good_subarray nums k outer inner i j /\
+         subarray_sum nums i j = best) /\
+    (forall i j: int.
+       processed_good_subarray nums k outer inner i j ->
+       subarray_sum nums i j <= best) /\
+    (found = false ->
+       forall i j: int.
+         not (processed_good_subarray nums k outer inner i j))
+
+  let maximum_good_subarray_sum_array (nums: array int) (k: int) : int
+    requires { 2 <= length nums }
+    requires { 1 <= k }
+    ensures  { maximum_good_subarray_sum_spec nums k result }
+  =
+    let n = length nums in
+    let best = ref 0 in
+    let found = ref false in
+    for i = 0 to n - 1 do
+      invariant { 0 <= i <= n }
+      invariant { best_for_processed nums k !found !best i i }
+
+      let running_sum = ref 0 in
+      for j = i to n - 1 do
+        invariant { i <= j <= n }
+        invariant { !running_sum = sum nums i j }
+        invariant { best_for_processed nums k !found !best i j }
+
+        running_sum := !running_sum + nums[j];
+        assert { i <= j < n };
+        assert { !running_sum = subarray_sum nums i j };
+
+        if abs (nums[i] - nums[j]) = k then begin
+          assert { good_subarray nums k i j };
+          if not !found then begin
+            found := true;
+            best := !running_sum
+          end else if !running_sum > !best then
+            best := !running_sum;
+          assert { best_for_processed nums k !found !best i (j + 1) }
+        end else begin
+          assert { not (good_subarray nums k i j) };
+          assert { best_for_processed nums k !found !best i (j + 1) }
+        end
+      done;
+
+      assert { best_for_processed nums k !found !best i n };
+      assert { best_for_processed nums k !found !best (i + 1) (i + 1) }
+    done;
+
+    assert { best_for_processed nums k !found !best n n };
+    if !found then begin
+      assert { has_good_subarray_with_sum nums k !best };
+      assert { dominates_all_good_subarrays nums k !best };
+      assert { maximum_good_subarray_sum_spec nums k !best };
+      !best
+    end else begin
+      assert { no_good_subarray nums k };
+      assert { maximum_good_subarray_sum_spec nums k 0 };
+      0
+    end
+
+end

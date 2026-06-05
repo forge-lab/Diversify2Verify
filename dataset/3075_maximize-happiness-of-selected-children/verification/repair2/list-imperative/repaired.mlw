@@ -1,0 +1,327 @@
+module MaximizeHappinessOfSelectedChildren_List_Stage3_Imperative
+
+  use int.Int
+  use int.MinMax
+  use list.List
+  use list.Length
+  use list.NumOcc
+  use ref.Ref
+
+  let rec predicate all_positive (happiness: list int)
+    variant { happiness }
+  =
+    match happiness with
+    | Nil -> true
+    | Cons h rest -> 1 <= h && all_positive rest
+    end
+
+  let function adjusted_happiness (h: int) (turn: int) : int =
+    max (h - turn) 0
+
+  let rec function score_from (picked: list int) (turn: int) : int
+    variant { picked }
+  =
+    match picked with
+    | Nil -> 0
+    | Cons h rest -> adjusted_happiness h turn + score_from rest (turn + 1)
+    end
+
+  function selection_score (picked: list int) : int =
+    score_from picked 0
+
+  predicate selected_from (happiness: list int) (picked: list int) =
+    forall x: int. num_occ x picked <= num_occ x happiness
+
+  predicate valid_selection (happiness: list int) (k: int) (picked: list int) =
+    0 <= k <= length happiness /\
+    length picked = k /\
+    selected_from happiness picked
+
+  predicate maximized_happiness_score
+    (happiness: list int) (k: int) (score: int) =
+    0 <= k <= length happiness /\
+    (exists picked: list int.
+       valid_selection happiness k picked /\
+       score = selection_score picked) /\
+    (forall picked: list int.
+       valid_selection happiness k picked ->
+       selection_score picked <= score)
+
+  let rec predicate sorted_desc (l: list int)
+    variant { l }
+  =
+    match l with
+    | Nil -> true
+    | Cons _ Nil -> true
+    | Cons x (Cons y ys) -> y <= x && sorted_desc (Cons y ys)
+    end
+
+  let rec function score_take_from (l: list int) (turn: int) (n: int) : int
+    variant { l }
+  =
+    if n <= 0 then 0 else
+    match l with
+    | Nil -> 0
+    | Cons h rest ->
+        adjusted_happiness h turn + score_take_from rest (turn + 1) (n - 1)
+    end
+
+  let rec function take (l: list int) (n: int) : list int
+    variant { l }
+  =
+    if n <= 0 then Nil else
+    match l with
+    | Nil -> Nil
+    | Cons h rest -> Cons h (take rest (n - 1))
+    end
+
+  let rec function insert_desc (x: int) (l: list int) : list int
+    variant { l }
+  =
+    match l with
+    | Nil -> Cons x Nil
+    | Cons y ys ->
+        if x >= y then
+          Cons x l
+        else
+          let inserted = insert_desc x ys in
+          assert { length inserted = length ys + 1 };
+          assert { num_occ x inserted = num_occ x ys + 1 };
+          assert { forall z: int.
+            num_occ z inserted = num_occ z ys + (if z = x then 1 else 0) };
+          Cons y inserted
+    end
+
+  let rec lemma insert_desc_length (x: int) (l: list int)
+    ensures { length (insert_desc x l) = length l + 1 }
+    variant { l }
+  =
+    match l with
+    | Nil -> ()
+    | Cons _ ys ->
+        if x >= (match l with Cons y _ -> y | Nil -> x end) then ()
+        else insert_desc_length x ys
+    end
+
+  let rec lemma insert_desc_occurrence (x: int) (l: list int)
+    ensures { forall z: int.
+      num_occ z (insert_desc x l) = num_occ z l + (if z = x then 1 else 0) }
+    variant { l }
+  =
+    match l with
+    | Nil -> ()
+    | Cons y ys ->
+        if x >= y then ()
+        else begin
+          insert_desc_occurrence x ys;
+          assert { forall z: int.
+            num_occ z (insert_desc x ys) =
+            num_occ z ys + (if z = x then 1 else 0) };
+          assert { forall z: int.
+            num_occ z (Cons y (insert_desc x ys)) =
+            num_occ z (Cons y ys) + (if z = x then 1 else 0) }
+        end
+    end
+
+  let rec lemma insert_desc_sorted (x: int) (l: list int)
+    requires { sorted_desc l }
+    ensures  { sorted_desc (insert_desc x l) }
+    variant { l }
+  =
+    match l with
+    | Nil -> ()
+    | Cons _ Nil -> ()
+    | Cons y (Cons z zs) ->
+        if x >= y then ()
+        else begin
+          assert { z <= y };
+          assert { sorted_desc (Cons z zs) };
+          insert_desc_sorted x (Cons z zs)
+        end
+    end
+
+  let rec lemma insert_desc_positive (x: int) (l: list int)
+    requires { all_positive l }
+    requires { 1 <= x }
+    ensures  { all_positive (insert_desc x l) }
+    variant { l }
+  =
+    match l with
+    | Nil -> ()
+    | Cons _ ys ->
+        if x >= (match l with Cons y _ -> y | Nil -> x end) then ()
+        else insert_desc_positive x ys
+    end
+
+  let lemma insert_desc_positive_under (x: int) (l original: list int)
+    requires { all_positive original -> all_positive l }
+    requires { all_positive original -> 1 <= x }
+    ensures  { all_positive original -> all_positive (insert_desc x l) }
+  =
+    if all_positive original then insert_desc_positive x l
+
+  let rec lemma take_length (l: list int) (n: int)
+    requires { 0 <= n <= length l }
+    ensures  { length (take l n) = n }
+    variant { l }
+  =
+    if n <= 0 then () else
+    match l with
+    | Nil -> absurd
+    | Cons _ rest -> take_length rest (n - 1)
+    end
+
+  let rec lemma take_selected_from (l: list int) (n: int)
+    ensures { selected_from l (take l n) }
+    variant { l }
+  =
+    if n <= 0 then () else
+    match l with
+    | Nil -> ()
+    | Cons h rest ->
+        take_selected_from rest (n - 1);
+        assert { forall z: int.
+          num_occ z (take (Cons h rest) n) <= num_occ z (Cons h rest) }
+    end
+
+  let rec lemma score_take_is_selection_score (l: list int) (n: int)
+    requires { 0 <= n }
+    ensures  { selection_score (take l n) = score_take_from l 0 n }
+    variant { l }
+  =
+    if n <= 0 then () else
+    match l with
+    | Nil -> ()
+    | Cons _ rest -> score_take_is_selection_score rest (n - 1)
+    end
+
+  let lemma selected_from_trans (a b c: list int)
+    requires { selected_from a b }
+    requires { selected_from b c }
+    ensures  { selected_from a c }
+  =
+    assert { forall z: int. num_occ z c <= num_occ z b };
+    assert { forall z: int. num_occ z b <= num_occ z a };
+    assert { forall z: int. num_occ z c <= num_occ z a }
+
+  let lemma top_k_sorted_optimal (happiness sorted picked: list int) (k: int)
+    requires { 0 <= k <= length sorted }
+    requires { length sorted = length happiness }
+    requires { selected_from happiness sorted }
+    requires { selected_from sorted happiness }
+    requires { sorted_desc sorted }
+    requires { all_positive sorted }
+    requires { valid_selection happiness k picked }
+    ensures  { selection_score picked <= score_take_from sorted 0 k }
+  =
+    ()
+
+  let sort_desc (happiness: list int) : list int
+    ensures { length result = length happiness }
+    ensures { selected_from happiness result }
+    ensures { selected_from result happiness }
+    ensures { all_positive happiness -> all_positive result }
+    ensures { sorted_desc result }
+  =
+    let sorted = ref Nil in
+    let cur = ref happiness in
+    while (match !cur with Nil -> false | Cons _ _ -> true end) do
+      invariant { 0 <= length !cur }
+      invariant { 0 <= length !sorted }
+      invariant { length !cur + length !sorted = length happiness }
+      invariant { forall z: int.
+        num_occ z !cur + num_occ z !sorted = num_occ z happiness }
+      invariant { selected_from happiness !sorted }
+      invariant { all_positive happiness -> all_positive !cur }
+      invariant { all_positive happiness -> all_positive !sorted }
+      invariant { sorted_desc !sorted }
+      variant { length !cur }
+
+      match !cur with
+      | Nil -> ()
+      | Cons h rest ->
+          assert { length !cur = length rest + 1 };
+          assert { !cur = Cons h rest };
+          let old_sorted = !sorted in
+          insert_desc_length h old_sorted;
+          insert_desc_occurrence h old_sorted;
+          assert { all_positive happiness -> 1 <= h };
+          insert_desc_positive_under h old_sorted happiness;
+          insert_desc_sorted h old_sorted;
+          assert { forall z: int.
+            num_occ z rest + num_occ z old_sorted +
+            (if z = h then 1 else 0) = num_occ z happiness };
+          sorted := insert_desc h old_sorted;
+          assert { forall z: int.
+            num_occ z !sorted =
+            num_occ z old_sorted + (if z = h then 1 else 0) };
+          cur := rest;
+          assert { forall z: int.
+            num_occ z !cur + num_occ z !sorted = num_occ z happiness }
+      end
+    done;
+    assert { !cur = Nil };
+    assert { length !cur = 0 };
+    assert { forall z: int. num_occ z !sorted = num_occ z happiness };
+    assert { selected_from happiness !sorted };
+    assert { selected_from !sorted happiness };
+    !sorted
+
+  let maximize_happiness_of_selected_children_list
+    (happiness: list int) (k: int) : int
+    requires { happiness <> Nil }
+    requires { 1 <= k <= length happiness }
+    requires { all_positive happiness }
+    ensures  { maximized_happiness_score happiness k result }
+  =
+    let sorted = sort_desc happiness in
+    assert { length sorted = length happiness };
+    assert { selected_from happiness sorted };
+    assert { selected_from sorted happiness };
+    assert { all_positive sorted };
+    assert { sorted_desc sorted };
+    let picked = take sorted k in
+    take_length sorted k;
+    take_selected_from sorted k;
+    selected_from_trans happiness sorted picked;
+    score_take_is_selection_score sorted k;
+    assert { valid_selection happiness k picked };
+
+    let total = ref 0 in
+    let turn = ref 0 in
+    let cur = ref sorted in
+    while !turn < k do
+      invariant { 0 <= !turn <= k }
+      invariant { !turn <= length sorted }
+      invariant { length !cur + !turn = length sorted }
+      invariant { !total + score_take_from !cur !turn (k - !turn) =
+                  score_take_from sorted 0 k }
+      invariant { selected_from happiness sorted }
+      invariant { selected_from sorted happiness }
+      invariant { sorted_desc sorted }
+      invariant { all_positive sorted }
+      variant { k - !turn }
+
+      match !cur with
+      | Nil ->
+          assert { length !cur = 0 };
+          turn := k
+      | Cons h rest ->
+          assert { !cur = Cons h rest };
+          assert { length !cur = length rest + 1 };
+          assert { 0 <= adjusted_happiness h !turn };
+          total := !total + adjusted_happiness h !turn;
+          turn := !turn + 1;
+          cur := rest
+      end
+    done;
+    assert { !turn = k };
+    assert { !total = score_take_from sorted 0 k };
+    assert { exists picked: list int.
+      valid_selection happiness k picked /\ !total = selection_score picked };
+    assert { forall picked: list int.
+      valid_selection happiness k picked ->
+      selection_score picked <= !total };
+    !total
+
+end

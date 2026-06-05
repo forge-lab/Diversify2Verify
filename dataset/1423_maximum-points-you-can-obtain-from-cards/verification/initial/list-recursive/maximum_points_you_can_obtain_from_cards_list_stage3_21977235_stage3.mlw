@@ -1,0 +1,89 @@
+module MaximumPointsYouCanObtainFromCards_List_Stage3_Recursive
+
+  use int.Int
+  use list.List
+  use list.Length
+
+  let rec function take_prefix_sum (n: int) (xs: list int) : int
+    variant { xs }
+  =
+    if n <= 0 then 0 else
+    match xs with
+    | Nil -> 0
+    | Cons x tl -> x + take_prefix_sum (n - 1) tl
+    end
+
+  let rec function take_suffix_sum (n: int) (xs: list int) : int
+    variant { xs }
+  =
+    match xs with
+    | Nil -> 0
+    | Cons x tl ->
+        if length xs <= n then x + take_suffix_sum n tl
+        else take_suffix_sum n tl
+    end
+
+  predicate valid_take_split (cardPoints: list int) (k: int) (left_count: int) =
+    0 <= left_count <= k /\ k <= length cardPoints
+
+  let function split_score (cardPoints: list int) (k: int) (left_count: int) : int =
+    take_prefix_sum left_count cardPoints +
+    take_suffix_sum (k - left_count) cardPoints
+
+  predicate is_maximum_card_score (cardPoints: list int) (k: int) (answer: int) =
+    1 <= k <= length cardPoints /\
+    (exists left_count: int.
+       valid_take_split cardPoints k left_count /\
+       answer = split_score cardPoints k left_count) /\
+    (forall other_count: int.
+       valid_take_split cardPoints k other_count ->
+       split_score cardPoints k other_count <= answer)
+
+  let max_int (x: int) (y: int) : int
+    ensures { result = x \/ result = y }
+    ensures { x <= result }
+    ensures { y <= result }
+  =
+    if x >= y then x else y
+
+  let rec best_split_score (cardPoints: list int) (k: int) (left_count: int) : int
+    requires { 0 <= left_count }
+    ensures  { exists chosen: int.
+                 0 <= chosen <= left_count /\
+                 result = split_score cardPoints k chosen }
+    ensures  { forall other_count: int.
+                 0 <= other_count <= left_count ->
+                 split_score cardPoints k other_count <= result }
+    variant { left_count }
+  =
+    if left_count <= 0 then
+      split_score cardPoints k 0
+    else
+      let previous = best_split_score cardPoints k (left_count - 1) in
+      let current = split_score cardPoints k left_count in
+      let best = max_int previous current in
+      assert { best = previous \/ best = current };
+      assert { previous <= best };
+      assert { current <= best };
+      best
+
+  let maximum_points_you_can_obtain_from_cards_list (cardPoints: list int) (k: int) : int
+    requires { 1 <= k <= length cardPoints }
+    ensures  { is_maximum_card_score cardPoints k result }
+  =
+    let result = best_split_score cardPoints k k in
+    assert { exists chosen: int.
+               0 <= chosen <= k /\
+               result = split_score cardPoints k chosen };
+    assert { forall other_count: int.
+               0 <= other_count <= k ->
+               split_score cardPoints k other_count <= result };
+    assert { exists left_count: int.
+               valid_take_split cardPoints k left_count /\
+               result = split_score cardPoints k left_count };
+    assert { forall other_count: int.
+               valid_take_split cardPoints k other_count ->
+               split_score cardPoints k other_count <= result };
+    result
+
+end

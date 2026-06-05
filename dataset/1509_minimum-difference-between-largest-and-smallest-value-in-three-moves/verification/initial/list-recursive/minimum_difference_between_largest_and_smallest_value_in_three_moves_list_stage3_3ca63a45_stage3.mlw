@@ -1,0 +1,89 @@
+module MinimumDifferenceBetweenLargestAndSmallestValueInThreeMoves_List_Stage3_Recursive
+
+  use int.Int
+  use list.List
+  use list.Length
+  use list.Mem
+
+  predicate values_in_bounds (nums: list int) =
+    forall x: int. mem x nums -> -1000000000 <= x <= 1000000000
+
+  predicate valid_input (nums: list int) =
+    1 <= length nums <= 100000 /\
+    values_in_bounds nums
+
+  let rec function kept_count (nums: list int) (lo: int) (hi: int) : int
+    variant { nums }
+  =
+    match nums with
+    | Nil -> 0
+    | Cons x xs -> (if lo <= x <= hi then 1 else 0) + kept_count xs lo hi
+    end
+
+  predicate achievable_difference (nums: list int) (diff: int) =
+    0 <= diff /\
+    exists lo hi: int.
+      lo <= hi /\
+      hi - lo = diff /\
+      kept_count nums lo hi >= length nums - 3
+
+  predicate minimum_difference_between_largest_and_smallest_value_in_three_moves_list_spec
+      (nums: list int) (res: int) =
+    achievable_difference nums res /\
+    forall d: int. 0 <= d < res -> not (achievable_difference nums d)
+
+  let rec insert_sorted (x: int) (l: list int) : list int
+    variant { l }
+  =
+    match l with
+    | Nil -> Cons x Nil
+    | Cons y ys ->
+        if x <= y then Cons x l else Cons y (insert_sorted x ys)
+    end
+
+  let rec insertion_sort (l: list int) : list int
+    variant { l }
+  =
+    match l with
+    | Nil -> Nil
+    | Cons x xs -> insert_sorted x (insertion_sort xs)
+    end
+
+  let rec list_length (l: list int) : int
+    variant { l }
+  =
+    match l with
+    | Nil -> 0
+    | Cons _ xs -> 1 + list_length xs
+    end
+
+  let rec nth_default (l: list int) (i: int) (default: int) : int
+    variant { l }
+  =
+    match l with
+    | Nil -> default
+    | Cons x xs ->
+        if i <= 0 then x else nth_default xs (i - 1) default
+    end
+
+  let min2 (a: int) (b: int) : int =
+    if a <= b then a else b
+
+  let min4 (a: int) (b: int) (c: int) (d: int) : int =
+    min2 (min2 a b) (min2 c d)
+
+  let minimum_difference_between_largest_and_smallest_value_in_three_moves_list
+      (nums: list int) : int
+    requires { valid_input nums }
+    ensures  { minimum_difference_between_largest_and_smallest_value_in_three_moves_list_spec nums result }
+  =
+    let n = list_length nums in
+    if n <= 4 then 0 else
+    let sorted = insertion_sort nums in
+    let d0 = nth_default sorted (n - 4) 0 - nth_default sorted 0 0 in
+    let d1 = nth_default sorted (n - 3) 0 - nth_default sorted 1 0 in
+    let d2 = nth_default sorted (n - 2) 0 - nth_default sorted 2 0 in
+    let d3 = nth_default sorted (n - 1) 0 - nth_default sorted 3 0 in
+    min4 d0 d1 d2 d3
+
+end

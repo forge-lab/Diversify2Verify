@@ -1,0 +1,156 @@
+module MaximumSumCircularSubarray_Array_Spec
+
+  use int.Int
+  use int.EuclideanDivision
+  use array.Array
+  use array.Init
+
+  predicate leetcode_input (nums: array int) =
+    1 <= length nums <= 30000 /\
+    forall i: int. 0 <= i < length nums -> -30000 <= nums[i] <= 30000
+
+  predicate valid_circular_segment (nums: array int) (start: int) (len: int) =
+    0 <= start < length nums /\
+    1 <= len <= length nums
+
+  let rec function circular_segment_sum
+      (nums: array int) (start: int) (len: int) : int
+    requires { 0 <= start < length nums }
+    requires { 0 <= len <= length nums }
+    variant  { len } =
+    if len = 0 then 0 else
+      nums[start] +
+      circular_segment_sum nums (mod (start + 1) (length nums)) (len - 1)
+
+  predicate maximum_circular_subarray_sum (nums: array int) (best: int) =
+    (exists start len: int.
+       valid_circular_segment nums start len /\
+       best = circular_segment_sum nums start len) /\
+    (forall start len: int.
+       valid_circular_segment nums start len ->
+       circular_segment_sum nums start len <= best)
+
+  lemma mod_succ_shift:
+    forall n x: int. 0 < n -> mod (x + 1) n = mod (mod x n + 1) n
+
+  let rec circular_segment_sum_from
+      (nums: array int) (start: int) (offset: int) (remaining: int) : int
+    requires { 0 < length nums }
+    requires { 0 <= start < length nums }
+    requires { 0 <= remaining }
+    requires { 0 <= offset }
+    requires { offset + remaining <= length nums }
+    variant  { remaining }
+    ensures  { result = circular_segment_sum nums (mod (start + offset) (length nums)) remaining }
+  =
+    if remaining = 0 then
+      0
+    else
+      begin
+        assert { 0 <= mod (start + offset) (length nums) < length nums };
+        assert { mod (start + offset + 1) (length nums) =
+                 mod (mod (start + offset) (length nums) + 1) (length nums) };
+        nums[mod (start + offset) (length nums)] +
+        circular_segment_sum_from nums start (offset + 1) (remaining - 1)
+      end
+
+  let rec best_for_start_from (nums: array int) (start: int) (len: int) : int
+    requires { 0 < length nums }
+    requires { 0 <= start < length nums }
+    requires { 1 <= len <= length nums }
+    variant  { length nums - len }
+    ensures  { exists l: int.
+                 len <= l <= length nums /\
+                 result = circular_segment_sum nums start l }
+    ensures  { forall l: int.
+                 len <= l <= length nums ->
+                 circular_segment_sum nums start l <= result }
+  =
+    let current = circular_segment_sum_from nums start 0 len in
+    assert { current = circular_segment_sum nums start len };
+    if len = length nums then
+      current
+    else
+      begin
+        let rest = best_for_start_from nums start (len + 1) in
+        if current > rest then
+          begin
+            assert { exists l: int.
+                       len <= l <= length nums /\
+                       current = circular_segment_sum nums start l };
+            assert { forall l: int.
+                       len <= l <= length nums ->
+                       circular_segment_sum nums start l <= current };
+            current
+          end
+        else
+          begin
+            assert { exists l: int.
+                       len <= l <= length nums /\
+                       rest = circular_segment_sum nums start l };
+            assert { forall l: int.
+                       len <= l <= length nums ->
+                       circular_segment_sum nums start l <= rest };
+            rest
+          end
+      end
+
+  let rec best_over_starts (nums: array int) (start: int) : int
+    requires { 0 < length nums }
+    requires { 0 <= start < length nums }
+    variant  { length nums - start - 1 }
+    ensures  { exists s l: int.
+                 start <= s < length nums /\
+                 1 <= l <= length nums /\
+                 result = circular_segment_sum nums s l }
+    ensures  { forall s l: int.
+                 start <= s < length nums ->
+                 1 <= l <= length nums ->
+                 circular_segment_sum nums s l <= result }
+  =
+    let current = best_for_start_from nums start 1 in
+    if start = length nums - 1 then
+      current
+    else
+      begin
+        let rest = best_over_starts nums (start + 1) in
+        if current > rest then
+          begin
+            assert { exists s l: int.
+                       start <= s < length nums /\
+                       1 <= l <= length nums /\
+                       current = circular_segment_sum nums s l };
+            assert { forall s l: int.
+                       start <= s < length nums ->
+                       1 <= l <= length nums ->
+                       circular_segment_sum nums s l <= current };
+            current
+          end
+        else
+          begin
+            assert { exists s l: int.
+                       start <= s < length nums /\
+                       1 <= l <= length nums /\
+                       rest = circular_segment_sum nums s l };
+            assert { forall s l: int.
+                       start <= s < length nums ->
+                       1 <= l <= length nums ->
+                       circular_segment_sum nums s l <= rest };
+            rest
+          end
+      end
+
+  let maximum_sum_circular_subarray_array (nums: array int) : int
+    requires { leetcode_input nums }
+    ensures  { maximum_circular_subarray_sum nums result }
+  =
+    let r = best_over_starts nums 0 in
+    assert { exists start len: int.
+               valid_circular_segment nums start len /\
+               r = circular_segment_sum nums start len };
+    assert { forall start len: int.
+               valid_circular_segment nums start len ->
+               circular_segment_sum nums start len <= r };
+    r
+
+end

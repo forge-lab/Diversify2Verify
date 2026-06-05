@@ -1,0 +1,148 @@
+module LargestDivisibleSubset_List_Stage3_Recursive
+
+  use int.Int
+  use int.EuclideanDivision
+  use list.List
+  use list.Length
+  use list.Mem
+  use list.NumOcc
+
+  let rec predicate all_positive (l: list int)
+    variant { l }
+  =
+    match l with
+    | Nil -> true
+    | Cons x xs -> 1 <= x && x <= 2000000000 && all_positive xs
+    end
+
+  predicate no_duplicates (l: list int) =
+    forall x: int. num_occ x l <= 1
+
+  predicate valid_input (nums: list int) =
+    1 <= length nums <= 1000 /\
+    all_positive nums /\
+    no_duplicates nums
+
+  predicate all_from_input (nums: list int) (answer: list int) =
+    forall x: int. mem x answer -> mem x nums
+
+  predicate divides (x: int) (y: int) =
+    x > 0 /\ y > 0 /\ mod y x = 0
+
+  predicate comparable_by_divisibility (x: int) (y: int) =
+    divides x y \/ divides y x
+
+  let rec predicate divisible_with_all (x: int) (l: list int)
+    variant { l }
+  =
+    match l with
+    | Nil -> true
+    | Cons y ys ->
+        ((x > 0 && y > 0 && mod y x = 0) ||
+         (y > 0 && x > 0 && mod x y = 0)) &&
+        divisible_with_all x ys
+    end
+
+  let rec predicate pairwise_divisible (l: list int)
+    variant { l }
+  =
+    match l with
+    | Nil -> true
+    | Cons x xs -> divisible_with_all x xs && pairwise_divisible xs
+    end
+
+  predicate divisible_subset (nums: list int) (answer: list int) =
+    length answer <= length nums /\
+    no_duplicates answer /\
+    all_from_input nums answer /\
+    pairwise_divisible answer
+
+  predicate largest_divisible_subset_list_spec
+      (nums: list int) (answer: list int) =
+    divisible_subset nums answer /\
+    forall candidate: list int.
+      divisible_subset nums candidate -> length candidate <= length answer
+
+  type chain_store =
+    | StoreNil
+    | StoreCons int (list int) chain_store
+
+  let rec list_length (l: list int) : int
+    ensures { result = length l }
+    variant { l }
+  =
+    match l with
+    | Nil -> 0
+    | Cons _ xs -> 1 + list_length xs
+    end
+
+  let rec insert_sorted (x: int) (l: list int) : list int
+    variant { l }
+  =
+    match l with
+    | Nil -> Cons x Nil
+    | Cons y ys ->
+        if x <= y then
+          Cons x l
+        else
+          Cons y (insert_sorted x ys)
+    end
+
+  let rec sort_ascending (l: list int) : list int
+    variant { l }
+  =
+    match l with
+    | Nil -> Nil
+    | Cons x xs -> insert_sorted x (sort_ascending xs)
+    end
+
+  let rec choose_predecessor
+      (x: int)
+      (processed: chain_store)
+      (best_chain: list int)
+      (best_length: int) : list int
+    variant { processed }
+  =
+    match processed with
+    | StoreNil -> best_chain
+    | StoreCons value chain rest ->
+        if mod x value = 0 then
+          let candidate_length = 1 + list_length chain in
+          if candidate_length > best_length then
+            choose_predecessor x rest chain candidate_length
+          else
+            choose_predecessor x rest best_chain best_length
+        else
+          choose_predecessor x rest best_chain best_length
+    end
+
+  let rec build_best_chain
+      (remaining: list int)
+      (processed: chain_store)
+      (current_best: list int)
+      (current_best_length: int) : list int
+    variant { remaining }
+  =
+    match remaining with
+    | Nil -> current_best
+    | Cons x xs ->
+        let empty_chain: list int = Nil in
+        let predecessor_chain = choose_predecessor x processed empty_chain 1 in
+        let chain_here = Cons x predecessor_chain in
+        let chain_length = 1 + list_length predecessor_chain in
+        let new_processed = StoreCons x chain_here processed in
+        if chain_length > current_best_length then
+          build_best_chain xs new_processed chain_here chain_length
+        else
+          build_best_chain xs new_processed current_best current_best_length
+    end
+
+  let largest_divisible_subset_list (nums: list int) : list int
+    requires { valid_input nums }
+    ensures  { largest_divisible_subset_list_spec nums result }
+  =
+    let empty_processed = StoreNil in
+    let empty_chain: list int = Nil in
+    build_best_chain (sort_ascending nums) empty_processed empty_chain 0
+
+end

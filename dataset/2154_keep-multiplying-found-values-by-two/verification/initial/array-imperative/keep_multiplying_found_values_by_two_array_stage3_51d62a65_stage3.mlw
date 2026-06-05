@@ -1,0 +1,80 @@
+module KeepMultiplyingFoundValuesByTwo_Array_Spec
+
+  use int.Int
+  use int.Power
+  use array.Array
+  use array.Init
+  use ref.Ref
+
+  predicate valid_input (nums: array int) (original: int) =
+    1 <= length nums <= 1000 /\
+    1 <= original <= 1000 /\
+    forall i: int. 0 <= i < length nums -> 1 <= nums[i] <= 1000
+
+  predicate contains_value (nums: array int) (x: int) =
+    exists i: int. 0 <= i < length nums /\ nums[i] = x
+
+  function doubled_value (original: int) (steps: int) : int =
+    original * power 2 steps
+
+  predicate doubling_prefix_found (nums: array int) (original: int) (steps: int) =
+    forall t: int. 0 <= t < steps -> contains_value nums (doubled_value original t)
+
+  predicate final_value (nums: array int) (original: int) (res: int) =
+    exists steps: int.
+      0 <= steps <= length nums /\
+      res = doubled_value original steps /\
+      doubling_prefix_found nums original steps /\
+      not (contains_value nums res)
+
+  exception FoundValue
+
+  let contains_value_exec (nums: array int) (x: int) : bool =
+    if length nums = 0 then
+      false
+    else
+      try
+        for i = 0 to length nums - 1 do
+          invariant { 0 <= i <= length nums }
+          if nums[i] = x then raise FoundValue
+        done;
+        false
+      with FoundValue ->
+        true
+      end
+
+  let keep_multiplying_found_values_by_two_array (nums: array int) (original: int) : int
+    requires { valid_input nums original }
+    ensures  { final_value nums original result }
+  =
+    let current = ref original in
+    let ghost steps = ref 0 in
+    let keep_searching = ref true in
+    while !keep_searching do
+      invariant { 0 <= !steps <= length nums }
+      invariant { !current = doubled_value original !steps }
+      invariant { doubling_prefix_found nums original !steps }
+      invariant { 1 <= !current }
+      variant   { if !current <= 1000 then 1001 - !current else 0 }
+
+      if contains_value_exec nums !current then begin
+        assert { contains_value nums !current };
+        assert { !current = doubled_value original !steps };
+        assert { contains_value nums (doubled_value original !steps) };
+        assert { !steps < length nums };
+        assert { doubling_prefix_found nums original (!steps + 1) };
+        current := !current * 2;
+        steps := !steps + 1;
+        assert { !current = doubled_value original !steps };
+        assert { doubling_prefix_found nums original !steps }
+      end else begin
+        assert { not (contains_value nums !current) };
+        keep_searching := false
+      end
+    done;
+
+    assert { not (contains_value nums !current) };
+    assert { final_value nums original !current };
+    !current
+
+end

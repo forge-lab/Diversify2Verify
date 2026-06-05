@@ -1,0 +1,118 @@
+module ContainerWithMostWater_Array_Stage3_Imperative
+
+  use int.Int
+  use int.MinMax
+  use array.Array
+  use ref.Ref
+
+  predicate valid_input (height: array int) =
+    2 <= length height /\
+    forall i: int. 0 <= i < length height -> 0 <= height[i] <= 10000
+
+  predicate valid_pair (height: array int) (i: int) (j: int) =
+    0 <= i < j < length height
+
+  function container_area (height: array int) (i: int) (j: int) : int =
+    (j - i) * min (height[i]) (height[j])
+
+  predicate has_container_area (height: array int) (area: int) =
+    exists i j: int.
+      valid_pair height i j /\
+      area = container_area height i j
+
+  predicate area_upper_bound (height: array int) (area: int) =
+    forall i j: int.
+      valid_pair height i j -> container_area height i j <= area
+
+  predicate max_container_area (height: array int) (area: int) =
+    has_container_area height area /\
+    area_upper_bound height area
+
+  predicate pair_area_bound_at
+    (height: array int) (area: int) (i: int) (j: int) =
+    valid_pair height i j -> container_area height i j <= area
+
+  predicate processed_before_outer
+    (height: array int) (outer: int) (i: int) (j: int) =
+    valid_pair height i j /\ i < outer
+
+  predicate processed_before_inner
+    (height: array int) (outer: int) (inner: int) (i: int) (j: int) =
+    valid_pair height i j /\ (i < outer \/ (i = outer /\ j < inner))
+
+  let container_with_most_water_array (height: array int) : int
+    requires { valid_input height }
+    ensures  { max_container_area height result }
+  =
+    let n = length height in
+    let best = ref 0 in
+    let i = ref 0 in
+
+    while !i <= n - 2 do
+      invariant { n = length height }
+      invariant { 2 <= n }
+      invariant { 0 <= !i <= n - 1 }
+      invariant { (!i = 0 /\ !best = 0) \/ has_container_area height !best }
+      invariant {
+        forall p q: int.
+          processed_before_outer height !i p q ->
+          container_area height p q <= !best
+      }
+      variant { n - 1 - !i }
+
+      let j = ref (!i + 1) in
+      while !j <= n - 1 do
+        invariant { n = length height }
+        invariant { 2 <= n }
+        invariant { 0 <= !i <= n - 2 }
+        invariant { !i + 1 <= !j <= n }
+        invariant {
+          (!i = 0 /\ !j = 1 /\ !best = 0) \/
+          has_container_area height !best
+        }
+        invariant {
+          forall p q: int.
+            processed_before_inner height !i !j p q ->
+            container_area height p q <= !best
+        }
+        variant { n - !j }
+
+        let left = height[!i] in
+        let right = height[!j] in
+        let lower = if left <= right then left else right in
+        let area = (!j - !i) * lower in
+        assert { valid_pair height !i !j };
+        assert { lower = min height[!i] height[!j] };
+        assert { area = container_area height !i !j };
+        if area > !best then begin
+          best := area;
+          assert { has_container_area height !best }
+        end else begin
+          assert { area <= !best }
+        end;
+        assert { has_container_area height !best };
+
+        j := !j + 1
+      done;
+
+      assert { !j = n };
+      assert {
+        forall p q: int.
+          processed_before_outer height (!i + 1) p q ->
+          container_area height p q <= !best
+      };
+      assert { has_container_area height !best };
+      i := !i + 1
+    done;
+
+    assert { !i = n - 1 };
+    assert {
+      forall p q: int.
+        valid_pair height p q ->
+        processed_before_outer height !i p q
+    };
+    assert { area_upper_bound height !best };
+    assert { max_container_area height !best };
+    !best
+
+end

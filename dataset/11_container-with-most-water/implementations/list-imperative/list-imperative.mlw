@@ -1,0 +1,775 @@
+module ContainerWithMostWater_List_Imperative
+
+  use int.Int
+  use list.List
+  use ref.Ref
+
+  let min_int (a: int) (b: int) : int =
+    if a <= b then a else b
+
+  let container_with_most_water_list (height: list int) : int =
+    let best = ref 0 in
+    let left_idx = ref 0 in
+    let left_cur = ref height in
+    while (match !left_cur with Cons _ (Cons _ _) -> true | _ -> false end) do
+      match !left_cur with
+      | Nil -> ()
+      | Cons left left_tail ->
+          let right_idx = ref (!left_idx + 1) in
+          let right_cur = ref left_tail in
+          while (match !right_cur with Nil -> false | Cons _ _ -> true end) do
+            match !right_cur with
+            | Nil -> ()
+            | Cons right right_tail ->
+                let area = (!right_idx - !left_idx) * min_int left right in
+                if area > !best then best := area;
+                right_idx := !right_idx + 1;
+                right_cur := right_tail
+            end
+          done;
+          left_idx := !left_idx + 1;
+          left_cur := left_tail
+      end
+    done;
+    !best
+
+  let test_000 () : bool =
+    let height =
+      Cons 1 (
+        Cons 1 (
+          Nil
+        )
+      )
+    in
+    let r = container_with_most_water_list height in
+    r = 1
+
+  let test_001 () : bool =
+    let height =
+      Cons 4 (
+        Cons 3 (
+          Cons 2 (
+            Cons 1 (
+              Cons 4 (
+                Nil
+              )
+            )
+          )
+        )
+      )
+    in
+    let r = container_with_most_water_list height in
+    r = 16
+
+  let test_002 () : bool =
+    let height =
+      Cons 8 (
+        Cons 10 (
+          Cons 14 (
+            Cons 0 (
+              Cons 13 (
+                Cons 10 (
+                  Cons 9 (
+                    Cons 9 (
+                      Cons 8 (
+                        Cons 9 (
+                          Nil
+                        )
+                      )
+                    )
+                  )
+                )
+              )
+            )
+          )
+        )
+      )
+    in
+    let r = container_with_most_water_list height in
+    r = 72
+
+  let test_003 () : bool =
+    let height =
+      Cons 1 (
+        Cons 8 (
+          Cons 6 (
+            Cons 2 (
+              Cons 5 (
+                Cons 4 (
+                  Cons 8 (
+                    Cons 3 (
+                      Cons 7 (
+                        Nil
+                      )
+                    )
+                  )
+                )
+              )
+            )
+          )
+        )
+      )
+    in
+    let r = container_with_most_water_list height in
+    r = 49
+
+  let test_004 () : bool =
+    let height =
+      Cons 2 (
+        Cons 3 (
+          Cons 4 (
+            Cons 5 (
+              Cons 18 (
+                Cons 17 (
+                  Cons 16 (
+                    Cons 15 (
+                      Cons 14 (
+                        Cons 13 (
+                          Cons 12 (
+                            Cons 11 (
+                              Cons 10 (
+                                Cons 9 (
+                                  Cons 8 (
+                                    Cons 7 (
+                                      Cons 6 (
+                                        Cons 5 (
+                                          Cons 4 (
+                                            Cons 3 (
+                                              Cons 2 (
+                                                Cons 1 (
+                                                  Nil
+                                                )
+                                              )
+                                            )
+                                          )
+                                        )
+                                      )
+                                    )
+                                  )
+                                )
+                              )
+                            )
+                          )
+                        )
+                      )
+                    )
+                  )
+                )
+              )
+            )
+          )
+        )
+      )
+    in
+    let r = container_with_most_water_list height in
+    r = 81
+
+  let test_005 () : bool =
+    let height =
+      Cons 2 (
+        Cons 3 (
+          Cons 10 (
+            Cons 5 (
+              Cons 7 (
+                Cons 8 (
+                  Cons 9 (
+                    Nil
+                  )
+                )
+              )
+            )
+          )
+        )
+      )
+    in
+    let r = container_with_most_water_list height in
+    r = 36
+
+  let test_006 () : bool =
+    let height =
+      Cons 1 (
+        Cons 2 (
+          Cons 3 (
+            Cons 4 (
+              Cons 5 (
+                Cons 6 (
+                  Cons 7 (
+                    Cons 8 (
+                      Cons 9 (
+                        Cons 10 (
+                          Nil
+                        )
+                      )
+                    )
+                  )
+                )
+              )
+            )
+          )
+        )
+      )
+    in
+    let r = container_with_most_water_list height in
+    r = 25
+
+  let test_007 () : bool =
+    let height =
+      Cons 1 (
+        Cons 2 (
+          Cons 4 (
+            Cons 3 (
+              Nil
+            )
+          )
+        )
+      )
+    in
+    let r = container_with_most_water_list height in
+    r = 4
+
+  let test_008 () : bool =
+    let height =
+      Cons 1 (
+        Cons 2 (
+          Cons 3 (
+            Cons 4 (
+              Cons 5 (
+                Nil
+              )
+            )
+          )
+        )
+      )
+    in
+    let r = container_with_most_water_list height in
+    r = 6
+
+  let test_009 () : bool =
+    let height =
+      Cons 1 (
+        Cons 3 (
+          Cons 2 (
+            Cons 5 (
+              Cons 25 (
+                Cons 24 (
+                  Cons 5 (
+                    Nil
+                  )
+                )
+              )
+            )
+          )
+        )
+      )
+    in
+    let r = container_with_most_water_list height in
+    r = 24
+
+  let test_010 () : bool =
+    let height =
+      Cons 1 (
+        Cons 2 (
+          Cons 1 (
+            Nil
+          )
+        )
+      )
+    in
+    let r = container_with_most_water_list height in
+    r = 2
+
+  let test_011 () : bool =
+    let height =
+      Cons 10 (
+        Cons 9 (
+          Cons 8 (
+            Cons 7 (
+              Cons 6 (
+                Cons 5 (
+                  Cons 4 (
+                    Cons 3 (
+                      Cons 2 (
+                        Cons 1 (
+                          Nil
+                        )
+                      )
+                    )
+                  )
+                )
+              )
+            )
+          )
+        )
+      )
+    in
+    let r = container_with_most_water_list height in
+    r = 25
+
+  let test_012 () : bool =
+    let height =
+      Cons 1 (
+        Cons 10000 (
+          Cons 1 (
+            Cons 10000 (
+              Cons 1 (
+                Cons 10000 (
+                  Cons 1 (
+                    Cons 10000 (
+                      Cons 1 (
+                        Cons 10000 (
+                          Cons 1 (
+                            Cons 10000 (
+                              Cons 1 (
+                                Cons 10000 (
+                                  Cons 1 (
+                                    Cons 10000 (
+                                      Cons 1 (
+                                        Cons 10000 (
+                                          Cons 1 (
+                                            Cons 10000 (
+                                              Cons 1 (
+                                                Cons 10000 (
+                                                  Cons 1 (
+                                                    Cons 10000 (
+                                                      Cons 1 (
+                                                        Nil
+                                                      )
+                                                    )
+                                                  )
+                                                )
+                                              )
+                                            )
+                                          )
+                                        )
+                                      )
+                                    )
+                                  )
+                                )
+                              )
+                            )
+                          )
+                        )
+                      )
+                    )
+                  )
+                )
+              )
+            )
+          )
+        )
+      )
+    in
+    let r = container_with_most_water_list height in
+    r = 220000
+
+  let test_013 () : bool =
+    let height =
+      Cons 5 (
+        Cons 8 (
+          Cons 6 (
+            Cons 2 (
+              Cons 5 (
+                Cons 4 (
+                  Cons 8 (
+                    Cons 3 (
+                      Cons 7 (
+                        Cons 9 (
+                          Cons 10 (
+                            Cons 11 (
+                              Cons 10 (
+                                Cons 9 (
+                                  Cons 7 (
+                                    Cons 3 (
+                                      Cons 8 (
+                                        Cons 4 (
+                                          Cons 5 (
+                                            Cons 2 (
+                                              Cons 6 (
+                                                Cons 8 (
+                                                  Cons 5 (
+                                                    Cons 3 (
+                                                      Cons 7 (
+                                                        Cons 9 (
+                                                          Cons 1 (
+                                                            Cons 4 (
+                                                              Cons 6 (
+                                                                Cons 8 (
+                                                                  Nil
+                                                                )
+                                                              )
+                                                            )
+                                                          )
+                                                        )
+                                                      )
+                                                    )
+                                                  )
+                                                )
+                                              )
+                                            )
+                                          )
+                                        )
+                                      )
+                                    )
+                                  )
+                                )
+                              )
+                            )
+                          )
+                        )
+                      )
+                    )
+                  )
+                )
+              )
+            )
+          )
+        )
+      )
+    in
+    let r = container_with_most_water_list height in
+    r = 224
+
+  let test_014 () : bool =
+    let height =
+      Cons 10 (
+        Cons 20 (
+          Cons 10 (
+            Cons 20 (
+              Cons 10 (
+                Cons 20 (
+                  Cons 10 (
+                    Cons 20 (
+                      Cons 10 (
+                        Cons 20 (
+                          Nil
+                        )
+                      )
+                    )
+                  )
+                )
+              )
+            )
+          )
+        )
+      )
+    in
+    let r = container_with_most_water_list height in
+    r = 160
+
+  let test_015 () : bool =
+    let height =
+      Cons 10 (
+        Cons 1 (
+          Cons 10 (
+            Cons 1 (
+              Cons 10 (
+                Cons 1 (
+                  Cons 10 (
+                    Cons 1 (
+                      Cons 10 (
+                        Cons 1 (
+                          Cons 10 (
+                            Cons 1 (
+                              Cons 10 (
+                                Cons 1 (
+                                  Cons 10 (
+                                    Cons 1 (
+                                      Cons 10 (
+                                        Cons 1 (
+                                          Cons 10 (
+                                            Cons 1 (
+                                              Nil
+                                            )
+                                          )
+                                        )
+                                      )
+                                    )
+                                  )
+                                )
+                              )
+                            )
+                          )
+                        )
+                      )
+                    )
+                  )
+                )
+              )
+            )
+          )
+        )
+      )
+    in
+    let r = container_with_most_water_list height in
+    r = 180
+
+  let test_016 () : bool =
+    let height =
+      Cons 1 (
+        Cons 8 (
+          Cons 6 (
+            Cons 2 (
+              Cons 5 (
+                Cons 4 (
+                  Cons 8 (
+                    Cons 3 (
+                      Cons 7 (
+                        Cons 15 (
+                          Cons 14 (
+                            Cons 13 (
+                              Cons 12 (
+                                Cons 11 (
+                                  Cons 10 (
+                                    Cons 9 (
+                                      Cons 8 (
+                                        Cons 7 (
+                                          Cons 6 (
+                                            Cons 5 (
+                                              Cons 4 (
+                                                Cons 3 (
+                                                  Cons 2 (
+                                                    Cons 1 (
+                                                      Nil
+                                                    )
+                                                  )
+                                                )
+                                              )
+                                            )
+                                          )
+                                        )
+                                      )
+                                    )
+                                  )
+                                )
+                              )
+                            )
+                          )
+                        )
+                      )
+                    )
+                  )
+                )
+              )
+            )
+          )
+        )
+      )
+    in
+    let r = container_with_most_water_list height in
+    r = 120
+
+  let test_017 () : bool =
+    let height =
+      Cons 10 (
+        Cons 9 (
+          Cons 8 (
+            Cons 7 (
+              Cons 6 (
+                Cons 5 (
+                  Cons 4 (
+                    Cons 3 (
+                      Cons 2 (
+                        Cons 1 (
+                          Cons 1 (
+                            Cons 2 (
+                              Cons 3 (
+                                Cons 4 (
+                                  Cons 5 (
+                                    Cons 6 (
+                                      Cons 7 (
+                                        Cons 8 (
+                                          Cons 9 (
+                                            Cons 10 (
+                                              Cons 10 (
+                                                Cons 9 (
+                                                  Cons 8 (
+                                                    Cons 7 (
+                                                      Cons 6 (
+                                                        Cons 5 (
+                                                          Cons 4 (
+                                                            Cons 3 (
+                                                              Cons 2 (
+                                                                Cons 1 (
+                                                                  Nil
+                                                                )
+                                                              )
+                                                            )
+                                                          )
+                                                        )
+                                                      )
+                                                    )
+                                                  )
+                                                )
+                                              )
+                                            )
+                                          )
+                                        )
+                                      )
+                                    )
+                                  )
+                                )
+                              )
+                            )
+                          )
+                        )
+                      )
+                    )
+                  )
+                )
+              )
+            )
+          )
+        )
+      )
+    in
+    let r = container_with_most_water_list height in
+    r = 200
+
+  let test_018 () : bool =
+    let height =
+      Cons 1 (
+        Cons 2 (
+          Cons 1 (
+            Cons 2 (
+              Cons 1 (
+                Cons 2 (
+                  Cons 1 (
+                    Cons 2 (
+                      Cons 1 (
+                        Cons 2 (
+                          Cons 1 (
+                            Cons 2 (
+                              Cons 1 (
+                                Cons 2 (
+                                  Cons 1 (
+                                    Cons 2 (
+                                      Cons 1 (
+                                        Cons 2 (
+                                          Cons 1 (
+                                            Cons 2 (
+                                              Cons 1 (
+                                                Cons 2 (
+                                                  Cons 1 (
+                                                    Cons 2 (
+                                                      Cons 1 (
+                                                        Cons 2 (
+                                                          Cons 1 (
+                                                            Cons 2 (
+                                                              Cons 1 (
+                                                                Cons 2 (
+                                                                  Nil
+                                                                )
+                                                              )
+                                                            )
+                                                          )
+                                                        )
+                                                      )
+                                                    )
+                                                  )
+                                                )
+                                              )
+                                            )
+                                          )
+                                        )
+                                      )
+                                    )
+                                  )
+                                )
+                              )
+                            )
+                          )
+                        )
+                      )
+                    )
+                  )
+                )
+              )
+            )
+          )
+        )
+      )
+    in
+    let r = container_with_most_water_list height in
+    r = 56
+
+  let test_019 () : bool =
+    let height =
+      Cons 5 (
+        Cons 4 (
+          Cons 3 (
+            Cons 2 (
+              Cons 1 (
+                Cons 1 (
+                  Cons 2 (
+                    Cons 3 (
+                      Cons 4 (
+                        Cons 5 (
+                          Cons 5 (
+                            Cons 4 (
+                              Cons 3 (
+                                Cons 2 (
+                                  Cons 1 (
+                                    Nil
+                                  )
+                                )
+                              )
+                            )
+                          )
+                        )
+                      )
+                    )
+                  )
+                )
+              )
+            )
+          )
+        )
+      )
+    in
+    let r = container_with_most_water_list height in
+    r = 50
+
+  let run_tests () : bool =
+    if test_000 () then
+    if test_001 () then
+    if test_002 () then
+    if test_003 () then
+    if test_004 () then
+    if test_005 () then
+    if test_006 () then
+    if test_007 () then
+    if test_008 () then
+    if test_009 () then
+    if test_010 () then
+    if test_011 () then
+    if test_012 () then
+    if test_013 () then
+    if test_014 () then
+    if test_015 () then
+    if test_016 () then
+    if test_017 () then
+    if test_018 () then
+    if test_019 () then
+      true
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+
+end

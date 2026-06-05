@@ -1,0 +1,128 @@
+module MinimizeTheMaximumDifferenceOfPairs_List_Stage3_Recursive
+
+  use int.Int
+  use int.Abs
+  use int.EuclideanDivision
+  use list.List
+  use list.Length
+  use list.NumOcc
+
+  type int_pair = Pair int int
+
+  let rec function endpoint_occ_pairs (x: int) (pairs: list int_pair) : int
+    variant { pairs }
+  =
+    match pairs with
+    | Nil -> 0
+    | Cons (Pair a b) rest ->
+        (if x = a then 1 else 0) + (if x = b then 1 else 0) +
+        endpoint_occ_pairs x rest
+    end
+
+  let rec predicate pair_diffs_at_most (pairs: list int_pair) (d: int)
+    variant { pairs }
+  =
+    match pairs with
+    | Nil -> true
+    | Cons (Pair a b) rest ->
+        abs (a - b) <= d && pair_diffs_at_most rest d
+    end
+
+  predicate valid_pairing_with_bound
+    (nums: list int) (p: int) (d: int) (pairs: list int_pair) =
+    0 <= d /\
+    length pairs = p /\
+    pair_diffs_at_most pairs d /\
+    (forall x: int. endpoint_occ_pairs x pairs <= num_occ x nums)
+
+  predicate minimized_max_difference (nums: list int) (p: int) (answer: int) =
+    0 <= answer /\
+    (exists pairs: list int_pair. valid_pairing_with_bound nums p answer pairs) /\
+    (forall d: int.
+       0 <= d < answer ->
+       not (exists pairs: list int_pair. valid_pairing_with_bound nums p d pairs))
+
+  let rec insert_sorted (x: int) (l: list int) : list int
+    variant { l }
+  =
+    match l with
+    | Nil -> Cons x Nil
+    | Cons y ys ->
+        if x <= y then Cons x (Cons y ys) else Cons y (insert_sorted x ys)
+    end
+
+  let rec sort_list (l: list int) : list int
+    variant { l }
+  =
+    match l with
+    | Nil -> Nil
+    | Cons x xs -> insert_sorted x (sort_list xs)
+    end
+
+  let rec last_of_list (l: list int) : int
+    variant { l }
+  =
+    match l with
+    | Nil -> 0
+    | Cons x Nil -> x
+    | Cons _ xs -> last_of_list xs
+    end
+
+  let rec count_pairs_with_bound (l: list int) (d: int) : int
+    ensures { 0 <= result }
+    variant { l }
+  =
+    match l with
+    | Nil -> 0
+    | Cons _ Nil -> 0
+    | Cons x (Cons y ys) ->
+        if y - x <= d then
+          1 + count_pairs_with_bound ys d
+        else
+          count_pairs_with_bound (Cons y ys) d
+    end
+
+  let enough_pairs (sorted_nums: list int) (p: int) (d: int) : bool =
+    count_pairs_with_bound sorted_nums d >= p
+
+  let rec search_min_diff (sorted_nums: list int) (p: int) (lo: int) (hi: int) : int
+    requires { lo <= hi }
+    ensures  { lo <= result <= hi }
+    variant { hi - lo }
+  =
+    if lo >= hi then
+      lo
+    else
+      let mid = lo + div (hi - lo) 2 in
+      assert { lo <= mid <= hi };
+      if enough_pairs sorted_nums p mid then
+        search_min_diff sorted_nums p lo mid
+      else
+        search_min_diff sorted_nums p (mid + 1) hi
+
+  let minimize_the_maximum_difference_of_pairs_list (nums: list int) (p: int) : int
+    requires { 0 <= p }
+    requires { 2 * p <= length nums }
+    ensures  { minimized_max_difference nums p result }
+  =
+    if p <= 0 then begin
+      assert { p = 0 };
+      assert { valid_pairing_with_bound nums p 0 (Nil: list int_pair) };
+      assert { minimized_max_difference nums p 0 };
+      0
+    end else begin
+      let sorted_nums = sort_list nums in
+      match sorted_nums with
+      | Nil ->
+          assert { p > 0 };
+          0
+      | Cons first _ ->
+          let upper = (last_of_list sorted_nums) - first in
+          assert { 0 <= upper };
+          let result = search_min_diff sorted_nums p 0 upper in
+          assert { 0 <= result };
+          result
+      end
+    end
+
+end

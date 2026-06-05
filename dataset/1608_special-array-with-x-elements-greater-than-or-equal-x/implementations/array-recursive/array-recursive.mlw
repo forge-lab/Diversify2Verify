@@ -1,0 +1,176 @@
+module SpecialArrayWithXElementsGreaterThanOrEqualX_Array_Recursive_Implementation
+
+  use int.Int
+  use array.Array
+  use array.Init
+
+  let rec count_ge_from (nums: array int) (x: int) (i: int) : int
+    variant { length nums - i }
+  =
+    if i >= length nums then
+      0
+    else
+      (if nums[i] >= x then 1 else 0) + count_ge_from nums x (i + 1)
+
+  let count_ge (nums: array int) (x: int) : int =
+    count_ge_from nums x 0
+
+  let rec find_special_candidate (nums: array int) (x: int) : int
+    variant { length nums - x + 1 }
+  =
+    if x > length nums then
+      -1
+    else
+      let count = count_ge nums x in
+      if count = x then
+        x
+      else
+        find_special_candidate nums (x + 1)
+
+  let special_array_with_x_elements_greater_than_or_equal_x_array (nums: array int) : int =
+    find_special_candidate nums 0
+
+  let test_000 () : bool =
+    let nums = init 6 [|6; 5; 4; 3; 2; 1|] in
+    let r = special_array_with_x_elements_greater_than_or_equal_x_array nums in
+    r = (-1)
+
+  let test_001 () : bool =
+    let nums = init 10 [|100; 100; 100; 100; 100; 100; 100; 100; 100; 100|] in
+    let r = special_array_with_x_elements_greater_than_or_equal_x_array nums in
+    r = 10
+
+  let test_002 () : bool =
+    let nums = init 6 [|0; 1; 2; 3; 4; 5|] in
+    let r = special_array_with_x_elements_greater_than_or_equal_x_array nums in
+    r = 3
+
+  let test_003 () : bool =
+    let nums = init 11 [|0; 1; 2; 3; 4; 5; 6; 7; 8; 9; 10|] in
+    let r = special_array_with_x_elements_greater_than_or_equal_x_array nums in
+    r = (-1)
+
+  let test_004 () : bool =
+    let nums = init 5 [|100; 200; 300; 400; 500|] in
+    let r = special_array_with_x_elements_greater_than_or_equal_x_array nums in
+    r = 5
+
+  let test_005 () : bool =
+    let nums = init 2 [|0; 0|] in
+    let r = special_array_with_x_elements_greater_than_or_equal_x_array nums in
+    r = (-1)
+
+  let test_006 () : bool =
+    let nums = init 1 [|1|] in
+    let r = special_array_with_x_elements_greater_than_or_equal_x_array nums in
+    r = 1
+
+  let test_007 () : bool =
+    let nums = init 10 [|1; 1; 2; 2; 3; 3; 4; 4; 5; 5|] in
+    let r = special_array_with_x_elements_greater_than_or_equal_x_array nums in
+    r = 4
+
+  let test_008 () : bool =
+    let nums = init 5 [|10; 20; 30; 40; 50|] in
+    let r = special_array_with_x_elements_greater_than_or_equal_x_array nums in
+    r = 5
+
+  let test_009 () : bool =
+    let nums = init 5 [|5; 5; 5; 5; 5|] in
+    let r = special_array_with_x_elements_greater_than_or_equal_x_array nums in
+    r = 5
+
+  let test_010 () : bool =
+    let nums = init 5 [|0; 0; 0; 0; 0|] in
+    let r = special_array_with_x_elements_greater_than_or_equal_x_array nums in
+    r = (-1)
+
+  let test_011 () : bool =
+    let nums = init 5 [|1; 2; 3; 4; 5|] in
+    let r = special_array_with_x_elements_greater_than_or_equal_x_array nums in
+    r = 3
+
+  let test_012 () : bool =
+    let nums = init 1 [|1000|] in
+    let r = special_array_with_x_elements_greater_than_or_equal_x_array nums in
+    r = 1
+
+  let test_013 () : bool =
+    let nums = init 6 [|0; 0; 0; 0; 0; 0|] in
+    let r = special_array_with_x_elements_greater_than_or_equal_x_array nums in
+    r = (-1)
+
+  let test_014 () : bool =
+    let nums = init 1 [|0|] in
+    let r = special_array_with_x_elements_greater_than_or_equal_x_array nums in
+    r = (-1)
+
+  let test_015 () : bool =
+    let nums = init 5 [|100; 200; 300; 400; 500|] in
+    let r = special_array_with_x_elements_greater_than_or_equal_x_array nums in
+    r = 5
+
+  let test_016 () : bool =
+    let nums = init 5 [|0; 4; 3; 0; 4|] in
+    let r = special_array_with_x_elements_greater_than_or_equal_x_array nums in
+    r = 3
+
+  let test_017 () : bool =
+    let nums = init 2 [|3; 5|] in
+    let r = special_array_with_x_elements_greater_than_or_equal_x_array nums in
+    r = 2
+
+  let test_018 () : bool =
+    let nums = init 5 [|1000; 999; 998; 997; 996|] in
+    let r = special_array_with_x_elements_greater_than_or_equal_x_array nums in
+    r = 5
+
+  let test_019 () : bool =
+    let nums = init 5 [|1; 2; 3; 3; 3|] in
+    let r = special_array_with_x_elements_greater_than_or_equal_x_array nums in
+    r = 3
+
+  let run_tests () : bool =
+    if test_000 () then
+    if test_001 () then
+    if test_002 () then
+    if test_003 () then
+    if test_004 () then
+    if test_005 () then
+    if test_006 () then
+    if test_007 () then
+    if test_008 () then
+    if test_009 () then
+    if test_010 () then
+    if test_011 () then
+    if test_012 () then
+    if test_013 () then
+    if test_014 () then
+    if test_015 () then
+    if test_016 () then
+    if test_017 () then
+    if test_018 () then
+    if test_019 () then
+      true
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+
+end

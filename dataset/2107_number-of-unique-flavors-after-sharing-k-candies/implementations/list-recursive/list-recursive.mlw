@@ -1,0 +1,217 @@
+module NumberOfUniqueFlavorsAfterSharingKCandies_List_Recursive_Implementation
+
+  use int.Int
+  use list.List
+
+  let rec mem_int (x: int) (candies: list int) : bool
+    variant { candies }
+  =
+    match candies with
+    | Nil -> false
+    | Cons y ys -> if x = y then true else mem_int x ys
+    end
+
+  let rec unique_count (candies: list int) : int
+    variant { candies }
+  =
+    match candies with
+    | Nil -> 0
+    | Cons flavor rest ->
+        let tail_count = unique_count rest in
+        if mem_int flavor rest then tail_count else tail_count + 1
+    end
+
+  let rec list_length (candies: list int) : int
+    variant { candies }
+  =
+    match candies with
+    | Nil -> 0
+    | Cons _ rest -> 1 + list_length rest
+    end
+
+  let rec drop_k (candies: list int) (k: int) : list int
+    variant { candies }
+  =
+    if k <= 0 then candies else
+    match candies with
+    | Nil -> Nil
+    | Cons _ rest -> drop_k rest (k - 1)
+    end
+
+  let rec reverse_append (rev_prefix: list int) (suffix: list int) : list int
+    variant { rev_prefix }
+  =
+    match rev_prefix with
+    | Nil -> suffix
+    | Cons x xs -> reverse_append xs (Cons x suffix)
+    end
+
+  let rec max_unique_after_each_share
+      (prefix_rev: list int) (suffix: list int) (remaining: int) (k: int) : int
+    variant { remaining }
+  =
+    if remaining <= 0 then 0 else
+      let kept = reverse_append prefix_rev (drop_k suffix k) in
+      let current = unique_count kept in
+      match suffix with
+      | Nil -> current
+      | Cons flavor rest ->
+          if remaining = 1 then current else
+            let next_best =
+              max_unique_after_each_share (Cons flavor prefix_rev) rest (remaining - 1) k
+            in
+            if current >= next_best then current else next_best
+      end
+
+  let number_of_unique_flavors_after_sharing_k_candies_list
+      (candies: list int) (k: int) : int =
+    let n = list_length candies in
+    max_unique_after_each_share Nil candies (n - k + 1) k
+
+  let test_case_000 () : bool =
+    let candies = Nil in
+    let r = number_of_unique_flavors_after_sharing_k_candies_list candies 0 in
+    r = 0
+
+  let test_case_001 () : bool =
+    let candies = Cons 100000 (Cons 100000 (Cons 100000 (Cons 100000 Nil))) in
+    let r = number_of_unique_flavors_after_sharing_k_candies_list candies 2 in
+    r = 1
+
+  let test_case_002 () : bool =
+    let candies =
+      Cons 1 (Cons 2 (Cons 3 (Cons 4 (Cons 5 (Cons 6 (Cons 7 (Cons 8
+      (Cons 9 (Cons 10 (Cons 11 (Cons 12 (Cons 13 (Cons 14 (Cons 15 Nil))))))))))))))
+    in
+    let r = number_of_unique_flavors_after_sharing_k_candies_list candies 7 in
+    r = 8
+
+  let test_case_003 () : bool =
+    let candies = Cons 1 (Cons 2 (Cons 3 Nil)) in
+    let r = number_of_unique_flavors_after_sharing_k_candies_list candies 3 in
+    r = 0
+
+  let test_case_004 () : bool =
+    let candies = Cons 2 (Cons 2 (Cons 2 (Cons 2 (Cons 3 (Cons 3 Nil))))) in
+    let r = number_of_unique_flavors_after_sharing_k_candies_list candies 2 in
+    r = 2
+
+  let test_case_005 () : bool =
+    let candies = Cons 1 (Cons 2 (Cons 2 (Cons 3 (Cons 4 (Cons 3 Nil))))) in
+    let r = number_of_unique_flavors_after_sharing_k_candies_list candies 3 in
+    r = 3
+
+  let test_case_006 () : bool =
+    let candies = Cons 1 (Cons 2 (Cons 3 (Cons 1 (Cons 2 (Cons 3 (Cons 1 (Cons 2 (Cons 3 Nil)))))))) in
+    let r = number_of_unique_flavors_after_sharing_k_candies_list candies 4 in
+    r = 3
+
+  let test_case_007 () : bool =
+    let candies = Cons 10 (Cons 20 (Cons 30 (Cons 40 (Cons 50 Nil)))) in
+    let r = number_of_unique_flavors_after_sharing_k_candies_list candies 0 in
+    r = 5
+
+  let test_case_008 () : bool =
+    let candies = Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 Nil))))) in
+    let r = number_of_unique_flavors_after_sharing_k_candies_list candies 2 in
+    r = 1
+
+  let test_case_009 () : bool =
+    let candies = Cons 1 (Cons 2 (Cons 3 (Cons 4 (Cons 5 (Cons 6 (Cons 7 (Cons 8 (Cons 9 (Cons 10 Nil))))))))) in
+    let r = number_of_unique_flavors_after_sharing_k_candies_list candies 10 in
+    r = 0
+
+  let test_case_010 () : bool =
+    let candies = Cons 2 (Cons 4 (Cons 5 Nil)) in
+    let r = number_of_unique_flavors_after_sharing_k_candies_list candies 0 in
+    r = 3
+
+  let test_case_011 () : bool =
+    let candies = Cons 1 (Cons 2 (Cons 3 (Cons 4 (Cons 5 (Cons 6 (Cons 7 (Cons 8 (Cons 9 (Cons 10 Nil))))))))) in
+    let r = number_of_unique_flavors_after_sharing_k_candies_list candies 5 in
+    r = 5
+
+  let test_case_012 () : bool =
+    let candies = Cons 1 (Cons 3 (Cons 5 (Cons 7 (Cons 9 Nil)))) in
+    let r = number_of_unique_flavors_after_sharing_k_candies_list candies 3 in
+    r = 2
+
+  let test_case_013 () : bool =
+    let candies = Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 Nil))))))))) in
+    let r = number_of_unique_flavors_after_sharing_k_candies_list candies 5 in
+    r = 1
+
+  let test_case_014 () : bool =
+    let candies = Cons 1 (Cons 2 (Cons 2 (Cons 3 (Cons 4 (Cons 3 (Cons 5 (Cons 6 (Cons 7 (Cons 8 Nil))))))))) in
+    let r = number_of_unique_flavors_after_sharing_k_candies_list candies 4 in
+    r = 6
+
+  let test_case_015 () : bool =
+    let candies = Cons 5 (Cons 5 (Cons 5 (Cons 5 (Cons 5 (Cons 5 (Cons 5 (Cons 5 (Cons 5 (Cons 5 Nil))))))))) in
+    let r = number_of_unique_flavors_after_sharing_k_candies_list candies 3 in
+    r = 1
+
+  let test_case_016 () : bool =
+    let candies = Cons 5 (Cons 5 (Cons 5 (Cons 5 (Cons 5 (Cons 5 (Cons 5 (Cons 5 (Cons 5 (Cons 5 Nil))))))))) in
+    let r = number_of_unique_flavors_after_sharing_k_candies_list candies 10 in
+    r = 0
+
+  let test_case_017 () : bool =
+    let candies = Cons 1 (Cons 2 (Cons 3 (Cons 4 (Cons 5 Nil)))) in
+    let r = number_of_unique_flavors_after_sharing_k_candies_list candies 5 in
+    r = 0
+
+  let test_case_018 () : bool =
+    let candies = Cons 100000 (Cons 100000 (Cons 99999 (Cons 99998 (Cons 99997 Nil)))) in
+    let r = number_of_unique_flavors_after_sharing_k_candies_list candies 2 in
+    r = 3
+
+  let test_case_019 () : bool =
+    let candies = Cons 100000 (Cons 100000 (Cons 100000 Nil)) in
+    let r = number_of_unique_flavors_after_sharing_k_candies_list candies 1 in
+    r = 1
+
+  let run_tests () : bool =
+    if test_case_000 () then
+    if test_case_001 () then
+    if test_case_002 () then
+    if test_case_003 () then
+    if test_case_004 () then
+    if test_case_005 () then
+    if test_case_006 () then
+    if test_case_007 () then
+    if test_case_008 () then
+    if test_case_009 () then
+    if test_case_010 () then
+    if test_case_011 () then
+    if test_case_012 () then
+    if test_case_013 () then
+    if test_case_014 () then
+    if test_case_015 () then
+    if test_case_016 () then
+    if test_case_017 () then
+    if test_case_018 () then
+    if test_case_019 () then
+      true
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+
+end

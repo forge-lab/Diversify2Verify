@@ -1,0 +1,257 @@
+module MinimumOperationsToMakeTheArrayAlternating_List_Stage3_Recursive
+
+  use int.Int
+  use list.List
+  use list.Length
+  use list.NumOcc
+
+  let rec predicate all_positive (nums: list int)
+    variant { nums }
+  =
+    match nums with
+    | Nil -> true
+    | Cons x xs -> x > 0 && all_positive xs
+    end
+
+  let rec function even_positions (nums: list int) : list int
+    variant { nums }
+  =
+    match nums with
+    | Nil -> Nil
+    | Cons x xs -> Cons x (odd_positions_from_tail xs)
+    end
+
+  with function odd_positions_from_tail (nums: list int) : list int
+    variant { nums }
+  =
+    match nums with
+    | Nil -> Nil
+    | Cons _ xs -> even_positions xs
+    end
+
+  function odd_positions (nums: list int) : list int =
+    match nums with
+    | Nil -> Nil
+    | Cons _ xs -> even_positions xs
+    end
+
+  predicate valid_alternating_values (even_value: int) (odd_value: int) =
+    even_value > 0 /\ odd_value > 0 /\ even_value <> odd_value
+
+  function kept_by_values (nums: list int) (even_value: int) (odd_value: int) : int =
+    num_occ even_value (even_positions nums) + num_occ odd_value (odd_positions nums)
+
+  predicate best_kept (nums: list int) (kept: int) =
+    exists even_value odd_value: int.
+      valid_alternating_values even_value odd_value /\
+      kept = kept_by_values nums even_value odd_value /\
+      (forall ev ov: int.
+        valid_alternating_values ev ov ->
+        kept_by_values nums ev ov <= kept)
+
+  predicate minimum_operations_spec (nums: list int) (ops: int) =
+    exists kept: int.
+      best_kept nums kept /\
+      ops = length nums - kept /\
+      0 <= ops <= length nums
+
+  type freq = Freq int int
+  type parity_counts = ParityCounts (list freq) (list freq)
+
+  let rec function freq_count (counts: list freq) (x: int) : int
+    variant { counts }
+  =
+    match counts with
+    | Nil -> 0
+    | Cons (Freq y c) ys -> if x = y then c else freq_count ys x
+    end
+
+  let rec function best_count_except (counts: list freq) (excluded: int) : int
+    variant { counts }
+  =
+    match counts with
+    | Nil -> 0
+    | Cons (Freq value count) rest ->
+        let rest_best = best_count_except rest excluded in
+        if value = excluded then rest_best
+        else if count > rest_best then count
+        else rest_best
+    end
+
+  predicate counts_model (counts: list freq) (values: list int) =
+    forall x: int. freq_count counts x = num_occ x values
+
+  predicate counts_positive_values (counts: list freq) =
+    forall x: int. freq_count counts x > 0 -> x > 0
+
+  predicate best_freq_result (counts: list freq) (excluded: int)
+      (value: int) (count: int) =
+    count = best_count_except counts excluded /\
+    count >= 0 /\
+    (count > 0 -> value <> excluded /\ freq_count counts value = count) /\
+    (forall x: int. x <> excluded -> freq_count counts x <= count)
+
+  let rec lemma all_positive_num_occ_nonpositive_zero (nums: list int) (x: int)
+    requires { all_positive nums }
+    requires { x <= 0 }
+    ensures  { num_occ x nums = 0 }
+    variant  { nums }
+  =
+    match nums with
+    | Nil -> ()
+    | Cons _ ys ->
+        all_positive_num_occ_nonpositive_zero ys x
+    end
+
+  let lemma counts_model_nonnegative (counts: list freq) (values: list int) (x: int)
+    requires { counts_model counts values }
+    ensures  { freq_count counts x >= 0 }
+  =
+    assert { freq_count counts x = num_occ x values }
+
+  let lemma counts_model_positive_values (counts: list freq) (values: list int)
+    requires { counts_model counts values }
+    requires { all_positive values }
+    ensures  { counts_positive_values counts }
+  =
+    assert { forall x: int. x <= 0 -> freq_count counts x = 0 };
+    assert { forall x: int. freq_count counts x > 0 -> x > 0 }
+
+  let lemma best_freq_result_upper (counts: list freq) (excluded value count x: int)
+    requires { best_freq_result counts excluded value count }
+    requires { x <> excluded }
+    ensures  { freq_count counts x <= count }
+  =
+    assert { forall y: int. y <> excluded -> freq_count counts y <= count }
+
+  let lemma best_freq_result_witness (counts: list freq) (excluded value count: int)
+    requires { best_freq_result counts excluded value count }
+    requires { count > 0 }
+    ensures  { value <> excluded /\ freq_count counts value = count }
+  =
+    ()
+
+  let rec increment_count (counts: list freq) (x: int) : list freq
+    ensures { forall y: int.
+      freq_count result y = freq_count counts y + (if y = x then 1 else 0) }
+    variant { counts }
+  =
+    match counts with
+    | Nil -> Cons (Freq x 1) Nil
+    | Cons (Freq y c) ys ->
+        if x = y then Cons (Freq y (c + 1)) ys
+        else Cons (Freq y c) (increment_count ys x)
+    end
+
+  let rec collect_even_odd_counts (nums: list int) : parity_counts
+    ensures { match result with ParityCounts even_counts odd_counts ->
+      counts_model even_counts (even_positions nums) /\
+      counts_model odd_counts (odd_positions nums)
+      end }
+    ensures { all_positive nums -> match result with ParityCounts even_counts odd_counts ->
+      counts_positive_values even_counts /\ counts_positive_values odd_counts
+      end }
+    variant { nums }
+  =
+    match nums with
+    | Nil -> ParityCounts Nil Nil
+    | Cons x xs ->
+        let ParityCounts even_counts odd_counts = collect_odd_even_counts xs in
+        ParityCounts (increment_count even_counts x) odd_counts
+    end
+
+  with collect_odd_even_counts (nums: list int) : parity_counts
+    ensures { match result with ParityCounts even_counts odd_counts ->
+      counts_model even_counts (odd_positions_from_tail nums) /\
+      counts_model odd_counts (even_positions nums)
+      end }
+    ensures { all_positive nums -> match result with ParityCounts even_counts odd_counts ->
+      counts_positive_values even_counts /\ counts_positive_values odd_counts
+      end }
+    variant { nums }
+  =
+    match nums with
+    | Nil -> ParityCounts Nil Nil
+    | Cons x xs ->
+        let ParityCounts even_counts odd_counts = collect_even_odd_counts xs in
+        ParityCounts even_counts (increment_count odd_counts x)
+    end
+
+  let rec best_freq_except (counts: list freq) (excluded: int) : freq
+    ensures { match result with Freq value count ->
+      best_freq_result counts excluded value count
+      end }
+    variant { counts }
+  =
+    match counts with
+    | Nil -> Freq 0 0
+    | Cons (Freq value count) rest ->
+        let Freq best_value best_count = best_freq_except rest excluded in
+        if value = excluded then Freq best_value best_count
+        else if count > best_count then Freq value count
+        else Freq best_value best_count
+    end
+
+  let lemma choose_best_kept_from_counts
+      (nums: list int) (even_counts odd_counts: list freq)
+      (even_value_1 even_count_1 even_value_2 even_count_2: int)
+      (odd_value_1 odd_count_1 odd_value_2 odd_count_2: int)
+      (kept: int)
+    requires { length nums >= 1 }
+    requires { all_positive nums }
+    requires { counts_model even_counts (even_positions nums) }
+    requires { counts_model odd_counts (odd_positions nums) }
+    requires { counts_positive_values even_counts }
+    requires { counts_positive_values odd_counts }
+    requires { best_freq_result even_counts 0 even_value_1 even_count_1 }
+    requires { best_freq_result even_counts even_value_1 even_value_2 even_count_2 }
+    requires { best_freq_result odd_counts 0 odd_value_1 odd_count_1 }
+    requires { best_freq_result odd_counts odd_value_1 odd_value_2 odd_count_2 }
+    requires { kept =
+      (if even_value_1 <> odd_value_1 then even_count_1 + odd_count_1
+       else
+         let keep_even_first = even_count_1 + odd_count_2 in
+         let keep_odd_first = even_count_2 + odd_count_1 in
+         if keep_even_first >= keep_odd_first then keep_even_first else keep_odd_first) }
+    ensures  { best_kept nums kept }
+    ensures  { 0 <= kept <= length nums }
+  =
+    if even_value_1 <> odd_value_1 then begin
+      assert { forall ev ov: int.
+        valid_alternating_values ev ov ->
+        kept_by_values nums ev ov <= kept };
+      assert { best_kept nums kept }
+    end else begin
+      assert { forall ev ov: int.
+        valid_alternating_values ev ov ->
+        kept_by_values nums ev ov <= kept };
+      assert { best_kept nums kept }
+    end
+
+  let minimum_operations_to_make_the_array_alternating_list (nums: list int) : int
+    requires { length nums >= 1 }
+    requires { all_positive nums }
+    ensures  { minimum_operations_spec nums result }
+  =
+    let len = length nums in
+    let ParityCounts even_counts odd_counts = collect_even_odd_counts nums in
+    let Freq even_value_1 even_count_1 = best_freq_except even_counts 0 in
+    let Freq even_value_2 even_count_2 = best_freq_except even_counts even_value_1 in
+    let Freq odd_value_1 odd_count_1 = best_freq_except odd_counts 0 in
+    let Freq odd_value_2 odd_count_2 = best_freq_except odd_counts odd_value_1 in
+    let kept =
+      if even_value_1 <> odd_value_1 then even_count_1 + odd_count_1
+      else
+        let keep_even_first = even_count_1 + odd_count_2 in
+        let keep_odd_first = even_count_2 + odd_count_1 in
+        if keep_even_first >= keep_odd_first then keep_even_first else keep_odd_first
+    in
+    choose_best_kept_from_counts nums even_counts odd_counts
+      even_value_1 even_count_1 even_value_2 even_count_2
+      odd_value_1 odd_count_1 odd_value_2 odd_count_2 kept;
+    assert { best_kept nums kept };
+    assert { 0 <= kept <= length nums };
+    assert { minimum_operations_spec nums (len - kept) };
+    len - kept
+
+end

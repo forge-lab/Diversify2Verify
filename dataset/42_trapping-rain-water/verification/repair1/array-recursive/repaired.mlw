@@ -1,0 +1,140 @@
+module TrappingRainWater_Array_Stage3_Recursive
+
+  use int.Int
+  use int.MinMax
+  use array.Array
+  use array.Init
+  use array.ArraySum
+
+  predicate valid_height_input (height: array int) =
+    1 <= length height <= 20000 /\
+    forall i: int. 0 <= i < length height -> 0 <= height[i] <= 100000
+
+  predicate prefix_max_value (height: array int) (i: int) (m: int) =
+    0 <= i < length height /\
+    (exists k: int. 0 <= k <= i /\ height[k] = m) /\
+    (forall k: int. 0 <= k <= i -> height[k] <= m)
+
+  predicate suffix_max_value (height: array int) (i: int) (m: int) =
+    0 <= i < length height /\
+    (exists k: int. i <= k < length height /\ height[k] = m) /\
+    (forall k: int. i <= k < length height -> height[k] <= m)
+
+  predicate trapped_contribution (height: array int) (i: int) (c: int) =
+    0 <= i < length height /\
+    exists left_wall right_wall: int.
+      prefix_max_value height i left_wall /\
+      suffix_max_value height i right_wall /\
+      c = max 0 (min left_wall right_wall - height[i])
+
+  predicate water_profile (height: array int) (water: array int) =
+    length water = length height /\
+    forall i: int.
+      0 <= i < length height -> trapped_contribution height i water[i]
+
+  predicate trapped_water_total (height: array int) (total: int) =
+    exists water: array int.
+      water_profile height water /\
+      total = ArraySum.sum water 0 (length water)
+
+  let lemma water_profile_intro (height: array int) (water: array int)
+    requires { length water = length height }
+    requires { forall i: int.
+      0 <= i < length height -> trapped_contribution height i water[i] }
+    ensures  { water_profile height water }
+  = ()
+
+  let lemma trapped_water_total_intro
+      (height: array int) (water: array int) (total: int)
+    requires { water_profile height water }
+    requires { total = ArraySum.sum water 0 (length water) }
+    ensures  { trapped_water_total height total }
+  = ()
+
+  let rec prefix_max (height: array int) (i: int) : int
+    requires { valid_height_input height }
+    requires { 0 <= i < length height }
+    variant  { i }
+    ensures  { prefix_max_value height i result }
+  =
+    if i <= 0 then
+      height[0]
+    else
+      max (prefix_max height (i - 1)) height[i]
+
+  let rec suffix_max (height: array int) (i: int) : int
+    requires { valid_height_input height }
+    requires { 0 <= i < length height }
+    variant  { length height - i }
+    ensures  { suffix_max_value height i result }
+  =
+    if i + 1 >= length height then
+      height[i]
+    else
+      max height[i] (suffix_max height (i + 1))
+
+  let water_at (height: array int) (i: int) : int
+    requires { valid_height_input height }
+    requires { 0 <= i < length height }
+    ensures  { trapped_contribution height i result }
+  =
+    let left_wall = prefix_max height i in
+    let right_wall = suffix_max height i in
+    let bound = min left_wall right_wall in
+    assert { prefix_max_value height i left_wall };
+    assert { suffix_max_value height i right_wall };
+    if bound > height[i] then begin
+      assert { bound - height[i] = max 0 (min left_wall right_wall - height[i]) };
+      bound - height[i]
+    end else begin
+      assert { 0 = max 0 (min left_wall right_wall - height[i]) };
+      0
+    end
+
+  let rec sum_water_from (height: array int) (water: array int) (i: int) : int
+    requires { valid_height_input height }
+    requires { length water = length height }
+    requires { 0 <= i <= length height }
+    variant  { length height - i }
+    ensures  { forall j: int. 0 <= j < i -> water[j] = old water[j] }
+    ensures  { forall j: int.
+      i <= j < length height -> trapped_contribution height j water[j] }
+    ensures  { result = ArraySum.sum water i (length water) }
+  =
+    if i >= length height then
+      0
+    else begin
+      let c = water_at height i in
+      water[i] <- c;
+      assert { trapped_contribution height i water[i] };
+      let rest = sum_water_from height water (i + 1) in
+      assert { water[i] = c };
+      assert { forall j: int.
+        i <= j < length height -> trapped_contribution height j water[j] };
+      assert { ArraySum.sum water i (length water) =
+               water[i] + ArraySum.sum water (i + 1) (length water) };
+      c + rest
+    end
+
+  let trapping_rain_water_array (height: array int) : int
+    requires { valid_height_input height }
+    ensures  { trapped_water_total height result }
+  =
+    if length height = 0 then
+      0
+    else begin
+      let water = make (length height) 0 in
+      assert { length water = length height };
+      let total = sum_water_from height water 0 in
+      assert { length water = length height };
+      assert { forall i: int.
+        0 <= i < length height -> trapped_contribution height i water[i] };
+      water_profile_intro height water;
+      assert { water_profile height water };
+      assert { total = ArraySum.sum water 0 (length water) };
+      trapped_water_total_intro height water total;
+      assert { trapped_water_total height total };
+      total
+    end
+
+end

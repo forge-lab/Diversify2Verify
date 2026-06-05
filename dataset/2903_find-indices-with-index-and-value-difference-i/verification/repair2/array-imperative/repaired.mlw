@@ -1,0 +1,197 @@
+module FindIndicesWithIndexAndValueDifferenceI_Array_Stage3_Imperative
+
+  use int.Int
+  use int.Abs
+  use array.Array
+  use array.Init
+  use ref.Ref
+
+  predicate valid_index_pair (nums: array int) (indexDifference: int)
+      (valueDifference: int) (i: int) (j: int) =
+    0 <= i < length nums /\
+    0 <= j < length nums /\
+    abs (i - j) >= indexDifference /\
+    abs (nums[i] - nums[j]) >= valueDifference
+
+  predicate no_valid_index_pair (nums: array int) (indexDifference: int)
+      (valueDifference: int) =
+    forall i j: int.
+      0 <= i < length nums ->
+      0 <= j < length nums ->
+      not (abs (i - j) >= indexDifference /\
+           abs (nums[i] - nums[j]) >= valueDifference)
+
+  predicate answer_is (answer: array int) (i: int) (j: int) =
+    length answer = 2 /\ answer[0] = i /\ answer[1] = j
+
+  predicate valid_answer (nums: array int) (indexDifference: int)
+      (valueDifference: int) (answer: array int) =
+    length answer = 2 /\
+    ((answer_is answer (-1) (-1) /\
+      no_valid_index_pair nums indexDifference valueDifference) \/
+     valid_index_pair nums indexDifference valueDifference answer[0] answer[1])
+
+  predicate prefix_min_index (nums: array int) (limit: int) (idx: int) =
+    0 <= idx < limit /\
+    limit <= length nums /\
+    forall k: int. 0 <= k < limit -> nums[idx] <= nums[k]
+
+  predicate prefix_max_index (nums: array int) (limit: int) (idx: int) =
+    0 <= idx < limit /\
+    limit <= length nums /\
+    forall k: int. 0 <= k < limit -> nums[k] <= nums[idx]
+
+  lemma prefix_min_extend_keep:
+    forall nums: array int, limit idx candidate: int.
+      prefix_min_index nums limit idx ->
+      candidate = limit ->
+      limit < length nums ->
+      nums[idx] <= nums[candidate] ->
+      prefix_min_index nums (limit + 1) idx
+
+  lemma prefix_min_extend_take:
+    forall nums: array int, limit idx candidate: int.
+      prefix_min_index nums limit idx ->
+      candidate = limit ->
+      limit < length nums ->
+      nums[candidate] < nums[idx] ->
+      prefix_min_index nums (limit + 1) candidate
+
+  lemma prefix_max_extend_keep:
+    forall nums: array int, limit idx candidate: int.
+      prefix_max_index nums limit idx ->
+      candidate = limit ->
+      limit < length nums ->
+      nums[candidate] <= nums[idx] ->
+      prefix_max_index nums (limit + 1) idx
+
+  lemma prefix_max_extend_take:
+    forall nums: array int, limit idx candidate: int.
+      prefix_max_index nums limit idx ->
+      candidate = limit ->
+      limit < length nums ->
+      nums[idx] < nums[candidate] ->
+      prefix_max_index nums (limit + 1) candidate
+
+  predicate no_valid_pair_below (nums: array int) (indexDifference: int)
+      (valueDifference: int) (limit: int) =
+    forall i j: int.
+      0 <= i < limit ->
+      0 <= j < limit ->
+      not (abs (i - j) >= indexDifference /\
+           abs (nums[i] - nums[j]) >= valueDifference)
+
+  let find_indices_with_index_and_value_difference_i_array
+      (nums: array int) (indexDifference: int) (valueDifference: int) : array int
+    requires { 1 <= length nums }
+    requires { 0 <= indexDifference }
+    requires { 0 <= valueDifference }
+    ensures { valid_answer nums indexDifference valueDifference result }
+  =
+    let min_idx = ref 0 in
+    let max_idx = ref 0 in
+    let answer_i = ref (-1) in
+    let answer_j = ref (-1) in
+    for j = 0 to length nums - 1 do
+      invariant { 0 <= j <= length nums }
+      invariant { 0 <= !min_idx < length nums }
+      invariant { 0 <= !max_idx < length nums }
+      invariant { !answer_i = (-1) -> !answer_j = (-1) }
+      invariant {
+        !answer_i <> (-1) ->
+        valid_index_pair nums indexDifference valueDifference !answer_i !answer_j
+      }
+      invariant {
+        !answer_i = (-1) ->
+        no_valid_pair_below nums indexDifference valueDifference j
+      }
+      invariant {
+        !answer_i = (-1) ->
+        j <= indexDifference -> !min_idx = 0 /\ !max_idx = 0
+      }
+      invariant {
+        !answer_i = (-1) ->
+        j > indexDifference ->
+        prefix_min_index nums (j - indexDifference) !min_idx
+      }
+      invariant {
+        !answer_i = (-1) ->
+        j > indexDifference ->
+        prefix_max_index nums (j - indexDifference) !max_idx
+      }
+      if !answer_i = (-1) then begin
+        if j >= indexDifference then begin
+          let candidate = j - indexDifference in
+          assert { 0 <= candidate };
+          assert { candidate <= j };
+          assert { candidate < length nums };
+          let old_min_idx = !min_idx in
+          if nums[candidate] < nums[old_min_idx] then begin
+            assert { candidate <> 0 };
+            assert { j > indexDifference };
+            assert { prefix_min_index nums candidate old_min_idx };
+            min_idx := candidate;
+            assert { prefix_min_index nums (candidate + 1) !min_idx }
+          end else begin
+            if candidate = 0 then begin
+              assert { old_min_idx = 0 };
+              assert { prefix_min_index nums (candidate + 1) old_min_idx }
+            end else begin
+              assert { j > indexDifference };
+              assert { prefix_min_index nums candidate old_min_idx };
+              assert { nums[old_min_idx] <= nums[candidate] };
+              assert { prefix_min_index nums (candidate + 1) old_min_idx }
+            end;
+            assert { !min_idx = old_min_idx }
+          end;
+          assert { prefix_min_index nums (candidate + 1) !min_idx };
+          let old_max_idx = !max_idx in
+          if nums[candidate] > nums[old_max_idx] then begin
+            assert { candidate <> 0 };
+            assert { j > indexDifference };
+            assert { prefix_max_index nums candidate old_max_idx };
+            max_idx := candidate;
+            assert { prefix_max_index nums (candidate + 1) !max_idx }
+          end else begin
+            if candidate = 0 then begin
+              assert { old_max_idx = 0 };
+              assert { prefix_max_index nums (candidate + 1) old_max_idx }
+            end else begin
+              assert { j > indexDifference };
+              assert { prefix_max_index nums candidate old_max_idx };
+              assert { nums[candidate] <= nums[old_max_idx] };
+              assert { prefix_max_index nums (candidate + 1) old_max_idx }
+            end;
+            assert { !max_idx = old_max_idx }
+          end;
+          assert { prefix_max_index nums (candidate + 1) !max_idx };
+          assert { 0 <= !min_idx <= candidate };
+          assert { 0 <= !max_idx <= candidate };
+          if abs (nums[j] - nums[!min_idx]) >= valueDifference then begin
+            answer_i := !min_idx;
+            answer_j := j;
+            assert { valid_index_pair nums indexDifference valueDifference !answer_i !answer_j }
+          end else
+            if abs (nums[j] - nums[!max_idx]) >= valueDifference then begin
+              answer_i := !max_idx;
+              answer_j := j;
+              assert { valid_index_pair nums indexDifference valueDifference !answer_i !answer_j }
+            end
+        end
+      end
+    done;
+    assert {
+      !answer_i = (-1) ->
+      no_valid_pair_below nums indexDifference valueDifference (length nums)
+    };
+    assert {
+      !answer_i = (-1) ->
+      no_valid_index_pair nums indexDifference valueDifference
+    };
+    let result = init 2 [|!answer_i; !answer_j|] in
+    assert { length result = 2 };
+    assert { result[0] = !answer_i };
+    assert { result[1] = !answer_j };
+    result
+
+end

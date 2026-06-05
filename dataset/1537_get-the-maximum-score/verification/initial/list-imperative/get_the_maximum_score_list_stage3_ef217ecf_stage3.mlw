@@ -1,0 +1,150 @@
+module GetTheMaximumScore_List_Stage3_Imperative
+
+  use int.Int
+  use int.MinMax
+  use int.EuclideanDivision
+  use list.List
+  use list.Length
+  use ref.Ref
+
+  let rec predicate all_values_in_range (l: list int)
+    variant { l }
+  =
+    match l with
+    | Nil -> true
+    | Cons x xs -> 1 <= x && x <= 10000000 && all_values_in_range xs
+    end
+
+  let rec predicate lt_all (x: int) (l: list int)
+    variant { l }
+  =
+    match l with
+    | Nil -> true
+    | Cons y ys -> x < y && lt_all x ys
+    end
+
+  let rec predicate strictly_increasing (l: list int)
+    variant { l }
+  =
+    match l with
+    | Nil -> true
+    | Cons x xs -> lt_all x xs && strictly_increasing xs
+    end
+
+  let rec function max_score_acc (xs: list int) (ys: list int)
+      (acc1: int) (acc2: int) : int
+    variant { xs, ys }
+  =
+    match xs, ys with
+    | Nil, Nil -> max acc1 acc2
+    | Nil, Cons y ys_tail -> max_score_acc Nil ys_tail acc1 (acc2 + y)
+    | Cons x xs_tail, Nil -> max_score_acc xs_tail Nil (acc1 + x) acc2
+    | Cons x xs_tail, Cons y ys_tail ->
+        if x < y then
+          max_score_acc xs_tail ys (acc1 + x) acc2
+        else if y < x then
+          max_score_acc xs ys_tail acc1 (acc2 + y)
+        else
+          let joined = max acc1 acc2 + x in
+          max_score_acc xs_tail ys_tail joined joined
+    end
+
+  function max_score (nums1: list int) (nums2: list int) : int =
+    max_score_acc nums1 nums2 0 0
+
+  let get_the_maximum_score_list (nums1: list int) (nums2: list int) : int
+    requires { nums1 <> Nil /\ nums2 <> Nil }
+    requires { length nums1 <= 100000 /\ length nums2 <= 100000 }
+    requires { all_values_in_range nums1 /\ all_values_in_range nums2 }
+    requires { strictly_increasing nums1 /\ strictly_increasing nums2 }
+    ensures  { result = mod (max_score nums1 nums2) 1000000007 }
+    ensures  { 0 <= result < 1000000007 }
+  =
+    let acc1 = ref 0 in
+    let acc2 = ref 0 in
+    let cur1 = ref nums1 in
+    let cur2 = ref nums2 in
+    while (match !cur1, !cur2 with
+           | Cons _ _, Cons _ _ -> true
+           | _, _ -> false
+           end) do
+      invariant { max_score_acc !cur1 !cur2 !acc1 !acc2 = max_score nums1 nums2 }
+      invariant { 0 <= length !cur1 }
+      invariant { 0 <= length !cur2 }
+      variant { length !cur1 + length !cur2 }
+
+      match !cur1, !cur2 with
+      | Cons x xs, Cons y ys ->
+          if x < y then (
+            assert { max_score_acc !cur1 !cur2 !acc1 !acc2 =
+                     max_score_acc xs !cur2 (!acc1 + x) !acc2 };
+            acc1 := !acc1 + x;
+            cur1 := xs
+          ) else if y < x then (
+            assert { max_score_acc !cur1 !cur2 !acc1 !acc2 =
+                     max_score_acc !cur1 ys !acc1 (!acc2 + y) };
+            acc2 := !acc2 + y;
+            cur2 := ys
+          ) else (
+            let joined = (max !acc1 !acc2) + x in
+            assert { max_score_acc !cur1 !cur2 !acc1 !acc2 =
+                     max_score_acc xs ys joined joined };
+            acc1 := joined;
+            acc2 := joined;
+            cur1 := xs;
+            cur2 := ys
+          )
+      | _, _ ->
+          assert { false }
+      end
+    done;
+    assert { max_score_acc !cur1 !cur2 !acc1 !acc2 = max_score nums1 nums2 };
+    match !cur1, !cur2 with
+    | Cons _ _, Cons _ _ -> assert { false }
+    | _, _ -> ()
+    end;
+
+    while (match !cur1 with Nil -> false | Cons _ _ -> true end) do
+      invariant { max_score_acc !cur1 !cur2 !acc1 !acc2 = max_score nums1 nums2 }
+      invariant { !cur2 = Nil }
+      invariant { 0 <= length !cur1 }
+      variant { length !cur1 }
+
+      match !cur1 with
+      | Nil ->
+          assert { false }
+      | Cons x xs ->
+          assert { max_score_acc !cur1 !cur2 !acc1 !acc2 =
+                   max_score_acc xs !cur2 (!acc1 + x) !acc2 };
+          acc1 := !acc1 + x;
+          cur1 := xs
+      end
+    done;
+    assert { !cur1 = Nil };
+    assert { max_score_acc !cur1 !cur2 !acc1 !acc2 = max_score nums1 nums2 };
+
+    while (match !cur2 with Nil -> false | Cons _ _ -> true end) do
+      invariant { max_score_acc !cur1 !cur2 !acc1 !acc2 = max_score nums1 nums2 }
+      invariant { !cur1 = Nil }
+      invariant { 0 <= length !cur2 }
+      variant { length !cur2 }
+
+      match !cur2 with
+      | Nil ->
+          assert { false }
+      | Cons y ys ->
+          assert { max_score_acc !cur1 !cur2 !acc1 !acc2 =
+                   max_score_acc !cur1 ys !acc1 (!acc2 + y) };
+          acc2 := !acc2 + y;
+          cur2 := ys
+      end
+    done;
+    assert { !cur1 = Nil };
+    assert { !cur2 = Nil };
+    assert { max_score_acc !cur1 !cur2 !acc1 !acc2 = max_score nums1 nums2 };
+    assert { max_score_acc Nil Nil !acc1 !acc2 = max !acc1 !acc2 };
+    let total = max !acc1 !acc2 in
+    assert { total = max_score nums1 nums2 };
+    mod total 1000000007
+
+end

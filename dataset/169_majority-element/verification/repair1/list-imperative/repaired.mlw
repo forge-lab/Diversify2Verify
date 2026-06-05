@@ -1,0 +1,155 @@
+module MajorityElement_List_Stage3_Imperative
+
+  use int.Int
+  use list.List
+  use list.Length
+  use list.NumOcc
+  use ref.Ref
+
+  predicate is_majority (nums: list int) (x: int) =
+    2 * num_occ x nums > length nums
+
+  predicate has_majority (nums: list int) =
+    exists x: int. is_majority nums x
+
+  function signed_balance (candidate: int) (majority: int) (balance: int) : int =
+    if candidate = majority then balance else -balance
+
+  let lemma majority_margin_init (majority h: int) (t: list int)
+    requires { is_majority (Cons h t) majority }
+    ensures  { 2 * num_occ majority t + signed_balance h majority 1 > length t }
+  =
+    assert { num_occ majority (Cons h t) =
+      (if h = majority then 1 else 0) + num_occ majority t };
+    assert { length (Cons h t) = 1 + length t };
+    if h = majority then
+      assert { signed_balance h majority 1 = 1 }
+    else
+      assert { signed_balance h majority 1 = -1 }
+
+  let lemma majority_margin_step (majority candidate x: int) (balance: int)
+      (xs: list int)
+    requires { 0 <= balance }
+    requires {
+      2 * num_occ majority (Cons x xs) +
+      signed_balance candidate majority balance > length (Cons x xs)
+    }
+    ensures {
+      balance = 0 ->
+      2 * num_occ majority xs + signed_balance x majority 1 > length xs
+    }
+    ensures {
+      balance <> 0 /\ x = candidate ->
+      2 * num_occ majority xs +
+      signed_balance candidate majority (balance + 1) > length xs
+    }
+    ensures {
+      balance <> 0 /\ x <> candidate ->
+      2 * num_occ majority xs +
+      signed_balance candidate majority (balance - 1) > length xs
+    }
+  =
+    assert { length (Cons x xs) = 1 + length xs };
+    if x = majority then
+      assert { num_occ majority (Cons x xs) = 1 + num_occ majority xs }
+    else
+      assert { num_occ majority (Cons x xs) = num_occ majority xs };
+    if balance = 0 then begin
+      if x = majority then
+        assert { signed_balance x majority 1 = 1 }
+      else
+        assert { signed_balance x majority 1 = -1 }
+    end else if x = candidate then begin
+      assert { 1 <= balance };
+      if candidate = majority then
+        assert { signed_balance candidate majority (balance + 1) = balance + 1 }
+      else
+        assert { signed_balance candidate majority (balance + 1) = -(balance + 1) }
+    end else begin
+      assert { 1 <= balance };
+      if candidate = majority then
+        assert { signed_balance candidate majority (balance - 1) = balance - 1 }
+      else
+        assert { signed_balance candidate majority (balance - 1) = -(balance - 1) }
+    end
+
+  let lemma majority_margin_exit (majority candidate: int) (balance: int)
+    requires { 0 <= balance }
+    requires { 2 * num_occ majority (Nil : list int) +
+      signed_balance candidate majority balance > length (Nil : list int) }
+    ensures  { candidate = majority }
+  =
+    assert { num_occ majority (Nil : list int) = 0 };
+    assert { length (Nil : list int) = 0 };
+    if candidate = majority then
+      ()
+    else begin
+      assert { signed_balance candidate majority balance = -balance };
+      absurd
+    end
+
+  let majority_element_list (nums: list int) : int
+    requires { has_majority nums }
+    ensures  { is_majority nums result }
+  =
+    match nums with
+    | Nil -> absurd
+    | Cons h t ->
+        let ghost majority = any int ensures { is_majority nums result } in
+        assert { is_majority (Cons h t) majority };
+        majority_margin_init majority h t;
+        let candidate = ref h in
+        let balance = ref 1 in
+        let cur = ref t in
+        while (match !cur with Nil -> false | Cons _ _ -> true end) do
+          invariant { 0 <= length !cur }
+          invariant { 0 <= !balance }
+          invariant {
+            2 * num_occ majority !cur +
+            signed_balance !candidate majority !balance > length !cur
+          }
+          variant { length !cur }
+
+          match !cur with
+          | Nil -> absurd
+          | Cons x xs ->
+              let old_candidate = !candidate in
+              let old_balance = !balance in
+              assert {
+                2 * num_occ majority (Cons x xs) +
+                signed_balance old_candidate majority old_balance >
+                length (Cons x xs)
+              };
+              majority_margin_step majority old_candidate x old_balance xs;
+              if !balance = 0 then (
+                candidate := x;
+                balance := 1;
+                assert {
+                  2 * num_occ majority xs +
+                  signed_balance !candidate majority !balance > length xs
+                }
+              ) else if x = !candidate then (
+                balance := !balance + 1;
+                assert {
+                  2 * num_occ majority xs +
+                  signed_balance !candidate majority !balance > length xs
+                }
+              ) else (
+                balance := !balance - 1;
+                assert { 0 <= !balance };
+                assert {
+                  2 * num_occ majority xs +
+                  signed_balance !candidate majority !balance > length xs
+                }
+              );
+              cur := xs
+          end
+        done;
+        assert { !cur = Nil };
+        majority_margin_exit majority !candidate !balance;
+        assert { !candidate = majority };
+        assert { is_majority nums !candidate };
+        !candidate
+    end
+
+end

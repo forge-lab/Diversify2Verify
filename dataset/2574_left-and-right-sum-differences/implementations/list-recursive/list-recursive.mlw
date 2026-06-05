@@ -1,0 +1,203 @@
+module LeftAndRightSumDifferences_List_Recursive_Implementation
+
+  use int.Int
+  use int.Abs
+  use list.List
+
+  let rec sum_list (nums: list int) : int
+    variant { nums }
+  =
+    match nums with
+    | Nil -> 0
+    | Cons x xs -> x + sum_list xs
+    end
+
+  let rec build_differences (left_sum: int) (remaining_sum: int) (nums: list int) : list int
+    variant { nums }
+  =
+    match nums with
+    | Nil -> Nil
+    | Cons x xs ->
+        let right_sum = remaining_sum - x in
+        Cons (abs (left_sum - right_sum))
+          (build_differences (left_sum + x) right_sum xs)
+    end
+
+  let left_and_right_sum_differences_list (nums: list int) : list int =
+    let total = sum_list nums in
+    build_differences 0 total nums
+
+  let rec list_eq (xs: list int) (ys: list int) : bool
+    variant { xs, ys }
+  =
+    match xs, ys with
+    | Nil, Nil -> true
+    | Cons x xs1, Cons y ys1 ->
+        if x = y then list_eq xs1 ys1 else false
+    | _, _ -> false
+    end
+
+  let test_case_000 () : bool =
+    let nums = Cons 5 (Cons 4 (Cons 3 (Cons 2 (Cons 1 Nil)))) in
+    let expected = Cons 10 (Cons 1 (Cons 6 (Cons 11 (Cons 14 Nil)))) in
+    let r = left_and_right_sum_differences_list nums in
+    list_eq r expected
+
+  let test_case_001 () : bool =
+    let nums = Cons 1 Nil in
+    let expected = Cons 0 Nil in
+    let r = left_and_right_sum_differences_list nums in
+    list_eq r expected
+
+  let test_case_002 () : bool =
+    let nums = Cons 1 (Cons 2 (Cons 3 (Cons 4 (Cons 5 (Cons 6 (Cons 7 (Cons 8 (Cons 9 (Cons 10 Nil))))))))) in
+    let expected = Cons 54 (Cons 51 (Cons 46 (Cons 39 (Cons 30 (Cons 19 (Cons 6 (Cons 9 (Cons 26 (Cons 45 Nil))))))))) in
+    let r = left_and_right_sum_differences_list nums in
+    list_eq r expected
+
+  let test_case_003 () : bool =
+    let nums = Cons 10 (Cons 20 (Cons 30 Nil)) in
+    let expected = Cons 50 (Cons 20 (Cons 30 Nil)) in
+    let r = left_and_right_sum_differences_list nums in
+    list_eq r expected
+
+  let test_case_004 () : bool =
+    let nums = Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 Nil))))))))) in
+    let expected = Cons 9 (Cons 7 (Cons 5 (Cons 3 (Cons 1 (Cons 1 (Cons 3 (Cons 5 (Cons 7 (Cons 9 Nil))))))))) in
+    let r = left_and_right_sum_differences_list nums in
+    list_eq r expected
+
+  let test_case_005 () : bool =
+    let nums = Cons 100000 (Cons 100000 (Cons 100000 Nil)) in
+    let expected = Cons 200000 (Cons 0 (Cons 200000 Nil)) in
+    let r = left_and_right_sum_differences_list nums in
+    list_eq r expected
+
+  let test_case_006 () : bool =
+    let nums = Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 Nil))))))))) in
+    let expected = Cons 9 (Cons 7 (Cons 5 (Cons 3 (Cons 1 (Cons 1 (Cons 3 (Cons 5 (Cons 7 (Cons 9 Nil))))))))) in
+    let r = left_and_right_sum_differences_list nums in
+    list_eq r expected
+
+  let test_case_007 () : bool =
+    let nums = Cons 10 (Cons 20 (Cons 30 (Cons 40 (Cons 50 (Cons 60 (Cons 70 (Cons 80 (Cons 90 (Cons 100 Nil))))))))) in
+    let expected = Cons 540 (Cons 510 (Cons 460 (Cons 390 (Cons 300 (Cons 190 (Cons 60 (Cons 90 (Cons 260 (Cons 450 Nil))))))))) in
+    let r = left_and_right_sum_differences_list nums in
+    list_eq r expected
+
+  let test_case_008 () : bool =
+    let nums = Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 Nil)))) in
+    let expected = Cons 4 (Cons 2 (Cons 0 (Cons 2 (Cons 4 Nil)))) in
+    let r = left_and_right_sum_differences_list nums in
+    list_eq r expected
+
+  let test_case_009 () : bool =
+    let nums = Cons 1 (Cons 2 Nil) in
+    let expected = Cons 2 (Cons 1 Nil) in
+    let r = left_and_right_sum_differences_list nums in
+    list_eq r expected
+
+  let test_case_010 () : bool =
+    let nums = Cons 100000 (Cons 1 (Cons 1 (Cons 1 Nil))) in
+    let expected = Cons 3 (Cons 99998 (Cons 100000 (Cons 100002 Nil))) in
+    let r = left_and_right_sum_differences_list nums in
+    list_eq r expected
+
+  let test_case_011 () : bool =
+    let nums = Cons 1000 (Cons 1000 (Cons 1000 (Cons 1000 Nil))) in
+    let expected = Cons 3000 (Cons 1000 (Cons 1000 (Cons 3000 Nil))) in
+    let r = left_and_right_sum_differences_list nums in
+    list_eq r expected
+
+  let test_case_012 () : bool =
+    let nums = Cons 5 (Cons 5 (Cons 5 (Cons 5 Nil))) in
+    let expected = Cons 15 (Cons 5 (Cons 5 (Cons 15 Nil))) in
+    let r = left_and_right_sum_differences_list nums in
+    list_eq r expected
+
+  let test_case_013 () : bool =
+    let nums = Cons 1 (Cons 2 (Cons 3 (Cons 4 (Cons 5 Nil)))) in
+    let expected = Cons 14 (Cons 11 (Cons 6 (Cons 1 (Cons 10 Nil)))) in
+    let r = left_and_right_sum_differences_list nums in
+    list_eq r expected
+
+  let test_case_014 () : bool =
+    let nums = Cons 100000 (Cons 100000 (Cons 100000 Nil)) in
+    let expected = Cons 200000 (Cons 0 (Cons 200000 Nil)) in
+    let r = left_and_right_sum_differences_list nums in
+    list_eq r expected
+
+  let test_case_015 () : bool =
+    let nums = Cons 100000 (Cons 100000 (Cons 100000 (Cons 100000 (Cons 100000 Nil)))) in
+    let expected = Cons 400000 (Cons 200000 (Cons 0 (Cons 200000 (Cons 400000 Nil)))) in
+    let r = left_and_right_sum_differences_list nums in
+    list_eq r expected
+
+  let test_case_016 () : bool =
+    let nums = Cons 10 (Cons 4 (Cons 8 (Cons 3 Nil))) in
+    let expected = Cons 15 (Cons 1 (Cons 11 (Cons 22 Nil))) in
+    let r = left_and_right_sum_differences_list nums in
+    list_eq r expected
+
+  let test_case_017 () : bool =
+    let nums = Cons 100000 (Cons 1 (Cons 100000 (Cons 1 (Cons 100000 (Cons 1 (Cons 100000 (Cons 1 (Cons 100000 (Cons 1 Nil))))))))) in
+    let expected = Cons 400005 (Cons 300004 (Cons 200003 (Cons 100002 (Cons 1 (Cons 100000 (Cons 200001 (Cons 300002 (Cons 400003 (Cons 500004 Nil))))))))) in
+    let r = left_and_right_sum_differences_list nums in
+    list_eq r expected
+
+  let test_case_018 () : bool =
+    let nums = Cons 29 (Cons 27 (Cons 25 (Cons 23 (Cons 21 (Cons 19 (Cons 17 (Cons 15 (Cons 13 (Cons 11 (Cons 9 (Cons 7 (Cons 5 (Cons 3 (Cons 1 Nil)))))))))))))) in
+    let expected = Cons 196 (Cons 140 (Cons 88 (Cons 40 (Cons 4 (Cons 44 (Cons 80 (Cons 112 (Cons 140 (Cons 164 (Cons 184 (Cons 200 (Cons 212 (Cons 220 (Cons 224 Nil)))))))))))))) in
+    let r = left_and_right_sum_differences_list nums in
+    list_eq r expected
+
+  let test_case_019 () : bool =
+    let nums = Cons 100000 (Cons 200000 (Cons 300000 (Cons 400000 (Cons 500000 (Cons 600000 (Cons 700000 (Cons 800000 (Cons 900000 (Cons 1000000 (Cons 1100000 (Cons 1200000 (Cons 1300000 (Cons 1400000 (Cons 1500000 Nil)))))))))))))) in
+    let expected = Cons 11900000 (Cons 11600000 (Cons 11100000 (Cons 10400000 (Cons 9500000 (Cons 8400000 (Cons 7100000 (Cons 5600000 (Cons 3900000 (Cons 2000000 (Cons 100000 (Cons 2400000 (Cons 4900000 (Cons 7600000 (Cons 10500000 Nil)))))))))))))) in
+    let r = left_and_right_sum_differences_list nums in
+    list_eq r expected
+
+  let run_tests () : bool =
+    if test_case_000 () then
+    if test_case_001 () then
+    if test_case_002 () then
+    if test_case_003 () then
+    if test_case_004 () then
+    if test_case_005 () then
+    if test_case_006 () then
+    if test_case_007 () then
+    if test_case_008 () then
+    if test_case_009 () then
+    if test_case_010 () then
+    if test_case_011 () then
+    if test_case_012 () then
+    if test_case_013 () then
+    if test_case_014 () then
+    if test_case_015 () then
+    if test_case_016 () then
+    if test_case_017 () then
+    if test_case_018 () then
+    if test_case_019 () then
+      true
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+
+end

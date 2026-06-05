@@ -1,0 +1,557 @@
+== Stage 1: first prover on whole file ==
+Running in /Users/rubenm/Desktop/Diversify2Verify/codex-runs/dataset-merge/1425_constrained-subsequence-sum/stage3a/list-imperative/constrained_subsequence_sum_list_stage3_8f3299ae/generated/why3/list: why3 session create -o /Users/rubenm/Desktop/Diversify2Verify/codex-runs/dataset-merge/1425_constrained-subsequence-sum/stage3a/list-imperative/constrained_subsequence_sum_list_stage3_8f3299ae/generated/why3/list/.why3_sessions/constrained_subsequence_sum_list_stage3_8f3299ae_stage3_stage1 -P Z3,4.8.6 -t 10 -m 8192 constrained_subsequence_sum_list_stage3_8f3299ae_stage3.mlw
+Session created successfully
+Running in /Users/rubenm/Desktop/Diversify2Verify/codex-runs/dataset-merge/1425_constrained-subsequence-sum/stage3a/list-imperative/constrained_subsequence_sum_list_stage3_8f3299ae/generated/why3/list: why3 bench /Users/rubenm/Desktop/Diversify2Verify/codex-runs/dataset-merge/1425_constrained-subsequence-sum/stage3a/list-imperative/constrained_subsequence_sum_list_stage3_8f3299ae/generated/why3/list/.why3_sessions/constrained_subsequence_sum_list_stage3_8f3299ae_stage3_stage1
+Progress: 3/1/0                       Progress: 2/2/0                       Progress: 1/3/0                       Progress: 0/4/0                       Progress: 0/0/1                       
+Replay completed, saving session... done
+== Stage 1 stats ==
+= Statistics for session /Users/rubenm/Desktop/Diversify2Verify/codex-runs/dataset-merge/1425_constrained-subsequence-sum/stage3a/list-imperative/constrained_subsequence_sum_list_stage3_8f3299ae/generated/why3/list/.why3_sessions/constrained_subsequence_sum_list_stage3_8f3299ae_stage3_stage1
+
+== Number of root goals ==
+  total: 4  proved: 3
+
+== Number of sub goals ==
+  total: 0  proved: 0
+
+== Goals not proved ==
+  +-- file [../../constrained_subsequence_sum_list_stage3_8f3299ae_stage3.mlw]
+    +-- theory ConstrainedSubsequenceSum_List_Stage3_Imperative
+      +-- goal constrained_subsequence_sum_list'vc
+  
+== Goals proved by only one prover ==
+  +-- file [../../constrained_subsequence_sum_list_stage3_8f3299ae_stage3.mlw]
+    +-- theory ConstrainedSubsequenceSum_List_Stage3_Imperative
+      +-- goal constrained_tail_sum'vc: Z3 4.8.6
+      +-- goal constrained_nonempty_sum'vc: Z3 4.8.6
+      +-- goal max_nonnegative_prefix'vc: Z3 4.8.6
+  
+1 session(s) read, with a total of 4 proof goals.
+== Unproved root goals after first prover ==
+ConstrainedSubsequenceSum_List_Stage3_Imperative	constrained_subsequence_sum_list'vc
+== Stage 1: trying remaining goals with prover Alt-Ergo,2.4.0 ==
+---- stage1 | prover: Alt-Ergo,2.4.0 | theory: ConstrainedSubsequenceSum_List_Stage3_Imperative | goal: constrained_subsequence_sum_list'vc ----
+File constrained_subsequence_sum_list_stage3_8f3299ae_stage3.mlw:
+Goal constrained_subsequence_sum_list'vc.
+Prover result is: Timeout (10.00s, 55009 steps).
+Remaining after prover Alt-Ergo,2.4.0: 1
+== Stage 1: trying remaining goals with prover CVC4,1.8 ==
+---- stage1 | prover: CVC4,1.8 | theory: ConstrainedSubsequenceSum_List_Stage3_Imperative | goal: constrained_subsequence_sum_list'vc ----
+File constrained_subsequence_sum_list_stage3_8f3299ae_stage3.mlw:
+Goal constrained_subsequence_sum_list'vc.
+Prover result is: Unknown (unknown + incomplete) (0.03s, 7786 steps).
+Remaining after prover CVC4,1.8: 1
+== Goals still unproved after stage 1 ==
+ConstrainedSubsequenceSum_List_Stage3_Imperative	constrained_subsequence_sum_list'vc
+== Stage 2: split_vc on unproved goal ==
+Target theory: ConstrainedSubsequenceSum_List_Stage3_Imperative
+Target goal  : constrained_subsequence_sum_list'vc
+---- stage2 | prover: Z3,4.8.6 | theory: ConstrainedSubsequenceSum_List_Stage3_Imperative | goal: constrained_subsequence_sum_list'vc ----
+Transforms: split_vc
+File "constrained_subsequence_sum_list_stage3_8f3299ae_stage3.mlw", line 64, characters 15-51:
+Sub-goal Postcondition of goal constrained_subsequence_sum_list'vc.
+Prover result is: Valid (0.01s, 904 steps).
+
+File "constrained_subsequence_sum_list_stage3_8f3299ae_stage3.mlw", line 73, characters 22-28:
+Sub-goal Loop invariant init of goal constrained_subsequence_sum_list'vc.
+Prover result is: Valid (0.01s, 787 steps).
+
+File "constrained_subsequence_sum_list_stage3_8f3299ae_stage3.mlw", line 74, characters 22-38:
+Sub-goal Loop invariant init of goal constrained_subsequence_sum_list'vc.
+Prover result is: Valid (0.01s, 10919 steps).
+
+File "constrained_subsequence_sum_list_stage3_8f3299ae_stage3.mlw", line 75, characters 22-46:
+Sub-goal Loop invariant init of goal constrained_subsequence_sum_list'vc.
+Prover result is: Valid (0.01s, 803 steps).
+
+File "constrained_subsequence_sum_list_stage3_8f3299ae_stage3.mlw", line 76, characters 20-31:
+Sub-goal Loop variant decrease of goal constrained_subsequence_sum_list'vc.
+Prover result is: Valid (0.01s, 842 steps).
+
+File "constrained_subsequence_sum_list_stage3_8f3299ae_stage3.mlw", line 73, characters 22-28:
+Sub-goal Loop invariant preservation of goal
+constrained_subsequence_sum_list'vc.
+Prover result is: Valid (0.01s, 826 steps).
+
+File "constrained_subsequence_sum_list_stage3_8f3299ae_stage3.mlw", line 74, characters 22-38:
+Sub-goal Loop invariant preservation of goal
+constrained_subsequence_sum_list'vc.
+Prover result is: Valid (0.01s, 831 steps).
+
+File "constrained_subsequence_sum_list_stage3_8f3299ae_stage3.mlw", line 75, characters 22-46:
+Sub-goal Loop invariant preservation of goal
+constrained_subsequence_sum_list'vc.
+Prover result is: Valid (0.01s, 838 steps).
+
+File "constrained_subsequence_sum_list_stage3_8f3299ae_stage3.mlw", line 80, characters 32-64:
+Sub-goal Precondition of goal constrained_subsequence_sum_list'vc.
+Prover result is: Valid (0.01s, 11188 steps).
+
+File "constrained_subsequence_sum_list_stage3_8f3299ae_stage3.mlw", line 76, characters 20-31:
+Sub-goal Loop variant decrease of goal constrained_subsequence_sum_list'vc.
+Prover result is: Valid (0.01s, 12243 steps).
+
+File "constrained_subsequence_sum_list_stage3_8f3299ae_stage3.mlw", line 73, characters 22-28:
+Sub-goal Loop invariant preservation of goal
+constrained_subsequence_sum_list'vc.
+Prover result is: Valid (0.01s, 868 steps).
+
+File "constrained_subsequence_sum_list_stage3_8f3299ae_stage3.mlw", line 74, characters 22-38:
+Sub-goal Loop invariant preservation of goal
+constrained_subsequence_sum_list'vc.
+Prover result is: Valid (0.01s, 12211 steps).
+
+File "constrained_subsequence_sum_list_stage3_8f3299ae_stage3.mlw", line 75, characters 22-46:
+Sub-goal Loop invariant preservation of goal
+constrained_subsequence_sum_list'vc.
+Prover result is: Valid (0.01s, 12495 steps).
+
+File "constrained_subsequence_sum_list_stage3_8f3299ae_stage3.mlw", line 76, characters 20-31:
+Sub-goal Loop variant decrease of goal constrained_subsequence_sum_list'vc.
+Prover result is: Valid (0.01s, 12193 steps).
+
+File "constrained_subsequence_sum_list_stage3_8f3299ae_stage3.mlw", line 73, characters 22-28:
+Sub-goal Loop invariant preservation of goal
+constrained_subsequence_sum_list'vc.
+Prover result is: Valid (0.01s, 867 steps).
+
+File "constrained_subsequence_sum_list_stage3_8f3299ae_stage3.mlw", line 74, characters 22-38:
+Sub-goal Loop invariant preservation of goal
+constrained_subsequence_sum_list'vc.
+Prover result is: Valid (0.01s, 12165 steps).
+
+File "constrained_subsequence_sum_list_stage3_8f3299ae_stage3.mlw", line 75, characters 22-46:
+Sub-goal Loop invariant preservation of goal
+constrained_subsequence_sum_list'vc.
+Prover result is: Valid (0.01s, 12449 steps).
+
+File "constrained_subsequence_sum_list_stage3_8f3299ae_stage3.mlw", line 64, characters 15-51:
+Sub-goal Postcondition of goal constrained_subsequence_sum_list'vc.
+Prover result is: Timeout (10.00s, 136581925 steps).
+---- stage2 | prover: Alt-Ergo,2.4.0 | theory: ConstrainedSubsequenceSum_List_Stage3_Imperative | goal: constrained_subsequence_sum_list'vc ----
+Transforms: split_vc
+File "constrained_subsequence_sum_list_stage3_8f3299ae_stage3.mlw", line 64, characters 15-51:
+Sub-goal Postcondition of goal constrained_subsequence_sum_list'vc.
+Prover result is: Valid (0.01s, 6 steps).
+
+File "constrained_subsequence_sum_list_stage3_8f3299ae_stage3.mlw", line 73, characters 22-28:
+Sub-goal Loop invariant init of goal constrained_subsequence_sum_list'vc.
+Prover result is: Valid (0.01s, 8 steps).
+
+File "constrained_subsequence_sum_list_stage3_8f3299ae_stage3.mlw", line 74, characters 22-38:
+Sub-goal Loop invariant init of goal constrained_subsequence_sum_list'vc.
+Prover result is: Valid (0.01s, 11 steps).
+
+File "constrained_subsequence_sum_list_stage3_8f3299ae_stage3.mlw", line 75, characters 22-46:
+Sub-goal Loop invariant init of goal constrained_subsequence_sum_list'vc.
+Prover result is: Valid (0.00s, 10 steps).
+
+File "constrained_subsequence_sum_list_stage3_8f3299ae_stage3.mlw", line 76, characters 20-31:
+Sub-goal Loop variant decrease of goal constrained_subsequence_sum_list'vc.
+Prover result is: Valid (0.01s, 14 steps).
+
+File "constrained_subsequence_sum_list_stage3_8f3299ae_stage3.mlw", line 73, characters 22-28:
+Sub-goal Loop invariant preservation of goal
+constrained_subsequence_sum_list'vc.
+Prover result is: Valid (0.00s, 14 steps).
+
+File "constrained_subsequence_sum_list_stage3_8f3299ae_stage3.mlw", line 74, characters 22-38:
+Sub-goal Loop invariant preservation of goal
+constrained_subsequence_sum_list'vc.
+Prover result is: Valid (0.00s, 14 steps).
+
+File "constrained_subsequence_sum_list_stage3_8f3299ae_stage3.mlw", line 75, characters 22-46:
+Sub-goal Loop invariant preservation of goal
+constrained_subsequence_sum_list'vc.
+Prover result is: Valid (0.01s, 14 steps).
+
+File "constrained_subsequence_sum_list_stage3_8f3299ae_stage3.mlw", line 80, characters 32-64:
+Sub-goal Precondition of goal constrained_subsequence_sum_list'vc.
+Prover result is: Valid (0.01s, 16 steps).
+
+File "constrained_subsequence_sum_list_stage3_8f3299ae_stage3.mlw", line 76, characters 20-31:
+Sub-goal Loop variant decrease of goal constrained_subsequence_sum_list'vc.
+Prover result is: Valid (0.01s, 40 steps).
+
+File "constrained_subsequence_sum_list_stage3_8f3299ae_stage3.mlw", line 73, characters 22-28:
+Sub-goal Loop invariant preservation of goal
+constrained_subsequence_sum_list'vc.
+Prover result is: Valid (0.01s, 24 steps).
+
+File "constrained_subsequence_sum_list_stage3_8f3299ae_stage3.mlw", line 74, characters 22-38:
+Sub-goal Loop invariant preservation of goal
+constrained_subsequence_sum_list'vc.
+Prover result is: Valid (0.01s, 30 steps).
+
+File "constrained_subsequence_sum_list_stage3_8f3299ae_stage3.mlw", line 75, characters 22-46:
+Sub-goal Loop invariant preservation of goal
+constrained_subsequence_sum_list'vc.
+Prover result is: Valid (0.01s, 40 steps).
+
+File "constrained_subsequence_sum_list_stage3_8f3299ae_stage3.mlw", line 76, characters 20-31:
+Sub-goal Loop variant decrease of goal constrained_subsequence_sum_list'vc.
+Prover result is: Valid (0.01s, 36 steps).
+
+File "constrained_subsequence_sum_list_stage3_8f3299ae_stage3.mlw", line 73, characters 22-28:
+Sub-goal Loop invariant preservation of goal
+constrained_subsequence_sum_list'vc.
+Prover result is: Valid (0.01s, 22 steps).
+
+File "constrained_subsequence_sum_list_stage3_8f3299ae_stage3.mlw", line 74, characters 22-38:
+Sub-goal Loop invariant preservation of goal
+constrained_subsequence_sum_list'vc.
+Prover result is: Valid (0.01s, 27 steps).
+
+File "constrained_subsequence_sum_list_stage3_8f3299ae_stage3.mlw", line 75, characters 22-46:
+Sub-goal Loop invariant preservation of goal
+constrained_subsequence_sum_list'vc.
+Prover result is: Valid (0.01s, 38 steps).
+
+File "constrained_subsequence_sum_list_stage3_8f3299ae_stage3.mlw", line 64, characters 15-51:
+Sub-goal Postcondition of goal constrained_subsequence_sum_list'vc.
+Prover result is: Timeout (10.00s, 68479 steps).
+---- stage2 | prover: CVC4,1.8 | theory: ConstrainedSubsequenceSum_List_Stage3_Imperative | goal: constrained_subsequence_sum_list'vc ----
+Transforms: split_vc
+File "constrained_subsequence_sum_list_stage3_8f3299ae_stage3.mlw", line 64, characters 15-51:
+Sub-goal Postcondition of goal constrained_subsequence_sum_list'vc.
+Prover result is: Valid (0.01s, 2388 steps).
+
+File "constrained_subsequence_sum_list_stage3_8f3299ae_stage3.mlw", line 73, characters 22-28:
+Sub-goal Loop invariant init of goal constrained_subsequence_sum_list'vc.
+Prover result is: Valid (0.01s, 1952 steps).
+
+File "constrained_subsequence_sum_list_stage3_8f3299ae_stage3.mlw", line 74, characters 22-38:
+Sub-goal Loop invariant init of goal constrained_subsequence_sum_list'vc.
+Prover result is: Valid (0.01s, 2308 steps).
+
+File "constrained_subsequence_sum_list_stage3_8f3299ae_stage3.mlw", line 75, characters 22-46:
+Sub-goal Loop invariant init of goal constrained_subsequence_sum_list'vc.
+Prover result is: Valid (0.01s, 1980 steps).
+
+File "constrained_subsequence_sum_list_stage3_8f3299ae_stage3.mlw", line 76, characters 20-31:
+Sub-goal Loop variant decrease of goal constrained_subsequence_sum_list'vc.
+Prover result is: Valid (0.01s, 2047 steps).
+
+File "constrained_subsequence_sum_list_stage3_8f3299ae_stage3.mlw", line 73, characters 22-28:
+Sub-goal Loop invariant preservation of goal
+constrained_subsequence_sum_list'vc.
+Prover result is: Valid (0.01s, 2033 steps).
+
+File "constrained_subsequence_sum_list_stage3_8f3299ae_stage3.mlw", line 74, characters 22-38:
+Sub-goal Loop invariant preservation of goal
+constrained_subsequence_sum_list'vc.
+Prover result is: Valid (0.01s, 2036 steps).
+
+File "constrained_subsequence_sum_list_stage3_8f3299ae_stage3.mlw", line 75, characters 22-46:
+Sub-goal Loop invariant preservation of goal
+constrained_subsequence_sum_list'vc.
+Prover result is: Valid (0.01s, 2036 steps).
+
+File "constrained_subsequence_sum_list_stage3_8f3299ae_stage3.mlw", line 80, characters 32-64:
+Sub-goal Precondition of goal constrained_subsequence_sum_list'vc.
+Prover result is: Valid (0.01s, 2191 steps).
+
+File "constrained_subsequence_sum_list_stage3_8f3299ae_stage3.mlw", line 76, characters 20-31:
+Sub-goal Loop variant decrease of goal constrained_subsequence_sum_list'vc.
+Prover result is: Valid (0.01s, 2841 steps).
+
+File "constrained_subsequence_sum_list_stage3_8f3299ae_stage3.mlw", line 73, characters 22-28:
+Sub-goal Loop invariant preservation of goal
+constrained_subsequence_sum_list'vc.
+Prover result is: Valid (0.01s, 2148 steps).
+
+File "constrained_subsequence_sum_list_stage3_8f3299ae_stage3.mlw", line 74, characters 22-38:
+Sub-goal Loop invariant preservation of goal
+constrained_subsequence_sum_list'vc.
+Prover result is: Valid (0.01s, 2748 steps).
+
+File "constrained_subsequence_sum_list_stage3_8f3299ae_stage3.mlw", line 75, characters 22-46:
+Sub-goal Loop invariant preservation of goal
+constrained_subsequence_sum_list'vc.
+Prover result is: Valid (0.02s, 2838 steps).
+
+File "constrained_subsequence_sum_list_stage3_8f3299ae_stage3.mlw", line 76, characters 20-31:
+Sub-goal Loop variant decrease of goal constrained_subsequence_sum_list'vc.
+Prover result is: Valid (0.01s, 2756 steps).
+
+File "constrained_subsequence_sum_list_stage3_8f3299ae_stage3.mlw", line 73, characters 22-28:
+Sub-goal Loop invariant preservation of goal
+constrained_subsequence_sum_list'vc.
+Prover result is: Valid (0.01s, 2129 steps).
+
+File "constrained_subsequence_sum_list_stage3_8f3299ae_stage3.mlw", line 74, characters 22-38:
+Sub-goal Loop invariant preservation of goal
+constrained_subsequence_sum_list'vc.
+Prover result is: Valid (0.01s, 2663 steps).
+
+File "constrained_subsequence_sum_list_stage3_8f3299ae_stage3.mlw", line 75, characters 22-46:
+Sub-goal Loop invariant preservation of goal
+constrained_subsequence_sum_list'vc.
+Prover result is: Valid (0.01s, 2753 steps).
+
+File "constrained_subsequence_sum_list_stage3_8f3299ae_stage3.mlw", line 64, characters 15-51:
+Sub-goal Postcondition of goal constrained_subsequence_sum_list'vc.
+Prover result is: Unknown (unknown + incomplete) (0.02s, 4236 steps).
+== Goals still unproved after stage 2 (split_vc) ==
+ConstrainedSubsequenceSum_List_Stage3_Imperative	constrained_subsequence_sum_list'vc
+== Stage 3: split_vc + inline_all on still-unproved goal ==
+Target theory: ConstrainedSubsequenceSum_List_Stage3_Imperative
+Target goal  : constrained_subsequence_sum_list'vc
+---- stage3 | prover: Z3,4.8.6 | theory: ConstrainedSubsequenceSum_List_Stage3_Imperative | goal: constrained_subsequence_sum_list'vc ----
+Transforms: split_vc inline_all
+File "constrained_subsequence_sum_list_stage3_8f3299ae_stage3.mlw", line 64, characters 15-51:
+Sub-goal Postcondition of goal constrained_subsequence_sum_list'vc.
+Prover result is: Valid (0.01s, 963 steps).
+
+File "constrained_subsequence_sum_list_stage3_8f3299ae_stage3.mlw", line 73, characters 22-28:
+Sub-goal Loop invariant init of goal constrained_subsequence_sum_list'vc.
+Prover result is: Valid (0.01s, 1255 steps).
+
+File "constrained_subsequence_sum_list_stage3_8f3299ae_stage3.mlw", line 74, characters 22-38:
+Sub-goal Loop invariant init of goal constrained_subsequence_sum_list'vc.
+Prover result is: Valid (0.01s, 11639 steps).
+
+File "constrained_subsequence_sum_list_stage3_8f3299ae_stage3.mlw", line 75, characters 22-46:
+Sub-goal Loop invariant init of goal constrained_subsequence_sum_list'vc.
+Prover result is: Valid (0.01s, 885 steps).
+
+File "constrained_subsequence_sum_list_stage3_8f3299ae_stage3.mlw", line 76, characters 20-31:
+Sub-goal Loop variant decrease of goal constrained_subsequence_sum_list'vc.
+Prover result is: Valid (0.01s, 952 steps).
+
+File "constrained_subsequence_sum_list_stage3_8f3299ae_stage3.mlw", line 73, characters 22-28:
+Sub-goal Loop invariant preservation of goal
+constrained_subsequence_sum_list'vc.
+Prover result is: Valid (0.01s, 928 steps).
+
+File "constrained_subsequence_sum_list_stage3_8f3299ae_stage3.mlw", line 74, characters 22-38:
+Sub-goal Loop invariant preservation of goal
+constrained_subsequence_sum_list'vc.
+Prover result is: Valid (0.01s, 943 steps).
+
+File "constrained_subsequence_sum_list_stage3_8f3299ae_stage3.mlw", line 75, characters 22-46:
+Sub-goal Loop invariant preservation of goal
+constrained_subsequence_sum_list'vc.
+Prover result is: Valid (0.01s, 956 steps).
+
+File "constrained_subsequence_sum_list_stage3_8f3299ae_stage3.mlw", line 80, characters 32-64:
+Sub-goal Precondition of goal constrained_subsequence_sum_list'vc.
+Prover result is: Valid (0.01s, 12519 steps).
+
+File "constrained_subsequence_sum_list_stage3_8f3299ae_stage3.mlw", line 76, characters 20-31:
+Sub-goal Loop variant decrease of goal constrained_subsequence_sum_list'vc.
+Prover result is: Valid (0.01s, 13462 steps).
+
+File "constrained_subsequence_sum_list_stage3_8f3299ae_stage3.mlw", line 73, characters 22-28:
+Sub-goal Loop invariant preservation of goal
+constrained_subsequence_sum_list'vc.
+Prover result is: Valid (0.01s, 1482 steps).
+
+File "constrained_subsequence_sum_list_stage3_8f3299ae_stage3.mlw", line 74, characters 22-38:
+Sub-goal Loop invariant preservation of goal
+constrained_subsequence_sum_list'vc.
+Prover result is: Valid (0.01s, 13477 steps).
+
+File "constrained_subsequence_sum_list_stage3_8f3299ae_stage3.mlw", line 75, characters 22-46:
+Sub-goal Loop invariant preservation of goal
+constrained_subsequence_sum_list'vc.
+Prover result is: Valid (0.01s, 14193 steps).
+
+File "constrained_subsequence_sum_list_stage3_8f3299ae_stage3.mlw", line 76, characters 20-31:
+Sub-goal Loop variant decrease of goal constrained_subsequence_sum_list'vc.
+Prover result is: Valid (0.01s, 12991 steps).
+
+File "constrained_subsequence_sum_list_stage3_8f3299ae_stage3.mlw", line 73, characters 22-28:
+Sub-goal Loop invariant preservation of goal
+constrained_subsequence_sum_list'vc.
+Prover result is: Valid (0.01s, 1473 steps).
+
+File "constrained_subsequence_sum_list_stage3_8f3299ae_stage3.mlw", line 74, characters 22-38:
+Sub-goal Loop invariant preservation of goal
+constrained_subsequence_sum_list'vc.
+Prover result is: Valid (0.01s, 13006 steps).
+
+File "constrained_subsequence_sum_list_stage3_8f3299ae_stage3.mlw", line 75, characters 22-46:
+Sub-goal Loop invariant preservation of goal
+constrained_subsequence_sum_list'vc.
+Prover result is: Valid (0.01s, 13714 steps).
+
+File "constrained_subsequence_sum_list_stage3_8f3299ae_stage3.mlw", line 64, characters 15-51:
+Sub-goal Postcondition of goal constrained_subsequence_sum_list'vc.
+Prover result is: Timeout (10.00s, 130448575 steps).
+---- stage3 | prover: Alt-Ergo,2.4.0 | theory: ConstrainedSubsequenceSum_List_Stage3_Imperative | goal: constrained_subsequence_sum_list'vc ----
+Transforms: split_vc inline_all
+File "constrained_subsequence_sum_list_stage3_8f3299ae_stage3.mlw", line 64, characters 15-51:
+Sub-goal Postcondition of goal constrained_subsequence_sum_list'vc.
+Prover result is: Valid (0.01s, 3 steps).
+
+File "constrained_subsequence_sum_list_stage3_8f3299ae_stage3.mlw", line 73, characters 22-28:
+Sub-goal Loop invariant init of goal constrained_subsequence_sum_list'vc.
+Prover result is: Valid (0.00s, 5 steps).
+
+File "constrained_subsequence_sum_list_stage3_8f3299ae_stage3.mlw", line 74, characters 22-38:
+Sub-goal Loop invariant init of goal constrained_subsequence_sum_list'vc.
+Prover result is: Valid (0.01s, 13 steps).
+
+File "constrained_subsequence_sum_list_stage3_8f3299ae_stage3.mlw", line 75, characters 22-46:
+Sub-goal Loop invariant init of goal constrained_subsequence_sum_list'vc.
+Prover result is: Valid (0.00s, 6 steps).
+
+File "constrained_subsequence_sum_list_stage3_8f3299ae_stage3.mlw", line 76, characters 20-31:
+Sub-goal Loop variant decrease of goal constrained_subsequence_sum_list'vc.
+Prover result is: Valid (0.01s, 7 steps).
+
+File "constrained_subsequence_sum_list_stage3_8f3299ae_stage3.mlw", line 73, characters 22-28:
+Sub-goal Loop invariant preservation of goal
+constrained_subsequence_sum_list'vc.
+Prover result is: Valid (0.01s, 7 steps).
+
+File "constrained_subsequence_sum_list_stage3_8f3299ae_stage3.mlw", line 74, characters 22-38:
+Sub-goal Loop invariant preservation of goal
+constrained_subsequence_sum_list'vc.
+Prover result is: Valid (0.00s, 7 steps).
+
+File "constrained_subsequence_sum_list_stage3_8f3299ae_stage3.mlw", line 75, characters 22-46:
+Sub-goal Loop invariant preservation of goal
+constrained_subsequence_sum_list'vc.
+Prover result is: Valid (0.01s, 7 steps).
+
+File "constrained_subsequence_sum_list_stage3_8f3299ae_stage3.mlw", line 80, characters 32-64:
+Sub-goal Precondition of goal constrained_subsequence_sum_list'vc.
+Prover result is: Valid (0.01s, 16 steps).
+
+File "constrained_subsequence_sum_list_stage3_8f3299ae_stage3.mlw", line 76, characters 20-31:
+Sub-goal Loop variant decrease of goal constrained_subsequence_sum_list'vc.
+Prover result is: Valid (0.01s, 43 steps).
+
+File "constrained_subsequence_sum_list_stage3_8f3299ae_stage3.mlw", line 73, characters 22-28:
+Sub-goal Loop invariant preservation of goal
+constrained_subsequence_sum_list'vc.
+Prover result is: Valid (0.01s, 16 steps).
+
+File "constrained_subsequence_sum_list_stage3_8f3299ae_stage3.mlw", line 74, characters 22-38:
+Sub-goal Loop invariant preservation of goal
+constrained_subsequence_sum_list'vc.
+Prover result is: Valid (0.01s, 31 steps).
+
+File "constrained_subsequence_sum_list_stage3_8f3299ae_stage3.mlw", line 75, characters 22-46:
+Sub-goal Loop invariant preservation of goal
+constrained_subsequence_sum_list'vc.
+Prover result is: Valid (0.01s, 71 steps).
+
+File "constrained_subsequence_sum_list_stage3_8f3299ae_stage3.mlw", line 76, characters 20-31:
+Sub-goal Loop variant decrease of goal constrained_subsequence_sum_list'vc.
+Prover result is: Valid (0.01s, 39 steps).
+
+File "constrained_subsequence_sum_list_stage3_8f3299ae_stage3.mlw", line 73, characters 22-28:
+Sub-goal Loop invariant preservation of goal
+constrained_subsequence_sum_list'vc.
+Prover result is: Valid (0.01s, 12 steps).
+
+File "constrained_subsequence_sum_list_stage3_8f3299ae_stage3.mlw", line 74, characters 22-38:
+Sub-goal Loop invariant preservation of goal
+constrained_subsequence_sum_list'vc.
+Prover result is: Valid (0.01s, 29 steps).
+
+File "constrained_subsequence_sum_list_stage3_8f3299ae_stage3.mlw", line 75, characters 22-46:
+Sub-goal Loop invariant preservation of goal
+constrained_subsequence_sum_list'vc.
+Prover result is: Valid (0.01s, 69 steps).
+
+File "constrained_subsequence_sum_list_stage3_8f3299ae_stage3.mlw", line 64, characters 15-51:
+Sub-goal Postcondition of goal constrained_subsequence_sum_list'vc.
+Prover result is: Timeout (10.00s, 90451 steps).
+---- stage3 | prover: CVC4,1.8 | theory: ConstrainedSubsequenceSum_List_Stage3_Imperative | goal: constrained_subsequence_sum_list'vc ----
+Transforms: split_vc inline_all
+File "constrained_subsequence_sum_list_stage3_8f3299ae_stage3.mlw", line 64, characters 15-51:
+Sub-goal Postcondition of goal constrained_subsequence_sum_list'vc.
+Prover result is: Valid (0.01s, 2453 steps).
+
+File "constrained_subsequence_sum_list_stage3_8f3299ae_stage3.mlw", line 73, characters 22-28:
+Sub-goal Loop invariant init of goal constrained_subsequence_sum_list'vc.
+Prover result is: Valid (0.01s, 2057 steps).
+
+File "constrained_subsequence_sum_list_stage3_8f3299ae_stage3.mlw", line 74, characters 22-38:
+Sub-goal Loop invariant init of goal constrained_subsequence_sum_list'vc.
+Prover result is: Valid (0.01s, 2482 steps).
+
+File "constrained_subsequence_sum_list_stage3_8f3299ae_stage3.mlw", line 75, characters 22-46:
+Sub-goal Loop invariant init of goal constrained_subsequence_sum_list'vc.
+Prover result is: Valid (0.01s, 2102 steps).
+
+File "constrained_subsequence_sum_list_stage3_8f3299ae_stage3.mlw", line 76, characters 20-31:
+Sub-goal Loop variant decrease of goal constrained_subsequence_sum_list'vc.
+Prover result is: Valid (0.01s, 2199 steps).
+
+File "constrained_subsequence_sum_list_stage3_8f3299ae_stage3.mlw", line 73, characters 22-28:
+Sub-goal Loop invariant preservation of goal
+constrained_subsequence_sum_list'vc.
+Prover result is: Valid (0.01s, 2185 steps).
+
+File "constrained_subsequence_sum_list_stage3_8f3299ae_stage3.mlw", line 74, characters 22-38:
+Sub-goal Loop invariant preservation of goal
+constrained_subsequence_sum_list'vc.
+Prover result is: Valid (0.01s, 2188 steps).
+
+File "constrained_subsequence_sum_list_stage3_8f3299ae_stage3.mlw", line 75, characters 22-46:
+Sub-goal Loop invariant preservation of goal
+constrained_subsequence_sum_list'vc.
+Prover result is: Valid (0.01s, 2191 steps).
+
+File "constrained_subsequence_sum_list_stage3_8f3299ae_stage3.mlw", line 80, characters 32-64:
+Sub-goal Precondition of goal constrained_subsequence_sum_list'vc.
+Prover result is: Valid (0.01s, 2453 steps).
+
+File "constrained_subsequence_sum_list_stage3_8f3299ae_stage3.mlw", line 76, characters 20-31:
+Sub-goal Loop variant decrease of goal constrained_subsequence_sum_list'vc.
+Prover result is: Valid (0.02s, 3134 steps).
+
+File "constrained_subsequence_sum_list_stage3_8f3299ae_stage3.mlw", line 73, characters 22-28:
+Sub-goal Loop invariant preservation of goal
+constrained_subsequence_sum_list'vc.
+Prover result is: Valid (0.01s, 2327 steps).
+
+File "constrained_subsequence_sum_list_stage3_8f3299ae_stage3.mlw", line 74, characters 22-38:
+Sub-goal Loop invariant preservation of goal
+constrained_subsequence_sum_list'vc.
+Prover result is: Valid (0.01s, 3091 steps).
+
+File "constrained_subsequence_sum_list_stage3_8f3299ae_stage3.mlw", line 75, characters 22-46:
+Sub-goal Loop invariant preservation of goal
+constrained_subsequence_sum_list'vc.
+Prover result is: Valid (0.02s, 3252 steps).
+
+File "constrained_subsequence_sum_list_stage3_8f3299ae_stage3.mlw", line 76, characters 20-31:
+Sub-goal Loop variant decrease of goal constrained_subsequence_sum_list'vc.
+Prover result is: Valid (0.01s, 3005 steps).
+
+File "constrained_subsequence_sum_list_stage3_8f3299ae_stage3.mlw", line 73, characters 22-28:
+Sub-goal Loop invariant preservation of goal
+constrained_subsequence_sum_list'vc.
+Prover result is: Valid (0.01s, 2308 steps).
+
+File "constrained_subsequence_sum_list_stage3_8f3299ae_stage3.mlw", line 74, characters 22-38:
+Sub-goal Loop invariant preservation of goal
+constrained_subsequence_sum_list'vc.
+Prover result is: Valid (0.01s, 2962 steps).
+
+File "constrained_subsequence_sum_list_stage3_8f3299ae_stage3.mlw", line 75, characters 22-46:
+Sub-goal Loop invariant preservation of goal
+constrained_subsequence_sum_list'vc.
+Prover result is: Valid (0.01s, 3133 steps).
+
+File "constrained_subsequence_sum_list_stage3_8f3299ae_stage3.mlw", line 64, characters 15-51:
+Sub-goal Postcondition of goal constrained_subsequence_sum_list'vc.
+Prover result is: Unknown (unknown + incomplete) (0.02s, 4295 steps).
+== Final summary ==
+Unproved root goals after first prover : 1
+Remaining failures after split_vc      : 1
+Remaining failures after stage 3       : 1
+Detailed logs stored in                : /Users/rubenm/Desktop/Diversify2Verify/codex-runs/dataset-merge/1425_constrained-subsequence-sum/stage3a/list-imperative/constrained_subsequence_sum_list_stage3_8f3299ae/generated/why3/list/.why3_sessions/constrained_subsequence_sum_list_stage3_8f3299ae_stage3_logs
+Still unproved goals:
+ConstrainedSubsequenceSum_List_Stage3_Imperative	constrained_subsequence_sum_list'vc
+VERIFY_RESULT: FAILURE
+VERIFY_REASON: unproved_goals_remain
+VERIFY_STAGE: stage3
+VERIFY_ROOT_TOTAL: 4
+VERIFY_ROOT_PROVED: 3
+VERIFY_ROOT_REMAINING: 1

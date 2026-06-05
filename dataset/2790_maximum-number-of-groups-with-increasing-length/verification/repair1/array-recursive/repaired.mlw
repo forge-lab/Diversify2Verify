@@ -1,0 +1,97 @@
+module MaximumNumberOfGroupsWithIncreasingLength_Array_Stage3
+
+  use int.Int
+  use array.Array
+
+  let rec function triangular (k: int) : int
+    requires { 0 <= k }
+    variant  { k }
+  =
+    if k = 0 then 0 else k + triangular (k - 1)
+
+  let rec function capped_usage_sum_from (usageLimits: array int) (k: int) (i: int) : int
+    requires { 0 <= k }
+    requires { 0 <= i <= length usageLimits }
+    variant  { length usageLimits - i }
+  =
+    if i = length usageLimits then 0
+    else (if usageLimits[i] <= k then usageLimits[i] else k) + capped_usage_sum_from usageLimits k (i + 1)
+
+  predicate nonnegative_usage_limits (usageLimits: array int) =
+    forall i: int. 0 <= i < length usageLimits -> 0 <= usageLimits[i]
+
+  predicate feasible_group_count (usageLimits: array int) (k: int) =
+    0 <= k <= length usageLimits /\
+    triangular k <= capped_usage_sum_from usageLimits k 0
+
+  predicate maximum_group_count (usageLimits: array int) (m: int) =
+    feasible_group_count usageLimits m /\
+    forall k: int. feasible_group_count usageLimits k -> k <= m
+
+  let rec lemma capped_usage_sum_from_zero (usageLimits: array int) (i: int)
+    requires { nonnegative_usage_limits usageLimits }
+    requires { 0 <= i <= length usageLimits }
+    ensures  { capped_usage_sum_from usageLimits 0 i = 0 }
+    variant  { length usageLimits - i }
+  =
+    if i = length usageLimits then
+      ()
+    else
+      begin
+        assert { 0 <= i < length usageLimits };
+        assert { 0 <= usageLimits[i] };
+        assert { (if usageLimits[i] <= 0 then usageLimits[i] else 0) = 0 };
+        capped_usage_sum_from_zero usageLimits (i + 1)
+      end
+
+  let feasible_group_count_bool (usageLimits: array int) (k: int) : bool
+    ensures { result <-> feasible_group_count usageLimits k }
+  =
+    if k < 0 then
+      false
+    else if length usageLimits < k then
+      false
+    else
+      triangular k <= capped_usage_sum_from usageLimits k 0
+
+  let rec maximum_group_count_down (usageLimits: array int) (k: int) : int
+    requires { nonnegative_usage_limits usageLimits }
+    requires { 0 <= k <= length usageLimits }
+    ensures  { 0 <= result <= k }
+    ensures  { feasible_group_count usageLimits result }
+    ensures  { forall j: int. feasible_group_count usageLimits j /\ j <= k -> j <= result }
+    variant  { k }
+  =
+    if k <= 0 then
+      begin
+        assert { k = 0 };
+        capped_usage_sum_from_zero usageLimits 0;
+        assert { triangular 0 = 0 };
+        assert { capped_usage_sum_from usageLimits 0 0 = 0 };
+        assert { feasible_group_count usageLimits 0 };
+        0
+      end
+    else if feasible_group_count_bool usageLimits k then
+      begin
+        assert { feasible_group_count usageLimits k };
+        k
+      end
+    else
+      begin
+        assert { 0 <= k - 1 <= length usageLimits };
+        maximum_group_count_down usageLimits (k - 1)
+      end
+
+  let maximum_number_of_groups_with_increasing_length_array (usageLimits: array int) : int
+    requires { 1 <= length usageLimits <= 100000 }
+    requires { forall i: int. 0 <= i < length usageLimits -> 1 <= usageLimits[i] <= 1000000000 }
+    ensures  { maximum_group_count usageLimits result }
+  =
+    assert { nonnegative_usage_limits usageLimits };
+    let r = maximum_group_count_down usageLimits (length usageLimits) in
+    assert { feasible_group_count usageLimits r };
+    assert { forall k: int. feasible_group_count usageLimits k -> k <= length usageLimits };
+    assert { forall k: int. feasible_group_count usageLimits k -> k <= r };
+    r
+
+end

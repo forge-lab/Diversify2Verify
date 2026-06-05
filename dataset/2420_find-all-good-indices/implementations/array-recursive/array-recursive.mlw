@@ -1,0 +1,240 @@
+module FindAllGoodIndices_Array_Recursive_Implementation
+
+  use int.Int
+  use array.Array
+  use array.Init
+
+  let rec non_increasing_from (nums: array int) (j: int) (stop: int) : bool
+    variant { stop - j }
+  =
+    if j >= stop then
+      true
+    else if nums[j] >= nums[j + 1] then
+      non_increasing_from nums (j + 1) stop
+    else
+      false
+
+  let rec non_decreasing_from (nums: array int) (j: int) (stop: int) : bool
+    variant { stop - j }
+  =
+    if j >= stop then
+      true
+    else if nums[j] <= nums[j + 1] then
+      non_decreasing_from nums (j + 1) stop
+    else
+      false
+
+  let is_good_index (nums: array int) (k: int) (i: int) : bool =
+    non_increasing_from nums (i - k) (i - 1) &&
+    non_decreasing_from nums (i + 1) (i + k)
+
+  let rec count_good_from (nums: array int) (k: int) (i: int) (upper: int) : int
+    variant { upper - i }
+  =
+    if i >= upper then
+      0
+    else
+      (if is_good_index nums k i then 1 else 0) + count_good_from nums k (i + 1) upper
+
+  let rec fill_good_from
+    (nums: array int) (k: int) (i: int) (upper: int) (res: array int) (out: int) : int
+    variant { upper - i }
+  =
+    if i >= upper then
+      out
+    else if is_good_index nums k i then begin
+      res[out] <- i;
+      fill_good_from nums k (i + 1) upper res (out + 1)
+    end else
+      fill_good_from nums k (i + 1) upper res out
+
+  let find_all_good_indices_array (nums: array int) (k: int) : array int
+    requires { 1 <= k }
+    requires { 2 * k <= length nums }
+  =
+    let upper = length nums - k in
+    let count = count_good_from nums k k upper in
+    let result = make count 0 in
+    let _ = fill_good_from nums k k upper result 0 in
+    result
+
+  let rec arrays_equal_from (a: array int) (b: array int) (i: int) : bool
+    variant { length a - i }
+  =
+    if i >= length a then
+      true
+    else if a[i] = b[i] then
+      arrays_equal_from a b (i + 1)
+    else
+      false
+
+  let arrays_equal (a: array int) (b: array int) : bool =
+    if length a <> length b then
+      false
+    else
+      arrays_equal_from a b 0
+
+  let test_000 () : bool =
+    let nums = init 13 [|9; 8; 7; 6; 5; 4; 3; 2; 1; 2; 3; 4; 5|] in
+    let expected = init 3 [|7; 8; 9|] in
+    let r = find_all_good_indices_array nums 3 in
+    arrays_equal r expected
+
+  let test_001 () : bool =
+    let nums = init 7 [|1; 2; 3; 4; 3; 2; 1|] in
+    let expected = make 0 0 in
+    let r = find_all_good_indices_array nums 2 in
+    arrays_equal r expected
+
+  let test_002 () : bool =
+    let nums = init 11 [|1; 2; 2; 3; 4; 5; 5; 4; 3; 2; 1|] in
+    let expected = make 0 0 in
+    let r = find_all_good_indices_array nums 3 in
+    arrays_equal r expected
+
+  let test_003 () : bool =
+    let nums = init 10 [|10; 9; 8; 7; 6; 5; 4; 3; 2; 1|] in
+    let expected = make 0 0 in
+    let r = find_all_good_indices_array nums 4 in
+    arrays_equal r expected
+
+  let test_004 () : bool =
+    let nums = init 9 [|1000000; 999999; 999998; 999997; 999996; 999995; 999994; 999993; 999992|] in
+    let expected = make 0 0 in
+    let r = find_all_good_indices_array nums 3 in
+    arrays_equal r expected
+
+  let test_005 () : bool =
+    let nums = init 9 [|5; 4; 3; 2; 1; 2; 3; 4; 5|] in
+    let expected = init 3 [|3; 4; 5|] in
+    let r = find_all_good_indices_array nums 2 in
+    arrays_equal r expected
+
+  let test_006 () : bool =
+    let nums = init 9 [|5; 4; 5; 3; 4; 5; 6; 7; 8|] in
+    let expected = init 2 [|2; 4|] in
+    let r = find_all_good_indices_array nums 2 in
+    arrays_equal r expected
+
+  let test_007 () : bool =
+    let nums = init 4 [|2; 1; 1; 2|] in
+    let expected = make 0 0 in
+    let r = find_all_good_indices_array nums 2 in
+    arrays_equal r expected
+
+  let test_008 () : bool =
+    let nums = init 10 [|1000000; 999999; 999998; 999997; 999996; 999995; 999994; 999993; 999992; 999991|] in
+    let expected = make 0 0 in
+    let r = find_all_good_indices_array nums 3 in
+    arrays_equal r expected
+
+  let test_009 () : bool =
+    let nums = init 9 [|1; 2; 3; 4; 5; 4; 3; 2; 1|] in
+    let expected = make 0 0 in
+    let r = find_all_good_indices_array nums 2 in
+    arrays_equal r expected
+
+  let test_010 () : bool =
+    let nums = init 17 [|9; 8; 7; 6; 5; 4; 3; 2; 1; 2; 3; 4; 5; 6; 7; 8; 9|] in
+    let expected = init 3 [|7; 8; 9|] in
+    let r = find_all_good_indices_array nums 3 in
+    arrays_equal r expected
+
+  let test_011 () : bool =
+    let nums = init 5 [|5; 4; 3; 4; 5|] in
+    let expected = init 3 [|1; 2; 3|] in
+    let r = find_all_good_indices_array nums 1 in
+    arrays_equal r expected
+
+  let test_012 () : bool =
+    let nums = init 7 [|2; 1; 1; 1; 3; 4; 1|] in
+    let expected = init 2 [|2; 3|] in
+    let r = find_all_good_indices_array nums 2 in
+    arrays_equal r expected
+
+  let test_013 () : bool =
+    let nums = init 24 [|1; 2; 2; 2; 3; 3; 3; 4; 4; 4; 5; 5; 5; 4; 4; 4; 3; 3; 3; 2; 2; 2; 1; 1|] in
+    let expected = init 4 [|4; 7; 15; 18|] in
+    let r = find_all_good_indices_array nums 3 in
+    arrays_equal r expected
+
+  let test_014 () : bool =
+    let nums = init 13 [|8; 8; 8; 8; 8; 8; 8; 8; 8; 8; 8; 8; 8|] in
+    let expected = init 7 [|3; 4; 5; 6; 7; 8; 9|] in
+    let r = find_all_good_indices_array nums 3 in
+    arrays_equal r expected
+
+  let test_015 () : bool =
+    let nums = init 17 [|9; 8; 7; 6; 5; 4; 3; 2; 1; 2; 3; 4; 5; 6; 7; 8; 9|] in
+    let expected = init 3 [|7; 8; 9|] in
+    let r = find_all_good_indices_array nums 4 in
+    arrays_equal r expected
+
+  let test_016 () : bool =
+    let nums = init 19 [|1; 3; 2; 1; 3; 2; 1; 3; 2; 1; 3; 2; 1; 3; 2; 1; 3; 2; 1|] in
+    let expected = make 0 0 in
+    let r = find_all_good_indices_array nums 2 in
+    arrays_equal r expected
+
+  let test_017 () : bool =
+    let nums = init 17 [|100; 99; 98; 97; 96; 97; 98; 99; 100; 101; 102; 103; 104; 103; 102; 101; 100|] in
+    let expected = init 2 [|4; 5|] in
+    let r = find_all_good_indices_array nums 4 in
+    arrays_equal r expected
+
+  let test_018 () : bool =
+    let nums = init 19 [|1; 2; 3; 4; 5; 4; 3; 4; 5; 4; 3; 4; 5; 4; 3; 4; 5; 4; 3|] in
+    let expected = init 3 [|6; 10; 14|] in
+    let r = find_all_good_indices_array nums 2 in
+    arrays_equal r expected
+
+  let test_019 () : bool =
+    let nums = init 16 [|10; 9; 8; 7; 6; 5; 6; 7; 8; 9; 10; 9; 8; 7; 6; 5|] in
+    let expected = init 1 [|5|] in
+    let r = find_all_good_indices_array nums 5 in
+    arrays_equal r expected
+
+  let run_tests () : bool =
+    if test_000 () then
+    if test_001 () then
+    if test_002 () then
+    if test_003 () then
+    if test_004 () then
+    if test_005 () then
+    if test_006 () then
+    if test_007 () then
+    if test_008 () then
+    if test_009 () then
+    if test_010 () then
+    if test_011 () then
+    if test_012 () then
+    if test_013 () then
+    if test_014 () then
+    if test_015 () then
+    if test_016 () then
+    if test_017 () then
+    if test_018 () then
+    if test_019 () then
+      true
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+
+end

@@ -1,0 +1,100 @@
+module MinimumCommonValue_List_Stage3_Imperative
+
+  use int.Int
+  use list.List
+  use list.Mem
+  use list.Length
+  use ref.Ref
+
+  let rec predicate le_all (x: int) (l: list int)
+    variant { l }
+  =
+    match l with
+    | Nil -> true
+    | Cons y ys -> x <= y && le_all x ys
+    end
+
+  let rec predicate sorted_list (l: list int)
+    variant { l }
+  =
+    match l with
+    | Nil -> true
+    | Cons x xs -> le_all x xs && sorted_list xs
+    end
+
+  let rec predicate all_positive (l: list int)
+    variant { l }
+  =
+    match l with
+    | Nil -> true
+    | Cons x xs -> 1 <= x && all_positive xs
+    end
+
+  predicate common_value (nums1: list int) (nums2: list int) (x: int) =
+    mem x nums1 /\ mem x nums2
+
+  predicate no_common_value (nums1: list int) (nums2: list int) =
+    forall x: int. not (common_value nums1 nums2 x)
+
+  predicate is_minimum_common_result
+    (nums1: list int) (nums2: list int) (r: int) =
+    (r = (-1) /\ no_common_value nums1 nums2) \/
+    (common_value nums1 nums2 r /\
+      (forall x: int. common_value nums1 nums2 x -> r <= x))
+
+  let minimum_common_value_list (nums1: list int) (nums2: list int) : int
+    requires { nums1 <> Nil }
+    requires { nums2 <> Nil }
+    requires { sorted_list nums1 }
+    requires { sorted_list nums2 }
+    requires { all_positive nums1 }
+    requires { all_positive nums2 }
+    ensures  { is_minimum_common_result nums1 nums2 result }
+  =
+    let cur1 = ref nums1 in
+    let cur2 = ref nums2 in
+    let result = ref (-1) in
+    let searching = ref true in
+    while !searching do
+      invariant { sorted_list !cur1 }
+      invariant { sorted_list !cur2 }
+      invariant { all_positive !cur1 }
+      invariant { all_positive !cur2 }
+      invariant { !result = (-1) \/ common_value nums1 nums2 !result }
+      invariant { 0 <= length !cur1 }
+      invariant { 0 <= length !cur2 }
+      variant   { length !cur1, length !cur2 }
+      match !cur1 with
+      | Nil ->
+          searching := false
+      | Cons x xs ->
+          assert { sorted_list xs };
+          assert { all_positive xs };
+          match !cur2 with
+          | Nil ->
+              searching := false
+          | Cons y ys ->
+              assert { sorted_list ys };
+              assert { all_positive ys };
+              if x = y then (
+                assert { mem x !cur1 };
+                assert { mem y !cur2 };
+                result := x;
+                searching := false
+              ) else if x < y then (
+                assert { x < y };
+                assert { !cur1 = Cons x xs };
+                assert { length xs < length !cur1 };
+                cur1 := xs
+              ) else (
+                assert { y < x };
+                assert { !cur2 = Cons y ys };
+                assert { length ys < length !cur2 };
+                cur2 := ys
+              )
+          end
+      end
+    done;
+    !result
+
+end

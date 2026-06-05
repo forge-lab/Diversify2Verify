@@ -1,0 +1,584 @@
+module SplitArrayLargestSum_List_Stage3_Imperative
+
+  use int.Int
+  use int.EuclideanDivision
+  use list.List
+  use list.Length
+  use list.Append
+  use list.Sum
+  use ref.Ref
+
+  let rec predicate bounded_nonnegative_list (nums: list int)
+    variant { nums }
+  =
+    match nums with
+    | Nil -> true
+    | Cons x xs -> 0 <= x && x <= 1000000 && bounded_nonnegative_list xs
+    end
+
+  let rec function concat_segments (segments: list (list int)) : list int
+    variant { segments }
+  =
+    match segments with
+    | Nil -> Nil
+    | Cons segment rest -> segment ++ concat_segments rest
+    end
+
+  let rec predicate all_nonempty_segments (segments: list (list int))
+    variant { segments }
+  =
+    match segments with
+    | Nil -> true
+    | Cons segment rest ->
+        match segment with
+        | Nil -> false
+        | Cons _ _ -> all_nonempty_segments rest
+        end
+    end
+
+  let rec predicate all_segment_sums_le (segments: list (list int)) (bound: int)
+    variant { segments }
+  =
+    match segments with
+    | Nil -> true
+    | Cons segment rest -> sum segment <= bound && all_segment_sums_le rest bound
+    end
+
+  predicate partition_with_bound (nums: list int) (k: int) (bound: int) =
+    exists segments: list (list int).
+      length segments = k /\
+      concat_segments segments = nums /\
+      all_nonempty_segments segments /\
+      all_segment_sums_le segments bound
+
+  predicate optimal_largest_sum (nums: list int) (k: int) (answer: int) =
+    partition_with_bound nums k answer /\
+    (forall bound: int. bound < answer -> not (partition_with_bound nums k bound))
+
+  let rec function max_value (nums: list int) : int
+    variant { nums }
+  =
+    match nums with
+    | Nil -> 0
+    | Cons x xs ->
+        let tail_max = max_value xs in
+        if x >= tail_max then x else tail_max
+    end
+
+  let rec predicate elements_le_bound (nums: list int) (bound: int)
+    variant { nums }
+  =
+    match nums with
+    | Nil -> true
+    | Cons x xs -> x <= bound && elements_le_bound xs bound
+    end
+
+  let rec function canonical_segments (nums: list int) (k: int) : list (list int)
+    variant { nums }
+  =
+    if k <= 1 then
+      Cons nums Nil
+    else
+      match nums with
+      | Nil -> Nil
+      | Cons x xs -> Cons (Cons x Nil) (canonical_segments xs (k - 1))
+      end
+
+  let lemma bounded_sum_nonnegative ()
+    ensures { forall nums: list int. bounded_nonnegative_list nums -> 0 <= sum nums }
+  =
+    let rec lemma aux (nums: list int)
+      requires { bounded_nonnegative_list nums }
+      ensures  { 0 <= sum nums }
+      variant { nums }
+    =
+      match nums with
+      | Nil -> ()
+      | Cons x xs ->
+          assert { 0 <= x };
+          aux xs;
+          assert { 0 <= sum xs };
+          assert { sum nums = x + sum xs }
+      end
+    in ()
+
+  let lemma max_value_nonnegative ()
+    ensures { forall nums: list int.
+      bounded_nonnegative_list nums -> nums <> Nil -> 0 <= max_value nums }
+  =
+    let rec lemma aux (nums: list int)
+      requires { bounded_nonnegative_list nums }
+      requires { nums <> Nil }
+      ensures  { 0 <= max_value nums }
+      variant { nums }
+    =
+      match nums with
+      | Nil -> absurd
+      | Cons x xs ->
+          assert { 0 <= x };
+          match xs with
+          | Nil -> ()
+          | Cons _ _ -> aux xs
+          end
+      end
+    in ()
+
+  let lemma max_value_le_sum ()
+    ensures { forall nums: list int.
+      bounded_nonnegative_list nums -> nums <> Nil -> max_value nums <= sum nums }
+  =
+    bounded_sum_nonnegative ();
+    let rec lemma aux (nums: list int)
+      requires { bounded_nonnegative_list nums }
+      requires { nums <> Nil }
+      ensures  { max_value nums <= sum nums }
+      variant { nums }
+    =
+      match nums with
+      | Nil -> absurd
+      | Cons x xs ->
+          assert { 0 <= x };
+          assert { 0 <= sum xs };
+          match xs with
+          | Nil -> ()
+          | Cons _ _ ->
+            aux xs;
+            assert { max_value xs <= sum xs }
+          end;
+          assert { x <= x + sum xs };
+          assert { max_value xs <= x + sum xs };
+          assert { sum nums = x + sum xs }
+      end
+    in ()
+
+  let lemma bounded_append_left ()
+    ensures { forall left right: list int.
+      bounded_nonnegative_list (left ++ right) -> bounded_nonnegative_list left }
+  =
+    let rec lemma aux (left right: list int)
+      requires { bounded_nonnegative_list (left ++ right) }
+      ensures  { bounded_nonnegative_list left }
+      variant { left }
+    =
+      match left with
+      | Nil -> ()
+      | Cons _ xs -> aux xs right
+      end
+    in ()
+
+  let lemma bounded_append_right ()
+    ensures { forall left right: list int.
+      bounded_nonnegative_list (left ++ right) -> bounded_nonnegative_list right }
+  =
+    let rec lemma aux (left right: list int)
+      requires { bounded_nonnegative_list (left ++ right) }
+      ensures  { bounded_nonnegative_list right }
+      variant { left }
+    =
+      match left with
+      | Nil -> ()
+      | Cons _ xs -> aux xs right
+      end
+    in ()
+
+  let lemma elements_le_bound_append ()
+    ensures { forall left right: list int, bound: int.
+      elements_le_bound left bound ->
+      elements_le_bound right bound ->
+      elements_le_bound (left ++ right) bound }
+  =
+    let rec lemma aux (left right: list int) (bound: int)
+      requires { elements_le_bound left bound }
+      requires { elements_le_bound right bound }
+      ensures  { elements_le_bound (left ++ right) bound }
+      variant { left }
+    =
+      match left with
+      | Nil -> ()
+      | Cons _ xs -> aux xs right bound
+      end
+    in ()
+
+  let lemma elements_le_bound_max ()
+    ensures { forall nums: list int, bound: int.
+      nums <> Nil -> elements_le_bound nums bound -> max_value nums <= bound }
+  =
+    let rec lemma aux (nums: list int) (bound: int)
+      requires { nums <> Nil }
+      requires { elements_le_bound nums bound }
+      ensures  { max_value nums <= bound }
+      variant { nums }
+    =
+      match nums with
+      | Nil -> absurd
+      | Cons _ xs ->
+          match xs with
+          | Nil -> ()
+          | Cons _ _ -> aux xs bound
+          end
+      end
+    in ()
+
+  let lemma bounded_sum_bound_elements ()
+    ensures { forall nums: list int, bound: int.
+      bounded_nonnegative_list nums ->
+      sum nums <= bound ->
+      elements_le_bound nums bound }
+  =
+    bounded_sum_nonnegative ();
+    let rec lemma aux (nums: list int) (bound: int)
+      requires { bounded_nonnegative_list nums }
+      requires { sum nums <= bound }
+      ensures  { elements_le_bound nums bound }
+      variant { nums }
+    =
+      match nums with
+      | Nil -> ()
+      | Cons x xs ->
+          assert { 0 <= sum xs };
+          assert { x <= sum nums };
+          assert { x <= bound };
+          aux xs bound
+      end
+    in ()
+
+  let lemma all_segment_sums_le_monotone ()
+    ensures { forall segments: list (list int), old_bound new_bound: int.
+      old_bound <= new_bound ->
+      all_segment_sums_le segments old_bound ->
+      all_segment_sums_le segments new_bound }
+  =
+    let rec lemma aux (segments: list (list int)) (old_bound new_bound: int)
+      requires { old_bound <= new_bound }
+      requires { all_segment_sums_le segments old_bound }
+      ensures  { all_segment_sums_le segments new_bound }
+      variant { segments }
+    =
+      match segments with
+      | Nil -> ()
+      | Cons _ rest -> aux rest old_bound new_bound
+      end
+    in ()
+
+  let lemma canonical_segments_spec ()
+    ensures { forall nums: list int, k: int.
+      bounded_nonnegative_list nums ->
+      nums <> Nil ->
+      1 <= k <= length nums ->
+      length (canonical_segments nums k) = k /\
+      concat_segments (canonical_segments nums k) = nums /\
+      all_nonempty_segments (canonical_segments nums k) /\
+      all_segment_sums_le (canonical_segments nums k) (sum nums) }
+  =
+    bounded_sum_nonnegative ();
+    all_segment_sums_le_monotone ();
+    let rec lemma aux (nums: list int) (k: int)
+      requires { bounded_nonnegative_list nums }
+      requires { nums <> Nil }
+      requires { 1 <= k <= length nums }
+      ensures  { length (canonical_segments nums k) = k }
+      ensures  { concat_segments (canonical_segments nums k) = nums }
+      ensures  { all_nonempty_segments (canonical_segments nums k) }
+      ensures  { all_segment_sums_le (canonical_segments nums k) (sum nums) }
+      variant { nums }
+    =
+      if k <= 1 then begin
+        assert { k = 1 };
+        assert { sum nums <= sum nums }
+      end else begin
+        match nums with
+        | Nil -> absurd
+        | Cons x xs ->
+            assert { 0 <= x };
+            assert { xs <> Nil };
+            assert { 1 <= k - 1 <= length xs };
+            aux xs (k - 1);
+            assert { 0 <= sum xs };
+            assert { sum xs <= sum nums };
+            assert { all_segment_sums_le (canonical_segments xs (k - 1)) (sum xs) };
+            assert { all_segment_sums_le (canonical_segments xs (k - 1)) (sum nums) }
+        end
+      end
+    in ()
+
+  let lemma partition_segments_elements_le ()
+    ensures { forall segments: list (list int), bound: int.
+      bounded_nonnegative_list (concat_segments segments) ->
+      all_nonempty_segments segments ->
+      all_segment_sums_le segments bound ->
+      elements_le_bound (concat_segments segments) bound }
+  =
+    bounded_append_left ();
+    bounded_append_right ();
+    bounded_sum_bound_elements ();
+    elements_le_bound_append ();
+    let rec lemma aux (segments: list (list int)) (bound: int)
+      requires { bounded_nonnegative_list (concat_segments segments) }
+      requires { all_nonempty_segments segments }
+      requires { all_segment_sums_le segments bound }
+      ensures  { elements_le_bound (concat_segments segments) bound }
+      variant { segments }
+    =
+      match segments with
+      | Nil -> ()
+      | Cons segment rest ->
+          assert { segment <> Nil };
+          bounded_append_left ();
+          bounded_append_right ();
+          assert { bounded_nonnegative_list segment };
+          assert { bounded_nonnegative_list (concat_segments rest) };
+          assert { sum segment <= bound };
+          assert { elements_le_bound segment bound };
+          aux rest bound;
+          assert { elements_le_bound (concat_segments rest) bound };
+          assert { elements_le_bound (segment ++ concat_segments rest) bound }
+      end
+    in ()
+
+  let lemma partition_bound_at_least_max ()
+    ensures { forall nums: list int, k bound: int.
+      bounded_nonnegative_list nums ->
+      nums <> Nil ->
+      partition_with_bound nums k bound ->
+      max_value nums <= bound }
+  =
+    partition_segments_elements_le ();
+    elements_le_bound_max ();
+    let lemma aux (nums: list int) (k bound: int)
+      requires { bounded_nonnegative_list nums }
+      requires { nums <> Nil }
+      requires { partition_with_bound nums k bound }
+      ensures  { max_value nums <= bound }
+    =
+      let segments = any (list (list int)) ensures {
+        length result = k /\
+        concat_segments result = nums /\
+        all_nonempty_segments result /\
+        all_segment_sums_le result bound } in
+      assert { bounded_nonnegative_list (concat_segments segments) };
+      assert { elements_le_bound (concat_segments segments) bound };
+      assert { elements_le_bound nums bound };
+      assert { max_value nums <= bound }
+    in ()
+
+  let lemma no_partition_below_max ()
+    ensures { forall nums: list int, k bound: int.
+      bounded_nonnegative_list nums ->
+      nums <> Nil ->
+      bound < max_value nums ->
+      not (partition_with_bound nums k bound) }
+  =
+    partition_bound_at_least_max ();
+    ()
+
+  let lemma sum_bound_partition ()
+    ensures { forall nums: list int, k: int.
+      bounded_nonnegative_list nums ->
+      nums <> Nil ->
+      1 <= k <= length nums ->
+      partition_with_bound nums k (sum nums) }
+  =
+    canonical_segments_spec ();
+    let lemma aux (nums: list int) (k: int)
+      requires { bounded_nonnegative_list nums }
+      requires { nums <> Nil }
+      requires { 1 <= k <= length nums }
+      ensures  { partition_with_bound nums k (sum nums) }
+    =
+      let segments = canonical_segments nums k in
+      assert { length segments = k };
+      assert { concat_segments segments = nums };
+      assert { all_nonempty_segments segments };
+      assert { all_segment_sums_le segments (sum nums) };
+      assert { partition_with_bound nums k (sum nums) }
+    in ()
+
+  let sum_list (nums: list int) : int
+    requires { bounded_nonnegative_list nums }
+    ensures  { result = sum nums }
+    ensures  { 0 <= result }
+  =
+    let total = ref 0 in
+    let cur = ref nums in
+    while (match !cur with Nil -> false | Cons _ _ -> true end) do
+      invariant { 0 <= !total }
+      invariant { bounded_nonnegative_list !cur }
+      invariant { !total + sum !cur = sum nums }
+      variant { length !cur }
+      match !cur with
+      | Nil -> ()
+      | Cons x xs ->
+          assert { 0 <= x };
+          total := !total + x;
+          cur := xs
+      end
+    done;
+    assert { not (match !cur with Nil -> false | Cons _ _ -> true end) };
+    assert { !cur = Nil };
+    assert { sum !cur = 0 };
+    !total
+
+  let max_list (nums: list int) : int
+    requires { bounded_nonnegative_list nums }
+    ensures  { 0 <= result }
+    ensures  { nums <> Nil -> result = max_value nums }
+    ensures  { nums <> Nil -> result <= sum nums }
+    ensures  { nums <> Nil -> forall bound: int. bound < result -> not (partition_with_bound nums 1 bound) }
+  =
+    match nums with
+    | Nil -> 0
+    | Cons x xs ->
+        let current = ref x in
+        let cur = ref xs in
+        while (match !cur with Nil -> false | Cons _ _ -> true end) do
+          invariant { 0 <= !current }
+          invariant { bounded_nonnegative_list !cur }
+          invariant { !current <= max_value nums }
+          invariant { forall bound: int. bound < !current -> not (partition_with_bound nums 1 bound) }
+          variant { length !cur }
+          match !cur with
+          | Nil -> ()
+          | Cons y ys ->
+              assert { 0 <= y };
+              if y > !current then current := y;
+              assert { !current <= max_value nums };
+              assert { forall bound: int. bound < !current -> not (partition_with_bound nums 1 bound) };
+              cur := ys
+          end
+        done;
+        assert { not (match !cur with Nil -> false | Cons _ _ -> true end) };
+        assert { !cur = Nil };
+        assert { !current = max_value nums };
+        assert { !current <= sum nums };
+        assert { forall bound: int. bound < !current -> not (partition_with_bound nums 1 bound) };
+        !current
+    end
+
+  let segments_needed (nums: list int) (bound: int) : int
+    requires { bounded_nonnegative_list nums }
+    requires { 0 <= bound }
+    ensures  { 0 <= result }
+    ensures  { nums <> Nil -> 1 <= result }
+    ensures  { forall k: int.
+      1 <= k <= length nums ->
+      max_value nums <= bound ->
+      result <= k ->
+      partition_with_bound nums k bound }
+    ensures  { forall k: int.
+      1 <= k <= length nums ->
+      k < result ->
+      not (partition_with_bound nums k bound) }
+  =
+    match nums with
+    | Nil -> 0
+    | Cons x xs ->
+        let segments = ref 1 in
+        let current_sum = ref x in
+        let cur = ref xs in
+        while (match !cur with Nil -> false | Cons _ _ -> true end) do
+          invariant { 1 <= !segments }
+          invariant { 0 <= !current_sum }
+          invariant { bounded_nonnegative_list !cur }
+          invariant { !segments <= length nums }
+          variant { length !cur }
+          match !cur with
+          | Nil -> ()
+          | Cons y ys ->
+              assert { 0 <= y };
+              if !current_sum + y <= bound then
+                current_sum := !current_sum + y
+              else begin
+                segments := !segments + 1;
+                current_sum := y
+              end;
+              cur := ys
+          end
+        done;
+        assert { not (match !cur with Nil -> false | Cons _ _ -> true end) };
+        assert { !cur = Nil };
+        !segments
+    end
+
+  let can_split_with_bound (nums: list int) (k: int) (bound: int) : bool
+    requires { bounded_nonnegative_list nums }
+    requires { 1 <= k <= length nums }
+    requires { 0 <= bound }
+    ensures  { result = true -> partition_with_bound nums k bound }
+    ensures  { result = false -> not (partition_with_bound nums k bound) }
+  =
+    let mx = max_list nums in
+    assert { nums <> Nil };
+    let needed = segments_needed nums bound in
+    if mx <= bound && needed <= k then begin
+      assert { mx = max_value nums };
+      assert { max_value nums <= bound };
+      assert { partition_with_bound nums k bound };
+      true
+    end else begin
+      assert { mx > bound \/ k < needed };
+      if mx > bound then begin
+        assert { mx = max_value nums };
+        assert { bound < max_value nums };
+        assert { not (partition_with_bound nums k bound) }
+      end else begin
+        assert { k < needed };
+        assert { not (partition_with_bound nums k bound) }
+      end;
+      false
+    end
+
+  let split_array_largest_sum_list (nums: list int) (k: int) : int
+    requires { 1 <= length nums <= 1000 }
+    requires { bounded_nonnegative_list nums }
+    requires { 1 <= k <= length nums }
+    requires { k <= 50 }
+    ensures  { optimal_largest_sum nums k result }
+  =
+    if k <= 0 then begin
+      assert { false };
+      0
+    end else
+      match nums with
+      | Nil ->
+          assert { false };
+          0
+      | Cons _ _ ->
+          let low = ref (max_list nums) in
+          let high = ref (sum_list nums) in
+          assert { nums <> Nil };
+          assert { !low = max_value nums };
+          assert { !high = sum nums };
+          assert { 0 <= !low };
+          assert { max_value nums <= sum nums };
+          assert { !low <= !high };
+          assert { forall bound: int. bound < max_value nums -> not (partition_with_bound nums k bound) };
+          assert { forall bound: int. bound < !low -> not (partition_with_bound nums k bound) };
+          assert { partition_with_bound nums k (sum nums) };
+          assert { partition_with_bound nums k !high };
+          while !low < !high do
+            invariant { 0 <= !low }
+            invariant { !low <= !high }
+            invariant { forall bound: int. bound < !low -> not (partition_with_bound nums k bound) }
+            invariant { partition_with_bound nums k !high }
+            variant { !high - !low }
+            let mid = !low + div (!high - !low) 2 in
+            assert { !low <= mid };
+            assert { mid < !high };
+            if can_split_with_bound nums k mid then begin
+              assert { partition_with_bound nums k mid };
+              high := mid
+            end else begin
+              assert { not (partition_with_bound nums k mid) };
+              assert { forall bound: int. bound < !low -> not (partition_with_bound nums k bound) };
+              assert { forall bound: int. !low <= bound < mid -> not (partition_with_bound nums k bound) };
+              assert { forall bound: int. bound < mid + 1 -> not (partition_with_bound nums k bound) };
+              low := mid + 1
+            end
+          done;
+          assert { !low = !high };
+          assert { partition_with_bound nums k !low };
+          assert { forall bound: int. bound < !low -> not (partition_with_bound nums k bound) };
+          !low
+      end
+
+end

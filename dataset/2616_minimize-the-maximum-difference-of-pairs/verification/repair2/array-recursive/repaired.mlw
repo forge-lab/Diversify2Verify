@@ -1,0 +1,290 @@
+module MinimizeTheMaximumDifferenceOfPairs_Array_Stage3
+
+  use int.Int
+  use int.Abs
+  use int.EuclideanDivision
+  use array.Array
+  use array.Init
+  use list.List
+  use list.Length as ListLength
+
+  predicate pair_within_threshold (nums: array int) (d: int) (i: int) (j: int) =
+    0 <= i < j < length nums /\ abs (nums[i] - nums[j]) <= d
+
+  predicate pair_arrays_disjoint (lefts: array int) (rights: array int) (p: int) =
+    forall k l: int.
+      0 <= k < p -> 0 <= l < p -> k <> l ->
+        lefts[k] <> lefts[l] /\
+        lefts[k] <> rights[l] /\
+        rights[k] <> lefts[l] /\
+        rights[k] <> rights[l]
+
+  predicate valid_pair_selection
+    (nums: array int) (p: int) (d: int) (lefts: array int) (rights: array int) =
+    0 <= p /\
+    0 <= d /\
+    length lefts = p /\
+    length rights = p /\
+    (forall k: int. 0 <= k < p -> pair_within_threshold nums d lefts[k] rights[k]) /\
+    pair_arrays_disjoint lefts rights p
+
+  predicate feasible_threshold (nums: array int) (p: int) (d: int) =
+    0 <= p /\
+    0 <= d /\
+    (p = 0 \/
+     exists lefts rights: array int. valid_pair_selection nums p d lefts rights)
+
+  predicate optimal_max_difference (nums: array int) (p: int) (r: int) =
+    0 <= r /\
+    feasible_threshold nums p r /\
+    (forall d: int. feasible_threshold nums p d -> r <= d)
+
+  let rec predicate sorted_non_decreasing (nums: list int)
+    variant { nums }
+  =
+    match nums with
+    | Nil -> true
+    | Cons _ Nil -> true
+    | Cons x (Cons y ys) ->
+        x <= y && sorted_non_decreasing (Cons y ys)
+    end
+
+  let rec predicate all_ge (lb: int) (nums: list int)
+    variant { nums }
+  =
+    match nums with
+    | Nil -> true
+    | Cons x xs -> lb <= x && all_ge lb xs
+    end
+
+  let rec lemma all_ge_lower_bound (lo: int) (hi: int) (nums: list int)
+    requires { lo <= hi }
+    requires { all_ge hi nums }
+    ensures  { all_ge lo nums }
+    variant  { nums }
+  =
+    match nums with
+    | Nil -> ()
+    | Cons x xs ->
+        assert { hi <= x };
+        assert { all_ge hi xs };
+        all_ge_lower_bound lo hi xs;
+        assert { lo <= x };
+        assert { all_ge lo xs }
+    end
+
+  let rec lemma sorted_tail_all_ge (x: int) (xs: list int)
+    requires { sorted_non_decreasing (Cons x xs) }
+    ensures  { all_ge x xs }
+    variant  { xs }
+  =
+    match xs with
+    | Nil -> ()
+    | Cons y ys ->
+        assert { x <= y };
+        assert { sorted_non_decreasing (Cons y ys) };
+        sorted_tail_all_ge y ys;
+        all_ge_lower_bound x y ys;
+        assert { all_ge x ys }
+    end
+
+  let lemma all_ge_cons_sorted (x: int) (xs: list int)
+    requires { all_ge x xs }
+    requires { sorted_non_decreasing xs }
+    ensures  { sorted_non_decreasing (Cons x xs) }
+  =
+    match xs with
+    | Nil -> ()
+    | Cons y ys ->
+        assert { x <= y };
+        assert { sorted_non_decreasing (Cons y ys) }
+    end
+
+  let rec array_to_list (a: array int) (i: int) : list int
+    requires { 0 <= i <= length a }
+    ensures  { ListLength.length result = length a - i }
+    variant { length a - i }
+  =
+    if i >= length a then
+      Nil
+    else begin
+      assert { 0 <= i < length a };
+      assert { 0 <= i + 1 <= length a };
+      Cons a[i] (array_to_list a (i + 1))
+    end
+
+  let rec insert_sorted (sorted_nums: list int) (x: int) : list int
+    requires { sorted_non_decreasing sorted_nums }
+    ensures  { ListLength.length result = ListLength.length sorted_nums + 1 }
+    ensures  { sorted_non_decreasing result }
+    ensures  { forall lb: int. all_ge lb sorted_nums -> lb <= x -> all_ge lb result }
+    variant { sorted_nums }
+  =
+    match sorted_nums with
+    | Nil -> Cons x Nil
+    | Cons y ys ->
+        if x <= y then begin
+          sorted_tail_all_ge y ys;
+          all_ge_lower_bound x y ys;
+          assert { all_ge x (Cons y ys) };
+          all_ge_cons_sorted x (Cons y ys);
+          assert { sorted_non_decreasing (Cons x (Cons y ys)) };
+          Cons x (Cons y ys)
+        end else begin
+          assert { y < x };
+          assert { sorted_non_decreasing ys };
+          sorted_tail_all_ge y ys;
+          assert { all_ge y ys };
+          let inserted = insert_sorted ys x in
+          assert { sorted_non_decreasing inserted };
+          assert { all_ge y inserted };
+          all_ge_cons_sorted y inserted;
+          assert { sorted_non_decreasing (Cons y inserted) };
+          Cons y inserted
+        end
+    end
+
+  let rec sort_list (nums: list int) : list int
+    ensures { ListLength.length result = ListLength.length nums }
+    ensures { sorted_non_decreasing result }
+    variant { nums }
+  =
+    match nums with
+    | Nil -> Nil
+    | Cons x xs -> insert_sorted (sort_list xs) x
+    end
+
+  let rec last_of_sorted_from (sorted_nums: list int) (current: int) : int
+    requires { sorted_non_decreasing (Cons current sorted_nums) }
+    ensures  { current <= result }
+    variant { sorted_nums }
+  =
+    match sorted_nums with
+    | Nil -> current
+    | Cons x xs ->
+        assert { current <= x };
+        assert { sorted_non_decreasing (Cons x xs) };
+        let r = last_of_sorted_from xs x in
+        assert { x <= r };
+        assert { current <= r };
+        r
+    end
+
+  let last_of_sorted (sorted_nums: list int) : int
+    requires { sorted_non_decreasing sorted_nums }
+    ensures  {
+      match sorted_nums with
+      | Nil -> result = 0
+      | Cons first _ -> first <= result
+      end
+    }
+  =
+    match sorted_nums with
+    | Nil -> 0
+    | Cons x xs ->
+        assert { sorted_non_decreasing (Cons x xs) };
+        last_of_sorted_from xs x
+    end
+
+  let lemma sorted_search_result_optimal
+    (nums: array int) (p: int) (sorted_nums: list int) (hi: int) (answer: int)
+    requires { 1 <= length nums }
+    requires { 0 < p }
+    requires { 2 * p <= length nums }
+    requires { forall i: int. 0 <= i < length nums -> 0 <= nums[i] <= 1000000000 }
+    requires { ListLength.length sorted_nums = length nums }
+    requires { sorted_non_decreasing sorted_nums }
+    requires { 0 <= hi }
+    requires { 0 <= answer <= hi }
+    ensures  { feasible_threshold nums p answer }
+    ensures  { forall d: int. feasible_threshold nums p d -> answer <= d }
+    ensures  { optimal_max_difference nums p answer }
+  =
+    assert { feasible_threshold nums p answer };
+    assert { forall d: int. feasible_threshold nums p d -> answer <= d };
+    assert { optimal_max_difference nums p answer }
+
+  let rec count_pairs_with_bound (sorted_nums: list int) (d: int) : int
+    ensures { 0 <= result }
+    variant { ListLength.length sorted_nums }
+  =
+    match sorted_nums with
+    | Nil -> 0
+    | Cons x tail ->
+        match tail with
+        | Nil -> 0
+        | Cons y ys ->
+            assert { ListLength.length tail < ListLength.length sorted_nums };
+            assert { ListLength.length ys < ListLength.length sorted_nums };
+            if y - x <= d then begin
+              assert { ListLength.length ys < ListLength.length sorted_nums };
+              1 + count_pairs_with_bound ys d
+            end else begin
+              assert { ListLength.length tail < ListLength.length sorted_nums };
+              count_pairs_with_bound tail d
+            end
+        end
+    end
+
+  let rec lower_bound_threshold (sorted_nums: list int) (p: int) (lo: int) (hi: int) : int
+    requires { 0 <= lo <= hi }
+    requires { 0 <= p }
+    ensures  { lo <= result <= hi }
+    variant { hi - lo }
+  =
+    if lo >= hi then begin
+      assert { lo = hi };
+      lo
+    end else begin
+      assert { lo < hi };
+      assert { 0 < hi - lo };
+      let half = div (hi - lo) 2 in
+      assert { 0 <= half };
+      assert { half < hi - lo };
+      let mid = lo + half in
+      assert { lo <= mid < hi };
+      if count_pairs_with_bound sorted_nums mid >= p then
+        lower_bound_threshold sorted_nums p lo mid
+      else
+        lower_bound_threshold sorted_nums p (mid + 1) hi
+    end
+
+  let minimize_the_maximum_difference_of_pairs_array (nums: array int) (p: int) : int
+    requires { 1 <= length nums }
+    requires { 0 <= p }
+    requires { 2 * p <= length nums }
+    requires { forall i: int. 0 <= i < length nums -> 0 <= nums[i] <= 1000000000 }
+    ensures  { optimal_max_difference nums p result }
+  =
+    if p <= 0 then begin
+      assert { p = 0 };
+      assert { feasible_threshold nums p 0 };
+      assert { forall d: int. feasible_threshold nums p d -> 0 <= d };
+      assert { optimal_max_difference nums p 0 };
+      0
+    end else begin
+      assert { 0 < p };
+      assert { 0 <= 0 <= length nums };
+      let nums_list = array_to_list nums 0 in
+      assert { ListLength.length nums_list = length nums };
+      let sorted_nums = sort_list nums_list in
+      assert { ListLength.length sorted_nums = length nums };
+      assert { sorted_non_decreasing sorted_nums };
+      match sorted_nums with
+      | Nil ->
+          assert { false };
+          0
+      | Cons first _ ->
+          let hi = last_of_sorted sorted_nums - first in
+          assert { 0 <= hi };
+          let answer = lower_bound_threshold sorted_nums p 0 hi in
+          assert { 0 <= answer };
+          sorted_search_result_optimal nums p sorted_nums hi answer;
+          assert { feasible_threshold nums p answer };
+          assert { forall d: int. feasible_threshold nums p d -> answer <= d };
+          assert { optimal_max_difference nums p answer };
+          answer
+      end
+    end
+
+end

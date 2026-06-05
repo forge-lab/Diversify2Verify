@@ -1,0 +1,177 @@
+module TwoSumLessThanK_List_Recursive_Implementation
+
+  use int.Int
+  use list.List
+
+  let max_int (a: int) (b: int) : int =
+    if a >= b then a else b
+
+  let rec best_with_first (x: int) (xs: list int) (k: int) : int
+    variant { xs }
+  =
+    match xs with
+    | Nil -> -1
+    | Cons y ys ->
+        let tail_best = best_with_first x ys k in
+        let candidate = x + y in
+        if candidate < k then max_int candidate tail_best else tail_best
+    end
+
+  let rec best_pair_sum_less_than (nums: list int) (k: int) : int
+    variant { nums }
+  =
+    match nums with
+    | Nil -> -1
+    | Cons x xs ->
+        let best_with_x = best_with_first x xs k in
+        let best_in_tail = best_pair_sum_less_than xs k in
+        max_int best_with_x best_in_tail
+    end
+
+  let two_sum_less_than_k_list (nums: list int) (k: int) : int =
+    best_pair_sum_less_than nums k
+
+  let test_000 () : bool =
+    let nums = Cons 500 (Cons 500 (Cons 500 (Cons 500 Nil))) in
+    let r = two_sum_less_than_k_list nums 1000 in
+    r = -1
+
+  let test_001 () : bool =
+    let nums = Cons 5 (Cons 15 (Cons 25 (Cons 35 Nil))) in
+    let r = two_sum_less_than_k_list nums 50 in
+    r = 40
+
+  let test_002 () : bool =
+    let nums = Cons 1 (Cons 2 (Cons 3 (Cons 4 (Cons 5 Nil)))) in
+    let r = two_sum_less_than_k_list nums 8 in
+    r = 7
+
+  let test_003 () : bool =
+    let nums = Cons 999 (Cons 998 (Cons 997 (Cons 996 Nil))) in
+    let r = two_sum_less_than_k_list nums 1995 in
+    r = 1994
+
+  let test_004 () : bool =
+    let nums = Cons 5 (Cons 15 (Cons 25 (Cons 35 (Cons 45 Nil)))) in
+    let r = two_sum_less_than_k_list nums 50 in
+    r = 40
+
+  let test_005 () : bool =
+    let nums = Cons 5 (Cons 5 (Cons 5 (Cons 5 Nil))) in
+    let r = two_sum_less_than_k_list nums 10 in
+    r = -1
+
+  let test_006 () : bool =
+    let nums = Cons 999 (Cons 998 (Cons 997 (Cons 996 Nil))) in
+    let r = two_sum_less_than_k_list nums 2000 in
+    r = 1997
+
+  let test_007 () : bool =
+    let nums = Cons 1 Nil in
+    let r = two_sum_less_than_k_list nums 2 in
+    r = -1
+
+  let test_008 () : bool =
+    let nums = Cons 999 (Cons 998 (Cons 997 (Cons 996 (Cons 995 Nil)))) in
+    let r = two_sum_less_than_k_list nums 1995 in
+    r = 1994
+
+  let test_009 () : bool =
+    let nums = Cons 1 (Cons 2 (Cons 3 (Cons 4 (Cons 5 Nil)))) in
+    let r = two_sum_less_than_k_list nums 10 in
+    r = 9
+
+  let test_010 () : bool =
+    let nums = Cons 10 (Cons 20 (Cons 30 Nil)) in
+    let r = two_sum_less_than_k_list nums 15 in
+    r = -1
+
+  let test_011 () : bool =
+    let nums = Cons 100 (Cons 200 (Cons 300 (Cons 400 Nil))) in
+    let r = two_sum_less_than_k_list nums 1000 in
+    r = 700
+
+  let test_012 () : bool =
+    let nums = Cons 34 (Cons 23 (Cons 1 (Cons 24 (Cons 75 (Cons 33 (Cons 54 (Cons 8 Nil))))))) in
+    let r = two_sum_less_than_k_list nums 60 in
+    r = 58
+
+  let test_013 () : bool =
+    let nums = Cons 1 (Cons 1 (Cons 1 (Cons 1 Nil))) in
+    let r = two_sum_less_than_k_list nums 3 in
+    r = 2
+
+  let test_014 () : bool =
+    let nums = Cons 100 (Cons 200 (Cons 300 (Cons 400 (Cons 500 Nil)))) in
+    let r = two_sum_less_than_k_list nums 1000 in
+    r = 900
+
+  let test_015 () : bool =
+    let nums = Cons 100 (Cons 90 (Cons 80 (Cons 70 (Cons 60 (Cons 50 (Cons 40 (Cons 30 (Cons 20 (Cons 10 Nil))))))))) in
+    let r = two_sum_less_than_k_list nums 150 in
+    r = 140
+
+  let test_016 () : bool =
+    let nums = Cons 50 (Cons 100 (Cons 150 (Cons 200 (Cons 250 (Cons 300 (Cons 350 (Cons 400 (Cons 450 (Cons 500 Nil))))))))) in
+    let r = two_sum_less_than_k_list nums 850 in
+    r = 800
+
+  let test_017 () : bool =
+    let nums = Cons 999 (Cons 999 (Cons 999 (Cons 999 (Cons 999 (Cons 999 (Cons 999 (Cons 999 (Cons 999 (Cons 999 Nil))))))))) in
+    let r = two_sum_less_than_k_list nums 1998 in
+    r = -1
+
+  let test_018 () : bool =
+    let nums = Cons 500 (Cons 400 (Cons 300 (Cons 200 (Cons 100 Nil)))) in
+    let r = two_sum_less_than_k_list nums 800 in
+    r = 700
+
+  let test_019 () : bool =
+    let nums = Cons 1 (Cons 1 (Cons 2 (Cons 2 (Cons 3 (Cons 3 (Cons 4 (Cons 4 (Cons 5 (Cons 5 (Cons 6 (Cons 6 (Cons 7 (Cons 7 (Cons 8 (Cons 8 (Cons 9 (Cons 9 (Cons 10 (Cons 10 Nil))))))))))))))))))) in
+    let r = two_sum_less_than_k_list nums 18 in
+    r = 17
+
+  let run_tests () : bool =
+    if test_000 () then
+    if test_001 () then
+    if test_002 () then
+    if test_003 () then
+    if test_004 () then
+    if test_005 () then
+    if test_006 () then
+    if test_007 () then
+    if test_008 () then
+    if test_009 () then
+    if test_010 () then
+    if test_011 () then
+    if test_012 () then
+    if test_013 () then
+    if test_014 () then
+    if test_015 () then
+    if test_016 () then
+    if test_017 () then
+    if test_018 () then
+    if test_019 () then
+      true
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+
+end

@@ -1,0 +1,164 @@
+module MinimizeMaximumOfArray_Array_Imperative
+
+  use int.Int
+  use int.EuclideanDivision
+  use array.Array
+  use array.Init
+  use ref.Ref
+
+  let minimize_maximum_of_array_array (nums: array int) : int =
+    let prefix_sum = ref 0 in
+    let best = ref 0 in
+    for i = 0 to length nums - 1 do
+      prefix_sum := !prefix_sum + nums[i];
+      let count = i + 1 in
+      let candidate = div (!prefix_sum + count - 1) count in
+      if candidate > !best then
+        best := candidate
+    done;
+    !best
+
+  let test_000 () : bool =
+    let nums = init 5 [|1; 9; 1; 9; 1|] in
+    let r = minimize_maximum_of_array_array nums in
+    r = 5
+
+  let test_001 () : bool =
+    let nums = init 2 [|1; 1000000000|] in
+    let r = minimize_maximum_of_array_array nums in
+    r = 500000001
+
+  let test_002 () : bool =
+    let nums = init 5 [|1000000000; 1000000000; 1000000000; 1000000000; 1000000000|] in
+    let r = minimize_maximum_of_array_array nums in
+    r = 1000000000
+
+  let test_003 () : bool =
+    let nums = init 5 [|9; 7; 5; 3; 1|] in
+    let r = minimize_maximum_of_array_array nums in
+    r = 9
+
+  let test_004 () : bool =
+    let nums = init 10 [|10; 9; 8; 7; 6; 5; 4; 3; 2; 1|] in
+    let r = minimize_maximum_of_array_array nums in
+    r = 10
+
+  let test_005 () : bool =
+    let nums = init 2 [|1000000000; 1000000000|] in
+    let r = minimize_maximum_of_array_array nums in
+    r = 1000000000
+
+  let test_006 () : bool =
+    let nums = init 5 [|5; 5; 5; 5; 5|] in
+    let r = minimize_maximum_of_array_array nums in
+    r = 5
+
+  let test_007 () : bool =
+    let nums = init 5 [|0; 0; 0; 0; 0|] in
+    let r = minimize_maximum_of_array_array nums in
+    r = 0
+
+  let test_008 () : bool =
+    let nums = init 5 [|1; 2; 3; 4; 5|] in
+    let r = minimize_maximum_of_array_array nums in
+    r = 3
+
+  let test_009 () : bool =
+    let nums = init 5 [|1; 1000000000; 1; 1000000000; 1|] in
+    let r = minimize_maximum_of_array_array nums in
+    r = 500000001
+
+  let test_010 () : bool =
+    let nums = init 5 [|1; 2; 1000000000; 2; 1|] in
+    let r = minimize_maximum_of_array_array nums in
+    r = 333333335
+
+  let test_011 () : bool =
+    let nums = init 10 [|1; 1; 1; 1; 1; 1; 1; 1; 1; 1|] in
+    let r = minimize_maximum_of_array_array nums in
+    r = 1
+
+  let test_012 () : bool =
+    let nums = init 5 [|1000000000; 0; 0; 0; 0|] in
+    let r = minimize_maximum_of_array_array nums in
+    r = 1000000000
+
+  let test_013 () : bool =
+    let nums = init 5 [|5; 4; 3; 2; 1|] in
+    let r = minimize_maximum_of_array_array nums in
+    r = 5
+
+  let test_014 () : bool =
+    let nums = init 5 [|1; 1000000000; 1; 1; 1|] in
+    let r = minimize_maximum_of_array_array nums in
+    r = 500000001
+
+  let test_015 () : bool =
+    let nums = init 3 [|1; 1000000000; 1|] in
+    let r = minimize_maximum_of_array_array nums in
+    r = 500000001
+
+  let test_016 () : bool =
+    let nums = init 2 [|10; 1|] in
+    let r = minimize_maximum_of_array_array nums in
+    r = 10
+
+  let test_017 () : bool =
+    let nums = init 4 [|3; 7; 1; 6|] in
+    let r = minimize_maximum_of_array_array nums in
+    r = 5
+
+  let test_018 () : bool =
+    let nums = init 2 [|1000000000; 1|] in
+    let r = minimize_maximum_of_array_array nums in
+    r = 1000000000
+
+  let test_019 () : bool =
+    let nums = init 10 [|500; 450; 400; 350; 300; 250; 200; 150; 100; 50|] in
+    let r = minimize_maximum_of_array_array nums in
+    r = 500
+
+  let run_tests () : bool =
+    if test_000 () then
+    if test_001 () then
+    if test_002 () then
+    if test_003 () then
+    if test_004 () then
+    if test_005 () then
+    if test_006 () then
+    if test_007 () then
+    if test_008 () then
+    if test_009 () then
+    if test_010 () then
+    if test_011 () then
+    if test_012 () then
+    if test_013 () then
+    if test_014 () then
+    if test_015 () then
+    if test_016 () then
+    if test_017 () then
+    if test_018 () then
+    if test_019 () then
+      true
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+
+end

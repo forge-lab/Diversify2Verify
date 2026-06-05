@@ -1,0 +1,160 @@
+== Stage 1: first prover on whole file ==
+Running in /Users/rubenm/Desktop/Diversify2Verify/codex-runs/dataset-merge-verification/stage3a-repair/910_smallest-range-ii/array-recursive/smallest_range_ii_array_stage3_7f81e102_stage3/generated/why3: why3 session create -o /Users/rubenm/Desktop/Diversify2Verify/codex-runs/dataset-merge-verification/stage3a-repair/910_smallest-range-ii/array-recursive/smallest_range_ii_array_stage3_7f81e102_stage3/generated/why3/.why3_sessions/repaired_stage1 -P Z3,4.8.6 -t 10 -m 8192 repaired.mlw
+Session created successfully
+Running in /Users/rubenm/Desktop/Diversify2Verify/codex-runs/dataset-merge-verification/stage3a-repair/910_smallest-range-ii/array-recursive/smallest_range_ii_array_stage3_7f81e102_stage3/generated/why3: why3 bench /Users/rubenm/Desktop/Diversify2Verify/codex-runs/dataset-merge-verification/stage3a-repair/910_smallest-range-ii/array-recursive/smallest_range_ii_array_stage3_7f81e102_stage3/generated/why3/.why3_sessions/repaired_stage1
+Progress: 8/1/0                       Progress: 7/2/0                       Progress: 6/3/0                       Progress: 5/4/0                       Progress: 4/5/0                       Progress: 3/6/0                       Progress: 3/1/2                       Progress: 2/2/2                       Progress: 1/3/2                       Progress: 0/4/2                       Progress: 0/0/1                       
+Replay completed, saving session... done
+== Stage 1 stats ==
+= Statistics for session /Users/rubenm/Desktop/Diversify2Verify/codex-runs/dataset-merge-verification/stage3a-repair/910_smallest-range-ii/array-recursive/smallest_range_ii_array_stage3_7f81e102_stage3/generated/why3/.why3_sessions/repaired_stage1
+
+== Number of root goals ==
+  total: 9  proved: 6
+
+== Number of sub goals ==
+  total: 0  proved: 0
+
+== Goals not proved ==
+  +-- file [../../repaired.mlw]
+    +-- theory SmallestRangeIi_Array_Stage3
+      +-- goal insert_sorted'vc
+      +-- goal last_of_nonempty'vc
+      +-- goal smallest_range_ii_algorithm_correct'vc
+  
+== Goals proved by only one prover ==
+  +-- file [../../repaired.mlw]
+    +-- theory SmallestRangeIi_Array_Stage3
+      +-- goal min_int'vc: Z3 4.8.6
+      +-- goal max_int'vc: Z3 4.8.6
+      +-- goal sorted_list_of_array_from'vc: Z3 4.8.6
+      +-- goal best_width_from'vc: Z3 4.8.6
+      +-- goal sorted_list_nonempty_for_valid_input'vc: Z3 4.8.6
+      +-- goal smallest_range_ii_array'vc: Z3 4.8.6
+  
+1 session(s) read, with a total of 9 proof goals.
+== Unproved root goals after first prover ==
+SmallestRangeIi_Array_Stage3	insert_sorted'vc
+SmallestRangeIi_Array_Stage3	last_of_nonempty'vc
+SmallestRangeIi_Array_Stage3	smallest_range_ii_algorithm_correct'vc
+== Stage 1: trying remaining goals with prover Alt-Ergo,2.4.0 ==
+---- stage1 | prover: Alt-Ergo,2.4.0 | theory: SmallestRangeIi_Array_Stage3 | goal: insert_sorted'vc ----
+File repaired.mlw:
+Goal insert_sorted'vc.
+Prover result is: Timeout (10.00s, 229602 steps).
+---- stage1 | prover: Alt-Ergo,2.4.0 | theory: SmallestRangeIi_Array_Stage3 | goal: last_of_nonempty'vc ----
+File repaired.mlw:
+Goal last_of_nonempty'vc.
+Prover result is: Valid (0.02s, 144 steps).
+Solved in stage 1 using prover: Alt-Ergo,2.4.0
+---- stage1 | prover: Alt-Ergo,2.4.0 | theory: SmallestRangeIi_Array_Stage3 | goal: smallest_range_ii_algorithm_correct'vc ----
+File repaired.mlw:
+Goal smallest_range_ii_algorithm_correct'vc.
+Prover result is: High failure (signaled)
+  (7.47s)HighFailure (signaled),
+  Prover exit status: killed by signal 24
+  prover output:
+  
+  .
+Infrastructure issue in stage 1 with prover Alt-Ergo,2.4.0; aborting rest of stage 1.
+Remaining after prover Alt-Ergo,2.4.0: 2
+== Goals still unproved after stage 1 ==
+SmallestRangeIi_Array_Stage3	insert_sorted'vc
+SmallestRangeIi_Array_Stage3	smallest_range_ii_algorithm_correct'vc
+== Stage 2: split_vc on unproved goal ==
+Target theory: SmallestRangeIi_Array_Stage3
+Target goal  : insert_sorted'vc
+---- stage2 | prover: Z3,4.8.6 | theory: SmallestRangeIi_Array_Stage3 | goal: insert_sorted'vc ----
+Transforms: split_vc
+File "repaired.mlw", line 78, characters 17-37:
+Sub-goal Variant decrease of goal insert_sorted'vc.
+Prover result is: Valid (0.01s, 12014 steps).
+
+File "repaired.mlw", line 67, characters 14-30:
+Sub-goal Postcondition of goal insert_sorted'vc.
+Prover result is: Valid (0.02s, 40985 steps).
+
+File "repaired.mlw", line 68, characters 45-61:
+Sub-goal Postcondition of goal insert_sorted'vc.
+Prover result is: High failure (signaled)
+  (6.67s)HighFailure (signaled),
+  Prover exit status: killed by signal 24
+  prover output:
+  
+  .
+
+File "repaired.mlw", line 69, characters 49-70:
+Sub-goal Postcondition of goal insert_sorted'vc.
+Prover result is: Timeout (10.00s, 58430075 steps).
+
+File "repaired.mlw", line 70, characters 36-58:
+Sub-goal Postcondition of goal insert_sorted'vc.
+Prover result is: Timeout (10.00s, 48933892 steps).
+Infrastructure issue in stage 2 with prover Z3,4.8.6; aborting rest of stage 2.
+== Goals still unproved after stage 2 (split_vc) ==
+SmallestRangeIi_Array_Stage3	insert_sorted'vc
+SmallestRangeIi_Array_Stage3	smallest_range_ii_algorithm_correct'vc
+== Stage 3: split_vc + inline_all on still-unproved goal ==
+Target theory: SmallestRangeIi_Array_Stage3
+Target goal  : insert_sorted'vc
+---- stage3 | prover: CVC4,1.8 | theory: SmallestRangeIi_Array_Stage3 | goal: insert_sorted'vc ----
+Transforms: split_vc inline_all
+File "repaired.mlw", line 78, characters 17-37:
+Sub-goal Variant decrease of goal insert_sorted'vc.
+Prover result is: Valid (0.02s, 2468 steps).
+
+File "repaired.mlw", line 67, characters 14-30:
+Sub-goal Postcondition of goal insert_sorted'vc.
+Prover result is: Unknown (unknown + incomplete) (0.02s, 3422 steps).
+
+File "repaired.mlw", line 68, characters 45-61:
+Sub-goal Postcondition of goal insert_sorted'vc.
+Prover result is: Unknown (unknown + incomplete) (0.02s, 3545 steps).
+
+File "repaired.mlw", line 69, characters 49-70:
+Sub-goal Postcondition of goal insert_sorted'vc.
+Prover result is: Unknown (unknown + incomplete) (0.02s, 3643 steps).
+
+File "repaired.mlw", line 70, characters 36-58:
+Sub-goal Postcondition of goal insert_sorted'vc.
+Prover result is: Unknown (unknown + incomplete) (0.02s, 3600 steps).
+== Stage 3: split_vc + inline_all on still-unproved goal ==
+Target theory: SmallestRangeIi_Array_Stage3
+Target goal  : smallest_range_ii_algorithm_correct'vc
+---- stage3 | prover: CVC4,1.8 | theory: SmallestRangeIi_Array_Stage3 | goal: smallest_range_ii_algorithm_correct'vc ----
+Transforms: split_vc inline_all
+File "repaired.mlw", line 152, characters 13-35:
+Sub-goal Assertion of goal smallest_range_ii_algorithm_correct'vc.
+Prover result is: Valid (0.02s, 4776 steps).
+
+File "repaired.mlw", line 153, characters 13-33:
+Sub-goal Assertion of goal smallest_range_ii_algorithm_correct'vc.
+Prover result is: Valid (0.02s, 4998 steps).
+
+File "repaired.mlw", line 154, characters 13-32:
+Sub-goal Assertion of goal smallest_range_ii_algorithm_correct'vc.
+Prover result is: Valid (0.02s, 4790 steps).
+
+File "repaired.mlw", line 155, characters 13-42:
+Sub-goal Assertion of goal smallest_range_ii_algorithm_correct'vc.
+Prover result is: Unknown (unknown + incomplete) (0.03s, 7414 steps).
+
+File "repaired.mlw", line 156, characters 13-41:
+Sub-goal Assertion of goal smallest_range_ii_algorithm_correct'vc.
+Prover result is: Unknown (unknown + incomplete) (0.03s, 9792 steps).
+
+File "repaired.mlw", line 150, characters 15-44:
+Sub-goal Postcondition of goal smallest_range_ii_algorithm_correct'vc.
+Prover result is: Valid (0.02s, 8449 steps).
+== Final summary ==
+Unproved root goals after first prover : 2
+Remaining failures after split_vc      : 2
+Remaining failures after stage 3       : 2
+Detailed logs stored in                : /Users/rubenm/Desktop/Diversify2Verify/codex-runs/dataset-merge-verification/stage3a-repair/910_smallest-range-ii/array-recursive/smallest_range_ii_array_stage3_7f81e102_stage3/generated/why3/.why3_sessions/repaired_logs
+Still unproved goals:
+SmallestRangeIi_Array_Stage3	insert_sorted'vc
+SmallestRangeIi_Array_Stage3	smallest_range_ii_algorithm_correct'vc
+VERIFY_RESULT: FAILURE
+VERIFY_REASON: unproved_goals_remain
+VERIFY_STAGE: stage3
+VERIFY_ROOT_TOTAL: 9
+VERIFY_ROOT_PROVED: 7
+VERIFY_ROOT_REMAINING: 2

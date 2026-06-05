@@ -1,0 +1,109 @@
+module DividePlayersIntoTeamsOfEqualSkill_Array_Stage3_Imperative
+
+  use int.Int
+  use int.EuclideanDivision
+  use array.Array
+  use ref.Ref
+
+  predicate skill_domain (skill: array int) =
+    length skill >= 2 /\
+    length skill <= 100000 /\
+    (exists teams: int. teams >= 1 /\ length skill = 2 * teams) /\
+    (forall i: int. 0 <= i < length skill -> 1 <= skill[i] <= 1000)
+
+  predicate valid_pairing (skill: array int) (mate: array int) (target_sum: int) =
+    length mate = length skill /\
+    (forall i: int. 0 <= i < length skill ->
+      0 <= mate[i] < length skill /\
+      mate[i] <> i /\
+      mate[mate[i]] = i /\
+      skill[i] + skill[mate[i]] = target_sum)
+
+  let rec function chemistry_sum_from
+      (skill: array int) (mate: array int) (target_sum: int) (i: int) : int
+    requires { valid_pairing skill mate target_sum }
+    requires { 0 <= i <= length skill }
+    variant  { length skill - i }
+  =
+    if i = length skill then 0
+    else
+      (if i < mate[i] then skill[i] * skill[mate[i]] else 0) +
+      chemistry_sum_from skill mate target_sum (i + 1)
+
+  let rec function sorted_pair_chemistry_prefix
+      (sorted: array int) (i: int) : int
+    requires { 0 <= i }
+    requires { 2 * i <= length sorted }
+    variant  { i }
+  =
+    if i = 0 then 0
+    else
+      sorted_pair_chemistry_prefix sorted (i - 1) +
+      sorted[i - 1] * sorted[length sorted - i]
+
+  predicate sorted_pairs_match_prefix
+      (sorted: array int) (target_sum: int) (i: int) =
+    0 <= i /\
+    2 * i <= length sorted /\
+    (forall k: int. 0 <= k < i ->
+      sorted[k] + sorted[length sorted - 1 - k] = target_sum)
+
+  let sort_int_array (a: array int) : unit =
+    let n = length a in
+    for i = 1 to n - 1 do
+      invariant { length a = n }
+      let key = a[i] in
+      let j = ref (i - 1) in
+      while !j >= 0 && a[!j] > key do
+        invariant { -1 <= !j < i }
+        invariant { length a = n }
+        variant { !j + 1 }
+        a[!j + 1] <- a[!j];
+        j := !j - 1
+      done;
+      a[!j + 1] <- key
+    done
+
+  let divide_players_into_teams_of_equal_skill_array (skill: array int) : int
+    requires { skill_domain skill }
+    ensures  {
+      result = -1 <->
+      not (exists mate: array int. exists target_sum: int.
+        valid_pairing skill mate target_sum)
+    }
+    ensures  {
+      result <> -1 ->
+      exists mate: array int. exists target_sum: int.
+        valid_pairing skill mate target_sum /\
+        result = chemistry_sum_from skill mate target_sum 0
+    }
+  =
+    let n = length skill in
+    if n < 2 || mod n 2 <> 0 then -1 else
+    let sorted = copy skill in
+    sort_int_array sorted;
+    let target = sorted[0] + sorted[n - 1] in
+    let i = ref 0 in
+    let total = ref 0 in
+    let ok = ref true in
+    while !ok && 2 * !i < n do
+      invariant { length sorted = n }
+      invariant { 0 <= !i }
+      invariant { 2 * !i <= n }
+      invariant { !total = sorted_pair_chemistry_prefix sorted !i }
+      invariant { !ok -> sorted_pairs_match_prefix sorted target !i }
+      variant { (if !ok then 1 else 0), n - !i }
+      let j = n - 1 - !i in
+      let left = sorted[!i] in
+      let right = sorted[j] in
+      if left + right <> target then
+        ok := false
+      else begin
+        assert { sorted[!i] + sorted[n - 1 - !i] = target };
+        total := !total + left * right;
+        i := !i + 1
+      end
+    done;
+    if !ok then !total else -1
+
+end

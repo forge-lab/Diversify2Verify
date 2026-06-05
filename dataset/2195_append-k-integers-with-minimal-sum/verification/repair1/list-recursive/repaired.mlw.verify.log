@@ -1,0 +1,142 @@
+== Stage 1: first prover on whole file ==
+Running in /Users/rubenm/Desktop/Diversify2Verify/codex-runs/dataset-merge-verification/stage3a-repair/2195_append-k-integers-with-minimal-sum/list-recursive/append_k_integers_with_minimal_sum_list_stage3_8b32f14b_stage3/generated/why3: why3 session create -o /Users/rubenm/Desktop/Diversify2Verify/codex-runs/dataset-merge-verification/stage3a-repair/2195_append-k-integers-with-minimal-sum/list-recursive/append_k_integers_with_minimal_sum_list_stage3_8b32f14b_stage3/generated/why3/.why3_sessions/repaired_stage1 -P Z3,4.8.6 -t 10 -m 8192 repaired.mlw
+Session created successfully
+Running in /Users/rubenm/Desktop/Diversify2Verify/codex-runs/dataset-merge-verification/stage3a-repair/2195_append-k-integers-with-minimal-sum/list-recursive/append_k_integers_with_minimal_sum_list_stage3_8b32f14b_stage3/generated/why3: why3 bench /Users/rubenm/Desktop/Diversify2Verify/codex-runs/dataset-merge-verification/stage3a-repair/2195_append-k-integers-with-minimal-sum/list-recursive/append_k_integers_with_minimal_sum_list_stage3_8b32f14b_stage3/generated/why3/.why3_sessions/repaired_stage1
+Progress: 9/1/0                       Progress: 8/2/0                       Progress: 7/3/0                       Progress: 6/4/0                       Progress: 5/5/0                       Progress: 4/6/0                       Progress: 4/1/2                       Progress: 3/2/2                       Progress: 2/3/2                       Progress: 1/4/2                       Progress: 1/0/2                       Progress: 0/1/2                       
+Replay completed, saving session... done
+== Stage 1 stats ==
+= Statistics for session /Users/rubenm/Desktop/Diversify2Verify/codex-runs/dataset-merge-verification/stage3a-repair/2195_append-k-integers-with-minimal-sum/list-recursive/append_k_integers_with_minimal_sum_list_stage3_8b32f14b_stage3/generated/why3/.why3_sessions/repaired_stage1
+
+== Number of root goals ==
+  total: 10  proved: 6
+
+== Number of sub goals ==
+  total: 0  proved: 0
+
+== Goals not proved ==
+  +-- file [../../repaired.mlw]
+    +-- theory AppendKIntegersWithMinimalSum_List_Stage3_Recursive
+      +-- goal mem_bool_spec'vc
+      +-- goal mem_int'vc
+      +-- goal count_distinct_positive_seen'vc
+      +-- goal missing_choices_top_correct'vc
+  
+== Goals proved by only one prover ==
+  +-- file [../../repaired.mlw]
+    +-- theory AppendKIntegersWithMinimalSum_List_Stage3_Recursive
+      +-- goal mem_bool'vc: Z3 4.8.6
+      +-- goal missing_choices_in_steps'vc: Z3 4.8.6
+      +-- goal count_distinct_positive_seen_model'vc: Z3 4.8.6
+      +-- goal count_distinct_positive'vc: Z3 4.8.6
+      +-- goal sum_missing_in_steps'vc: Z3 4.8.6
+      +-- goal append_k_integers_with_minimal_sum_list'vc: Z3 4.8.6
+  
+1 session(s) read, with a total of 10 proof goals.
+== Unproved root goals after first prover ==
+AppendKIntegersWithMinimalSum_List_Stage3_Recursive	mem_bool_spec'vc
+AppendKIntegersWithMinimalSum_List_Stage3_Recursive	mem_int'vc
+AppendKIntegersWithMinimalSum_List_Stage3_Recursive	count_distinct_positive_seen'vc
+AppendKIntegersWithMinimalSum_List_Stage3_Recursive	missing_choices_top_correct'vc
+== Stage 1: trying remaining goals with prover Alt-Ergo,2.4.0 ==
+---- stage1 | prover: Alt-Ergo,2.4.0 | theory: AppendKIntegersWithMinimalSum_List_Stage3_Recursive | goal: mem_bool_spec'vc ----
+File repaired.mlw:
+Goal mem_bool_spec'vc.
+Prover result is: Valid (0.01s, 280 steps).
+Solved in stage 1 using prover: Alt-Ergo,2.4.0
+---- stage1 | prover: Alt-Ergo,2.4.0 | theory: AppendKIntegersWithMinimalSum_List_Stage3_Recursive | goal: mem_int'vc ----
+File repaired.mlw:
+Goal mem_int'vc.
+Prover result is: Valid (0.01s, 278 steps).
+Solved in stage 1 using prover: Alt-Ergo,2.4.0
+---- stage1 | prover: Alt-Ergo,2.4.0 | theory: AppendKIntegersWithMinimalSum_List_Stage3_Recursive | goal: count_distinct_positive_seen'vc ----
+File repaired.mlw:
+Goal count_distinct_positive_seen'vc.
+Prover result is: Valid (0.01s, 102 steps).
+Solved in stage 1 using prover: Alt-Ergo,2.4.0
+---- stage1 | prover: Alt-Ergo,2.4.0 | theory: AppendKIntegersWithMinimalSum_List_Stage3_Recursive | goal: missing_choices_top_correct'vc ----
+File repaired.mlw:
+Goal missing_choices_top_correct'vc.
+Prover result is: Timeout (10.00s, 160247 steps).
+Remaining after prover Alt-Ergo,2.4.0: 1
+== Stage 1: trying remaining goals with prover CVC4,1.8 ==
+---- stage1 | prover: CVC4,1.8 | theory: AppendKIntegersWithMinimalSum_List_Stage3_Recursive | goal: missing_choices_top_correct'vc ----
+File repaired.mlw:
+Goal missing_choices_top_correct'vc.
+Prover result is: Timeout (10.00s, 2922347 steps).
+Remaining after prover CVC4,1.8: 1
+== Goals still unproved after stage 1 ==
+AppendKIntegersWithMinimalSum_List_Stage3_Recursive	missing_choices_top_correct'vc
+== Stage 2: split_vc on unproved goal ==
+Target theory: AppendKIntegersWithMinimalSum_List_Stage3_Recursive
+Target goal  : missing_choices_top_correct'vc
+---- stage2 | prover: Z3,4.8.6 | theory: AppendKIntegersWithMinimalSum_List_Stage3_Recursive | goal: missing_choices_top_correct'vc ----
+Transforms: split_vc
+File "repaired.mlw", line 155, characters 13-23:
+Sub-goal Assertion of goal missing_choices_top_correct'vc.
+Prover result is: Valid (0.01s, 28791 steps).
+
+File "repaired.mlw", line 156, characters 13-30:
+Sub-goal Assertion of goal missing_choices_top_correct'vc.
+Prover result is: Timeout (10.00s, 39893572 steps).
+
+File "repaired.mlw", line 159, characters 8-57:
+Sub-goal Assertion of goal missing_choices_top_correct'vc.
+Prover result is: Timeout (10.00s, 38022005 steps).
+
+File "repaired.mlw", line 161, characters 13-47:
+Sub-goal Assertion of goal missing_choices_top_correct'vc.
+Prover result is: Valid (0.01s, 34538 steps).
+
+File "repaired.mlw", line 164, characters 45-68:
+Sub-goal Assertion of goal missing_choices_top_correct'vc.
+Prover result is: High failure (signaled)
+  (7.70s)HighFailure (signaled),
+  Prover exit status: killed by signal 24
+  prover output:
+  
+  .
+
+File "repaired.mlw", line 166, characters 13-53:
+Sub-goal Assertion of goal missing_choices_top_correct'vc.
+Prover result is: Valid (0.01s, 38538 steps).
+
+File "repaired.mlw", line 149, character 6 to line 150, character 69:
+Sub-goal Postcondition of goal missing_choices_top_correct'vc.
+Prover result is: Valid (0.01s, 2686 steps).
+Infrastructure issue in stage 2 with prover Z3,4.8.6; aborting rest of stage 2.
+== Goals still unproved after stage 2 (split_vc) ==
+AppendKIntegersWithMinimalSum_List_Stage3_Recursive	missing_choices_top_correct'vc
+== Stage 3: split_vc + inline_all on still-unproved goal ==
+Target theory: AppendKIntegersWithMinimalSum_List_Stage3_Recursive
+Target goal  : missing_choices_top_correct'vc
+---- stage3 | prover: Alt-Ergo,2.4.0 | theory: AppendKIntegersWithMinimalSum_List_Stage3_Recursive | goal: missing_choices_top_correct'vc ----
+Transforms: split_vc inline_all
+File "repaired.mlw", line 155, characters 13-23:
+Sub-goal Assertion of goal missing_choices_top_correct'vc.
+Prover result is: Valid (0.01s, 18 steps).
+
+File "repaired.mlw", line 156, characters 13-30:
+Sub-goal Assertion of goal missing_choices_top_correct'vc.
+Prover result is: Timeout (10.00s, 209041 steps).
+
+File "repaired.mlw", line 159, characters 8-57:
+Sub-goal Assertion of goal missing_choices_top_correct'vc.
+Prover result is: Timeout (10.00s, 135310 steps).
+
+File "repaired.mlw", line 161, characters 13-47:
+Sub-goal Assertion of goal missing_choices_top_correct'vc.
+Prover result is: Valid (0.01s, 20 steps).
+Infrastructure issue in stage 3 with prover Alt-Ergo,2.4.0; aborting rest of stage 3.
+== Final summary ==
+Unproved root goals after first prover : 1
+Remaining failures after split_vc      : 1
+Remaining failures after stage 3       : 1
+Detailed logs stored in                : /Users/rubenm/Desktop/Diversify2Verify/codex-runs/dataset-merge-verification/stage3a-repair/2195_append-k-integers-with-minimal-sum/list-recursive/append_k_integers_with_minimal_sum_list_stage3_8b32f14b_stage3/generated/why3/.why3_sessions/repaired_logs
+Still unproved goals:
+AppendKIntegersWithMinimalSum_List_Stage3_Recursive	missing_choices_top_correct'vc
+VERIFY_RESULT: FAILURE
+VERIFY_REASON: unproved_goals_remain
+VERIFY_STAGE: stage3
+VERIFY_ROOT_TOTAL: 10
+VERIFY_ROOT_PROVED: 9
+VERIFY_ROOT_REMAINING: 1

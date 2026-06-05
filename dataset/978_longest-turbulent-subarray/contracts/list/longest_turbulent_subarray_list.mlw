@@ -1,0 +1,159 @@
+module LongestTurbulentSubarray_List_Spec
+
+  use int.Int
+  use int.MinMax
+  use list.List
+  use list.Length
+
+  let rec function run_len_from (prev: int) (rest: list int) (expect_up: bool) : int
+    variant { rest }
+  =
+    match rest with
+    | Nil -> 1
+    | Cons x xs ->
+        if expect_up then
+          if prev < x then 1 + run_len_from x xs false else 1
+        else
+          if prev > x then 1 + run_len_from x xs true else 1
+    end
+
+  let function turbulent_prefix_len (arr: list int) : int =
+    match arr with
+    | Nil -> 0
+    | Cons x xs ->
+        match xs with
+        | Nil -> 1
+        | Cons y ys ->
+            if x < y then 1 + run_len_from y ys false
+            else if x > y then 1 + run_len_from y ys true
+            else 1
+        end
+    end
+
+  let rec function longest_turbulent_length (arr: list int) : int
+    variant { arr }
+  =
+    match arr with
+    | Nil -> 0
+    | Cons _ xs -> max (turbulent_prefix_len arr) (longest_turbulent_length xs)
+    end
+
+  val longest_turbulent_subarray_list (arr: list int) : int
+    requires { length arr >= 1 }
+    ensures  { result = longest_turbulent_length arr }
+
+  let lemma check_test_000 () =
+    let arr = Cons 9 (Cons 9 Nil) in
+    assert { run_len_from 9 (Cons 9 Nil) true = 1 };
+    assert { run_len_from 9 (Cons 9 Nil) false = 1 };
+    assert { turbulent_prefix_len (Cons 9 Nil) = 1 };
+    assert { turbulent_prefix_len arr = 1 };
+    assert { longest_turbulent_length (Cons 9 Nil) = 1 };
+    assert { longest_turbulent_length arr = 1 }
+
+  let lemma check_test_001 () =
+    let s5 = Cons 8 Nil in
+    let s4 = Cons 7 s5 in
+    let s3 = Cons 10 s4 in
+    let s2 = Cons 2 s3 in
+    let s1 = Cons 4 s2 in
+    let best = s1 in
+    let tail_after_equal = Cons 8 (Cons 1 (Cons 9 Nil)) in
+    let arr = Cons 9 (Cons 4 (Cons 2 (Cons 10 (Cons 7 tail_after_equal)))) in
+    assert { run_len_from 8 Nil true = 1 };
+    assert { run_len_from 7 s5 true = 2 };
+    assert { run_len_from 10 s4 false = 3 };
+    assert { run_len_from 2 s3 true = 4 };
+    assert { run_len_from 4 s2 false = 5 };
+    assert { turbulent_prefix_len best = 5 };
+    assert { turbulent_prefix_len tail_after_equal = 1 };
+    assert { longest_turbulent_length best = 5 };
+    assert { longest_turbulent_length arr = 5 }
+
+  let lemma check_test_004 () =
+    let a1 = Cons 1 Nil in
+    let a2 = Cons 2 a1 in
+    let a3 = Cons 1 a2 in
+    let a4 = Cons 2 a3 in
+    let a5 = Cons 1 a4 in
+    let a6 = Cons 2 a5 in
+    let a7 = Cons 1 a6 in
+    let a8 = Cons 2 a7 in
+    let arr = Cons 1 a8 in
+    assert { run_len_from 2 a1 false = 2 };
+    assert { run_len_from 1 a2 true = 3 };
+    assert { run_len_from 2 a3 false = 4 };
+    assert { run_len_from 1 a4 true = 5 };
+    assert { run_len_from 2 a5 false = 6 };
+    assert { run_len_from 1 a6 true = 7 };
+    assert { run_len_from 2 a7 false = 8 };
+    assert { turbulent_prefix_len arr = 9 };
+    assert { longest_turbulent_length arr = 9 }
+
+  let lemma check_test_007 () =
+    let s1 = Cons 1 Nil in
+    let s2 = Cons 2 s1 in
+    let s3 = Cons 3 s2 in
+    let s4 = Cons 4 s3 in
+    let s5 = Cons 5 s4 in
+    let s6 = Cons 6 s5 in
+    let s7 = Cons 7 s6 in
+    let s8 = Cons 8 s7 in
+    let s9 = Cons 9 s8 in
+    let arr = Cons 10 s9 in
+    assert { run_len_from 9 s8 true = 1 };
+    assert { turbulent_prefix_len s9 = 2 };
+    assert { turbulent_prefix_len arr = 2 };
+    assert { longest_turbulent_length s1 = 1 };
+    assert { longest_turbulent_length s2 = 2 };
+    assert { longest_turbulent_length s9 = 2 };
+    assert { longest_turbulent_length arr = 2 }
+
+  let lemma check_test_009 () =
+    let z1 = Cons 0 Nil in
+    let z2 = Cons 0 z1 in
+    let z3 = Cons 0 z2 in
+    let z4 = Cons 0 z3 in
+    let z5 = Cons 0 z4 in
+    let z6 = Cons 0 z5 in
+    let z7 = Cons 0 z6 in
+    let z8 = Cons 0 z7 in
+    let arr = Cons 0 z8 in
+    assert { run_len_from 0 z1 true = 1 };
+    assert { run_len_from 0 z1 false = 1 };
+    assert { turbulent_prefix_len z1 = 1 };
+    assert { turbulent_prefix_len arr = 1 };
+    assert { longest_turbulent_length z1 = 1 };
+    assert { longest_turbulent_length z8 = 1 };
+    assert { longest_turbulent_length arr = 1 }
+
+  let lemma check_test_014 () =
+    let arr = Cons 100 Nil in
+    assert { turbulent_prefix_len Nil = 0 };
+    assert { longest_turbulent_length Nil = 0 };
+    assert { turbulent_prefix_len arr = 1 };
+    assert { longest_turbulent_length arr = 1 }
+
+  let lemma check_test_019 () =
+    let s1 = Cons 10 Nil in
+    let s2 = Cons 8 s1 in
+    let s3 = Cons 9 s2 in
+    let s4 = Cons 6 s3 in
+    let s5 = Cons 7 s4 in
+    let s6 = Cons 4 s5 in
+    let s7 = Cons 5 s6 in
+    let s8 = Cons 2 s7 in
+    let s9 = Cons 3 s8 in
+    let arr = Cons 1 s9 in
+    assert { run_len_from 8 s1 true = 2 };
+    assert { run_len_from 9 s2 false = 3 };
+    assert { run_len_from 6 s3 true = 4 };
+    assert { run_len_from 7 s4 false = 5 };
+    assert { run_len_from 4 s5 true = 6 };
+    assert { run_len_from 5 s6 false = 7 };
+    assert { run_len_from 2 s7 true = 8 };
+    assert { run_len_from 3 s8 false = 9 };
+    assert { turbulent_prefix_len arr = 10 };
+    assert { longest_turbulent_length arr = 10 }
+
+end

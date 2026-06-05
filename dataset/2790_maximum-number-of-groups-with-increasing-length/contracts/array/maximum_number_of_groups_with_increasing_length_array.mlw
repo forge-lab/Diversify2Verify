@@ -1,0 +1,164 @@
+module MaximumNumberOfGroupsWithIncreasingLength_Array_Spec
+
+  use int.Int
+  use array.Array
+  use array.Init
+
+  let rec function triangular (k: int) : int
+    requires { 0 <= k }
+    variant  { k }
+  =
+    if k = 0 then 0 else k + triangular (k - 1)
+
+  let rec function capped_usage_sum_from (usageLimits: array int) (k: int) (i: int) : int
+    requires { 0 <= k }
+    requires { 0 <= i <= length usageLimits }
+    variant  { length usageLimits - i }
+  =
+    if i = length usageLimits then 0
+    else (if usageLimits[i] <= k then usageLimits[i] else k) + capped_usage_sum_from usageLimits k (i + 1)
+
+  predicate feasible_group_count (usageLimits: array int) (k: int) =
+    0 <= k <= length usageLimits /\
+    triangular k <= capped_usage_sum_from usageLimits k 0
+
+  predicate maximum_group_count (usageLimits: array int) (m: int) =
+    feasible_group_count usageLimits m /\
+    forall k: int. feasible_group_count usageLimits k -> k <= m
+
+  val maximum_number_of_groups_with_increasing_length_array (usageLimits: array int) : int
+    requires { 1 <= length usageLimits <= 100000 }
+    requires { forall i: int. 0 <= i < length usageLimits -> 1 <= usageLimits[i] <= 1000000000 }
+    ensures  { maximum_group_count usageLimits result }
+
+  let lemma check_test_000 () =
+    let a = init 10 [|10; 9; 8; 7; 6; 5; 4; 3; 2; 1|] in
+    assert { length a = 10 };
+    assert { a[0] = 10 };
+    assert { a[1] = 9 };
+    assert { a[2] = 8 };
+    assert { a[3] = 7 };
+    assert { a[4] = 6 };
+    assert { a[5] = 5 };
+    assert { a[6] = 4 };
+    assert { a[7] = 3 };
+    assert { a[8] = 2 };
+    assert { a[9] = 1 };
+    assert { triangular 10 = 55 };
+    assert { capped_usage_sum_from a 10 10 = 0 };
+    assert { capped_usage_sum_from a 10 9 = 1 };
+    assert { capped_usage_sum_from a 10 8 = 3 };
+    assert { capped_usage_sum_from a 10 7 = 6 };
+    assert { capped_usage_sum_from a 10 6 = 10 };
+    assert { capped_usage_sum_from a 10 5 = 15 };
+    assert { capped_usage_sum_from a 10 4 = 21 };
+    assert { capped_usage_sum_from a 10 3 = 28 };
+    assert { capped_usage_sum_from a 10 2 = 36 };
+    assert { capped_usage_sum_from a 10 1 = 45 };
+    assert { capped_usage_sum_from a 10 0 = 55 };
+    assert { feasible_group_count a 10 };
+    assert { not (feasible_group_count a 11) };
+    assert { maximum_group_count a 10 }
+
+  let lemma check_test_001 () =
+    let a = init 3 [|1000000000; 1000000000; 1000000000|] in
+    assert { length a = 3 };
+    assert { a[0] = 1000000000 };
+    assert { a[1] = 1000000000 };
+    assert { a[2] = 1000000000 };
+    assert { triangular 3 = 6 };
+    assert { capped_usage_sum_from a 3 3 = 0 };
+    assert { capped_usage_sum_from a 3 2 = 3 };
+    assert { capped_usage_sum_from a 3 1 = 6 };
+    assert { capped_usage_sum_from a 3 0 = 9 };
+    assert { feasible_group_count a 3 };
+    assert { not (feasible_group_count a 4) };
+    assert { maximum_group_count a 3 }
+
+  let lemma check_test_002 () =
+    let a = init 10 [|5; 5; 5; 5; 5; 5; 5; 5; 5; 5|] in
+    assert { length a = 10 };
+    assert { forall i: int. 0 <= i < length a -> a[i] = 5 };
+    assert { triangular 9 = 45 };
+    assert { capped_usage_sum_from a 9 10 = 0 };
+    assert { capped_usage_sum_from a 9 9 = 5 };
+    assert { capped_usage_sum_from a 9 8 = 10 };
+    assert { capped_usage_sum_from a 9 7 = 15 };
+    assert { capped_usage_sum_from a 9 6 = 20 };
+    assert { capped_usage_sum_from a 9 5 = 25 };
+    assert { capped_usage_sum_from a 9 4 = 30 };
+    assert { capped_usage_sum_from a 9 3 = 35 };
+    assert { capped_usage_sum_from a 9 2 = 40 };
+    assert { capped_usage_sum_from a 9 1 = 45 };
+    assert { capped_usage_sum_from a 9 0 = 50 };
+    assert { feasible_group_count a 9 };
+    assert { triangular 10 = 55 };
+    assert { capped_usage_sum_from a 10 0 = 50 };
+    assert { not (feasible_group_count a 10) };
+    assert { maximum_group_count a 9 }
+
+  let lemma check_test_003 () =
+    let a = init 3 [|1; 2; 5|] in
+    assert { length a = 3 };
+    assert { a[0] = 1 };
+    assert { a[1] = 2 };
+    assert { a[2] = 5 };
+    assert { triangular 3 = 6 };
+    assert { capped_usage_sum_from a 3 3 = 0 };
+    assert { capped_usage_sum_from a 3 2 = 3 };
+    assert { capped_usage_sum_from a 3 1 = 5 };
+    assert { capped_usage_sum_from a 3 0 = 6 };
+    assert { feasible_group_count a 3 };
+    assert { not (feasible_group_count a 4) };
+    assert { maximum_group_count a 3 }
+
+  let lemma check_test_004 () =
+    let a = init 5 [|1; 2; 3; 4; 5|] in
+    assert { length a = 5 };
+    assert { a[0] = 1 };
+    assert { a[1] = 2 };
+    assert { a[2] = 3 };
+    assert { a[3] = 4 };
+    assert { a[4] = 5 };
+    assert { triangular 5 = 15 };
+    assert { capped_usage_sum_from a 5 5 = 0 };
+    assert { capped_usage_sum_from a 5 4 = 5 };
+    assert { capped_usage_sum_from a 5 3 = 9 };
+    assert { capped_usage_sum_from a 5 2 = 12 };
+    assert { capped_usage_sum_from a 5 1 = 14 };
+    assert { capped_usage_sum_from a 5 0 = 15 };
+    assert { feasible_group_count a 5 };
+    assert { not (feasible_group_count a 6) };
+    assert { maximum_group_count a 5 }
+
+  let lemma check_test_005 () =
+    let a = init 3 [|3; 3; 3|] in
+    assert { length a = 3 };
+    assert { a[0] = 3 };
+    assert { a[1] = 3 };
+    assert { a[2] = 3 };
+    assert { triangular 3 = 6 };
+    assert { capped_usage_sum_from a 3 3 = 0 };
+    assert { capped_usage_sum_from a 3 2 = 3 };
+    assert { capped_usage_sum_from a 3 1 = 6 };
+    assert { capped_usage_sum_from a 3 0 = 9 };
+    assert { feasible_group_count a 3 };
+    assert { not (feasible_group_count a 4) };
+    assert { maximum_group_count a 3 }
+
+  let lemma check_test_006 () =
+    let a = init 2 [|1; 1|] in
+    assert { length a = 2 };
+    assert { a[0] = 1 };
+    assert { a[1] = 1 };
+    assert { triangular 1 = 1 };
+    assert { capped_usage_sum_from a 1 2 = 0 };
+    assert { capped_usage_sum_from a 1 1 = 1 };
+    assert { capped_usage_sum_from a 1 0 = 2 };
+    assert { feasible_group_count a 1 };
+    assert { triangular 2 = 3 };
+    assert { capped_usage_sum_from a 2 0 = 2 };
+    assert { not (feasible_group_count a 2) };
+    assert { maximum_group_count a 1 }
+
+end

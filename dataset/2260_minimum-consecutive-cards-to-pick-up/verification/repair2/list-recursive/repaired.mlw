@@ -1,0 +1,215 @@
+module MinimumConsecutiveCardsToPickUp_List_Stage3_Recursive
+
+  use int.Int
+  use list.List
+  use list.Length
+  use list.Mem
+  use list.NthNoOpt
+
+  predicate card_values_in_range (cards: list int) =
+    forall x: int. mem x cards -> 0 <= x /\ x <= 1000000
+
+  predicate valid_matching_pair (cards: list int) (i: int) (j: int) =
+    0 <= i /\ i < j /\ j < length cards /\
+    nth i cards = nth j cards
+
+  predicate matching_window (cards: list int) (span: int) =
+    span >= 2 /\
+    exists i: int. exists j: int.
+      valid_matching_pair cards i j /\ span = j - i + 1
+
+  predicate minimum_pickup_result (cards: list int) (result: int) =
+    (result = -1 /\
+     (forall span: int. not (matching_window cards span))) \/
+    (result >= 2 /\
+     matching_window cards result /\
+     (forall span: int. matching_window cards span -> result <= span))
+
+  predicate first_matching_suffix_result (card: int) (cards: list int) (span: int) (result: int) =
+    (result = -1 /\
+     (forall k: int. 0 <= k /\ k < length cards -> nth k cards <> card)) \/
+    (result >= span /\
+     exists k: int.
+       0 <= k /\ k < length cards /\
+       nth k cards = card /\
+       result = span + k /\
+       (forall h: int. 0 <= h /\ h < k -> nth h cards <> card))
+
+  let function min_positive (left: int) (right: int) : int
+    ensures { left = -1 /\ right = -1 -> result = -1 }
+    ensures { left >= 2 /\ right = -1 -> result = left }
+    ensures { left = -1 /\ right >= 2 -> result = right }
+    ensures { left >= 2 /\ right >= 2 -> result >= 2 }
+    ensures { left >= 2 /\ right >= 2 -> result <= left /\ result <= right }
+    ensures { left >= 2 /\ right >= 2 -> result = left \/ result = right }
+  =
+    if left = -1 then right else
+    if right = -1 then left else
+    if left <= right then left else right
+
+  predicate head_matching_window (card: int) (cards: list int) (span: int) =
+    span >= 2 /\
+    exists k: int.
+      0 <= k /\ k < length cards /\
+      nth k cards = card /\
+      span = k + 2
+
+  let lemma no_matching_window_nil ()
+    ensures { forall span: int. not (matching_window Nil span) }
+  = ()
+
+  let lemma head_matching_window_lift (card: int) (cards: list int) (span: int)
+    requires { head_matching_window card cards span }
+    ensures  { matching_window (Cons card cards) span }
+  =
+    let ghost k =
+      any int ensures {
+        0 <= result /\ result < length cards /\
+        nth result cards = card /\ span = result + 2
+      }
+    in
+    assert { 0 <= k + 1 };
+    assert { k + 1 < length (Cons card cards) };
+    assert { nth 0 (Cons card cards) = card };
+    assert { nth (k + 1) (Cons card cards) = nth k cards };
+    assert { nth (k + 1) (Cons card cards) = card };
+    assert { valid_matching_pair (Cons card cards) 0 (k + 1) };
+    assert { span = (k + 1) - 0 + 1 };
+    assert { matching_window (Cons card cards) span }
+
+  let lemma tail_matching_window_lift (card: int) (cards: list int) (span: int)
+    requires { matching_window cards span }
+    ensures  { matching_window (Cons card cards) span }
+  =
+    let ghost i =
+      any int ensures {
+        exists j: int. valid_matching_pair cards result j /\ span = j - result + 1
+      }
+    in
+    let ghost j =
+      any int ensures {
+        valid_matching_pair cards i result /\ span = result - i + 1
+      }
+    in
+    assert { 0 <= i + 1 };
+    assert { i + 1 < j + 1 };
+    assert { j + 1 < length (Cons card cards) };
+    assert { nth (i + 1) (Cons card cards) = nth i cards };
+    assert { nth (j + 1) (Cons card cards) = nth j cards };
+    assert { nth (i + 1) (Cons card cards) = nth (j + 1) (Cons card cards) };
+    assert { valid_matching_pair (Cons card cards) (i + 1) (j + 1) };
+    assert { span = (j + 1) - (i + 1) + 1 };
+    assert { matching_window (Cons card cards) span }
+
+  lemma matching_window_cons_decompose:
+    forall card: int, cards: list int, span: int.
+      matching_window (Cons card cards) span ->
+      head_matching_window card cards span \/ matching_window cards span
+
+  let lemma first_suffix_head_window_bounds (card: int) (cards: list int) (candidate: int)
+    requires { first_matching_suffix_result card cards 2 candidate }
+    ensures  { candidate = -1 -> forall span: int. not (head_matching_window card cards span) }
+    ensures  { candidate >= 2 ->
+      head_matching_window card cards candidate /\
+      (forall span: int. head_matching_window card cards span -> candidate <= span) }
+  = ()
+
+  let lemma combine_minimum_pickup_cons
+      (card: int) (cards: list int) (current: int) (rest: int) (combined: int)
+    requires { first_matching_suffix_result card cards 2 current }
+    requires { minimum_pickup_result cards rest }
+    requires { combined = min_positive current rest }
+    ensures  { minimum_pickup_result (Cons card cards) combined }
+  =
+    first_suffix_head_window_bounds card cards current;
+    if current = -1 then begin
+      if rest = -1 then begin
+        assert { forall span: int. not (head_matching_window card cards span) };
+        assert { forall span: int. not (matching_window cards span) };
+        assert { forall span: int. not (matching_window (Cons card cards) span) };
+        assert { combined = -1 }
+      end else begin
+        assert { rest >= 2 };
+        assert { matching_window cards rest };
+        tail_matching_window_lift card cards rest;
+        assert { matching_window (Cons card cards) rest };
+        assert { forall span: int. matching_window (Cons card cards) span -> rest <= span };
+        assert { combined = rest }
+      end
+    end else begin
+      assert { current >= 2 };
+      assert { head_matching_window card cards current };
+      head_matching_window_lift card cards current;
+      assert { matching_window (Cons card cards) current };
+      if rest = -1 then begin
+        assert { forall span: int. not (matching_window cards span) };
+        assert { forall span: int. matching_window (Cons card cards) span -> current <= span };
+        assert { combined = current }
+      end else begin
+        assert { rest >= 2 };
+        assert { matching_window cards rest };
+        tail_matching_window_lift card cards rest;
+        assert { matching_window (Cons card cards) rest };
+        assert { combined = current \/ combined = rest };
+        assert { combined >= 2 };
+        assert { matching_window (Cons card cards) combined };
+        assert { forall span: int. matching_window (Cons card cards) span -> combined <= span }
+      end
+    end
+
+  let rec distance_to_next_match (card: int) (cards: list int) (span: int) : int
+    requires { span >= 2 }
+    ensures  { result = -1 \/ result >= span }
+    ensures  { first_matching_suffix_result card cards span result }
+    variant  { cards }
+  =
+    match cards with
+    | Nil ->
+        assert { first_matching_suffix_result card Nil span (-1) };
+        -1
+    | Cons x xs ->
+        if x = card then begin
+          assert { length (Cons x xs) = length xs + 1 };
+          assert { nth 0 (Cons x xs) = card };
+          assert { first_matching_suffix_result card (Cons x xs) span span };
+          span
+        end else begin
+          let result = distance_to_next_match card xs (span + 1) in
+          assert { result = -1 \/ result >= span + 1 };
+          assert { first_matching_suffix_result card xs (span + 1) result };
+          assert { first_matching_suffix_result card (Cons x xs) span result };
+          result
+        end
+    end
+
+  let rec minimum_pickup_rec (cards: list int) : int
+    ensures { result = -1 \/ result >= 2 }
+    ensures { minimum_pickup_result cards result }
+    variant { cards }
+  =
+    match cards with
+    | Nil ->
+        no_matching_window_nil ();
+        assert { minimum_pickup_result Nil (-1) };
+        -1
+    | Cons x xs ->
+        let current = distance_to_next_match x xs 2 in
+        let rest = minimum_pickup_rec xs in
+        let result = min_positive current rest in
+        assert { result = -1 \/ result >= 2 };
+        combine_minimum_pickup_cons x xs current rest result;
+        assert { minimum_pickup_result (Cons x xs) result };
+        result
+    end
+
+  let minimum_consecutive_cards_to_pick_up_list (cards: list int) : int
+    requires { 1 <= length cards }
+    requires { length cards <= 100000 }
+    requires { card_values_in_range cards }
+    ensures  { minimum_pickup_result cards result }
+  =
+    let result = minimum_pickup_rec cards in
+    assert { minimum_pickup_result cards result };
+    result
+
+end

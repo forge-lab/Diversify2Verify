@@ -1,0 +1,259 @@
+module KDiffPairsInAnArray_List_Recursive_Implementation
+
+  use int.Int
+  use list.List
+
+  let rec occ (x: int) (l: list int) : int
+    variant { l }
+  =
+    match l with
+    | Nil -> 0
+    | Cons y ys -> (if y = x then 1 else 0) + occ x ys
+    end
+
+  let pair_contribution (x: int) (nums: list int) (k: int) : int =
+    if k = 0 then
+      if occ x nums >= 2 then 1 else 0
+    else
+      if occ (x + k) nums >= 1 then 1 else 0
+
+  let rec count_unique_kdiff_from
+      (seen: list int) (remaining: list int) (nums: list int) (k: int) : int
+    variant { remaining }
+  =
+    match remaining with
+    | Nil -> 0
+    | Cons x xs ->
+        (if occ x seen = 0 then pair_contribution x nums k else 0) +
+        count_unique_kdiff_from (Cons x seen) xs nums k
+    end
+
+  let k_diff_pairs_in_an_array_list (nums: list int) (k: int) : int =
+    count_unique_kdiff_from Nil nums nums k
+
+  let test_000 () : bool =
+    let nums = Cons 1 (Cons 2 (Cons 3 (Cons 4 (Cons 5 Nil)))) in
+    let r = k_diff_pairs_in_an_array_list nums 3 in
+    r = 2
+
+  let test_001 () : bool =
+    let nums =
+      Cons 6 (Cons 3 (Cons 5 (Cons 7 (Cons 2 (Cons 3 (Cons 3 (Cons 8 (Cons 2 (Cons 4 Nil)))))))))
+    in
+    let r = k_diff_pairs_in_an_array_list nums 2 in
+    r = 5
+
+  let test_002 () : bool =
+    let nums = Cons 10 (Cons 20 (Cons 30 (Cons 40 (Cons 50 Nil)))) in
+    let r = k_diff_pairs_in_an_array_list nums 10 in
+    r = 4
+
+  let test_003 () : bool =
+    let nums =
+      Cons 1 (Cons 2 (Cons 3 (Cons 4 (Cons 5 (Cons 6 (Cons 7 (Cons 8 (Cons 9 (Cons 10 Nil)))))))))
+    in
+    let r = k_diff_pairs_in_an_array_list nums 5 in
+    r = 5
+
+  let test_004 () : bool =
+    let nums = Cons 1 (Cons 3 (Cons 1 (Cons 5 (Cons 4 Nil)))) in
+    let r = k_diff_pairs_in_an_array_list nums 0 in
+    r = 1
+
+  let test_005 () : bool =
+    let nums = Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 Nil)))) in
+    let r = k_diff_pairs_in_an_array_list nums 0 in
+    r = 1
+
+  let test_006 () : bool =
+    let nums = Cons (-1) (Cons (-1) (Cons (-1) (Cons 2 (Cons 2 (Cons 2 Nil))))) in
+    let r = k_diff_pairs_in_an_array_list nums 3 in
+    r = 1
+
+  let test_007 () : bool =
+    let nums = Cons (-1) (Cons (-2) (Cons (-3) (Cons (-4) (Cons (-5) Nil)))) in
+    let r = k_diff_pairs_in_an_array_list nums 1 in
+    r = 4
+
+  let test_008 () : bool =
+    let nums = Cons 1 (Cons 1 (Cons 2 (Cons 2 (Cons 3 (Cons 3 Nil))))) in
+    let r = k_diff_pairs_in_an_array_list nums 1 in
+    r = 2
+
+  let test_009 () : bool =
+    let nums = Cons 3 (Cons 1 (Cons 4 (Cons 1 (Cons 5 Nil)))) in
+    let r = k_diff_pairs_in_an_array_list nums 2 in
+    r = 2
+
+  let test_010 () : bool =
+    let nums = Cons 1 (Cons 2 (Cons 2 (Cons 3 (Cons 3 (Cons 4 (Cons 4 Nil)))))) in
+    let r = k_diff_pairs_in_an_array_list nums 2 in
+    r = 2
+
+  let test_011 () : bool =
+    let nums = Cons 1 (Cons 3 (Cons 5 (Cons 7 (Cons 9 Nil)))) in
+    let r = k_diff_pairs_in_an_array_list nums 2 in
+    r = 4
+
+  let test_012 () : bool =
+    let nums = Cons 0 (Cons 0 (Cons 0 (Cons 0 (Cons 0 Nil)))) in
+    let r = k_diff_pairs_in_an_array_list nums 0 in
+    r = 1
+
+  let test_013 () : bool =
+    let nums = Cons 1 (Cons 2 (Cons 3 (Cons 4 (Cons 5 Nil)))) in
+    let r = k_diff_pairs_in_an_array_list nums 1 in
+    r = 4
+
+  let test_014 () : bool =
+    let l1 = Cons (-9999991) Nil in
+    let l2 = Cons (-9999992) l1 in
+    let l3 = Cons (-9999993) l2 in
+    let l4 = Cons (-9999994) l3 in
+    let l5 = Cons (-9999995) l4 in
+    let l6 = Cons (-9999996) l5 in
+    let l7 = Cons (-9999997) l6 in
+    let l8 = Cons (-9999998) l7 in
+    let l9 = Cons (-9999999) l8 in
+    let nums = Cons (-10000000) l9
+    in
+    let r = k_diff_pairs_in_an_array_list nums 1 in
+    r = 9
+
+  let test_015 () : bool =
+    let l1 = Cons (-9) Nil in
+    let l2 = Cons (-8) l1 in
+    let l3 = Cons (-7) l2 in
+    let l4 = Cons (-6) l3 in
+    let l5 = Cons (-5) l4 in
+    let l6 = Cons (-4) l5 in
+    let l7 = Cons (-3) l6 in
+    let l8 = Cons (-2) l7 in
+    let l9 = Cons (-1) l8 in
+    let l10 = Cons (-3) l9 in
+    let l11 = Cons (-2) l10 in
+    let nums = Cons (-1) l11
+    in
+    let r = k_diff_pairs_in_an_array_list nums 1 in
+    r = 8
+
+  let test_016 () : bool =
+    let l1 = Cons 0 Nil in
+    let l2 = Cons 0 l1 in
+    let l3 = Cons 0 l2 in
+    let l4 = Cons 0 l3 in
+    let l5 = Cons 0 l4 in
+    let l6 = Cons 0 l5 in
+    let l7 = Cons 0 l6 in
+    let l8 = Cons 0 l7 in
+    let l9 = Cons 0 l8 in
+    let nums = Cons 0 l9
+    in
+    let r = k_diff_pairs_in_an_array_list nums 0 in
+    r = 1
+
+  let test_017 () : bool =
+    let l1 = Cons 3 Nil in
+    let l2 = Cons 3 l1 in
+    let l3 = Cons 3 l2 in
+    let l4 = Cons 3 l3 in
+    let l5 = Cons 3 l4 in
+    let l6 = Cons 2 l5 in
+    let l7 = Cons 2 l6 in
+    let l8 = Cons 2 l7 in
+    let l9 = Cons 2 l8 in
+    let l10 = Cons 2 l9 in
+    let l11 = Cons 1 l10 in
+    let l12 = Cons 1 l11 in
+    let l13 = Cons 1 l12 in
+    let l14 = Cons 1 l13 in
+    let nums = Cons 1 l14
+    in
+    let r = k_diff_pairs_in_an_array_list nums 1 in
+    r = 2
+
+  let test_018 () : bool =
+    let l1 = Cons 20 Nil in
+    let l2 = Cons 19 l1 in
+    let l3 = Cons 18 l2 in
+    let l4 = Cons 17 l3 in
+    let l5 = Cons 16 l4 in
+    let l6 = Cons 15 l5 in
+    let l7 = Cons 14 l6 in
+    let l8 = Cons 13 l7 in
+    let l9 = Cons 12 l8 in
+    let l10 = Cons 11 l9 in
+    let l11 = Cons 10 l10 in
+    let l12 = Cons 9 l11 in
+    let l13 = Cons 8 l12 in
+    let l14 = Cons 7 l13 in
+    let l15 = Cons 6 l14 in
+    let l16 = Cons 5 l15 in
+    let l17 = Cons 4 l16 in
+    let l18 = Cons 3 l17 in
+    let l19 = Cons 2 l18 in
+    let nums = Cons 1 l19
+    in
+    let r = k_diff_pairs_in_an_array_list nums 19 in
+    r = 1
+
+  let test_019 () : bool =
+    let l1 = Cons 110 Nil in
+    let l2 = Cons 109 l1 in
+    let l3 = Cons 108 l2 in
+    let l4 = Cons 107 l3 in
+    let l5 = Cons 106 l4 in
+    let l6 = Cons 105 l5 in
+    let l7 = Cons 104 l6 in
+    let l8 = Cons 103 l7 in
+    let l9 = Cons 102 l8 in
+    let l10 = Cons 101 l9 in
+    let nums = Cons 100 l10
+    in
+    let r = k_diff_pairs_in_an_array_list nums 1 in
+    r = 10
+
+  let run_tests () : bool =
+    if test_000 () then
+    if test_001 () then
+    if test_002 () then
+    if test_003 () then
+    if test_004 () then
+    if test_005 () then
+    if test_006 () then
+    if test_007 () then
+    if test_008 () then
+    if test_009 () then
+    if test_010 () then
+    if test_011 () then
+    if test_012 () then
+    if test_013 () then
+    if test_014 () then
+    if test_015 () then
+    if test_016 () then
+    if test_017 () then
+    if test_018 () then
+    if test_019 () then
+      true
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+
+end

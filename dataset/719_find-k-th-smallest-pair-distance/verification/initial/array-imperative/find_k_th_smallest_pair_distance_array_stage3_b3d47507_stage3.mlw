@@ -1,0 +1,140 @@
+module FindKThSmallestPairDistance_Array_Stage3_Imperative
+
+  use int.Int
+  use int.Abs
+  use int.EuclideanDivision
+  use array.Array
+  use array.Init
+  use ref.Ref
+
+  predicate valid_pair (nums: array int) (i: int) (j: int) =
+    0 <= i < j < length nums
+
+  function pair_distance (nums: array int) (i: int) (j: int) : int =
+    abs (nums[i] - nums[j])
+
+  let rec function count_pairs_lt_from_j
+    (nums: array int) (i: int) (j: int) (d: int) : int
+    requires { 0 <= i < length nums }
+    requires { i < j <= length nums }
+    variant  { length nums - j }
+  =
+    if j = length nums then 0
+    else
+      (if abs (nums[i] - nums[j]) < d then 1 else 0) +
+      count_pairs_lt_from_j nums i (j + 1) d
+
+  let rec function count_pairs_lt_from_i
+    (nums: array int) (i: int) (d: int) : int
+    requires { 0 <= i <= length nums }
+    variant  { length nums - i }
+  =
+    if i + 1 >= length nums then 0
+    else
+      count_pairs_lt_from_j nums i (i + 1) d +
+      count_pairs_lt_from_i nums (i + 1) d
+
+  let function count_pairs_less (nums: array int) (d: int) : int =
+    count_pairs_lt_from_i nums 0 d
+
+  let rec function count_pairs_le_from_j
+    (nums: array int) (i: int) (j: int) (d: int) : int
+    requires { 0 <= i < length nums }
+    requires { i < j <= length nums }
+    variant  { length nums - j }
+  =
+    if j = length nums then 0
+    else
+      (if abs (nums[i] - nums[j]) <= d then 1 else 0) +
+      count_pairs_le_from_j nums i (j + 1) d
+
+  let rec function count_pairs_le_from_i
+    (nums: array int) (i: int) (d: int) : int
+    requires { 0 <= i <= length nums }
+    variant  { length nums - i }
+  =
+    if i + 1 >= length nums then 0
+    else
+      count_pairs_le_from_j nums i (i + 1) d +
+      count_pairs_le_from_i nums (i + 1) d
+
+  let function count_pairs_at_most (nums: array int) (d: int) : int =
+    count_pairs_le_from_i nums 0 d
+
+  predicate input_constraints (nums: array int) (k: int) =
+    2 <= length nums /\
+    (forall i: int. 0 <= i < length nums -> 0 <= nums[i] <= 1000000) /\
+    1 <= k /\
+    2 * k <= length nums * (length nums - 1)
+
+  predicate kth_pair_distance_spec (nums: array int) (k: int) (d: int) =
+    0 <= d /\
+    count_pairs_less nums d < k /\
+    k <= count_pairs_at_most nums d
+
+  let count_pairs_at_most_exec (nums: array int) (d: int) : int
+    ensures { result = count_pairs_at_most nums d }
+    ensures { 0 <= result }
+  =
+    let n = length nums in
+    let count = ref 0 in
+    if n >= 2 then begin
+      for i = 0 to n - 2 do
+        invariant { 0 <= !count }
+        for j = i + 1 to n - 1 do
+          invariant { 0 <= !count }
+          if abs (nums[i] - nums[j]) <= d then
+            count := !count + 1
+        done
+      done
+    end;
+    !count
+
+  let array_min (nums: array int) : int
+    requires { 1 <= length nums }
+    ensures  { exists i: int. 0 <= i < length nums /\ result = nums[i] }
+    ensures  { forall i: int. 0 <= i < length nums -> result <= nums[i] }
+  =
+    let current = ref nums[0] in
+    for i = 1 to length nums - 1 do
+      invariant { exists j: int. 0 <= j < i /\ !current = nums[j] }
+      invariant { forall j: int. 0 <= j < i -> !current <= nums[j] }
+      if nums[i] < !current then
+        current := nums[i]
+    done;
+    !current
+
+  let array_max (nums: array int) : int
+    requires { 1 <= length nums }
+    ensures  { exists i: int. 0 <= i < length nums /\ result = nums[i] }
+    ensures  { forall i: int. 0 <= i < length nums -> nums[i] <= result }
+  =
+    let current = ref nums[0] in
+    for i = 1 to length nums - 1 do
+      invariant { exists j: int. 0 <= j < i /\ !current = nums[j] }
+      invariant { forall j: int. 0 <= j < i -> nums[j] <= !current }
+      if nums[i] > !current then
+        current := nums[i]
+    done;
+    !current
+
+  let find_k_th_smallest_pair_distance_array (nums: array int) (k: int) : int
+    requires { input_constraints nums k }
+    ensures  { kth_pair_distance_spec nums k result }
+  =
+    let low = ref 0 in
+    let high = ref (array_max nums - array_min nums) in
+    while !low < !high do
+      invariant { 0 <= !low }
+      invariant { !low <= !high }
+      variant   { !high - !low }
+      let mid = !low + div (!high - !low) 2 in
+      let count = count_pairs_at_most_exec nums mid in
+      if count < k then
+        low := mid + 1
+      else
+        high := mid
+    done;
+    !low
+
+end

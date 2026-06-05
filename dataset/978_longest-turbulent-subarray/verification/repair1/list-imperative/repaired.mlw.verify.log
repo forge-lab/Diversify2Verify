@@ -1,0 +1,160 @@
+== Stage 1: first prover on whole file ==
+Running in /Users/rubenm/Desktop/Diversify2Verify/codex-runs/dataset-merge-verification/stage3a-repair/978_longest-turbulent-subarray/list-imperative/longest_turbulent_subarray_list_stage3_998f750d_stage3/generated/why3: why3 session create -o /Users/rubenm/Desktop/Diversify2Verify/codex-runs/dataset-merge-verification/stage3a-repair/978_longest-turbulent-subarray/list-imperative/longest_turbulent_subarray_list_stage3_998f750d_stage3/generated/why3/.why3_sessions/repaired_stage1 -P Z3,4.8.6 -t 10 -m 8192 repaired.mlw
+Session created successfully
+Running in /Users/rubenm/Desktop/Diversify2Verify/codex-runs/dataset-merge-verification/stage3a-repair/978_longest-turbulent-subarray/list-imperative/longest_turbulent_subarray_list_stage3_998f750d_stage3/generated/why3: why3 bench /Users/rubenm/Desktop/Diversify2Verify/codex-runs/dataset-merge-verification/stage3a-repair/978_longest-turbulent-subarray/list-imperative/longest_turbulent_subarray_list_stage3_998f750d_stage3/generated/why3/.why3_sessions/repaired_stage1
+Progress: 10/1/0                       Progress: 9/2/0                       Progress: 8/3/0                       Progress: 7/4/0                       Progress: 6/5/0                       Progress: 5/6/0                       Progress: 5/0/1                       Progress: 4/1/1                       Progress: 3/2/1                       Progress: 2/3/1                       Progress: 1/4/1                       Progress: 0/5/1                       Progress: 0/0/2                       Progress: 0/0/1                       
+Replay completed, saving session... done
+== Stage 1 stats ==
+= Statistics for session /Users/rubenm/Desktop/Diversify2Verify/codex-runs/dataset-merge-verification/stage3a-repair/978_longest-turbulent-subarray/list-imperative/longest_turbulent_subarray_list_stage3_998f750d_stage3/generated/why3/.why3_sessions/repaired_stage1
+
+== Number of root goals ==
+  total: 11  proved: 9
+
+== Number of sub goals ==
+  total: 0  proved: 0
+
+== Goals not proved ==
+  +-- file [../../repaired.mlw]
+    +-- theory LongestTurbulentSubarray_List_Stage3_Imperative
+      +-- goal scan_best'vc
+      +-- goal longest_turbulent_subarray_list'vc
+  
+== Goals proved by only one prover ==
+  +-- file [../../repaired.mlw]
+    +-- theory LongestTurbulentSubarray_List_Stage3_Imperative
+      +-- goal run_len_from'vc: Z3 4.8.6
+      +-- goal turbulent_prefix_len'vc: Z3 4.8.6
+      +-- goal longest_turbulent_length'vc: Z3 4.8.6
+      +-- goal run_len_from_bounds'vc: Z3 4.8.6
+      +-- goal run_len_from_positive'vc: Z3 4.8.6
+      +-- goal turbulent_prefix_len_bounds'vc: Z3 4.8.6
+      +-- goal longest_turbulent_length_bounds'vc: Z3 4.8.6
+      +-- goal scan_best_lower_bound'vc: Z3 4.8.6
+      +-- goal scan_best_initial'vc: Z3 4.8.6
+  
+1 session(s) read, with a total of 11 proof goals.
+== Unproved root goals after first prover ==
+LongestTurbulentSubarray_List_Stage3_Imperative	scan_best'vc
+LongestTurbulentSubarray_List_Stage3_Imperative	longest_turbulent_subarray_list'vc
+== Stage 1: trying remaining goals with prover Alt-Ergo,2.4.0 ==
+---- stage1 | prover: Alt-Ergo,2.4.0 | theory: LongestTurbulentSubarray_List_Stage3_Imperative | goal: scan_best'vc ----
+File repaired.mlw:
+Goal scan_best'vc.
+Prover result is: Timeout (10.00s, 143134 steps).
+---- stage1 | prover: Alt-Ergo,2.4.0 | theory: LongestTurbulentSubarray_List_Stage3_Imperative | goal: longest_turbulent_subarray_list'vc ----
+File repaired.mlw:
+Goal longest_turbulent_subarray_list'vc.
+Prover result is: Timeout (10.00s, 139903 steps).
+Remaining after prover Alt-Ergo,2.4.0: 2
+== Stage 1: trying remaining goals with prover CVC4,1.8 ==
+---- stage1 | prover: CVC4,1.8 | theory: LongestTurbulentSubarray_List_Stage3_Imperative | goal: scan_best'vc ----
+File repaired.mlw:
+Goal scan_best'vc.
+Prover result is: Timeout (10.00s, 739156 steps).
+---- stage1 | prover: CVC4,1.8 | theory: LongestTurbulentSubarray_List_Stage3_Imperative | goal: longest_turbulent_subarray_list'vc ----
+File repaired.mlw:
+Goal longest_turbulent_subarray_list'vc.
+Prover result is: Valid (0.32s, 74495 steps).
+Solved in stage 1 using prover: CVC4,1.8
+Remaining after prover CVC4,1.8: 1
+== Goals still unproved after stage 1 ==
+LongestTurbulentSubarray_List_Stage3_Imperative	scan_best'vc
+== Stage 2: split_vc on unproved goal ==
+Target theory: LongestTurbulentSubarray_List_Stage3_Imperative
+Target goal  : scan_best'vc
+---- stage2 | prover: Z3,4.8.6 | theory: LongestTurbulentSubarray_List_Stage3_Imperative | goal: scan_best'vc ----
+Transforms: split_vc
+File "repaired.mlw", line 77, character 8 to line 81, character 12:
+Sub-goal Variant decrease of goal scan_best'vc.
+Prover result is: Valid (0.01s, 11118 steps).
+
+File "repaired.mlw", line 68, characters 14-28:
+Sub-goal Postcondition of goal scan_best'vc.
+Prover result is: Valid (0.02s, 69824 steps).
+
+File "repaired.mlw", line 71, characters 6-55:
+Sub-goal Postcondition of goal scan_best'vc.
+Prover result is: Timeout (10.00s, 274993451 steps).
+---- stage2 | prover: Alt-Ergo,2.4.0 | theory: LongestTurbulentSubarray_List_Stage3_Imperative | goal: scan_best'vc ----
+Transforms: split_vc
+File "repaired.mlw", line 77, character 8 to line 81, character 12:
+Sub-goal Variant decrease of goal scan_best'vc.
+Prover result is: Valid (0.01s, 33 steps).
+
+File "repaired.mlw", line 68, characters 14-28:
+Sub-goal Postcondition of goal scan_best'vc.
+Prover result is: Timeout (10.00s, 302243 steps).
+
+File "repaired.mlw", line 71, characters 6-55:
+Sub-goal Postcondition of goal scan_best'vc.
+Prover result is: Timeout (10.00s, 214460 steps).
+---- stage2 | prover: CVC4,1.8 | theory: LongestTurbulentSubarray_List_Stage3_Imperative | goal: scan_best'vc ----
+Transforms: split_vc
+File "repaired.mlw", line 77, character 8 to line 81, character 12:
+Sub-goal Variant decrease of goal scan_best'vc.
+Prover result is: Valid (0.02s, 2935 steps).
+
+File "repaired.mlw", line 68, characters 14-28:
+Sub-goal Postcondition of goal scan_best'vc.
+Prover result is: Unknown (unknown + incomplete) (0.02s, 5476 steps).
+
+File "repaired.mlw", line 71, characters 6-55:
+Sub-goal Postcondition of goal scan_best'vc.
+Prover result is: Timeout (10.00s, 757990 steps).
+== Goals still unproved after stage 2 (split_vc) ==
+LongestTurbulentSubarray_List_Stage3_Imperative	scan_best'vc
+== Stage 3: split_vc + inline_all on still-unproved goal ==
+Target theory: LongestTurbulentSubarray_List_Stage3_Imperative
+Target goal  : scan_best'vc
+---- stage3 | prover: Z3,4.8.6 | theory: LongestTurbulentSubarray_List_Stage3_Imperative | goal: scan_best'vc ----
+Transforms: split_vc inline_all
+File "repaired.mlw", line 77, character 8 to line 81, character 12:
+Sub-goal Variant decrease of goal scan_best'vc.
+Prover result is: Valid (0.01s, 11262 steps).
+
+File "repaired.mlw", line 68, characters 14-28:
+Sub-goal Postcondition of goal scan_best'vc.
+Prover result is: Timeout (10.00s, 62449385 steps).
+
+File "repaired.mlw", line 71, characters 6-55:
+Sub-goal Postcondition of goal scan_best'vc.
+Prover result is: Timeout (10.00s, 198788976 steps).
+---- stage3 | prover: Alt-Ergo,2.4.0 | theory: LongestTurbulentSubarray_List_Stage3_Imperative | goal: scan_best'vc ----
+Transforms: split_vc inline_all
+File "repaired.mlw", line 77, character 8 to line 81, character 12:
+Sub-goal Variant decrease of goal scan_best'vc.
+Prover result is: Valid (0.01s, 34 steps).
+
+File "repaired.mlw", line 68, characters 14-28:
+Sub-goal Postcondition of goal scan_best'vc.
+Prover result is: Timeout (10.00s, 154971 steps).
+
+File "repaired.mlw", line 71, characters 6-55:
+Sub-goal Postcondition of goal scan_best'vc.
+Prover result is: Timeout (10.00s, 379495 steps).
+---- stage3 | prover: CVC4,1.8 | theory: LongestTurbulentSubarray_List_Stage3_Imperative | goal: scan_best'vc ----
+Transforms: split_vc inline_all
+File "repaired.mlw", line 77, character 8 to line 81, character 12:
+Sub-goal Variant decrease of goal scan_best'vc.
+Prover result is: Valid (0.03s, 5956 steps).
+
+File "repaired.mlw", line 68, characters 14-28:
+Sub-goal Postcondition of goal scan_best'vc.
+Prover result is: Unknown (unknown + incomplete) (0.03s, 8337 steps).
+
+File "repaired.mlw", line 71, characters 6-55:
+Sub-goal Postcondition of goal scan_best'vc.
+Prover result is: Timeout (10.00s, 931322 steps).
+== Final summary ==
+Unproved root goals after first prover : 1
+Remaining failures after split_vc      : 1
+Remaining failures after stage 3       : 1
+Detailed logs stored in                : /Users/rubenm/Desktop/Diversify2Verify/codex-runs/dataset-merge-verification/stage3a-repair/978_longest-turbulent-subarray/list-imperative/longest_turbulent_subarray_list_stage3_998f750d_stage3/generated/why3/.why3_sessions/repaired_logs
+Still unproved goals:
+LongestTurbulentSubarray_List_Stage3_Imperative	scan_best'vc
+VERIFY_RESULT: FAILURE
+VERIFY_REASON: unproved_goals_remain
+VERIFY_STAGE: stage3
+VERIFY_ROOT_TOTAL: 11
+VERIFY_ROOT_PROVED: 10
+VERIFY_ROOT_REMAINING: 1

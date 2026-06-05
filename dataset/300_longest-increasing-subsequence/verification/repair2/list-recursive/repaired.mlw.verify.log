@@ -1,0 +1,102 @@
+== Stage 1: first prover on whole file ==
+Running in /Users/rubenm/Desktop/Diversify2Verify/codex-runs/repair2-split2/stage3a-rerepair/300_longest-increasing-subsequence/list-recursive/longest_increasing_subsequence_list_stage3_a484f341_stage3/repaired/generated/why3: why3 session create -o /Users/rubenm/Desktop/Diversify2Verify/codex-runs/repair2-split2/stage3a-rerepair/300_longest-increasing-subsequence/list-recursive/longest_increasing_subsequence_list_stage3_a484f341_stage3/repaired/generated/why3/.why3_sessions/repaired_stage1 -P Z3,4.8.6 -t 10 -m 8192 repaired.mlw
+Session created successfully
+Running in /Users/rubenm/Desktop/Diversify2Verify/codex-runs/repair2-split2/stage3a-rerepair/300_longest-increasing-subsequence/list-recursive/longest_increasing_subsequence_list_stage3_a484f341_stage3/repaired/generated/why3: why3 bench /Users/rubenm/Desktop/Diversify2Verify/codex-runs/repair2-split2/stage3a-rerepair/300_longest-increasing-subsequence/list-recursive/longest_increasing_subsequence_list_stage3_a484f341_stage3/repaired/generated/why3/.why3_sessions/repaired_stage1
+Progress: 6/1/0                       Progress: 5/2/0                       Progress: 4/3/0                       Progress: 3/4/0                       Progress: 2/5/0                       Progress: 1/6/0                       Progress: 1/0/2                       Progress: 0/1/2                       
+Replay completed, saving session... done
+== Stage 1 stats ==
+= Statistics for session /Users/rubenm/Desktop/Diversify2Verify/codex-runs/repair2-split2/stage3a-rerepair/300_longest-increasing-subsequence/list-recursive/longest_increasing_subsequence_list_stage3_a484f341_stage3/repaired/generated/why3/.why3_sessions/repaired_stage1
+
+== Number of root goals ==
+  total: 7  proved: 5
+
+== Number of sub goals ==
+  total: 0  proved: 0
+
+== Goals not proved ==
+  +-- file [../../repaired.mlw]
+    +-- theory LongestIncreasingSubsequence_List_Stage3_Recursive
+      +-- goal build_tails'vc
+      +-- goal build_tails_public_bridge'vc
+  
+== Goals proved by only one prover ==
+  +-- file [../../repaired.mlw]
+    +-- theory LongestIncreasingSubsequence_List_Stage3_Recursive
+      +-- goal is_subsequence'vc: Z3 4.8.6
+      +-- goal strictly_increasing'vc: Z3 4.8.6
+      +-- goal update_tails'vc: Z3 4.8.6
+      +-- goal update_tails_starts_a_candidate'vc: Z3 4.8.6
+      +-- goal longest_increasing_subsequence_list'vc: Z3 4.8.6
+  
+1 session(s) read, with a total of 7 proof goals.
+== Unproved root goals after first prover ==
+LongestIncreasingSubsequence_List_Stage3_Recursive	build_tails'vc
+LongestIncreasingSubsequence_List_Stage3_Recursive	build_tails_public_bridge'vc
+== Stage 1: trying remaining goals with prover Alt-Ergo,2.4.0 ==
+---- stage1 | prover: Alt-Ergo,2.4.0 | theory: LongestIncreasingSubsequence_List_Stage3_Recursive | goal: build_tails'vc ----
+File repaired.mlw:
+Goal build_tails'vc.
+Prover result is: Timeout (10.00s, 302779 steps).
+---- stage1 | prover: Alt-Ergo,2.4.0 | theory: LongestIncreasingSubsequence_List_Stage3_Recursive | goal: build_tails_public_bridge'vc ----
+File repaired.mlw:
+Goal build_tails_public_bridge'vc.
+Prover result is: Valid (0.01s, 185 steps).
+Solved in stage 1 using prover: Alt-Ergo,2.4.0
+Remaining after prover Alt-Ergo,2.4.0: 1
+== Stage 1: trying remaining goals with prover CVC4,1.8 ==
+---- stage1 | prover: CVC4,1.8 | theory: LongestIncreasingSubsequence_List_Stage3_Recursive | goal: build_tails'vc ----
+File repaired.mlw:
+Goal build_tails'vc.
+Prover result is: Unknown (unknown + incomplete) (1.16s, 410839 steps).
+Remaining after prover CVC4,1.8: 1
+== Goals still unproved after stage 1 ==
+LongestIncreasingSubsequence_List_Stage3_Recursive	build_tails'vc
+== Stage 2: split_vc on unproved goal ==
+Target theory: LongestIncreasingSubsequence_List_Stage3_Recursive
+Target goal  : build_tails'vc
+---- stage2 | prover: Z3,4.8.6 | theory: LongestIncreasingSubsequence_List_Stage3_Recursive | goal: build_tails'vc ----
+Transforms: split_vc
+File "repaired.mlw", line 83, characters 19-56:
+Sub-goal Variant decrease of goal build_tails'vc.
+Prover result is: Valid (0.01s, 12783 steps).
+
+File "repaired.mlw", line 73, characters 50-83:
+Sub-goal Postcondition of goal build_tails'vc.
+Prover result is: Timeout (10.00s, 179494403 steps).
+
+File "repaired.mlw", line 75, characters 6-60:
+Sub-goal Postcondition of goal build_tails'vc.
+Prover result is: Timeout (10.00s, 109834127 steps).
+Infrastructure issue in stage 2 with prover Z3,4.8.6; aborting rest of stage 2.
+== Goals still unproved after stage 2 (split_vc) ==
+LongestIncreasingSubsequence_List_Stage3_Recursive	build_tails'vc
+== Stage 3: split_vc + inline_all on still-unproved goal ==
+Target theory: LongestIncreasingSubsequence_List_Stage3_Recursive
+Target goal  : build_tails'vc
+---- stage3 | prover: Alt-Ergo,2.4.0 | theory: LongestIncreasingSubsequence_List_Stage3_Recursive | goal: build_tails'vc ----
+Transforms: split_vc inline_all
+File "repaired.mlw", line 83, characters 19-56:
+Sub-goal Variant decrease of goal build_tails'vc.
+Prover result is: Valid (0.01s, 34 steps).
+
+File "repaired.mlw", line 73, characters 50-83:
+Sub-goal Postcondition of goal build_tails'vc.
+Prover result is: Timeout (10.00s, 272983 steps).
+
+File "repaired.mlw", line 75, characters 6-60:
+Sub-goal Postcondition of goal build_tails'vc.
+Prover result is: Timeout (10.00s, 294351 steps).
+Infrastructure issue in stage 3 with prover Alt-Ergo,2.4.0; aborting rest of stage 3.
+== Final summary ==
+Unproved root goals after first prover : 1
+Remaining failures after split_vc      : 1
+Remaining failures after stage 3       : 1
+Detailed logs stored in                : /Users/rubenm/Desktop/Diversify2Verify/codex-runs/repair2-split2/stage3a-rerepair/300_longest-increasing-subsequence/list-recursive/longest_increasing_subsequence_list_stage3_a484f341_stage3/repaired/generated/why3/.why3_sessions/repaired_logs
+Still unproved goals:
+LongestIncreasingSubsequence_List_Stage3_Recursive	build_tails'vc
+VERIFY_RESULT: FAILURE
+VERIFY_REASON: unproved_goals_remain
+VERIFY_STAGE: stage3
+VERIFY_ROOT_TOTAL: 7
+VERIFY_ROOT_PROVED: 6
+VERIFY_ROOT_REMAINING: 1

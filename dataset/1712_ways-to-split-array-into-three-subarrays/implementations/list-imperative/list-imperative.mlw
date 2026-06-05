@@ -1,0 +1,219 @@
+module WaysToSplitArrayIntoThreeSubarrays_List_Imperative_Implementation
+
+  use int.Int
+  use int.EuclideanDivision
+  use list.List
+  use list.Length
+  use ref.Ref
+
+  let rec predicate nonnegative_list (nums: list int)
+    variant { nums }
+  =
+    match nums with
+    | Nil -> true
+    | Cons x xs -> 0 <= x && nonnegative_list xs
+    end
+
+  let ways_to_split_array_into_three_subarrays_list (nums: list int) : int
+    requires { length nums >= 3 }
+    requires { nonnegative_list nums }
+  =
+    let modulus = 1000000007 in
+    let total_sum = ref 0 in
+    let total_cur = ref nums in
+    while (match !total_cur with Nil -> false | Cons _ _ -> true end) do
+      match !total_cur with
+      | Nil -> ()
+      | Cons x xs ->
+          total_sum := !total_sum + x;
+          total_cur := xs
+      end
+    done;
+    let result = ref 0 in
+    let left_sum = ref 0 in
+    let left_cur = ref nums in
+    while (match !left_cur with Cons _ (Cons _ (Cons _ _)) -> true | _ -> false end) do
+      match !left_cur with
+      | Nil -> ()
+      | Cons x xs ->
+          left_sum := !left_sum + x;
+          let mid_sum = ref 0 in
+          let right_sum = ref (!total_sum - !left_sum) in
+          let mid_cur = ref xs in
+          while (match !mid_cur with Cons _ (Cons _ _) -> true | _ -> false end) do
+            match !mid_cur with
+            | Nil -> ()
+            | Cons y ys ->
+                mid_sum := !mid_sum + y;
+                right_sum := !right_sum - y;
+                if !left_sum <= !mid_sum && !mid_sum <= !right_sum then
+                  result := !result + 1;
+                mid_cur := ys
+            end
+          done;
+          left_cur := xs
+      end
+    done;
+    mod !result modulus
+
+  let check_case (nums: list int) (expected: int) : bool =
+    let r = ways_to_split_array_into_three_subarrays_list nums in
+    r = expected
+
+  let test_000 () : bool =
+    let nums = Cons 10000 (Cons 10000 (Cons 10000 Nil)) in
+    check_case nums 1
+
+  let test_001 () : bool =
+    let nums =
+      Cons 1 (Cons 2 (Cons 3 (Cons 4 (Cons 5
+      (Cons 6 (Cons 7 (Cons 8 (Cons 9 Nil)))))))) in
+    check_case nums 12
+
+  let test_002 () : bool =
+    let nums =
+      Cons 1 (Cons 3 (Cons 2 (Cons 3 (Cons 1
+      (Cons 1 (Cons 1 (Cons 3 (Cons 2 (Cons 3 Nil))))))))) in
+    check_case nums 9
+
+  let test_003 () : bool =
+    let nums = Cons 9 (Cons 4 (Cons 2 (Cons 5 (Cons 1 Nil)))) in
+    check_case nums 0
+
+  let test_004 () : bool =
+    let nums =
+      Cons 10 (Cons 10 (Cons 10 (Cons 10 (Cons 10
+      (Cons 10 (Cons 10 (Cons 10 (Cons 10 (Cons 10 Nil))))))))) in
+    check_case nums 8
+
+  let test_005 () : bool =
+    let nums =
+      Cons 1 (Cons 1 (Cons 2 (Cons 2 (Cons 3
+      (Cons 3 (Cons 4 (Cons 4 (Cons 5 (Cons 5 Nil))))))))) in
+    check_case nums 15
+
+  let test_006 () : bool =
+    let nums =
+      Cons 1 (Cons 3 (Cons 2 (Cons 4 (Cons 1
+      (Cons 2 (Cons 3 (Cons 4 Nil))))))) in
+    check_case nums 6
+
+  let test_007 () : bool =
+    let nums = Cons 1 (Cons 1 (Cons 1 Nil)) in
+    check_case nums 1
+
+  let test_008 () : bool =
+    let nums =
+      Cons 5 (Cons 5 (Cons 5 (Cons 5 (Cons 5
+      (Cons 5 (Cons 5 (Cons 5 (Cons 5 (Cons 5 Nil))))))))) in
+    check_case nums 8
+
+  let test_010 () : bool =
+    let nums = Cons 10 (Cons 10 (Cons 10 (Cons 10 (Cons 10 Nil)))) in
+    check_case nums 2
+
+  let test_011 () : bool =
+    let nums = Cons 1 (Cons 3 (Cons 1 (Cons 1 (Cons 2 Nil)))) in
+    check_case nums 1
+
+  let test_012 () : bool =
+    let nums = Cons 3 (Cons 2 (Cons 1 Nil)) in
+    check_case nums 0
+
+  let test_013 () : bool =
+    let nums = Cons 0 (Cons 0 (Cons 0 (Cons 0 (Cons 0 Nil)))) in
+    check_case nums 6
+
+  let test_014 () : bool =
+    let nums = Cons 1 (Cons 2 (Cons 2 (Cons 2 (Cons 5 (Cons 0 Nil))))) in
+    check_case nums 3
+
+  let test_015 () : bool =
+    let nums =
+      Cons 9 (Cons 8 (Cons 7 (Cons 6 (Cons 5
+      (Cons 4 (Cons 3 (Cons 2 (Cons 1 Nil)))))))) in
+    check_case nums 1
+
+  let test_016 () : bool =
+    let nums =
+      Cons 1 (Cons 0 (Cons 0 (Cons 0 (Cons 0
+      (Cons 0 (Cons 0 (Cons 0 (Cons 0 (Cons 2 Nil))))))))) in
+    check_case nums 0
+
+  let test_017 () : bool =
+    let nums = Cons 1 (Cons 3 (Cons 2 (Cons 2 (Cons 1 (Cons 1 Nil))))) in
+    check_case nums 1
+
+  let test_018 () : bool =
+    let nums =
+      Cons 1 (Cons 1 (Cons 2 (Cons 2 (Cons 3
+      (Cons 3 (Cons 4 (Cons 4 (Cons 5 (Cons 5
+      (Cons 6 (Cons 6 (Cons 7 (Cons 7 (Cons 8
+      (Cons 8 (Cons 9 (Cons 9 (Cons 10 (Cons 10
+      (Cons 11 (Cons 11 (Cons 12 (Cons 12 (Cons 13
+      (Cons 13 (Cons 14 (Cons 14 (Cons 15 (Cons 15 Nil))))))))))))))))))))))))))))) in
+    check_case nums 160
+
+  let test_019 () : bool =
+    let nums =
+      Cons 10 (Cons 9 (Cons 8 (Cons 7 (Cons 6
+      (Cons 5 (Cons 4 (Cons 3 (Cons 2 (Cons 1
+      (Cons 1 (Cons 2 (Cons 3 (Cons 4 (Cons 5
+      (Cons 6 (Cons 7 (Cons 8 (Cons 9 (Cons 10
+      (Cons 1 (Cons 2 (Cons 3 (Cons 4 (Cons 5
+      (Cons 6 (Cons 7 (Cons 8 (Cons 9 (Cons 10 Nil))))))))))))))))))))))))))))) in
+    check_case nums 50
+
+  let test_020 () : bool =
+    let nums =
+      Cons 1 (Cons 2 (Cons 3 (Cons 4 (Cons 5
+      (Cons 6 (Cons 7 (Cons 8 (Cons 9 (Cons 10
+      (Cons 11 (Cons 12 (Cons 13 (Cons 14 (Cons 15
+      (Cons 16 (Cons 17 (Cons 18 (Cons 19 (Cons 20
+      (Cons 1 (Cons 2 (Cons 3 (Cons 4 (Cons 5 Nil)))))))))))))))))))))))) in
+    check_case nums 74
+
+  let run_tests () : bool =
+    if test_000 () then
+    if test_001 () then
+    if test_002 () then
+    if test_003 () then
+    if test_004 () then
+    if test_005 () then
+    if test_006 () then
+    if test_007 () then
+    if test_008 () then
+    if test_010 () then
+    if test_011 () then
+    if test_012 () then
+    if test_013 () then
+    if test_014 () then
+    if test_015 () then
+    if test_016 () then
+    if test_017 () then
+    if test_018 () then
+    if test_019 () then
+    if test_020 () then
+      true
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+
+end

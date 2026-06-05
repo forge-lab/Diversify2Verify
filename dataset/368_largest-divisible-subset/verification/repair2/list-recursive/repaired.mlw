@@ -1,0 +1,281 @@
+module LargestDivisibleSubset_List_Stage3_Recursive
+
+  use int.Int
+  use int.EuclideanDivision
+  use list.List
+  use list.Length
+  use list.Mem
+  use list.NumOcc
+
+  let rec predicate all_positive (l: list int)
+    variant { l }
+  =
+    match l with
+    | Nil -> true
+    | Cons x xs -> 1 <= x && x <= 2000000000 && all_positive xs
+    end
+
+  predicate no_duplicates (l: list int) =
+    forall x: int. num_occ x l <= 1
+
+  predicate valid_input (nums: list int) =
+    1 <= length nums <= 1000 /\
+    all_positive nums /\
+    no_duplicates nums
+
+  predicate all_from_input (nums: list int) (answer: list int) =
+    forall x: int. mem x answer -> mem x nums
+
+  predicate divides (x: int) (y: int) =
+    x > 0 /\ y > 0 /\ mod y x = 0
+
+  predicate comparable_by_divisibility (x: int) (y: int) =
+    divides x y \/ divides y x
+
+  let rec predicate divisible_with_all (x: int) (l: list int)
+    variant { l }
+  =
+    match l with
+    | Nil -> true
+    | Cons y ys ->
+        ((x > 0 && y > 0 && mod y x = 0) ||
+         (y > 0 && x > 0 && mod x y = 0)) &&
+        divisible_with_all x ys
+    end
+
+  let rec predicate pairwise_divisible (l: list int)
+    variant { l }
+  =
+    match l with
+    | Nil -> true
+    | Cons x xs -> divisible_with_all x xs && pairwise_divisible xs
+    end
+
+  predicate divisible_subset (nums: list int) (answer: list int) =
+    length answer <= length nums /\
+    no_duplicates answer /\
+    all_from_input nums answer /\
+    pairwise_divisible answer
+
+  predicate chain_candidate (nums: list int) (chain: list int) =
+    all_positive chain /\ divisible_subset nums chain
+
+  let rec predicate le_all (x: int) (l: list int)
+    variant { l }
+  =
+    match l with
+    | Nil -> true
+    | Cons y ys -> x <= y && le_all x ys
+    end
+
+  let rec predicate sorted_non_decreasing (l: list int)
+    variant { l }
+  =
+    match l with
+    | Nil -> true
+    | Cons x xs -> le_all x xs && sorted_non_decreasing xs
+    end
+
+  predicate largest_divisible_subset_list_spec
+      (nums: list int) (answer: list int) =
+    divisible_subset nums answer /\
+    forall candidate: list int.
+      divisible_subset nums candidate -> length candidate <= length answer
+
+  type chain_store =
+    | StoreNil
+    | StoreCons int (list int) chain_store
+
+  inductive store_candidate (nums: list int) (processed: chain_store) =
+    | StoreCandidateNil:
+        forall nums: list int. store_candidate nums StoreNil
+    | StoreCandidateCons:
+        forall nums: list int, value: int, chain: list int, rest: chain_store.
+          mem value nums ->
+          chain_candidate nums chain ->
+          store_candidate nums rest ->
+          store_candidate nums (StoreCons value chain rest)
+
+  let rec predicate store_positive (processed: chain_store)
+    variant { processed }
+  =
+    match processed with
+    | StoreNil -> true
+    | StoreCons value chain rest ->
+        value > 0 && all_positive chain && store_positive rest
+    end
+
+  let rec list_length (l: list int) : int
+    ensures { result = length l }
+    variant { l }
+  =
+    match l with
+    | Nil -> 0
+    | Cons _ xs -> 1 + list_length xs
+    end
+
+  let rec insert_sorted (x: int) (l: list int) : list int
+    ensures { length result = 1 + length l }
+    ensures { all_positive l /\ x > 0 -> all_positive result }
+    ensures { forall y: int. mem y result <-> y = x \/ mem y l }
+    ensures { no_duplicates l /\ not mem x l -> no_duplicates result }
+    ensures { sorted_non_decreasing l -> sorted_non_decreasing result }
+    variant { l }
+  =
+    match l with
+    | Nil ->
+        assert { length (Cons x Nil) = 1 + length l };
+        assert { forall y: int. mem y (Cons x Nil) <-> y = x \/ mem y l };
+        assert { sorted_non_decreasing (Cons x Nil) };
+        Cons x Nil
+    | Cons y ys ->
+        if x <= y then
+          begin
+          assert { length (Cons x l) = 1 + length l };
+          assert { forall z: int. mem z (Cons x l) <-> z = x \/ mem z l };
+          assert { sorted_non_decreasing l -> sorted_non_decreasing (Cons x l) };
+          Cons x l
+          end
+        else
+          begin
+          let inserted_tail = insert_sorted x ys in
+          assert { length inserted_tail = 1 + length ys };
+          assert { forall z: int. mem z inserted_tail <-> z = x \/ mem z ys };
+          assert { sorted_non_decreasing ys -> sorted_non_decreasing inserted_tail };
+          assert { forall z: int. mem z (Cons y inserted_tail) <-> z = y \/ mem z inserted_tail };
+          Cons y inserted_tail
+          end
+    end
+
+  let rec sort_ascending (l: list int) : list int
+    ensures { length result = length l }
+    ensures { all_positive l -> all_positive result }
+    ensures { forall y: int. mem y result <-> mem y l }
+    ensures { no_duplicates l -> no_duplicates result }
+    ensures { sorted_non_decreasing result }
+    variant { l }
+  =
+    match l with
+    | Nil ->
+        assert { sorted_non_decreasing Nil };
+        Nil
+    | Cons x xs ->
+        let sorted_tail = sort_ascending xs in
+        assert { sorted_non_decreasing sorted_tail };
+        let sorted_all = insert_sorted x sorted_tail in
+        assert { sorted_non_decreasing sorted_all };
+        sorted_all
+    end
+
+  let rec choose_predecessor
+      (ghost nums: list int)
+      (x: int)
+      (processed: chain_store)
+      (best_chain: list int)
+      (best_length: int) : list int
+    requires { x > 0 }
+    requires { store_positive processed }
+    requires { all_positive best_chain }
+    requires { store_candidate nums processed }
+    requires { chain_candidate nums best_chain }
+    ensures  { all_positive result }
+    ensures  { chain_candidate nums result }
+    variant { processed }
+  =
+    match processed with
+    | StoreNil ->
+        assert { chain_candidate nums best_chain };
+        best_chain
+    | StoreCons value chain rest ->
+        assert { value > 0 };
+        assert { value <> 0 };
+        assert { all_positive chain };
+        assert { store_positive rest };
+        assert { chain_candidate nums chain };
+        assert { store_candidate nums rest };
+        if mod x value = 0 then
+          let candidate_length = 1 + list_length chain in
+          if candidate_length > best_length then
+            choose_predecessor nums x rest chain candidate_length
+          else
+            choose_predecessor nums x rest best_chain best_length
+        else
+          choose_predecessor nums x rest best_chain best_length
+    end
+
+  let rec build_best_chain
+      (ghost nums: list int)
+      (remaining: list int)
+      (processed: chain_store)
+      (current_best: list int)
+      (current_best_length: int) : list int
+    requires { all_positive remaining }
+    requires { store_positive processed }
+    requires { all_positive current_best }
+    requires { all_from_input nums remaining }
+    requires { store_candidate nums processed }
+    requires { chain_candidate nums current_best }
+    ensures  { all_positive result }
+    ensures  { chain_candidate nums result }
+    variant { remaining }
+  =
+    match remaining with
+    | Nil ->
+        assert { chain_candidate nums current_best };
+        current_best
+    | Cons x xs ->
+        assert { x > 0 };
+        assert { all_positive xs };
+        assert { mem x nums };
+        assert { all_from_input nums xs };
+        let empty_chain: list int = Nil in
+        assert { all_positive empty_chain };
+        assert { chain_candidate nums empty_chain };
+        let predecessor_chain = choose_predecessor nums x processed empty_chain 1 in
+        assert { all_positive predecessor_chain };
+        assert { chain_candidate nums predecessor_chain };
+        let chain_here = Cons x predecessor_chain in
+        assert { all_positive chain_here };
+        assert { all_from_input nums chain_here };
+        let chain_length = 1 + list_length predecessor_chain in
+        let new_processed = StoreCons x chain_here processed in
+        assert { store_positive new_processed };
+        assert { chain_candidate nums chain_here };
+        assert { store_candidate nums new_processed };
+        if chain_length > current_best_length then
+          build_best_chain nums xs new_processed chain_here chain_length
+        else
+          build_best_chain nums xs new_processed current_best current_best_length
+    end
+
+  let largest_divisible_subset_list (nums: list int) : list int
+    requires { valid_input nums }
+    ensures  { largest_divisible_subset_list_spec nums result }
+  =
+    let empty_processed = StoreNil in
+    let empty_chain: list int = Nil in
+    assert { store_positive empty_processed };
+    assert { all_positive empty_chain };
+    assert { chain_candidate nums empty_chain };
+    let sorted_nums = sort_ascending nums in
+    assert { length sorted_nums = length nums };
+    assert { all_positive sorted_nums };
+    assert { no_duplicates sorted_nums };
+    assert { forall x: int. mem x sorted_nums <-> mem x nums };
+    assert { all_from_input nums sorted_nums };
+    assert { store_candidate nums empty_processed };
+    let result = build_best_chain nums sorted_nums empty_processed empty_chain 0 in
+    assert { all_positive result };
+    assert { chain_candidate nums result };
+    assert { all_from_input nums result };
+    assert { no_duplicates result };
+    assert { pairwise_divisible result };
+    assert { divisible_subset nums result };
+    assert {
+      forall candidate: list int.
+        divisible_subset nums candidate -> length candidate <= length result
+    };
+    assert { largest_divisible_subset_list_spec nums result };
+    result
+
+end

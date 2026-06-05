@@ -1,0 +1,138 @@
+module MinimumCostsUsingTheTrainLine_List_Spec
+
+  use int.Int
+  use int.MinMax
+  use list.List
+  use list.Length
+  use ref.Ref
+
+  let rec function minimum_costs_from
+      (regular: list int) (express: list int) (expressCost: int)
+      (regular_so_far: int) (express_so_far: int) : list int
+    variant { regular }
+  =
+    match regular with
+    | Nil -> Nil
+    | Cons r rs ->
+        match express with
+        | Nil -> Nil
+        | Cons e es ->
+            let next_regular = min regular_so_far express_so_far + r in
+            let next_express = min (regular_so_far + expressCost) express_so_far + e in
+            Cons (min next_regular next_express)
+              (minimum_costs_from rs es expressCost next_regular next_express)
+        end
+    end
+
+  function minimum_costs_using_the_train_line_spec
+      (regular: list int) (express: list int) (expressCost: int) : list int =
+    minimum_costs_from regular express expressCost 0 expressCost
+
+  let rec function reverse_acc_model (remaining: list int) (acc: list int) : list int
+    variant { remaining }
+  =
+    match remaining with
+    | Nil -> acc
+    | Cons x xs -> reverse_acc_model xs (Cons x acc)
+    end
+
+  let rec lemma minimum_costs_from_length
+      (regular: list int) (express: list int) (expressCost: int)
+      (regular_so_far: int) (express_so_far: int)
+    requires { length regular = length express }
+    ensures  { length (minimum_costs_from regular express expressCost regular_so_far express_so_far) = length regular }
+    variant  { regular }
+  =
+    match regular with
+    | Nil ->
+        assert { express = Nil };
+        assert { minimum_costs_from regular express expressCost regular_so_far express_so_far = Nil }
+    | Cons r rs ->
+        match express with
+        | Nil ->
+            assert { false }
+        | Cons e es ->
+            let next_regular = min regular_so_far express_so_far + r in
+            let next_express = min (regular_so_far + expressCost) express_so_far + e in
+            assert { length rs = length es };
+            minimum_costs_from_length rs es expressCost next_regular next_express;
+            assert {
+              minimum_costs_from regular express expressCost regular_so_far express_so_far =
+              Cons (min next_regular next_express)
+                (minimum_costs_from rs es expressCost next_regular next_express)
+            }
+        end
+    end
+
+  let rec lemma reverse_acc_model_length (remaining: list int) (acc: list int)
+    ensures { length (reverse_acc_model remaining acc) = length remaining + length acc }
+    variant { remaining }
+  =
+    match remaining with
+    | Nil -> ()
+    | Cons x xs ->
+        reverse_acc_model_length xs (Cons x acc)
+    end
+
+  let rec reverse_list_acc (remaining: list int) (acc: list int) : list int
+    ensures { result = reverse_acc_model remaining acc }
+    variant { remaining }
+  =
+    match remaining with
+    | Nil -> acc
+    | Cons x xs -> reverse_list_acc xs (Cons x acc)
+    end
+
+  let reverse_list (l: list int) : list int
+    ensures { result = reverse_acc_model l Nil }
+    ensures { length result = length l }
+  =
+    reverse_acc_model_length l Nil;
+    reverse_list_acc l Nil
+
+  let minimum_costs_using_the_train_line_list
+      (regular: list int) (express: list int) (expressCost: int) : list int
+    requires { length regular = length express }
+    ensures  { result = minimum_costs_using_the_train_line_spec regular express expressCost }
+    ensures  { length result = length regular }
+  =
+    let regular_so_far = ref 0 in
+    let express_so_far = ref expressCost in
+    let regular_cur = ref regular in
+    let express_cur = ref express in
+    let result_rev = ref Nil in
+    while (match !regular_cur, !express_cur with Cons _ _, Cons _ _ -> true | _, _ -> false end) do
+      invariant { length !regular_cur = length !express_cur }
+      invariant {
+        reverse_acc_model !result_rev
+          (minimum_costs_from !regular_cur !express_cur expressCost !regular_so_far !express_so_far) =
+        minimum_costs_using_the_train_line_spec regular express expressCost
+      }
+      variant { length !regular_cur }
+
+      match !regular_cur, !express_cur with
+      | Cons r rs, Cons e es ->
+          let next_regular = min !regular_so_far !express_so_far + r in
+          let next_express = min (!regular_so_far + expressCost) !express_so_far + e in
+          let best = min next_regular next_express in
+          assert {
+            minimum_costs_from !regular_cur !express_cur expressCost !regular_so_far !express_so_far =
+            Cons best (minimum_costs_from rs es expressCost next_regular next_express)
+          };
+          result_rev := Cons best !result_rev;
+          regular_so_far := next_regular;
+          express_so_far := next_express;
+          regular_cur := rs;
+          express_cur := es
+      | _, _ ->
+          assert { false }
+      end
+    done;
+    assert { !regular_cur = Nil };
+    assert { !express_cur = Nil };
+    assert { minimum_costs_from !regular_cur !express_cur expressCost !regular_so_far !express_so_far = Nil };
+    assert { reverse_acc_model !result_rev Nil = minimum_costs_using_the_train_line_spec regular express expressCost };
+    minimum_costs_from_length regular express expressCost 0 expressCost;
+    reverse_list !result_rev
+
+end

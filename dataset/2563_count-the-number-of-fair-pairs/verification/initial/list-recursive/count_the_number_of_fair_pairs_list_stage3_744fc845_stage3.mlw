@@ -1,0 +1,52 @@
+module CountTheNumberOfFairPairs_List_Stage3_Recursive
+
+  use int.Int
+  use list.List
+
+  let rec function count_fair_with (x: int) (ys: list int) (lower: int) (upper: int) : int
+    variant { ys }
+  =
+    match ys with
+    | Nil -> 0
+    | Cons y rest ->
+        (if lower <= x + y && x + y <= upper then 1 else 0) +
+        count_fair_with x rest lower upper
+    end
+
+  let rec function fair_pair_count (nums: list int) (lower: int) (upper: int) : int
+    variant { nums }
+  =
+    match nums with
+    | Nil -> 0
+    | Cons x rest ->
+        count_fair_with x rest lower upper +
+        fair_pair_count rest lower upper
+    end
+
+  let rec count_fair_with_exec (x: int) (ys: list int) (lower: int) (upper: int) : int
+    ensures { result = count_fair_with x ys lower upper }
+    variant { ys }
+  =
+    match ys with
+    | Nil -> 0
+    | Cons y rest ->
+        let pair_sum = x + y in
+        assert { pair_sum = x + y };
+        (if lower <= pair_sum && pair_sum <= upper then 1 else 0) +
+        count_fair_with_exec x rest lower upper
+    end
+
+  let rec count_the_number_of_fair_pairs_list (nums: list int) (lower: int) (upper: int) : int
+    ensures { result = fair_pair_count nums lower upper }
+    variant { nums }
+  =
+    match nums with
+    | Nil -> 0
+    | Cons x rest ->
+        assert { fair_pair_count nums lower upper =
+          count_fair_with x rest lower upper + fair_pair_count rest lower upper };
+        count_fair_with_exec x rest lower upper +
+        count_the_number_of_fair_pairs_list rest lower upper
+    end
+
+end

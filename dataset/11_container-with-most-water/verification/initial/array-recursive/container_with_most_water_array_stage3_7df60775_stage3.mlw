@@ -1,0 +1,104 @@
+module ContainerWithMostWater_Array_Stage3
+
+  use int.Int
+  use int.MinMax
+  use array.Array
+
+  predicate valid_input (height: array int) =
+    2 <= length height /\
+    forall i: int. 0 <= i < length height -> 0 <= height[i] <= 10000
+
+  predicate valid_pair (height: array int) (i: int) (j: int) =
+    0 <= i < j < length height
+
+  function container_area (height: array int) (i: int) (j: int) : int =
+    (j - i) * min (height[i]) (height[j])
+
+  predicate has_container_area (height: array int) (area: int) =
+    exists i j: int.
+      valid_pair height i j /\
+      area = container_area height i j
+
+  predicate area_upper_bound (height: array int) (area: int) =
+    forall i j: int.
+      valid_pair height i j -> container_area height i j <= area
+
+  predicate max_container_area (height: array int) (area: int) =
+    has_container_area height area /\
+    area_upper_bound height area
+
+  predicate pair_area_bound_at
+    (height: array int) (area: int) (i: int) (j: int) =
+    valid_pair height i j -> container_area height i j <= area
+
+  predicate max_area_for_left_from
+    (height: array int) (i: int) (j: int) (area: int) =
+    if j >= length height then
+      area = 0
+    else
+      (exists k: int.
+        j <= k < length height /\
+        area = container_area height i k) /\
+      (forall k: int.
+        j <= k < length height -> container_area height i k <= area)
+
+  predicate max_area_from_left
+    (height: array int) (i: int) (area: int) =
+    if i + 1 >= length height then
+      area = 0
+    else
+      (exists p q: int.
+        i <= p < q < length height /\
+        area = container_area height p q) /\
+      (forall p q: int.
+        i <= p < q < length height -> container_area height p q <= area)
+
+  let rec best_with_left (height: array int) (i: int) (j: int) : int
+    requires { valid_input height }
+    requires { 0 <= i < length height }
+    requires { i < j <= length height }
+    ensures  { 0 <= result }
+    ensures  { max_area_for_left_from height i j result }
+    variant  { length height - j }
+  =
+    if j >= length height then
+      0
+    else
+      let current = (j - i) * min (height[i]) (height[j]) in
+      assert { valid_pair height i j };
+      assert { current = container_area height i j };
+      assert { 0 <= current };
+      let rest = best_with_left height i (j + 1) in
+      assert { max_area_for_left_from height i (j + 1) rest };
+      if current >= rest then current else rest
+
+  let rec best_from_left (height: array int) (i: int) : int
+    requires { valid_input height }
+    requires { 0 <= i <= length height }
+    ensures  { 0 <= result }
+    ensures  { max_area_from_left height i result }
+    variant  { length height - i }
+  =
+    if i + 1 >= length height then
+      0
+    else
+      let current = best_with_left height i (i + 1) in
+      assert { max_area_for_left_from height i (i + 1) current };
+      let rest = best_from_left height (i + 1) in
+      assert { max_area_from_left height (i + 1) rest };
+      if current >= rest then current else rest
+
+  let container_with_most_water_array (height: array int) : int
+    requires { valid_input height }
+    ensures  { max_container_area height result }
+  =
+    if length height < 2 then
+      (assert { false }; 0)
+    else
+      let best = best_from_left height 0 in
+      assert { max_area_from_left height 0 best };
+      assert { has_container_area height best };
+      assert { area_upper_bound height best };
+      best
+
+end

@@ -1,0 +1,208 @@
+module EqualSumArraysWithMinimumNumberOfOperations_Array_Spec
+
+  use int.Int
+  use int.NumOf
+  use array.Array
+  use array.Init
+  use array.ArraySum
+
+  function dice_sum (a: array int) : int =
+    ArraySum.sum a 0 (length a)
+
+  function changed_positions (delta: array int) : int =
+    NumOf.numof (fun i -> delta[i] <> 0) 0 (length delta)
+
+  predicate valid_dice_array (a: array int) =
+    1 <= length a <= 100000 /\
+    forall i: int. 0 <= i < length a -> 1 <= a[i] <= 6
+
+  predicate decrease_plan (nums: array int) (delta: array int) =
+    length delta = length nums /\
+    forall i: int. 0 <= i < length nums -> 0 <= delta[i] <= nums[i] - 1
+
+  predicate increase_plan (nums: array int) (delta: array int) =
+    length delta = length nums /\
+    forall i: int. 0 <= i < length nums -> 0 <= delta[i] <= 6 - nums[i]
+
+  function plan_gain (delta1: array int) (delta2: array int) : int =
+    ArraySum.sum delta1 0 (length delta1) + ArraySum.sum delta2 0 (length delta2)
+
+  function plan_cost (delta1: array int) (delta2: array int) : int =
+    changed_positions delta1 + changed_positions delta2
+
+  predicate equalizing_plan
+    (nums1: array int) (nums2: array int) (delta1: array int) (delta2: array int) =
+    (dice_sum nums1 >= dice_sum nums2 /\
+      decrease_plan nums1 delta1 /\
+      increase_plan nums2 delta2 /\
+      plan_gain delta1 delta2 = dice_sum nums1 - dice_sum nums2) \/
+    (dice_sum nums2 >= dice_sum nums1 /\
+      increase_plan nums1 delta1 /\
+      decrease_plan nums2 delta2 /\
+      plan_gain delta1 delta2 = dice_sum nums2 - dice_sum nums1)
+
+  predicate minimum_operations_spec
+    (nums1: array int) (nums2: array int) (res: int) =
+    (res = (-1) /\
+      forall delta1 delta2: array int.
+        not (equalizing_plan nums1 nums2 delta1 delta2)) \/
+    (0 <= res /\
+      exists delta1 delta2: array int.
+        equalizing_plan nums1 nums2 delta1 delta2 /\
+        plan_cost delta1 delta2 = res /\
+        forall other1 other2: array int.
+          equalizing_plan nums1 nums2 other1 other2 ->
+          res <= plan_cost other1 other2)
+
+  val equal_sum_arrays_with_minimum_number_of_operations_array
+    (nums1: array int) (nums2: array int) : int
+    requires { valid_dice_array nums1 }
+    requires { valid_dice_array nums2 }
+    ensures  { minimum_operations_spec nums1 nums2 result }
+
+  let lemma test_000_python_assertions () =
+    let nums1 = init 6 [|6; 5; 4; 3; 2; 1|] in
+    let nums2 = init 6 [|1; 2; 3; 4; 5; 6|] in
+    let delta1 = init 6 [|0; 0; 0; 0; 0; 0|] in
+    let delta2 = init 6 [|0; 0; 0; 0; 0; 0|] in
+    assert { length nums1 = 6 };
+    assert { length nums2 = 6 };
+    assert { nums1[0] = 6 /\ nums1[5] = 1 };
+    assert { nums2[0] = 1 /\ nums2[5] = 6 };
+    assert { dice_sum nums1 = 21 };
+    assert { dice_sum nums2 = 21 };
+    assert { decrease_plan nums1 delta1 };
+    assert { increase_plan nums2 delta2 };
+    assert { plan_gain delta1 delta2 = 0 };
+    assert { changed_positions delta1 = 0 };
+    assert { changed_positions delta2 = 0 };
+    assert { equalizing_plan nums1 nums2 delta1 delta2 };
+    assert { plan_cost delta1 delta2 = 0 };
+    assert { minimum_operations_spec nums1 nums2 0 }
+
+  let lemma test_001_python_assertions () =
+    let nums1 = init 4 [|3; 3; 3; 3|] in
+    let nums2 = init 4 [|2; 2; 2; 2|] in
+    let delta1 = init 4 [|0; 0; 0; 0|] in
+    let delta2 = init 4 [|4; 0; 0; 0|] in
+    assert { length nums1 = 4 };
+    assert { length nums2 = 4 };
+    assert { nums1[0] = 3 /\ nums1[3] = 3 };
+    assert { nums2[0] = 2 /\ nums2[3] = 2 };
+    assert { dice_sum nums1 = 12 };
+    assert { dice_sum nums2 = 8 };
+    assert { decrease_plan nums1 delta1 };
+    assert { increase_plan nums2 delta2 };
+    assert { ArraySum.sum delta1 0 (length delta1) = 0 };
+    assert { ArraySum.sum delta2 0 (length delta2) = 4 };
+    assert { plan_gain delta1 delta2 = 4 };
+    assert { changed_positions delta1 = 0 };
+    assert { changed_positions delta2 = 1 };
+    assert { equalizing_plan nums1 nums2 delta1 delta2 };
+    assert { plan_cost delta1 delta2 = 1 };
+    assert { minimum_operations_spec nums1 nums2 1 }
+
+  let lemma test_002_python_assertions () =
+    let nums1 = init 2 [|1; 1|] in
+    let nums2 = init 2 [|6; 6|] in
+    let delta1 = init 2 [|5; 5|] in
+    let delta2 = init 2 [|0; 0|] in
+    assert { length nums1 = 2 };
+    assert { length nums2 = 2 };
+    assert { nums1[0] = 1 /\ nums1[1] = 1 };
+    assert { nums2[0] = 6 /\ nums2[1] = 6 };
+    assert { dice_sum nums1 = 2 };
+    assert { dice_sum nums2 = 12 };
+    assert { increase_plan nums1 delta1 };
+    assert { decrease_plan nums2 delta2 };
+    assert { ArraySum.sum delta1 0 (length delta1) = 10 };
+    assert { ArraySum.sum delta2 0 (length delta2) = 0 };
+    assert { plan_gain delta1 delta2 = 10 };
+    assert { changed_positions delta1 = 2 };
+    assert { changed_positions delta2 = 0 };
+    assert { equalizing_plan nums1 nums2 delta1 delta2 };
+    assert { plan_cost delta1 delta2 = 2 };
+    assert { minimum_operations_spec nums1 nums2 2 }
+
+  let lemma test_003_python_assertions () =
+    let nums1 = init 3 [|6; 6; 6|] in
+    let nums2 = init 2 [|1; 1|] in
+    let delta1 = init 3 [|5; 5; 5|] in
+    let delta2 = init 2 [|1; 0|] in
+    assert { length nums1 = 3 };
+    assert { length nums2 = 2 };
+    assert { nums1[0] = 6 /\ nums1[1] = 6 /\ nums1[2] = 6 };
+    assert { nums2[0] = 1 /\ nums2[1] = 1 };
+    assert { dice_sum nums1 = 18 };
+    assert { dice_sum nums2 = 2 };
+    assert { decrease_plan nums1 delta1 };
+    assert { increase_plan nums2 delta2 };
+    assert { ArraySum.sum delta1 0 (length delta1) = 15 };
+    assert { ArraySum.sum delta2 0 (length delta2) = 1 };
+    assert { plan_gain delta1 delta2 = 16 };
+    assert { changed_positions delta1 = 3 };
+    assert { changed_positions delta2 = 1 };
+    assert { equalizing_plan nums1 nums2 delta1 delta2 };
+    assert { plan_cost delta1 delta2 = 4 };
+    assert { minimum_operations_spec nums1 nums2 4 }
+
+  let lemma test_011_python_assertions () =
+    let nums1 = init 7 [|1; 1; 1; 1; 1; 1; 1|] in
+    let nums2 = init 1 [|6|] in
+    assert { length nums1 = 7 };
+    assert { length nums2 = 1 };
+    assert { nums1[0] = 1 /\ nums1[6] = 1 };
+    assert { nums2[0] = 6 };
+    assert { dice_sum nums1 = 7 };
+    assert { dice_sum nums2 = 6 };
+    assert { not (exists delta1 delta2: array int.
+      equalizing_plan nums1 nums2 delta1 delta2) };
+    assert { minimum_operations_spec nums1 nums2 (-1) }
+
+  let lemma test_013_python_assertions () =
+    let nums1 = init 6 [|1; 2; 3; 4; 5; 6|] in
+    let nums2 = init 6 [|1; 1; 2; 2; 2; 2|] in
+    let delta1 = init 6 [|0; 0; 1; 0; 0; 5|] in
+    let delta2 = init 6 [|5; 0; 0; 0; 0; 0|] in
+    assert { length nums1 = 6 };
+    assert { length nums2 = 6 };
+    assert { nums1[0] = 1 /\ nums1[1] = 2 /\ nums1[2] = 3 };
+    assert { nums1[3] = 4 /\ nums1[4] = 5 /\ nums1[5] = 6 };
+    assert { nums2[0] = 1 /\ nums2[1] = 1 /\ nums2[2] = 2 };
+    assert { nums2[3] = 2 /\ nums2[4] = 2 /\ nums2[5] = 2 };
+    assert { dice_sum nums1 = 21 };
+    assert { dice_sum nums2 = 10 };
+    assert { decrease_plan nums1 delta1 };
+    assert { increase_plan nums2 delta2 };
+    assert { ArraySum.sum delta1 0 (length delta1) = 6 };
+    assert { ArraySum.sum delta2 0 (length delta2) = 5 };
+    assert { plan_gain delta1 delta2 = 11 };
+    assert { changed_positions delta1 = 2 };
+    assert { changed_positions delta2 = 1 };
+    assert { equalizing_plan nums1 nums2 delta1 delta2 };
+    assert { plan_cost delta1 delta2 = 3 };
+    assert { minimum_operations_spec nums1 nums2 3 }
+
+  let lemma test_015_python_assertions () =
+    let nums1 = init 2 [|6; 6|] in
+    let nums2 = init 1 [|1|] in
+    let delta1 = init 2 [|4; 4|] in
+    let delta2 = init 1 [|3|] in
+    assert { length nums1 = 2 };
+    assert { length nums2 = 1 };
+    assert { nums1[0] = 6 /\ nums1[1] = 6 };
+    assert { nums2[0] = 1 };
+    assert { dice_sum nums1 = 12 };
+    assert { dice_sum nums2 = 1 };
+    assert { decrease_plan nums1 delta1 };
+    assert { increase_plan nums2 delta2 };
+    assert { ArraySum.sum delta1 0 (length delta1) = 8 };
+    assert { ArraySum.sum delta2 0 (length delta2) = 3 };
+    assert { plan_gain delta1 delta2 = 11 };
+    assert { changed_positions delta1 = 2 };
+    assert { changed_positions delta2 = 1 };
+    assert { equalizing_plan nums1 nums2 delta1 delta2 };
+    assert { plan_cost delta1 delta2 = 3 };
+    assert { minimum_operations_spec nums1 nums2 3 }
+
+end

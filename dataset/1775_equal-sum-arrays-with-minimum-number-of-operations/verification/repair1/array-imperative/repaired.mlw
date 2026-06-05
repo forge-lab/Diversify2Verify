@@ -1,0 +1,260 @@
+module EqualSumArraysWithMinimumNumberOfOperations_Array_Stage3_Imperative
+
+  use int.Int
+  use int.NumOf
+  use array.Array
+  use array.Init
+  use array.ArraySum
+  use ref.Ref
+
+  function dice_sum (a: array int) : int =
+    ArraySum.sum a 0 (length a)
+
+  function changed_positions (delta: array int) : int =
+    NumOf.numof (fun i -> delta[i] <> 0) 0 (length delta)
+
+  predicate valid_dice_array (a: array int) =
+    1 <= length a <= 100000 /\
+    forall i: int. 0 <= i < length a -> 1 <= a[i] <= 6
+
+  predicate decrease_plan (nums: array int) (delta: array int) =
+    length delta = length nums /\
+    forall i: int. 0 <= i < length nums -> 0 <= delta[i] <= nums[i] - 1
+
+  predicate increase_plan (nums: array int) (delta: array int) =
+    length delta = length nums /\
+    forall i: int. 0 <= i < length nums -> 0 <= delta[i] <= 6 - nums[i]
+
+  function plan_gain (delta1: array int) (delta2: array int) : int =
+    ArraySum.sum delta1 0 (length delta1) + ArraySum.sum delta2 0 (length delta2)
+
+  function plan_cost (delta1: array int) (delta2: array int) : int =
+    changed_positions delta1 + changed_positions delta2
+
+  predicate equalizing_plan
+    (nums1: array int) (nums2: array int) (delta1: array int) (delta2: array int) =
+    (dice_sum nums1 >= dice_sum nums2 /\
+      decrease_plan nums1 delta1 /\
+      increase_plan nums2 delta2 /\
+      plan_gain delta1 delta2 = dice_sum nums1 - dice_sum nums2) \/
+    (dice_sum nums2 >= dice_sum nums1 /\
+      increase_plan nums1 delta1 /\
+      decrease_plan nums2 delta2 /\
+      plan_gain delta1 delta2 = dice_sum nums2 - dice_sum nums1)
+
+  predicate minimum_operations_spec
+    (nums1: array int) (nums2: array int) (res: int) =
+    (res = (-1) /\
+      forall delta1 delta2: array int.
+        not (equalizing_plan nums1 nums2 delta1 delta2)) \/
+    (0 <= res /\
+      exists delta1 delta2: array int.
+        equalizing_plan nums1 nums2 delta1 delta2 /\
+        plan_cost delta1 delta2 = res /\
+        forall other1 other2: array int.
+          equalizing_plan nums1 nums2 other1 other2 ->
+          res <= plan_cost other1 other2)
+
+  predicate gain_count_bounds (c1 c2 c3 c4 c5: int) =
+    0 <= c1 /\ 0 <= c2 /\ 0 <= c3 /\ 0 <= c4 /\ 0 <= c5
+
+  function gain_capacity (c1 c2 c3 c4 c5: int) : int =
+    c1 + 2 * c2 + 3 * c3 + 4 * c4 + 5 * c5
+
+  function gain_count_total (c1 c2 c3 c4 c5: int) : int =
+    c1 + c2 + c3 + c4 + c5
+
+  function spent_gain
+    (initial_c1 initial_c2 initial_c3 initial_c4 initial_c5: int)
+    (c1 c2 c3 c4 c5: int) : int =
+    (initial_c1 - c1) +
+    2 * (initial_c2 - c2) +
+    3 * (initial_c3 - c3) +
+    4 * (initial_c4 - c4) +
+    5 * (initial_c5 - c5)
+
+  function spent_operations
+    (initial_c1 initial_c2 initial_c3 initial_c4 initial_c5: int)
+    (c1 c2 c3 c4 c5: int) : int =
+    (initial_c1 - c1) +
+    (initial_c2 - c2) +
+    (initial_c3 - c3) +
+    (initial_c4 - c4) +
+    (initial_c5 - c5)
+
+  let sum_array (nums: array int) : int
+    ensures { result = ArraySum.sum nums 0 (length nums) }
+  =
+    let total = ref 0 in
+    for i = 0 to length nums - 1 do
+      invariant { 0 <= i <= length nums }
+      invariant { !total = ArraySum.sum nums 0 i }
+      total := !total + nums[i]
+    done;
+    assert { !total = ArraySum.sum nums 0 (length nums) };
+    !total
+
+  let equal_sum_arrays_with_minimum_number_of_operations_array
+      (nums1: array int) (nums2: array int) : int
+    requires { valid_dice_array nums1 }
+    requires { valid_dice_array nums2 }
+    ensures  { minimum_operations_spec nums1 nums2 result }
+  =
+    let sum1 = sum_array nums1 in
+    let sum2 = sum_array nums2 in
+    assert { sum1 = dice_sum nums1 };
+    assert { sum2 = dice_sum nums2 };
+    if sum1 = sum2 then (
+      assert { dice_sum nums1 = dice_sum nums2 };
+      let ghost delta1 = make (length nums1) 0 in
+      let ghost delta2 = make (length nums2) 0 in
+      assert { decrease_plan nums1 delta1 };
+      assert { increase_plan nums2 delta2 };
+      assert { plan_gain delta1 delta2 = 0 };
+      assert { plan_cost delta1 delta2 = 0 };
+      assert { equalizing_plan nums1 nums2 delta1 delta2 };
+      assert { 0 <= 0 };
+      assert { forall other1 other2: array int.
+        equalizing_plan nums1 nums2 other1 other2 ->
+        0 <= plan_cost other1 other2 };
+      assert { minimum_operations_spec nums1 nums2 0 };
+      0
+    ) else
+    let diff = ref (if sum1 < sum2 then sum2 - sum1 else sum1 - sum2) in
+    assert { !diff > 0 };
+    let c1 = ref 0 in
+    let c2 = ref 0 in
+    let c3 = ref 0 in
+    let c4 = ref 0 in
+    let c5 = ref 0 in
+    if sum1 < sum2 then (
+      for i = 0 to length nums1 - 1 do
+        invariant { 0 <= i <= length nums1 }
+        invariant { gain_count_bounds !c1 !c2 !c3 !c4 !c5 }
+        let gain = 6 - nums1[i] in
+        assert { 0 <= gain <= 5 };
+        if gain = 5 then c5 := !c5 + 1
+        else if gain = 4 then c4 := !c4 + 1
+        else if gain = 3 then c3 := !c3 + 1
+        else if gain = 2 then c2 := !c2 + 1
+        else if gain = 1 then c1 := !c1 + 1
+      done;
+      for i = 0 to length nums2 - 1 do
+        invariant { 0 <= i <= length nums2 }
+        invariant { gain_count_bounds !c1 !c2 !c3 !c4 !c5 }
+        let gain = nums2[i] - 1 in
+        assert { 0 <= gain <= 5 };
+        if gain = 5 then c5 := !c5 + 1
+        else if gain = 4 then c4 := !c4 + 1
+        else if gain = 3 then c3 := !c3 + 1
+        else if gain = 2 then c2 := !c2 + 1
+        else if gain = 1 then c1 := !c1 + 1
+      done
+    ) else (
+      for i = 0 to length nums1 - 1 do
+        invariant { 0 <= i <= length nums1 }
+        invariant { gain_count_bounds !c1 !c2 !c3 !c4 !c5 }
+        let gain = nums1[i] - 1 in
+        assert { 0 <= gain <= 5 };
+        if gain = 5 then c5 := !c5 + 1
+        else if gain = 4 then c4 := !c4 + 1
+        else if gain = 3 then c3 := !c3 + 1
+        else if gain = 2 then c2 := !c2 + 1
+        else if gain = 1 then c1 := !c1 + 1
+      done;
+      for i = 0 to length nums2 - 1 do
+        invariant { 0 <= i <= length nums2 }
+        invariant { gain_count_bounds !c1 !c2 !c3 !c4 !c5 }
+        let gain = 6 - nums2[i] in
+        assert { 0 <= gain <= 5 };
+        if gain = 5 then c5 := !c5 + 1
+        else if gain = 4 then c4 := !c4 + 1
+        else if gain = 3 then c3 := !c3 + 1
+        else if gain = 2 then c2 := !c2 + 1
+        else if gain = 1 then c1 := !c1 + 1
+      done
+    );
+    assert { gain_count_bounds !c1 !c2 !c3 !c4 !c5 };
+    let available = 5 * !c5 + 4 * !c4 + 3 * !c3 + 2 * !c2 + !c1 in
+    assert { available = gain_capacity !c1 !c2 !c3 !c4 !c5 };
+    if available < !diff then (
+      assert { available < !diff };
+      assert { forall delta1 delta2: array int.
+        equalizing_plan nums1 nums2 delta1 delta2 ->
+        plan_gain delta1 delta2 <= available };
+      assert { forall delta1 delta2: array int.
+        not (equalizing_plan nums1 nums2 delta1 delta2) };
+      assert { minimum_operations_spec nums1 nums2 (-1) };
+      -1
+    ) else
+    let initial_diff = !diff in
+    let initial_c1 = !c1 in
+    let initial_c2 = !c2 in
+    let initial_c3 = !c3 in
+    let initial_c4 = !c4 in
+    let initial_c5 = !c5 in
+    assert { gain_count_bounds initial_c1 initial_c2 initial_c3 initial_c4 initial_c5 };
+    assert { initial_diff <= gain_capacity initial_c1 initial_c2 initial_c3 initial_c4 initial_c5 };
+    let ops = ref 0 in
+    while !diff > 0 do
+      invariant { 0 <= !ops }
+      invariant { gain_count_bounds !c1 !c2 !c3 !c4 !c5 }
+      invariant { 0 <= !c1 <= initial_c1 }
+      invariant { 0 <= !c2 <= initial_c2 }
+      invariant { 0 <= !c3 <= initial_c3 }
+      invariant { 0 <= !c4 <= initial_c4 }
+      invariant { 0 <= !c5 <= initial_c5 }
+      invariant { !diff <= gain_capacity !c1 !c2 !c3 !c4 !c5 }
+      invariant { !diff = initial_diff -
+        spent_gain initial_c1 initial_c2 initial_c3 initial_c4 initial_c5
+          !c1 !c2 !c3 !c4 !c5 }
+      invariant { !ops =
+        spent_operations initial_c1 initial_c2 initial_c3 initial_c4 initial_c5
+          !c1 !c2 !c3 !c4 !c5 }
+      invariant { gain_count_total !c1 !c2 !c3 !c4 !c5 <=
+        gain_count_total initial_c1 initial_c2 initial_c3 initial_c4 initial_c5 }
+      variant   { gain_capacity !c1 !c2 !c3 !c4 !c5 }
+      if !c5 > 0 then (
+        assert { 0 <= !c5 - 1 };
+        c5 := !c5 - 1;
+        diff := !diff - 5;
+        ops := !ops + 1
+      ) else if !c4 > 0 then (
+        assert { 0 <= !c4 - 1 };
+        c4 := !c4 - 1;
+        diff := !diff - 4;
+        ops := !ops + 1
+      ) else if !c3 > 0 then (
+        assert { 0 <= !c3 - 1 };
+        c3 := !c3 - 1;
+        diff := !diff - 3;
+        ops := !ops + 1
+      ) else if !c2 > 0 then (
+        assert { 0 <= !c2 - 1 };
+        c2 := !c2 - 1;
+        diff := !diff - 2;
+        ops := !ops + 1
+      ) else (
+        assert { !c5 = 0 /\ !c4 = 0 /\ !c3 = 0 /\ !c2 = 0 };
+        assert { !c1 > 0 };
+        assert { 0 <= !c1 - 1 };
+        c1 := !c1 - 1;
+        diff := !diff - 1;
+        ops := !ops + 1
+      )
+    done;
+    assert { !diff <= 0 };
+    assert { 0 <= !ops };
+    assert { initial_diff <=
+      spent_gain initial_c1 initial_c2 initial_c3 initial_c4 initial_c5
+        !c1 !c2 !c3 !c4 !c5 };
+    assert { exists delta1 delta2: array int.
+      equalizing_plan nums1 nums2 delta1 delta2 /\
+      plan_cost delta1 delta2 = !ops };
+    assert { forall other1 other2: array int.
+      equalizing_plan nums1 nums2 other1 other2 ->
+      !ops <= plan_cost other1 other2 };
+    assert { minimum_operations_spec nums1 nums2 !ops };
+    !ops
+
+end

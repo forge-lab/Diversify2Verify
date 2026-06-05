@@ -1,0 +1,162 @@
+module SpecialArrayWithXElementsGreaterThanOrEqualX_List_Stage3_Imperative
+
+  use int.Int
+  use list.List
+  use list.Length
+  use ref.Ref
+
+  let rec function count_ge (nums: list int) (x: int) : int
+    variant { nums }
+  =
+    match nums with
+    | Nil -> 0
+    | Cons y ys -> (if y >= x then 1 else 0) + count_ge ys x
+    end
+
+  predicate special_value (nums: list int) (x: int) =
+    count_ge nums x = x
+
+  predicate no_special_value (nums: list int) =
+    forall x: int. not (special_value nums x)
+
+  predicate valid_special_result (nums: list int) (r: int) =
+    (r = -1 /\ no_special_value nums) \/
+    (r <> -1 /\ special_value nums r /\
+     (forall x: int. special_value nums x -> x = r))
+
+  let rec lemma count_ge_bounds (nums: list int) (x: int)
+    ensures { 0 <= count_ge nums x <= length nums }
+    variant { nums }
+  =
+    match nums with
+    | Nil ->
+        ()
+    | Cons _ ys ->
+        count_ge_bounds ys x;
+        assert { length nums = 1 + length ys }
+    end
+
+  let rec lemma count_ge_monotone_threshold (nums: list int) (x y: int)
+    requires { x <= y }
+    ensures { count_ge nums y <= count_ge nums x }
+    variant { nums }
+  =
+    match nums with
+    | Nil ->
+        ()
+    | Cons z zs ->
+        count_ge_monotone_threshold zs x y;
+        if z >= y then assert { z >= x } else ();
+        assert { (if z >= y then 1 else 0) <= (if z >= x then 1 else 0) }
+    end
+
+  let lemma special_value_unique (nums: list int) (x y: int)
+    requires { special_value nums x }
+    requires { special_value nums y }
+    ensures { x = y }
+  =
+    if x < y then begin
+      count_ge_monotone_threshold nums x y;
+      assert { count_ge nums y <= count_ge nums x };
+      assert { y <= x };
+      assert { false }
+    end else if y < x then begin
+      count_ge_monotone_threshold nums y x;
+      assert { count_ge nums x <= count_ge nums y };
+      assert { x <= y };
+      assert { false }
+    end else
+      ()
+
+  let list_length_exec (nums: list int) : int
+    ensures { result = length nums }
+    ensures { 0 <= result }
+  =
+    let n = ref 0 in
+    let cur = ref nums in
+    while (match !cur with Nil -> false | Cons _ _ -> true end) do
+      invariant { 0 <= !n }
+      invariant { !n + length !cur = length nums }
+      variant { length !cur }
+      match !cur with
+      | Nil ->
+          absurd
+      | Cons _ ys ->
+          n := !n + 1;
+          cur := ys
+      end
+    done;
+    assert { !cur = Nil };
+    !n
+
+  let count_ge_exec (nums: list int) (x: int) : int
+    ensures { result = count_ge nums x }
+    ensures { 0 <= result <= length nums }
+  =
+    let count = ref 0 in
+    let cur = ref nums in
+    while (match !cur with Nil -> false | Cons _ _ -> true end) do
+      invariant { 0 <= !count }
+      invariant { !count + count_ge !cur x = count_ge nums x }
+      invariant { !count + length !cur <= length nums }
+      variant { length !cur }
+      match !cur with
+      | Nil ->
+          absurd
+      | Cons y ys ->
+          if y >= x then count := !count + 1;
+          cur := ys
+      end
+    done;
+    assert { !cur = Nil };
+    count_ge_bounds nums x;
+    !count
+
+  let special_array_with_x_elements_greater_than_or_equal_x_list (nums: list int) : int
+    ensures { valid_special_result nums result }
+    ensures { result = -1 \/ 0 <= result <= length nums }
+  =
+    let n = list_length_exec nums in
+    let candidate = ref 0 in
+    let result = ref (-1) in
+    while !candidate <= n do
+      invariant { n = length nums }
+      invariant { 0 <= !candidate <= n + 1 }
+      invariant { !result = -1 \/ 0 <= !result < !candidate }
+      invariant { !result <> -1 -> special_value nums !result }
+      invariant {
+        forall x: int. 0 <= x < !candidate ->
+          special_value nums x -> x = !result
+      }
+      variant { n - !candidate + 1 }
+      let old_candidate = !candidate in
+      let matching = count_ge_exec nums old_candidate in
+      if matching = old_candidate then begin
+        assert { special_value nums old_candidate };
+        result := old_candidate
+      end;
+      assert {
+        forall x: int. 0 <= x < old_candidate ->
+          special_value nums x -> x = !result
+      };
+      assert {
+        special_value nums old_candidate -> old_candidate = !result
+      };
+      candidate := old_candidate + 1
+    done;
+    assert { !candidate = n + 1 };
+    if !result = -1 then begin
+      assert {
+        forall x: int. special_value nums x -> false
+      };
+      assert { no_special_value nums };
+      !result
+    end else begin
+      assert { special_value nums !result };
+      assert {
+        forall x: int. special_value nums x -> x = !result
+      };
+      !result
+    end
+
+end

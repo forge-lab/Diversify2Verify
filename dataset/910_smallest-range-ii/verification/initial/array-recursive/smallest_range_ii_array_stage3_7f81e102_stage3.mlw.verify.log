@@ -1,0 +1,168 @@
+== Stage 1: first prover on whole file ==
+Running in /Users/rubenm/Desktop/Diversify2Verify/codex-runs/dataset-merge/910_smallest-range-ii/stage3a/array-recursive/smallest_range_ii_array_stage3_7f81e102/generated/why3/array: why3 session create -o /Users/rubenm/Desktop/Diversify2Verify/codex-runs/dataset-merge/910_smallest-range-ii/stage3a/array-recursive/smallest_range_ii_array_stage3_7f81e102/generated/why3/array/.why3_sessions/smallest_range_ii_array_stage3_7f81e102_stage3_stage1 -P Z3,4.8.6 -t 10 -m 8192 smallest_range_ii_array_stage3_7f81e102_stage3.mlw
+Session created successfully
+Running in /Users/rubenm/Desktop/Diversify2Verify/codex-runs/dataset-merge/910_smallest-range-ii/stage3a/array-recursive/smallest_range_ii_array_stage3_7f81e102/generated/why3/array: why3 bench /Users/rubenm/Desktop/Diversify2Verify/codex-runs/dataset-merge/910_smallest-range-ii/stage3a/array-recursive/smallest_range_ii_array_stage3_7f81e102/generated/why3/array/.why3_sessions/smallest_range_ii_array_stage3_7f81e102_stage3_stage1
+Progress: 4/1/0                       Progress: 3/2/0                       Progress: 2/3/0                       Progress: 1/4/0                       Progress: 0/5/0                       Progress: 0/0/2                       
+Replay completed, saving session... done
+== Stage 1 stats ==
+= Statistics for session /Users/rubenm/Desktop/Diversify2Verify/codex-runs/dataset-merge/910_smallest-range-ii/stage3a/array-recursive/smallest_range_ii_array_stage3_7f81e102/generated/why3/array/.why3_sessions/smallest_range_ii_array_stage3_7f81e102_stage3_stage1
+
+== Number of root goals ==
+  total: 5  proved: 3
+
+== Number of sub goals ==
+  total: 0  proved: 0
+
+== Goals not proved ==
+  +-- file [../../smallest_range_ii_array_stage3_7f81e102_stage3.mlw]
+    +-- theory SmallestRangeIi_Array_Stage3
+      +-- goal sorted_list_of_array_from'vc
+      +-- goal smallest_range_ii_array'vc
+  
+== Goals proved by only one prover ==
+  +-- file [../../smallest_range_ii_array_stage3_7f81e102_stage3.mlw]
+    +-- theory SmallestRangeIi_Array_Stage3
+      +-- goal insert_sorted'vc: Z3 4.8.6
+      +-- goal last_of_nonempty'vc: Z3 4.8.6
+      +-- goal best_width_from'vc: Z3 4.8.6
+  
+1 session(s) read, with a total of 5 proof goals.
+== Unproved root goals after first prover ==
+SmallestRangeIi_Array_Stage3	sorted_list_of_array_from'vc
+SmallestRangeIi_Array_Stage3	smallest_range_ii_array'vc
+== Stage 1: trying remaining goals with prover Alt-Ergo,2.4.0 ==
+---- stage1 | prover: Alt-Ergo,2.4.0 | theory: SmallestRangeIi_Array_Stage3 | goal: sorted_list_of_array_from'vc ----
+File smallest_range_ii_array_stage3_7f81e102_stage3.mlw:
+Goal sorted_list_of_array_from'vc.
+Prover result is: Unknown () (0.01s, 6 steps).
+---- stage1 | prover: Alt-Ergo,2.4.0 | theory: SmallestRangeIi_Array_Stage3 | goal: smallest_range_ii_array'vc ----
+File smallest_range_ii_array_stage3_7f81e102_stage3.mlw:
+Goal smallest_range_ii_array'vc.
+Prover result is: Timeout (10.00s, 71444 steps).
+Remaining after prover Alt-Ergo,2.4.0: 2
+== Stage 1: trying remaining goals with prover CVC4,1.8 ==
+---- stage1 | prover: CVC4,1.8 | theory: SmallestRangeIi_Array_Stage3 | goal: sorted_list_of_array_from'vc ----
+File smallest_range_ii_array_stage3_7f81e102_stage3.mlw:
+Goal sorted_list_of_array_from'vc.
+Prover result is: Unknown (unknown + incomplete) (0.01s, 1498 steps).
+---- stage1 | prover: CVC4,1.8 | theory: SmallestRangeIi_Array_Stage3 | goal: smallest_range_ii_array'vc ----
+File smallest_range_ii_array_stage3_7f81e102_stage3.mlw:
+Goal smallest_range_ii_array'vc.
+Prover result is: Unknown (unknown + incomplete) (0.03s, 4693 steps).
+Remaining after prover CVC4,1.8: 2
+== Goals still unproved after stage 1 ==
+SmallestRangeIi_Array_Stage3	sorted_list_of_array_from'vc
+SmallestRangeIi_Array_Stage3	smallest_range_ii_array'vc
+== Stage 2: split_vc on unproved goal ==
+Target theory: SmallestRangeIi_Array_Stage3
+Target goal  : sorted_list_of_array_from'vc
+---- stage2 | prover: Z3,4.8.6 | theory: SmallestRangeIi_Array_Stage3 | goal: sorted_list_of_array_from'vc ----
+Transforms: split_vc
+File "smallest_range_ii_array_stage3_7f81e102_stage3.mlw", line 59, characters 28-68:
+Sub-goal Variant decrease of goal sorted_list_of_array_from'vc.
+Prover result is: Valid (0.01s, 6002 steps).
+
+File "smallest_range_ii_array_stage3_7f81e102_stage3.mlw", line 59, characters 20-27:
+Sub-goal Index in array bounds of goal sorted_list_of_array_from'vc.
+Prover result is: Timeout (10.00s, 186146793 steps).
+---- stage2 | prover: Alt-Ergo,2.4.0 | theory: SmallestRangeIi_Array_Stage3 | goal: sorted_list_of_array_from'vc ----
+Transforms: split_vc
+File "smallest_range_ii_array_stage3_7f81e102_stage3.mlw", line 59, characters 28-68:
+Sub-goal Variant decrease of goal sorted_list_of_array_from'vc.
+Prover result is: Valid (0.01s, 2 steps).
+
+File "smallest_range_ii_array_stage3_7f81e102_stage3.mlw", line 59, characters 20-27:
+Sub-goal Index in array bounds of goal sorted_list_of_array_from'vc.
+Prover result is: Unknown () (0.01s, 6 steps).
+---- stage2 | prover: CVC4,1.8 | theory: SmallestRangeIi_Array_Stage3 | goal: sorted_list_of_array_from'vc ----
+Transforms: split_vc
+File "smallest_range_ii_array_stage3_7f81e102_stage3.mlw", line 59, characters 28-68:
+Sub-goal Variant decrease of goal sorted_list_of_array_from'vc.
+Prover result is: Valid (0.01s, 1348 steps).
+
+File "smallest_range_ii_array_stage3_7f81e102_stage3.mlw", line 59, characters 20-27:
+Sub-goal Index in array bounds of goal sorted_list_of_array_from'vc.
+Prover result is: Unknown (unknown + incomplete) (0.01s, 2135 steps).
+== Stage 2: split_vc on unproved goal ==
+Target theory: SmallestRangeIi_Array_Stage3
+Target goal  : smallest_range_ii_array'vc
+---- stage2 | prover: Z3,4.8.6 | theory: SmallestRangeIi_Array_Stage3 | goal: smallest_range_ii_array'vc ----
+Transforms: split_vc
+File "smallest_range_ii_array_stage3_7f81e102_stage3.mlw", line 85, characters 15-49:
+Sub-goal Postcondition of goal smallest_range_ii_array'vc.
+Prover result is: Timeout (10.00s, 186858558 steps).
+---- stage2 | prover: Alt-Ergo,2.4.0 | theory: SmallestRangeIi_Array_Stage3 | goal: smallest_range_ii_array'vc ----
+Transforms: split_vc
+File "smallest_range_ii_array_stage3_7f81e102_stage3.mlw", line 85, characters 15-49:
+Sub-goal Postcondition of goal smallest_range_ii_array'vc.
+Prover result is: Timeout (10.00s, 46711 steps).
+---- stage2 | prover: CVC4,1.8 | theory: SmallestRangeIi_Array_Stage3 | goal: smallest_range_ii_array'vc ----
+Transforms: split_vc
+File "smallest_range_ii_array_stage3_7f81e102_stage3.mlw", line 85, characters 15-49:
+Sub-goal Postcondition of goal smallest_range_ii_array'vc.
+Prover result is: Unknown (unknown + incomplete) (0.02s, 3935 steps).
+== Goals still unproved after stage 2 (split_vc) ==
+SmallestRangeIi_Array_Stage3	sorted_list_of_array_from'vc
+SmallestRangeIi_Array_Stage3	smallest_range_ii_array'vc
+== Stage 3: split_vc + inline_all on still-unproved goal ==
+Target theory: SmallestRangeIi_Array_Stage3
+Target goal  : sorted_list_of_array_from'vc
+---- stage3 | prover: Z3,4.8.6 | theory: SmallestRangeIi_Array_Stage3 | goal: sorted_list_of_array_from'vc ----
+Transforms: split_vc inline_all
+File "smallest_range_ii_array_stage3_7f81e102_stage3.mlw", line 59, characters 28-68:
+Sub-goal Variant decrease of goal sorted_list_of_array_from'vc.
+Prover result is: Valid (0.01s, 7336 steps).
+
+File "smallest_range_ii_array_stage3_7f81e102_stage3.mlw", line 59, characters 20-27:
+Sub-goal Index in array bounds of goal sorted_list_of_array_from'vc.
+Prover result is: Unknown (unknown) (0.01s, 24541 steps).
+---- stage3 | prover: Alt-Ergo,2.4.0 | theory: SmallestRangeIi_Array_Stage3 | goal: sorted_list_of_array_from'vc ----
+Transforms: split_vc inline_all
+File "smallest_range_ii_array_stage3_7f81e102_stage3.mlw", line 59, characters 28-68:
+Sub-goal Variant decrease of goal sorted_list_of_array_from'vc.
+Prover result is: Valid (0.01s, 5 steps).
+
+File "smallest_range_ii_array_stage3_7f81e102_stage3.mlw", line 59, characters 20-27:
+Sub-goal Index in array bounds of goal sorted_list_of_array_from'vc.
+Prover result is: Unknown () (0.01s, 9 steps).
+---- stage3 | prover: CVC4,1.8 | theory: SmallestRangeIi_Array_Stage3 | goal: sorted_list_of_array_from'vc ----
+Transforms: split_vc inline_all
+File "smallest_range_ii_array_stage3_7f81e102_stage3.mlw", line 59, characters 28-68:
+Sub-goal Variant decrease of goal sorted_list_of_array_from'vc.
+Prover result is: Valid (0.02s, 2093 steps).
+
+File "smallest_range_ii_array_stage3_7f81e102_stage3.mlw", line 59, characters 20-27:
+Sub-goal Index in array bounds of goal sorted_list_of_array_from'vc.
+Prover result is: Unknown (unknown + incomplete) (0.02s, 2903 steps).
+== Stage 3: split_vc + inline_all on still-unproved goal ==
+Target theory: SmallestRangeIi_Array_Stage3
+Target goal  : smallest_range_ii_array'vc
+---- stage3 | prover: Z3,4.8.6 | theory: SmallestRangeIi_Array_Stage3 | goal: smallest_range_ii_array'vc ----
+Transforms: split_vc inline_all
+File "smallest_range_ii_array_stage3_7f81e102_stage3.mlw", line 85, characters 15-49:
+Sub-goal Postcondition of goal smallest_range_ii_array'vc.
+Prover result is: Timeout (10.00s, 185792832 steps).
+---- stage3 | prover: Alt-Ergo,2.4.0 | theory: SmallestRangeIi_Array_Stage3 | goal: smallest_range_ii_array'vc ----
+Transforms: split_vc inline_all
+File "smallest_range_ii_array_stage3_7f81e102_stage3.mlw", line 85, characters 15-49:
+Sub-goal Postcondition of goal smallest_range_ii_array'vc.
+Prover result is: Timeout (10.00s, 162430 steps).
+---- stage3 | prover: CVC4,1.8 | theory: SmallestRangeIi_Array_Stage3 | goal: smallest_range_ii_array'vc ----
+Transforms: split_vc inline_all
+File "smallest_range_ii_array_stage3_7f81e102_stage3.mlw", line 85, characters 15-49:
+Sub-goal Postcondition of goal smallest_range_ii_array'vc.
+Prover result is: Unknown (unknown + incomplete) (0.02s, 5421 steps).
+== Final summary ==
+Unproved root goals after first prover : 2
+Remaining failures after split_vc      : 2
+Remaining failures after stage 3       : 2
+Detailed logs stored in                : /Users/rubenm/Desktop/Diversify2Verify/codex-runs/dataset-merge/910_smallest-range-ii/stage3a/array-recursive/smallest_range_ii_array_stage3_7f81e102/generated/why3/array/.why3_sessions/smallest_range_ii_array_stage3_7f81e102_stage3_logs
+Still unproved goals:
+SmallestRangeIi_Array_Stage3	sorted_list_of_array_from'vc
+SmallestRangeIi_Array_Stage3	smallest_range_ii_array'vc
+VERIFY_RESULT: FAILURE
+VERIFY_REASON: unproved_goals_remain
+VERIFY_STAGE: stage3
+VERIFY_ROOT_TOTAL: 5
+VERIFY_ROOT_PROVED: 3
+VERIFY_ROOT_REMAINING: 2

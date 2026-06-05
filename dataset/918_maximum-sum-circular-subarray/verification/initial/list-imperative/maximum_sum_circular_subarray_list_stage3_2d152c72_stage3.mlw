@@ -1,0 +1,88 @@
+module MaximumSumCircularSubarray_List_Spec
+
+  use int.Int
+  use list.List
+  use list.Append
+  use list.Sum
+  use list.Length
+  use ref.Ref
+
+  predicate linear_segment (nums: list int) (seg: list int) =
+    seg <> Nil /\
+    exists left right: list int.
+      nums = (left ++ seg) ++ right
+
+  predicate wrapped_segment (nums: list int) (seg: list int) =
+    seg <> Nil /\
+    exists prefix middle suffix: list int.
+      prefix <> Nil /\
+      suffix <> Nil /\
+      nums = (prefix ++ middle) ++ suffix /\
+      seg = suffix ++ prefix
+
+  predicate circular_segment (nums: list int) (seg: list int) =
+    linear_segment nums seg \/ wrapped_segment nums seg
+
+  predicate is_max_circular_subarray_sum (nums: list int) (answer: int) =
+    nums <> Nil /\
+    (exists seg: list int. circular_segment nums seg /\ answer = sum seg) /\
+    (forall seg: list int. circular_segment nums seg -> sum seg <= answer)
+
+  let max_int (x: int) (y: int) : int
+    ensures { result = x \/ result = y }
+    ensures { result >= x /\ result >= y }
+  =
+    if x >= y then x else y
+
+  let min_int (x: int) (y: int) : int
+    ensures { result = x \/ result = y }
+    ensures { result <= x /\ result <= y }
+  =
+    if x <= y then x else y
+
+  let maximum_sum_circular_subarray_list (nums: list int) : int
+    requires { nums <> Nil }
+    ensures  { is_max_circular_subarray_sum nums result }
+  =
+    match nums with
+    | Nil -> 0
+    | Cons first rest ->
+        let total = ref first in
+        let max_ending = ref first in
+        let max_so_far = ref first in
+        let min_ending = ref first in
+        let min_so_far = ref first in
+        let cur = ref rest in
+        while (match !cur with Nil -> false | Cons _ _ -> true end) do
+          invariant { length !cur >= 0 }
+          invariant { exists processed: list int.
+            nums = Cons first (processed ++ !cur) /\
+            !total = sum (Cons first processed) }
+          invariant { !max_so_far >= !max_ending }
+          invariant { !min_so_far <= !min_ending }
+          variant { length !cur }
+
+          match !cur with
+          | Nil -> ()
+          | Cons x xs ->
+              total := !total + x;
+              let best_extend = !max_ending + x in
+              max_ending := max_int x best_extend;
+              max_so_far := max_int !max_so_far !max_ending;
+              let worst_extend = !min_ending + x in
+              min_ending := min_int x worst_extend;
+              min_so_far := min_int !min_so_far !min_ending;
+              cur := xs
+          end
+        done;
+        assert { !cur = Nil };
+        assert { exists processed: list int.
+          nums = Cons first (processed ++ Nil) /\
+          !total = sum (Cons first processed) };
+        if !max_so_far < 0 then
+          !max_so_far
+        else
+          max_int !max_so_far (!total - !min_so_far)
+    end
+
+end

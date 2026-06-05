@@ -1,0 +1,98 @@
+module MaximumGoodSubarraySum_List_Stage3_Imperative
+
+  use int.Int
+  use int.Abs
+  use list.List
+  use list.Length
+  use list.Append
+  use list.Sum
+  use ref.Ref
+
+  predicate first_value (l: list int) (x: int) =
+    match l with
+    | Nil -> false
+    | Cons y _ -> x = y
+    end
+
+  let rec predicate last_value (l: list int) (x: int)
+    variant { l }
+  =
+    match l with
+    | Nil -> false
+    | Cons y Nil -> x = y
+    | Cons _ ys -> last_value ys x
+    end
+
+  predicate good_segment (seg: list int) (k: int) =
+    exists first last: int.
+      first_value seg first /\
+      last_value seg last /\
+      abs (first - last) = k
+
+  predicate contiguous_segment (seg: list int) (nums: list int) =
+    exists left right: list int. nums = left ++ (seg ++ right)
+
+  predicate good_subarray_sum (nums: list int) (k: int) (s: int) =
+    exists seg: list int.
+      contiguous_segment seg nums /\
+      good_segment seg k /\
+      s = sum seg
+
+  predicate has_good_subarray_sum (nums: list int) (k: int) =
+    exists s: int. good_subarray_sum nums k s
+
+  predicate maximum_good_subarray_sum_spec (nums: list int) (k: int) (r: int) =
+    (has_good_subarray_sum nums k ->
+       good_subarray_sum nums k r /\
+       (forall s: int. good_subarray_sum nums k s -> s <= r)) /\
+    ((not (has_good_subarray_sum nums k)) -> r = 0)
+
+  let maximum_good_subarray_sum_list (nums: list int) (k: int) : int
+    requires { length nums >= 2 }
+    requires { k > 0 }
+    ensures  { maximum_good_subarray_sum_spec nums k result }
+  =
+    let found = ref false in
+    let best = ref 0 in
+    let starts = ref nums in
+    while (match !starts with Nil -> false | Cons _ _ -> true end) do
+      invariant { 0 <= length !starts }
+      invariant { not !found -> !best = 0 }
+      variant { length !starts }
+
+      match !starts with
+      | Nil ->
+          assert { false }
+      | Cons h t ->
+          let first = h in
+          let running_sum = ref h in
+          let cur = ref t in
+          while (match !cur with Nil -> false | Cons _ _ -> true end) do
+            invariant { 0 <= length !cur }
+            invariant { not !found -> !best = 0 }
+            variant { length !cur }
+
+            match !cur with
+            | Nil ->
+                assert { false }
+            | Cons y ys ->
+                running_sum := !running_sum + y;
+                if abs (first - y) = k then begin
+                  if not !found then begin
+                    found := true;
+                    best := !running_sum
+                  end else if !running_sum > !best then begin
+                    best := !running_sum
+                  end
+                end;
+                cur := ys
+            end
+          done;
+          assert { !cur = Nil };
+          starts := t
+      end
+    done;
+    assert { !starts = Nil };
+    if !found then !best else 0
+
+end

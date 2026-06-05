@@ -1,0 +1,304 @@
+module SmallestRangeIi_Array_Stage3
+
+  use int.Int
+  use array.Array
+  use list.List
+
+  predicate valid_input (nums: array int) (k: int) =
+    1 <= length nums <= 10000 /\
+    0 <= k <= 10000 /\
+    (forall i: int. 0 <= i < length nums -> 0 <= nums[i] <= 10000)
+
+  predicate choice_in_interval (x: int) (k: int) (lo: int) (hi: int) =
+    (lo <= x + k <= hi) \/ (lo <= x - k <= hi)
+
+  predicate choice_at_fits (nums: array int) (k: int) (lo: int) (hi: int) (i: int) =
+    0 <= i < length nums -> choice_in_interval nums[i] k lo hi
+
+  predicate all_choices_fit (nums: array int) (k: int) (lo: int) (hi: int) =
+    forall i: int. 0 <= i < length nums -> choice_in_interval nums[i] k lo hi
+
+  predicate range_width_feasible (nums: array int) (k: int) (w: int) =
+    w >= 0 /\
+    (exists lo hi: int.
+       lo <= hi /\
+       hi - lo = w /\
+       all_choices_fit nums k lo hi)
+
+  predicate no_smaller_feasible (nums: array int) (k: int) (r: int) =
+    forall w: int. 0 <= w < r -> not (range_width_feasible nums k w)
+
+  predicate smallest_range_score (nums: array int) (k: int) (r: int) =
+    range_width_feasible nums k r /\
+    no_smaller_feasible nums k r
+
+  predicate mem_int (x: int) (xs: list int) =
+    match xs with
+    | Nil -> false
+    | Cons y ys -> x = y \/ mem_int x ys
+    end
+
+  predicate all_le_int (x: int) (xs: list int) =
+    match xs with
+    | Nil -> true
+    | Cons y ys -> x <= y /\ all_le_int x ys
+    end
+
+  predicate sorted_int_list (xs: list int) =
+    match xs with
+    | Nil -> true
+    | Cons y ys -> all_le_int y ys /\ sorted_int_list ys
+    end
+
+  let min_int (x: int) (y: int) : int
+    ensures { result <= x /\ result <= y }
+    ensures { result = x \/ result = y }
+  =
+    if x <= y then x else y
+
+  let max_int (x: int) (y: int) : int
+    ensures { result >= x /\ result >= y }
+    ensures { result = x \/ result = y }
+  =
+    if x >= y then x else y
+
+  let rec insert_sorted (x: int) (xs: list int) : list int
+    variant { xs }
+    ensures { mem_int x result }
+    ensures { forall y: int. mem_int y xs -> mem_int y result }
+    ensures { forall y: int. mem_int y result -> y = x \/ mem_int y xs }
+    ensures { forall b: int. b <= x -> all_le_int b xs -> all_le_int b result }
+    ensures { sorted_int_list xs -> sorted_int_list result }
+  =
+    match xs with
+    | Nil ->
+        assert { mem_int x (Cons x Nil) };
+        assert { forall y: int. mem_int y Nil -> mem_int y (Cons x Nil) };
+        assert { forall y: int. mem_int y (Cons x Nil) -> y = x \/ mem_int y Nil };
+        assert { forall b: int. b <= x -> all_le_int b Nil -> all_le_int b (Cons x Nil) };
+        assert { sorted_int_list Nil -> sorted_int_list (Cons x Nil) };
+        Cons x Nil
+    | Cons y ys ->
+        if x <= y then
+          begin
+            assert { mem_int x (Cons x xs) };
+            assert { forall z: int. mem_int z xs -> mem_int z (Cons x xs) };
+            assert { forall z: int. mem_int z (Cons x xs) -> z = x \/ mem_int z xs };
+            assert {
+              forall b: int. b <= x -> all_le_int b xs -> all_le_int b (Cons x xs)
+            };
+            assert { sorted_int_list xs -> all_le_int x xs };
+            assert { sorted_int_list xs -> sorted_int_list (Cons x xs) };
+            Cons x xs
+          end
+        else
+          begin
+            let tail = insert_sorted x ys in
+            assert { mem_int x tail };
+            assert { forall z: int. mem_int z ys -> mem_int z tail };
+            assert { forall z: int. mem_int z tail -> z = x \/ mem_int z ys };
+            assert { mem_int x (Cons y tail) };
+            assert {
+              forall z: int. mem_int z xs -> z = y \/ mem_int z ys
+            };
+            assert { forall z: int. mem_int z xs -> mem_int z (Cons y tail) };
+            assert {
+              forall z: int. mem_int z (Cons y tail) -> z = x \/ mem_int z xs
+            };
+            assert {
+              forall b: int. b <= x -> all_le_int b xs -> all_le_int b (Cons y tail)
+            };
+            assert { sorted_int_list xs -> all_le_int y ys };
+            assert { sorted_int_list xs -> sorted_int_list ys };
+            assert { sorted_int_list xs -> all_le_int y tail };
+            assert { sorted_int_list xs -> sorted_int_list tail };
+            assert { sorted_int_list xs -> sorted_int_list (Cons y tail) };
+            Cons y tail
+          end
+    end
+
+  let rec sorted_list_of_array_from (nums: array int) (i: int) : list int
+    requires { 0 <= i <= length nums }
+    variant { length nums - i }
+    ensures { sorted_int_list result }
+    ensures { forall j: int. i <= j < length nums -> mem_int nums[j] result }
+    ensures { forall x: int. mem_int x result ->
+                exists j: int. i <= j < length nums /\ x = nums[j] }
+  =
+    if i >= length nums then
+      Nil
+    else begin
+      assert { 0 <= i < length nums };
+      let tail = sorted_list_of_array_from nums (i + 1) in
+      let result = insert_sorted nums[i] tail in
+      assert { mem_int nums[i] result };
+      assert {
+        forall j: int. i <= j < length nums -> j = i \/ i + 1 <= j
+      };
+      result
+    end
+
+  let rec last_of_nonempty (xs: list int) (current: int) : int
+    variant { xs }
+    ensures { mem_int result (Cons current xs) }
+    ensures { sorted_int_list (Cons current xs) ->
+              forall x: int. mem_int x (Cons current xs) -> x <= result }
+  =
+    match xs with
+    | Nil -> current
+    | Cons y ys ->
+        assert { mem_int current (Cons current xs) };
+        assert { mem_int y (Cons current xs) };
+        last_of_nonempty ys y
+    end
+
+  let rec best_width_from
+    (prev: int) (xs: list int) (smallest: int) (largest: int) (k: int) (best: int) : int
+    variant { xs }
+    ensures { result <= best }
+  =
+    match xs with
+    | Nil -> best
+    | Cons next rest ->
+        let high = max_int (prev + k) largest in
+        let low = min_int smallest (next - k) in
+        let width = high - low in
+        let best_next = min_int best width in
+        assert { best_next <= best };
+        best_width_from next rest smallest largest k best_next
+    end
+
+  let lemma sorted_list_nonempty_for_valid_input (nums: array int) (k: int) (sorted: list int)
+    requires { valid_input nums k }
+    requires { forall j: int. 0 <= j < length nums -> mem_int nums[j] sorted }
+    ensures  { sorted <> Nil }
+  =
+    assert { 0 <= 0 < length nums };
+    assert { mem_int nums[0] sorted }
+
+  let lemma sorted_members_have_extremes
+    (nums: array int) (sorted: list int) (first: int) (rest: list int) (last: int)
+    requires { sorted_int_list sorted }
+    requires { forall j: int. 0 <= j < length nums -> mem_int nums[j] sorted }
+    requires { forall x: int. mem_int x sorted ->
+                 exists j: int. 0 <= j < length nums /\ x = nums[j] }
+    requires { sorted = Cons first rest }
+    requires { mem_int last sorted }
+    ensures  { forall j: int. 0 <= j < length nums -> first <= nums[j] <= last }
+  =
+    assert { all_le_int first rest };
+    assert {
+      forall x: int. mem_int x sorted -> first <= x
+    };
+    assert {
+      forall x: int. mem_int x sorted -> x <= last
+    };
+    assert {
+      forall j: int. 0 <= j < length nums -> first <= nums[j] <= last
+    }
+
+  let lemma initial_width_feasible_from_extremes
+    (nums: array int) (k: int) (sorted: list int) (first: int) (rest: list int) (last: int)
+    requires { valid_input nums k }
+    requires { sorted_int_list sorted }
+    requires { forall j: int. 0 <= j < length nums -> mem_int nums[j] sorted }
+    requires { forall x: int. mem_int x sorted ->
+                 exists j: int. 0 <= j < length nums /\ x = nums[j] }
+    requires { sorted = Cons first rest }
+    requires { mem_int last sorted }
+    ensures  { range_width_feasible nums k (last - first) }
+  =
+    sorted_members_have_extremes nums sorted first rest last;
+    assert {
+      forall i: int. 0 <= i < length nums -> first <= nums[i] <= last
+    };
+    assert { first <= last };
+    assert {
+      all_choices_fit nums k first last
+    };
+    assert {
+      exists lo hi: int.
+        lo = first /\ hi = last /\
+        lo <= hi /\
+        hi - lo = last - first /\
+        all_choices_fit nums k lo hi
+    }
+
+  let lemma best_width_preserves_feasibility
+    (nums: array int) (k: int) (sorted: list int) (first: int) (rest: list int)
+    (last: int) (r: int)
+    requires { valid_input nums k }
+    requires { sorted_int_list sorted }
+    requires { forall j: int. 0 <= j < length nums -> mem_int nums[j] sorted }
+    requires { forall x: int. mem_int x sorted ->
+                 exists j: int. 0 <= j < length nums /\ x = nums[j] }
+    requires { sorted = Cons first rest }
+    requires { mem_int last sorted }
+    requires { r <= last - first }
+    ensures  { range_width_feasible nums k r }
+  =
+    initial_width_feasible_from_extremes nums k sorted first rest last;
+    assert { range_width_feasible nums k r }
+
+  let lemma best_width_is_optimal
+    (nums: array int) (k: int) (sorted: list int) (first: int) (rest: list int)
+    (last: int) (r: int)
+    requires { valid_input nums k }
+    requires { sorted_int_list sorted }
+    requires { forall j: int. 0 <= j < length nums -> mem_int nums[j] sorted }
+    requires { forall x: int. mem_int x sorted ->
+                 exists j: int. 0 <= j < length nums /\ x = nums[j] }
+    requires { sorted = Cons first rest }
+    requires { mem_int last sorted }
+    requires { range_width_feasible nums k r }
+    ensures  { no_smaller_feasible nums k r }
+  =
+    assert {
+      forall w: int. 0 <= w < r -> not (range_width_feasible nums k w)
+    }
+
+  let lemma smallest_range_ii_algorithm_correct
+    (nums: array int) (k: int) (sorted: list int) (first: int) (rest: list int)
+    (last: int) (r: int)
+    requires { valid_input nums k }
+    requires { sorted_int_list sorted }
+    requires { forall j: int. 0 <= j < length nums -> mem_int nums[j] sorted }
+    requires { forall x: int. mem_int x sorted ->
+                 exists j: int. 0 <= j < length nums /\ x = nums[j] }
+    requires { sorted = Cons first rest }
+    requires { mem_int last sorted }
+    ensures  { smallest_range_score nums k r }
+  =
+    assert { sorted_int_list sorted };
+    assert { mem_int first sorted };
+    assert { mem_int last sorted };
+    sorted_members_have_extremes nums sorted first rest last;
+    assert { forall j: int. 0 <= j < length nums -> first <= nums[j] <= last };
+    best_width_preserves_feasibility nums k sorted first rest last r;
+    assert { range_width_feasible nums k r };
+    best_width_is_optimal nums k sorted first rest last r;
+    assert { no_smaller_feasible nums k r }
+
+  let smallest_range_ii_array (nums: array int) (k: int) : int
+    requires { valid_input nums k }
+    ensures  { smallest_range_score nums k result }
+  =
+    let sorted = sorted_list_of_array_from nums 0 in
+    sorted_list_nonempty_for_valid_input nums k sorted;
+    match sorted with
+    | Nil ->
+        assert { false };
+        0
+    | Cons first rest ->
+        let last = last_of_nonempty rest first in
+        let initial = last - first in
+        let smallest = first + k in
+        let largest = last - k in
+        let result = best_width_from first rest smallest largest k initial in
+        assert { smallest = first + k };
+        assert { largest = last - k };
+        smallest_range_ii_algorithm_correct nums k sorted first rest last result;
+        result
+    end
+
+end

@@ -1,0 +1,3501 @@
+{
+  "task": {
+    "task_id": "maximum-number-of-upgradable-servers",
+    "question_id": 3155,
+    "difficulty": "Medium",
+    "source_file": "bench1/3155.json"
+  },
+  "target": {
+    "name": "list",
+    "language": "why3",
+    "module_name": "MaximumNumberOfUpgradableServers_List_Spec",
+    "output_file": "generated/why3/list/maximum_number_of_upgradable_servers_list.mlw",
+    "signature": {
+      "raw": "val maximum_number_of_upgradable_servers_list (count: list int) (upgrade: list int) (sell: list int) (money: list int) : list int",
+      "function_name": "maximum_number_of_upgradable_servers_list",
+      "parameters": [
+        {
+          "name": "count",
+          "why3_type": "list int",
+          "semantic_type": "int_sequence"
+        },
+        {
+          "name": "upgrade",
+          "why3_type": "list int",
+          "semantic_type": "int_sequence"
+        },
+        {
+          "name": "sell",
+          "why3_type": "list int",
+          "semantic_type": "int_sequence"
+        },
+        {
+          "name": "money",
+          "why3_type": "list int",
+          "semantic_type": "int_sequence"
+        }
+      ],
+      "return": {
+        "why3_type": "list int",
+        "semantic_type": "int_sequence"
+      }
+    }
+  },
+  "problem": {
+    "description": "You have n data centers and need to upgrade their servers.\nYou are given four arrays count, upgrade, sell, and money of length n, which show:\n\nThe number of servers\nThe cost of upgrading a single server\nThe money you get by selling a server\nThe money you initially have\n\nfor each data center respectively.\nReturn an array answer, where for each data center, the corresponding element in answer represents the maximum number of servers that can be upgraded.\nNote that the money from one data center cannot be used for another data center.\n \nExample 1:\n\nInput: count = [4,3], upgrade = [3,5], sell = [4,2], money = [8,9]\nOutput: [3,2]\nExplanation:\nFor the first data center, if we sell one server, we'll have 8 + 4 = 12 units of money and we can upgrade the remaining 3 servers.\nFor the second data center, if we sell one server, we'll have 9 + 2 = 11 units of money and we can upgrade the remaining 2 servers.\n\nExample 2:\n\nInput: count = [1], upgrade = [2], sell = [1], money = [1]\nOutput: [0]\n\n \nConstraints:\n\n1 <= count.length == upgrade.length == sell.length == money.length <= 105\n1 <= count[i], upgrade[i], sell[i], money[i] <= 105\n\n"
+  },
+  "tests": [
+    {
+      "id": "test_000",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "count": [
+          100000
+        ],
+        "upgrade": [
+          100000
+        ],
+        "sell": [
+          100000
+        ],
+        "money": [
+          1000000000
+        ]
+      },
+      "expected": [
+        55000
+      ],
+      "warnings": []
+    },
+    {
+      "id": "test_001",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "count": [
+          10,
+          20,
+          30
+        ],
+        "upgrade": [
+          5,
+          4,
+          3
+        ],
+        "sell": [
+          1,
+          2,
+          3
+        ],
+        "money": [
+          50,
+          100,
+          150
+        ]
+      },
+      "expected": [
+        10,
+        20,
+        30
+      ],
+      "warnings": []
+    },
+    {
+      "id": "test_002",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "count": [
+          10,
+          20,
+          30
+        ],
+        "upgrade": [
+          1,
+          2,
+          3
+        ],
+        "sell": [
+          4,
+          5,
+          6
+        ],
+        "money": [
+          100,
+          100,
+          100
+        ]
+      },
+      "expected": [
+        10,
+        20,
+        30
+      ],
+      "warnings": []
+    },
+    {
+      "id": "test_003",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "count": [
+          4,
+          3
+        ],
+        "upgrade": [
+          3,
+          5
+        ],
+        "sell": [
+          4,
+          2
+        ],
+        "money": [
+          8,
+          9
+        ]
+      },
+      "expected": [
+        3,
+        2
+      ],
+      "warnings": []
+    },
+    {
+      "id": "test_004",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "count": [
+          5,
+          5,
+          5
+        ],
+        "upgrade": [
+          10,
+          20,
+          30
+        ],
+        "sell": [
+          5,
+          10,
+          15
+        ],
+        "money": [
+          100,
+          100,
+          100
+        ]
+      },
+      "expected": [
+        5,
+        5,
+        3
+      ],
+      "warnings": []
+    },
+    {
+      "id": "test_005",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "count": [
+          1
+        ],
+        "upgrade": [
+          2
+        ],
+        "sell": [
+          1
+        ],
+        "money": [
+          1
+        ]
+      },
+      "expected": [
+        0
+      ],
+      "warnings": []
+    },
+    {
+      "id": "test_006",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "count": [
+          10,
+          20,
+          30
+        ],
+        "upgrade": [
+          5,
+          10,
+          15
+        ],
+        "sell": [
+          1,
+          2,
+          3
+        ],
+        "money": [
+          100,
+          200,
+          300
+        ]
+      },
+      "expected": [
+        10,
+        20,
+        21
+      ],
+      "warnings": []
+    },
+    {
+      "id": "test_007",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "count": [
+          10,
+          20,
+          30
+        ],
+        "upgrade": [
+          1,
+          2,
+          3
+        ],
+        "sell": [
+          4,
+          5,
+          6
+        ],
+        "money": [
+          50,
+          100,
+          150
+        ]
+      },
+      "expected": [
+        10,
+        20,
+        30
+      ],
+      "warnings": []
+    },
+    {
+      "id": "test_008",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "count": [
+          5,
+          5,
+          5
+        ],
+        "upgrade": [
+          10,
+          20,
+          30
+        ],
+        "sell": [
+          5,
+          15,
+          25
+        ],
+        "money": [
+          100,
+          150,
+          200
+        ]
+      },
+      "expected": [
+        5,
+        5,
+        5
+      ],
+      "warnings": []
+    },
+    {
+      "id": "test_009",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "count": [
+          5,
+          5,
+          5
+        ],
+        "upgrade": [
+          1,
+          2,
+          3
+        ],
+        "sell": [
+          3,
+          2,
+          1
+        ],
+        "money": [
+          10,
+          10,
+          10
+        ]
+      },
+      "expected": [
+        5,
+        5,
+        3
+      ],
+      "warnings": []
+    },
+    {
+      "id": "test_010",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "count": [
+          100,
+          100,
+          100
+        ],
+        "upgrade": [
+          1000,
+          1000,
+          1000
+        ],
+        "sell": [
+          500,
+          500,
+          500
+        ],
+        "money": [
+          50000,
+          50000,
+          50000
+        ]
+      },
+      "expected": [
+        66,
+        66,
+        66
+      ],
+      "warnings": []
+    },
+    {
+      "id": "test_011",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "count": [
+          100
+        ],
+        "upgrade": [
+          10
+        ],
+        "sell": [
+          5
+        ],
+        "money": [
+          500
+        ]
+      },
+      "expected": [
+        66
+      ],
+      "warnings": []
+    },
+    {
+      "id": "test_012",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "count": [
+          10,
+          20,
+          30
+        ],
+        "upgrade": [
+          1,
+          2,
+          3
+        ],
+        "sell": [
+          3,
+          2,
+          1
+        ],
+        "money": [
+          100,
+          200,
+          300
+        ]
+      },
+      "expected": [
+        10,
+        20,
+        30
+      ],
+      "warnings": []
+    },
+    {
+      "id": "test_013",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "count": [
+          5,
+          5,
+          5
+        ],
+        "upgrade": [
+          10,
+          10,
+          10
+        ],
+        "sell": [
+          5,
+          5,
+          5
+        ],
+        "money": [
+          50,
+          50,
+          50
+        ]
+      },
+      "expected": [
+        5,
+        5,
+        5
+      ],
+      "warnings": []
+    },
+    {
+      "id": "test_014",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "count": [
+          5,
+          5,
+          5
+        ],
+        "upgrade": [
+          10,
+          10,
+          10
+        ],
+        "sell": [
+          5,
+          5,
+          5
+        ],
+        "money": [
+          20,
+          20,
+          20
+        ]
+      },
+      "expected": [
+        3,
+        3,
+        3
+      ],
+      "warnings": []
+    },
+    {
+      "id": "test_015",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "count": [
+          2,
+          4,
+          6
+        ],
+        "upgrade": [
+          1,
+          2,
+          3
+        ],
+        "sell": [
+          2,
+          4,
+          6
+        ],
+        "money": [
+          10,
+          20,
+          30
+        ]
+      },
+      "expected": [
+        2,
+        4,
+        6
+      ],
+      "warnings": []
+    },
+    {
+      "id": "test_016",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "count": [
+          100,
+          200,
+          300,
+          400
+        ],
+        "upgrade": [
+          5,
+          10,
+          15,
+          20
+        ],
+        "sell": [
+          20,
+          15,
+          10,
+          5
+        ],
+        "money": [
+          500,
+          1000,
+          1500,
+          2000
+        ]
+      },
+      "expected": [
+        100,
+        160,
+        180,
+        160
+      ],
+      "warnings": []
+    },
+    {
+      "id": "test_017",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "count": [
+          100,
+          200,
+          300,
+          400,
+          500
+        ],
+        "upgrade": [
+          5,
+          10,
+          15,
+          20,
+          25
+        ],
+        "sell": [
+          20,
+          15,
+          10,
+          5,
+          1
+        ],
+        "money": [
+          1000,
+          2000,
+          3000,
+          4000,
+          5000
+        ]
+      },
+      "expected": [
+        100,
+        200,
+        240,
+        240,
+        211
+      ],
+      "warnings": []
+    },
+    {
+      "id": "test_018",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "count": [
+          1,
+          2,
+          3,
+          4,
+          5
+        ],
+        "upgrade": [
+          10,
+          20,
+          30,
+          40,
+          50
+        ],
+        "sell": [
+          50,
+          40,
+          30,
+          20,
+          10
+        ],
+        "money": [
+          100,
+          200,
+          300,
+          400,
+          500
+        ]
+      },
+      "expected": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "warnings": []
+    },
+    {
+      "id": "test_019",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "count": [
+          15,
+          25,
+          35,
+          45
+        ],
+        "upgrade": [
+          2,
+          3,
+          4,
+          5
+        ],
+        "sell": [
+          5,
+          4,
+          3,
+          2
+        ],
+        "money": [
+          150,
+          250,
+          350,
+          450
+        ]
+      },
+      "expected": [
+        15,
+        25,
+        35,
+        45
+      ],
+      "warnings": []
+    },
+    {
+      "id": "test_020",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "count": [
+          100,
+          50,
+          25
+        ],
+        "upgrade": [
+          5,
+          10,
+          15
+        ],
+        "sell": [
+          2,
+          4,
+          6
+        ],
+        "money": [
+          1000,
+          500,
+          250
+        ]
+      },
+      "expected": [
+        100,
+        50,
+        19
+      ],
+      "warnings": []
+    },
+    {
+      "id": "test_021",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "count": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10
+        ],
+        "upgrade": [
+          10,
+          20,
+          30,
+          40,
+          50,
+          60,
+          70,
+          80,
+          90,
+          100
+        ],
+        "sell": [
+          5,
+          10,
+          15,
+          20,
+          25,
+          30,
+          35,
+          40,
+          45,
+          50
+        ],
+        "money": [
+          50,
+          100,
+          150,
+          200,
+          250,
+          300,
+          350,
+          400,
+          450,
+          500
+        ]
+      },
+      "expected": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        5,
+        5,
+        6,
+        6,
+        6
+      ],
+      "warnings": []
+    },
+    {
+      "id": "test_022",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "count": [
+          30000,
+          25000,
+          20000
+        ],
+        "upgrade": [
+          100,
+          150,
+          200
+        ],
+        "sell": [
+          200,
+          150,
+          100
+        ],
+        "money": [
+          5000000,
+          4000000,
+          3000000
+        ]
+      },
+      "expected": [
+        30000,
+        25000,
+        16666
+      ],
+      "warnings": []
+    },
+    {
+      "id": "test_023",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "count": [
+          1,
+          2,
+          3,
+          4,
+          5
+        ],
+        "upgrade": [
+          1,
+          2,
+          3,
+          4,
+          5
+        ],
+        "sell": [
+          5,
+          4,
+          3,
+          2,
+          1
+        ],
+        "money": [
+          15,
+          10,
+          5,
+          0,
+          0
+        ]
+      },
+      "expected": [
+        1,
+        2,
+        2,
+        1,
+        0
+      ],
+      "warnings": []
+    },
+    {
+      "id": "test_024",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "count": [
+          333,
+          666,
+          999
+        ],
+        "upgrade": [
+          33,
+          66,
+          99
+        ],
+        "sell": [
+          11,
+          22,
+          33
+        ],
+        "money": [
+          1110,
+          2220,
+          3330
+        ]
+      },
+      "expected": [
+        108,
+        191,
+        274
+      ],
+      "warnings": []
+    },
+    {
+      "id": "test_025",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "count": [
+          50,
+          50,
+          50,
+          50
+        ],
+        "upgrade": [
+          2,
+          3,
+          4,
+          5
+        ],
+        "sell": [
+          3,
+          2,
+          1,
+          4
+        ],
+        "money": [
+          150,
+          200,
+          250,
+          300
+        ]
+      },
+      "expected": [
+        50,
+        50,
+        50,
+        50
+      ],
+      "warnings": []
+    },
+    {
+      "id": "test_026",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "count": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10
+        ],
+        "upgrade": [
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1,
+          1
+        ],
+        "sell": [
+          10,
+          9,
+          8,
+          7,
+          6,
+          5,
+          4,
+          3,
+          2,
+          1
+        ],
+        "money": [
+          10,
+          20,
+          30,
+          40,
+          50,
+          60,
+          70,
+          80,
+          90,
+          100
+        ]
+      },
+      "expected": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10
+      ],
+      "warnings": []
+    },
+    {
+      "id": "test_027",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "count": [
+          1000,
+          2000,
+          3000
+        ],
+        "upgrade": [
+          1,
+          2,
+          3
+        ],
+        "sell": [
+          2,
+          1,
+          2
+        ],
+        "money": [
+          5000,
+          10000,
+          15000
+        ]
+      },
+      "expected": [
+        1000,
+        2000,
+        3000
+      ],
+      "warnings": []
+    },
+    {
+      "id": "test_028",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "count": [
+          10,
+          10,
+          10,
+          10,
+          10
+        ],
+        "upgrade": [
+          1,
+          2,
+          3,
+          4,
+          5
+        ],
+        "sell": [
+          5,
+          4,
+          3,
+          2,
+          1
+        ],
+        "money": [
+          50,
+          40,
+          30,
+          20,
+          10
+        ]
+      },
+      "expected": [
+        10,
+        10,
+        10,
+        6,
+        3
+      ],
+      "warnings": []
+    },
+    {
+      "id": "test_029",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "count": [
+          20,
+          25,
+          30,
+          35,
+          40,
+          45,
+          50
+        ],
+        "upgrade": [
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11
+        ],
+        "sell": [
+          11,
+          10,
+          9,
+          8,
+          7,
+          6,
+          5
+        ],
+        "money": [
+          200,
+          250,
+          300,
+          350,
+          400,
+          450,
+          500
+        ]
+      },
+      "expected": [
+        20,
+        25,
+        30,
+        35,
+        40,
+        45,
+        46
+      ],
+      "warnings": []
+    },
+    {
+      "id": "test_030",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "count": [
+          500,
+          500,
+          500,
+          500
+        ],
+        "upgrade": [
+          10,
+          20,
+          30,
+          40
+        ],
+        "sell": [
+          20,
+          10,
+          40,
+          30
+        ],
+        "money": [
+          2000,
+          1000,
+          4000,
+          3000
+        ]
+      },
+      "expected": [
+        400,
+        200,
+        342,
+        257
+      ],
+      "warnings": []
+    },
+    {
+      "id": "test_031",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "count": [
+          50,
+          75,
+          100
+        ],
+        "upgrade": [
+          2,
+          3,
+          4
+        ],
+        "sell": [
+          1,
+          2,
+          3
+        ],
+        "money": [
+          100,
+          200,
+          300
+        ]
+      },
+      "expected": [
+        50,
+        70,
+        85
+      ],
+      "warnings": []
+    },
+    {
+      "id": "test_032",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "count": [
+          100,
+          100,
+          100,
+          100
+        ],
+        "upgrade": [
+          1,
+          1,
+          1,
+          1
+        ],
+        "sell": [
+          2,
+          2,
+          2,
+          2
+        ],
+        "money": [
+          1000,
+          2000,
+          3000,
+          4000
+        ]
+      },
+      "expected": [
+        100,
+        100,
+        100,
+        100
+      ],
+      "warnings": []
+    },
+    {
+      "id": "test_033",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "count": [
+          100,
+          150,
+          200
+        ],
+        "upgrade": [
+          10,
+          15,
+          20
+        ],
+        "sell": [
+          5,
+          10,
+          15
+        ],
+        "money": [
+          1000,
+          1500,
+          2000
+        ]
+      },
+      "expected": [
+        100,
+        120,
+        142
+      ],
+      "warnings": []
+    },
+    {
+      "id": "test_034",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "count": [
+          50,
+          50,
+          50
+        ],
+        "upgrade": [
+          10,
+          20,
+          30
+        ],
+        "sell": [
+          15,
+          25,
+          35
+        ],
+        "money": [
+          500,
+          750,
+          1000
+        ]
+      },
+      "expected": [
+        50,
+        44,
+        42
+      ],
+      "warnings": []
+    },
+    {
+      "id": "test_035",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "count": [
+          50,
+          50,
+          50,
+          50,
+          50
+        ],
+        "upgrade": [
+          10,
+          20,
+          30,
+          40,
+          50
+        ],
+        "sell": [
+          5,
+          10,
+          15,
+          20,
+          25
+        ],
+        "money": [
+          500,
+          1000,
+          1500,
+          2000,
+          2500
+        ]
+      },
+      "expected": [
+        50,
+        50,
+        50,
+        50,
+        50
+      ],
+      "warnings": []
+    },
+    {
+      "id": "test_036",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "count": [
+          15,
+          25,
+          35
+        ],
+        "upgrade": [
+          4,
+          6,
+          8
+        ],
+        "sell": [
+          7,
+          5,
+          3
+        ],
+        "money": [
+          150,
+          250,
+          350
+        ]
+      },
+      "expected": [
+        15,
+        25,
+        35
+      ],
+      "warnings": []
+    },
+    {
+      "id": "test_037",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "count": [
+          50,
+          60,
+          70,
+          80,
+          90
+        ],
+        "upgrade": [
+          3,
+          5,
+          7,
+          9,
+          11
+        ],
+        "sell": [
+          2,
+          4,
+          6,
+          8,
+          10
+        ],
+        "money": [
+          250,
+          500,
+          750,
+          1000,
+          1250
+        ]
+      },
+      "expected": [
+        50,
+        60,
+        70,
+        80,
+        90
+      ],
+      "warnings": []
+    },
+    {
+      "id": "test_038",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "count": [
+          5,
+          10,
+          15,
+          20,
+          25
+        ],
+        "upgrade": [
+          2,
+          4,
+          6,
+          8,
+          10
+        ],
+        "sell": [
+          1,
+          2,
+          3,
+          4,
+          5
+        ],
+        "money": [
+          20,
+          40,
+          60,
+          80,
+          100
+        ]
+      },
+      "expected": [
+        5,
+        10,
+        11,
+        13,
+        15
+      ],
+      "warnings": []
+    },
+    {
+      "id": "test_039",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "count": [
+          10,
+          20,
+          30,
+          40,
+          50,
+          60,
+          70,
+          80,
+          90,
+          100
+        ],
+        "upgrade": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10
+        ],
+        "sell": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10
+        ],
+        "money": [
+          50,
+          100,
+          150,
+          200,
+          250,
+          300,
+          350,
+          400,
+          450,
+          500
+        ]
+      },
+      "expected": [
+        10,
+        20,
+        30,
+        40,
+        50,
+        55,
+        60,
+        65,
+        70,
+        75
+      ],
+      "warnings": []
+    },
+    {
+      "id": "test_040",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "count": [
+          99999,
+          99998,
+          99997
+        ],
+        "upgrade": [
+          99999,
+          99998,
+          99997
+        ],
+        "sell": [
+          99997,
+          99998,
+          99999
+        ],
+        "money": [
+          1000000000,
+          1000000000,
+          1000000000
+        ]
+      },
+      "expected": [
+        54999,
+        54999,
+        54999
+      ],
+      "warnings": []
+    },
+    {
+      "id": "test_041",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "count": [
+          100,
+          50,
+          75
+        ],
+        "upgrade": [
+          10,
+          5,
+          20
+        ],
+        "sell": [
+          5,
+          15,
+          25
+        ],
+        "money": [
+          500,
+          250,
+          700
+        ]
+      },
+      "expected": [
+        66,
+        50,
+        57
+      ],
+      "warnings": []
+    },
+    {
+      "id": "test_042",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "count": [
+          50,
+          50,
+          50,
+          50,
+          50
+        ],
+        "upgrade": [
+          10,
+          20,
+          30,
+          40,
+          50
+        ],
+        "sell": [
+          5,
+          15,
+          25,
+          35,
+          45
+        ],
+        "money": [
+          1000,
+          2000,
+          3000,
+          4000,
+          5000
+        ]
+      },
+      "expected": [
+        50,
+        50,
+        50,
+        50,
+        50
+      ],
+      "warnings": []
+    },
+    {
+      "id": "test_043",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "count": [
+          1000,
+          2000,
+          3000,
+          4000,
+          5000
+        ],
+        "upgrade": [
+          100,
+          200,
+          300,
+          400,
+          500
+        ],
+        "sell": [
+          150,
+          250,
+          350,
+          450,
+          550
+        ],
+        "money": [
+          10000,
+          20000,
+          30000,
+          40000,
+          50000
+        ]
+      },
+      "expected": [
+        640,
+        1155,
+        1661,
+        2164,
+        2666
+      ],
+      "warnings": []
+    },
+    {
+      "id": "test_044",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "count": [
+          50,
+          60,
+          70
+        ],
+        "upgrade": [
+          5,
+          6,
+          7
+        ],
+        "sell": [
+          2,
+          3,
+          4
+        ],
+        "money": [
+          250,
+          300,
+          350
+        ]
+      },
+      "expected": [
+        50,
+        53,
+        57
+      ],
+      "warnings": []
+    },
+    {
+      "id": "test_045",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "count": [
+          1,
+          2,
+          3,
+          4,
+          5
+        ],
+        "upgrade": [
+          100000,
+          90000,
+          80000,
+          70000,
+          60000
+        ],
+        "sell": [
+          50000,
+          60000,
+          70000,
+          80000,
+          90000
+        ],
+        "money": [
+          1000000,
+          1000000,
+          1000000,
+          1000000,
+          1000000
+        ]
+      },
+      "expected": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "warnings": []
+    },
+    {
+      "id": "test_046",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "count": [
+          10000,
+          20000,
+          30000
+        ],
+        "upgrade": [
+          1000,
+          2000,
+          3000
+        ],
+        "sell": [
+          3000,
+          2000,
+          1000
+        ],
+        "money": [
+          100000,
+          200000,
+          300000
+        ]
+      },
+      "expected": [
+        7525,
+        10050,
+        7575
+      ],
+      "warnings": []
+    },
+    {
+      "id": "test_047",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "count": [
+          10000,
+          20000
+        ],
+        "upgrade": [
+          100,
+          200
+        ],
+        "sell": [
+          50,
+          100
+        ],
+        "money": [
+          1000000,
+          2000000
+        ]
+      },
+      "expected": [
+        10000,
+        13333
+      ],
+      "warnings": []
+    },
+    {
+      "id": "test_048",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "count": [
+          1,
+          2,
+          3,
+          4,
+          5
+        ],
+        "upgrade": [
+          1,
+          1,
+          1,
+          1,
+          1
+        ],
+        "sell": [
+          1,
+          1,
+          1,
+          1,
+          1
+        ],
+        "money": [
+          1,
+          2,
+          3,
+          4,
+          5
+        ]
+      },
+      "expected": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "warnings": []
+    },
+    {
+      "id": "test_049",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "count": [
+          100,
+          200,
+          300,
+          400
+        ],
+        "upgrade": [
+          10,
+          9,
+          8,
+          7
+        ],
+        "sell": [
+          7,
+          8,
+          9,
+          10
+        ],
+        "money": [
+          500,
+          1000,
+          1500,
+          2000
+        ]
+      },
+      "expected": [
+        70,
+        152,
+        247,
+        352
+      ],
+      "warnings": []
+    },
+    {
+      "id": "test_050",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "count": [
+          30,
+          60,
+          90
+        ],
+        "upgrade": [
+          5,
+          10,
+          15
+        ],
+        "sell": [
+          2,
+          4,
+          6
+        ],
+        "money": [
+          150,
+          300,
+          450
+        ]
+      },
+      "expected": [
+        30,
+        38,
+        47
+      ],
+      "warnings": []
+    },
+    {
+      "id": "test_051",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "count": [
+          50,
+          50,
+          50,
+          50,
+          50
+        ],
+        "upgrade": [
+          10,
+          15,
+          20,
+          25,
+          30
+        ],
+        "sell": [
+          3,
+          6,
+          9,
+          12,
+          15
+        ],
+        "money": [
+          100,
+          200,
+          300,
+          400,
+          500
+        ]
+      },
+      "expected": [
+        19,
+        23,
+        25,
+        27,
+        27
+      ],
+      "warnings": []
+    },
+    {
+      "id": "test_052",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "count": [
+          1,
+          1,
+          1,
+          1,
+          1
+        ],
+        "upgrade": [
+          100000,
+          90000,
+          80000,
+          70000,
+          60000
+        ],
+        "sell": [
+          50000,
+          60000,
+          70000,
+          80000,
+          90000
+        ],
+        "money": [
+          100000,
+          100000,
+          100000,
+          100000,
+          100000
+        ]
+      },
+      "expected": [
+        1,
+        1,
+        1,
+        1,
+        1
+      ],
+      "warnings": []
+    },
+    {
+      "id": "test_053",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "count": [
+          100,
+          100,
+          100,
+          100
+        ],
+        "upgrade": [
+          1,
+          1,
+          1,
+          1
+        ],
+        "sell": [
+          1,
+          1,
+          1,
+          1
+        ],
+        "money": [
+          100,
+          100,
+          100,
+          100
+        ]
+      },
+      "expected": [
+        100,
+        100,
+        100,
+        100
+      ],
+      "warnings": []
+    },
+    {
+      "id": "test_054",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "count": [
+          100000
+        ],
+        "upgrade": [
+          1
+        ],
+        "sell": [
+          1
+        ],
+        "money": [
+          100000
+        ]
+      },
+      "expected": [
+        100000
+      ],
+      "warnings": []
+    },
+    {
+      "id": "test_055",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "count": [
+          25,
+          50,
+          75,
+          100
+        ],
+        "upgrade": [
+          5,
+          10,
+          15,
+          20
+        ],
+        "sell": [
+          10,
+          20,
+          30,
+          40
+        ],
+        "money": [
+          500,
+          1000,
+          1500,
+          2000
+        ]
+      },
+      "expected": [
+        25,
+        50,
+        75,
+        100
+      ],
+      "warnings": []
+    },
+    {
+      "id": "test_056",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "count": [
+          100000,
+          50000,
+          25000
+        ],
+        "upgrade": [
+          1000,
+          500,
+          250
+        ],
+        "sell": [
+          500,
+          250,
+          125
+        ],
+        "money": [
+          10000000,
+          5000000,
+          2500000
+        ]
+      },
+      "expected": [
+        40000,
+        23333,
+        15000
+      ],
+      "warnings": []
+    },
+    {
+      "id": "test_057",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "count": [
+          1000,
+          2000,
+          3000
+        ],
+        "upgrade": [
+          50,
+          75,
+          100
+        ],
+        "sell": [
+          25,
+          50,
+          75
+        ],
+        "money": [
+          50000,
+          100000,
+          150000
+        ]
+      },
+      "expected": [
+        1000,
+        1600,
+        2142
+      ],
+      "warnings": []
+    },
+    {
+      "id": "test_058",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "count": [
+          15,
+          25,
+          35,
+          45
+        ],
+        "upgrade": [
+          2,
+          4,
+          6,
+          8
+        ],
+        "sell": [
+          1,
+          3,
+          5,
+          7
+        ],
+        "money": [
+          50,
+          75,
+          100,
+          125
+        ]
+      },
+      "expected": [
+        15,
+        21,
+        25,
+        29
+      ],
+      "warnings": []
+    },
+    {
+      "id": "test_059",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "count": [
+          50,
+          40,
+          30,
+          20,
+          10
+        ],
+        "upgrade": [
+          10,
+          20,
+          30,
+          40,
+          50
+        ],
+        "sell": [
+          5,
+          10,
+          15,
+          20,
+          25
+        ],
+        "money": [
+          100,
+          150,
+          200,
+          250,
+          300
+        ]
+      },
+      "expected": [
+        23,
+        18,
+        14,
+        10,
+        7
+      ],
+      "warnings": []
+    },
+    {
+      "id": "test_060",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "count": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6
+        ],
+        "upgrade": [
+          1000,
+          900,
+          800,
+          700,
+          600,
+          500
+        ],
+        "sell": [
+          500,
+          600,
+          700,
+          800,
+          900,
+          1000
+        ],
+        "money": [
+          10000,
+          20000,
+          30000,
+          40000,
+          50000,
+          60000
+        ]
+      },
+      "expected": [
+        1,
+        2,
+        3,
+        4,
+        5,
+        6
+      ],
+      "warnings": []
+    },
+    {
+      "id": "test_061",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "count": [
+          1000,
+          2000,
+          3000
+        ],
+        "upgrade": [
+          10,
+          20,
+          30
+        ],
+        "sell": [
+          5,
+          10,
+          15
+        ],
+        "money": [
+          10000,
+          20000,
+          30000
+        ]
+      },
+      "expected": [
+        1000,
+        1333,
+        1666
+      ],
+      "warnings": []
+    },
+    {
+      "id": "test_062",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "count": [
+          100,
+          100
+        ],
+        "upgrade": [
+          10,
+          5
+        ],
+        "sell": [
+          20,
+          10
+        ],
+        "money": [
+          1000,
+          500
+        ]
+      },
+      "expected": [
+        100,
+        100
+      ],
+      "warnings": []
+    },
+    {
+      "id": "test_063",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "count": [
+          100000,
+          100000
+        ],
+        "upgrade": [
+          1,
+          1
+        ],
+        "sell": [
+          1,
+          1
+        ],
+        "money": [
+          200000,
+          200000
+        ]
+      },
+      "expected": [
+        100000,
+        100000
+      ],
+      "warnings": []
+    },
+    {
+      "id": "test_064",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "count": [
+          30,
+          20,
+          10
+        ],
+        "upgrade": [
+          1,
+          2,
+          3
+        ],
+        "sell": [
+          3,
+          2,
+          1
+        ],
+        "money": [
+          100,
+          50,
+          10
+        ]
+      },
+      "expected": [
+        30,
+        20,
+        5
+      ],
+      "warnings": []
+    },
+    {
+      "id": "test_065",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "count": [
+          100,
+          200,
+          300,
+          400
+        ],
+        "upgrade": [
+          1,
+          2,
+          3,
+          4
+        ],
+        "sell": [
+          4,
+          3,
+          2,
+          1
+        ],
+        "money": [
+          1000,
+          2000,
+          3000,
+          4000
+        ]
+      },
+      "expected": [
+        100,
+        200,
+        300,
+        400
+      ],
+      "warnings": []
+    },
+    {
+      "id": "test_066",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "count": [
+          100000
+        ],
+        "upgrade": [
+          1
+        ],
+        "sell": [
+          1
+        ],
+        "money": [
+          50000
+        ]
+      },
+      "expected": [
+        75000
+      ],
+      "warnings": []
+    },
+    {
+      "id": "test_067",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "count": [
+          500,
+          500,
+          500,
+          500
+        ],
+        "upgrade": [
+          5,
+          5,
+          5,
+          5
+        ],
+        "sell": [
+          2,
+          2,
+          2,
+          2
+        ],
+        "money": [
+          1000,
+          2000,
+          3000,
+          4000
+        ]
+      },
+      "expected": [
+        285,
+        428,
+        500,
+        500
+      ],
+      "warnings": []
+    },
+    {
+      "id": "test_068",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "count": [
+          100000,
+          100000,
+          100000
+        ],
+        "upgrade": [
+          50000,
+          60000,
+          70000
+        ],
+        "sell": [
+          30000,
+          20000,
+          10000
+        ],
+        "money": [
+          900000,
+          1200000,
+          1500000
+        ]
+      },
+      "expected": [
+        37511,
+        25015,
+        12518
+      ],
+      "warnings": []
+    },
+    {
+      "id": "test_069",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "count": [
+          1000,
+          2000,
+          3000,
+          4000
+        ],
+        "upgrade": [
+          100,
+          200,
+          300,
+          400
+        ],
+        "sell": [
+          10,
+          20,
+          30,
+          40
+        ],
+        "money": [
+          10000,
+          20000,
+          30000,
+          40000
+        ]
+      },
+      "expected": [
+        181,
+        272,
+        363,
+        454
+      ],
+      "warnings": []
+    },
+    {
+      "id": "test_070",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "count": [
+          1000,
+          2000,
+          3000
+        ],
+        "upgrade": [
+          1,
+          1,
+          1
+        ],
+        "sell": [
+          1,
+          1,
+          1
+        ],
+        "money": [
+          1000,
+          2000,
+          3000
+        ]
+      },
+      "expected": [
+        1000,
+        2000,
+        3000
+      ],
+      "warnings": []
+    },
+    {
+      "id": "test_071",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "count": [
+          25,
+          25,
+          25,
+          25
+        ],
+        "upgrade": [
+          10,
+          20,
+          30,
+          40
+        ],
+        "sell": [
+          1,
+          2,
+          3,
+          4
+        ],
+        "money": [
+          500,
+          750,
+          1000,
+          1250
+        ]
+      },
+      "expected": [
+        25,
+        25,
+        25,
+        25
+      ],
+      "warnings": []
+    },
+    {
+      "id": "test_072",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "count": [
+          10,
+          10,
+          10,
+          10,
+          10,
+          10,
+          10,
+          10,
+          10,
+          10
+        ],
+        "upgrade": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10
+        ],
+        "sell": [
+          10,
+          9,
+          8,
+          7,
+          6,
+          5,
+          4,
+          3,
+          2,
+          1
+        ],
+        "money": [
+          100,
+          200,
+          300,
+          400,
+          500,
+          600,
+          700,
+          800,
+          900,
+          1000
+        ]
+      },
+      "expected": [
+        10,
+        10,
+        10,
+        10,
+        10,
+        10,
+        10,
+        10,
+        10,
+        10
+      ],
+      "warnings": []
+    },
+    {
+      "id": "test_073",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "count": [
+          50,
+          50,
+          50,
+          50,
+          50
+        ],
+        "upgrade": [
+          1,
+          2,
+          3,
+          4,
+          5
+        ],
+        "sell": [
+          5,
+          4,
+          3,
+          2,
+          1
+        ],
+        "money": [
+          250,
+          200,
+          150,
+          100,
+          50
+        ]
+      },
+      "expected": [
+        50,
+        50,
+        50,
+        33,
+        16
+      ],
+      "warnings": []
+    },
+    {
+      "id": "test_074",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "count": [
+          100,
+          100,
+          100,
+          100,
+          100,
+          100,
+          100,
+          100,
+          100,
+          100
+        ],
+        "upgrade": [
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10
+        ],
+        "sell": [
+          2,
+          4,
+          6,
+          8,
+          10,
+          12,
+          14,
+          16,
+          18,
+          20
+        ],
+        "money": [
+          1000,
+          2000,
+          3000,
+          4000,
+          5000,
+          6000,
+          7000,
+          8000,
+          9000,
+          10000
+        ]
+      },
+      "expected": [
+        100,
+        100,
+        100,
+        100,
+        100,
+        100,
+        100,
+        100,
+        100,
+        100
+      ],
+      "warnings": []
+    },
+    {
+      "id": "test_075",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "count": [
+          15,
+          25,
+          35
+        ],
+        "upgrade": [
+          7,
+          11,
+          13
+        ],
+        "sell": [
+          5,
+          8,
+          6
+        ],
+        "money": [
+          150,
+          250,
+          350
+        ]
+      },
+      "expected": [
+        15,
+        23,
+        29
+      ],
+      "warnings": []
+    },
+    {
+      "id": "test_076",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "count": [
+          10,
+          20,
+          30,
+          40,
+          50
+        ],
+        "upgrade": [
+          1,
+          2,
+          3,
+          4,
+          5
+        ],
+        "sell": [
+          5,
+          4,
+          3,
+          2,
+          1
+        ],
+        "money": [
+          50,
+          100,
+          150,
+          200,
+          250
+        ]
+      },
+      "expected": [
+        10,
+        20,
+        30,
+        40,
+        50
+      ],
+      "warnings": []
+    },
+    {
+      "id": "test_077",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "count": [
+          10,
+          20,
+          30,
+          40
+        ],
+        "upgrade": [
+          5,
+          4,
+          3,
+          2
+        ],
+        "sell": [
+          2,
+          3,
+          4,
+          5
+        ],
+        "money": [
+          50,
+          100,
+          150,
+          200
+        ]
+      },
+      "expected": [
+        10,
+        20,
+        30,
+        40
+      ],
+      "warnings": []
+    },
+    {
+      "id": "test_078",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "count": [
+          1000,
+          2000
+        ],
+        "upgrade": [
+          50,
+          75
+        ],
+        "sell": [
+          25,
+          35
+        ],
+        "money": [
+          10000,
+          20000
+        ]
+      },
+      "expected": [
+        466,
+        818
+      ],
+      "warnings": []
+    },
+    {
+      "id": "test_079",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "count": [
+          90000,
+          10000
+        ],
+        "upgrade": [
+          9,
+          1
+        ],
+        "sell": [
+          1,
+          9
+        ],
+        "money": [
+          900000,
+          100000
+        ]
+      },
+      "expected": [
+        90000,
+        10000
+      ],
+      "warnings": []
+    },
+    {
+      "id": "test_080",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "count": [
+          100,
+          100,
+          100,
+          100
+        ],
+        "upgrade": [
+          10,
+          20,
+          30,
+          40
+        ],
+        "sell": [
+          40,
+          30,
+          20,
+          10
+        ],
+        "money": [
+          1000,
+          2000,
+          3000,
+          4000
+        ]
+      },
+      "expected": [
+        100,
+        100,
+        100,
+        100
+      ],
+      "warnings": []
+    },
+    {
+      "id": "test_081",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "count": [
+          100,
+          200,
+          300,
+          400
+        ],
+        "upgrade": [
+          15,
+          25,
+          35,
+          45
+        ],
+        "sell": [
+          5,
+          10,
+          15,
+          20
+        ],
+        "money": [
+          1000,
+          2000,
+          3000,
+          4000
+        ]
+      },
+      "expected": [
+        75,
+        114,
+        150,
+        184
+      ],
+      "warnings": []
+    },
+    {
+      "id": "test_082",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "count": [
+          1,
+          2,
+          3,
+          4,
+          5
+        ],
+        "upgrade": [
+          1,
+          2,
+          3,
+          4,
+          5
+        ],
+        "sell": [
+          5,
+          4,
+          3,
+          2,
+          1
+        ],
+        "money": [
+          5,
+          10,
+          15,
+          20,
+          25
+        ]
+      },
+      "expected": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "warnings": []
+    },
+    {
+      "id": "test_083",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "count": [
+          50,
+          50,
+          50,
+          50
+        ],
+        "upgrade": [
+          5,
+          6,
+          7,
+          8
+        ],
+        "sell": [
+          8,
+          7,
+          6,
+          5
+        ],
+        "money": [
+          500,
+          600,
+          700,
+          800
+        ]
+      },
+      "expected": [
+        50,
+        50,
+        50,
+        50
+      ],
+      "warnings": []
+    },
+    {
+      "id": "test_084",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "count": [
+          99999,
+          99998,
+          99997
+        ],
+        "upgrade": [
+          99,
+          98,
+          97
+        ],
+        "sell": [
+          97,
+          96,
+          95
+        ],
+        "money": [
+          9999900,
+          9999800,
+          9999700
+        ]
+      },
+      "expected": [
+        99999,
+        99998,
+        99997
+      ],
+      "warnings": []
+    },
+    {
+      "id": "test_085",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "count": [
+          100,
+          150,
+          200
+        ],
+        "upgrade": [
+          5,
+          7,
+          9
+        ],
+        "sell": [
+          8,
+          6,
+          4
+        ],
+        "money": [
+          300,
+          450,
+          600
+        ]
+      },
+      "expected": [
+        84,
+        103,
+        107
+      ],
+      "warnings": []
+    },
+    {
+      "id": "test_086",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "count": [
+          20,
+          40,
+          60,
+          80,
+          100
+        ],
+        "upgrade": [
+          1,
+          2,
+          3,
+          4,
+          5
+        ],
+        "sell": [
+          10,
+          20,
+          30,
+          40,
+          50
+        ],
+        "money": [
+          500,
+          1000,
+          1500,
+          2000,
+          2500
+        ]
+      },
+      "expected": [
+        20,
+        40,
+        60,
+        80,
+        100
+      ],
+      "warnings": []
+    },
+    {
+      "id": "test_087",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "count": [
+          50000,
+          50000
+        ],
+        "upgrade": [
+          2,
+          2
+        ],
+        "sell": [
+          1,
+          1
+        ],
+        "money": [
+          150000,
+          150000
+        ]
+      },
+      "expected": [
+        50000,
+        50000
+      ],
+      "warnings": []
+    },
+    {
+      "id": "test_088",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "count": [
+          50,
+          60,
+          70
+        ],
+        "upgrade": [
+          3,
+          4,
+          5
+        ],
+        "sell": [
+          2,
+          3,
+          4
+        ],
+        "money": [
+          150,
+          200,
+          250
+        ]
+      },
+      "expected": [
+        50,
+        54,
+        58
+      ],
+      "warnings": []
+    },
+    {
+      "id": "test_089",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "count": [
+          100000
+        ],
+        "upgrade": [
+          1
+        ],
+        "sell": [
+          10
+        ],
+        "money": [
+          900000
+        ]
+      },
+      "expected": [
+        100000
+      ],
+      "warnings": []
+    },
+    {
+      "id": "test_090",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "count": [
+          10,
+          20,
+          30,
+          40,
+          50
+        ],
+        "upgrade": [
+          5,
+          10,
+          15,
+          20,
+          25
+        ],
+        "sell": [
+          30,
+          25,
+          20,
+          15,
+          10
+        ],
+        "money": [
+          1000,
+          2000,
+          3000,
+          4000,
+          5000
+        ]
+      },
+      "expected": [
+        10,
+        20,
+        30,
+        40,
+        50
+      ],
+      "warnings": []
+    },
+    {
+      "id": "test_091",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "count": [
+          33333,
+          33333,
+          33333
+        ],
+        "upgrade": [
+          1,
+          1,
+          1
+        ],
+        "sell": [
+          1,
+          1,
+          1
+        ],
+        "money": [
+          1000000,
+          1000000,
+          1000000
+        ]
+      },
+      "expected": [
+        33333,
+        33333,
+        33333
+      ],
+      "warnings": []
+    },
+    {
+      "id": "test_092",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "count": [
+          1000,
+          2000,
+          3000
+        ],
+        "upgrade": [
+          1,
+          2,
+          3
+        ],
+        "sell": [
+          2,
+          4,
+          6
+        ],
+        "money": [
+          20000,
+          40000,
+          60000
+        ]
+      },
+      "expected": [
+        1000,
+        2000,
+        3000
+      ],
+      "warnings": []
+    },
+    {
+      "id": "test_093",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "count": [
+          100,
+          100,
+          100,
+          100
+        ],
+        "upgrade": [
+          1,
+          2,
+          3,
+          4
+        ],
+        "sell": [
+          4,
+          3,
+          2,
+          1
+        ],
+        "money": [
+          100,
+          200,
+          300,
+          400
+        ]
+      },
+      "expected": [
+        100,
+        100,
+        100,
+        100
+      ],
+      "warnings": []
+    },
+    {
+      "id": "test_094",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "count": [
+          1,
+          2,
+          3,
+          4,
+          5
+        ],
+        "upgrade": [
+          1,
+          1,
+          1,
+          1,
+          1
+        ],
+        "sell": [
+          2,
+          2,
+          2,
+          2,
+          2
+        ],
+        "money": [
+          0,
+          1,
+          3,
+          6,
+          10
+        ]
+      },
+      "expected": [
+        0,
+        1,
+        3,
+        4,
+        5
+      ],
+      "warnings": []
+    }
+  ],
+  "normalization": {
+    "test_source": "python_assertions",
+    "test_count": 95,
+    "raw_test_sha256": "6afd2c8e5b5a2415324f1ff3947facb7a18a6c9d4de29e1fa88de54936b05f72",
+    "generated_by": "scripts/d2v-normalize-json.py",
+    "allow_extra_tests": false
+  }
+}

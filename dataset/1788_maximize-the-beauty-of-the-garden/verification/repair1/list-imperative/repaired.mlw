@@ -1,0 +1,122 @@
+module MaximizeTheBeautyOfTheGarden_List_Stage3_Imperative
+
+  use int.Int
+  use list.List
+  use list.Length
+  use list.Sum
+  use list.Append
+  use ref.Ref
+
+  inductive subsequence (kept: list int) (source: list int) =
+    | SubNil:
+        forall source: list int. subsequence Nil source
+    | SubKeep:
+        forall x: int, xs ys: list int.
+          subsequence xs ys ->
+          subsequence (Cons x xs) (Cons x ys)
+    | SubSkip:
+        forall kept: list int, y: int, ys: list int.
+          subsequence kept ys ->
+          subsequence kept (Cons y ys)
+
+  inductive ends_with_value (l: list int) (x: int) =
+    | EndsSingle:
+        forall x: int. ends_with_value (Cons x Nil) x
+    | EndsCons:
+        forall y x: int, ys: list int.
+          ends_with_value ys x ->
+          ends_with_value (Cons y ys) x
+
+  predicate matching_endpoints (kept: list int) =
+    match kept with
+    | Nil -> false
+    | Cons first rest -> ends_with_value rest first
+    end
+
+  predicate valid_remaining (flowers: list int) (kept: list int) =
+    subsequence kept flowers /\
+    length kept >= 2 /\
+    matching_endpoints kept
+
+  predicate best_beauty (flowers: list int) (beauty: int) =
+    (exists kept: list int. valid_remaining flowers kept /\ sum kept = beauty) /\
+    (forall kept: list int. valid_remaining flowers kept -> sum kept <= beauty)
+
+  predicate suffix_cursor (whole: list int) (cur: list int) =
+    exists prefix: list int. whole = prefix ++ cur
+
+  predicate inner_cursor (tail: list int) (cur: list int) =
+    exists scanned: list int. tail = scanned ++ cur
+
+  predicate witnessed_beauty (flowers: list int) (beauty: int) =
+    exists kept: list int. valid_remaining flowers kept /\ sum kept = beauty
+
+  predicate upper_bound_beauty (flowers: list int) (beauty: int) =
+    forall kept: list int. valid_remaining flowers kept -> sum kept <= beauty
+
+  predicate partial_best_state
+    (flowers: list int) (found: bool) (best: int)
+  =
+    found -> witnessed_beauty flowers best
+
+  let maximize_the_beauty_of_the_garden_list (flowers: list int) : int
+    requires { exists kept: list int. valid_remaining flowers kept }
+    ensures  { best_beauty flowers result }
+  =
+    let found = ref false in
+    let best = ref 0 in
+    let outer = ref flowers in
+    while (match !outer with Cons _ (Cons _ _) -> true | _ -> false end) do
+      invariant { 0 <= length !outer }
+      invariant { suffix_cursor flowers !outer }
+      invariant { partial_best_state flowers !found !best }
+      variant { length !outer }
+
+      match !outer with
+      | Nil -> ()
+      | Cons x xs ->
+          let positive_between = ref 0 in
+          let inner = ref xs in
+          while (match !inner with Nil -> false | Cons _ _ -> true end) do
+            invariant { 0 <= length !inner }
+            invariant { inner_cursor xs !inner }
+            invariant { 0 <= !positive_between }
+            invariant { suffix_cursor flowers (Cons x xs) }
+            invariant { partial_best_state flowers !found !best }
+            variant { length !inner }
+
+            match !inner with
+            | Nil -> ()
+            | Cons y ys ->
+                if y = x then
+                  let candidate = x + x + !positive_between in
+                  if !found then
+                    if candidate > !best then begin
+                      assert { !best < candidate };
+                      best := candidate
+                    end else ()
+                  else begin
+                    found := true;
+                    best := candidate
+                  end
+                else ();
+                if y > 0 then begin
+                  assert { 0 < y };
+                  positive_between := !positive_between + y
+                end else ();
+                inner := ys
+            end
+          done;
+          assert { !inner = Nil };
+          outer := xs
+      end
+    done;
+    assert { !outer = Nil \/ exists x: int. !outer = Cons x Nil };
+    assert { partial_best_state flowers !found !best };
+    assert { !found };
+    assert { witnessed_beauty flowers !best };
+    assert { upper_bound_beauty flowers !best };
+    assert { best_beauty flowers !best };
+    if !found then !best else 0
+
+end

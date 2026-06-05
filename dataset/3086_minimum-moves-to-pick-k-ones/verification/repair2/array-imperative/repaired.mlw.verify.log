@@ -1,0 +1,1211 @@
+== Stage 1: first prover on whole file ==
+Running in /Users/rubenm/Desktop/Diversify2Verify/codex-runs/repair2-split1/stage3a-rerepair/3086_minimum-moves-to-pick-k-ones/array-imperative/minimum_moves_to_pick_k_ones_array_stage3_9e39e39c_stage3/repaired/generated/why3: why3 session create -o /Users/rubenm/Desktop/Diversify2Verify/codex-runs/repair2-split1/stage3a-rerepair/3086_minimum-moves-to-pick-k-ones/array-imperative/minimum_moves_to_pick_k_ones_array_stage3_9e39e39c_stage3/repaired/generated/why3/.why3_sessions/repaired_stage1 -P Z3,4.8.6 -t 10 -m 8192 repaired.mlw
+Session created successfully
+Running in /Users/rubenm/Desktop/Diversify2Verify/codex-runs/repair2-split1/stage3a-rerepair/3086_minimum-moves-to-pick-k-ones/array-imperative/minimum_moves_to_pick_k_ones_array_stage3_9e39e39c_stage3/repaired/generated/why3: why3 bench /Users/rubenm/Desktop/Diversify2Verify/codex-runs/repair2-split1/stage3a-rerepair/3086_minimum-moves-to-pick-k-ones/array-imperative/minimum_moves_to_pick_k_ones_array_stage3_9e39e39c_stage3/repaired/generated/why3/.why3_sessions/repaired_stage1
+Progress: 10/1/0                       Progress: 9/2/0                       Progress: 8/3/0                       Progress: 7/4/0                       Progress: 6/5/0                       Progress: 5/6/0                       Progress: 5/0/0                       Progress: 4/1/0                       Progress: 3/2/0                       Progress: 2/3/0                       Progress: 1/4/0                       Progress: 0/5/0                       Progress: 0/1/2                       Progress: 0/0/2                       Progress: 0/0/1                       
+Replay completed, saving session... done
+== Stage 1 stats ==
+= Statistics for session /Users/rubenm/Desktop/Diversify2Verify/codex-runs/repair2-split1/stage3a-rerepair/3086_minimum-moves-to-pick-k-ones/array-imperative/minimum_moves_to_pick_k_ones_array_stage3_9e39e39c_stage3/repaired/generated/why3/.why3_sessions/repaired_stage1
+
+== Number of root goals ==
+  total: 11  proved: 9
+
+== Number of sub goals ==
+  total: 0  proved: 0
+
+== Goals not proved ==
+  +-- file [../../repaired.mlw]
+    +-- theory MinimumMovesToPickKOnes_Array_Spec
+      +-- goal window_cost'vc
+      +-- goal minimum_moves_to_pick_k_ones_array'vc
+  
+== Goals proved by only one prover ==
+  +-- file [../../repaired.mlw]
+    +-- theory MinimumMovesToPickKOnes_Array_Spec
+      +-- goal ones_count_from'vc: Z3 4.8.6
+      +-- goal ones_count_prefix'vc: Z3 4.8.6
+      +-- goal ones_count_prefix_monotone'vc: Z3 4.8.6
+      +-- goal ones_count_prefix_from_split'vc: Z3 4.8.6
+      +-- goal selected_count_from'vc: Z3 4.8.6
+      +-- goal selected_distance_from'vc: Z3 4.8.6
+      +-- goal positions_prefix_implies_sorted_nonnegative'vc: Z3 4.8.6
+      +-- goal collect_one_positions'vc: Z3 4.8.6
+      +-- goal build_prefix_sums'vc: Z3 4.8.6
+  
+1 session(s) read, with a total of 11 proof goals.
+== Unproved root goals after first prover ==
+MinimumMovesToPickKOnes_Array_Spec	window_cost'vc
+MinimumMovesToPickKOnes_Array_Spec	minimum_moves_to_pick_k_ones_array'vc
+== Stage 1: trying remaining goals with prover Alt-Ergo,2.4.0 ==
+---- stage1 | prover: Alt-Ergo,2.4.0 | theory: MinimumMovesToPickKOnes_Array_Spec | goal: window_cost'vc ----
+File repaired.mlw:
+Goal window_cost'vc.
+Prover result is: Timeout (10.00s, 113812 steps).
+---- stage1 | prover: Alt-Ergo,2.4.0 | theory: MinimumMovesToPickKOnes_Array_Spec | goal: minimum_moves_to_pick_k_ones_array'vc ----
+File repaired.mlw:
+Goal minimum_moves_to_pick_k_ones_array'vc.
+Prover result is: Timeout (10.00s, 158878 steps).
+Remaining after prover Alt-Ergo,2.4.0: 2
+== Stage 1: trying remaining goals with prover CVC4,1.8 ==
+---- stage1 | prover: CVC4,1.8 | theory: MinimumMovesToPickKOnes_Array_Spec | goal: window_cost'vc ----
+File repaired.mlw:
+Goal window_cost'vc.
+Prover result is: Timeout (10.00s, 657573 steps).
+---- stage1 | prover: CVC4,1.8 | theory: MinimumMovesToPickKOnes_Array_Spec | goal: minimum_moves_to_pick_k_ones_array'vc ----
+File repaired.mlw:
+Goal minimum_moves_to_pick_k_ones_array'vc.
+Prover result is: Timeout (10.00s, 754445 steps).
+Remaining after prover CVC4,1.8: 2
+== Goals still unproved after stage 1 ==
+MinimumMovesToPickKOnes_Array_Spec	window_cost'vc
+MinimumMovesToPickKOnes_Array_Spec	minimum_moves_to_pick_k_ones_array'vc
+== Stage 2: split_vc on unproved goal ==
+Target theory: MinimumMovesToPickKOnes_Array_Spec
+Target goal  : window_cost'vc
+---- stage2 | prover: Z3,4.8.6 | theory: MinimumMovesToPickKOnes_Array_Spec | goal: window_cost'vc ----
+Transforms: split_vc
+File "repaired.mlw", line 213, characters 14-34:
+Sub-goal Precondition of goal window_cost'vc.
+Prover result is: Valid (0.01s, 1269 steps).
+
+File "repaired.mlw", line 214, characters 13-57:
+Sub-goal Assertion of goal window_cost'vc.
+Prover result is: Valid (0.01s, 23813 steps).
+
+File "repaired.mlw", line 215, characters 17-31:
+Sub-goal Index in array bounds of goal window_cost'vc.
+Prover result is: Valid (0.01s, 23572 steps).
+
+File "repaired.mlw", line 216, characters 31-41:
+Sub-goal Index in array bounds of goal window_cost'vc.
+Prover result is: Valid (0.01s, 22144 steps).
+
+File "repaired.mlw", line 216, characters 19-28:
+Sub-goal Index in array bounds of goal window_cost'vc.
+Prover result is: Valid (0.01s, 23599 steps).
+
+File "repaired.mlw", line 217, characters 38-51:
+Sub-goal Index in array bounds of goal window_cost'vc.
+Prover result is: Valid (0.01s, 23620 steps).
+
+File "repaired.mlw", line 217, characters 20-35:
+Sub-goal Index in array bounds of goal window_cost'vc.
+Prover result is: Valid (0.01s, 23417 steps).
+
+File "repaired.mlw", line 220, characters 13-24:
+Sub-goal Assertion of goal window_cost'vc.
+Prover result is: Valid (0.01s, 23625 steps).
+
+File "repaired.mlw", line 210, characters 15-26:
+Sub-goal Postcondition of goal window_cost'vc.
+Prover result is: Timeout (10.00s, 480166934 steps).
+---- stage2 | prover: Alt-Ergo,2.4.0 | theory: MinimumMovesToPickKOnes_Array_Spec | goal: window_cost'vc ----
+Transforms: split_vc
+File "repaired.mlw", line 213, characters 14-34:
+Sub-goal Precondition of goal window_cost'vc.
+Prover result is: Valid (0.01s, 12 steps).
+
+File "repaired.mlw", line 214, characters 13-57:
+Sub-goal Assertion of goal window_cost'vc.
+Prover result is: Valid (0.01s, 12 steps).
+
+File "repaired.mlw", line 215, characters 17-31:
+Sub-goal Index in array bounds of goal window_cost'vc.
+Prover result is: Valid (0.01s, 22 steps).
+
+File "repaired.mlw", line 216, characters 31-41:
+Sub-goal Index in array bounds of goal window_cost'vc.
+Prover result is: Valid (0.01s, 22 steps).
+
+File "repaired.mlw", line 216, characters 19-28:
+Sub-goal Index in array bounds of goal window_cost'vc.
+Prover result is: Valid (0.01s, 22 steps).
+
+File "repaired.mlw", line 217, characters 38-51:
+Sub-goal Index in array bounds of goal window_cost'vc.
+Prover result is: Valid (0.01s, 25 steps).
+
+File "repaired.mlw", line 217, characters 20-35:
+Sub-goal Index in array bounds of goal window_cost'vc.
+Prover result is: Valid (0.01s, 21 steps).
+
+File "repaired.mlw", line 220, characters 13-24:
+Sub-goal Assertion of goal window_cost'vc.
+Prover result is: Valid (0.02s, 260 steps).
+
+File "repaired.mlw", line 210, characters 15-26:
+Sub-goal Postcondition of goal window_cost'vc.
+Prover result is: Timeout (10.00s, 113981 steps).
+---- stage2 | prover: CVC4,1.8 | theory: MinimumMovesToPickKOnes_Array_Spec | goal: window_cost'vc ----
+Transforms: split_vc
+File "repaired.mlw", line 213, characters 14-34:
+Sub-goal Precondition of goal window_cost'vc.
+Prover result is: Valid (0.01s, 3342 steps).
+
+File "repaired.mlw", line 214, characters 13-57:
+Sub-goal Assertion of goal window_cost'vc.
+Prover result is: Valid (0.02s, 6694 steps).
+
+File "repaired.mlw", line 215, characters 17-31:
+Sub-goal Index in array bounds of goal window_cost'vc.
+Prover result is: Valid (0.02s, 6710 steps).
+
+File "repaired.mlw", line 216, characters 31-41:
+Sub-goal Index in array bounds of goal window_cost'vc.
+Prover result is: Valid (0.02s, 6650 steps).
+
+File "repaired.mlw", line 216, characters 19-28:
+Sub-goal Index in array bounds of goal window_cost'vc.
+Prover result is: Valid (0.02s, 6718 steps).
+
+File "repaired.mlw", line 217, characters 38-51:
+Sub-goal Index in array bounds of goal window_cost'vc.
+Prover result is: Valid (0.02s, 6734 steps).
+
+File "repaired.mlw", line 217, characters 20-35:
+Sub-goal Index in array bounds of goal window_cost'vc.
+Prover result is: Valid (0.02s, 6675 steps).
+
+File "repaired.mlw", line 220, characters 13-24:
+Sub-goal Assertion of goal window_cost'vc.
+Prover result is: Valid (0.03s, 9059 steps).
+
+File "repaired.mlw", line 210, characters 15-26:
+Sub-goal Postcondition of goal window_cost'vc.
+Prover result is: Timeout (10.00s, 860062 steps).
+== Stage 2: split_vc on unproved goal ==
+Target theory: MinimumMovesToPickKOnes_Array_Spec
+Target goal  : minimum_moves_to_pick_k_ones_array'vc
+---- stage2 | prover: Z3,4.8.6 | theory: MinimumMovesToPickKOnes_Array_Spec | goal: minimum_moves_to_pick_k_ones_array'vc ----
+Transforms: split_vc
+File "repaired.mlw", line 229, characters 13-47:
+Sub-goal Assertion of goal minimum_moves_to_pick_k_ones_array'vc.
+Prover result is: Valid (0.01s, 1405 steps).
+
+File "repaired.mlw", line 230, characters 13-63:
+Sub-goal Assertion of goal minimum_moves_to_pick_k_ones_array'vc.
+Prover result is: Valid (0.01s, 1410 steps).
+
+File "repaired.mlw", line 231, characters 13-67:
+Sub-goal Assertion of goal minimum_moves_to_pick_k_ones_array'vc.
+Prover result is: Valid (0.01s, 1415 steps).
+
+File "repaired.mlw", line 232, characters 13-64:
+Sub-goal Assertion of goal minimum_moves_to_pick_k_ones_array'vc.
+Prover result is: Valid (0.01s, 1420 steps).
+
+File "repaired.mlw", line 235, characters 13-23:
+Sub-goal Assertion of goal minimum_moves_to_pick_k_ones_array'vc.
+Prover result is: Valid (0.01s, 25244 steps).
+
+File "repaired.mlw", line 236, characters 13-23:
+Sub-goal Assertion of goal minimum_moves_to_pick_k_ones_array'vc.
+Prover result is: Valid (0.01s, 25719 steps).
+
+File "repaired.mlw", line 237, characters 13-38:
+Sub-goal Assertion of goal minimum_moves_to_pick_k_ones_array'vc.
+Prover result is: Valid (0.01s, 25641 steps).
+
+File "repaired.mlw", line 238, characters 13-27:
+Sub-goal Assertion of goal minimum_moves_to_pick_k_ones_array'vc.
+Prover result is: Valid (0.01s, 28162 steps).
+
+File "repaired.mlw", line 242, characters 18-41:
+Sub-goal Loop invariant init of goal minimum_moves_to_pick_k_ones_array'vc.
+Prover result is: Valid (0.01s, 1528 steps).
+
+File "repaired.mlw", line 243, characters 18-37:
+Sub-goal Loop invariant init of goal minimum_moves_to_pick_k_ones_array'vc.
+Prover result is: Valid (0.01s, 2223 steps).
+
+File "repaired.mlw", line 244, characters 18-43:
+Sub-goal Loop invariant init of goal minimum_moves_to_pick_k_ones_array'vc.
+Prover result is: Valid (0.01s, 1542 steps).
+
+File "repaired.mlw", line 245, characters 18-28:
+Sub-goal Loop invariant init of goal minimum_moves_to_pick_k_ones_array'vc.
+Prover result is: Valid (0.22s, 2563569 steps).
+
+File "repaired.mlw", line 246, characters 18-72:
+Sub-goal Loop invariant init of goal minimum_moves_to_pick_k_ones_array'vc.
+Prover result is: Valid (0.01s, 1599 steps).
+
+File "repaired.mlw", line 247, characters 18-69:
+Sub-goal Loop invariant init of goal minimum_moves_to_pick_k_ones_array'vc.
+Prover result is: Valid (0.01s, 1604 steps).
+
+File "repaired.mlw", line 242, characters 18-41:
+Sub-goal Loop invariant preservation of goal
+minimum_moves_to_pick_k_ones_array'vc.
+Prover result is: Valid (0.01s, 25299 steps).
+
+File "repaired.mlw", line 243, characters 18-37:
+Sub-goal Loop invariant preservation of goal
+minimum_moves_to_pick_k_ones_array'vc.
+Prover result is: Valid (0.01s, 2439 steps).
+
+File "repaired.mlw", line 244, characters 18-43:
+Sub-goal Loop invariant preservation of goal
+minimum_moves_to_pick_k_ones_array'vc.
+Prover result is: Valid (0.01s, 1688 steps).
+
+File "repaired.mlw", line 245, characters 18-28:
+Sub-goal Loop invariant preservation of goal
+minimum_moves_to_pick_k_ones_array'vc.
+Prover result is: Valid (0.01s, 25388 steps).
+
+File "repaired.mlw", line 246, characters 18-72:
+Sub-goal Loop invariant preservation of goal
+minimum_moves_to_pick_k_ones_array'vc.
+Prover result is: Valid (0.01s, 1698 steps).
+
+File "repaired.mlw", line 247, characters 18-69:
+Sub-goal Loop invariant preservation of goal
+minimum_moves_to_pick_k_ones_array'vc.
+Prover result is: Valid (0.01s, 1703 steps).
+
+File "repaired.mlw", line 242, characters 18-41:
+Sub-goal Loop invariant preservation of goal
+minimum_moves_to_pick_k_ones_array'vc.
+Prover result is: Valid (0.01s, 25218 steps).
+
+File "repaired.mlw", line 243, characters 18-37:
+Sub-goal Loop invariant preservation of goal
+minimum_moves_to_pick_k_ones_array'vc.
+Prover result is: Valid (0.01s, 2424 steps).
+
+File "repaired.mlw", line 244, characters 18-43:
+Sub-goal Loop invariant preservation of goal
+minimum_moves_to_pick_k_ones_array'vc.
+Prover result is: Valid (0.01s, 1681 steps).
+
+File "repaired.mlw", line 245, characters 18-28:
+Sub-goal Loop invariant preservation of goal
+minimum_moves_to_pick_k_ones_array'vc.
+Prover result is: Valid (0.01s, 1686 steps).
+
+File "repaired.mlw", line 246, characters 18-72:
+Sub-goal Loop invariant preservation of goal
+minimum_moves_to_pick_k_ones_array'vc.
+Prover result is: Valid (0.01s, 1691 steps).
+
+File "repaired.mlw", line 247, characters 18-69:
+Sub-goal Loop invariant preservation of goal
+minimum_moves_to_pick_k_ones_array'vc.
+Prover result is: Valid (0.01s, 1696 steps).
+
+File "repaired.mlw", line 253, characters 24-61:
+Sub-goal Loop invariant init of goal minimum_moves_to_pick_k_ones_array'vc.
+Prover result is: Valid (0.01s, 1614 steps).
+
+File "repaired.mlw", line 254, characters 24-29:
+Sub-goal Loop invariant init of goal minimum_moves_to_pick_k_ones_array'vc.
+Prover result is: Valid (0.01s, 25371 steps).
+
+File "repaired.mlw", line 255, characters 24-45:
+Sub-goal Loop invariant init of goal minimum_moves_to_pick_k_ones_array'vc.
+Prover result is: Valid (0.01s, 25699 steps).
+
+File "repaired.mlw", line 256, characters 24-41:
+Sub-goal Loop invariant init of goal minimum_moves_to_pick_k_ones_array'vc.
+Prover result is: Timeout (10.00s, 309585111 steps).
+
+File "repaired.mlw", line 257, characters 24-78:
+Sub-goal Loop invariant init of goal minimum_moves_to_pick_k_ones_array'vc.
+Prover result is: Valid (0.01s, 1687 steps).
+
+File "repaired.mlw", line 258, characters 24-75:
+Sub-goal Loop invariant init of goal minimum_moves_to_pick_k_ones_array'vc.
+Prover result is: Valid (0.01s, 1692 steps).
+
+File "repaired.mlw", line 259, characters 26-59:
+Sub-goal Precondition of goal minimum_moves_to_pick_k_ones_array'vc.
+Prover result is: Valid (0.01s, 1655 steps).
+
+File "repaired.mlw", line 259, characters 26-59:
+Sub-goal Precondition of goal minimum_moves_to_pick_k_ones_array'vc.
+Prover result is: Valid (0.01s, 1660 steps).
+
+File "repaired.mlw", line 259, characters 26-59:
+Sub-goal Precondition of goal minimum_moves_to_pick_k_ones_array'vc.
+Prover result is: Valid (0.01s, 12778 steps).
+
+File "repaired.mlw", line 259, characters 26-59:
+Sub-goal Precondition of goal minimum_moves_to_pick_k_ones_array'vc.
+Prover result is: Valid (0.01s, 1680 steps).
+
+File "repaired.mlw", line 259, characters 26-59:
+Sub-goal Precondition of goal minimum_moves_to_pick_k_ones_array'vc.
+Prover result is: Valid (0.01s, 1685 steps).
+
+File "repaired.mlw", line 259, characters 26-59:
+Sub-goal Precondition of goal minimum_moves_to_pick_k_ones_array'vc.
+Prover result is: Valid (0.01s, 1690 steps).
+
+File "repaired.mlw", line 253, characters 24-61:
+Sub-goal Loop invariant preservation of goal
+minimum_moves_to_pick_k_ones_array'vc.
+Prover result is: Valid (0.01s, 26364 steps).
+
+File "repaired.mlw", line 254, characters 24-29:
+Sub-goal Loop invariant preservation of goal
+minimum_moves_to_pick_k_ones_array'vc.
+Prover result is: Valid (0.01s, 1693 steps).
+
+File "repaired.mlw", line 255, characters 24-45:
+Sub-goal Loop invariant preservation of goal
+minimum_moves_to_pick_k_ones_array'vc.
+Prover result is: Valid (0.01s, 1698 steps).
+
+File "repaired.mlw", line 256, characters 24-41:
+Sub-goal Loop invariant preservation of goal
+minimum_moves_to_pick_k_ones_array'vc.
+Prover result is: Valid (0.01s, 9475 steps).
+
+File "repaired.mlw", line 257, characters 24-78:
+Sub-goal Loop invariant preservation of goal
+minimum_moves_to_pick_k_ones_array'vc.
+Prover result is: Valid (0.01s, 1708 steps).
+
+File "repaired.mlw", line 258, characters 24-75:
+Sub-goal Loop invariant preservation of goal
+minimum_moves_to_pick_k_ones_array'vc.
+Prover result is: Valid (0.01s, 1713 steps).
+
+File "repaired.mlw", line 253, characters 24-61:
+Sub-goal Loop invariant preservation of goal
+minimum_moves_to_pick_k_ones_array'vc.
+Prover result is: Valid (0.01s, 26290 steps).
+
+File "repaired.mlw", line 254, characters 24-29:
+Sub-goal Loop invariant preservation of goal
+minimum_moves_to_pick_k_ones_array'vc.
+Prover result is: Valid (0.01s, 1692 steps).
+
+File "repaired.mlw", line 255, characters 24-45:
+Sub-goal Loop invariant preservation of goal
+minimum_moves_to_pick_k_ones_array'vc.
+Prover result is: Valid (0.01s, 1697 steps).
+
+File "repaired.mlw", line 256, characters 24-41:
+Sub-goal Loop invariant preservation of goal
+minimum_moves_to_pick_k_ones_array'vc.
+Prover result is: Valid (0.01s, 1702 steps).
+
+File "repaired.mlw", line 257, characters 24-78:
+Sub-goal Loop invariant preservation of goal
+minimum_moves_to_pick_k_ones_array'vc.
+Prover result is: Valid (0.01s, 1707 steps).
+
+File "repaired.mlw", line 258, characters 24-75:
+Sub-goal Loop invariant preservation of goal
+minimum_moves_to_pick_k_ones_array'vc.
+Prover result is: Valid (0.01s, 1712 steps).
+
+File "repaired.mlw", line 242, characters 18-41:
+Sub-goal Loop invariant preservation of goal
+minimum_moves_to_pick_k_ones_array'vc.
+Prover result is: Valid (0.01s, 25362 steps).
+
+File "repaired.mlw", line 243, characters 18-37:
+Sub-goal Loop invariant preservation of goal
+minimum_moves_to_pick_k_ones_array'vc.
+Prover result is: Valid (0.01s, 2543 steps).
+
+File "repaired.mlw", line 244, characters 18-43:
+Sub-goal Loop invariant preservation of goal
+minimum_moves_to_pick_k_ones_array'vc.
+Prover result is: Valid (0.01s, 1760 steps).
+
+File "repaired.mlw", line 245, characters 18-28:
+Sub-goal Loop invariant preservation of goal
+minimum_moves_to_pick_k_ones_array'vc.
+Prover result is: Valid (0.01s, 29163 steps).
+
+File "repaired.mlw", line 246, characters 18-72:
+Sub-goal Loop invariant preservation of goal
+minimum_moves_to_pick_k_ones_array'vc.
+Prover result is: Valid (0.01s, 1770 steps).
+
+File "repaired.mlw", line 247, characters 18-69:
+Sub-goal Loop invariant preservation of goal
+minimum_moves_to_pick_k_ones_array'vc.
+Prover result is: Valid (0.01s, 1775 steps).
+
+File "repaired.mlw", line 242, characters 18-41:
+Sub-goal Loop invariant preservation of goal
+minimum_moves_to_pick_k_ones_array'vc.
+Prover result is: Valid (0.01s, 25267 steps).
+
+File "repaired.mlw", line 243, characters 18-37:
+Sub-goal Loop invariant preservation of goal
+minimum_moves_to_pick_k_ones_array'vc.
+Prover result is: Valid (0.01s, 2528 steps).
+
+File "repaired.mlw", line 244, characters 18-43:
+Sub-goal Loop invariant preservation of goal
+minimum_moves_to_pick_k_ones_array'vc.
+Prover result is: Valid (0.01s, 1753 steps).
+
+File "repaired.mlw", line 245, characters 18-28:
+Sub-goal Loop invariant preservation of goal
+minimum_moves_to_pick_k_ones_array'vc.
+Prover result is: Valid (0.01s, 1758 steps).
+
+File "repaired.mlw", line 246, characters 18-72:
+Sub-goal Loop invariant preservation of goal
+minimum_moves_to_pick_k_ones_array'vc.
+Prover result is: Valid (0.01s, 1763 steps).
+
+File "repaired.mlw", line 247, characters 18-69:
+Sub-goal Loop invariant preservation of goal
+minimum_moves_to_pick_k_ones_array'vc.
+Prover result is: Valid (0.01s, 1768 steps).
+
+File repaired.mlw:
+Sub-goal Out of loop bounds of goal minimum_moves_to_pick_k_ones_array'vc.
+Prover result is: Valid (0.01s, 26054 steps).
+
+File "repaired.mlw", line 269, characters 13-45:
+Sub-goal Assertion of goal minimum_moves_to_pick_k_ones_array'vc.
+Prover result is: Valid (0.01s, 1560 steps).
+
+File "repaired.mlw", line 270, characters 13-23:
+Sub-goal Assertion of goal minimum_moves_to_pick_k_ones_array'vc.
+Prover result is: Valid (0.01s, 1565 steps).
+
+File "repaired.mlw", line 271, character 13 to line 272, character 70:
+Sub-goal Assertion of goal minimum_moves_to_pick_k_ones_array'vc.
+Prover result is: Timeout (10.00s, 144563897 steps).
+Infrastructure issue in stage 2 with prover Z3,4.8.6; aborting rest of stage 2.
+== Goals still unproved after stage 2 (split_vc) ==
+MinimumMovesToPickKOnes_Array_Spec	window_cost'vc
+MinimumMovesToPickKOnes_Array_Spec	minimum_moves_to_pick_k_ones_array'vc
+== Stage 3: split_vc + inline_all on still-unproved goal ==
+Target theory: MinimumMovesToPickKOnes_Array_Spec
+Target goal  : window_cost'vc
+---- stage3 | prover: Alt-Ergo,2.4.0 | theory: MinimumMovesToPickKOnes_Array_Spec | goal: window_cost'vc ----
+Transforms: split_vc inline_all
+File "repaired.mlw", line 213, characters 14-34:
+Sub-goal Precondition of goal window_cost'vc.
+Prover result is: Valid (0.01s, 11 steps).
+
+File "repaired.mlw", line 214, characters 13-57:
+Sub-goal Assertion of goal window_cost'vc.
+Prover result is: Valid (0.01s, 100 steps).
+
+File "repaired.mlw", line 215, characters 17-31:
+Sub-goal Index in array bounds of goal window_cost'vc.
+Prover result is: Valid (0.01s, 100 steps).
+
+File "repaired.mlw", line 216, characters 31-41:
+Sub-goal Index in array bounds of goal window_cost'vc.
+Prover result is: Valid (0.01s, 44 steps).
+
+File "repaired.mlw", line 216, characters 19-28:
+Sub-goal Index in array bounds of goal window_cost'vc.
+Prover result is: Valid (0.01s, 100 steps).
+
+File "repaired.mlw", line 217, characters 38-51:
+Sub-goal Index in array bounds of goal window_cost'vc.
+Prover result is: Valid (0.01s, 125 steps).
+
+File "repaired.mlw", line 217, characters 20-35:
+Sub-goal Index in array bounds of goal window_cost'vc.
+Prover result is: Valid (0.01s, 90 steps).
+
+File "repaired.mlw", line 220, characters 13-24:
+Sub-goal Assertion of goal window_cost'vc.
+Prover result is: Valid (0.03s, 815 steps).
+
+File "repaired.mlw", line 210, characters 15-26:
+Sub-goal Postcondition of goal window_cost'vc.
+Prover result is: Timeout (10.00s, 235537 steps).
+---- stage3 | prover: CVC4,1.8 | theory: MinimumMovesToPickKOnes_Array_Spec | goal: window_cost'vc ----
+Transforms: split_vc inline_all
+File "repaired.mlw", line 213, characters 14-34:
+Sub-goal Precondition of goal window_cost'vc.
+Prover result is: Valid (0.01s, 4327 steps).
+
+File "repaired.mlw", line 214, characters 13-57:
+Sub-goal Assertion of goal window_cost'vc.
+Prover result is: Valid (0.02s, 8046 steps).
+
+File "repaired.mlw", line 215, characters 17-31:
+Sub-goal Index in array bounds of goal window_cost'vc.
+Prover result is: Valid (0.02s, 8166 steps).
+
+File "repaired.mlw", line 216, characters 31-41:
+Sub-goal Index in array bounds of goal window_cost'vc.
+Prover result is: Valid (0.02s, 7937 steps).
+
+File "repaired.mlw", line 216, characters 19-28:
+Sub-goal Index in array bounds of goal window_cost'vc.
+Prover result is: Valid (0.02s, 8176 steps).
+
+File "repaired.mlw", line 217, characters 38-51:
+Sub-goal Index in array bounds of goal window_cost'vc.
+Prover result is: Valid (0.02s, 8159 steps).
+
+File "repaired.mlw", line 217, characters 20-35:
+Sub-goal Index in array bounds of goal window_cost'vc.
+Prover result is: Valid (0.02s, 8015 steps).
+
+File "repaired.mlw", line 220, characters 13-24:
+Sub-goal Assertion of goal window_cost'vc.
+Prover result is: Valid (0.03s, 9083 steps).
+
+File "repaired.mlw", line 210, characters 15-26:
+Sub-goal Postcondition of goal window_cost'vc.
+Prover result is: Timeout (10.00s, 1067044 steps).
+== Stage 3: split_vc + inline_all on still-unproved goal ==
+Target theory: MinimumMovesToPickKOnes_Array_Spec
+Target goal  : minimum_moves_to_pick_k_ones_array'vc
+---- stage3 | prover: Alt-Ergo,2.4.0 | theory: MinimumMovesToPickKOnes_Array_Spec | goal: minimum_moves_to_pick_k_ones_array'vc ----
+Transforms: split_vc inline_all
+File "repaired.mlw", line 229, characters 13-47:
+Sub-goal Assertion of goal minimum_moves_to_pick_k_ones_array'vc.
+Prover result is: Valid (0.01s, 15 steps).
+
+File "repaired.mlw", line 230, characters 13-63:
+Sub-goal Assertion of goal minimum_moves_to_pick_k_ones_array'vc.
+Prover result is: Valid (0.03s, 517 steps).
+
+File "repaired.mlw", line 231, characters 13-67:
+Sub-goal Assertion of goal minimum_moves_to_pick_k_ones_array'vc.
+Prover result is: Valid (0.02s, 348 steps).
+
+File "repaired.mlw", line 232, characters 13-64:
+Sub-goal Assertion of goal minimum_moves_to_pick_k_ones_array'vc.
+Prover result is: Valid (0.01s, 95 steps).
+
+File "repaired.mlw", line 235, characters 13-23:
+Sub-goal Assertion of goal minimum_moves_to_pick_k_ones_array'vc.
+Prover result is: Valid (0.01s, 21 steps).
+
+File "repaired.mlw", line 236, characters 13-23:
+Sub-goal Assertion of goal minimum_moves_to_pick_k_ones_array'vc.
+Prover result is: Valid (0.01s, 54 steps).
+
+File "repaired.mlw", line 237, characters 13-38:
+Sub-goal Assertion of goal minimum_moves_to_pick_k_ones_array'vc.
+Prover result is: Valid (0.01s, 23 steps).
+
+File "repaired.mlw", line 238, characters 13-27:
+Sub-goal Assertion of goal minimum_moves_to_pick_k_ones_array'vc.
+Prover result is: Valid (0.01s, 66 steps).
+
+File "repaired.mlw", line 242, characters 18-41:
+Sub-goal Loop invariant init of goal minimum_moves_to_pick_k_ones_array'vc.
+Prover result is: Valid (0.01s, 23 steps).
+
+File "repaired.mlw", line 243, characters 18-37:
+Sub-goal Loop invariant init of goal minimum_moves_to_pick_k_ones_array'vc.
+Prover result is: Valid (0.01s, 23 steps).
+
+File "repaired.mlw", line 244, characters 18-43:
+Sub-goal Loop invariant init of goal minimum_moves_to_pick_k_ones_array'vc.
+Prover result is: Valid (0.01s, 23 steps).
+
+File "repaired.mlw", line 245, characters 18-28:
+Sub-goal Loop invariant init of goal minimum_moves_to_pick_k_ones_array'vc.
+Prover result is: Valid (0.01s, 165 steps).
+
+File "repaired.mlw", line 246, characters 18-72:
+Sub-goal Loop invariant init of goal minimum_moves_to_pick_k_ones_array'vc.
+Prover result is: Valid (0.03s, 423 steps).
+
+File "repaired.mlw", line 247, characters 18-69:
+Sub-goal Loop invariant init of goal minimum_moves_to_pick_k_ones_array'vc.
+Prover result is: Valid (0.01s, 124 steps).
+
+File "repaired.mlw", line 242, characters 18-41:
+Sub-goal Loop invariant preservation of goal
+minimum_moves_to_pick_k_ones_array'vc.
+Prover result is: Valid (0.01s, 52 steps).
+
+File "repaired.mlw", line 243, characters 18-37:
+Sub-goal Loop invariant preservation of goal
+minimum_moves_to_pick_k_ones_array'vc.
+Prover result is: Valid (0.01s, 37 steps).
+
+File "repaired.mlw", line 244, characters 18-43:
+Sub-goal Loop invariant preservation of goal
+minimum_moves_to_pick_k_ones_array'vc.
+Prover result is: Valid (0.01s, 37 steps).
+
+File "repaired.mlw", line 245, characters 18-28:
+Sub-goal Loop invariant preservation of goal
+minimum_moves_to_pick_k_ones_array'vc.
+Prover result is: Valid (0.01s, 62 steps).
+
+File "repaired.mlw", line 246, characters 18-72:
+Sub-goal Loop invariant preservation of goal
+minimum_moves_to_pick_k_ones_array'vc.
+Prover result is: Valid (0.03s, 454 steps).
+
+File "repaired.mlw", line 247, characters 18-69:
+Sub-goal Loop invariant preservation of goal
+minimum_moves_to_pick_k_ones_array'vc.
+Prover result is: Valid (0.01s, 147 steps).
+
+File "repaired.mlw", line 242, characters 18-41:
+Sub-goal Loop invariant preservation of goal
+minimum_moves_to_pick_k_ones_array'vc.
+Prover result is: Valid (0.01s, 49 steps).
+
+File "repaired.mlw", line 243, characters 18-37:
+Sub-goal Loop invariant preservation of goal
+minimum_moves_to_pick_k_ones_array'vc.
+Prover result is: Valid (0.01s, 33 steps).
+
+File "repaired.mlw", line 244, characters 18-43:
+Sub-goal Loop invariant preservation of goal
+minimum_moves_to_pick_k_ones_array'vc.
+Prover result is: Valid (0.01s, 33 steps).
+
+File "repaired.mlw", line 245, characters 18-28:
+Sub-goal Loop invariant preservation of goal
+minimum_moves_to_pick_k_ones_array'vc.
+Prover result is: Valid (0.01s, 33 steps).
+
+File "repaired.mlw", line 246, characters 18-72:
+Sub-goal Loop invariant preservation of goal
+minimum_moves_to_pick_k_ones_array'vc.
+Prover result is: Valid (0.03s, 447 steps).
+
+File "repaired.mlw", line 247, characters 18-69:
+Sub-goal Loop invariant preservation of goal
+minimum_moves_to_pick_k_ones_array'vc.
+Prover result is: Valid (0.01s, 141 steps).
+
+File "repaired.mlw", line 253, characters 24-61:
+Sub-goal Loop invariant init of goal minimum_moves_to_pick_k_ones_array'vc.
+Prover result is: Valid (0.01s, 31 steps).
+
+File "repaired.mlw", line 254, characters 24-29:
+Sub-goal Loop invariant init of goal minimum_moves_to_pick_k_ones_array'vc.
+Prover result is: Valid (0.01s, 52 steps).
+
+File "repaired.mlw", line 255, characters 24-45:
+Sub-goal Loop invariant init of goal minimum_moves_to_pick_k_ones_array'vc.
+Prover result is: Valid (0.01s, 63 steps).
+
+File "repaired.mlw", line 256, characters 24-41:
+Sub-goal Loop invariant init of goal minimum_moves_to_pick_k_ones_array'vc.
+Prover result is: Valid (0.01s, 197 steps).
+
+File "repaired.mlw", line 257, characters 24-78:
+Sub-goal Loop invariant init of goal minimum_moves_to_pick_k_ones_array'vc.
+Prover result is: Valid (0.03s, 483 steps).
+
+File "repaired.mlw", line 258, characters 24-75:
+Sub-goal Loop invariant init of goal minimum_moves_to_pick_k_ones_array'vc.
+Prover result is: Valid (0.01s, 144 steps).
+
+File "repaired.mlw", line 259, characters 26-59:
+Sub-goal Precondition of goal minimum_moves_to_pick_k_ones_array'vc.
+Prover result is: Valid (0.01s, 38 steps).
+
+File "repaired.mlw", line 259, characters 26-59:
+Sub-goal Precondition of goal minimum_moves_to_pick_k_ones_array'vc.
+Prover result is: Valid (0.01s, 38 steps).
+
+File "repaired.mlw", line 259, characters 26-59:
+Sub-goal Precondition of goal minimum_moves_to_pick_k_ones_array'vc.
+Prover result is: Valid (0.01s, 52 steps).
+
+File "repaired.mlw", line 259, characters 26-59:
+Sub-goal Precondition of goal minimum_moves_to_pick_k_ones_array'vc.
+Prover result is: Valid (0.01s, 39 steps).
+
+File "repaired.mlw", line 259, characters 26-59:
+Sub-goal Precondition of goal minimum_moves_to_pick_k_ones_array'vc.
+Prover result is: Valid (0.03s, 481 steps).
+
+File "repaired.mlw", line 259, characters 26-59:
+Sub-goal Precondition of goal minimum_moves_to_pick_k_ones_array'vc.
+Prover result is: Valid (0.01s, 148 steps).
+
+File "repaired.mlw", line 253, characters 24-61:
+Sub-goal Loop invariant preservation of goal
+minimum_moves_to_pick_k_ones_array'vc.
+Prover result is: Valid (0.01s, 91 steps).
+
+File "repaired.mlw", line 254, characters 24-29:
+Sub-goal Loop invariant preservation of goal
+minimum_moves_to_pick_k_ones_array'vc.
+Prover result is: Valid (0.01s, 45 steps).
+
+File "repaired.mlw", line 255, characters 24-45:
+Sub-goal Loop invariant preservation of goal
+minimum_moves_to_pick_k_ones_array'vc.
+Prover result is: Valid (0.01s, 45 steps).
+
+File "repaired.mlw", line 256, characters 24-41:
+Sub-goal Loop invariant preservation of goal
+minimum_moves_to_pick_k_ones_array'vc.
+Prover result is: Valid (0.01s, 51 steps).
+
+File "repaired.mlw", line 257, characters 24-78:
+Sub-goal Loop invariant preservation of goal
+minimum_moves_to_pick_k_ones_array'vc.
+Prover result is: Valid (0.03s, 502 steps).
+
+File "repaired.mlw", line 258, characters 24-75:
+Sub-goal Loop invariant preservation of goal
+minimum_moves_to_pick_k_ones_array'vc.
+Prover result is: Valid (0.01s, 160 steps).
+
+File "repaired.mlw", line 253, characters 24-61:
+Sub-goal Loop invariant preservation of goal
+minimum_moves_to_pick_k_ones_array'vc.
+Prover result is: Valid (0.01s, 89 steps).
+
+File "repaired.mlw", line 254, characters 24-29:
+Sub-goal Loop invariant preservation of goal
+minimum_moves_to_pick_k_ones_array'vc.
+Prover result is: Valid (0.01s, 43 steps).
+
+File "repaired.mlw", line 255, characters 24-45:
+Sub-goal Loop invariant preservation of goal
+minimum_moves_to_pick_k_ones_array'vc.
+Prover result is: Valid (0.01s, 43 steps).
+
+File "repaired.mlw", line 256, characters 24-41:
+Sub-goal Loop invariant preservation of goal
+minimum_moves_to_pick_k_ones_array'vc.
+Prover result is: Valid (0.01s, 43 steps).
+
+File "repaired.mlw", line 257, characters 24-78:
+Sub-goal Loop invariant preservation of goal
+minimum_moves_to_pick_k_ones_array'vc.
+Prover result is: Valid (0.03s, 495 steps).
+
+File "repaired.mlw", line 258, characters 24-75:
+Sub-goal Loop invariant preservation of goal
+minimum_moves_to_pick_k_ones_array'vc.
+Prover result is: Valid (0.01s, 155 steps).
+
+File "repaired.mlw", line 242, characters 18-41:
+Sub-goal Loop invariant preservation of goal
+minimum_moves_to_pick_k_ones_array'vc.
+Prover result is: Valid (0.01s, 75 steps).
+
+File "repaired.mlw", line 243, characters 18-37:
+Sub-goal Loop invariant preservation of goal
+minimum_moves_to_pick_k_ones_array'vc.
+Prover result is: Valid (0.01s, 41 steps).
+
+File "repaired.mlw", line 244, characters 18-43:
+Sub-goal Loop invariant preservation of goal
+minimum_moves_to_pick_k_ones_array'vc.
+Prover result is: Valid (0.01s, 40 steps).
+
+File "repaired.mlw", line 245, characters 18-28:
+Sub-goal Loop invariant preservation of goal
+minimum_moves_to_pick_k_ones_array'vc.
+Prover result is: Valid (0.01s, 109 steps).
+
+File "repaired.mlw", line 246, characters 18-72:
+Sub-goal Loop invariant preservation of goal
+minimum_moves_to_pick_k_ones_array'vc.
+Prover result is: Valid (0.03s, 492 steps).
+
+File "repaired.mlw", line 247, characters 18-69:
+Sub-goal Loop invariant preservation of goal
+minimum_moves_to_pick_k_ones_array'vc.
+Prover result is: Valid (0.01s, 151 steps).
+
+File "repaired.mlw", line 242, characters 18-41:
+Sub-goal Loop invariant preservation of goal
+minimum_moves_to_pick_k_ones_array'vc.
+Prover result is: Valid (0.01s, 71 steps).
+
+File "repaired.mlw", line 243, characters 18-37:
+Sub-goal Loop invariant preservation of goal
+minimum_moves_to_pick_k_ones_array'vc.
+Prover result is: Valid (0.01s, 38 steps).
+
+File "repaired.mlw", line 244, characters 18-43:
+Sub-goal Loop invariant preservation of goal
+minimum_moves_to_pick_k_ones_array'vc.
+Prover result is: Valid (0.01s, 38 steps).
+
+File "repaired.mlw", line 245, characters 18-28:
+Sub-goal Loop invariant preservation of goal
+minimum_moves_to_pick_k_ones_array'vc.
+Prover result is: Valid (0.01s, 38 steps).
+
+File "repaired.mlw", line 246, characters 18-72:
+Sub-goal Loop invariant preservation of goal
+minimum_moves_to_pick_k_ones_array'vc.
+Prover result is: Valid (0.03s, 482 steps).
+
+File "repaired.mlw", line 247, characters 18-69:
+Sub-goal Loop invariant preservation of goal
+minimum_moves_to_pick_k_ones_array'vc.
+Prover result is: Valid (0.01s, 145 steps).
+
+File repaired.mlw:
+Sub-goal Out of loop bounds of goal minimum_moves_to_pick_k_ones_array'vc.
+Prover result is: Valid (0.01s, 122 steps).
+
+File "repaired.mlw", line 269, characters 13-45:
+Sub-goal Assertion of goal minimum_moves_to_pick_k_ones_array'vc.
+Prover result is: Valid (0.01s, 89 steps).
+
+File "repaired.mlw", line 270, characters 13-23:
+Sub-goal Assertion of goal minimum_moves_to_pick_k_ones_array'vc.
+Prover result is: Valid (0.01s, 24 steps).
+
+File "repaired.mlw", line 271, character 13 to line 272, character 70:
+Sub-goal Assertion of goal minimum_moves_to_pick_k_ones_array'vc.
+Prover result is: Timeout (10.00s, 207057 steps).
+
+File "repaired.mlw", line 274, characters 74-88:
+Sub-goal Assertion of goal minimum_moves_to_pick_k_ones_array'vc.
+Prover result is: Timeout (10.00s, 139627 steps).
+
+File "repaired.mlw", line 275, characters 13-56:
+Sub-goal Assertion of goal minimum_moves_to_pick_k_ones_array'vc.
+Prover result is: Valid (3.86s, 81047 steps).
+
+File "repaired.mlw", line 225, characters 15-59:
+Sub-goal Postcondition of goal minimum_moves_to_pick_k_ones_array'vc.
+Prover result is: Valid (1.59s, 29832 steps).
+
+File repaired.mlw:
+Sub-goal Out of loop bounds of goal minimum_moves_to_pick_k_ones_array'vc.
+Prover result is: Valid (0.01s, 30 steps).
+---- stage3 | prover: CVC4,1.8 | theory: MinimumMovesToPickKOnes_Array_Spec | goal: minimum_moves_to_pick_k_ones_array'vc ----
+Transforms: split_vc inline_all
+File "repaired.mlw", line 229, characters 13-47:
+Sub-goal Assertion of goal minimum_moves_to_pick_k_ones_array'vc.
+Prover result is: Valid (0.02s, 4979 steps).
+
+File "repaired.mlw", line 230, characters 13-63:
+Sub-goal Assertion of goal minimum_moves_to_pick_k_ones_array'vc.
+Prover result is: Valid (0.02s, 5462 steps).
+
+File "repaired.mlw", line 231, characters 13-67:
+Sub-goal Assertion of goal minimum_moves_to_pick_k_ones_array'vc.
+Prover result is: Valid (0.02s, 5782 steps).
+
+File "repaired.mlw", line 232, characters 13-64:
+Sub-goal Assertion of goal minimum_moves_to_pick_k_ones_array'vc.
+Prover result is: Valid (0.02s, 6001 steps).
+
+File "repaired.mlw", line 235, characters 13-23:
+Sub-goal Assertion of goal minimum_moves_to_pick_k_ones_array'vc.
+Prover result is: Valid (0.02s, 6215 steps).
+
+File "repaired.mlw", line 236, characters 13-23:
+Sub-goal Assertion of goal minimum_moves_to_pick_k_ones_array'vc.
+Prover result is: Valid (0.02s, 6344 steps).
+
+File "repaired.mlw", line 237, characters 13-38:
+Sub-goal Assertion of goal minimum_moves_to_pick_k_ones_array'vc.
+Prover result is: Valid (0.02s, 6322 steps).
+
+File "repaired.mlw", line 238, characters 13-27:
+Sub-goal Assertion of goal minimum_moves_to_pick_k_ones_array'vc.
+Prover result is: Valid (0.02s, 6689 steps).
+
+File "repaired.mlw", line 242, characters 18-41:
+Sub-goal Loop invariant init of goal minimum_moves_to_pick_k_ones_array'vc.
+Prover result is: Valid (0.02s, 6188 steps).
+
+File "repaired.mlw", line 243, characters 18-37:
+Sub-goal Loop invariant init of goal minimum_moves_to_pick_k_ones_array'vc.
+Prover result is: Valid (0.02s, 6202 steps).
+
+File "repaired.mlw", line 244, characters 18-43:
+Sub-goal Loop invariant init of goal minimum_moves_to_pick_k_ones_array'vc.
+Prover result is: Valid (0.02s, 6207 steps).
+
+File "repaired.mlw", line 245, characters 18-28:
+Sub-goal Loop invariant init of goal minimum_moves_to_pick_k_ones_array'vc.
+Prover result is: Valid (0.03s, 7683 steps).
+
+File "repaired.mlw", line 246, characters 18-72:
+Sub-goal Loop invariant init of goal minimum_moves_to_pick_k_ones_array'vc.
+Prover result is: Valid (0.02s, 6831 steps).
+
+File "repaired.mlw", line 247, characters 18-69:
+Sub-goal Loop invariant init of goal minimum_moves_to_pick_k_ones_array'vc.
+Prover result is: Valid (0.02s, 7050 steps).
+
+File "repaired.mlw", line 242, characters 18-41:
+Sub-goal Loop invariant preservation of goal
+minimum_moves_to_pick_k_ones_array'vc.
+Prover result is: Valid (0.02s, 7562 steps).
+
+File "repaired.mlw", line 243, characters 18-37:
+Sub-goal Loop invariant preservation of goal
+minimum_moves_to_pick_k_ones_array'vc.
+Prover result is: Valid (0.02s, 7066 steps).
+
+File "repaired.mlw", line 244, characters 18-43:
+Sub-goal Loop invariant preservation of goal
+minimum_moves_to_pick_k_ones_array'vc.
+Prover result is: Valid (0.02s, 7071 steps).
+
+File "repaired.mlw", line 245, characters 18-28:
+Sub-goal Loop invariant preservation of goal
+minimum_moves_to_pick_k_ones_array'vc.
+Prover result is: Valid (0.02s, 7680 steps).
+
+File "repaired.mlw", line 246, characters 18-72:
+Sub-goal Loop invariant preservation of goal
+minimum_moves_to_pick_k_ones_array'vc.
+Prover result is: Valid (0.02s, 7984 steps).
+
+File "repaired.mlw", line 247, characters 18-69:
+Sub-goal Loop invariant preservation of goal
+minimum_moves_to_pick_k_ones_array'vc.
+Prover result is: Valid (0.03s, 8203 steps).
+
+File "repaired.mlw", line 242, characters 18-41:
+Sub-goal Loop invariant preservation of goal
+minimum_moves_to_pick_k_ones_array'vc.
+Prover result is: Valid (0.02s, 7522 steps).
+
+File "repaired.mlw", line 243, characters 18-37:
+Sub-goal Loop invariant preservation of goal
+minimum_moves_to_pick_k_ones_array'vc.
+Prover result is: Valid (0.02s, 7047 steps).
+
+File "repaired.mlw", line 244, characters 18-43:
+Sub-goal Loop invariant preservation of goal
+minimum_moves_to_pick_k_ones_array'vc.
+Prover result is: Valid (0.02s, 7052 steps).
+
+File "repaired.mlw", line 245, characters 18-28:
+Sub-goal Loop invariant preservation of goal
+minimum_moves_to_pick_k_ones_array'vc.
+Prover result is: Valid (0.02s, 7055 steps).
+
+File "repaired.mlw", line 246, characters 18-72:
+Sub-goal Loop invariant preservation of goal
+minimum_moves_to_pick_k_ones_array'vc.
+Prover result is: Valid (0.02s, 7852 steps).
+
+File "repaired.mlw", line 247, characters 18-69:
+Sub-goal Loop invariant preservation of goal
+minimum_moves_to_pick_k_ones_array'vc.
+Prover result is: Valid (0.04s, 8071 steps).
+
+File "repaired.mlw", line 253, characters 24-61:
+Sub-goal Loop invariant init of goal minimum_moves_to_pick_k_ones_array'vc.
+Prover result is: Valid (0.02s, 6954 steps).
+
+File "repaired.mlw", line 254, characters 24-29:
+Sub-goal Loop invariant init of goal minimum_moves_to_pick_k_ones_array'vc.
+Prover result is: Valid (0.02s, 7451 steps).
+
+File "repaired.mlw", line 255, characters 24-45:
+Sub-goal Loop invariant init of goal minimum_moves_to_pick_k_ones_array'vc.
+Prover result is: Valid (0.02s, 7521 steps).
+
+File "repaired.mlw", line 256, characters 24-41:
+Sub-goal Loop invariant init of goal minimum_moves_to_pick_k_ones_array'vc.
+Prover result is: Valid (0.03s, 8837 steps).
+
+File "repaired.mlw", line 257, characters 24-78:
+Sub-goal Loop invariant init of goal minimum_moves_to_pick_k_ones_array'vc.
+Prover result is: Valid (0.02s, 7762 steps).
+
+File "repaired.mlw", line 258, characters 24-75:
+Sub-goal Loop invariant init of goal minimum_moves_to_pick_k_ones_array'vc.
+Prover result is: Valid (0.02s, 7981 steps).
+
+File "repaired.mlw", line 259, characters 26-59:
+Sub-goal Precondition of goal minimum_moves_to_pick_k_ones_array'vc.
+Prover result is: Valid (0.02s, 7700 steps).
+
+File "repaired.mlw", line 259, characters 26-59:
+Sub-goal Precondition of goal minimum_moves_to_pick_k_ones_array'vc.
+Prover result is: Valid (0.02s, 7707 steps).
+
+File "repaired.mlw", line 259, characters 26-59:
+Sub-goal Precondition of goal minimum_moves_to_pick_k_ones_array'vc.
+Prover result is: Valid (0.02s, 7740 steps).
+
+File "repaired.mlw", line 259, characters 26-59:
+Sub-goal Precondition of goal minimum_moves_to_pick_k_ones_array'vc.
+Prover result is: Valid (0.02s, 7744 steps).
+
+File "repaired.mlw", line 259, characters 26-59:
+Sub-goal Precondition of goal minimum_moves_to_pick_k_ones_array'vc.
+Prover result is: Valid (0.02s, 8500 steps).
+
+File "repaired.mlw", line 259, characters 26-59:
+Sub-goal Precondition of goal minimum_moves_to_pick_k_ones_array'vc.
+Prover result is: Valid (0.03s, 8719 steps).
+
+File "repaired.mlw", line 253, characters 24-61:
+Sub-goal Loop invariant preservation of goal
+minimum_moves_to_pick_k_ones_array'vc.
+Prover result is: Valid (0.03s, 8373 steps).
+
+File "repaired.mlw", line 254, characters 24-29:
+Sub-goal Loop invariant preservation of goal
+minimum_moves_to_pick_k_ones_array'vc.
+Prover result is: Valid (0.02s, 7873 steps).
+
+File "repaired.mlw", line 255, characters 24-45:
+Sub-goal Loop invariant preservation of goal
+minimum_moves_to_pick_k_ones_array'vc.
+Prover result is: Valid (0.02s, 7880 steps).
+
+File "repaired.mlw", line 256, characters 24-41:
+Sub-goal Loop invariant preservation of goal
+minimum_moves_to_pick_k_ones_array'vc.
+Prover result is: Valid (0.03s, 8413 steps).
+
+File "repaired.mlw", line 257, characters 24-78:
+Sub-goal Loop invariant preservation of goal
+minimum_moves_to_pick_k_ones_array'vc.
+Prover result is: Valid (0.03s, 8725 steps).
+
+File "repaired.mlw", line 258, characters 24-75:
+Sub-goal Loop invariant preservation of goal
+minimum_moves_to_pick_k_ones_array'vc.
+Prover result is: Valid (0.03s, 8944 steps).
+
+File "repaired.mlw", line 253, characters 24-61:
+Sub-goal Loop invariant preservation of goal
+minimum_moves_to_pick_k_ones_array'vc.
+Prover result is: Valid (0.03s, 8330 steps).
+
+File "repaired.mlw", line 254, characters 24-29:
+Sub-goal Loop invariant preservation of goal
+minimum_moves_to_pick_k_ones_array'vc.
+Prover result is: Valid (0.02s, 7860 steps).
+
+File "repaired.mlw", line 255, characters 24-45:
+Sub-goal Loop invariant preservation of goal
+minimum_moves_to_pick_k_ones_array'vc.
+Prover result is: Valid (0.02s, 7867 steps).
+
+File "repaired.mlw", line 256, characters 24-41:
+Sub-goal Loop invariant preservation of goal
+minimum_moves_to_pick_k_ones_array'vc.
+Prover result is: Valid (0.02s, 7870 steps).
+
+File "repaired.mlw", line 257, characters 24-78:
+Sub-goal Loop invariant preservation of goal
+minimum_moves_to_pick_k_ones_array'vc.
+Prover result is: Valid (0.03s, 8657 steps).
+
+File "repaired.mlw", line 258, characters 24-75:
+Sub-goal Loop invariant preservation of goal
+minimum_moves_to_pick_k_ones_array'vc.
+Prover result is: Valid (0.03s, 8876 steps).
+
+File "repaired.mlw", line 242, characters 18-41:
+Sub-goal Loop invariant preservation of goal
+minimum_moves_to_pick_k_ones_array'vc.
+Prover result is: Valid (0.02s, 8152 steps).
+
+File "repaired.mlw", line 243, characters 18-37:
+Sub-goal Loop invariant preservation of goal
+minimum_moves_to_pick_k_ones_array'vc.
+Prover result is: Valid (0.02s, 7740 steps).
+
+File "repaired.mlw", line 244, characters 18-43:
+Sub-goal Loop invariant preservation of goal
+minimum_moves_to_pick_k_ones_array'vc.
+Prover result is: Valid (0.02s, 7745 steps).
+
+File "repaired.mlw", line 245, characters 18-28:
+Sub-goal Loop invariant preservation of goal
+minimum_moves_to_pick_k_ones_array'vc.
+Prover result is: Valid (0.03s, 8521 steps).
+
+File "repaired.mlw", line 246, characters 18-72:
+Sub-goal Loop invariant preservation of goal
+minimum_moves_to_pick_k_ones_array'vc.
+Prover result is: Valid (0.03s, 8536 steps).
+
+File "repaired.mlw", line 247, characters 18-69:
+Sub-goal Loop invariant preservation of goal
+minimum_moves_to_pick_k_ones_array'vc.
+Prover result is: Valid (0.03s, 8755 steps).
+
+File "repaired.mlw", line 242, characters 18-41:
+Sub-goal Loop invariant preservation of goal
+minimum_moves_to_pick_k_ones_array'vc.
+Prover result is: Valid (0.02s, 8122 steps).
+
+File "repaired.mlw", line 243, characters 18-37:
+Sub-goal Loop invariant preservation of goal
+minimum_moves_to_pick_k_ones_array'vc.
+Prover result is: Valid (0.02s, 7711 steps).
+
+File "repaired.mlw", line 244, characters 18-43:
+Sub-goal Loop invariant preservation of goal
+minimum_moves_to_pick_k_ones_array'vc.
+Prover result is: Valid (0.02s, 7716 steps).
+
+File "repaired.mlw", line 245, characters 18-28:
+Sub-goal Loop invariant preservation of goal
+minimum_moves_to_pick_k_ones_array'vc.
+Prover result is: Valid (0.02s, 7719 steps).
+
+File "repaired.mlw", line 246, characters 18-72:
+Sub-goal Loop invariant preservation of goal
+minimum_moves_to_pick_k_ones_array'vc.
+Prover result is: Valid (0.02s, 8459 steps).
+
+File "repaired.mlw", line 247, characters 18-69:
+Sub-goal Loop invariant preservation of goal
+minimum_moves_to_pick_k_ones_array'vc.
+Prover result is: Valid (0.03s, 8678 steps).
+
+File repaired.mlw:
+Sub-goal Out of loop bounds of goal minimum_moves_to_pick_k_ones_array'vc.
+Prover result is: Valid (0.03s, 9340 steps).
+
+File "repaired.mlw", line 269, characters 13-45:
+Sub-goal Assertion of goal minimum_moves_to_pick_k_ones_array'vc.
+Prover result is: Valid (0.02s, 7168 steps).
+
+File "repaired.mlw", line 270, characters 13-23:
+Sub-goal Assertion of goal minimum_moves_to_pick_k_ones_array'vc.
+Prover result is: Valid (0.02s, 6889 steps).
+
+File "repaired.mlw", line 271, character 13 to line 272, character 70:
+Sub-goal Assertion of goal minimum_moves_to_pick_k_ones_array'vc.
+Prover result is: Timeout (10.00s, 1304731 steps).
+
+File "repaired.mlw", line 274, characters 74-88:
+Sub-goal Assertion of goal minimum_moves_to_pick_k_ones_array'vc.
+Prover result is: Timeout (10.00s, 1096068 steps).
+
+File "repaired.mlw", line 275, characters 13-56:
+Sub-goal Assertion of goal minimum_moves_to_pick_k_ones_array'vc.
+Prover result is: Valid (0.03s, 12200 steps).
+
+File "repaired.mlw", line 225, characters 15-59:
+Sub-goal Postcondition of goal minimum_moves_to_pick_k_ones_array'vc.
+Prover result is: Valid (0.04s, 14380 steps).
+
+File repaired.mlw:
+Sub-goal Out of loop bounds of goal minimum_moves_to_pick_k_ones_array'vc.
+Prover result is: Valid (0.03s, 11400 steps).
+== Final summary ==
+Unproved root goals after first prover : 2
+Remaining failures after split_vc      : 2
+Remaining failures after stage 3       : 2
+Detailed logs stored in                : /Users/rubenm/Desktop/Diversify2Verify/codex-runs/repair2-split1/stage3a-rerepair/3086_minimum-moves-to-pick-k-ones/array-imperative/minimum_moves_to_pick_k_ones_array_stage3_9e39e39c_stage3/repaired/generated/why3/.why3_sessions/repaired_logs
+Still unproved goals:
+MinimumMovesToPickKOnes_Array_Spec	window_cost'vc
+MinimumMovesToPickKOnes_Array_Spec	minimum_moves_to_pick_k_ones_array'vc
+VERIFY_RESULT: FAILURE
+VERIFY_REASON: unproved_goals_remain
+VERIFY_STAGE: stage3
+VERIFY_ROOT_TOTAL: 11
+VERIFY_ROOT_PROVED: 9
+VERIFY_ROOT_REMAINING: 2

@@ -1,0 +1,197 @@
+module SumOfMutatedArrayClosestToTarget_Array_Imperative
+
+  use int.Int
+  use int.Abs
+  use int.EuclideanDivision
+  use array.Array
+  use array.Init
+  use ref.Ref
+
+  let mutated_sum_exec (arr: array int) (value: int) : int =
+    let total = ref 0 in
+    for i = 0 to length arr - 1 do
+      if arr[i] <= value then
+        total := !total + arr[i]
+      else
+        total := !total + value
+    done;
+    !total
+
+  let max_array_value (arr: array int) : int =
+    let current = ref (arr[0]) in
+    for i = 1 to length arr - 1 do
+      if arr[i] > !current then
+        current := arr[i]
+    done;
+    !current
+
+  let sum_of_mutated_array_closest_to_target_array (arr: array int) (target: int) : int =
+    let max_value = max_array_value arr in
+    let total = mutated_sum_exec arr max_value in
+    if total <= target then
+      max_value
+    else
+      let lo = ref 0 in
+      let hi = ref max_value in
+      while !lo < !hi do
+        variant { !hi - !lo }
+        let mid = !lo + div (!hi - !lo) 2 in
+        let current = mutated_sum_exec arr mid in
+        if current < target then
+          lo := mid + 1
+        else
+          hi := mid
+      done;
+      let candidate = !lo in
+      if candidate = 0 then
+        0
+      else
+        let prev = candidate - 1 in
+        let candidate_dist = abs (mutated_sum_exec arr candidate - target) in
+        let prev_dist = abs (mutated_sum_exec arr prev - target) in
+        if prev_dist <= candidate_dist then prev else candidate
+
+  let test_000 () : bool =
+    let a = init 5 [|1; 2; 3; 4; 5|] in
+    let r = sum_of_mutated_array_closest_to_target_array a 11 in
+    r = 3
+
+  let test_001 () : bool =
+    let a = init 5 [|5; 5; 5; 5; 5|] in
+    let r = sum_of_mutated_array_closest_to_target_array a 17 in
+    r = 3
+
+  let test_002 () : bool =
+    let a = init 5 [|10; 20; 30; 40; 50|] in
+    let r = sum_of_mutated_array_closest_to_target_array a 100 in
+    r = 23
+
+  let test_003 () : bool =
+    let a = init 3 [|2; 3; 5|] in
+    let r = sum_of_mutated_array_closest_to_target_array a 10 in
+    r = 5
+
+  let test_004 () : bool =
+    let a = init 5 [|9; 9; 9; 9; 9|] in
+    let r = sum_of_mutated_array_closest_to_target_array a 40 in
+    r = 8
+
+  let test_005 () : bool =
+    let a = init 3 [|10000; 10000; 10000|] in
+    let r = sum_of_mutated_array_closest_to_target_array a 10000 in
+    r = 3333
+
+  let test_006 () : bool =
+    let a = init 4 [|99999; 99999; 99999; 99999|] in
+    let r = sum_of_mutated_array_closest_to_target_array a 100000 in
+    r = 25000
+
+  let test_007 () : bool =
+    let a = init 10 [|1; 2; 3; 4; 5; 6; 7; 8; 9; 10|] in
+    let r = sum_of_mutated_array_closest_to_target_array a 50 in
+    r = 7
+
+  let test_008 () : bool =
+    let a = init 5 [|60864; 25176; 27249; 21296; 20204|] in
+    let r = sum_of_mutated_array_closest_to_target_array a 56803 in
+    r = 11361
+
+  let test_009 () : bool =
+    let a = init 3 [|100000; 100000; 100000|] in
+    let r = sum_of_mutated_array_closest_to_target_array a 100000 in
+    r = 33333
+
+  let test_010 () : bool =
+    let a = init 3 [|100000; 100000; 100000|] in
+    let r = sum_of_mutated_array_closest_to_target_array a 299999 in
+    r = 100000
+
+  let test_011 () : bool =
+    let a = init 5 [|5; 5; 5; 5; 5|] in
+    let r = sum_of_mutated_array_closest_to_target_array a 20 in
+    r = 4
+
+  let test_012 () : bool =
+    let a = init 3 [|10; 20; 30|] in
+    let r = sum_of_mutated_array_closest_to_target_array a 25 in
+    r = 8
+
+  let test_013 () : bool =
+    let a = init 5 [|1; 1; 1; 1; 1|] in
+    let r = sum_of_mutated_array_closest_to_target_array a 3 in
+    r = 1
+
+  let test_014 () : bool =
+    let a = init 5 [|1; 2; 3; 4; 5|] in
+    let r = sum_of_mutated_array_closest_to_target_array a 15 in
+    r = 5
+
+  let test_015 () : bool =
+    let a = init 3 [|100000; 100000; 100000|] in
+    let r = sum_of_mutated_array_closest_to_target_array a 250000 in
+    r = 83333
+
+  let test_016 () : bool =
+    let a = init 3 [|4; 9; 3|] in
+    let r = sum_of_mutated_array_closest_to_target_array a 10 in
+    r = 3
+
+  let test_017 () : bool =
+    let a = init 5 [|1; 1; 1; 1; 1|] in
+    let r = sum_of_mutated_array_closest_to_target_array a 5 in
+    r = 1
+
+  let test_018 () : bool =
+    let a = init 5 [|10000; 20000; 30000; 40000; 50000|] in
+    let r = sum_of_mutated_array_closest_to_target_array a 100000 in
+    r = 23333
+
+  let test_019 () : bool =
+    let a = init 10 [|10000; 10000; 10000; 10000; 10000; 10000; 10000; 10000; 10000; 10000|] in
+    let r = sum_of_mutated_array_closest_to_target_array a 95000 in
+    r = 9500
+
+  let run_tests () : bool =
+    if test_000 () then
+    if test_001 () then
+    if test_002 () then
+    if test_003 () then
+    if test_004 () then
+    if test_005 () then
+    if test_006 () then
+    if test_007 () then
+    if test_008 () then
+    if test_009 () then
+    if test_010 () then
+    if test_011 () then
+    if test_012 () then
+    if test_013 () then
+    if test_014 () then
+    if test_015 () then
+    if test_016 () then
+    if test_017 () then
+    if test_018 () then
+    if test_019 () then
+      true
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+
+end

@@ -1,0 +1,370 @@
+module MaximumTastinessOfCandyBasket_List_Stage3_Imperative
+
+  use int.Int
+  use int.Abs
+  use int.EuclideanDivision
+  use list.List
+  use list.Length
+  use list.Mem
+  use list.NumOcc
+  use ref.Ref
+
+  let rec predicate spaced_from (x: int) (basket: list int) (d: int)
+    variant { basket }
+  =
+    match basket with
+    | Nil -> true
+    | Cons y ys -> d <= abs (x - y) && spaced_from x ys d
+    end
+
+  let rec predicate pairwise_spaced (basket: list int) (d: int)
+    variant { basket }
+  =
+    match basket with
+    | Nil -> true
+    | Cons x xs -> spaced_from x xs d && pairwise_spaced xs d
+    end
+
+  predicate submultiset (basket: list int) (price: list int) =
+    forall x: int. num_occ x basket <= num_occ x price
+
+  predicate valid_basket
+    (price: list int) (basket: list int) (k: int) (d: int) =
+    length basket = k /\
+    submultiset basket price /\
+    pairwise_spaced basket d
+
+  predicate feasible_tastiness (price: list int) (k: int) (d: int) =
+    d >= 0 /\
+    exists basket: list int. valid_basket price basket k d
+
+  predicate maximum_tastiness (price: list int) (k: int) (result: int) =
+    feasible_tastiness price k result /\
+    (forall d: int. feasible_tastiness price k d -> d <= result)
+
+  let rec predicate sorted_nondec (l: list int)
+    variant { l }
+  =
+    match l with
+    | Nil -> true
+    | Cons _ Nil -> true
+    | Cons x (Cons y ys) -> x <= y && sorted_nondec (Cons y ys)
+    end
+
+  let rec predicate all_ge (lb: int) (l: list int)
+    variant { l }
+  =
+    match l with
+    | Nil -> true
+    | Cons y ys -> lb <= y && all_ge lb ys
+    end
+
+  let rec lemma all_ge_weaken (a: int) (b: int) (l: list int)
+    ensures { a <= b -> all_ge b l -> all_ge a l }
+    variant { l }
+  =
+    match l with
+    | Nil -> ()
+    | Cons _ ys -> all_ge_weaken a b ys
+    end
+
+  let rec lemma all_ge_mem (lb: int) (x: int) (l: list int)
+    ensures { all_ge lb l -> mem x l -> lb <= x }
+    variant { l }
+  =
+    match l with
+    | Nil -> ()
+    | Cons _ ys -> all_ge_mem lb x ys
+    end
+
+  let lemma sorted_tail (x: int) (xs: list int)
+    ensures { sorted_nondec (Cons x xs) -> sorted_nondec xs }
+  =
+    match xs with
+    | Nil -> ()
+    | Cons _ _ -> ()
+    end
+
+  let rec lemma sorted_all_ge_head (x: int) (xs: list int)
+    ensures { sorted_nondec (Cons x xs) -> all_ge x xs }
+    variant { xs }
+  =
+    match xs with
+    | Nil -> ()
+    | Cons y ys ->
+        sorted_all_ge_head y ys;
+        all_ge_weaken x y ys
+    end
+
+  let lemma sorted_cons_from_all_ge (x: int) (xs: list int)
+    ensures { sorted_nondec xs -> all_ge x xs -> sorted_nondec (Cons x xs) }
+  =
+    match xs with
+    | Nil -> ()
+    | Cons _ _ -> ()
+    end
+
+  let lemma num_occ_cons_insert (z: int) (x: int) (l: list int)
+    ensures { num_occ z (Cons x l) =
+      num_occ z l + (if z = x then 1 else 0) }
+  = ()
+
+  let lemma all_ge_cons_intro (b: int) (x: int) (l: list int)
+    ensures { b <= x -> all_ge b l -> all_ge b (Cons x l) }
+  = ()
+
+  inductive suffix_of (s: list int) (l: list int) =
+  | suffix_here: forall l: list int. suffix_of l l
+  | suffix_next: forall s: list int, x: int, xs: list int.
+      suffix_of s xs -> suffix_of s (Cons x xs)
+
+  let rec lemma suffix_refl (l: list int)
+    ensures { suffix_of l l }
+    variant { l }
+  =
+    match l with
+    | Nil -> ()
+    | Cons _ _ -> ()
+    end
+
+  let rec lemma suffix_tail (y: int) (ys: list int) (l: list int)
+    ensures { suffix_of (Cons y ys) l -> suffix_of ys l }
+    variant { l }
+  =
+    match l with
+    | Nil -> ()
+    | Cons _ xs ->
+        suffix_refl ys;
+        suffix_tail y ys xs
+    end
+
+  let rec lemma suffix_head_mem (y: int) (ys: list int) (l: list int)
+    ensures { suffix_of (Cons y ys) l -> mem y l }
+    variant { l }
+  =
+    match l with
+    | Nil -> ()
+    | Cons _ xs -> suffix_head_mem y ys xs
+    end
+
+  let rec lemma sorted_suffix_head_upper (l: list int) (h: int) (t: list int)
+    ensures { sorted_nondec l -> suffix_of (Cons h t) l ->
+      forall v: int. mem v l /\ not (mem v t) -> v <= h }
+    variant { l }
+  =
+    match l with
+    | Nil -> ()
+    | Cons x xs ->
+        sorted_all_ge_head h t;
+        sorted_tail x xs;
+        sorted_all_ge_head x xs;
+        suffix_head_mem h t xs;
+        all_ge_mem x h xs;
+        sorted_suffix_head_upper xs h t
+    end
+
+  let rec insert_sorted (x: int) (l: list int) : list int
+    ensures { length result = length l + 1 }
+    ensures { forall z: int.
+      num_occ z result = num_occ z l + (if z = x then 1 else 0) }
+    ensures { sorted_nondec l -> sorted_nondec result }
+    ensures { forall b: int. all_ge b l /\ b <= x -> all_ge b result }
+    variant { l }
+  =
+    match l with
+    | Nil ->
+        let r = Cons x Nil in
+        assert { length r = length l + 1 };
+        assert { forall z: int.
+          num_occ z r = num_occ z l + (if z = x then 1 else 0) };
+        assert { sorted_nondec l -> sorted_nondec r };
+        assert { forall b: int. all_ge b l /\ b <= x -> all_ge b r };
+        r
+    | Cons y ys ->
+        if x <= y then begin
+          let r = Cons x l in
+          assert { length r = length l + 1 };
+          assert { forall z: int.
+            num_occ z r = num_occ z l + (if z = x then 1 else 0) };
+          sorted_all_ge_head y ys;
+          all_ge_weaken x y ys;
+          assert { sorted_nondec l -> all_ge x l };
+          sorted_cons_from_all_ge x l;
+          assert { sorted_nondec l -> sorted_nondec r };
+          assert { forall b: int. all_ge b l /\ b <= x -> all_ge b r };
+          r
+        end else begin
+          let rest = insert_sorted x ys in
+          let r = Cons y rest in
+          assert { length rest = length ys + 1 };
+          assert { length r = length l + 1 };
+          assert { forall z: int.
+            num_occ z rest = num_occ z ys + (if z = x then 1 else 0) };
+          assert { forall z: int.
+            num_occ z r = num_occ z l + (if z = x then 1 else 0) };
+          sorted_tail y ys;
+          sorted_all_ge_head y ys;
+          assert { y <= x };
+          assert { sorted_nondec l -> all_ge y ys };
+          assert { sorted_nondec l -> all_ge y rest };
+          sorted_cons_from_all_ge y rest;
+          assert { sorted_nondec l -> sorted_nondec r };
+          assert { forall b: int. all_ge b l -> all_ge b ys };
+          assert { forall b: int. all_ge b l /\ b <= x -> all_ge b rest };
+          assert { forall b: int. all_ge b l /\ b <= x -> all_ge b r };
+          r
+        end
+    end
+
+  let sort_list (l: list int) : list int
+    ensures { length result = length l }
+    ensures { forall z: int. num_occ z result = num_occ z l }
+    ensures { sorted_nondec result }
+  =
+    let sorted = ref (Nil : list int) in
+    let cur = ref l in
+    while (match !cur with Nil -> false | Cons _ _ -> true end) do
+      invariant { 0 <= length !cur }
+      invariant { length !sorted + length !cur = length l }
+      invariant { forall z: int.
+        num_occ z !sorted + num_occ z !cur = num_occ z l }
+      invariant { sorted_nondec !sorted }
+      variant { length !cur }
+
+      match !cur with
+      | Nil -> ()
+      | Cons x xs ->
+          sorted := insert_sorted x !sorted;
+          cur := xs
+      end
+    done;
+    match !cur with
+    | Nil -> ()
+    | Cons _ _ -> assert { false }
+    end;
+    assert { !cur = Nil };
+    assert { forall z: int. num_occ z !sorted = num_occ z l };
+    !sorted
+
+  let last_value (l: list int) : int
+    ensures { l = Nil -> result = 0 }
+    ensures { l <> Nil -> mem result l }
+    ensures { sorted_nondec l -> forall x: int. mem x l -> x <= result }
+  =
+    match l with
+    | Nil -> 0
+    | Cons x xs ->
+        let last = ref x in
+        let cur = ref xs in
+        suffix_refl xs;
+        assert { suffix_of !cur l };
+        while (match !cur with Nil -> false | Cons _ _ -> true end) do
+          invariant { 0 <= length !cur }
+          invariant { suffix_of !cur l }
+          invariant { mem !last l }
+          invariant { sorted_nondec l -> forall y: int. mem y l /\ not (mem y !cur) -> y <= !last }
+          variant { length !cur }
+
+          match !cur with
+          | Nil -> ()
+          | Cons y ys ->
+              suffix_head_mem y ys l;
+              suffix_tail y ys l;
+              sorted_suffix_head_upper l y ys;
+              assert { mem y l };
+              assert { suffix_of ys l };
+              assert { sorted_nondec l -> forall v: int. mem v l /\ not (mem v ys) -> v <= y };
+              last := y;
+              cur := ys
+          end
+        done;
+        match !cur with
+        | Nil -> ()
+        | Cons _ _ -> assert { false }
+        end;
+        assert { !cur = Nil };
+        !last
+    end
+
+  let feasible_tastiness_exec (sorted_prices: list int) (k: int) (d: int) : bool
+    requires { 1 <= k }
+    requires { d >= 0 }
+    ensures { result = true -> feasible_tastiness sorted_prices k d }
+    ensures { result = false -> not feasible_tastiness sorted_prices k d }
+  =
+    match sorted_prices with
+    | Nil -> false
+    | Cons first rest ->
+        if k <= 1 then true else
+        let chosen = ref 1 in
+        let last = ref first in
+        let cur = ref rest in
+        while (match !cur with Nil -> false | Cons _ _ -> true end) do
+          invariant { 1 <= !chosen <= k }
+          invariant { mem !last sorted_prices }
+          invariant { 0 <= length !cur }
+          invariant { !chosen < k -> !chosen <= length sorted_prices }
+          invariant { d >= 0 }
+          variant { length !cur }
+
+          match !cur with
+          | Nil -> ()
+          | Cons x xs ->
+              if !chosen < k && x - !last >= d then (
+                chosen := !chosen + 1;
+                last := x
+              );
+              cur := xs
+          end
+        done;
+        match !cur with
+        | Nil -> ()
+        | Cons _ _ -> assert { false }
+        end;
+        assert { !cur = Nil };
+        !chosen >= k
+    end
+
+  let maximum_tastiness_of_candy_basket_list (price: list int) (k: int) : int
+    requires { 2 <= k <= length price }
+    requires { forall x: int. mem x price -> 1 <= x }
+    ensures  { maximum_tastiness price k result }
+  =
+    let sorted_prices = sort_list price in
+    match sorted_prices with
+    | Nil ->
+        assert { length sorted_prices = length price };
+        assert { false };
+        0
+    | Cons first _ ->
+        let low = ref 0 in
+        let high = ref (last_value sorted_prices - first + 1) in
+        assert { 0 <= !low };
+        assert { feasible_tastiness price k !low };
+        while !low + 1 < !high do
+          invariant { 0 <= !low < !high }
+          invariant { feasible_tastiness price k !low }
+          invariant { forall d: int. !high <= d -> not feasible_tastiness price k d }
+          variant { !high - !low }
+
+          let mid = !low + div (!high - !low) 2 in
+          assert { !low <= mid < !high };
+          if feasible_tastiness_exec sorted_prices k mid then begin
+            assert { feasible_tastiness sorted_prices k mid };
+            assert { forall z: int. num_occ z sorted_prices = num_occ z price };
+            assert { feasible_tastiness price k mid };
+            low := mid
+          end else begin
+            assert { not feasible_tastiness sorted_prices k mid };
+            assert { forall z: int. num_occ z sorted_prices = num_occ z price };
+            assert { not feasible_tastiness price k mid };
+            high := mid
+          end
+        done;
+        assert { !low + 1 >= !high };
+        assert { forall d: int. feasible_tastiness price k d -> d <= !low };
+        assert { maximum_tastiness price k !low };
+        !low
+    end
+
+end

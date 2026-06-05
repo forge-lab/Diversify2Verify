@@ -1,0 +1,211 @@
+module SmallestRangeIi_Array_Recursive
+
+  use int.Int
+  use array.Array
+  use array.Init
+  use list.List
+
+  let min_int (x: int) (y: int) : int =
+    if x <= y then x else y
+
+  let max_int (x: int) (y: int) : int =
+    if x >= y then x else y
+
+  let rec insert_sorted (x: int) (xs: list int) : list int
+    variant { xs }
+  =
+    match xs with
+    | Nil -> Cons x Nil
+    | Cons y ys ->
+        if x <= y then
+          Cons x xs
+        else
+          Cons y (insert_sorted x ys)
+    end
+
+  let rec sorted_list_of_array_from (nums: array int) (i: int) : list int
+    variant { length nums - i }
+  =
+    if i >= length nums then
+      Nil
+    else
+      insert_sorted nums[i] (sorted_list_of_array_from nums (i + 1))
+
+  let rec last_of_nonempty (xs: list int) (current: int) : int
+    variant { xs }
+  =
+    match xs with
+    | Nil -> current
+    | Cons y ys -> last_of_nonempty ys y
+    end
+
+  let rec best_width_from
+    (prev: int) (xs: list int) (smallest: int) (largest: int) (k: int) (best: int) : int
+    variant { xs }
+  =
+    match xs with
+    | Nil -> best
+    | Cons next rest ->
+        let high = max_int (prev + k) largest in
+        let low = min_int smallest (next - k) in
+        let width = high - low in
+        let best_next = min_int best width in
+        best_width_from next rest smallest largest k best_next
+    end
+
+  let smallest_range_ii_array (nums: array int) (k: int) : int =
+    let sorted = sorted_list_of_array_from nums 0 in
+    match sorted with
+    | Nil -> 0
+    | Cons first rest ->
+        let last = last_of_nonempty rest first in
+        let initial = last - first in
+        let smallest = first + k in
+        let largest = last - k in
+        best_width_from first rest smallest largest k initial
+    end
+
+  let test_test_000 () : bool =
+    let nums = init 2 [|0; 10|] in
+    let r = smallest_range_ii_array nums 2 in
+    r = 6
+
+  let test_test_001 () : bool =
+    let nums = init 3 [|1; 5; 8|] in
+    let r = smallest_range_ii_array nums 2 in
+    r = 3
+
+  let test_test_002 () : bool =
+    let nums = init 4 [|6; 3; 4; 7|] in
+    let r = smallest_range_ii_array nums 3 in
+    r = 4
+
+  let test_test_003 () : bool =
+    let nums = init 10 [|6; 3; 2; 18; 9; 12; 3; 6; 5; 0|] in
+    let r = smallest_range_ii_array nums 6 in
+    r = 9
+
+  let test_test_004 () : bool =
+    let nums = init 3 [|4; 9; 6|] in
+    let r = smallest_range_ii_array nums 2 in
+    r = 2
+
+  let test_test_005 () : bool =
+    let nums = init 3 [|1; 3; 6|] in
+    let r = smallest_range_ii_array nums 3 in
+    r = 3
+
+  let test_test_006 () : bool =
+    let nums = init 4 [|7; 8; 8; 10|] in
+    let r = smallest_range_ii_array nums 3 in
+    r = 3
+
+  let test_test_007 () : bool =
+    let nums = init 1 [|1|] in
+    let r = smallest_range_ii_array nums 0 in
+    r = 0
+
+  let test_test_008 () : bool =
+    let nums = init 4 [|4; 1; 8; 10|] in
+    let r = smallest_range_ii_array nums 2 in
+    r = 5
+
+  let test_test_009 () : bool =
+    let nums = init 4 [|6; 3; 4; 2|] in
+    let r = smallest_range_ii_array nums 1 in
+    r = 2
+
+  let test_test_010 () : bool =
+    let nums = init 5 [|100; 200; 300; 400; 500|] in
+    let r = smallest_range_ii_array nums 50 in
+    r = 300
+
+  let test_test_011 () : bool =
+    let nums = init 6 [|30; 10; 20; 40; 50; 60|] in
+    let r = smallest_range_ii_array nums 15 in
+    r = 20
+
+  let test_test_012 () : bool =
+    let nums = init 6 [|10; 15; 3; 7; 8; 12|] in
+    let r = smallest_range_ii_array nums 4 in
+    r = 6
+
+  let test_test_013 () : bool =
+    let nums = init 10 [|9999; 9998; 9997; 9996; 9995; 9994; 9993; 9992; 9991; 9990|] in
+    let r = smallest_range_ii_array nums 1000 in
+    r = 9
+
+  let test_test_014 () : bool =
+    let nums = init 10 [|2; 4; 6; 8; 10; 12; 14; 16; 18; 20|] in
+    let r = smallest_range_ii_array nums 3 in
+    r = 12
+
+  let test_test_015 () : bool =
+    let nums = init 12 [|10; 20; 30; 40; 50; 60; 70; 80; 90; 100; 110; 120|] in
+    let r = smallest_range_ii_array nums 15 in
+    r = 80
+
+  let test_test_016 () : bool =
+    let nums = init 7 [|5; 8; 12; 15; 20; 25; 30|] in
+    let r = smallest_range_ii_array nums 10 in
+    r = 15
+
+  let test_test_017 () : bool =
+    let nums = init 11 [|1; 100; 200; 300; 400; 500; 600; 700; 800; 900; 1000|] in
+    let r = smallest_range_ii_array nums 100 in
+    r = 799
+
+  let test_test_018 () : bool =
+    let nums = init 20 [|1; 3; 5; 7; 9; 11; 13; 15; 17; 19; 21; 23; 25; 27; 29; 31; 33; 35; 37; 39|] in
+    let r = smallest_range_ii_array nums 10 in
+    r = 18
+
+  let test_test_019 () : bool =
+    let nums = init 7 [|10; 15; 20; 25; 30; 35; 40|] in
+    let r = smallest_range_ii_array nums 5 in
+    r = 20
+
+  let run_tests () : bool =
+    if test_test_000 () then
+    if test_test_001 () then
+    if test_test_002 () then
+    if test_test_003 () then
+    if test_test_004 () then
+    if test_test_005 () then
+    if test_test_006 () then
+    if test_test_007 () then
+    if test_test_008 () then
+    if test_test_009 () then
+    if test_test_010 () then
+    if test_test_011 () then
+    if test_test_012 () then
+    if test_test_013 () then
+    if test_test_014 () then
+    if test_test_015 () then
+    if test_test_016 () then
+    if test_test_017 () then
+    if test_test_018 () then
+    if test_test_019 () then
+      true
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+
+end

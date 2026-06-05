@@ -1,0 +1,386 @@
+module FindAllKDistantIndicesInAnArray_List_Stage3_Imperative
+
+  use int.Int
+  use int.Abs
+  use list.List
+  use list.Length
+  use list.Mem
+  use list.Append
+  use list.Reverse
+  use list.RevAppend
+  use ref.Ref
+
+  let rec predicate value_at_index (nums: list int) (i: int) (v: int)
+    variant { nums }
+  =
+    match nums with
+    | Nil -> false
+    | Cons x xs ->
+        if i = 0 then x = v
+        else 0 < i && value_at_index xs (i - 1) v
+    end
+
+  let rec predicate values_in_range (nums: list int)
+    variant { nums }
+  =
+    match nums with
+    | Nil -> true
+    | Cons x xs -> 1 <= x <= 1000 && values_in_range xs
+    end
+
+  predicate k_distant_index (nums: list int) (key: int) (k: int) (i: int) =
+    0 <= i < length nums /\
+    exists j: int. value_at_index nums j key /\ abs (i - j) <= k
+
+  let rec predicate all_greater_than (x: int) (indices: list int)
+    variant { indices }
+  =
+    match indices with
+    | Nil -> true
+    | Cons y ys -> x < y && all_greater_than x ys
+    end
+
+  let rec predicate strictly_increasing (indices: list int)
+    variant { indices }
+  =
+    match indices with
+    | Nil -> true
+    | Cons x xs -> all_greater_than x xs && strictly_increasing xs
+    end
+
+  predicate valid_result (nums: list int) (key: int) (k: int) (indices: list int) =
+    strictly_increasing indices /\
+    (forall i: int. mem i indices <-> k_distant_index nums key k i)
+
+  let rec predicate close_to_position (positions: list int) (idx: int) (k: int)
+    variant { positions }
+  =
+    match positions with
+    | Nil -> false
+    | Cons pos rest -> abs (idx - pos) <= k || close_to_position rest idx k
+    end
+
+  let rec function key_positions_from (nums: list int) (key: int) (idx: int) : list int
+    variant { nums }
+  =
+    match nums with
+    | Nil -> Nil
+    | Cons x rest ->
+        if x = key then
+          Cons idx (key_positions_from rest key (idx + 1))
+        else
+          key_positions_from rest key (idx + 1)
+    end
+
+  let rec function result_indices_from
+    (nums: list int) (positions: list int) (k: int) (idx: int) : list int
+    variant { nums }
+  =
+    match nums with
+    | Nil -> Nil
+    | Cons _ rest ->
+        if close_to_position positions idx k then
+          Cons idx (result_indices_from rest positions k (idx + 1))
+        else
+          result_indices_from rest positions k (idx + 1)
+    end
+
+  let rec lemma key_positions_from_mem
+    (nums: list int) (key: int) (idx: int) (p: int)
+    ensures {
+      mem p (key_positions_from nums key idx) <->
+      idx <= p < idx + length nums /\ value_at_index nums (p - idx) key
+    }
+    variant { nums }
+  =
+    match nums with
+    | Nil -> ()
+    | Cons x rest ->
+        key_positions_from_mem rest key (idx + 1) p;
+        if x = key then begin
+          if p = idx then
+            assert { p - idx = 0 }
+          else begin
+            assert { p <> idx };
+            assert { mem p (Cons idx (key_positions_from rest key (idx + 1))) <->
+                     mem p (key_positions_from rest key (idx + 1)) };
+            assert { p - idx <> 0 };
+            assert { p - idx - 1 = p - (idx + 1) }
+          end
+        end else begin
+          assert { key_positions_from (Cons x rest) key idx =
+                   key_positions_from rest key (idx + 1) };
+          assert { p - idx <> 0 -> p - idx - 1 = p - (idx + 1) }
+        end
+    end
+
+  let lemma key_positions_from_zero_mem
+    (nums: list int) (key: int) (p: int)
+    ensures {
+      mem p (key_positions_from nums key 0) <-> value_at_index nums p key
+    }
+  =
+    key_positions_from_mem nums key 0 p
+
+  let rec lemma close_to_position_mem
+    (positions: list int) (idx: int) (k: int)
+    ensures {
+      close_to_position positions idx k <->
+      exists pos: int. mem pos positions /\ abs (idx - pos) <= k
+    }
+    variant { positions }
+  =
+    match positions with
+    | Nil -> ()
+    | Cons pos rest ->
+        close_to_position_mem rest idx k;
+        if abs (idx - pos) <= k then
+          assert { mem pos (Cons pos rest) }
+        else
+          assert { close_to_position (Cons pos rest) idx k =
+                   close_to_position rest idx k }
+    end
+
+  let rec lemma result_indices_from_mem
+    (nums: list int) (positions: list int) (k: int) (idx: int) (i: int)
+    ensures {
+      mem i (result_indices_from nums positions k idx) <->
+      idx <= i < idx + length nums /\ close_to_position positions i k
+    }
+    variant { nums }
+  =
+    match nums with
+    | Nil -> ()
+    | Cons _ rest ->
+        result_indices_from_mem rest positions k (idx + 1) i;
+        if close_to_position positions idx k then begin
+          if i = idx then
+            assert { close_to_position positions i k }
+          else begin
+            assert { i <> idx };
+            assert { mem i (Cons idx (result_indices_from rest positions k (idx + 1))) <->
+                     mem i (result_indices_from rest positions k (idx + 1)) };
+            assert { idx < i < idx + length (Cons 0 rest) <->
+                     idx + 1 <= i < idx + 1 + length rest }
+          end
+        end else begin
+          assert { result_indices_from (Cons 0 rest) positions k idx =
+                   result_indices_from rest positions k (idx + 1) };
+          assert { close_to_position positions idx k = false }
+        end
+    end
+
+  let rec lemma result_indices_from_all_greater_than
+    (nums: list int) (positions: list int) (k: int) (idx: int) (x: int)
+    requires { x < idx }
+    ensures  { all_greater_than x (result_indices_from nums positions k idx) }
+    variant  { nums }
+  =
+    match nums with
+    | Nil -> ()
+    | Cons _ rest ->
+        result_indices_from_all_greater_than rest positions k (idx + 1) x;
+        if close_to_position positions idx k then
+          assert { x < idx }
+        else
+          assert { result_indices_from (Cons 0 rest) positions k idx =
+                   result_indices_from rest positions k (idx + 1) }
+    end
+
+  let rec lemma result_indices_from_strictly_increasing
+    (nums: list int) (positions: list int) (k: int) (idx: int)
+    ensures { strictly_increasing (result_indices_from nums positions k idx) }
+    variant { nums }
+  =
+    match nums with
+    | Nil -> ()
+    | Cons _ rest ->
+        result_indices_from_strictly_increasing rest positions k (idx + 1);
+        result_indices_from_all_greater_than rest positions k (idx + 1) idx;
+        if close_to_position positions idx k then
+          assert { all_greater_than idx
+                     (result_indices_from rest positions k (idx + 1)) }
+        else
+          assert { result_indices_from (Cons 0 rest) positions k idx =
+                   result_indices_from rest positions k (idx + 1) }
+    end
+
+  let lemma close_to_key_positions_from_zero
+    (nums: list int) (key: int) (idx: int) (k: int)
+    ensures {
+      close_to_position (key_positions_from nums key 0) idx k <->
+      exists j: int. value_at_index nums j key /\ abs (idx - j) <= k
+    }
+  =
+    close_to_position_mem (key_positions_from nums key 0) idx k;
+    assert {
+      forall p: int.
+        mem p (key_positions_from nums key 0) <-> value_at_index nums p key
+    };
+    assert {
+      (exists p: int. mem p (key_positions_from nums key 0) /\
+                      abs (idx - p) <= k) <->
+      (exists j: int. value_at_index nums j key /\ abs (idx - j) <= k)
+    }
+
+  let lemma result_indices_from_valid_at
+    (nums: list int) (key: int) (k: int) (i: int)
+    requires { 1 <= length nums <= 1000 }
+    requires { values_in_range nums }
+    requires { mem key nums }
+    requires { 1 <= k <= length nums }
+    ensures  {
+      mem i (result_indices_from nums (key_positions_from nums key 0) k 0) <->
+      k_distant_index nums key k i
+    }
+  =
+    let positions = key_positions_from nums key 0 in
+    result_indices_from_mem nums positions k 0 i;
+    close_to_key_positions_from_zero nums key i k
+
+  let lemma result_indices_from_valid
+    (nums: list int) (key: int) (k: int)
+    requires { 1 <= length nums <= 1000 }
+    requires { values_in_range nums }
+    requires { mem key nums }
+    requires { 1 <= k <= length nums }
+    ensures  {
+      valid_result nums key k
+        (result_indices_from nums (key_positions_from nums key 0) k 0)
+    }
+  =
+    let positions = key_positions_from nums key 0 in
+    result_indices_from_strictly_increasing nums positions k 0;
+    assert { strictly_increasing (result_indices_from nums positions k 0) };
+    assert {
+      forall i: int.
+        mem i (result_indices_from nums positions k 0) <->
+        k_distant_index nums key k i
+    }
+
+  let reverse_list (xs: list int) : list int
+    ensures { result = reverse xs }
+  =
+    let acc = ref Nil in
+    let cur = ref xs in
+    while (match !cur with Nil -> false | Cons _ _ -> true end) do
+      invariant { rev_append !cur !acc = reverse xs }
+      invariant { 0 <= length !cur }
+      variant { length !cur }
+      match !cur with
+      | Nil -> ()
+      | Cons x rest ->
+          acc := Cons x !acc;
+          cur := rest
+      end
+    done;
+    assert { !cur = Nil };
+    assert { rev_append Nil !acc = !acc };
+    !acc
+
+  let has_close_position (positions: list int) (idx: int) (k: int) : bool
+    ensures { result = true <-> close_to_position positions idx k }
+  =
+    let found = ref false in
+    let cur = ref positions in
+    while (match !cur with Nil -> false | Cons _ _ -> not !found end) do
+      invariant { 0 <= length !cur }
+      invariant { !found = true -> close_to_position positions idx k }
+      invariant { !found = false -> (close_to_position positions idx k <-> close_to_position !cur idx k) }
+      variant { length !cur }
+      match !cur with
+      | Nil -> ()
+      | Cons pos rest ->
+          if abs (idx - pos) <= k then begin
+            assert { close_to_position !cur idx k };
+            found := true
+          end;
+          cur := rest
+      end
+    done;
+    match !cur with
+    | Nil ->
+        assert { close_to_position !cur idx k = false }
+    | Cons _ _ ->
+        assert { !found = true }
+    end;
+    !found
+
+  let find_all_k_distant_indices_in_an_array_list
+    (nums: list int) (key: int) (k: int) : list int
+    requires { 1 <= length nums <= 1000 }
+    requires { values_in_range nums }
+    requires { mem key nums }
+    requires { 1 <= k <= length nums }
+    ensures  { valid_result nums key k result }
+  =
+    let rev_key_positions = ref Nil in
+    let cur = ref nums in
+    let idx = ref 0 in
+    while (match !cur with Nil -> false | Cons _ _ -> true end) do
+      invariant { 0 <= !idx <= length nums }
+      invariant { length !cur + !idx = length nums }
+      invariant { reverse !rev_key_positions ++ key_positions_from !cur key !idx =
+                  key_positions_from nums key 0 }
+      variant { length !cur }
+      match !cur with
+      | Nil -> ()
+      | Cons x rest ->
+          if x = key then begin
+            assert { key_positions_from !cur key !idx =
+                     Cons !idx (key_positions_from rest key (!idx + 1)) };
+            rev_key_positions := Cons !idx !rev_key_positions
+          end else begin
+            assert { key_positions_from !cur key !idx =
+                     key_positions_from rest key (!idx + 1) }
+          end;
+          cur := rest;
+          idx := !idx + 1
+      end
+    done;
+    assert { !cur = Nil };
+    assert { !idx = length nums };
+    assert { key_positions_from !cur key !idx = Nil };
+    assert { reverse !rev_key_positions = key_positions_from nums key 0 };
+
+    let key_positions = reverse_list !rev_key_positions in
+    assert { key_positions = key_positions_from nums key 0 };
+    let rev_result = ref Nil in
+    let out_cur = ref nums in
+    let out_idx = ref 0 in
+    while (match !out_cur with Nil -> false | Cons _ _ -> true end) do
+      invariant { 0 <= !out_idx <= length nums }
+      invariant { length !out_cur + !out_idx = length nums }
+      invariant { reverse !rev_result ++ result_indices_from !out_cur key_positions k !out_idx =
+                  result_indices_from nums key_positions k 0 }
+      variant { length !out_cur }
+      match !out_cur with
+      | Nil -> ()
+      | Cons _ rest ->
+          if has_close_position key_positions !out_idx k then begin
+            assert { close_to_position key_positions !out_idx k };
+            assert { result_indices_from !out_cur key_positions k !out_idx =
+                     Cons !out_idx (result_indices_from rest key_positions k (!out_idx + 1)) };
+            rev_result := Cons !out_idx !rev_result
+          end else begin
+            assert { not (close_to_position key_positions !out_idx k) };
+            assert { result_indices_from !out_cur key_positions k !out_idx =
+                     result_indices_from rest key_positions k (!out_idx + 1) }
+          end;
+          out_cur := rest;
+          out_idx := !out_idx + 1
+      end
+    done;
+    assert { !out_cur = Nil };
+    assert { !out_idx = length nums };
+    assert { result_indices_from !out_cur key_positions k !out_idx = Nil };
+    assert { reverse !rev_result = result_indices_from nums key_positions k 0 };
+    assert { reverse !rev_result =
+             result_indices_from nums (key_positions_from nums key 0) k 0 };
+    let result = reverse_list !rev_result in
+    assert { result = result_indices_from nums (key_positions_from nums key 0) k 0 };
+    result_indices_from_valid nums key k;
+    assert { valid_result nums key k result };
+    result
+
+end

@@ -1,0 +1,143 @@
+module MinimizeTheMaximumDifferenceOfPairs_List_Spec
+
+  use int.Int
+  use int.Abs
+  use list.List
+  use list.Length
+  use list.NumOcc
+
+  type int_pair = Pair int int
+
+  let rec function endpoint_occ_pairs (x: int) (pairs: list int_pair) : int
+    variant { pairs }
+  =
+    match pairs with
+    | Nil -> 0
+    | Cons (Pair a b) rest ->
+        (if x = a then 1 else 0) + (if x = b then 1 else 0) +
+        endpoint_occ_pairs x rest
+    end
+
+  let rec predicate pair_diffs_at_most (pairs: list int_pair) (d: int)
+    variant { pairs }
+  =
+    match pairs with
+    | Nil -> true
+    | Cons (Pair a b) rest ->
+        abs (a - b) <= d && pair_diffs_at_most rest d
+    end
+
+  predicate valid_pairing_with_bound
+    (nums: list int) (p: int) (d: int) (pairs: list int_pair) =
+    0 <= d /\
+    length pairs = p /\
+    pair_diffs_at_most pairs d /\
+    (forall x: int. endpoint_occ_pairs x pairs <= num_occ x nums)
+
+  predicate minimized_max_difference (nums: list int) (p: int) (answer: int) =
+    0 <= answer /\
+    (exists pairs: list int_pair. valid_pairing_with_bound nums p answer pairs) /\
+    (forall d: int.
+       0 <= d < answer ->
+       not (exists pairs: list int_pair. valid_pairing_with_bound nums p d pairs))
+
+  val minimize_the_maximum_difference_of_pairs_list (nums: list int) (p: int) : int
+    requires { 0 <= p }
+    requires { 2 * p <= length nums }
+    ensures  { minimized_max_difference nums p result }
+
+  let lemma check_test_000 () =
+    let nums = Cons 1 (Cons 3 (Cons 6 (Cons 8 (Cons 10 Nil)))) in
+    let pairs = Cons (Pair 1 3) (Cons (Pair 6 8) Nil) in
+    assert { endpoint_occ_pairs 1 pairs = 1 };
+    assert { endpoint_occ_pairs 3 pairs = 1 };
+    assert { endpoint_occ_pairs 6 pairs = 1 };
+    assert { endpoint_occ_pairs 8 pairs = 1 };
+    assert { endpoint_occ_pairs 10 pairs = 0 };
+    assert { num_occ 1 nums = 1 };
+    assert { num_occ 3 nums = 1 };
+    assert { num_occ 6 nums = 1 };
+    assert { num_occ 8 nums = 1 };
+    assert { pair_diffs_at_most pairs 2 };
+    assert { valid_pairing_with_bound nums 2 2 pairs }
+
+  let lemma check_test_002 () =
+    let nums = Cons 5 (Cons 5 (Cons 5 (Cons 5 (Cons 5 Nil)))) in
+    let pairs = Cons (Pair 5 5) (Cons (Pair 5 5) Nil) in
+    assert { endpoint_occ_pairs 5 pairs = 4 };
+    assert { num_occ 5 nums = 5 };
+    assert { pair_diffs_at_most pairs 0 };
+    assert { valid_pairing_with_bound nums 2 0 pairs };
+    assert { minimized_max_difference nums 2 0 }
+
+  let lemma check_test_003 () =
+    let nums = Cons 7 (Cons 1 (Cons 3 (Cons 4 (Cons 2 (Cons 5 Nil))))) in
+    let pairs : list int_pair = Nil in
+    assert { endpoint_occ_pairs 7 pairs = 0 };
+    assert { endpoint_occ_pairs 1 pairs = 0 };
+    assert { pair_diffs_at_most pairs 0 };
+    assert { valid_pairing_with_bound nums 0 0 pairs };
+    assert { minimized_max_difference nums 0 0 }
+
+  let lemma check_test_005 () =
+    let nums =
+      Cons 5 (Cons 4 (Cons 2 (Cons 2 (Cons 1 (Cons 3 (Cons 3 (Cons 5 Nil))))))) in
+    let pairs =
+      Cons (Pair 5 5) (Cons (Pair 2 2) (Cons (Pair 3 3) Nil)) in
+    assert { endpoint_occ_pairs 5 pairs = 2 };
+    assert { endpoint_occ_pairs 2 pairs = 2 };
+    assert { endpoint_occ_pairs 3 pairs = 2 };
+    assert { num_occ 5 nums = 2 };
+    assert { num_occ 2 nums = 2 };
+    assert { num_occ 3 nums = 2 };
+    assert { pair_diffs_at_most pairs 0 };
+    assert { valid_pairing_with_bound nums 3 0 pairs };
+    assert { minimized_max_difference nums 3 0 }
+
+  let lemma check_test_007 () =
+    let nums = Cons 1 (Cons 3 (Cons 6 (Cons 9 (Cons 12 (Cons 15 Nil))))) in
+    let pairs = Cons (Pair 3 6) (Cons (Pair 9 12) Nil) in
+    assert { endpoint_occ_pairs 3 pairs = 1 };
+    assert { endpoint_occ_pairs 6 pairs = 1 };
+    assert { endpoint_occ_pairs 9 pairs = 1 };
+    assert { endpoint_occ_pairs 12 pairs = 1 };
+    assert { num_occ 3 nums = 1 };
+    assert { num_occ 6 nums = 1 };
+    assert { num_occ 9 nums = 1 };
+    assert { num_occ 12 nums = 1 };
+    assert { pair_diffs_at_most pairs 3 };
+    assert { valid_pairing_with_bound nums 2 3 pairs }
+
+  let lemma check_test_009 () =
+    let nums = Cons 1 (Cons 3 (Cons 6 (Cons 19 (Cons 20 Nil)))) in
+    let pairs = Cons (Pair 1 3) (Cons (Pair 19 20) Nil) in
+    assert { endpoint_occ_pairs 1 pairs = 1 };
+    assert { endpoint_occ_pairs 3 pairs = 1 };
+    assert { endpoint_occ_pairs 19 pairs = 1 };
+    assert { endpoint_occ_pairs 20 pairs = 1 };
+    assert { num_occ 1 nums = 1 };
+    assert { num_occ 3 nums = 1 };
+    assert { num_occ 19 nums = 1 };
+    assert { num_occ 20 nums = 1 };
+    assert { pair_diffs_at_most pairs 2 };
+    assert { valid_pairing_with_bound nums 2 2 pairs }
+
+  let lemma check_test_010 () =
+    let nums = Cons 8 (Cons 4 (Cons 2 (Cons 6 (Cons 10 (Cons 12 Nil))))) in
+    let pairs = Cons (Pair 8 6) (Cons (Pair 4 2) (Cons (Pair 10 12) Nil)) in
+    assert { endpoint_occ_pairs 8 pairs = 1 };
+    assert { endpoint_occ_pairs 6 pairs = 1 };
+    assert { endpoint_occ_pairs 4 pairs = 1 };
+    assert { endpoint_occ_pairs 2 pairs = 1 };
+    assert { endpoint_occ_pairs 10 pairs = 1 };
+    assert { endpoint_occ_pairs 12 pairs = 1 };
+    assert { num_occ 8 nums = 1 };
+    assert { num_occ 6 nums = 1 };
+    assert { num_occ 4 nums = 1 };
+    assert { num_occ 2 nums = 1 };
+    assert { num_occ 10 nums = 1 };
+    assert { num_occ 12 nums = 1 };
+    assert { pair_diffs_at_most pairs 2 };
+    assert { valid_pairing_with_bound nums 3 2 pairs }
+
+end

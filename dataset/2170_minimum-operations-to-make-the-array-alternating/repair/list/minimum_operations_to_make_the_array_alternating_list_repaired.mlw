@@ -1,0 +1,154 @@
+module MinimumOperationsToMakeTheArrayAlternating_List_Spec
+
+  use int.Int
+  use list.List
+  use list.Length
+  use list.NumOcc
+
+  let rec predicate all_positive (nums: list int)
+    variant { nums }
+  =
+    match nums with
+    | Nil -> true
+    | Cons x xs -> x > 0 && all_positive xs
+    end
+
+  let rec function even_positions (nums: list int) : list int
+    variant { nums }
+  =
+    match nums with
+    | Nil -> Nil
+    | Cons x xs -> Cons x (odd_positions_from_tail xs)
+    end
+
+  with function odd_positions_from_tail (nums: list int) : list int
+    variant { nums }
+  =
+    match nums with
+    | Nil -> Nil
+    | Cons _ xs -> even_positions xs
+    end
+
+  function odd_positions (nums: list int) : list int =
+    match nums with
+    | Nil -> Nil
+    | Cons _ xs -> even_positions xs
+    end
+
+  predicate valid_alternating_values (even_value: int) (odd_value: int) =
+    even_value > 0 /\ odd_value > 0 /\ even_value <> odd_value
+
+  function kept_by_values (nums: list int) (even_value: int) (odd_value: int) : int =
+    num_occ even_value (even_positions nums) + num_occ odd_value (odd_positions nums)
+
+  predicate best_kept (nums: list int) (kept: int) =
+    exists even_value odd_value: int.
+      valid_alternating_values even_value odd_value /\
+      kept = kept_by_values nums even_value odd_value /\
+      (forall ev ov: int.
+        valid_alternating_values ev ov ->
+        kept_by_values nums ev ov <= kept)
+
+  predicate minimum_operations_spec (nums: list int) (ops: int) =
+    exists kept: int.
+      best_kept nums kept /\
+      ops = length nums - kept /\
+      0 <= ops <= length nums
+
+  val minimum_operations_to_make_the_array_alternating_list (nums: list int) : int
+    requires { length nums >= 1 }
+    requires { all_positive nums }
+    ensures  { minimum_operations_spec nums result }
+
+  let lemma check_test_004 () =
+    let l = Cons 1 Nil in
+    assert { all_positive l };
+    assert { even_positions l = Cons 1 Nil };
+    assert { odd_positions l = Nil };
+    assert { num_occ 1 (even_positions l) = 1 };
+    assert { num_occ 2 (odd_positions l) = 0 };
+    assert { kept_by_values l 1 2 = 1 };
+    assert { forall ev ov: int.
+      valid_alternating_values ev ov -> kept_by_values l ev ov <= 1 };
+    assert { best_kept l 1 };
+    assert { minimum_operations_spec l 0 }
+
+  let lemma check_test_001 () =
+    let l = Cons 5 (Cons 6 (Cons 5 (Cons 6 (Cons 5 (Cons 6 (Cons 5 (Cons 6 (Cons 5 (Cons 6 (Cons 5 Nil)))))))))) in
+    assert { all_positive l };
+    assert { even_positions l = Cons 5 (Cons 5 (Cons 5 (Cons 5 (Cons 5 (Cons 5 Nil))))) };
+    assert { odd_positions l = Cons 6 (Cons 6 (Cons 6 (Cons 6 (Cons 6 Nil)))) };
+    assert { num_occ 5 (even_positions l) = 6 };
+    assert { num_occ 6 (odd_positions l) = 5 };
+    assert { kept_by_values l 5 6 = 11 };
+    assert { forall ev ov: int.
+      valid_alternating_values ev ov -> kept_by_values l ev ov <= 11 };
+    assert { best_kept l 11 };
+    assert { minimum_operations_spec l 0 }
+
+  let lemma check_test_000 () =
+    let l = Cons 5 (Cons 5 (Cons 5 (Cons 5 (Cons 5 (Cons 5 (Cons 5 (Cons 5 Nil))))))) in
+    assert { all_positive l };
+    assert { even_positions l = Cons 5 (Cons 5 (Cons 5 (Cons 5 Nil))) };
+    assert { odd_positions l = Cons 5 (Cons 5 (Cons 5 (Cons 5 Nil))) };
+    assert { num_occ 5 (even_positions l) = 4 };
+    assert { num_occ 1 (odd_positions l) = 0 };
+    assert { kept_by_values l 5 1 = 4 };
+    assert { forall ev ov: int.
+      valid_alternating_values ev ov -> kept_by_values l ev ov <= 4 };
+    assert { best_kept l 4 };
+    assert { minimum_operations_spec l 4 }
+
+  let lemma check_test_002 () =
+    let l = Cons 2 (Cons 2 (Cons 2 (Cons 2 (Cons 2 (Cons 1 Nil))))) in
+    assert { all_positive l };
+    assert { even_positions l = Cons 2 (Cons 2 (Cons 2 Nil)) };
+    assert { odd_positions l = Cons 2 (Cons 2 (Cons 1 Nil)) };
+    assert { num_occ 2 (even_positions l) = 3 };
+    assert { num_occ 1 (odd_positions l) = 1 };
+    assert { kept_by_values l 2 1 = 4 };
+    assert { forall ev ov: int.
+      valid_alternating_values ev ov -> kept_by_values l ev ov <= 4 };
+    assert { best_kept l 4 };
+    assert { minimum_operations_spec l 2 }
+
+  let lemma check_test_003 () =
+    let l = Cons 1 (Cons 3 (Cons 1 (Cons 3 (Cons 2 (Cons 3 (Cons 1 (Cons 3 (Cons 1 (Cons 3 Nil))))))))) in
+    assert { all_positive l };
+    assert { even_positions l = Cons 1 (Cons 1 (Cons 2 (Cons 1 (Cons 1 Nil)))) };
+    assert { odd_positions l = Cons 3 (Cons 3 (Cons 3 (Cons 3 (Cons 3 Nil)))) };
+    assert { num_occ 1 (even_positions l) = 4 };
+    assert { num_occ 3 (odd_positions l) = 5 };
+    assert { kept_by_values l 1 3 = 9 };
+    assert { forall ev ov: int.
+      valid_alternating_values ev ov -> kept_by_values l ev ov <= 9 };
+    assert { best_kept l 9 };
+    assert { minimum_operations_spec l 1 }
+
+  let lemma check_test_008 () =
+    let l = Cons 3 (Cons 1 (Cons 3 (Cons 2 (Cons 4 (Cons 3 Nil))))) in
+    assert { all_positive l };
+    assert { even_positions l = Cons 3 (Cons 3 (Cons 4 Nil)) };
+    assert { odd_positions l = Cons 1 (Cons 2 (Cons 3 Nil)) };
+    assert { num_occ 3 (even_positions l) = 2 };
+    assert { num_occ 1 (odd_positions l) = 1 };
+    assert { kept_by_values l 3 1 = 3 };
+    assert { forall ev ov: int.
+      valid_alternating_values ev ov -> kept_by_values l ev ov <= 3 };
+    assert { best_kept l 3 };
+    assert { minimum_operations_spec l 3 }
+
+  let lemma check_test_010 () =
+    let l = Cons 1 (Cons 2 (Cons 3 (Cons 4 (Cons 5 Nil)))) in
+    assert { all_positive l };
+    assert { even_positions l = Cons 1 (Cons 3 (Cons 5 Nil)) };
+    assert { odd_positions l = Cons 2 (Cons 4 Nil) };
+    assert { num_occ 1 (even_positions l) = 1 };
+    assert { num_occ 2 (odd_positions l) = 1 };
+    assert { kept_by_values l 1 2 = 2 };
+    assert { forall ev ov: int.
+      valid_alternating_values ev ov -> kept_by_values l ev ov <= 2 };
+    assert { best_kept l 2 };
+    assert { minimum_operations_spec l 3 }
+
+end

@@ -1,0 +1,315 @@
+module MinimumSumOfSquaredDifference_Array_Stage3
+
+  use int.Int
+  use int.Abs
+  use array.Array
+  use array.Init
+
+  function square (x: int) : int =
+    x * x
+
+  let function abs_diff_at
+    (nums1: array int) (nums2: array int) (i: int) : int
+    requires { 0 <= i < length nums1 }
+    requires { 0 <= i < length nums2 }
+  =
+    abs (nums1[i] - nums2[i])
+
+  let rec function total_abs_diff_from
+    (nums1: array int) (nums2: array int) (i: int) : int
+    requires { length nums1 = length nums2 }
+    requires { 0 <= i <= length nums1 }
+    variant  { length nums1 - i }
+  =
+    if i = length nums1 then 0
+    else abs (nums1[i] - nums2[i]) + total_abs_diff_from nums1 nums2 (i + 1)
+
+  let function total_abs_diff (nums1: array int) (nums2: array int) : int
+    requires { length nums1 = length nums2 }
+  =
+    total_abs_diff_from nums1 nums2 0
+
+  let rec function residual_sum_from (residual: array int) (i: int) : int
+    requires { 0 <= i <= length residual }
+    variant  { length residual - i }
+  =
+    if i = length residual then 0
+    else residual[i] + residual_sum_from residual (i + 1)
+
+  let function residual_sum (residual: array int) : int =
+    residual_sum_from residual 0
+
+  let rec function squared_residual_sum_from
+    (residual: array int) (i: int) : int
+    requires { 0 <= i <= length residual }
+    variant  { length residual - i }
+  =
+    if i = length residual then 0
+    else residual[i] * residual[i] + squared_residual_sum_from residual (i + 1)
+
+  let function squared_residual_sum (residual: array int) : int =
+    squared_residual_sum_from residual 0
+
+  let rec lemma residual_sum_from_zero
+    (residual: array int) (i: int)
+    requires { 0 <= i <= length residual }
+    requires { forall j: int. i <= j < length residual -> residual[j] = 0 }
+    ensures  { residual_sum_from residual i = 0 }
+    variant  { length residual - i }
+  =
+    if i = length residual then
+      ()
+    else
+      begin
+        assert { residual[i] = 0 };
+        residual_sum_from_zero residual (i + 1);
+        assert { residual_sum_from residual i =
+          residual[i] + residual_sum_from residual (i + 1) }
+      end
+
+  let lemma residual_sum_zero (residual: array int)
+    requires { forall j: int. 0 <= j < length residual -> residual[j] = 0 }
+    ensures  { residual_sum residual = 0 }
+  =
+    residual_sum_from_zero residual 0
+
+  let rec lemma squared_residual_sum_from_zero
+    (residual: array int) (i: int)
+    requires { 0 <= i <= length residual }
+    requires { forall j: int. i <= j < length residual -> residual[j] = 0 }
+    ensures  { squared_residual_sum_from residual i = 0 }
+    variant  { length residual - i }
+  =
+    if i = length residual then
+      ()
+    else
+      begin
+        assert { residual[i] = 0 };
+        assert { residual[i] * residual[i] = 0 };
+        squared_residual_sum_from_zero residual (i + 1);
+        assert { squared_residual_sum_from residual i =
+          residual[i] * residual[i] + squared_residual_sum_from residual (i + 1) }
+      end
+
+  let lemma squared_residual_sum_zero (residual: array int)
+    requires { forall j: int. 0 <= j < length residual -> residual[j] = 0 }
+    ensures  { squared_residual_sum residual = 0 }
+  =
+    squared_residual_sum_from_zero residual 0
+
+  predicate valid_input
+    (nums1: array int) (nums2: array int) (k1: int) (k2: int)
+  =
+    length nums1 = length nums2 /\
+    1 <= length nums1 <= 100000 /\
+    0 <= k1 <= 1000000000 /\
+    0 <= k2 <= 1000000000 /\
+    (forall i: int.
+      0 <= i < length nums1 ->
+      0 <= nums1[i] <= 100000 /\ 0 <= nums2[i] <= 100000)
+
+  predicate valid_residual
+    (nums1: array int) (nums2: array int) (k1: int) (k2: int)
+    (residual: array int)
+  =
+    length nums1 = length nums2 /\
+    length residual = length nums1 /\
+    0 <= k1 /\ 0 <= k2 /\
+    (forall i: int.
+      0 <= i < length residual ->
+      0 <= residual[i] <= abs_diff_at nums1 nums2 i) /\
+    0 <= total_abs_diff nums1 nums2 - residual_sum residual <= k1 + k2
+
+  predicate minimum_squared_difference_result
+    (nums1: array int) (nums2: array int) (k1: int) (k2: int)
+    (res: int)
+  =
+    (exists residual: array int.
+      valid_residual nums1 nums2 k1 k2 residual /\
+      res = squared_residual_sum residual) /\
+    (forall residual: array int.
+      valid_residual nums1 nums2 k1 k2 residual ->
+      res <= squared_residual_sum residual)
+
+  predicate nonnegative_counts (counts: array int) =
+    forall i: int. 0 <= i < length counts -> 0 <= counts[i]
+
+  let rec lemma squared_residual_sum_from_nonnegative
+    (residual: array int) (i: int)
+    requires { 0 <= i <= length residual }
+    requires { forall j: int. i <= j < length residual -> 0 <= residual[j] }
+    ensures  { 0 <= squared_residual_sum_from residual i }
+    variant  { length residual - i }
+  =
+    if i = length residual then
+      ()
+    else
+      begin
+        assert { 0 <= residual[i] };
+        assert { 0 <= residual[i] * residual[i] };
+        squared_residual_sum_from_nonnegative residual (i + 1)
+      end
+
+  let lemma squared_residual_sum_nonnegative (residual: array int)
+    requires { forall j: int. 0 <= j < length residual -> 0 <= residual[j] }
+    ensures  { 0 <= squared_residual_sum residual }
+  =
+    squared_residual_sum_from_nonnegative residual 0
+
+  let rec max_diff_from_impl
+    (nums1: array int) (nums2: array int) (i: int) (current: int) : int
+    requires { length nums1 = length nums2 }
+    requires { 0 <= i <= length nums1 }
+    requires { 0 <= current }
+    ensures  { current <= result }
+    ensures  { forall j: int.
+      i <= j < length nums1 -> abs (nums1[j] - nums2[j]) <= result }
+    variant  { length nums1 - i }
+  =
+    if i = length nums1 then
+      current
+    else
+      let d = abs (nums1[i] - nums2[i]) in
+      if d > current then
+        max_diff_from_impl nums1 nums2 (i + 1) d
+      else
+        max_diff_from_impl nums1 nums2 (i + 1) current
+
+  let rec total_abs_diff_from_impl
+    (nums1: array int) (nums2: array int) (i: int) : int
+    requires { length nums1 = length nums2 }
+    requires { 0 <= i <= length nums1 }
+    ensures  { result = total_abs_diff_from nums1 nums2 i }
+    ensures  { 0 <= result }
+    variant  { length nums1 - i }
+  =
+    if i = length nums1 then
+      0
+    else
+      abs (nums1[i] - nums2[i]) + total_abs_diff_from_impl nums1 nums2 (i + 1)
+
+  let rec fill_diff_counts_impl
+    (nums1: array int) (nums2: array int) (counts: array int) (i: int) : unit
+    requires { length nums1 = length nums2 }
+    requires { 0 <= i <= length nums1 }
+    requires { nonnegative_counts counts }
+    requires { forall j: int.
+      i <= j < length nums1 -> abs (nums1[j] - nums2[j]) < length counts }
+    ensures  { nonnegative_counts counts }
+    variant  { length nums1 - i }
+  =
+    if i = length nums1 then
+      ()
+    else
+      let d = abs (nums1[i] - nums2[i]) in
+      let c = counts[d] in
+      assert { 0 <= c };
+      counts[d] <- c + 1;
+      assert { nonnegative_counts counts };
+      fill_diff_counts_impl nums1 nums2 counts (i + 1)
+
+  let rec reduce_counts_impl (counts: array int) (level: int) (ops: int) : unit
+    requires { 0 <= level < length counts }
+    requires { 0 <= ops }
+    requires { nonnegative_counts counts }
+    ensures  { nonnegative_counts counts }
+    variant  { level + ops }
+  =
+    if level <= 0 then
+      ()
+    else if ops <= 0 then
+      ()
+    else
+      let c = counts[level] in
+      assert { 0 <= c };
+      if c = 0 then
+        begin
+        assert { (level - 1) + ops < level + ops };
+        reduce_counts_impl counts (level - 1) ops
+        end
+      else if c <= ops then
+        begin
+        let next = counts[level - 1] in
+        assert { 0 <= next };
+        assert { 1 <= c };
+        assert { 0 <= ops - c };
+        assert { (level - 1) + (ops - c) < level + ops };
+        counts[level] <- 0;
+        counts[level - 1] <- next + c;
+        assert { nonnegative_counts counts };
+        reduce_counts_impl counts (level - 1) (ops - c)
+        end
+      else
+        begin
+        let next = counts[level - 1] in
+        assert { 0 <= next };
+        counts[level] <- c - ops;
+        counts[level - 1] <- next + ops;
+        assert { nonnegative_counts counts }
+        end
+
+  let rec squared_sum_from_counts_impl (counts: array int) (i: int) : int
+    requires { 0 <= i <= length counts }
+    requires { nonnegative_counts counts }
+    ensures  { 0 <= result }
+    variant  { length counts - i }
+  =
+    if i = length counts then
+      0
+    else
+      begin
+        assert { 0 <= i };
+        assert { 0 <= i * i };
+        assert { 0 <= counts[i] };
+        assert { 0 <= i * i * counts[i] };
+        i * i * counts[i] + squared_sum_from_counts_impl counts (i + 1)
+      end
+
+  let minimum_sum_of_squared_difference_array
+    (nums1: array int) (nums2: array int) (k1: int) (k2: int) : int
+    requires { valid_input nums1 nums2 k1 k2 }
+    ensures  { minimum_squared_difference_result nums1 nums2 k1 k2 result }
+  =
+    if length nums1 = 0 then
+      0
+    else
+      let total_ops = k1 + k2 in
+      assert { 0 <= total_ops };
+      let total_diff = total_abs_diff_from_impl nums1 nums2 0 in
+      assert { total_diff = total_abs_diff nums1 nums2 };
+      if total_diff <= total_ops then
+        begin
+          let residual = make (length nums1) 0 in
+          assert { length residual = length nums1 };
+          assert { forall i: int. 0 <= i < length residual -> residual[i] = 0 };
+          residual_sum_zero residual;
+          squared_residual_sum_zero residual;
+          assert { residual_sum residual = 0 };
+          assert { squared_residual_sum residual = 0 };
+          assert { valid_residual nums1 nums2 k1 k2 residual };
+          assert { forall candidate: array int.
+            valid_residual nums1 nums2 k1 k2 candidate ->
+            0 <= squared_residual_sum candidate };
+          assert { minimum_squared_difference_result nums1 nums2 k1 k2 0 };
+          0
+        end
+      else
+        let max_d = max_diff_from_impl nums1 nums2 0 0 in
+        assert { 0 <= max_d };
+        assert { forall i: int.
+          0 <= i < length nums1 -> abs (nums1[i] - nums2[i]) <= max_d };
+        let counts = make (max_d + 1) 0 in
+        assert { length counts = max_d + 1 };
+        assert { nonnegative_counts counts };
+        assert { forall i: int.
+          0 <= i < length nums1 -> abs (nums1[i] - nums2[i]) < length counts };
+        fill_diff_counts_impl nums1 nums2 counts 0;
+        assert { nonnegative_counts counts };
+        reduce_counts_impl counts max_d total_ops;
+        assert { nonnegative_counts counts };
+        let result = squared_sum_from_counts_impl counts 0 in
+        assert { 0 <= result };
+        assert { minimum_squared_difference_result nums1 nums2 k1 k2 result };
+        result
+
+end

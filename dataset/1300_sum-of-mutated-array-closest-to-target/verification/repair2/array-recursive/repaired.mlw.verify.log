@@ -1,0 +1,117 @@
+== Stage 1: first prover on whole file ==
+Running in /Users/rubenm/Desktop/Diversify2Verify/codex-runs/repair2-split2/stage3a-rerepair/1300_sum-of-mutated-array-closest-to-target/array-recursive/sum_of_mutated_array_closest_to_target_array_stage3_9918c061_stage3/repaired/generated/why3: why3 session create -o /Users/rubenm/Desktop/Diversify2Verify/codex-runs/repair2-split2/stage3a-rerepair/1300_sum-of-mutated-array-closest-to-target/array-recursive/sum_of_mutated_array_closest_to_target_array_stage3_9918c061_stage3/repaired/generated/why3/.why3_sessions/repaired_stage1 -P Z3,4.8.6 -t 10 -m 8192 repaired.mlw
+Session created successfully
+Running in /Users/rubenm/Desktop/Diversify2Verify/codex-runs/repair2-split2/stage3a-rerepair/1300_sum-of-mutated-array-closest-to-target/array-recursive/sum_of_mutated_array_closest_to_target_array_stage3_9918c061_stage3/repaired/generated/why3: why3 bench /Users/rubenm/Desktop/Diversify2Verify/codex-runs/repair2-split2/stage3a-rerepair/1300_sum-of-mutated-array-closest-to-target/array-recursive/sum_of_mutated_array_closest_to_target_array_stage3_9918c061_stage3/repaired/generated/why3/.why3_sessions/repaired_stage1
+Progress: 19/1/0                       Progress: 18/2/0                       Progress: 17/3/0                       Progress: 16/4/0                       Progress: 15/5/0                       Progress: 14/6/0                       Progress: 14/0/1                       Progress: 13/1/1                       Progress: 12/2/1                       Progress: 11/3/1                       Progress: 10/4/1                       Progress: 9/5/1                       Progress: 9/1/2                       Progress: 8/2/2                       Progress: 7/3/2                       Progress: 6/4/2                       Progress: 6/3/2                       Progress: 5/4/2                       Progress: 5/2/2                       Progress: 4/3/2                       Progress: 3/4/2                       Progress: 3/0/1                       Progress: 2/1/1                       Progress: 1/2/1                       Progress: 0/3/1                       Progress: 0/0/1                       
+Replay completed, saving session... done
+== Stage 1 stats ==
+= Statistics for session /Users/rubenm/Desktop/Diversify2Verify/codex-runs/repair2-split2/stage3a-rerepair/1300_sum-of-mutated-array-closest-to-target/array-recursive/sum_of_mutated_array_closest_to_target_array_stage3_9918c061_stage3/repaired/generated/why3/.why3_sessions/repaired_stage1
+
+== Number of root goals ==
+  total: 20  proved: 19
+
+== Number of sub goals ==
+  total: 0  proved: 0
+
+== Goals not proved ==
+  +-- file [../../repaired.mlw]
+    +-- theory SumOfMutatedArrayClosestToTarget_Array_Stage3_Recursive
+      +-- goal capped_sum_strict_at_index'vc
+  
+== Goals proved by only one prover ==
+  +-- file [../../repaired.mlw]
+    +-- theory SumOfMutatedArrayClosestToTarget_Array_Stage3_Recursive
+      +-- goal min_monotone_in_cap: Z3 4.8.6
+      +-- goal mutated_sum_monotone: Z3 4.8.6
+      +-- goal mutated_sum_at_or_above_upper_bound: Z3 4.8.6
+      +-- goal mutated_sum_strictly_increases_below_maximum'vc: Z3 4.8.6
+      +-- goal distance_under_target_monotone: Z3 4.8.6
+      +-- goal distance_over_target_monotone: Z3 4.8.6
+      +-- goal left_candidate_best_below_right: Z3 4.8.6
+      +-- goal right_candidate_best_at_or_above_right: Z3 4.8.6
+      +-- goal adjacent_left_choice_is_optimal: Z3 4.8.6
+      +-- goal adjacent_right_choice_is_optimal: Z3 4.8.6
+      +-- goal abs_int'vc: Z3 4.8.6
+      +-- goal capped_sum_from'vc: Z3 4.8.6
+      +-- goal capped_sum'vc: Z3 4.8.6
+      +-- goal distance_for_value'vc: Z3 4.8.6
+      +-- goal max_from'vc: Z3 4.8.6
+      +-- goal max_value'vc: Z3 4.8.6
+      +-- goal lower_bound_value'vc: Z3 4.8.6
+      +-- goal choose_better_value'vc: Z3 4.8.6
+      +-- goal sum_of_mutated_array_closest_to_target_array'vc: Z3 4.8.6
+  
+1 session(s) read, with a total of 20 proof goals.
+== Unproved root goals after first prover ==
+SumOfMutatedArrayClosestToTarget_Array_Stage3_Recursive	capped_sum_strict_at_index'vc
+== Stage 1: trying remaining goals with prover Alt-Ergo,2.4.0 ==
+---- stage1 | prover: Alt-Ergo,2.4.0 | theory: SumOfMutatedArrayClosestToTarget_Array_Stage3_Recursive | goal: capped_sum_strict_at_index'vc ----
+File repaired.mlw:
+Goal capped_sum_strict_at_index'vc.
+Prover result is: Timeout (10.00s, 113774 steps).
+Remaining after prover Alt-Ergo,2.4.0: 1
+== Stage 1: trying remaining goals with prover CVC4,1.8 ==
+---- stage1 | prover: CVC4,1.8 | theory: SumOfMutatedArrayClosestToTarget_Array_Stage3_Recursive | goal: capped_sum_strict_at_index'vc ----
+File repaired.mlw:
+Goal capped_sum_strict_at_index'vc.
+Prover result is: Timeout (10.00s, 1852042 steps).
+Remaining after prover CVC4,1.8: 1
+== Goals still unproved after stage 1 ==
+SumOfMutatedArrayClosestToTarget_Array_Stage3_Recursive	capped_sum_strict_at_index'vc
+== Stage 2: split_vc on unproved goal ==
+Target theory: SumOfMutatedArrayClosestToTarget_Array_Stage3_Recursive
+Target goal  : capped_sum_strict_at_index'vc
+---- stage2 | prover: Z3,4.8.6 | theory: SumOfMutatedArrayClosestToTarget_Array_Stage3_Recursive | goal: capped_sum_strict_at_index'vc ----
+Transforms: split_vc
+File "repaired.mlw", line 69, character 13 to line 71, character 52:
+Sub-goal Assertion of goal capped_sum_strict_at_index'vc.
+Prover result is: Timeout (10.00s, 126624187 steps).
+
+File "repaired.mlw", line 72, character 13 to line 74, character 52:
+Sub-goal Assertion of goal capped_sum_strict_at_index'vc.
+Prover result is: Timeout (10.00s, 243971732 steps).
+
+File "repaired.mlw", line 75, character 13 to line 77, character 58:
+Sub-goal Assertion of goal capped_sum_strict_at_index'vc.
+Prover result is: Valid (0.04s, 369962 steps).
+
+File "repaired.mlw", line 78, character 13 to line 80, character 58:
+Sub-goal Assertion of goal capped_sum_strict_at_index'vc.
+Prover result is: Valid (0.04s, 316815 steps).
+
+File "repaired.mlw", line 81, character 13 to line 82, character 52:
+Sub-goal Assertion of goal capped_sum_strict_at_index'vc.
+Prover result is: Valid (0.04s, 316545 steps).
+
+File "repaired.mlw", line 83, character 13 to line 84, character 58:
+Sub-goal Assertion of goal capped_sum_strict_at_index'vc.
+Prover result is: Valid (0.06s, 433089 steps).
+Infrastructure issue in stage 2 with prover Z3,4.8.6; aborting rest of stage 2.
+== Goals still unproved after stage 2 (split_vc) ==
+SumOfMutatedArrayClosestToTarget_Array_Stage3_Recursive	capped_sum_strict_at_index'vc
+== Stage 3: split_vc + inline_all on still-unproved goal ==
+Target theory: SumOfMutatedArrayClosestToTarget_Array_Stage3_Recursive
+Target goal  : capped_sum_strict_at_index'vc
+---- stage3 | prover: Alt-Ergo,2.4.0 | theory: SumOfMutatedArrayClosestToTarget_Array_Stage3_Recursive | goal: capped_sum_strict_at_index'vc ----
+Transforms: split_vc inline_all
+File "repaired.mlw", line 69, character 13 to line 71, character 52:
+Sub-goal Assertion of goal capped_sum_strict_at_index'vc.
+Prover result is: Timeout (10.00s, 134642 steps).
+
+File "repaired.mlw", line 72, character 13 to line 74, character 52:
+Sub-goal Assertion of goal capped_sum_strict_at_index'vc.
+Prover result is: Timeout (10.00s, 122145 steps).
+Infrastructure issue in stage 3 with prover Alt-Ergo,2.4.0; aborting rest of stage 3.
+== Final summary ==
+Unproved root goals after first prover : 1
+Remaining failures after split_vc      : 1
+Remaining failures after stage 3       : 1
+Detailed logs stored in                : /Users/rubenm/Desktop/Diversify2Verify/codex-runs/repair2-split2/stage3a-rerepair/1300_sum-of-mutated-array-closest-to-target/array-recursive/sum_of_mutated_array_closest_to_target_array_stage3_9918c061_stage3/repaired/generated/why3/.why3_sessions/repaired_logs
+Still unproved goals:
+SumOfMutatedArrayClosestToTarget_Array_Stage3_Recursive	capped_sum_strict_at_index'vc
+VERIFY_RESULT: FAILURE
+VERIFY_REASON: unproved_goals_remain
+VERIFY_STAGE: stage3
+VERIFY_ROOT_TOTAL: 20
+VERIFY_ROOT_PROVED: 19
+VERIFY_ROOT_REMAINING: 1

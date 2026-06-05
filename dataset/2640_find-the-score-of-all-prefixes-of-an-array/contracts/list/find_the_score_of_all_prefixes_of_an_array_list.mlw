@@ -1,0 +1,166 @@
+module FindTheScoreOfAllPrefixesOfAnArray_List_Spec
+
+  use int.Int
+  use int.MinMax
+  use list.List
+
+  let rec predicate values_in_domain (nums: list int)
+    variant { nums }
+  =
+    match nums with
+    | Nil -> true
+    | Cons x xs -> 1 <= x && x <= 1000000000 && values_in_domain xs
+    end
+
+  predicate valid_input (nums: list int) =
+    nums <> Nil /\ values_in_domain nums
+
+  let rec function prefix_scores_from
+    (nums: list int) (current_max: int) (running_score: int) : list int
+    variant { nums }
+  =
+    match nums with
+    | Nil -> Nil
+    | Cons x xs ->
+        let next_max = max current_max x in
+        let next_score = running_score + x + next_max in
+        Cons next_score (prefix_scores_from xs next_max next_score)
+    end
+
+  function prefix_scores (nums: list int) : list int =
+    match nums with
+    | Nil -> Nil
+    | Cons x xs ->
+        let first_score = x + x in
+        Cons first_score (prefix_scores_from xs x first_score)
+    end
+
+  predicate result_matches (nums: list int) (ans: list int) =
+    valid_input nums /\ ans = prefix_scores nums
+
+  val find_the_score_of_all_prefixes_of_an_array_list (nums: list int) : list int
+    requires { valid_input nums }
+    ensures  { result_matches nums result }
+
+  let lemma test_000 () =
+    let nums = Cons 5 (Cons 4 (Cons 3 (Cons 2 (Cons 1 Nil)))) in
+    let expected = Cons 10 (Cons 19 (Cons 27 (Cons 34 (Cons 40 Nil)))) in
+    assert { values_in_domain Nil };
+    assert { values_in_domain (Cons 1 Nil) };
+    assert { values_in_domain (Cons 2 (Cons 1 Nil)) };
+    assert { values_in_domain (Cons 3 (Cons 2 (Cons 1 Nil))) };
+    assert { values_in_domain (Cons 4 (Cons 3 (Cons 2 (Cons 1 Nil)))) };
+    assert { valid_input nums };
+    assert { prefix_scores_from Nil 5 40 = Nil };
+    assert { prefix_scores_from (Cons 1 Nil) 5 34 = Cons 40 Nil };
+    assert { prefix_scores_from (Cons 2 (Cons 1 Nil)) 5 27 = Cons 34 (Cons 40 Nil) };
+    assert { prefix_scores_from (Cons 3 (Cons 2 (Cons 1 Nil))) 5 19 = Cons 27 (Cons 34 (Cons 40 Nil)) };
+    assert { prefix_scores_from (Cons 4 (Cons 3 (Cons 2 (Cons 1 Nil)))) 5 10 = Cons 19 (Cons 27 (Cons 34 (Cons 40 Nil))) };
+    assert { prefix_scores nums = expected };
+    assert { result_matches nums expected }
+
+  let lemma test_001 () =
+    let nums = Cons 1 Nil in
+    let expected = Cons 2 Nil in
+    assert { values_in_domain Nil };
+    assert { values_in_domain nums };
+    assert { valid_input nums };
+    assert { prefix_scores_from Nil 1 2 = Nil };
+    assert { prefix_scores nums = expected };
+    assert { result_matches nums expected }
+
+  let lemma test_002 () =
+    let nums = Cons 1000000000 Nil in
+    let expected = Cons 2000000000 Nil in
+    assert { values_in_domain Nil };
+    assert { values_in_domain nums };
+    assert { valid_input nums };
+    assert { prefix_scores_from Nil 1000000000 2000000000 = Nil };
+    assert { prefix_scores nums = expected };
+    assert { result_matches nums expected }
+
+  let lemma test_003 () =
+    let nums =
+      Cons 1 (Cons 1 (Cons 2 (Cons 4 (Cons 8 (Cons 16 Nil))))) in
+    let expected =
+      Cons 2 (Cons 4 (Cons 8 (Cons 16 (Cons 32 (Cons 64 Nil))))) in
+    assert { values_in_domain Nil };
+    assert { values_in_domain (Cons 16 Nil) };
+    assert { values_in_domain (Cons 8 (Cons 16 Nil)) };
+    assert { values_in_domain (Cons 4 (Cons 8 (Cons 16 Nil))) };
+    assert { values_in_domain (Cons 2 (Cons 4 (Cons 8 (Cons 16 Nil)))) };
+    assert { values_in_domain (Cons 1 (Cons 2 (Cons 4 (Cons 8 (Cons 16 Nil))))) };
+    assert { valid_input nums };
+    assert { prefix_scores_from Nil 16 64 = Nil };
+    assert { prefix_scores_from (Cons 16 Nil) 8 32 = Cons 64 Nil };
+    assert { prefix_scores_from (Cons 8 (Cons 16 Nil)) 4 16 = Cons 32 (Cons 64 Nil) };
+    assert { prefix_scores_from (Cons 4 (Cons 8 (Cons 16 Nil))) 2 8 = Cons 16 (Cons 32 (Cons 64 Nil)) };
+    assert { prefix_scores_from (Cons 2 (Cons 4 (Cons 8 (Cons 16 Nil)))) 1 4 = Cons 8 (Cons 16 (Cons 32 (Cons 64 Nil))) };
+    assert { prefix_scores_from (Cons 1 (Cons 2 (Cons 4 (Cons 8 (Cons 16 Nil))))) 1 2 = Cons 4 (Cons 8 (Cons 16 (Cons 32 (Cons 64 Nil)))) };
+    assert { prefix_scores nums = expected };
+    assert { result_matches nums expected }
+
+  let lemma test_004 () =
+    let nums = Cons 2 (Cons 3 (Cons 7 (Cons 5 (Cons 10 Nil)))) in
+    let expected = Cons 4 (Cons 10 (Cons 24 (Cons 36 (Cons 56 Nil)))) in
+    assert { values_in_domain Nil };
+    assert { values_in_domain (Cons 10 Nil) };
+    assert { values_in_domain (Cons 5 (Cons 10 Nil)) };
+    assert { values_in_domain (Cons 7 (Cons 5 (Cons 10 Nil))) };
+    assert { values_in_domain (Cons 3 (Cons 7 (Cons 5 (Cons 10 Nil)))) };
+    assert { valid_input nums };
+    assert { prefix_scores_from Nil 10 56 = Nil };
+    assert { prefix_scores_from (Cons 10 Nil) 7 36 = Cons 56 Nil };
+    assert { prefix_scores_from (Cons 5 (Cons 10 Nil)) 7 24 = Cons 36 (Cons 56 Nil) };
+    assert { prefix_scores_from (Cons 7 (Cons 5 (Cons 10 Nil))) 3 10 = Cons 24 (Cons 36 (Cons 56 Nil)) };
+    assert { prefix_scores_from (Cons 3 (Cons 7 (Cons 5 (Cons 10 Nil)))) 2 4 = Cons 10 (Cons 24 (Cons 36 (Cons 56 Nil))) };
+    assert { prefix_scores nums = expected };
+    assert { result_matches nums expected }
+
+  let lemma test_006 () =
+    let nums = Cons 5 (Cons 5 (Cons 5 (Cons 5 (Cons 5 Nil)))) in
+    let expected = Cons 10 (Cons 20 (Cons 30 (Cons 40 (Cons 50 Nil)))) in
+    assert { values_in_domain Nil };
+    assert { values_in_domain (Cons 5 Nil) };
+    assert { values_in_domain (Cons 5 (Cons 5 Nil)) };
+    assert { values_in_domain (Cons 5 (Cons 5 (Cons 5 Nil))) };
+    assert { values_in_domain (Cons 5 (Cons 5 (Cons 5 (Cons 5 Nil)))) };
+    assert { valid_input nums };
+    assert { prefix_scores_from Nil 5 50 = Nil };
+    assert { prefix_scores_from (Cons 5 Nil) 5 40 = Cons 50 Nil };
+    assert { prefix_scores_from (Cons 5 (Cons 5 Nil)) 5 30 = Cons 40 (Cons 50 Nil) };
+    assert { prefix_scores_from (Cons 5 (Cons 5 (Cons 5 Nil))) 5 20 = Cons 30 (Cons 40 (Cons 50 Nil)) };
+    assert { prefix_scores_from (Cons 5 (Cons 5 (Cons 5 (Cons 5 Nil)))) 5 10 = Cons 20 (Cons 30 (Cons 40 (Cons 50 Nil))) };
+    assert { prefix_scores nums = expected };
+    assert { result_matches nums expected }
+
+  let lemma test_007 () =
+    let nums =
+      Cons 10 (Cons 9 (Cons 8 (Cons 7 (Cons 6 (Cons 5 (Cons 4 (Cons 3 (Cons 2 (Cons 1 Nil))))))))) in
+    let expected =
+      Cons 20 (Cons 39 (Cons 57 (Cons 74 (Cons 90 (Cons 105 (Cons 119 (Cons 132 (Cons 144 (Cons 155 Nil))))))))) in
+    assert { values_in_domain Nil };
+    assert { values_in_domain (Cons 1 Nil) };
+    assert { values_in_domain (Cons 2 (Cons 1 Nil)) };
+    assert { values_in_domain (Cons 3 (Cons 2 (Cons 1 Nil))) };
+    assert { values_in_domain (Cons 4 (Cons 3 (Cons 2 (Cons 1 Nil)))) };
+    assert { values_in_domain (Cons 5 (Cons 4 (Cons 3 (Cons 2 (Cons 1 Nil))))) };
+    assert { values_in_domain (Cons 6 (Cons 5 (Cons 4 (Cons 3 (Cons 2 (Cons 1 Nil)))))) };
+    assert { values_in_domain (Cons 7 (Cons 6 (Cons 5 (Cons 4 (Cons 3 (Cons 2 (Cons 1 Nil))))))) };
+    assert { values_in_domain (Cons 8 (Cons 7 (Cons 6 (Cons 5 (Cons 4 (Cons 3 (Cons 2 (Cons 1 Nil)))))))) };
+    assert { values_in_domain (Cons 9 (Cons 8 (Cons 7 (Cons 6 (Cons 5 (Cons 4 (Cons 3 (Cons 2 (Cons 1 Nil))))))))) };
+    assert { valid_input nums };
+    assert { prefix_scores_from Nil 10 155 = Nil };
+    assert { prefix_scores_from (Cons 1 Nil) 10 144 = Cons 155 Nil };
+    assert { prefix_scores_from (Cons 2 (Cons 1 Nil)) 10 132 = Cons 144 (Cons 155 Nil) };
+    assert { prefix_scores_from (Cons 3 (Cons 2 (Cons 1 Nil))) 10 119 = Cons 132 (Cons 144 (Cons 155 Nil)) };
+    assert { prefix_scores_from (Cons 4 (Cons 3 (Cons 2 (Cons 1 Nil)))) 10 105 = Cons 119 (Cons 132 (Cons 144 (Cons 155 Nil))) };
+    assert { prefix_scores_from (Cons 5 (Cons 4 (Cons 3 (Cons 2 (Cons 1 Nil))))) 10 90 = Cons 105 (Cons 119 (Cons 132 (Cons 144 (Cons 155 Nil)))) };
+    assert { prefix_scores_from (Cons 6 (Cons 5 (Cons 4 (Cons 3 (Cons 2 (Cons 1 Nil)))))) 10 74 = Cons 90 (Cons 105 (Cons 119 (Cons 132 (Cons 144 (Cons 155 Nil))))) };
+    assert { prefix_scores_from (Cons 7 (Cons 6 (Cons 5 (Cons 4 (Cons 3 (Cons 2 (Cons 1 Nil))))))) 10 57 = Cons 74 (Cons 90 (Cons 105 (Cons 119 (Cons 132 (Cons 144 (Cons 155 Nil)))))) };
+    assert { prefix_scores_from (Cons 8 (Cons 7 (Cons 6 (Cons 5 (Cons 4 (Cons 3 (Cons 2 (Cons 1 Nil)))))))) 10 39 = Cons 57 (Cons 74 (Cons 90 (Cons 105 (Cons 119 (Cons 132 (Cons 144 (Cons 155 Nil))))))) };
+    assert { prefix_scores_from (Cons 9 (Cons 8 (Cons 7 (Cons 6 (Cons 5 (Cons 4 (Cons 3 (Cons 2 (Cons 1 Nil))))))))) 10 20 = Cons 39 (Cons 57 (Cons 74 (Cons 90 (Cons 105 (Cons 119 (Cons 132 (Cons 144 (Cons 155 Nil)))))))) };
+    assert { prefix_scores nums = expected };
+    assert { result_matches nums expected }
+
+end

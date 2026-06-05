@@ -1,0 +1,198 @@
+module CountOfInterestingSubarrays_List_Recursive_Implementation
+
+  use int.Int
+  use int.EuclideanDivision
+  use list.List
+
+  let interesting_element_indicator (x: int) (modulo: int) (k: int) : int =
+    if 0 < modulo then
+      if mod x modulo = k then 1 else 0
+    else 0
+
+  let rec count_interesting_prefixes_aux
+      (nums: list int) (modulo: int) (k: int) (running_count: int) : int
+    variant { nums }
+  =
+    match nums with
+    | Nil -> 0
+    | Cons x xs ->
+        let next_count =
+          running_count + interesting_element_indicator x modulo k in
+        (if 0 < modulo then
+           if mod next_count modulo = k then 1 else 0
+         else 0) +
+        count_interesting_prefixes_aux xs modulo k next_count
+    end
+
+  let count_interesting_prefixes
+      (nums: list int) (modulo: int) (k: int) : int =
+    count_interesting_prefixes_aux nums modulo k 0
+
+  let rec count_interesting_subarrays
+      (nums: list int) (modulo: int) (k: int) : int
+    variant { nums }
+  =
+    match nums with
+    | Nil -> 0
+    | Cons _ xs ->
+        count_interesting_prefixes nums modulo k +
+        count_interesting_subarrays xs modulo k
+    end
+
+  let count_of_interesting_subarrays_list
+      (nums: list int) (modulo: int) (k: int) : int =
+    count_interesting_subarrays nums modulo k
+
+  let test_000 () : bool =
+    let nums = Cons 3 (Cons 2 (Cons 4 Nil)) in
+    let r = count_of_interesting_subarrays_list nums 2 1 in
+    r = 3
+
+  let test_001 () : bool =
+    let nums = Cons 8 (Cons 12 (Cons 16 (Cons 20 (Cons 24 Nil)))) in
+    let r = count_of_interesting_subarrays_list nums 4 0 in
+    r = 2
+
+  let test_002 () : bool =
+    let nums = Cons 7 (Cons 7 (Cons 7 (Cons 7 (Cons 7 (Cons 7 (Cons 7 Nil)))))) in
+    let r = count_of_interesting_subarrays_list nums 7 0 in
+    r = 1
+
+  let test_003 () : bool =
+    let nums = Cons 3 (Cons 1 (Cons 9 (Cons 6 Nil))) in
+    let r = count_of_interesting_subarrays_list nums 3 0 in
+    r = 2
+
+  let test_004 () : bool =
+    let nums = Cons 5 (Cons 5 (Cons 5 (Cons 5 Nil))) in
+    let r = count_of_interesting_subarrays_list nums 5 0 in
+    r = 0
+
+  let test_005 () : bool =
+    let nums = Cons 1 (Cons 3 (Cons 5 (Cons 7 (Cons 9 Nil)))) in
+    let r = count_of_interesting_subarrays_list nums 2 1 in
+    r = 9
+
+  let test_006 () : bool =
+    let nums = Cons 7 (Cons 7 (Cons 7 (Cons 7 (Cons 7 (Cons 7 (Cons 7 Nil)))))) in
+    let r = count_of_interesting_subarrays_list nums 7 3 in
+    r = 0
+
+  let test_007 () : bool =
+    let nums = Cons 11 (Cons 22 (Cons 33 (Cons 44 (Cons 55 Nil)))) in
+    let r = count_of_interesting_subarrays_list nums 11 0 in
+    r = 0
+
+  let test_008 () : bool =
+    let nums = Cons 7 (Cons 7 (Cons 7 (Cons 7 (Cons 7 Nil)))) in
+    let r = count_of_interesting_subarrays_list nums 7 0 in
+    r = 0
+
+  let test_009 () : bool =
+    let nums = Cons 2 (Cons 4 (Cons 6 (Cons 8 (Cons 10 Nil)))) in
+    let r = count_of_interesting_subarrays_list nums 2 0 in
+    r = 6
+
+  let test_010 () : bool =
+    let nums = Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 Nil)))) in
+    let r = count_of_interesting_subarrays_list nums 2 1 in
+    r = 9
+
+  let test_011 () : bool =
+    let nums = Cons 7 (Cons 14 (Cons 21 (Cons 28 (Cons 35 Nil)))) in
+    let r = count_of_interesting_subarrays_list nums 7 0 in
+    r = 0
+
+  let test_012 () : bool =
+    let nums = Cons 10 (Cons 20 (Cons 30 (Cons 40 (Cons 50 Nil)))) in
+    let r = count_of_interesting_subarrays_list nums 5 0 in
+    r = 1
+
+  let test_013 () : bool =
+    let nums = Cons 5 (Cons 5 (Cons 5 (Cons 5 (Cons 5 Nil)))) in
+    let r = count_of_interesting_subarrays_list nums 5 0 in
+    r = 1
+
+  let test_014 () : bool =
+    let nums = Cons 13 (Cons 19 (Cons 3 (Cons 5 (Cons 17 Nil)))) in
+    let r = count_of_interesting_subarrays_list nums 5 2 in
+    r = 0
+
+  let test_015 () : bool =
+    let nums = Cons 10 (Cons 20 (Cons 30 (Cons 40 (Cons 50 Nil)))) in
+    let r = count_of_interesting_subarrays_list nums 10 0 in
+    r = 0
+
+  let test_016 () : bool =
+    let nums = Cons 1 (Cons 2 (Cons 3 (Cons 4 (Cons 5 Nil)))) in
+    let r = count_of_interesting_subarrays_list nums 2 1 in
+    r = 9
+
+  let test_017 () : bool =
+    let nums =
+      Cons 13 (Cons 26 (Cons 39 (Cons 52 (Cons 65
+      (Cons 78 (Cons 91 (Cons 104 (Cons 117 (Cons 130
+      (Cons 143 (Cons 156 (Cons 169 (Cons 182 (Cons 195 Nil)))))))))))))) in
+    let r = count_of_interesting_subarrays_list nums 13 0 in
+    r = 3
+
+  let test_018 () : bool =
+    let nums =
+      Cons 8 (Cons 16 (Cons 24 (Cons 32 (Cons 40
+      (Cons 48 (Cons 56 (Cons 64 (Cons 72 (Cons 80 Nil))))))))) in
+    let r = count_of_interesting_subarrays_list nums 8 4 in
+    r = 0
+
+  let test_019 () : bool =
+    let nums =
+      Cons 21 (Cons 32 (Cons 43 (Cons 54 (Cons 65
+      (Cons 76 (Cons 87 (Cons 98 (Cons 109 (Cons 120
+      (Cons 131 (Cons 142 (Cons 153 (Cons 164 (Cons 175
+      (Cons 186 Nil))))))))))))))) in
+    let r = count_of_interesting_subarrays_list nums 7 3 in
+    r = 0
+
+  let run_tests () : bool =
+    if test_000 () then
+    if test_001 () then
+    if test_002 () then
+    if test_003 () then
+    if test_004 () then
+    if test_005 () then
+    if test_006 () then
+    if test_007 () then
+    if test_008 () then
+    if test_009 () then
+    if test_010 () then
+    if test_011 () then
+    if test_012 () then
+    if test_013 () then
+    if test_014 () then
+    if test_015 () then
+    if test_016 () then
+    if test_017 () then
+    if test_018 () then
+    if test_019 () then
+      true
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+
+end

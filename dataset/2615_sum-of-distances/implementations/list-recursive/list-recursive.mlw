@@ -1,0 +1,250 @@
+module SumOfDistances_List_Recursive_Implementation
+
+  use int.Int
+  use int.Abs
+  use list.List
+
+  let rec distance_sum_from
+      (target: int) (target_index: int) (current_index: int) (nums: list int) : int
+    variant { nums }
+  =
+    match nums with
+    | Nil -> 0
+    | Cons x xs ->
+        (if x = target then
+           if current_index = target_index then 0
+           else abs (target_index - current_index)
+         else 0) + distance_sum_from target target_index (current_index + 1) xs
+    end
+
+  let rec distances_for
+      (all_nums: list int) (current_index: int) (suffix: list int) : list int
+    variant { suffix }
+  =
+    match suffix with
+    | Nil -> Nil
+    | Cons x xs ->
+        Cons (distance_sum_from x current_index 0 all_nums)
+          (distances_for all_nums (current_index + 1) xs)
+    end
+
+  let sum_of_distances_list (nums: list int) : list int =
+    distances_for nums 0 nums
+
+  let rec same_list (xs: list int) (ys: list int) : bool
+    variant { xs }
+  =
+    match xs, ys with
+    | Nil, Nil -> true
+    | Cons x xt, Cons y yt -> if x = y then same_list xt yt else false
+    | _, _ -> false
+    end
+
+  let rec append_list (xs: list int) (ys: list int) : list int
+    variant { xs }
+  =
+    match xs with
+    | Nil -> ys
+    | Cons x xt -> Cons x (append_list xt ys)
+    end
+
+  let test_000 () : bool =
+    let nums = Cons 0 (Cons 5 (Cons 3 Nil)) in
+    let expected = Cons 0 (Cons 0 (Cons 0 Nil)) in
+    let r = sum_of_distances_list nums in
+    same_list r expected
+
+  let test_001 () : bool =
+    let nums =
+      Cons 1 (Cons 2 (Cons 3 (Cons 4 (Cons 5
+        (Cons 1 (Cons 2 (Cons 3 (Cons 4 (Cons 5 Nil))))))))) in
+    let expected =
+      Cons 5 (Cons 5 (Cons 5 (Cons 5 (Cons 5
+        (Cons 5 (Cons 5 (Cons 5 (Cons 5 (Cons 5 Nil))))))))) in
+    let r = sum_of_distances_list nums in
+    same_list r expected
+
+  let test_002 () : bool =
+    let nums = Cons 1 Nil in
+    let expected = Cons 0 Nil in
+    let r = sum_of_distances_list nums in
+    same_list r expected
+
+  let test_003 () : bool =
+    let nums = Cons 10 (Cons 10 (Cons 10 (Cons 10 Nil))) in
+    let expected = Cons 6 (Cons 4 (Cons 4 (Cons 6 Nil))) in
+    let r = sum_of_distances_list nums in
+    same_list r expected
+
+  let test_004 () : bool =
+    let nums = Cons 5 (Cons 4 (Cons 3 (Cons 2 (Cons 1 Nil)))) in
+    let expected = Cons 0 (Cons 0 (Cons 0 (Cons 0 (Cons 0 Nil)))) in
+    let r = sum_of_distances_list nums in
+    same_list r expected
+
+  let test_005 () : bool =
+    let nums =
+      Cons 10 (Cons 20 (Cons 10 (Cons 30 (Cons 10 (Cons 40 (Cons 10 Nil)))))) in
+    let expected =
+      Cons 12 (Cons 0 (Cons 8 (Cons 0 (Cons 8 (Cons 0 (Cons 12 Nil)))))) in
+    let r = sum_of_distances_list nums in
+    same_list r expected
+
+  let test_006 () : bool =
+    let nums =
+      Cons 9 (Cons 9 (Cons 9 (Cons 9 (Cons 9
+        (Cons 9 (Cons 9 (Cons 9 (Cons 9 (Cons 9 Nil))))))))) in
+    let expected =
+      Cons 45 (Cons 37 (Cons 31 (Cons 27 (Cons 25
+        (Cons 25 (Cons 27 (Cons 31 (Cons 37 (Cons 45 Nil))))))))) in
+    let r = sum_of_distances_list nums in
+    same_list r expected
+
+  let test_007 () : bool =
+    let nums = Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 Nil)))) in
+    let expected = Cons 10 (Cons 7 (Cons 6 (Cons 7 (Cons 10 Nil)))) in
+    let r = sum_of_distances_list nums in
+    same_list r expected
+
+  let test_008 () : bool =
+    let nums =
+      Cons 10 (Cons 20 (Cons 10 (Cons 10 (Cons 30 (Cons 20 (Cons 10 Nil)))))) in
+    let expected =
+      Cons 11 (Cons 4 (Cons 7 (Cons 7 (Cons 0 (Cons 4 (Cons 13 Nil)))))) in
+    let r = sum_of_distances_list nums in
+    same_list r expected
+
+  let test_009 () : bool =
+    let nums =
+      Cons 1 (Cons 2 (Cons 3 (Cons 4 (Cons 5
+        (Cons 6 (Cons 7 (Cons 8 (Cons 9 (Cons 1 Nil))))))))) in
+    let expected =
+      Cons 9 (Cons 0 (Cons 0 (Cons 0 (Cons 0
+        (Cons 0 (Cons 0 (Cons 0 (Cons 0 (Cons 9 Nil))))))))) in
+    let r = sum_of_distances_list nums in
+    same_list r expected
+
+  let test_010 () : bool =
+    let nums =
+      Cons 5 (Cons 5 (Cons 5 (Cons 5 (Cons 5
+        (Cons 5 (Cons 5 (Cons 5 (Cons 5 (Cons 5 Nil))))))))) in
+    let expected =
+      Cons 45 (Cons 37 (Cons 31 (Cons 27 (Cons 25
+        (Cons 25 (Cons 27 (Cons 31 (Cons 37 (Cons 45 Nil))))))))) in
+    let r = sum_of_distances_list nums in
+    same_list r expected
+
+  let test_011 () : bool =
+    let nums = Cons 10 (Cons 20 (Cons 30 (Cons 40 (Cons 50 Nil)))) in
+    let expected = Cons 0 (Cons 0 (Cons 0 (Cons 0 (Cons 0 Nil)))) in
+    let r = sum_of_distances_list nums in
+    same_list r expected
+
+  let test_012 () : bool =
+    let nums = Cons 1 (Cons 3 (Cons 1 (Cons 1 (Cons 2 Nil)))) in
+    let expected = Cons 5 (Cons 0 (Cons 3 (Cons 4 (Cons 0 Nil)))) in
+    let r = sum_of_distances_list nums in
+    same_list r expected
+
+  let test_013 () : bool =
+    let nums =
+      Cons 1 (Cons 2 (Cons 3 (Cons 2 (Cons 1
+        (Cons 4 (Cons 5 (Cons 4 (Cons 3 (Cons 2 (Cons 1 Nil)))))))))) in
+    let expected =
+      Cons 14 (Cons 10 (Cons 6 (Cons 8 (Cons 10
+        (Cons 2 (Cons 0 (Cons 2 (Cons 6 (Cons 14 (Cons 16 Nil)))))))))) in
+    let r = sum_of_distances_list nums in
+    same_list r expected
+
+  let test_014 () : bool =
+    let nums = Cons 2 (Cons 1 (Cons 3 (Cons 1 (Cons 2 (Cons 3 (Cons 3 Nil)))))) in
+    let expected =
+      Cons 4 (Cons 2 (Cons 7 (Cons 2 (Cons 4 (Cons 4 (Cons 5 Nil)))))) in
+    let r = sum_of_distances_list nums in
+    same_list r expected
+
+  let test_015 () : bool =
+    let nums = Cons 2 (Cons 2 (Cons 2 (Cons 2 Nil))) in
+    let expected = Cons 6 (Cons 4 (Cons 4 (Cons 6 Nil))) in
+    let r = sum_of_distances_list nums in
+    same_list r expected
+
+  let test_016 () : bool =
+    let nums = Cons 1 (Cons 2 (Cons 3 (Cons 4 (Cons 5 Nil)))) in
+    let expected = Cons 0 (Cons 0 (Cons 0 (Cons 0 (Cons 0 Nil)))) in
+    let r = sum_of_distances_list nums in
+    same_list r expected
+
+  let test_017 () : bool =
+    let nums =
+      Cons 1 (Cons 2 (Cons 3 (Cons 4 (Cons 5
+        (Cons 6 (Cons 7 (Cons 8 (Cons 9 (Cons 10 Nil))))))))) in
+    let expected =
+      Cons 0 (Cons 0 (Cons 0 (Cons 0 (Cons 0
+        (Cons 0 (Cons 0 (Cons 0 (Cons 0 (Cons 0 Nil))))))))) in
+    let r = sum_of_distances_list nums in
+    same_list r expected
+
+  let test_020 () : bool =
+    let nums = Cons 5 (Cons 3 (Cons 2 (Cons 5 (Cons 3 (Cons 5 (Cons 2 (Cons 5 (Cons 3 Nil)))))))) in
+    let expected = Cons 15 (Cons 10 (Cons 4 (Cons 9 (Cons 7 (Cons 9 (Cons 4 (Cons 13 (Cons 11 Nil)))))))) in
+    let r = sum_of_distances_list nums in
+    same_list r expected
+
+  let test_024 () : bool =
+    let nums_front =
+      Cons 20 (Cons 19 (Cons 18 (Cons 17 (Cons 16
+        (Cons 15 (Cons 14 (Cons 13 (Cons 12 (Cons 11 Nil))))))))) in
+    let nums_back =
+      Cons 10 (Cons 9 (Cons 8 (Cons 7 (Cons 6
+        (Cons 5 (Cons 4 (Cons 3 (Cons 2 (Cons 1 Nil))))))))) in
+    let nums = append_list nums_front nums_back in
+    let zeros10 = Cons 0 (Cons 0 (Cons 0 (Cons 0 (Cons 0 (Cons 0 (Cons 0 (Cons 0 (Cons 0 (Cons 0 Nil))))))))) in
+    let expected = append_list zeros10 zeros10 in
+    let r = sum_of_distances_list nums in
+    same_list r expected
+
+  let run_tests () : bool =
+    if test_000 () then
+    if test_001 () then
+    if test_002 () then
+    if test_003 () then
+    if test_004 () then
+    if test_005 () then
+    if test_006 () then
+    if test_007 () then
+    if test_008 () then
+    if test_009 () then
+    if test_010 () then
+    if test_011 () then
+    if test_012 () then
+    if test_013 () then
+    if test_014 () then
+    if test_015 () then
+    if test_016 () then
+    if test_017 () then
+    if test_020 () then
+    if test_024 () then
+      true
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+
+end

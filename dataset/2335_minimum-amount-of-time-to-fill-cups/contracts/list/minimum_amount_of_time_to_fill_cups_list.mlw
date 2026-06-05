@@ -1,0 +1,133 @@
+module MinimumAmountOfTimeToFillCups_List_Spec
+
+  use int.Int
+  use int.MinMax
+  use list.List
+  use list.Length
+  use list.Mem
+  use list.Sum
+
+  let rec function max_amount (amount: list int) : int
+    variant { amount }
+  =
+    match amount with
+    | Nil -> 0
+    | Cons x xs -> max x (max_amount xs)
+    end
+
+  predicate valid_amounts (amount: list int) =
+    length amount = 3 /\
+    (forall x: int. mem x amount -> 0 <= x)
+
+  predicate feasible_fill_time (amount: list int) (seconds: int) =
+    valid_amounts amount /\
+    max_amount amount <= seconds /\
+    sum amount <= 2 * seconds
+
+  predicate minimum_fill_time (amount: list int) (seconds: int) =
+    feasible_fill_time amount seconds /\
+    (forall other: int. feasible_fill_time amount other -> seconds <= other)
+
+  val minimum_amount_of_time_to_fill_cups_list (amount: list int) : int
+    requires { valid_amounts amount }
+    ensures  { minimum_fill_time amount result }
+
+  let lemma check_test_001 () =
+    let l = Cons 0 (Cons 0 (Cons 0 Nil)) in
+    assert { max_amount Nil = 0 };
+    assert { max_amount (Cons 0 Nil) = 0 };
+    assert { max_amount (Cons 0 (Cons 0 Nil)) = 0 };
+    assert { max_amount l = 0 };
+    assert { sum l = 0 };
+    assert { length l = 3 };
+    assert { forall x: int. mem x l -> x = 0 };
+    assert { valid_amounts l };
+    assert { feasible_fill_time l 0 };
+    assert { forall other: int. feasible_fill_time l other -> 0 <= other };
+    assert { minimum_fill_time l 0 }
+
+  let lemma check_test_002 () =
+    let l = Cons 99 (Cons 1 (Cons 1 Nil)) in
+    assert { max_amount Nil = 0 };
+    assert { max_amount (Cons 1 Nil) = 1 };
+    assert { max_amount (Cons 1 (Cons 1 Nil)) = 1 };
+    assert { max_amount l = 99 };
+    assert { sum l = 101 };
+    assert { length l = 3 };
+    assert { forall x: int. mem x l -> x = 99 \/ x = 1 };
+    assert { valid_amounts l };
+    assert { feasible_fill_time l 99 };
+    assert { forall other: int. feasible_fill_time l other -> 99 <= other };
+    assert { minimum_fill_time l 99 }
+
+  let lemma check_test_003 () =
+    let l = Cons 7 (Cons 7 (Cons 7 Nil)) in
+    assert { max_amount Nil = 0 };
+    assert { max_amount (Cons 7 Nil) = 7 };
+    assert { max_amount (Cons 7 (Cons 7 Nil)) = 7 };
+    assert { max_amount l = 7 };
+    assert { sum l = 21 };
+    assert { length l = 3 };
+    assert { forall x: int. mem x l -> x = 7 };
+    assert { valid_amounts l };
+    assert { feasible_fill_time l 11 };
+    assert { forall other: int. feasible_fill_time l other -> 11 <= other };
+    assert { minimum_fill_time l 11 }
+
+  let lemma check_test_007 () =
+    let l = Cons 100 (Cons 100 (Cons 100 Nil)) in
+    assert { max_amount Nil = 0 };
+    assert { max_amount (Cons 100 Nil) = 100 };
+    assert { max_amount (Cons 100 (Cons 100 Nil)) = 100 };
+    assert { max_amount l = 100 };
+    assert { sum l = 300 };
+    assert { length l = 3 };
+    assert { forall x: int. mem x l -> x = 100 };
+    assert { valid_amounts l };
+    assert { feasible_fill_time l 150 };
+    assert { forall other: int. feasible_fill_time l other -> 150 <= other };
+    assert { minimum_fill_time l 150 }
+
+  let lemma check_test_009 () =
+    let l = Cons 1 (Cons 4 (Cons 2 Nil)) in
+    assert { max_amount Nil = 0 };
+    assert { max_amount (Cons 2 Nil) = 2 };
+    assert { max_amount (Cons 4 (Cons 2 Nil)) = 4 };
+    assert { max_amount l = 4 };
+    assert { sum l = 7 };
+    assert { length l = 3 };
+    assert { forall x: int. mem x l -> x = 1 \/ x = 4 \/ x = 2 };
+    assert { valid_amounts l };
+    assert { feasible_fill_time l 4 };
+    assert { forall other: int. feasible_fill_time l other -> 4 <= other };
+    assert { minimum_fill_time l 4 }
+
+  let lemma check_test_011 () =
+    let l = Cons 99 (Cons 99 (Cons 1 Nil)) in
+    assert { max_amount Nil = 0 };
+    assert { max_amount (Cons 1 Nil) = 1 };
+    assert { max_amount (Cons 99 (Cons 1 Nil)) = 99 };
+    assert { max_amount l = 99 };
+    assert { sum l = 199 };
+    assert { length l = 3 };
+    assert { forall x: int. mem x l -> x = 99 \/ x = 1 };
+    assert { valid_amounts l };
+    assert { feasible_fill_time l 100 };
+    assert { forall other: int. feasible_fill_time l other -> 100 <= other };
+    assert { minimum_fill_time l 100 }
+
+  let lemma check_test_174 () =
+    let l = Cons 0 (Cons 50 (Cons 50 Nil)) in
+    assert { max_amount Nil = 0 };
+    assert { max_amount (Cons 50 Nil) = 50 };
+    assert { max_amount (Cons 50 (Cons 50 Nil)) = 50 };
+    assert { max_amount l = 50 };
+    assert { sum l = 100 };
+    assert { length l = 3 };
+    assert { forall x: int. mem x l -> x = 0 \/ x = 50 };
+    assert { valid_amounts l };
+    assert { feasible_fill_time l 50 };
+    assert { forall other: int. feasible_fill_time l other -> 50 <= other };
+    assert { minimum_fill_time l 50 }
+
+end

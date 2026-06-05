@@ -1,0 +1,165 @@
+module ContainerWithMostWater_Array_Imperative
+
+  use int.Int
+  use array.Array
+  use array.Init
+  use ref.Ref
+
+  let container_with_most_water_array (height: array int) : int =
+    let best = ref 0 in
+    for i = 0 to length height - 2 do
+      for j = i + 1 to length height - 1 do
+        let left = height[i] in
+        let right = height[j] in
+        let lower = if left <= right then left else right in
+        let area = (j - i) * lower in
+        if area > !best then
+          best := area
+      done
+    done;
+    !best
+
+  let test_000 () : bool =
+    let height = init 2 [|1; 1|] in
+    let r = container_with_most_water_array height in
+    r = 1
+
+  let test_001 () : bool =
+    let height = init 5 [|4; 3; 2; 1; 4|] in
+    let r = container_with_most_water_array height in
+    r = 16
+
+  let test_002 () : bool =
+    let height = init 10 [|8; 10; 14; 0; 13; 10; 9; 9; 8; 9|] in
+    let r = container_with_most_water_array height in
+    r = 72
+
+  let test_003 () : bool =
+    let height = init 9 [|1; 8; 6; 2; 5; 4; 8; 3; 7|] in
+    let r = container_with_most_water_array height in
+    r = 49
+
+  let test_004 () : bool =
+    let height = init 22 [|2; 3; 4; 5; 18; 17; 16; 15; 14; 13; 12; 11; 10; 9; 8; 7; 6; 5; 4; 3; 2; 1|] in
+    let r = container_with_most_water_array height in
+    r = 81
+
+  let test_005 () : bool =
+    let height = init 7 [|2; 3; 10; 5; 7; 8; 9|] in
+    let r = container_with_most_water_array height in
+    r = 36
+
+  let test_006 () : bool =
+    let height = init 10 [|1; 2; 3; 4; 5; 6; 7; 8; 9; 10|] in
+    let r = container_with_most_water_array height in
+    r = 25
+
+  let test_007 () : bool =
+    let height = init 4 [|1; 2; 4; 3|] in
+    let r = container_with_most_water_array height in
+    r = 4
+
+  let test_008 () : bool =
+    let height = init 5 [|1; 2; 3; 4; 5|] in
+    let r = container_with_most_water_array height in
+    r = 6
+
+  let test_009 () : bool =
+    let height = init 7 [|1; 3; 2; 5; 25; 24; 5|] in
+    let r = container_with_most_water_array height in
+    r = 24
+
+  let test_010 () : bool =
+    let height = init 3 [|1; 2; 1|] in
+    let r = container_with_most_water_array height in
+    r = 2
+
+  let test_011 () : bool =
+    let height = init 10 [|10; 9; 8; 7; 6; 5; 4; 3; 2; 1|] in
+    let r = container_with_most_water_array height in
+    r = 25
+
+  let test_012 () : bool =
+    let height = init 25 [|1; 10000; 1; 10000; 1; 10000; 1; 10000; 1; 10000; 1; 10000; 1; 10000; 1; 10000; 1; 10000; 1; 10000; 1; 10000; 1; 10000; 1|] in
+    let r = container_with_most_water_array height in
+    r = 220000
+
+  let test_013 () : bool =
+    let height = init 30 [|5; 8; 6; 2; 5; 4; 8; 3; 7; 9; 10; 11; 10; 9; 7; 3; 8; 4; 5; 2; 6; 8; 5; 3; 7; 9; 1; 4; 6; 8|] in
+    let r = container_with_most_water_array height in
+    r = 224
+
+  let test_014 () : bool =
+    let height = init 10 [|10; 20; 10; 20; 10; 20; 10; 20; 10; 20|] in
+    let r = container_with_most_water_array height in
+    r = 160
+
+  let test_015 () : bool =
+    let height = init 20 [|10; 1; 10; 1; 10; 1; 10; 1; 10; 1; 10; 1; 10; 1; 10; 1; 10; 1; 10; 1|] in
+    let r = container_with_most_water_array height in
+    r = 180
+
+  let test_016 () : bool =
+    let height = init 24 [|1; 8; 6; 2; 5; 4; 8; 3; 7; 15; 14; 13; 12; 11; 10; 9; 8; 7; 6; 5; 4; 3; 2; 1|] in
+    let r = container_with_most_water_array height in
+    r = 120
+
+  let test_017 () : bool =
+    let height = init 30 [|10; 9; 8; 7; 6; 5; 4; 3; 2; 1; 1; 2; 3; 4; 5; 6; 7; 8; 9; 10; 10; 9; 8; 7; 6; 5; 4; 3; 2; 1|] in
+    let r = container_with_most_water_array height in
+    r = 200
+
+  let test_018 () : bool =
+    let height = init 30 [|1; 2; 1; 2; 1; 2; 1; 2; 1; 2; 1; 2; 1; 2; 1; 2; 1; 2; 1; 2; 1; 2; 1; 2; 1; 2; 1; 2; 1; 2|] in
+    let r = container_with_most_water_array height in
+    r = 56
+
+  let test_019 () : bool =
+    let height = init 15 [|5; 4; 3; 2; 1; 1; 2; 3; 4; 5; 5; 4; 3; 2; 1|] in
+    let r = container_with_most_water_array height in
+    r = 50
+
+  let run_tests () : bool =
+    if test_000 () then
+    if test_001 () then
+    if test_002 () then
+    if test_003 () then
+    if test_004 () then
+    if test_005 () then
+    if test_006 () then
+    if test_007 () then
+    if test_008 () then
+    if test_009 () then
+    if test_010 () then
+    if test_011 () then
+    if test_012 () then
+    if test_013 () then
+    if test_014 () then
+    if test_015 () then
+    if test_016 () then
+    if test_017 () then
+    if test_018 () then
+    if test_019 () then
+      true
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+
+end

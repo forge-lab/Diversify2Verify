@@ -1,0 +1,275 @@
+== Stage 1: first prover on whole file ==
+Running in /Users/rubenm/Desktop/Diversify2Verify/codex-runs/repair2-split1/stage3a-rerepair/2195_append-k-integers-with-minimal-sum/array-recursive/append_k_integers_with_minimal_sum_array_stage3_d81b9cf6_stage3/repaired/generated/why3: why3 session create -o /Users/rubenm/Desktop/Diversify2Verify/codex-runs/repair2-split1/stage3a-rerepair/2195_append-k-integers-with-minimal-sum/array-recursive/append_k_integers_with_minimal_sum_array_stage3_d81b9cf6_stage3/repaired/generated/why3/.why3_sessions/repaired_stage1 -P Z3,4.8.6 -t 10 -m 8192 repaired.mlw
+Session created successfully
+Running in /Users/rubenm/Desktop/Diversify2Verify/codex-runs/repair2-split1/stage3a-rerepair/2195_append-k-integers-with-minimal-sum/array-recursive/append_k_integers_with_minimal_sum_array_stage3_d81b9cf6_stage3/repaired/generated/why3: why3 bench /Users/rubenm/Desktop/Diversify2Verify/codex-runs/repair2-split1/stage3a-rerepair/2195_append-k-integers-with-minimal-sum/array-recursive/append_k_integers_with_minimal_sum_array_stage3_d81b9cf6_stage3/repaired/generated/why3/.why3_sessions/repaired_stage1
+Progress: 5/1/0                       Progress: 4/2/0                       Progress: 3/3/0                       Progress: 2/4/0                       Progress: 1/5/0                       Progress: 0/6/0                       Progress: 0/0/1                       
+Replay completed, saving session... done
+== Stage 1 stats ==
+= Statistics for session /Users/rubenm/Desktop/Diversify2Verify/codex-runs/repair2-split1/stage3a-rerepair/2195_append-k-integers-with-minimal-sum/array-recursive/append_k_integers_with_minimal_sum_array_stage3_d81b9cf6_stage3/repaired/generated/why3/.why3_sessions/repaired_stage1
+
+== Number of root goals ==
+  total: 6  proved: 4
+
+== Number of sub goals ==
+  total: 0  proved: 0
+
+== Goals not proved ==
+  +-- file [../../repaired.mlw]
+    +-- theory AppendKIntegersWithMinimalSum_Array_Stage3
+      +-- goal insert_sorted_unique'vc
+      +-- goal consume_sorted_public_bridge'vc
+  
+== Goals proved by only one prover ==
+  +-- file [../../repaired.mlw]
+    +-- theory AppendKIntegersWithMinimalSum_Array_Stage3
+      +-- goal sorted_unique_list_of_array_from'vc: Z3 4.8.6
+      +-- goal arithmetic_sum'vc: Z3 4.8.6
+      +-- goal consume_sorted'vc: Z3 4.8.6
+      +-- goal append_k_integers_with_minimal_sum_array'vc: Z3 4.8.6
+  
+1 session(s) read, with a total of 6 proof goals.
+== Unproved root goals after first prover ==
+AppendKIntegersWithMinimalSum_Array_Stage3	insert_sorted_unique'vc
+AppendKIntegersWithMinimalSum_Array_Stage3	consume_sorted_public_bridge'vc
+== Stage 1: trying remaining goals with prover Alt-Ergo,2.4.0 ==
+---- stage1 | prover: Alt-Ergo,2.4.0 | theory: AppendKIntegersWithMinimalSum_Array_Stage3 | goal: insert_sorted_unique'vc ----
+File repaired.mlw:
+Goal insert_sorted_unique'vc.
+Prover result is: Timeout (10.00s, 20890 steps).
+---- stage1 | prover: Alt-Ergo,2.4.0 | theory: AppendKIntegersWithMinimalSum_Array_Stage3 | goal: consume_sorted_public_bridge'vc ----
+File repaired.mlw:
+Goal consume_sorted_public_bridge'vc.
+Prover result is: Timeout (10.00s, 295954 steps).
+Remaining after prover Alt-Ergo,2.4.0: 2
+== Stage 1: trying remaining goals with prover CVC4,1.8 ==
+---- stage1 | prover: CVC4,1.8 | theory: AppendKIntegersWithMinimalSum_Array_Stage3 | goal: insert_sorted_unique'vc ----
+File repaired.mlw:
+Goal insert_sorted_unique'vc.
+Prover result is: Valid (0.03s, 8488 steps).
+Solved in stage 1 using prover: CVC4,1.8
+---- stage1 | prover: CVC4,1.8 | theory: AppendKIntegersWithMinimalSum_Array_Stage3 | goal: consume_sorted_public_bridge'vc ----
+File repaired.mlw:
+Goal consume_sorted_public_bridge'vc.
+Prover result is: Timeout (10.00s, 1129186 steps).
+Remaining after prover CVC4,1.8: 1
+== Goals still unproved after stage 1 ==
+AppendKIntegersWithMinimalSum_Array_Stage3	consume_sorted_public_bridge'vc
+== Stage 2: split_vc on unproved goal ==
+Target theory: AppendKIntegersWithMinimalSum_Array_Stage3
+Target goal  : consume_sorted_public_bridge'vc
+---- stage2 | prover: Z3,4.8.6 | theory: AppendKIntegersWithMinimalSum_Array_Stage3 | goal: consume_sorted_public_bridge'vc ----
+Transforms: split_vc
+File "repaired.mlw", line 143, characters 13-34:
+Sub-goal Assertion of goal consume_sorted_public_bridge'vc.
+Prover result is: Valid (0.01s, 37712 steps).
+
+File "repaired.mlw", line 147, characters 8-58:
+Sub-goal Assertion of goal consume_sorted_public_bridge'vc.
+Prover result is: Valid (0.01s, 39399 steps).
+
+File "repaired.mlw", line 151, characters 34-46:
+Sub-goal Assertion of goal consume_sorted_public_bridge'vc.
+Prover result is: Valid (0.01s, 42054 steps).
+
+File "repaired.mlw", line 153, characters 13-52:
+Sub-goal Assertion of goal consume_sorted_public_bridge'vc.
+Prover result is: Valid (0.01s, 42491 steps).
+
+File "repaired.mlw", line 154, characters 13-48:
+Sub-goal Assertion of goal consume_sorted_public_bridge'vc.
+Prover result is: Valid (0.01s, 42901 steps).
+
+File "repaired.mlw", line 155, characters 13-42:
+Sub-goal Assertion of goal consume_sorted_public_bridge'vc.
+Prover result is: Timeout (10.00s, 341525238 steps).
+
+File "repaired.mlw", line 140, characters 15-50:
+Sub-goal Postcondition of goal consume_sorted_public_bridge'vc.
+Prover result is: Valid (0.01s, 3441 steps).
+
+File "repaired.mlw", line 141, characters 15-44:
+Sub-goal Postcondition of goal consume_sorted_public_bridge'vc.
+Prover result is: Valid (0.01s, 3446 steps).
+---- stage2 | prover: Alt-Ergo,2.4.0 | theory: AppendKIntegersWithMinimalSum_Array_Stage3 | goal: consume_sorted_public_bridge'vc ----
+Transforms: split_vc
+File "repaired.mlw", line 143, characters 13-34:
+Sub-goal Assertion of goal consume_sorted_public_bridge'vc.
+Prover result is: Valid (0.01s, 12 steps).
+
+File "repaired.mlw", line 147, characters 8-58:
+Sub-goal Assertion of goal consume_sorted_public_bridge'vc.
+Prover result is: Valid (0.01s, 42 steps).
+
+File "repaired.mlw", line 151, characters 34-46:
+Sub-goal Assertion of goal consume_sorted_public_bridge'vc.
+Prover result is: Valid (0.01s, 50 steps).
+
+File "repaired.mlw", line 153, characters 13-52:
+Sub-goal Assertion of goal consume_sorted_public_bridge'vc.
+Prover result is: Valid (0.01s, 69 steps).
+
+File "repaired.mlw", line 154, characters 13-48:
+Sub-goal Assertion of goal consume_sorted_public_bridge'vc.
+Prover result is: Valid (0.01s, 20 steps).
+
+File "repaired.mlw", line 155, characters 13-42:
+Sub-goal Assertion of goal consume_sorted_public_bridge'vc.
+Prover result is: Timeout (10.00s, 315372 steps).
+
+File "repaired.mlw", line 140, characters 15-50:
+Sub-goal Postcondition of goal consume_sorted_public_bridge'vc.
+Prover result is: Valid (0.01s, 20 steps).
+
+File "repaired.mlw", line 141, characters 15-44:
+Sub-goal Postcondition of goal consume_sorted_public_bridge'vc.
+Prover result is: Valid (0.01s, 20 steps).
+---- stage2 | prover: CVC4,1.8 | theory: AppendKIntegersWithMinimalSum_Array_Stage3 | goal: consume_sorted_public_bridge'vc ----
+Transforms: split_vc
+File "repaired.mlw", line 143, characters 13-34:
+Sub-goal Assertion of goal consume_sorted_public_bridge'vc.
+Prover result is: Valid (0.03s, 10768 steps).
+
+File "repaired.mlw", line 147, characters 8-58:
+Sub-goal Assertion of goal consume_sorted_public_bridge'vc.
+Prover result is: Valid (0.03s, 12325 steps).
+
+File "repaired.mlw", line 151, characters 34-46:
+Sub-goal Assertion of goal consume_sorted_public_bridge'vc.
+Prover result is: Valid (0.03s, 13003 steps).
+
+File "repaired.mlw", line 153, characters 13-52:
+Sub-goal Assertion of goal consume_sorted_public_bridge'vc.
+Prover result is: Valid (0.03s, 13157 steps).
+
+File "repaired.mlw", line 154, characters 13-48:
+Sub-goal Assertion of goal consume_sorted_public_bridge'vc.
+Prover result is: Valid (0.03s, 12820 steps).
+
+File "repaired.mlw", line 155, characters 13-42:
+Sub-goal Assertion of goal consume_sorted_public_bridge'vc.
+Prover result is: Timeout (10.00s, 1339887 steps).
+
+File "repaired.mlw", line 140, characters 15-50:
+Sub-goal Postcondition of goal consume_sorted_public_bridge'vc.
+Prover result is: Valid (0.02s, 11762 steps).
+
+File "repaired.mlw", line 141, characters 15-44:
+Sub-goal Postcondition of goal consume_sorted_public_bridge'vc.
+Prover result is: Valid (0.02s, 11765 steps).
+== Goals still unproved after stage 2 (split_vc) ==
+AppendKIntegersWithMinimalSum_Array_Stage3	consume_sorted_public_bridge'vc
+== Stage 3: split_vc + inline_all on still-unproved goal ==
+Target theory: AppendKIntegersWithMinimalSum_Array_Stage3
+Target goal  : consume_sorted_public_bridge'vc
+---- stage3 | prover: Z3,4.8.6 | theory: AppendKIntegersWithMinimalSum_Array_Stage3 | goal: consume_sorted_public_bridge'vc ----
+Transforms: split_vc inline_all
+File "repaired.mlw", line 143, characters 13-34:
+Sub-goal Assertion of goal consume_sorted_public_bridge'vc.
+Prover result is: Valid (0.01s, 42260 steps).
+
+File "repaired.mlw", line 147, characters 8-58:
+Sub-goal Assertion of goal consume_sorted_public_bridge'vc.
+Prover result is: Valid (0.01s, 45333 steps).
+
+File "repaired.mlw", line 151, characters 34-46:
+Sub-goal Assertion of goal consume_sorted_public_bridge'vc.
+Prover result is: Valid (0.01s, 46001 steps).
+
+File "repaired.mlw", line 153, characters 13-52:
+Sub-goal Assertion of goal consume_sorted_public_bridge'vc.
+Prover result is: Valid (0.01s, 47391 steps).
+
+File "repaired.mlw", line 154, characters 13-48:
+Sub-goal Assertion of goal consume_sorted_public_bridge'vc.
+Prover result is: Valid (0.01s, 46465 steps).
+
+File "repaired.mlw", line 155, characters 13-42:
+Sub-goal Assertion of goal consume_sorted_public_bridge'vc.
+Prover result is: Unknown (unknown) (6.29s, 174475183 steps).
+
+File "repaired.mlw", line 140, characters 15-50:
+Sub-goal Postcondition of goal consume_sorted_public_bridge'vc.
+Prover result is: Valid (0.01s, 6594 steps).
+
+File "repaired.mlw", line 141, characters 15-44:
+Sub-goal Postcondition of goal consume_sorted_public_bridge'vc.
+Prover result is: Valid (0.01s, 4921 steps).
+---- stage3 | prover: Alt-Ergo,2.4.0 | theory: AppendKIntegersWithMinimalSum_Array_Stage3 | goal: consume_sorted_public_bridge'vc ----
+Transforms: split_vc inline_all
+File "repaired.mlw", line 143, characters 13-34:
+Sub-goal Assertion of goal consume_sorted_public_bridge'vc.
+Prover result is: Valid (0.01s, 17 steps).
+
+File "repaired.mlw", line 147, characters 8-58:
+Sub-goal Assertion of goal consume_sorted_public_bridge'vc.
+Prover result is: Valid (0.01s, 41 steps).
+
+File "repaired.mlw", line 151, characters 34-46:
+Sub-goal Assertion of goal consume_sorted_public_bridge'vc.
+Prover result is: Valid (0.01s, 74 steps).
+
+File "repaired.mlw", line 153, characters 13-52:
+Sub-goal Assertion of goal consume_sorted_public_bridge'vc.
+Prover result is: Valid (0.01s, 75 steps).
+
+File "repaired.mlw", line 154, characters 13-48:
+Sub-goal Assertion of goal consume_sorted_public_bridge'vc.
+Prover result is: Valid (0.01s, 91 steps).
+
+File "repaired.mlw", line 155, characters 13-42:
+Sub-goal Assertion of goal consume_sorted_public_bridge'vc.
+Prover result is: Timeout (10.00s, 166778 steps).
+
+File "repaired.mlw", line 140, characters 15-50:
+Sub-goal Postcondition of goal consume_sorted_public_bridge'vc.
+Prover result is: Valid (0.08s, 1461 steps).
+
+File "repaired.mlw", line 141, characters 15-44:
+Sub-goal Postcondition of goal consume_sorted_public_bridge'vc.
+Prover result is: Timeout (10.00s, 159211 steps).
+---- stage3 | prover: CVC4,1.8 | theory: AppendKIntegersWithMinimalSum_Array_Stage3 | goal: consume_sorted_public_bridge'vc ----
+Transforms: split_vc inline_all
+File "repaired.mlw", line 143, characters 13-34:
+Sub-goal Assertion of goal consume_sorted_public_bridge'vc.
+Prover result is: Valid (0.03s, 11693 steps).
+
+File "repaired.mlw", line 147, characters 8-58:
+Sub-goal Assertion of goal consume_sorted_public_bridge'vc.
+Prover result is: Valid (0.03s, 13309 steps).
+
+File "repaired.mlw", line 151, characters 34-46:
+Sub-goal Assertion of goal consume_sorted_public_bridge'vc.
+Prover result is: Valid (0.03s, 13580 steps).
+
+File "repaired.mlw", line 153, characters 13-52:
+Sub-goal Assertion of goal consume_sorted_public_bridge'vc.
+Prover result is: Valid (0.04s, 14858 steps).
+
+File "repaired.mlw", line 154, characters 13-48:
+Sub-goal Assertion of goal consume_sorted_public_bridge'vc.
+Prover result is: Valid (0.03s, 12657 steps).
+
+File "repaired.mlw", line 155, characters 13-42:
+Sub-goal Assertion of goal consume_sorted_public_bridge'vc.
+Prover result is: Timeout (10.00s, 1702258 steps).
+
+File "repaired.mlw", line 140, characters 15-50:
+Sub-goal Postcondition of goal consume_sorted_public_bridge'vc.
+Prover result is: Valid (0.03s, 14106 steps).
+
+File "repaired.mlw", line 141, characters 15-44:
+Sub-goal Postcondition of goal consume_sorted_public_bridge'vc.
+Prover result is: Valid (0.04s, 15312 steps).
+== Final summary ==
+Unproved root goals after first prover : 1
+Remaining failures after split_vc      : 1
+Remaining failures after stage 3       : 1
+Detailed logs stored in                : /Users/rubenm/Desktop/Diversify2Verify/codex-runs/repair2-split1/stage3a-rerepair/2195_append-k-integers-with-minimal-sum/array-recursive/append_k_integers_with_minimal_sum_array_stage3_d81b9cf6_stage3/repaired/generated/why3/.why3_sessions/repaired_logs
+Still unproved goals:
+AppendKIntegersWithMinimalSum_Array_Stage3	consume_sorted_public_bridge'vc
+VERIFY_RESULT: FAILURE
+VERIFY_REASON: unproved_goals_remain
+VERIFY_STAGE: stage3
+VERIFY_ROOT_TOTAL: 6
+VERIFY_ROOT_PROVED: 5
+VERIFY_ROOT_REMAINING: 1

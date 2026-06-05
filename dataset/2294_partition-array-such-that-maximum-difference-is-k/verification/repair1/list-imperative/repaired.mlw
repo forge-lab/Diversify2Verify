@@ -1,0 +1,134 @@
+module PartitionArraySuchThatMaximumDifferenceIsK_List_Spec
+
+  use int.Int
+  use list.List
+  use list.Length
+  use ref.Ref
+
+  let rec predicate values_in_domain (nums: list int)
+    variant { nums }
+  =
+    match nums with
+    | Nil -> true
+    | Cons x xs -> 0 <= x && x <= 100000 && values_in_domain xs
+    end
+
+  predicate valid_input (nums: list int) (k: int) =
+    nums <> Nil /\
+    length nums <= 100000 /\
+    0 <= k /\ k <= 100000 /\
+    values_in_domain nums
+
+  predicate interval_covers (start: int) (k: int) (x: int) =
+    start <= x /\ x <= start + k
+
+  let rec predicate covered_by_some_interval (starts: list int) (k: int) (x: int)
+    variant { starts }
+  =
+    match starts with
+    | Nil -> false
+    | Cons start rest ->
+        (start <= x && x <= start + k) || covered_by_some_interval rest k x
+    end
+
+  let rec predicate values_covered (nums: list int) (starts: list int) (k: int)
+    variant { nums }
+  =
+    match nums with
+    | Nil -> true
+    | Cons x xs ->
+        covered_by_some_interval starts k x && values_covered xs starts k
+    end
+
+  predicate minimal_interval_cover_count (nums: list int) (k: int) (r: int) =
+    0 <= r /\
+    (exists starts: list int.
+       length starts = r /\ values_covered nums starts k) /\
+    (forall other_starts: list int.
+       values_covered nums other_starts k -> r <= length other_starts)
+
+  let rec insert_sorted (x: int) (nums: list int) : list int
+    variant { nums }
+  =
+    match nums with
+    | Nil -> Cons x Nil
+    | Cons y ys ->
+        if x <= y then Cons x (Cons y ys) else Cons y (insert_sorted x ys)
+    end
+
+  let sort_nums_imperative (nums: list int) : list int =
+    let sorted = ref Nil in
+    let cur = ref nums in
+    while (match !cur with Nil -> false | Cons _ _ -> true end) do
+      invariant { 0 <= length !cur }
+      variant { length !cur }
+      match !cur with
+      | Nil ->
+          assert { false }
+      | Cons x xs ->
+          sorted := insert_sorted x !sorted;
+          cur := xs
+      end
+    done;
+    match !cur with
+    | Nil -> ()
+    | Cons _ _ -> assert { false }
+    end;
+    assert { !cur = Nil };
+    !sorted
+
+  let partition_array_such_that_maximum_difference_is_k_list
+    (nums: list int) (k: int) : int
+    requires { valid_input nums k }
+    ensures  { result >= 1 }
+    ensures  { minimal_interval_cover_count nums k result }
+  =
+    let sorted_nums = sort_nums_imperative nums in
+    match sorted_nums with
+    | Nil ->
+        assert { false };
+        0
+    | Cons x xs ->
+        let groups = ref 1 in
+        let group_min = ref x in
+        let starts = ref (Cons x Nil) in
+        let cur = ref xs in
+        while (match !cur with Nil -> false | Cons _ _ -> true end) do
+          invariant { 0 <= length !cur }
+          invariant { 1 <= !groups }
+          invariant { length !starts = !groups }
+          variant { length !cur }
+          match !cur with
+          | Nil ->
+              assert { false }
+          | Cons y ys ->
+              assert { 1 <= !groups };
+              assert { length !starts = !groups };
+              if y - !group_min > k then begin
+                groups := !groups + 1;
+                group_min := y;
+                starts := Cons y !starts;
+                assert { 1 <= !groups };
+                assert { length !starts = !groups }
+              end;
+              cur := ys
+          end
+        done;
+        match !cur with
+        | Nil -> ()
+        | Cons _ _ -> assert { false }
+        end;
+        assert { !cur = Nil };
+        let result = !groups in
+        assert { 1 <= result };
+        assert { 0 <= result };
+        assert { length !starts = result };
+        assert { exists starts0: list int.
+          length starts0 = result /\ values_covered nums starts0 k };
+        assert { forall other_starts: list int.
+          values_covered nums other_starts k -> result <= length other_starts };
+        assert { minimal_interval_cover_count nums k result };
+        result
+    end
+
+end

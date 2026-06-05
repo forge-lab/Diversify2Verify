@@ -1,0 +1,195 @@
+module SplitArrayLargestSum_Array_Stage3
+
+  use int.Int
+  use int.EuclideanDivision
+  use array.Array
+  use array.Init
+  use array.ArraySum
+
+  predicate valid_partition (nums: array int) (k: int) (cuts: array int) =
+    length cuts = k + 1 /\
+    cuts[0] = 0 /\
+    cuts[k] = length nums /\
+    (forall p: int. 0 <= p <= k -> 0 <= cuts[p] <= length nums) /\
+    (forall p: int. 0 <= p < k -> cuts[p] < cuts[p + 1])
+
+  predicate feasible_with_bound (nums: array int) (k: int) (bound: int) =
+    exists cuts: array int.
+      valid_partition nums k cuts /\
+      forall p: int. 0 <= p < k -> sum nums cuts[p] cuts[p + 1] <= bound
+
+  predicate optimal_split_result (nums: array int) (k: int) (result: int) =
+    feasible_with_bound nums k result /\
+    forall bound: int. feasible_with_bound nums k bound -> result <= bound
+
+  predicate feasible_lower_bound (nums: array int) (k: int) (low: int) =
+    forall bound: int. feasible_with_bound nums k bound -> low <= bound
+
+  predicate input_domain (nums: array int) (k: int) =
+    1 <= length nums <= 1000 /\
+    (forall i: int. 0 <= i < length nums -> 0 <= nums[i] <= 1000000) /\
+    1 <= k <= 50 /\
+    k <= length nums
+
+  let lemma feasible_lower_bound_unfold (nums: array int) (k: int) (low: int)
+    requires { feasible_lower_bound nums k low }
+    ensures  { forall bound: int. feasible_with_bound nums k bound -> low <= bound }
+  =
+    assert { forall bound: int. feasible_with_bound nums k bound -> low <= bound }
+
+  let lemma feasible_lower_bound_raise (nums: array int) (k: int) (low: int) (mid: int)
+    requires { feasible_lower_bound nums k low }
+    requires { not feasible_with_bound nums k mid }
+    requires { low <= mid }
+    requires { forall bound: int. feasible_with_bound nums k bound -> mid < bound }
+    ensures  { feasible_lower_bound nums k (mid + 1) }
+  =
+    assert { forall bound: int. feasible_with_bound nums k bound -> mid + 1 <= bound }
+
+  let lemma optimal_from_feasible_lower_bound (nums: array int) (k: int) (answer: int)
+    requires { feasible_with_bound nums k answer }
+    requires { feasible_lower_bound nums k answer }
+    ensures  { optimal_split_result nums k answer }
+  =
+    feasible_lower_bound_unfold nums k answer
+
+  let lemma max_bound_implies_feasible_lower_bound
+      (nums: array int) (k: int) (candidate: int)
+    requires { input_domain nums k }
+    requires { forall i: int. 0 <= i < length nums -> nums[i] <= candidate }
+    ensures  { feasible_lower_bound nums k candidate }
+  =
+    assert { forall bound: int. feasible_with_bound nums k bound -> candidate <= bound }
+
+  let lemma total_sum_is_feasible_bound (nums: array int) (k: int) (total: int)
+    requires { input_domain nums k }
+    requires { total = sum nums 0 (length nums) }
+    ensures  { feasible_with_bound nums k total }
+  =
+    assert { feasible_with_bound nums k total }
+
+  let rec max_from (nums: array int) (i: int) (current: int) : int
+    requires { 0 <= i <= length nums }
+    variant  { length nums - i }
+    ensures  { result >= current }
+    ensures  { forall j: int. i <= j < length nums -> nums[j] <= result }
+  =
+    if i >= length nums then
+      current
+    else begin
+      assert { 0 <= i < length nums };
+      if nums[i] > current then
+        max_from nums (i + 1) nums[i]
+      else
+        max_from nums (i + 1) current
+    end
+
+  let max_array (nums: array int) : int
+    requires { 1 <= length nums }
+    ensures  { forall j: int. 0 <= j < length nums -> nums[j] <= result }
+    ensures  { result >= nums[0] }
+  =
+    assert { 0 <= 0 < length nums };
+    max_from nums 1 nums[0]
+
+  let rec sum_from (nums: array int) (i: int) (acc: int) : int
+    requires { 0 <= i <= length nums }
+    variant  { length nums - i }
+    ensures  { result = acc + sum nums i (length nums) }
+  =
+    if i >= length nums then
+      acc
+    else begin
+      assert { 0 <= i < length nums };
+      sum_from nums (i + 1) (acc + nums[i])
+    end
+
+  let sum_array (nums: array int) : int
+    ensures { result = sum nums 0 (length nums) }
+  =
+    sum_from nums 0 0
+
+  let rec partitions_needed_from
+      (nums: array int) (bound: int) (i: int) (current_sum: int) (parts: int) : int
+    requires { 0 <= i <= length nums }
+    requires { 1 <= parts }
+    variant  { length nums - i }
+    ensures  { result >= parts }
+  =
+    if i >= length nums then
+      parts
+    else begin
+      assert { 0 <= i < length nums };
+      let next_sum = current_sum + nums[i] in
+      if next_sum <= bound then
+        partitions_needed_from nums bound (i + 1) next_sum parts
+      else
+        partitions_needed_from nums bound (i + 1) nums[i] (parts + 1)
+    end
+
+  let partitions_needed (nums: array int) (bound: int) : int
+    ensures { result >= 1 }
+  =
+    partitions_needed_from nums bound 0 0 1
+
+  let can_split_with_bound (nums: array int) (k: int) (bound: int) : bool
+    requires { input_domain nums k }
+    requires { 0 <= bound }
+    ensures  { result -> feasible_with_bound nums k bound }
+    ensures  { not result -> not feasible_with_bound nums k bound }
+  =
+    let needed = partitions_needed nums bound in
+    needed <= k
+
+  let rec search_answer (nums: array int) (k: int) (low: int) (high: int) : int
+    requires { input_domain nums k }
+    requires { 0 <= low <= high }
+    requires { feasible_lower_bound nums k low }
+    requires { feasible_with_bound nums k high }
+    variant  { high - low }
+    ensures  { optimal_split_result nums k result }
+  =
+    if low >= high then begin
+      assert { low = high };
+      assert { feasible_with_bound nums k low };
+      feasible_lower_bound_unfold nums k low;
+      optimal_from_feasible_lower_bound nums k low;
+      low
+    end else begin
+      assert { low < high };
+      let mid = low + div (high - low) 2 in
+      assert { low <= mid < high };
+      assert { 0 <= mid };
+      if can_split_with_bound nums k mid then begin
+        assert { feasible_with_bound nums k mid };
+        feasible_lower_bound_unfold nums k low;
+        search_answer nums k low mid
+      end else begin
+        assert { not (feasible_with_bound nums k mid) };
+        assert { forall bound: int. feasible_with_bound nums k bound -> mid < bound };
+        assert { forall bound: int. feasible_with_bound nums k bound -> mid + 1 <= bound };
+        feasible_lower_bound_raise nums k low mid;
+        search_answer nums k (mid + 1) high
+      end
+    end
+
+  let split_array_largest_sum_array (nums: array int) (k: int) : int
+    requires { 1 <= length nums <= 1000 }
+    requires { forall i: int. 0 <= i < length nums -> 0 <= nums[i] <= 1000000 }
+    requires { 1 <= k <= 50 }
+    requires { k <= length nums }
+    ensures  { optimal_split_result nums k result }
+  =
+    assert { input_domain nums k };
+    let low = max_array nums in
+    let high = sum_array nums in
+    assert { low <= high };
+    assert { 0 <= low };
+    max_bound_implies_feasible_lower_bound nums k low;
+    assert { feasible_lower_bound nums k low };
+    feasible_lower_bound_unfold nums k low;
+    total_sum_is_feasible_bound nums k high;
+    assert { feasible_with_bound nums k high };
+    search_answer nums k low high
+
+end

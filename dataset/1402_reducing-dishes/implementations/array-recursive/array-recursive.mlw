@@ -1,0 +1,207 @@
+module ReducingDishes_Array_Recursive_Implementation
+
+  use int.Int
+  use array.Array
+  use array.Init
+  use list.List
+
+  let rec array_to_list_from (a: array int) (i: int) : list int
+    variant { length a - i }
+  =
+    if i >= length a then
+      Nil
+    else
+      Cons a[i] (array_to_list_from a (i + 1))
+
+  let array_to_list (a: array int) : list int =
+    array_to_list_from a 0
+
+  let rec insert_sorted (x: int) (l: list int) : list int
+    variant { l }
+  =
+    match l with
+    | Nil -> Cons x Nil
+    | Cons y ys ->
+        if x <= y then Cons x l else Cons y (insert_sorted x ys)
+    end
+
+  let rec sort_asc (l: list int) : list int
+    variant { l }
+  =
+    match l with
+    | Nil -> Nil
+    | Cons x xs -> insert_sorted x (sort_asc xs)
+    end
+
+  let rec reverse_acc (l: list int) (acc: list int) : list int
+    variant { l }
+  =
+    match l with
+    | Nil -> acc
+    | Cons x xs -> reverse_acc xs (Cons x acc)
+    end
+
+  let reverse (l: list int) : list int =
+    reverse_acc l Nil
+
+  let rec best_total_desc (l: list int) (current_sum: int) (current_total: int) : int
+    variant { l }
+  =
+    match l with
+    | Nil -> current_total
+    | Cons x xs ->
+        let next_sum = current_sum + x in
+        if next_sum > 0 then
+          best_total_desc xs next_sum (current_total + next_sum)
+        else
+          current_total
+    end
+
+  let reducing_dishes_array (satisfaction: array int) : int =
+    let sorted_desc = reverse (sort_asc (array_to_list satisfaction)) in
+    best_total_desc sorted_desc 0 0
+
+  let test_000 () : bool =
+    let satisfaction = init 6 [|1; -1; 2; -2; 3; -3|] in
+    let r = reducing_dishes_array satisfaction in
+    r = 22
+
+  let test_001 () : bool =
+    let satisfaction = init 1 [|0|] in
+    let r = reducing_dishes_array satisfaction in
+    r = 0
+
+  let test_002 () : bool =
+    let satisfaction = init 1 [|-1|] in
+    let r = reducing_dishes_array satisfaction in
+    r = 0
+
+  let test_003 () : bool =
+    let satisfaction = init 5 [|-500; -500; -500; -500; -500|] in
+    let r = reducing_dishes_array satisfaction in
+    r = 0
+
+  let test_004 () : bool =
+    let satisfaction = init 5 [|0; 0; 0; 0; 0|] in
+    let r = reducing_dishes_array satisfaction in
+    r = 0
+
+  let test_005 () : bool =
+    let satisfaction = init 4 [|-1000; 1000; -500; 500|] in
+    let r = reducing_dishes_array satisfaction in
+    r = 3500
+
+  let test_006 () : bool =
+    let satisfaction = init 4 [|0; 0; 0; 0|] in
+    let r = reducing_dishes_array satisfaction in
+    r = 0
+
+  let test_007 () : bool =
+    let satisfaction = init 5 [|1000; -1000; 1000; -1000; 1000|] in
+    let r = reducing_dishes_array satisfaction in
+    r = 9000
+
+  let test_008 () : bool =
+    let satisfaction = init 5 [|-1; -8; 0; 5; -9|] in
+    let r = reducing_dishes_array satisfaction in
+    r = 14
+
+  let test_009 () : bool =
+    let satisfaction = init 6 [|-10; -20; -30; 10; 20; 30|] in
+    let r = reducing_dishes_array satisfaction in
+    r = 220
+
+  let test_010 () : bool =
+    let satisfaction = init 5 [|1; 2; 3; 4; 5|] in
+    let r = reducing_dishes_array satisfaction in
+    r = 55
+
+  let test_011 () : bool =
+    let satisfaction = init 5 [|100; 200; 300; 400; 500|] in
+    let r = reducing_dishes_array satisfaction in
+    r = 5500
+
+  let test_012 () : bool =
+    let satisfaction = init 5 [|-10; -20; -30; -40; -50|] in
+    let r = reducing_dishes_array satisfaction in
+    r = 0
+
+  let test_013 () : bool =
+    let satisfaction = init 3 [|4; 3; 2|] in
+    let r = reducing_dishes_array satisfaction in
+    r = 20
+
+  let test_014 () : bool =
+    let satisfaction = init 5 [|500; 500; 500; 500; 500|] in
+    let r = reducing_dishes_array satisfaction in
+    r = 7500
+
+  let test_015 () : bool =
+    let satisfaction = init 2 [|-1000; 1000|] in
+    let r = reducing_dishes_array satisfaction in
+    r = 1000
+
+  let test_016 () : bool =
+    let satisfaction = init 3 [|-1; -4; -5|] in
+    let r = reducing_dishes_array satisfaction in
+    r = 0
+
+  let test_020 () : bool =
+    let satisfaction = init 1 [|1|] in
+    let r = reducing_dishes_array satisfaction in
+    r = 1
+
+  let test_022 () : bool =
+    let satisfaction = init 4 [|1000; -1000; 1000; -1000|] in
+    let r = reducing_dishes_array satisfaction in
+    r = 4000
+
+  let test_023 () : bool =
+    let satisfaction = init 6 [|5; -1; 3; 2; -2; 1|] in
+    let r = reducing_dishes_array satisfaction in
+    r = 52
+
+  let run_tests () : bool =
+    if test_000 () then
+    if test_001 () then
+    if test_002 () then
+    if test_003 () then
+    if test_004 () then
+    if test_005 () then
+    if test_006 () then
+    if test_007 () then
+    if test_008 () then
+    if test_009 () then
+    if test_010 () then
+    if test_011 () then
+    if test_012 () then
+    if test_013 () then
+    if test_014 () then
+    if test_015 () then
+    if test_016 () then
+    if test_020 () then
+    if test_022 () then
+    if test_023 () then
+      true
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+
+end

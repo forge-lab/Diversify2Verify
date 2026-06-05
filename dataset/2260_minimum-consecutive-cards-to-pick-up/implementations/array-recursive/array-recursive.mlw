@@ -1,0 +1,171 @@
+module MinimumConsecutiveCardsToPickUp_Array_Recursive_Implementation
+
+  use int.Int
+  use array.Array
+  use array.Init
+
+  predicate valid_cards (cards: array int) =
+    1 <= length cards <= 100000 /\
+    forall i: int. 0 <= i < length cards -> 0 <= cards[i] <= 1000000
+
+  let rec first_match_length (cards: array int) (i: int) (j: int) : int
+    variant { length cards - j }
+  =
+    if j >= length cards then
+      -1
+    else if cards[i] = cards[j] then
+      j - i + 1
+    else
+      first_match_length cards i (j + 1)
+
+  let rec minimum_consecutive_cards_to_pick_up_array_from (cards: array int) (i: int) : int
+    variant { length cards - i }
+  =
+    if i >= length cards then
+      -1
+    else
+      let current = first_match_length cards i (i + 1) in
+      let rest = minimum_consecutive_cards_to_pick_up_array_from cards (i + 1) in
+      if current = -1 then
+        rest
+      else if rest = -1 then
+        current
+      else if current < rest then
+        current
+      else
+        rest
+
+  let minimum_consecutive_cards_to_pick_up_array (cards: array int) : int
+    requires { valid_cards cards }
+  =
+    minimum_consecutive_cards_to_pick_up_array_from cards 0
+
+  let check_case (cards: array int) (expected: int) : bool =
+    let r = minimum_consecutive_cards_to_pick_up_array cards in
+    r = expected
+
+  let test_000 () : bool =
+    let cards = init 11 [|0; 1; 2; 3; 4; 5; 6; 7; 8; 9; 0|] in
+    check_case cards 11
+
+  let test_001 () : bool =
+    let cards = init 21 [|1; 2; 3; 4; 5; 6; 7; 8; 9; 10; 11; 12; 13; 14; 15; 16; 17; 18; 19; 20; 1|] in
+    check_case cards 21
+
+  let test_002 () : bool =
+    let cards = init 10 [|1; 1; 1; 1; 1; 1; 1; 1; 1; 1|] in
+    check_case cards 2
+
+  let test_003 () : bool =
+    let cards = init 10 [|1; 2; 3; 4; 5; 6; 7; 8; 9; 1|] in
+    check_case cards 10
+
+  let test_004 () : bool =
+    let cards = init 6 [|3; 4; 2; 3; 4; 7|] in
+    check_case cards 4
+
+  let test_005 () : bool =
+    let cards = init 2 [|0; 0|] in
+    check_case cards 2
+
+  let test_006 () : bool =
+    let cards = init 2 [|1; 1|] in
+    check_case cards 2
+
+  let test_007 () : bool =
+    let cards = init 5 [|0; 0; 0; 0; 0|] in
+    check_case cards 2
+
+  let test_008 () : bool =
+    let cards = init 20 [|1000000; 500000; 250000; 125000; 62500; 31250; 15625; 7812; 3906; 1953; 976; 488; 244; 122; 61; 30; 15; 7; 3; 1|] in
+    check_case cards (-1)
+
+  let test_009 () : bool =
+    let cards = init 1 [|5|] in
+    check_case cards (-1)
+
+  let test_010 () : bool =
+    let cards = init 10 [|1; 2; 3; 4; 5; 6; 7; 8; 9; 10|] in
+    check_case cards (-1)
+
+  let test_011 () : bool =
+    let cards = init 3 [|1000000; 999999; 1000000|] in
+    check_case cards 3
+
+  let test_012 () : bool =
+    let cards = init 5 [|1; 1; 1; 1; 1|] in
+    check_case cards 2
+
+  let test_013 () : bool =
+    let cards = init 4 [|1; 0; 5; 3|] in
+    check_case cards (-1)
+
+  let test_014 () : bool =
+    let cards = init 3 [|1000000; 0; 1000000|] in
+    check_case cards 3
+
+  let test_015 () : bool =
+    let cards =
+      init 101 [|1; 2; 3; 4; 5; 6; 7; 8; 9; 10; 11; 12; 13; 14; 15; 16; 17; 18; 19; 20; 21; 22; 23; 24; 25; 26; 27; 28; 29; 30; 31; 32; 33; 34; 35; 36; 37; 38; 39; 40; 41; 42; 43; 44; 45; 46; 47; 48; 49; 50; 1; 2; 3; 4; 5; 6; 7; 8; 9; 10; 11; 12; 13; 14; 15; 16; 17; 18; 19; 20; 21; 22; 23; 24; 25; 26; 27; 28; 29; 30; 31; 32; 33; 34; 35; 36; 37; 38; 39; 40; 41; 42; 43; 44; 45; 46; 47; 48; 49; 50; 1|] in
+    check_case cards 51
+
+  let test_016 () : bool =
+    let cards = init 32 [|1; 2; 3; 4; 5; 6; 7; 8; 9; 10; 11; 12; 13; 14; 15; 16; 17; 18; 19; 20; 1; 21; 22; 23; 24; 25; 26; 27; 28; 29; 30; 1|] in
+    check_case cards 12
+
+  let test_017 () : bool =
+    let cards = init 30 [|1; 2; 3; 4; 5; 6; 7; 8; 9; 10; 1; 2; 3; 4; 5; 6; 7; 8; 9; 10; 1; 2; 3; 4; 5; 6; 7; 8; 9; 10|] in
+    check_case cards 11
+
+  let test_018 () : bool =
+    let cards = init 51 [|1; 2; 3; 4; 5; 6; 7; 8; 9; 10; 11; 12; 13; 14; 15; 16; 17; 18; 19; 20; 21; 22; 23; 24; 25; 26; 27; 28; 29; 30; 31; 32; 33; 34; 35; 36; 37; 38; 39; 40; 41; 42; 43; 44; 45; 46; 47; 48; 49; 50; 1|] in
+    check_case cards 51
+
+  let test_019 () : bool =
+    let cards = init 90 [|1; 2; 3; 4; 5; 6; 7; 8; 9; 10; 11; 12; 13; 14; 15; 16; 17; 18; 19; 20; 1; 2; 3; 4; 5; 6; 7; 8; 9; 10; 1; 2; 3; 4; 5; 6; 7; 8; 9; 10; 1; 2; 3; 4; 5; 6; 7; 8; 9; 10; 1; 2; 3; 4; 5; 6; 7; 8; 9; 10; 1; 2; 3; 4; 5; 6; 7; 8; 9; 10; 1; 2; 3; 4; 5; 6; 7; 8; 9; 10; 1; 2; 3; 4; 5; 6; 7; 8; 9; 10|] in
+    check_case cards 11
+
+  let run_tests () : bool =
+    if test_000 () then
+    if test_001 () then
+    if test_002 () then
+    if test_003 () then
+    if test_004 () then
+    if test_005 () then
+    if test_006 () then
+    if test_007 () then
+    if test_008 () then
+    if test_009 () then
+    if test_010 () then
+    if test_011 () then
+    if test_012 () then
+    if test_013 () then
+    if test_014 () then
+    if test_015 () then
+    if test_016 () then
+    if test_017 () then
+    if test_018 () then
+    if test_019 () then
+      true
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+
+end

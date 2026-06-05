@@ -1,0 +1,199 @@
+module FindIndicesWithIndexAndValueDifferenceI_List_Recursive
+
+  use int.Int
+  use int.Abs
+  use list.List
+
+  let make_answer (i: int) (j: int) : list int =
+    Cons i (Cons j Nil)
+
+  let rec same_answer (left: list int) (right: list int) : bool
+    variant { left }
+  =
+    match left, right with
+    | Nil, Nil -> true
+    | Cons x xs, Cons y ys ->
+        if x = y then same_answer xs ys else false
+    | _, _ -> false
+    end
+
+  let is_not_found (answer: list int) : bool =
+    same_answer answer (make_answer (-1) (-1))
+
+  let rec search_j
+      (value_i: int) (i: int) (j: int) (rest: list int)
+      (indexDifference: int) (valueDifference: int) : list int
+    variant { rest }
+  =
+    match rest with
+    | Nil -> make_answer (-1) (-1)
+    | Cons value_j tail ->
+        if abs (i - j) >= indexDifference && abs (value_i - value_j) >= valueDifference then
+          make_answer i j
+        else
+          search_j value_i i (j + 1) tail indexDifference valueDifference
+    end
+
+  let rec search_i
+      (all_nums: list int) (remaining_i: list int) (i: int)
+      (indexDifference: int) (valueDifference: int) : list int
+    variant { remaining_i }
+  =
+    match remaining_i with
+    | Nil -> make_answer (-1) (-1)
+    | Cons value_i tail_i ->
+        let candidate = search_j value_i i 0 all_nums indexDifference valueDifference in
+        if is_not_found candidate then
+          search_i all_nums tail_i (i + 1) indexDifference valueDifference
+        else
+          candidate
+    end
+
+  let find_indices_with_index_and_value_difference_i_list
+      (nums: list int) (indexDifference: int) (valueDifference: int) : list int =
+    search_i nums nums 0 indexDifference valueDifference
+
+  let test_000 () : bool =
+    let nums = Cons 1 (Cons 3 (Cons 5 (Cons 7 (Cons 9 Nil)))) in
+    let r = find_indices_with_index_and_value_difference_i_list nums 2 6 in
+    same_answer r (make_answer 0 3)
+
+  let test_001 () : bool =
+    let nums = Cons 0 (Cons 0 (Cons 0 (Cons 0 (Cons 0 Nil)))) in
+    let r = find_indices_with_index_and_value_difference_i_list nums 0 0 in
+    same_answer r (make_answer 0 0)
+
+  let test_002 () : bool =
+    let nums = Cons 10 (Cons 20 (Cons 30 (Cons 40 (Cons 50 Nil)))) in
+    let r = find_indices_with_index_and_value_difference_i_list nums 1 25 in
+    same_answer r (make_answer 0 3)
+
+  let test_003 () : bool =
+    let nums = Cons 0 (Cons 0 (Cons 0 (Cons 0 Nil))) in
+    let r = find_indices_with_index_and_value_difference_i_list nums 3 1 in
+    same_answer r (make_answer (-1) (-1))
+
+  let test_004 () : bool =
+    let nums = Cons 0 (Cons 0 (Cons 0 (Cons 0 Nil))) in
+    let r = find_indices_with_index_and_value_difference_i_list nums 1 1 in
+    same_answer r (make_answer (-1) (-1))
+
+  let test_006 () : bool =
+    let nums = Cons 4 (Cons 2 (Cons 3 (Cons 1 (Cons 5 Nil)))) in
+    let r = find_indices_with_index_and_value_difference_i_list nums 1 2 in
+    same_answer r (make_answer 0 1)
+
+  let test_007 () : bool =
+    let nums = Cons 1 (Cons 3 (Cons 5 (Cons 7 (Cons 9 Nil)))) in
+    let r = find_indices_with_index_and_value_difference_i_list nums 3 4 in
+    same_answer r (make_answer 0 3)
+
+  let test_008 () : bool =
+    let nums = Cons 45 (Cons 46 (Cons 47 (Cons 48 (Cons 49 (Cons 50 Nil))))) in
+    let r = find_indices_with_index_and_value_difference_i_list nums 2 5 in
+    same_answer r (make_answer 0 5)
+
+  let test_009 () : bool =
+    let nums = Cons 4 (Cons 2 (Cons 3 (Cons 4 (Cons 5 Nil)))) in
+    let r = find_indices_with_index_and_value_difference_i_list nums 1 2 in
+    same_answer r (make_answer 0 1)
+
+  let test_010 () : bool =
+    let nums = Cons 50 (Cons 40 (Cons 30 (Cons 20 (Cons 10 Nil)))) in
+    let r = find_indices_with_index_and_value_difference_i_list nums 2 15 in
+    same_answer r (make_answer 0 2)
+
+  let test_011 () : bool =
+    let nums = Cons 1 (Cons 2 (Cons 3 Nil)) in
+    let r = find_indices_with_index_and_value_difference_i_list nums 2 4 in
+    same_answer r (make_answer (-1) (-1))
+
+  let test_012 () : bool =
+    let nums = Cons 1 (Cons 2 (Cons 3 (Cons 4 (Cons 5 (Cons 6 (Cons 7 (Cons 8 (Cons 9 (Cons 10 Nil))))))))) in
+    let r = find_indices_with_index_and_value_difference_i_list nums 5 5 in
+    same_answer r (make_answer 0 5)
+
+  let test_013 () : bool =
+    let nums = Cons 2 (Cons 1 Nil) in
+    let r = find_indices_with_index_and_value_difference_i_list nums 0 0 in
+    same_answer r (make_answer 0 0)
+
+  let test_014 () : bool =
+    let nums = Cons 50 (Cons 40 (Cons 30 (Cons 20 (Cons 10 Nil)))) in
+    let r = find_indices_with_index_and_value_difference_i_list nums 2 30 in
+    same_answer r (make_answer 0 3)
+
+  let test_015 () : bool =
+    let nums = Cons 3 (Cons 5 (Cons 7 (Cons 9 (Cons 11 Nil)))) in
+    let r = find_indices_with_index_and_value_difference_i_list nums 1 2 in
+    same_answer r (make_answer 0 1)
+
+  let test_016 () : bool =
+    let nums = Cons 5 (Cons 5 (Cons 5 (Cons 5 (Cons 5 Nil)))) in
+    let r = find_indices_with_index_and_value_difference_i_list nums 1 1 in
+    same_answer r (make_answer (-1) (-1))
+
+  let test_017 () : bool =
+    let nums = Cons 3 (Cons 3 (Cons 3 (Cons 3 (Cons 3 Nil)))) in
+    let r = find_indices_with_index_and_value_difference_i_list nums 0 0 in
+    same_answer r (make_answer 0 0)
+
+  let test_018 () : bool =
+    let nums = Cons 10 (Cons 20 (Cons 30 (Cons 40 (Cons 50 Nil)))) in
+    let r = find_indices_with_index_and_value_difference_i_list nums 3 15 in
+    same_answer r (make_answer 0 3)
+
+  let test_019 () : bool =
+    let nums = Cons 10 (Cons 20 (Cons 30 (Cons 40 (Cons 50 Nil)))) in
+    let r = find_indices_with_index_and_value_difference_i_list nums 3 20 in
+    same_answer r (make_answer 0 3)
+
+  let test_020 () : bool =
+    let nums = Cons 10 (Cons 20 (Cons 30 (Cons 40 (Cons 50 Nil)))) in
+    let r = find_indices_with_index_and_value_difference_i_list nums 2 25 in
+    same_answer r (make_answer 0 3)
+
+  let run_tests () : bool =
+    if test_000 () then
+    if test_001 () then
+    if test_002 () then
+    if test_003 () then
+    if test_004 () then
+    if test_006 () then
+    if test_007 () then
+    if test_008 () then
+    if test_009 () then
+    if test_010 () then
+    if test_011 () then
+    if test_012 () then
+    if test_013 () then
+    if test_014 () then
+    if test_015 () then
+    if test_016 () then
+    if test_017 () then
+    if test_018 () then
+    if test_019 () then
+    if test_020 () then
+      true
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+
+end

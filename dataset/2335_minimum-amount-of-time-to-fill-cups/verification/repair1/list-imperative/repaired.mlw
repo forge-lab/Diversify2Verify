@@ -1,0 +1,203 @@
+module MinimumAmountOfTimeToFillCups_List_Stage3_Imperative
+
+  use int.Int
+  use int.MinMax
+  use int.EuclideanDivision
+  use list.List
+  use list.Length
+  use list.Mem
+  use list.Sum
+  use ref.Ref
+
+  let rec function max_amount (amount: list int) : int
+    variant { amount }
+  =
+    match amount with
+    | Nil -> 0
+    | Cons x xs -> max x (max_amount xs)
+    end
+
+  predicate valid_amounts (amount: list int) =
+    length amount = 3 /\
+    (forall x: int. mem x amount -> 0 <= x)
+
+  predicate feasible_fill_time (amount: list int) (seconds: int) =
+    valid_amounts amount /\
+    max_amount amount <= seconds /\
+    sum amount <= 2 * seconds
+
+  predicate minimum_fill_time (amount: list int) (seconds: int) =
+    feasible_fill_time amount seconds /\
+    (forall other: int. feasible_fill_time amount other -> seconds <= other)
+
+  let rec function max_acc (current: int) (amount: list int) : int
+    variant { amount }
+  =
+    match amount with
+    | Nil -> current
+    | Cons x xs ->
+        if x > current then max_acc x xs else max_acc current xs
+    end
+
+  let lemma nonnegative_cons_parts (x: int) (xs: list int)
+    requires { forall y: int. mem y (Cons x xs) -> 0 <= y }
+    ensures  { 0 <= x }
+    ensures  { forall y: int. mem y xs -> 0 <= y }
+  =
+    assert { mem x (Cons x xs) };
+    assert { forall y: int. mem y xs -> mem y (Cons x xs) }
+
+  let lemma max_absorb_smaller_left (current x tail_max: int)
+    requires { current < x }
+    ensures  { max x tail_max = max current (max x tail_max) }
+  =
+    let m = max x tail_max in
+    assert { x <= m };
+    assert { current <= m };
+    assert { max current m = m }
+
+  let lemma max_ignore_smaller_middle (current x tail_max: int)
+    requires { x <= current }
+    ensures  { max current tail_max = max current (max x tail_max) }
+  =
+    if tail_max <= current then begin
+      assert { max current tail_max = current };
+      assert { max x tail_max <= current };
+      assert { max current (max x tail_max) = current }
+    end else begin
+      assert { current <= tail_max };
+      assert { x <= tail_max };
+      assert { max x tail_max = tail_max };
+      assert { max current tail_max = tail_max };
+      assert { max current (max x tail_max) = tail_max }
+    end
+
+  let rec lemma sum_nonnegative (amount: list int)
+    requires { forall x: int. mem x amount -> 0 <= x }
+    ensures  { 0 <= sum amount }
+    variant  { amount }
+  =
+    match amount with
+    | Nil -> ()
+    | Cons x xs ->
+        nonnegative_cons_parts x xs;
+        sum_nonnegative xs
+    end
+
+  let rec lemma max_amount_nonnegative (amount: list int)
+    requires { forall x: int. mem x amount -> 0 <= x }
+    ensures  { 0 <= max_amount amount }
+    variant  { amount }
+  =
+    match amount with
+    | Nil -> ()
+    | Cons x xs ->
+        nonnegative_cons_parts x xs;
+        max_amount_nonnegative xs
+    end
+
+  let rec lemma max_acc_correct (amount: list int) (current: int)
+    requires { 0 <= current }
+    requires { forall x: int. mem x amount -> 0 <= x }
+    ensures  { max_acc current amount = max current (max_amount amount) }
+    variant  { amount }
+  =
+    match amount with
+    | Nil -> ()
+    | Cons x xs ->
+        nonnegative_cons_parts x xs;
+        if x > current then begin
+          max_acc_correct xs x;
+          max_absorb_smaller_left current x (max_amount xs);
+          assert { max_amount amount = max x (max_amount xs) };
+          assert { max_acc current amount = max x (max_amount xs) };
+          assert { max current (max_amount amount) = max x (max_amount xs) }
+        end else begin
+          assert { x <= current };
+          max_acc_correct xs current;
+          max_ignore_smaller_middle current x (max_amount xs);
+          assert { max_amount amount = max x (max_amount xs) };
+          assert { max_acc current amount = max current (max_amount xs) };
+          assert { max current (max_amount amount) = max current (max_amount xs) }
+        end
+    end
+
+  let lemma ceil_half_feasible (s: int)
+    requires { 0 <= s }
+    ensures  { s <= 2 * div (s + 1) 2 }
+  =
+    assert { 2 <> 0 };
+    assert { s + 1 = 2 * div (s + 1) 2 + mod (s + 1) 2 };
+    assert { 0 <= mod (s + 1) 2 < 2 }
+
+  let lemma ceil_half_minimal (s: int) (other: int)
+    requires { 0 <= s }
+    requires { s <= 2 * other }
+    ensures  { div (s + 1) 2 <= other }
+  =
+    assert { 2 <> 0 };
+    assert { s + 1 = 2 * div (s + 1) 2 + mod (s + 1) 2 };
+    assert { 0 <= mod (s + 1) 2 < 2 }
+
+  let lemma answer_formula_minimum (amount: list int)
+    requires { valid_amounts amount }
+    ensures  { minimum_fill_time amount (max (max_amount amount) (div (sum amount + 1) 2)) }
+  =
+    sum_nonnegative amount;
+    max_amount_nonnegative amount;
+    let m = max_amount amount in
+    let s = sum amount in
+    let h = div (s + 1) 2 in
+    let ans = max m h in
+    ceil_half_feasible s;
+    assert { valid_amounts amount };
+    assert { m <= ans };
+    assert { s <= 2 * h };
+    assert { h <= ans };
+    assert { s <= 2 * ans };
+    assert { feasible_fill_time amount ans };
+    assert { forall other: int. feasible_fill_time amount other -> ans <= other };
+    assert { minimum_fill_time amount ans }
+
+  let minimum_amount_of_time_to_fill_cups_list (amount: list int) : int
+    requires { valid_amounts amount }
+    ensures  { minimum_fill_time amount result }
+  =
+    sum_nonnegative amount;
+    max_amount_nonnegative amount;
+    max_acc_correct amount 0;
+    assert { max_acc 0 amount = max_amount amount };
+    let total = ref 0 in
+    let current_max = ref 0 in
+    let cur = ref amount in
+    while (match !cur with Nil -> false | Cons _ _ -> true end) do
+      invariant { !total + sum !cur = sum amount }
+      invariant { max_acc !current_max !cur = max_amount amount }
+      invariant { 0 <= !total }
+      invariant { 0 <= !current_max }
+      invariant { forall x: int. mem x !cur -> mem x amount }
+      variant   { length !cur }
+      match !cur with
+      | Nil -> ()
+      | Cons x xs ->
+          assert { mem x !cur };
+          assert { mem x amount };
+          assert { 0 <= x };
+          assert { forall y: int. mem y xs -> mem y amount };
+          total := !total + x;
+          if x > !current_max then current_max := x;
+          cur := xs
+      end
+    done;
+    assert { !cur = Nil };
+    assert { !total = sum amount };
+    assert { !current_max = max_amount amount };
+    let half_rounded_up = div (!total + 1) 2 in
+    let result =
+      if !current_max > half_rounded_up then !current_max else half_rounded_up
+    in
+    assert { result = max (max_amount amount) (div (sum amount + 1) 2) };
+    answer_formula_minimum amount;
+    result
+
+end

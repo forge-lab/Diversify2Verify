@@ -1,0 +1,140 @@
+module TwoSumLessThanK_Array_Stage3_Recursive
+
+  use int.Int
+  use array.Array
+
+  predicate valid_input (nums: array int) (k: int) =
+    1 <= length nums <= 100 /\
+    1 <= k <= 2000 /\
+    forall i: int. 0 <= i < length nums -> 1 <= nums[i] <= 1000
+
+  predicate valid_pair (nums: array int) (i: int) (j: int) =
+    0 <= i < j < length nums
+
+  predicate pair_sum_below (nums: array int) (k: int) (sum: int) =
+    exists i j: int.
+      valid_pair nums i j /\
+      sum = nums[i] + nums[j] /\
+      sum < k
+
+  predicate no_pair_sum_below (nums: array int) (k: int) =
+    forall i j: int.
+      valid_pair nums i j -> not (nums[i] + nums[j] < k)
+
+  predicate pair_sum_upper_bound (nums: array int) (k: int) (res: int) =
+    forall i j: int.
+      valid_pair nums i j /\ nums[i] + nums[j] < k ->
+      nums[i] + nums[j] <= res
+
+  predicate two_sum_less_than_k_array_spec
+    (nums: array int) (k: int) (res: int) =
+    (res = -1 /\ no_pair_sum_below nums k) \/
+    (pair_sum_below nums k res /\ pair_sum_upper_bound nums k res)
+
+  predicate pair_bound_at
+    (nums: array int) (k: int) (res: int) (i: int) (j: int) =
+    valid_pair nums i j /\ nums[i] + nums[j] < k ->
+    nums[i] + nums[j] <= res
+
+  predicate prefix_pair_upper_bound
+    (nums: array int) (k: int) (res: int) (i: int) =
+    forall p q: int.
+      valid_pair nums p q /\ p < i /\ nums[p] + nums[q] < k ->
+      nums[p] + nums[q] <= res
+
+  predicate prefix_with_i_pair_upper_bound
+    (nums: array int) (k: int) (res: int) (i: int) (j: int) =
+    forall p q: int.
+      valid_pair nums p q /\
+      (p < i \/ (p = i /\ q < j)) /\
+      nums[p] + nums[q] < k ->
+      nums[p] + nums[q] <= res
+
+  lemma positive_pair_sum:
+    forall nums: array int, k i j: int.
+      valid_input nums k /\ valid_pair nums i j ->
+      2 <= nums[i] + nums[j]
+
+  lemma negative_upper_bound_implies_no_pair:
+    forall nums: array int, k: int.
+      valid_input nums k /\ pair_sum_upper_bound nums k (-1) ->
+      no_pair_sum_below nums k
+
+  let rec best_pair_with_i
+    (nums: array int) (k: int) (i: int) (j: int) (best: int) : int
+    requires { valid_input nums k }
+    requires { 0 <= i < length nums }
+    requires { i < j <= length nums }
+    requires { -1 <= best }
+    requires { best = -1 \/ pair_sum_below nums k best }
+    requires { prefix_with_i_pair_upper_bound nums k best i j }
+    ensures  { -1 <= result }
+    ensures  { best <= result }
+    ensures  { result = best \/ pair_sum_below nums k result }
+    ensures  { prefix_with_i_pair_upper_bound nums k result i (length nums) }
+    variant  { length nums - j }
+  =
+    if j >= length nums then
+      best
+    else
+      let sum = nums[i] + nums[j] in
+      assert { valid_pair nums i j };
+      let next_best =
+        if sum < k then begin
+          assert { pair_sum_below nums k sum };
+          if sum > best then sum else best
+        end else
+          best
+      in
+      assert { -1 <= next_best };
+      assert { best <= next_best };
+      assert { next_best = best \/ pair_sum_below nums k next_best };
+      assert { prefix_with_i_pair_upper_bound nums k next_best i (j + 1) };
+      best_pair_with_i nums k i (j + 1) next_best
+
+  let rec scan_pairs_from
+    (nums: array int) (k: int) (i: int) (best: int) : int
+    requires { valid_input nums k }
+    requires { 0 <= i <= length nums }
+    requires { -1 <= best }
+    requires { best = -1 \/ pair_sum_below nums k best }
+    requires { prefix_pair_upper_bound nums k best i }
+    ensures  { -1 <= result }
+    ensures  { best <= result }
+    ensures  { result = best \/ pair_sum_below nums k result }
+    ensures  { pair_sum_upper_bound nums k result }
+    variant  { length nums - i }
+  =
+    if i >= length nums then begin
+      assert { prefix_pair_upper_bound nums k best (length nums) };
+      assert { pair_sum_upper_bound nums k best };
+      best
+    end else begin
+      assert { i < length nums };
+      assert { prefix_with_i_pair_upper_bound nums k best i (i + 1) };
+      let next_best = best_pair_with_i nums k i (i + 1) best in
+      assert { -1 <= next_best };
+      assert { best <= next_best };
+      assert { next_best = best \/ pair_sum_below nums k next_best };
+      assert { prefix_pair_upper_bound nums k next_best (i + 1) };
+      scan_pairs_from nums k (i + 1) next_best
+    end
+
+  let two_sum_less_than_k_array (nums: array int) (k: int) : int
+    requires { valid_input nums k }
+    ensures  { two_sum_less_than_k_array_spec nums k result }
+  =
+    assert { prefix_pair_upper_bound nums k (-1) 0 };
+    let r = scan_pairs_from nums k 0 (-1) in
+    assert { r = -1 \/ pair_sum_below nums k r };
+    assert { pair_sum_upper_bound nums k r };
+    if r = -1 then begin
+      assert { pair_sum_upper_bound nums k (-1) };
+      assert { no_pair_sum_below nums k };
+      r
+    end else begin
+      assert { pair_sum_below nums k r };
+      r
+    end
+
+end

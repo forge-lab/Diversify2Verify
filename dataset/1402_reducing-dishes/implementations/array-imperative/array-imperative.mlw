@@ -1,0 +1,192 @@
+module ReducingDishes_Array_Imperative_Implementation
+
+  use int.Int
+  use array.Array
+  use array.Init
+  use ref.Ref
+
+  let copy_array (a: array int) : array int =
+    let n = length a in
+    let result = make n 0 in
+    for i = 0 to n - 1 do
+      result[i] <- a[i]
+    done;
+    result
+
+  let insertion_sort (a: array int) : unit =
+    let n = length a in
+    if n >= 2 then
+      for i = 1 to n - 1 do
+        let key = a[i] in
+        let j = ref (i - 1) in
+        while !j >= 0 && a[!j] > key do
+          variant { !j + 1 }
+          a[!j + 1] <- a[!j];
+          j := !j - 1
+        done;
+        a[!j + 1] <- key
+      done
+
+  let reducing_dishes_array (satisfaction: array int) : int =
+    let n = length satisfaction in
+    if n = 0 then
+      0
+    else begin
+      let sorted = copy_array satisfaction in
+      insertion_sort sorted;
+      let suffix_sum = ref 0 in
+      let answer = ref 0 in
+      for i = n - 1 downto 0 do
+        suffix_sum := !suffix_sum + sorted[i];
+        if !suffix_sum > 0 then
+          answer := !answer + !suffix_sum
+        else
+          ()
+      done;
+      !answer
+    end
+
+  let test_000 () : bool =
+    let satisfaction = init 6 [|1; -1; 2; -2; 3; -3|] in
+    let r = reducing_dishes_array satisfaction in
+    r = 22
+
+  let test_001 () : bool =
+    let satisfaction = init 1 [|0|] in
+    let r = reducing_dishes_array satisfaction in
+    r = 0
+
+  let test_002 () : bool =
+    let satisfaction = init 1 [|-1|] in
+    let r = reducing_dishes_array satisfaction in
+    r = 0
+
+  let test_003 () : bool =
+    let satisfaction = init 5 [|-500; -500; -500; -500; -500|] in
+    let r = reducing_dishes_array satisfaction in
+    r = 0
+
+  let test_004 () : bool =
+    let satisfaction = init 5 [|0; 0; 0; 0; 0|] in
+    let r = reducing_dishes_array satisfaction in
+    r = 0
+
+  let test_005 () : bool =
+    let satisfaction = init 4 [|-1000; 1000; -500; 500|] in
+    let r = reducing_dishes_array satisfaction in
+    r = 3500
+
+  let test_006 () : bool =
+    let satisfaction = init 4 [|0; 0; 0; 0|] in
+    let r = reducing_dishes_array satisfaction in
+    r = 0
+
+  let test_007 () : bool =
+    let satisfaction = init 5 [|1000; -1000; 1000; -1000; 1000|] in
+    let r = reducing_dishes_array satisfaction in
+    r = 9000
+
+  let test_008 () : bool =
+    let satisfaction = init 5 [|-1; -8; 0; 5; -9|] in
+    let r = reducing_dishes_array satisfaction in
+    r = 14
+
+  let test_009 () : bool =
+    let satisfaction = init 6 [|-10; -20; -30; 10; 20; 30|] in
+    let r = reducing_dishes_array satisfaction in
+    r = 220
+
+  let test_010 () : bool =
+    let satisfaction = init 5 [|1; 2; 3; 4; 5|] in
+    let r = reducing_dishes_array satisfaction in
+    r = 55
+
+  let test_011 () : bool =
+    let satisfaction = init 5 [|100; 200; 300; 400; 500|] in
+    let r = reducing_dishes_array satisfaction in
+    r = 5500
+
+  let test_012 () : bool =
+    let satisfaction = init 5 [|-10; -20; -30; -40; -50|] in
+    let r = reducing_dishes_array satisfaction in
+    r = 0
+
+  let test_013 () : bool =
+    let satisfaction = init 3 [|4; 3; 2|] in
+    let r = reducing_dishes_array satisfaction in
+    r = 20
+
+  let test_014 () : bool =
+    let satisfaction = init 5 [|500; 500; 500; 500; 500|] in
+    let r = reducing_dishes_array satisfaction in
+    r = 7500
+
+  let test_015 () : bool =
+    let satisfaction = init 2 [|-1000; 1000|] in
+    let r = reducing_dishes_array satisfaction in
+    r = 1000
+
+  let test_016 () : bool =
+    let satisfaction = init 3 [|-1; -4; -5|] in
+    let r = reducing_dishes_array satisfaction in
+    r = 0
+
+  let test_017 () : bool =
+    let satisfaction = init 5 [|-5; -4; -3; -2; -1|] in
+    let r = reducing_dishes_array satisfaction in
+    r = 0
+
+  let test_018 () : bool =
+    let satisfaction = init 5 [|-500; -400; -300; -200; -100|] in
+    let r = reducing_dishes_array satisfaction in
+    r = 0
+
+  let test_019 () : bool =
+    let satisfaction = init 5 [|1000; -1000; 1000; -1000; 1000|] in
+    let r = reducing_dishes_array satisfaction in
+    r = 9000
+
+  let run_tests () : bool =
+    if test_000 () then
+    if test_001 () then
+    if test_002 () then
+    if test_003 () then
+    if test_004 () then
+    if test_005 () then
+    if test_006 () then
+    if test_007 () then
+    if test_008 () then
+    if test_009 () then
+    if test_010 () then
+    if test_011 () then
+    if test_012 () then
+    if test_013 () then
+    if test_014 () then
+    if test_015 () then
+    if test_016 () then
+    if test_017 () then
+    if test_018 () then
+    if test_019 () then
+      true
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+
+end

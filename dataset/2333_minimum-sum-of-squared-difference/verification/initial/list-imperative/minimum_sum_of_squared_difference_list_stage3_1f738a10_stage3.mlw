@@ -1,0 +1,189 @@
+module MinimumSumOfSquaredDifference_List_Stage3_Imperative
+
+  use int.Int
+  use int.Abs
+  use int.EuclideanDivision
+  use list.List
+  use list.Length
+  use ref.Ref
+
+  let rec predicate nonnegative_list (l: list int)
+    variant { l }
+  =
+    match l with
+    | Nil -> true
+    | Cons x xs -> 0 <= x && nonnegative_list xs
+    end
+
+  let rec predicate residuals_within (nums1: list int) (nums2: list int) (residuals: list int)
+    variant { nums1 }
+  =
+    match nums1 with
+    | Nil ->
+        match nums2 with
+        | Nil ->
+            match residuals with
+            | Nil -> true
+            | Cons _ _ -> false
+            end
+        | Cons _ _ -> false
+        end
+    | Cons x xs ->
+        match nums2 with
+        | Nil -> false
+        | Cons y ys ->
+            match residuals with
+            | Nil -> false
+            | Cons r rs ->
+                0 <= r <= abs (x - y) &&
+                residuals_within xs ys rs
+            end
+        end
+    end
+
+  let rec function reduction_spent (nums1: list int) (nums2: list int) (residuals: list int) : int
+    variant { nums1 }
+  =
+    match nums1 with
+    | Nil -> 0
+    | Cons x xs ->
+        match nums2 with
+        | Nil -> 0
+        | Cons y ys ->
+            match residuals with
+            | Nil -> 0
+            | Cons r rs -> (abs (x - y) - r) + reduction_spent xs ys rs
+            end
+        end
+    end
+
+  predicate feasible_residuals (nums1: list int) (nums2: list int) (budget: int) (residuals: list int) =
+    0 <= budget /\
+    residuals_within nums1 nums2 residuals /\
+    reduction_spent nums1 nums2 residuals <= budget
+
+  let rec function square_sum (l: list int) : int
+    variant { l }
+  =
+    match l with
+    | Nil -> 0
+    | Cons x xs -> x * x + square_sum xs
+    end
+
+  predicate minimum_sum_spec (nums1: list int) (nums2: list int) (k1: int) (k2: int) (result: int) =
+    0 <= result /\
+    (exists residuals: list int.
+       feasible_residuals nums1 nums2 (k1 + k2) residuals /\
+       result = square_sum residuals /\
+       (forall other: list int.
+          feasible_residuals nums1 nums2 (k1 + k2) other ->
+          result <= square_sum other))
+
+  type diff_group = Group int int
+
+  let square (x: int) : int
+    ensures { result = x * x }
+  =
+    x * x
+
+  let rec function square_sum_groups (groups: list diff_group) : int
+    variant { groups }
+  =
+    match groups with
+    | Nil -> 0
+    | Cons (Group value count) rest ->
+        count * square value + square_sum_groups rest
+    end
+
+  let reduced_square_block (value: int) (count: int) (budget: int) : int =
+    let q = div budget count in
+    let r = mod budget count in
+    let high = value - q in
+    let low = high - 1 in
+    (count - r) * square high + r * square low
+
+  let rec function insert_group (d: int) (groups: list diff_group) : list diff_group
+    variant { groups }
+  =
+    match groups with
+    | Nil -> Cons (Group d 1) Nil
+    | Cons (Group value count) rest ->
+        if d = value then Cons (Group value (count + 1)) rest
+        else if d > value then Cons (Group d 1) (Cons (Group value count) rest)
+        else Cons (Group value count) (insert_group d rest)
+    end
+
+  let build_groups (nums1: list int) (nums2: list int) : list diff_group
+    requires { length nums1 = length nums2 }
+  =
+    let groups = ref Nil in
+    let cur1 = ref nums1 in
+    let cur2 = ref nums2 in
+    while
+      (match !cur1 with
+       | Nil -> false
+       | Cons _ _ ->
+           match !cur2 with
+           | Nil -> false
+           | Cons _ _ -> true
+           end
+       end)
+    do
+      invariant { length !cur1 = length !cur2 }
+      invariant { 0 <= length !cur1 }
+      variant { length !cur1 }
+
+      match !cur1 with
+      | Nil -> absurd
+      | Cons x xs ->
+          match !cur2 with
+          | Nil -> absurd
+          | Cons y ys ->
+              let d = abs (x - y) in
+              groups := insert_group d !groups;
+              cur1 := xs;
+              cur2 := ys
+          end
+      end
+    done;
+    assert { !cur1 = Nil };
+    assert { !cur2 = Nil };
+    !groups
+
+  let rec function minimum_square_from_groups (groups: list diff_group) (budget: int) : int
+    variant { groups }
+  =
+    match groups with
+    | Nil -> 0
+    | Cons (Group value count) rest ->
+        if value <= 0 then 0
+        else
+          match rest with
+          | Nil ->
+              if budget >= value * count then 0
+              else reduced_square_block value count budget
+          | Cons (Group next_value next_count) tail ->
+              let need = (value - next_value) * count in
+              if budget < need then
+                reduced_square_block value count budget + square_sum_groups rest
+              else
+                minimum_square_from_groups
+                  (Cons (Group next_value (count + next_count)) tail)
+                  (budget - need)
+          end
+    end
+
+  let minimum_sum_of_squared_difference_list
+      (nums1: list int) (nums2: list int) (k1: int) (k2: int) : int
+    requires { nums1 <> Nil }
+    requires { length nums1 = length nums2 }
+    requires { nonnegative_list nums1 }
+    requires { nonnegative_list nums2 }
+    requires { 0 <= k1 /\ 0 <= k2 }
+    ensures  { minimum_sum_spec nums1 nums2 k1 k2 result }
+  =
+    let budget = k1 + k2 in
+    assert { 0 <= budget };
+    minimum_square_from_groups (build_groups nums1 nums2) budget
+
+end

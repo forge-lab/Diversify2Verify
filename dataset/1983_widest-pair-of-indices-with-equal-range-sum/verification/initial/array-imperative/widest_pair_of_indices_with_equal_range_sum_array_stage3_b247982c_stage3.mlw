@@ -1,0 +1,100 @@
+module WidestPairOfIndicesWithEqualRangeSum_Array_Spec
+
+  use int.Int
+  use array.Array
+  use array.Init
+  use array.ArraySum
+  use ref.Ref
+
+  predicate binary_value (x: int) =
+    x = 0 \/ x = 1
+
+  predicate valid_binary_arrays (nums1: array int) (nums2: array int) =
+    length nums1 = length nums2 /\
+    1 <= length nums1 /\
+    (forall k: int.
+      0 <= k < length nums1 ->
+      binary_value nums1[k] /\ binary_value nums2[k])
+
+  function range_width (i: int) (j: int) : int =
+    j - i + 1
+
+  predicate equal_range_sum (nums1: array int) (nums2: array int) (i: int) (j: int) =
+    length nums1 = length nums2 /\
+    0 <= i <= j < length nums1 /\
+    sum nums1 i (j + 1) = sum nums2 i (j + 1)
+
+  predicate widest_equal_range_distance (nums1: array int) (nums2: array int) (r: int) =
+    length nums1 = length nums2 /\
+    0 <= r <= length nums1 /\
+    (r = 0 \/
+      exists i j: int.
+        equal_range_sum nums1 nums2 i j /\
+        r = range_width i j) /\
+    (forall i j: int.
+      equal_range_sum nums1 nums2 i j ->
+      range_width i j <= r)
+
+  predicate processed_outer
+      (nums1: array int) (nums2: array int) (upto: int) (best: int) =
+    length nums1 = length nums2 /\
+    0 <= upto <= length nums1 /\
+    0 <= best <= length nums1 /\
+    (best = 0 \/
+      exists i j: int.
+        0 <= i < upto /\ i <= j < length nums1 /\
+        equal_range_sum nums1 nums2 i j /\
+        best = range_width i j) /\
+    (forall i j: int.
+      0 <= i < upto /\ i <= j < length nums1 /\
+      equal_range_sum nums1 nums2 i j ->
+      range_width i j <= best)
+
+  predicate processed_inner
+      (nums1: array int) (nums2: array int) (i: int) (next_j: int) (best: int) =
+    length nums1 = length nums2 /\
+    0 <= i <= next_j <= length nums1 /\
+    0 <= best <= length nums1 /\
+    (forall j: int.
+      i <= j < next_j /\ equal_range_sum nums1 nums2 i j ->
+      range_width i j <= best)
+
+  let widest_pair_of_indices_with_equal_range_sum_array
+      (nums1: array int) (nums2: array int) : int
+    requires { valid_binary_arrays nums1 nums2 }
+    ensures  { widest_equal_range_distance nums1 nums2 result }
+  =
+    let n = length nums1 in
+    assert { length nums2 = n };
+    let best = ref 0 in
+    for i = 0 to n - 1 do
+      invariant { length nums1 = n /\ length nums2 = n }
+      invariant { processed_outer nums1 nums2 i !best }
+      let diff = ref 0 in
+      for j = i to n - 1 do
+        invariant { length nums1 = n /\ length nums2 = n }
+        invariant { 0 <= i <= j <= n }
+        invariant { processed_outer nums1 nums2 i !best }
+        invariant { processed_inner nums1 nums2 i j !best }
+        invariant { !diff = sum nums1 i j - sum nums2 i j }
+        diff := !diff + nums1[j] - nums2[j];
+        assert { !diff = sum nums1 i (j + 1) - sum nums2 i (j + 1) };
+        if !diff = 0 then begin
+          assert { equal_range_sum nums1 nums2 i j };
+          let width = j - i + 1 in
+          assert { width = range_width i j };
+          if width > !best then begin
+            best := width;
+            assert { !best = range_width i j };
+            assert { equal_range_sum nums1 nums2 i j }
+          end
+        end;
+        assert { processed_inner nums1 nums2 i (j + 1) !best }
+      done;
+      assert { processed_outer nums1 nums2 (i + 1) !best }
+    done;
+    assert { processed_outer nums1 nums2 n !best };
+    assert { widest_equal_range_distance nums1 nums2 !best };
+    !best
+
+end

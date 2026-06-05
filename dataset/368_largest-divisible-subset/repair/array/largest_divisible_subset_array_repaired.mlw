@@ -1,0 +1,231 @@
+module LargestDivisibleSubset_Array_Spec
+
+  use int.Int
+  use int.EuclideanDivision
+  use array.Array
+  use array.Init
+
+  predicate positive_values (nums: array int) =
+    forall i: int.
+      0 <= i < length nums -> 1 <= nums[i] <= 2000000000
+
+  predicate distinct_values (nums: array int) =
+    forall i j: int.
+      0 <= i < j < length nums -> nums[i] <> nums[j]
+
+  predicate valid_input (nums: array int) =
+    1 <= length nums <= 1000 /\
+    positive_values nums /\
+    distinct_values nums
+
+  predicate contains_value (a: array int) (x: int) =
+    exists i: int. 0 <= i < length a /\ a[i] = x
+
+  predicate all_from_input (nums: array int) (answer: array int) =
+    forall k: int.
+      0 <= k < length answer -> contains_value nums answer[k]
+
+  predicate no_duplicates (a: array int) =
+    forall i j: int.
+      0 <= i < j < length a -> a[i] <> a[j]
+
+  predicate divides (x: int) (y: int) =
+    x > 0 /\ y > 0 /\ mod y x = 0
+
+  predicate pairwise_divisible (answer: array int) =
+    forall i j: int.
+      0 <= i < j < length answer ->
+        divides answer[i] answer[j] \/ divides answer[j] answer[i]
+
+  predicate divisible_subset (nums: array int) (answer: array int) =
+    length answer <= length nums /\
+    no_duplicates answer /\
+    all_from_input nums answer /\
+    pairwise_divisible answer
+
+  predicate largest_divisible_subset_array_spec
+      (nums: array int) (answer: array int) =
+    divisible_subset nums answer /\
+    forall candidate: array int.
+      divisible_subset nums candidate -> length candidate <= length answer
+
+  val largest_divisible_subset_array (nums: array int) : array int
+    requires { valid_input nums }
+    ensures  { largest_divisible_subset_array_spec nums result }
+
+  let lemma test_000_python_assertions () =
+    let nums = init 8 [|1; 3; 5; 7; 9; 11; 13; 15|] in
+    let answer = init 3 [|9; 3; 1|] in
+    assert { length nums = 8 };
+    assert { nums[0] = 1 };
+    assert { nums[1] = 3 };
+    assert { nums[2] = 5 };
+    assert { nums[3] = 7 };
+    assert { nums[4] = 9 };
+    assert { nums[5] = 11 };
+    assert { nums[6] = 13 };
+    assert { nums[7] = 15 };
+    assert { valid_input nums };
+    assert { length answer = 3 };
+    assert { answer[0] = 9 };
+    assert { answer[1] = 3 };
+    assert { answer[2] = 1 };
+    assert { contains_value nums 9 };
+    assert { contains_value nums 3 };
+    assert { contains_value nums 1 };
+    assert { all_from_input nums answer };
+    assert { no_duplicates answer };
+    assert { divides 3 9 };
+    assert { divides 1 9 };
+    assert { divides 1 3 };
+    assert { pairwise_divisible answer };
+    assert { divisible_subset nums answer }
+
+  let lemma test_001_python_assertions () =
+    let nums = init 6 [|100; 200; 400; 800; 1600; 3200|] in
+    let answer = init 6 [|3200; 1600; 800; 400; 200; 100|] in
+    assert { length nums = 6 };
+    assert { nums[0] = 100 };
+    assert { nums[1] = 200 };
+    assert { nums[2] = 400 };
+    assert { nums[3] = 800 };
+    assert { nums[4] = 1600 };
+    assert { nums[5] = 3200 };
+    assert { valid_input nums };
+    assert { length answer = 6 };
+    assert { answer[0] = 3200 };
+    assert { answer[1] = 1600 };
+    assert { answer[2] = 800 };
+    assert { answer[3] = 400 };
+    assert { answer[4] = 200 };
+    assert { answer[5] = 100 };
+    assert { all_from_input nums answer };
+    assert { no_duplicates answer };
+    assert { divides 1600 3200 };
+    assert { divides 800 1600 };
+    assert { divides 400 800 };
+    assert { divides 200 400 };
+    assert { divides 100 200 };
+    assert { pairwise_divisible answer };
+    assert { divisible_subset nums answer };
+    assert {
+      forall candidate: array int.
+        divisible_subset nums candidate -> length candidate <= 6
+    };
+    assert { largest_divisible_subset_array_spec nums answer }
+
+  let lemma test_002_python_assertions () =
+    let nums = init 6 [|1; 5; 10; 20; 25; 50|] in
+    let answer = init 4 [|20; 10; 5; 1|] in
+    assert { length nums = 6 };
+    assert { nums[0] = 1 };
+    assert { nums[1] = 5 };
+    assert { nums[2] = 10 };
+    assert { nums[3] = 20 };
+    assert { nums[4] = 25 };
+    assert { nums[5] = 50 };
+    assert { valid_input nums };
+    assert { length answer = 4 };
+    assert { answer[0] = 20 };
+    assert { answer[1] = 10 };
+    assert { answer[2] = 5 };
+    assert { answer[3] = 1 };
+    assert { all_from_input nums answer };
+    assert { no_duplicates answer };
+    assert { divides 10 20 };
+    assert { divides 5 20 };
+    assert { divides 1 20 };
+    assert { divides 5 10 };
+    assert { divides 1 10 };
+    assert { divides 1 5 };
+    assert { pairwise_divisible answer };
+    assert { divisible_subset nums answer }
+
+  let lemma test_003_python_assertions () =
+    let nums = init 6 [|2; 3; 5; 7; 11; 13|] in
+    let answer = init 1 [|2|] in
+    assert { length nums = 6 };
+    assert { nums[0] = 2 };
+    assert { nums[1] = 3 };
+    assert { nums[2] = 5 };
+    assert { nums[3] = 7 };
+    assert { nums[4] = 11 };
+    assert { nums[5] = 13 };
+    assert { valid_input nums };
+    assert { length answer = 1 };
+    assert { answer[0] = 2 };
+    assert { contains_value nums 2 };
+    assert { all_from_input nums answer };
+    assert { no_duplicates answer };
+    assert { pairwise_divisible answer };
+    assert { divisible_subset nums answer };
+    assert { not (divides 2 3) };
+    assert { not (divides 2 5) };
+    assert { not (divides 3 5) }
+
+  let lemma test_004_python_assertions () =
+    let nums = init 5 [|2; 3; 5; 7; 11|] in
+    let answer = init 1 [|2|] in
+    assert { length nums = 5 };
+    assert { nums[0] = 2 };
+    assert { nums[1] = 3 };
+    assert { nums[2] = 5 };
+    assert { nums[3] = 7 };
+    assert { nums[4] = 11 };
+    assert { valid_input nums };
+    assert { length answer = 1 };
+    assert { answer[0] = 2 };
+    assert { contains_value nums 2 };
+    assert { all_from_input nums answer };
+    assert { no_duplicates answer };
+    assert { pairwise_divisible answer };
+    assert { divisible_subset nums answer };
+    assert { not (divides 2 3) };
+    assert { not (divides 2 7) };
+    assert { not (divides 5 11) }
+
+  let lemma test_005_python_assertions () =
+    let nums = init 5 [|3; 9; 20; 18; 15|] in
+    let answer = init 3 [|18; 9; 3|] in
+    assert { length nums = 5 };
+    assert { nums[0] = 3 };
+    assert { nums[1] = 9 };
+    assert { nums[2] = 20 };
+    assert { nums[3] = 18 };
+    assert { nums[4] = 15 };
+    assert { valid_input nums };
+    assert { length answer = 3 };
+    assert { answer[0] = 18 };
+    assert { answer[1] = 9 };
+    assert { answer[2] = 3 };
+    assert { all_from_input nums answer };
+    assert { no_duplicates answer };
+    assert { divides 9 18 };
+    assert { divides 3 18 };
+    assert { divides 3 9 };
+    assert { pairwise_divisible answer };
+    assert { divisible_subset nums answer }
+
+  let lemma test_006_python_assertions () =
+    let nums = init 5 [|3; 6; 9; 12; 18|] in
+    let answer = init 3 [|12; 6; 3|] in
+    assert { length nums = 5 };
+    assert { nums[0] = 3 };
+    assert { nums[1] = 6 };
+    assert { nums[2] = 9 };
+    assert { nums[3] = 12 };
+    assert { nums[4] = 18 };
+    assert { valid_input nums };
+    assert { length answer = 3 };
+    assert { answer[0] = 12 };
+    assert { answer[1] = 6 };
+    assert { answer[2] = 3 };
+    assert { all_from_input nums answer };
+    assert { no_duplicates answer };
+    assert { divides 6 12 };
+    assert { divides 3 12 };
+    assert { divides 3 6 };
+    assert { pairwise_divisible answer };
+    assert { divisible_subset nums answer }
+
+end

@@ -1,0 +1,126 @@
+module AppendKIntegersWithMinimalSum_List_Spec
+
+  use int.Int
+  use int.EuclideanDivision
+  use list.List
+  use list.Length
+  use list.Mem
+  use list.NumOcc
+  use list.Sum
+  use list.Append
+  use ref.Ref
+
+  predicate valid_append_choices (nums: list int) (chosen: list int) (k: int) =
+    length chosen = k /\
+    (forall x: int. mem x chosen ->
+      x > 0 /\ not (mem x nums) /\ num_occ x chosen = 1)
+
+  predicate append_k_minimal_sum (nums: list int) (k: int) (r: int) =
+    exists chosen: list int.
+      valid_append_choices nums chosen k /\
+      r = sum chosen /\
+      (forall other: list int. valid_append_choices nums other k -> r <= sum other)
+
+  let rec function range_choices (start: int) (count: int) : list int
+    variant { count }
+  =
+    if count <= 0 then Nil else Cons start (range_choices (start + 1) (count - 1))
+
+  let rec insert_sorted_unique_positive (x: int) (xs: list int) : list int
+    variant { xs }
+  =
+    if x <= 0 then xs else
+    match xs with
+    | Nil -> Cons x Nil
+    | Cons y ys ->
+        if x = y then xs else
+        if x < y then Cons x xs else
+        Cons y (insert_sorted_unique_positive x ys)
+    end
+
+  let normalize_positive_nums (nums: list int) : list int =
+    let sorted = ref Nil in
+    let cur = ref nums in
+    while (match !cur with Nil -> false | Cons _ _ -> true end) do
+      invariant { 0 <= length !cur }
+      variant { length !cur }
+      match !cur with
+      | Nil -> absurd
+      | Cons x xs ->
+          sorted := insert_sorted_unique_positive x !sorted;
+          cur := xs
+      end
+    done;
+    assert { !cur = Nil };
+    !sorted
+
+  let range_sum (start: int) (count: int) : int =
+    if count <= 0 then 0 else
+    let finish = start + count - 1 in
+    if mod count 2 = 0 then
+      div count 2 * (start + finish)
+    else
+      count * div (start + finish) 2
+
+  let append_k_integers_with_minimal_sum_list (nums: list int) (k: int) : int
+    requires { k >= 0 }
+    ensures  { append_k_minimal_sum nums k result }
+  =
+    let blockers = normalize_positive_nums nums in
+    let total = ref 0 in
+    let remaining = ref k in
+    let next_value = ref 1 in
+    let cur = ref blockers in
+    let ghost chosen = ref Nil in
+    while !remaining > 0 &&
+      (match !cur with Nil -> false | Cons _ _ -> true end) do
+      invariant { 0 <= !remaining }
+      invariant { 1 <= !next_value }
+      invariant { 0 <= length !cur }
+      invariant { length !chosen + !remaining = k }
+      invariant { !total = sum !chosen }
+      variant { !remaining + length !cur }
+      match !cur with
+      | Nil -> absurd
+      | Cons x xs ->
+          if x < !next_value then
+            cur := xs
+          else if x = !next_value then begin
+            next_value := !next_value + 1;
+            cur := xs
+          end else begin
+            let gap = x - !next_value in
+            assert { gap > 0 };
+            let take = if gap < !remaining then gap else !remaining in
+            assert { 0 < take };
+            assert { take <= !remaining };
+            assert { take <= gap };
+            ghost chosen := !chosen ++ range_choices !next_value take;
+            total := !total + range_sum !next_value take;
+            remaining := !remaining - take;
+            next_value := !next_value + take;
+            if !remaining > 0 then next_value := !next_value + 1;
+            if !remaining > 0 then cur := xs
+          end
+      end
+    done;
+    assert { !remaining >= 0 };
+    assert { length !chosen + !remaining = k };
+    assert { !total = sum !chosen };
+    if !remaining > 0 then begin
+      ghost chosen := !chosen ++ range_choices !next_value !remaining;
+      total := !total + range_sum !next_value !remaining;
+      remaining := 0
+    end;
+    assert { !remaining = 0 };
+    assert { length !chosen = k };
+    assert { !total = sum !chosen };
+    assert { forall x: int. mem x !chosen ->
+      x > 0 /\ not (mem x nums) /\ num_occ x !chosen = 1 };
+    assert { valid_append_choices nums !chosen k };
+    assert { forall other: list int.
+      valid_append_choices nums other k -> !total <= sum other };
+    assert { append_k_minimal_sum nums k !total };
+    !total
+
+end

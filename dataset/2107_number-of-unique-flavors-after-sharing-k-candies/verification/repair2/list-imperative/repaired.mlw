@@ -1,0 +1,295 @@
+module NumberOfUniqueFlavorsAfterSharingKCandies_List_Stage3_Imperative
+
+  use int.Int
+  use list.List
+  use list.Length
+  use list.Append
+  use list.Elements
+  use list.Reverse
+  use set.Fset
+  use ref.Ref
+
+  exception Found
+
+  let rec predicate flavors_in_range (candies: list int)
+    variant { candies }
+  =
+    match candies with
+    | Nil -> true
+    | Cons flavor rest ->
+        1 <= flavor &&
+        flavor <= 100000 &&
+        flavors_in_range rest
+    end
+
+  function unique_flavor_count (candies: list int) : int =
+    cardinal (elements candies)
+
+  predicate valid_kept_after_sharing
+      (candies: list int) (k: int) (kept: list int) =
+    exists left shared right: list int.
+      candies = left ++ (shared ++ right) /\
+      length shared = k /\
+      kept = left ++ right
+
+  predicate no_better_share
+      (candies: list int) (k: int) (result: int) =
+    forall kept: list int.
+      valid_kept_after_sharing candies k kept ->
+      unique_flavor_count kept <= result
+
+  predicate maximum_unique_flavors_after_sharing
+      (candies: list int) (k: int) (result: int) =
+    exists kept: list int.
+      valid_kept_after_sharing candies k kept /\
+      result = unique_flavor_count kept /\
+      no_better_share candies k result
+
+  predicate seen_cursor_summary (candies: list int) (seen: list int) (cur: list int) =
+    union (elements seen) (elements cur) == elements candies
+
+  predicate kept_cursor_summary
+      (candies: list int) (start: int) (k: int)
+      (idx: int) (acc: list int) (cur: list int) =
+    0 <= idx <= length candies /\
+    length cur = length candies - idx /\
+    exists left shared right remaining: list int.
+      candies = left ++ (shared ++ (right ++ remaining)) /\
+      length left <= start /\
+      length shared <= k /\
+      length (left ++ shared ++ right) = idx /\
+      cur = remaining /\
+      reverse acc = left ++ right
+
+  let lemma kept_cursor_summary_initial
+      (candies: list int) (start: int) (k: int)
+    requires { 0 <= start }
+    requires { 0 <= k }
+    ensures  { kept_cursor_summary candies start k 0 (Nil: list int) candies }
+  =
+    assert { 0 <= length candies };
+    assert { length candies = length candies - 0 };
+    assert { candies =
+      (Nil: list int) ++ ((Nil: list int) ++ ((Nil: list int) ++ candies)) };
+    assert { reverse (Nil: list int) = (Nil: list int) ++ (Nil: list int) };
+    assert { exists left shared right remaining: list int.
+      left = Nil /\ shared = Nil /\ right = Nil /\ remaining = candies /\
+      candies = left ++ (shared ++ (right ++ remaining)) /\
+      length left <= start /\
+      length shared <= k /\
+      length (left ++ shared ++ right) = 0 /\
+      candies = remaining /\
+      reverse (Nil: list int) = left ++ right }
+
+  let rec lemma unique_flavor_count_le_length (candies: list int)
+    ensures { unique_flavor_count candies <= length candies }
+    variant { candies }
+  =
+    match candies with
+    | Nil -> ()
+    | Cons _ rest -> unique_flavor_count_le_length rest
+    end
+
+  let lemma valid_kept_after_sharing_length
+      (candies: list int) (k: int) (kept: list int)
+    requires { valid_kept_after_sharing candies k kept }
+    ensures  { length kept = length candies - k }
+  =
+    assert { exists left shared right: list int.
+      candies = left ++ (shared ++ right) /\
+      length shared = k /\
+      kept = left ++ right }
+
+  let lemma valid_kept_after_sharing_unique_bound
+      (candies: list int) (k: int) (kept: list int)
+    requires { valid_kept_after_sharing candies k kept }
+    ensures  { unique_flavor_count kept <= unique_flavor_count candies }
+  =
+    assert { exists left shared right: list int.
+      candies = left ++ (shared ++ right) /\
+      length shared = k /\
+      kept = left ++ right };
+    assert { subset (elements kept) (elements candies) }
+
+  let list_length (l: list int) : int
+    ensures { result = length l }
+    ensures { 0 <= result }
+  =
+    let count = ref 0 in
+    let cur = ref l in
+    while (match !cur with Nil -> false | Cons _ _ -> true end) do
+      invariant { 0 <= !count }
+      invariant { !count + length !cur = length l }
+      variant { length !cur }
+      match !cur with
+      | Nil -> ()
+      | Cons _ rest ->
+          count := !count + 1;
+          cur := rest
+      end
+    done;
+    assert { !cur = Nil };
+    !count
+
+  let contains_int (l: list int) (x: int) : bool
+    ensures { result = true <-> mem x (elements l) }
+  =
+    try
+      let cur = ref l in
+      while (match !cur with Nil -> false | Cons _ _ -> true end) do
+        invariant { mem x (elements !cur) -> mem x (elements l) }
+        invariant { mem x (elements l) -> mem x (elements !cur) }
+        variant { length !cur }
+        match !cur with
+        | Nil -> ()
+        | Cons y ys ->
+            if y = x then (
+              assert { mem x (elements l) };
+              raise Found
+            );
+            cur := ys
+        end
+      done;
+      assert { !cur = Nil };
+      assert { not (mem x (elements !cur)) };
+      assert { not (mem x (elements l)) };
+      false
+    with Found ->
+      true
+    end
+
+  let reverse_list (l: list int) : list int
+    ensures { result = reverse l }
+    ensures { length result = length l }
+  =
+    let acc = ref (Nil: list int) in
+    let cur = ref l in
+    while (match !cur with Nil -> false | Cons _ _ -> true end) do
+      invariant { 0 <= length !cur }
+      invariant { reverse l = reverse !cur ++ !acc }
+      invariant { length !acc + length !cur = length l }
+      variant { length !cur }
+      match !cur with
+      | Nil -> ()
+      | Cons x xs ->
+          assert { reverse !cur = reverse xs ++ Cons x Nil };
+          acc := Cons x !acc;
+          assert { reverse xs ++ !acc = reverse l };
+          cur := xs
+      end
+    done;
+    assert { !cur = Nil };
+    assert { reverse l = !acc };
+    !acc
+
+  let unique_count (candies: list int) : int
+    ensures { result = unique_flavor_count candies }
+    ensures { 0 <= result <= length candies }
+  =
+    let count = ref 0 in
+    let seen = ref (Nil: list int) in
+    let cur = ref candies in
+    while (match !cur with Nil -> false | Cons _ _ -> true end) do
+      invariant { 0 <= !count <= length candies }
+      invariant { 0 <= length !cur <= length candies }
+      invariant { !count = cardinal (elements !seen) }
+      invariant { seen_cursor_summary candies !seen !cur }
+      variant { length !cur }
+      match !cur with
+      | Nil -> ()
+      | Cons flavor rest ->
+          assert { elements !cur == add flavor (elements rest) };
+          let old_seen = !seen in
+          let already_seen = contains_int !seen flavor in
+          if not already_seen then (
+            assert { not (mem flavor (elements old_seen)) };
+            seen := Cons flavor old_seen;
+            assert { elements !seen == add flavor (elements old_seen) };
+            count := !count + 1
+          ) else (
+            assert { mem flavor (elements !seen) }
+          );
+          assert { seen_cursor_summary candies !seen rest };
+          cur := rest
+      end
+    done;
+    assert { !cur = Nil };
+    assert { seen_cursor_summary candies !seen Nil };
+    assert { elements !seen == elements candies };
+    assert { !count = unique_flavor_count candies };
+    !count
+
+  let kept_after_sharing (candies: list int) (start: int) (k: int) : list int
+    requires { 0 <= start }
+    requires { 0 <= k }
+    requires { start + k <= length candies }
+    ensures  { valid_kept_after_sharing candies k result }
+    ensures  { length result = length candies - k }
+  =
+    let idx = ref 0 in
+    let acc = ref (Nil: list int) in
+    let cur = ref candies in
+    kept_cursor_summary_initial candies start k;
+    assert { kept_cursor_summary candies start k !idx !acc !cur };
+    while (match !cur with Nil -> false | Cons _ _ -> true end) do
+      invariant { 0 <= !idx <= length candies }
+      invariant { 0 <= length !cur <= length candies }
+      invariant { length !cur = length candies - !idx }
+      invariant { kept_cursor_summary candies start k !idx !acc !cur }
+      variant { length !cur }
+      match !cur with
+      | Nil -> ()
+      | Cons flavor rest ->
+          assert { length rest = length !cur - 1 };
+          if !idx < start then
+            acc := Cons flavor !acc
+          else if !idx >= start + k then
+            acc := Cons flavor !acc;
+          idx := !idx + 1;
+          assert { length rest = length candies - !idx };
+          cur := rest
+      end
+    done;
+    match !cur with
+    | Nil -> ()
+    | Cons _ _ -> absurd
+    end;
+    assert { !cur = Nil };
+    assert { !idx = length candies };
+    assert { kept_cursor_summary candies start k !idx !acc !cur };
+    reverse_list !acc
+
+  let number_of_unique_flavors_after_sharing_k_candies_list
+      (candies: list int) (k: int) : int
+    requires { 0 <= k <= length candies }
+    requires { length candies <= 100000 }
+    requires { flavors_in_range candies }
+    ensures  { maximum_unique_flavors_after_sharing candies k result }
+  =
+    let n = list_length candies in
+    assert { n = length candies };
+    let best = ref 0 in
+    let start = ref 0 in
+    let limit = n - k in
+    assert { 0 <= limit };
+    while !start <= limit do
+      invariant { n = length candies }
+      invariant { 0 <= k <= length candies }
+      invariant { limit = n - k }
+      invariant { 0 <= !start <= limit + 1 }
+      invariant { 0 <= !best <= length candies }
+      invariant { forall kept: list int.
+        valid_kept_after_sharing candies k kept ->
+        unique_flavor_count kept <= length candies }
+      variant { limit - !start + 1 }
+      let kept = kept_after_sharing candies !start k in
+      assert { valid_kept_after_sharing candies k kept };
+      let current = unique_count kept in
+      assert { current = unique_flavor_count kept };
+      if current > !best then best := current;
+      start := !start + 1
+    done;
+    assert { !start = limit + 1 };
+    !best
+
+end

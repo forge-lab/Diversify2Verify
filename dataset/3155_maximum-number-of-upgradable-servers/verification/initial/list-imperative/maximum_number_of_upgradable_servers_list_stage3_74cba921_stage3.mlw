@@ -1,0 +1,154 @@
+module MaximumNumberOfUpgradableServers_List_Spec
+
+  use int.Int
+  use int.MinMax
+  use int.EuclideanDivision
+  use list.List
+  use list.Length
+  use list.RevAppend
+  use ref.Ref
+
+  let rec predicate valid_inputs (count: list int) (upgrade: list int)
+      (sell: list int) (money: list int)
+    variant { count }
+  =
+    match count with
+    | Nil ->
+        match upgrade with
+        | Nil ->
+            match sell with
+            | Nil ->
+                match money with
+                | Nil -> true
+                | Cons _ _ -> false
+                end
+            | Cons _ _ -> false
+            end
+        | Cons _ _ -> false
+        end
+    | Cons c cs ->
+        c >= 1 &&
+        match upgrade with
+        | Nil -> false
+        | Cons u us ->
+            u >= 1 &&
+            match sell with
+            | Nil -> false
+            | Cons s ss ->
+                s >= 1 &&
+                match money with
+                | Nil -> false
+                | Cons m ms -> m >= 1 && valid_inputs cs us ss ms
+                end
+            end
+        end
+    end
+
+  predicate feasible_upgrades (c: int) (u: int) (s: int) (m: int) (x: int) =
+    0 <= x /\ x <= c /\ x * u <= m + (c - x) * s
+
+  predicate maximum_upgrades_for_center (c: int) (u: int) (s: int) (m: int) (x: int) =
+    feasible_upgrades c u s m x /\
+    (forall y: int. feasible_upgrades c u s m y -> y <= x)
+
+  let function maximum_upgrades_amount (c: int) (u: int) (s: int) (m: int) : int =
+    if u + s <= 0 then 0 else min c (div (m + c * s) (u + s))
+
+  let rec function expected_answers (count: list int) (upgrade: list int)
+      (sell: list int) (money: list int) : list int
+    variant { count }
+  =
+    match count with
+    | Nil -> Nil
+    | Cons c cs ->
+        match upgrade with
+        | Nil -> Nil
+        | Cons u us ->
+            match sell with
+            | Nil -> Nil
+            | Cons s ss ->
+                match money with
+                | Nil -> Nil
+                | Cons m ms ->
+                    Cons (maximum_upgrades_amount c u s m)
+                      (expected_answers cs us ss ms)
+                end
+            end
+        end
+    end
+
+  predicate answers_for_lists (count: list int) (upgrade: list int)
+      (sell: list int) (money: list int) (answer: list int) =
+    answer = expected_answers count upgrade sell money
+
+  let reverse_list (xs: list int) : list int
+    ensures { result = rev_append xs Nil }
+  =
+    let cur = ref xs in
+    let acc = ref Nil in
+    while (match !cur with Nil -> false | Cons _ _ -> true end) do
+      invariant { rev_append !cur !acc = rev_append xs Nil }
+      variant { length !cur }
+
+      match !cur with
+      | Nil -> ()
+      | Cons x xt ->
+          acc := Cons x !acc;
+          cur := xt
+      end
+    done;
+    assert { !cur = Nil };
+    !acc
+
+  let maximum_number_of_upgradable_servers_list (count: list int) (upgrade: list int)
+      (sell: list int) (money: list int) : list int
+    requires { valid_inputs count upgrade sell money }
+    ensures  { answers_for_lists count upgrade sell money result }
+  =
+    let count_cur = ref count in
+    let upgrade_cur = ref upgrade in
+    let sell_cur = ref sell in
+    let money_cur = ref money in
+    let rev_answer = ref Nil in
+    while (match !count_cur, !upgrade_cur, !sell_cur, !money_cur with
+           | Cons _ _, Cons _ _, Cons _ _, Cons _ _ -> true
+           | _, _, _, _ -> false
+           end) do
+      invariant { valid_inputs !count_cur !upgrade_cur !sell_cur !money_cur }
+      invariant {
+        rev_append !rev_answer
+          (expected_answers !count_cur !upgrade_cur !sell_cur !money_cur)
+        = expected_answers count upgrade sell money
+      }
+      variant { length !count_cur }
+
+      match !count_cur, !upgrade_cur, !sell_cur, !money_cur with
+      | Cons c cs, Cons u us, Cons s ss, Cons m ms ->
+          assert { valid_inputs cs us ss ms };
+          assert {
+            expected_answers !count_cur !upgrade_cur !sell_cur !money_cur =
+            Cons (maximum_upgrades_amount c u s m)
+              (expected_answers cs us ss ms)
+          };
+          let value = maximum_upgrades_amount c u s m in
+          assert { value = maximum_upgrades_amount c u s m };
+          rev_answer := Cons value !rev_answer;
+          count_cur := cs;
+          upgrade_cur := us;
+          sell_cur := ss;
+          money_cur := ms
+      | _, _, _, _ ->
+          assert { false }
+      end
+    done;
+    assert { !count_cur = Nil };
+    assert { !upgrade_cur = Nil };
+    assert { !sell_cur = Nil };
+    assert { !money_cur = Nil };
+    assert { expected_answers !count_cur !upgrade_cur !sell_cur !money_cur = Nil };
+    assert { rev_append !rev_answer Nil = expected_answers count upgrade sell money };
+    let answer = reverse_list !rev_answer in
+    assert { answer = expected_answers count upgrade sell money };
+    answer
+
+end

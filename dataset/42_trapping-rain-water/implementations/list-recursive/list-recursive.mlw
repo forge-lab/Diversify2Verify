@@ -1,0 +1,174 @@
+module TrappingRainWater_List_Recursive_Implementation
+
+  use int.Int
+  use int.MinMax
+  use list.List
+
+  let rec max_height (height: list int) : int
+    variant { height }
+  =
+    match height with
+    | Nil -> 0
+    | Cons h rest -> max h (max_height rest)
+    end
+
+  let water_at (left_max: int) (h: int) (right_max: int) : int =
+    max 0 (min (max left_max h) right_max - h)
+
+  let rec trapped_from (left_max: int) (height: list int) : int
+    variant { height }
+  =
+    match height with
+    | Nil -> 0
+    | Cons h rest ->
+        water_at left_max h (max_height height) +
+        trapped_from (max left_max h) rest
+    end
+
+  let trapping_rain_water_list (height: list int) : int =
+    trapped_from 0 height
+
+  let test_test_000 () : bool =
+    let height = Cons 3 (Cons 1 (Cons 2 (Cons 1 (Cons 4 (Cons 3 (Cons 2 (Cons 1 (Cons 5 (Nil))))))))) in
+    let r = trapping_rain_water_list height in
+    r = 11
+
+  let test_test_001 () : bool =
+    let height = Cons 3 (Cons 0 (Cons 1 (Cons 3 (Cons 0 (Cons 1 (Cons 3 (Nil))))))) in
+    let r = trapping_rain_water_list height in
+    r = 10
+
+  let test_test_002 () : bool =
+    let height = Cons 5 (Cons 4 (Cons 3 (Cons 2 (Cons 1 (Nil))))) in
+    let r = trapping_rain_water_list height in
+    r = 0
+
+  let test_test_003 () : bool =
+    let height = Cons 1 (Nil) in
+    let r = trapping_rain_water_list height in
+    r = 0
+
+  let test_test_004 () : bool =
+    let height = Cons 2 (Cons 0 (Cons 2 (Nil))) in
+    let r = trapping_rain_water_list height in
+    r = 2
+
+  let test_test_005 () : bool =
+    let height = Cons 0 (Cons 0 (Cons 1 (Cons 0 (Cons 0 (Cons 0 (Cons 0 (Cons 0 (Cons 0 (Nil))))))))) in
+    let r = trapping_rain_water_list height in
+    r = 0
+
+  let test_test_006 () : bool =
+    let height = Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Nil)))))) in
+    let r = trapping_rain_water_list height in
+    r = 0
+
+  let test_test_007 () : bool =
+    let height = Cons 1 (Cons 0 (Cons 2 (Cons 0 (Cons 1 (Cons 0 (Cons 3 (Cons 0 (Cons 1 (Cons 0 (Cons 1 (Cons 2 (Nil)))))))))))) in
+    let r = trapping_rain_water_list height in
+    r = 12
+
+  let test_test_008 () : bool =
+    let height = Cons 1 (Cons 2 (Cons 1 (Cons 0 (Cons 1 (Cons 0 (Cons 1 (Cons 0 (Cons 1 (Cons 2 (Cons 1 (Nil))))))))))) in
+    let r = trapping_rain_water_list height in
+    r = 10
+
+  let test_test_009 () : bool =
+    let height = Cons 0 (Cons 0 (Cons 0 (Cons 0 (Cons 0 (Nil))))) in
+    let r = trapping_rain_water_list height in
+    r = 0
+
+  let test_test_010 () : bool =
+    let height = Cons 1 (Cons 2 (Cons 3 (Cons 4 (Cons 5 (Cons 4 (Cons 3 (Cons 2 (Cons 1 (Nil))))))))) in
+    let r = trapping_rain_water_list height in
+    r = 0
+
+  let test_test_011 () : bool =
+    let height = Cons 0 (Cons 0 (Cons 0 (Cons 0 (Nil)))) in
+    let r = trapping_rain_water_list height in
+    r = 0
+
+  let test_test_012 () : bool =
+    let height = Cons 5 (Cons 4 (Cons 1 (Cons 2 (Nil)))) in
+    let r = trapping_rain_water_list height in
+    r = 1
+
+  let test_test_013 () : bool =
+    let height = Cons 3 (Cons 0 (Cons 1 (Cons 3 (Cons 0 (Cons 1 (Cons 1 (Cons 3 (Cons 2 (Cons 1 (Cons 2 (Cons 1 (Nil)))))))))))) in
+    let r = trapping_rain_water_list height in
+    r = 13
+
+  let test_test_014 () : bool =
+    let height = Cons 4 (Cons 2 (Cons 0 (Cons 3 (Cons 2 (Cons 5 (Nil)))))) in
+    let r = trapping_rain_water_list height in
+    r = 9
+
+  let test_test_015 () : bool =
+    let height = Cons 3 (Cons 0 (Cons 0 (Cons 2 (Cons 0 (Cons 4 (Nil)))))) in
+    let r = trapping_rain_water_list height in
+    r = 10
+
+  let test_test_016 () : bool =
+    let height = Cons 5 (Cons 4 (Cons 3 (Cons 2 (Cons 1 (Cons 2 (Cons 3 (Cons 4 (Cons 5 (Nil))))))))) in
+    let r = trapping_rain_water_list height in
+    r = 16
+
+  let test_test_017 () : bool =
+    let height = Cons 1 (Cons 0 (Cons 2 (Cons 0 (Cons 1 (Cons 0 (Cons 3 (Cons 1 (Cons 0 (Cons 1 (Cons 2 (Nil))))))))))) in
+    let r = trapping_rain_water_list height in
+    r = 10
+
+  let test_test_018 () : bool =
+    let height = Cons 0 (Cons 2 (Cons 0 (Cons 2 (Cons 0 (Nil))))) in
+    let r = trapping_rain_water_list height in
+    r = 2
+
+  let test_test_019 () : bool =
+    let height = Cons 1 (Cons 0 (Cons 0 (Cons 0 (Cons 1 (Nil))))) in
+    let r = trapping_rain_water_list height in
+    r = 3
+
+  let run_tests () : bool =
+    if test_test_000 () then
+    if test_test_001 () then
+    if test_test_002 () then
+    if test_test_003 () then
+    if test_test_004 () then
+    if test_test_005 () then
+    if test_test_006 () then
+    if test_test_007 () then
+    if test_test_008 () then
+    if test_test_009 () then
+    if test_test_010 () then
+    if test_test_011 () then
+    if test_test_012 () then
+    if test_test_013 () then
+    if test_test_014 () then
+    if test_test_015 () then
+    if test_test_016 () then
+    if test_test_017 () then
+    if test_test_018 () then
+    if test_test_019 () then
+      true
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+
+end

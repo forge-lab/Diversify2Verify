@@ -1,0 +1,123 @@
+module CountOfInterestingSubarrays_List_Stage3_Recursive
+
+  use int.Int
+  use int.EuclideanDivision
+  use list.List
+  use list.Length
+
+  let rec predicate all_between (nums: list int) (lo: int) (hi: int)
+    variant { nums }
+  =
+    match nums with
+    | Nil -> true
+    | Cons x xs -> lo <= x <= hi && all_between xs lo hi
+    end
+
+  predicate valid_input (nums: list int) (modulo: int) (k: int) =
+    1 <= length nums <= 100000 /\
+    all_between nums 1 1000000000 /\
+    1 <= modulo <= 1000000000 /\
+    0 <= k < modulo
+
+  let function interesting_element_indicator
+      (x: int) (modulo: int) (k: int) : int =
+    if 0 < modulo then
+      if mod x modulo = k then 1 else 0
+    else 0
+
+  let rec function count_interesting_prefixes_aux
+      (nums: list int) (modulo: int) (k: int) (running_count: int) : int
+    variant { nums }
+  =
+    match nums with
+    | Nil -> 0
+    | Cons x xs ->
+        let next_count =
+          running_count + interesting_element_indicator x modulo k in
+        (if 0 < modulo then
+           if mod next_count modulo = k then 1 else 0
+         else 0) +
+        count_interesting_prefixes_aux xs modulo k next_count
+    end
+
+  let function count_interesting_prefixes
+      (nums: list int) (modulo: int) (k: int) : int =
+    count_interesting_prefixes_aux nums modulo k 0
+
+  let rec function count_interesting_subarrays
+      (nums: list int) (modulo: int) (k: int) : int
+    variant { nums }
+  =
+    match nums with
+    | Nil -> 0
+    | Cons _ xs ->
+        count_interesting_prefixes nums modulo k +
+        count_interesting_subarrays xs modulo k
+    end
+
+  predicate count_of_interesting_subarrays_list_spec
+      (nums: list int) (modulo: int) (k: int) (result: int) =
+    result = count_interesting_subarrays nums modulo k
+
+  let exec_interesting_element_indicator
+      (x: int) (modulo: int) (k: int) : int
+    ensures { result = interesting_element_indicator x modulo k }
+    ensures { result = 0 \/ result = 1 }
+  =
+    if 0 < modulo then
+      if mod x modulo = k then 1 else 0
+    else 0
+
+  let rec exec_count_interesting_prefixes_aux
+      (nums: list int) (modulo: int) (k: int) (running_count: int) : int
+    ensures { result = count_interesting_prefixes_aux nums modulo k running_count }
+    ensures { result >= 0 }
+    variant { nums }
+  =
+    match nums with
+    | Nil -> 0
+    | Cons x xs ->
+        let indicator = exec_interesting_element_indicator x modulo k in
+        let next_count = running_count + indicator in
+        let current =
+          if 0 < modulo then
+            if mod next_count modulo = k then 1 else 0
+          else 0 in
+        assert { next_count =
+          running_count + interesting_element_indicator x modulo k };
+        current + exec_count_interesting_prefixes_aux xs modulo k next_count
+    end
+
+  let exec_count_interesting_prefixes
+      (nums: list int) (modulo: int) (k: int) : int
+    ensures { result = count_interesting_prefixes nums modulo k }
+    ensures { result >= 0 }
+  =
+    exec_count_interesting_prefixes_aux nums modulo k 0
+
+  let rec exec_count_interesting_subarrays
+      (nums: list int) (modulo: int) (k: int) : int
+    ensures { result = count_interesting_subarrays nums modulo k }
+    ensures { result >= 0 }
+    variant { nums }
+  =
+    match nums with
+    | Nil -> 0
+    | Cons _ xs ->
+        let prefix_count = exec_count_interesting_prefixes nums modulo k in
+        let suffix_count = exec_count_interesting_subarrays xs modulo k in
+        prefix_count + suffix_count
+    end
+
+  let count_of_interesting_subarrays_list
+      (nums: list int) (modulo: int) (k: int) : int
+    requires { valid_input nums modulo k }
+    ensures  { count_of_interesting_subarrays_list_spec nums modulo k result }
+    ensures  { result >= 0 }
+  =
+    let result = exec_count_interesting_subarrays nums modulo k in
+    assert { result = count_interesting_subarrays nums modulo k };
+    assert { count_of_interesting_subarrays_list_spec nums modulo k result };
+    result
+
+end

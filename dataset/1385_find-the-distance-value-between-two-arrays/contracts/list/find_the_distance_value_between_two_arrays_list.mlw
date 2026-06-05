@@ -1,0 +1,191 @@
+module FindTheDistanceValueBetweenTwoArrays_List_Spec
+
+  use int.Int
+  use int.Abs
+  use list.List
+
+  let rec function far_from_all (arr2: list int) (x: int) (d: int) : bool
+    variant { arr2 }
+  =
+    match arr2 with
+    | Nil -> true
+    | Cons y ys ->
+        if abs (x - y) > d then far_from_all ys x d else false
+    end
+
+  let rec function distance_value_list
+    (arr1: list int) (arr2: list int) (d: int) : int
+    variant { arr1 }
+  =
+    match arr1 with
+    | Nil -> 0
+    | Cons x xs ->
+        (if far_from_all arr2 x d then 1 else 0) +
+        distance_value_list xs arr2 d
+    end
+
+  val find_the_distance_value_between_two_arrays_list
+    (arr1: list int) (arr2: list int) (d: int) : int
+    ensures { result = distance_value_list arr1 arr2 d }
+
+  let lemma check_test_001 () =
+    let arr1 = Cons (-1000) (Cons 1000 Nil) in
+    let arr2 = Cons (-500) (Cons 500 Nil) in
+
+    assert { far_from_all Nil (-1000) 499 = true };
+    assert { far_from_all (Cons 500 Nil) (-1000) 499 = true };
+    assert { far_from_all arr2 (-1000) 499 = true };
+
+    assert { far_from_all Nil 1000 499 = true };
+    assert { far_from_all (Cons 500 Nil) 1000 499 = true };
+    assert { far_from_all arr2 1000 499 = true };
+
+    assert { distance_value_list Nil arr2 499 = 0 };
+    assert { distance_value_list (Cons 1000 Nil) arr2 499 = 1 };
+    assert { distance_value_list arr1 arr2 499 = 2 }
+
+  let lemma check_test_002 () =
+    let arr1 = Cons 4 (Cons 5 (Cons 8 Nil)) in
+    let arr2 = Cons 10 (Cons 9 (Cons 1 (Cons 8 Nil))) in
+
+    assert { far_from_all Nil 4 2 = true };
+    assert { far_from_all (Cons 8 Nil) 4 2 = true };
+    assert { far_from_all (Cons 1 (Cons 8 Nil)) 4 2 = true };
+    assert { far_from_all (Cons 9 (Cons 1 (Cons 8 Nil))) 4 2 = true };
+    assert { far_from_all arr2 4 2 = true };
+
+    assert { far_from_all Nil 5 2 = true };
+    assert { far_from_all (Cons 8 Nil) 5 2 = true };
+    assert { far_from_all (Cons 1 (Cons 8 Nil)) 5 2 = true };
+    assert { far_from_all (Cons 9 (Cons 1 (Cons 8 Nil))) 5 2 = true };
+    assert { far_from_all arr2 5 2 = true };
+
+    assert { abs (8 - 8) <= 2 };
+    assert { far_from_all (Cons 8 Nil) 8 2 = false };
+    assert { far_from_all (Cons 1 (Cons 8 Nil)) 8 2 = false };
+    assert { far_from_all (Cons 9 (Cons 1 (Cons 8 Nil))) 8 2 = false };
+    assert { far_from_all arr2 8 2 = false };
+
+    assert { distance_value_list Nil arr2 2 = 0 };
+    assert { distance_value_list (Cons 8 Nil) arr2 2 = 0 };
+    assert { distance_value_list (Cons 5 (Cons 8 Nil)) arr2 2 = 1 };
+    assert { distance_value_list arr1 arr2 2 = 2 }
+
+  let lemma check_test_003 () =
+    let arr1 = Cons 1 (Cons 4 (Cons 2 (Cons 3 Nil))) in
+    let arr2 = Cons (-4) (Cons (-3) (Cons 6 (Cons 10 (Cons 20 (Cons 30 Nil))))) in
+
+    assert { far_from_all Nil 1 3 = true };
+    assert { far_from_all (Cons 30 Nil) 1 3 = true };
+    assert { far_from_all (Cons 20 (Cons 30 Nil)) 1 3 = true };
+    assert { far_from_all (Cons 10 (Cons 20 (Cons 30 Nil))) 1 3 = true };
+    assert { far_from_all (Cons 6 (Cons 10 (Cons 20 (Cons 30 Nil)))) 1 3 = true };
+    assert { far_from_all (Cons (-3) (Cons 6 (Cons 10 (Cons 20 (Cons 30 Nil))))) 1 3 = true };
+    assert { far_from_all arr2 1 3 = true };
+
+    assert { abs (4 - 6) <= 3 };
+    assert { far_from_all (Cons 6 (Cons 10 (Cons 20 (Cons 30 Nil)))) 4 3 = false };
+    assert { far_from_all (Cons (-3) (Cons 6 (Cons 10 (Cons 20 (Cons 30 Nil))))) 4 3 = false };
+    assert { far_from_all arr2 4 3 = false };
+
+    assert { far_from_all Nil 2 3 = true };
+    assert { far_from_all (Cons 30 Nil) 2 3 = true };
+    assert { far_from_all (Cons 20 (Cons 30 Nil)) 2 3 = true };
+    assert { far_from_all (Cons 10 (Cons 20 (Cons 30 Nil))) 2 3 = true };
+    assert { far_from_all (Cons 6 (Cons 10 (Cons 20 (Cons 30 Nil)))) 2 3 = true };
+    assert { far_from_all (Cons (-3) (Cons 6 (Cons 10 (Cons 20 (Cons 30 Nil))))) 2 3 = true };
+    assert { far_from_all arr2 2 3 = true };
+
+    assert { abs (3 - 6) <= 3 };
+    assert { far_from_all (Cons 6 (Cons 10 (Cons 20 (Cons 30 Nil)))) 3 3 = false };
+    assert { far_from_all (Cons (-3) (Cons 6 (Cons 10 (Cons 20 (Cons 30 Nil))))) 3 3 = false };
+    assert { far_from_all arr2 3 3 = false };
+
+    assert { distance_value_list Nil arr2 3 = 0 };
+    assert { distance_value_list (Cons 3 Nil) arr2 3 = 0 };
+    assert { distance_value_list (Cons 2 (Cons 3 Nil)) arr2 3 = 1 };
+    assert { distance_value_list (Cons 4 (Cons 2 (Cons 3 Nil))) arr2 3 = 1 };
+    assert { distance_value_list arr1 arr2 3 = 2 }
+
+  let lemma check_test_005 () =
+    let arr1 = Cons 0 (Cons 0 (Cons 0 (Cons 0 Nil))) in
+    let arr2 = Cons 1 (Cons 2 (Cons 3 (Cons 4 Nil))) in
+
+    assert { far_from_all Nil 0 0 = true };
+    assert { far_from_all (Cons 4 Nil) 0 0 = true };
+    assert { far_from_all (Cons 3 (Cons 4 Nil)) 0 0 = true };
+    assert { far_from_all (Cons 2 (Cons 3 (Cons 4 Nil))) 0 0 = true };
+    assert { far_from_all arr2 0 0 = true };
+
+    assert { distance_value_list Nil arr2 0 = 0 };
+    assert { distance_value_list (Cons 0 Nil) arr2 0 = 1 };
+    assert { distance_value_list (Cons 0 (Cons 0 Nil)) arr2 0 = 2 };
+    assert { distance_value_list (Cons 0 (Cons 0 (Cons 0 Nil))) arr2 0 = 3 };
+    assert { distance_value_list arr1 arr2 0 = 4 }
+
+  let lemma check_test_007 () =
+    let arr1 = Cons 1 Nil in
+    let arr2 = Cons 1 Nil in
+
+    assert { abs (1 - 1) <= 0 };
+    assert { far_from_all arr2 1 0 = false };
+
+    assert { distance_value_list Nil arr2 0 = 0 };
+    assert { distance_value_list arr1 arr2 0 = 0 }
+
+  let lemma check_test_008 () =
+    let arr1 = Cons 2 (Cons 1 (Cons 100 (Cons 3 Nil))) in
+    let arr2 = Cons (-5) (Cons (-2) (Cons 10 (Cons (-3) (Cons 7 Nil)))) in
+
+    assert { abs (2 - 7) <= 6 };
+    assert { far_from_all (Cons 7 Nil) 2 6 = false };
+    assert { far_from_all (Cons (-3) (Cons 7 Nil)) 2 6 = false };
+    assert { far_from_all (Cons 10 (Cons (-3) (Cons 7 Nil))) 2 6 = false };
+    assert { far_from_all (Cons (-2) (Cons 10 (Cons (-3) (Cons 7 Nil)))) 2 6 = false };
+    assert { far_from_all arr2 2 6 = false };
+
+    assert { abs (1 - 7) <= 6 };
+    assert { far_from_all (Cons 7 Nil) 1 6 = false };
+    assert { far_from_all (Cons (-3) (Cons 7 Nil)) 1 6 = false };
+    assert { far_from_all (Cons 10 (Cons (-3) (Cons 7 Nil))) 1 6 = false };
+    assert { far_from_all (Cons (-2) (Cons 10 (Cons (-3) (Cons 7 Nil)))) 1 6 = false };
+    assert { far_from_all arr2 1 6 = false };
+
+    assert { far_from_all Nil 100 6 = true };
+    assert { far_from_all (Cons 7 Nil) 100 6 = true };
+    assert { far_from_all (Cons (-3) (Cons 7 Nil)) 100 6 = true };
+    assert { far_from_all (Cons 10 (Cons (-3) (Cons 7 Nil))) 100 6 = true };
+    assert { far_from_all (Cons (-2) (Cons 10 (Cons (-3) (Cons 7 Nil)))) 100 6 = true };
+    assert { far_from_all arr2 100 6 = true };
+
+    assert { abs (3 - 7) <= 6 };
+    assert { far_from_all (Cons 7 Nil) 3 6 = false };
+    assert { far_from_all (Cons (-3) (Cons 7 Nil)) 3 6 = false };
+    assert { far_from_all (Cons 10 (Cons (-3) (Cons 7 Nil))) 3 6 = false };
+    assert { far_from_all (Cons (-2) (Cons 10 (Cons (-3) (Cons 7 Nil)))) 3 6 = false };
+    assert { far_from_all arr2 3 6 = false };
+
+    assert { distance_value_list Nil arr2 6 = 0 };
+    assert { distance_value_list (Cons 3 Nil) arr2 6 = 0 };
+    assert { distance_value_list (Cons 100 (Cons 3 Nil)) arr2 6 = 1 };
+    assert { distance_value_list (Cons 1 (Cons 100 (Cons 3 Nil))) arr2 6 = 1 };
+    assert { distance_value_list arr1 arr2 6 = 1 }
+
+  let lemma check_test_024 () =
+    let arr1 = Cons 10 (Cons 20 (Cons 30 (Cons 40 (Cons 50 Nil)))) in
+    let arr2 = Cons 5 (Cons 15 (Cons 25 (Cons 35 (Cons 45 (Cons 55 Nil))))) in
+
+    assert { far_from_all arr2 10 4 = true };
+    assert { far_from_all arr2 20 4 = true };
+    assert { far_from_all arr2 30 4 = true };
+    assert { far_from_all arr2 40 4 = true };
+    assert { far_from_all arr2 50 4 = true };
+
+    assert { distance_value_list Nil arr2 4 = 0 };
+    assert { distance_value_list (Cons 50 Nil) arr2 4 = 1 };
+    assert { distance_value_list (Cons 40 (Cons 50 Nil)) arr2 4 = 2 };
+    assert { distance_value_list (Cons 30 (Cons 40 (Cons 50 Nil))) arr2 4 = 3 };
+    assert { distance_value_list (Cons 20 (Cons 30 (Cons 40 (Cons 50 Nil)))) arr2 4 = 4 };
+    assert { distance_value_list arr1 arr2 4 = 5 }
+
+end

@@ -1,0 +1,165 @@
+module MaximumGoodSubarraySum_List_Imperative_Implementation
+
+  use int.Int
+  use int.Abs
+  use list.List
+  use ref.Ref
+
+  let maximum_good_subarray_sum_list (nums: list int) (k: int) : int =
+    let found = ref false in
+    let best = ref 0 in
+    let starts = ref nums in
+    while (match !starts with Nil -> false | Cons _ _ -> true end) do
+      match !starts with
+      | Nil -> ()
+      | Cons h t ->
+          let first = h in
+          let running_sum = ref h in
+          let cur = ref t in
+          while (match !cur with Nil -> false | Cons _ _ -> true end) do
+            match !cur with
+            | Nil -> ()
+            | Cons y ys ->
+                running_sum := !running_sum + y;
+                if abs (first - y) = k then
+                  if not !found then begin
+                    found := true;
+                    best := !running_sum
+                  end else if !running_sum > !best then
+                    best := !running_sum;
+                cur := ys
+            end
+          done;
+          starts := t
+      end
+    done;
+    if !found then !best else 0
+
+  let check_case (nums: list int) (k: int) (expected: int) : bool =
+    let r = maximum_good_subarray_sum_list nums k in
+    r = expected
+
+  let test_000 () : bool =
+    let nums = Cons 1000000000 (Cons (-1000000000) Nil) in
+    check_case nums 2000000000 0
+
+  let test_001 () : bool =
+    let nums = Cons (-1) (Cons 3 (Cons 2 (Cons 4 (Cons 5 Nil)))) in
+    check_case nums 3 11
+
+  let test_002 () : bool =
+    let nums = Cons 10 (Cons 20 (Cons 30 (Cons 40 (Cons 50 Nil)))) in
+    check_case nums 20 120
+
+  let test_005 () : bool =
+    let nums = Cons (-1000000000) (Cons 1000000000 (Cons (-1000000000) (Cons 1000000000 Nil))) in
+    check_case nums 2000000000 0
+
+  let test_006 () : bool =
+    let nums = Cons 1 (Cons 3 (Cons 5 (Cons 7 (Cons 9 Nil)))) in
+    check_case nums 8 25
+
+  let test_007 () : bool =
+    let nums = Cons 1 (Cons 2 (Cons 3 (Cons 4 (Cons 5 (Cons 6 (Cons 7 (Cons 8 (Cons 9 (Cons 10 Nil))))))))) in
+    check_case nums 9 55
+
+  let test_008 () : bool =
+    let nums = Cons 10 (Cons 20 (Cons 30 (Cons 40 (Cons 50 Nil)))) in
+    check_case nums 40 150
+
+  let test_009 () : bool =
+    let nums = Cons (-1) (Cons (-2) (Cons (-3) (Cons (-4) Nil))) in
+    check_case nums 2 (-6)
+
+  let test_010 () : bool =
+    let nums = Cons 1 (Cons (-1) (Cons 1 (Cons (-1) (Cons 1 Nil)))) in
+    check_case nums 2 0
+
+  let test_011 () : bool =
+    let nums = Cons 1 (Cons 2 (Cons 3 (Cons 4 (Cons 5 (Cons 6 Nil))))) in
+    check_case nums 1 11
+
+  let test_012 () : bool =
+    let nums = Cons 1 (Cons 3 (Cons 1 (Cons 5 (Cons 4 (Cons 1 (Cons 3 (Cons 5 Nil))))))) in
+    check_case nums 2 22
+
+  let test_013 () : bool =
+    let nums = Cons 1 (Cons 3 (Cons 1 (Cons 5 (Cons 4 (Cons 1 Nil))))) in
+    check_case nums 4 10
+
+  let test_014 () : bool =
+    let nums = Cons 5 (Cons 4 (Cons 3 (Cons 2 (Cons 1 Nil)))) in
+    check_case nums 4 15
+
+  let test_015 () : bool =
+    let nums = Cons 10 (Cons 9 (Cons 8 (Cons 7 (Cons 6 (Cons 5 (Cons 4 (Cons 3 (Cons 2 (Cons 1 Nil))))))))) in
+    check_case nums 9 55
+
+  let test_016 () : bool =
+    let nums = Cons 10 (Cons 20 (Cons 30 (Cons 40 (Cons 50 Nil)))) in
+    check_case nums 10 90
+
+  let test_020 () : bool =
+    let nums = Cons 1 (Cons 2 (Cons 3 (Cons 4 (Cons 5 (Cons 6 (Cons 7 (Cons 8 (Cons 9 (Cons 10 (Cons 11 (Cons 12 (Cons 13 (Cons 14 (Cons 15 (Cons 16 (Cons 17 (Cons 18 (Cons 19 (Cons 20 Nil))))))))))))))))))) in
+    check_case nums 19 210
+
+  let test_021 () : bool =
+    let nums = Cons 1 (Cons 2 (Cons 3 (Cons 4 (Cons 5 (Cons 6 (Cons 7 (Cons 8 (Cons 9 (Cons 10 (Cons 11 (Cons 12 (Cons 13 (Cons 14 (Cons 15 (Cons 1 (Cons 2 (Cons 3 (Cons 4 (Cons 5 Nil))))))))))))))))))) in
+    check_case nums 14 120
+
+  let test_022 () : bool =
+    let nums = Cons 1 (Cons 3 (Cons 1 (Cons 5 (Cons 1 (Cons 7 (Cons 1 (Cons 9 (Cons 1 (Cons 11 Nil))))))))) in
+    check_case nums 8 39
+
+  let test_023 () : bool =
+    let nums = Cons 1 (Cons 2 (Cons 3 (Cons 4 (Cons 5 (Cons 6 (Cons 7 (Cons 8 (Cons 9 (Cons 10 (Cons 11 (Cons 12 (Cons 13 (Cons 14 (Cons 15 (Cons 16 (Cons 17 (Cons 18 (Cons 19 (Cons 20 (Cons 1 (Cons 2 (Cons 3 (Cons 4 (Cons 5 Nil)))))))))))))))))))))))) in
+    check_case nums 19 210
+
+  let test_024 () : bool =
+    let nums = Cons (-1) (Cons 0 (Cons 1 (Cons (-2) (Cons 2 (Cons (-3) (Cons 3 (Cons (-4) (Cons 4 (Cons (-5) (Cons 5 Nil)))))))))) in
+    check_case nums 5 1
+
+  let run_tests () : bool =
+    if test_000 () then
+    if test_001 () then
+    if test_002 () then
+    if test_005 () then
+    if test_006 () then
+    if test_007 () then
+    if test_008 () then
+    if test_009 () then
+    if test_010 () then
+    if test_011 () then
+    if test_012 () then
+    if test_013 () then
+    if test_014 () then
+    if test_015 () then
+    if test_016 () then
+    if test_020 () then
+    if test_021 () then
+    if test_022 () then
+    if test_023 () then
+    if test_024 () then
+      true
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+
+end

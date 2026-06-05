@@ -1,0 +1,231 @@
+module FindTheScoreOfAllPrefixesOfAnArray_List_Imperative_Implementation
+
+  use int.Int
+  use list.List
+  use ref.Ref
+
+  let reverse_list (l: list int) : list int =
+    let acc = ref Nil in
+    let cur = ref l in
+    while (match !cur with Nil -> false | Cons _ _ -> true end) do
+      match !cur with
+      | Nil -> ()
+      | Cons x xs ->
+          acc := Cons x !acc;
+          cur := xs
+      end
+    done;
+    !acc
+
+  let find_the_score_of_all_prefixes_of_an_array_list (nums: list int) : list int =
+    match nums with
+    | Nil -> Nil
+    | Cons first rest ->
+        let current_max = ref first in
+        let running_score = ref (first + first) in
+        let scores_rev = ref (Cons !running_score Nil) in
+        let cur = ref rest in
+        while (match !cur with Nil -> false | Cons _ _ -> true end) do
+          match !cur with
+          | Nil -> ()
+          | Cons x xs ->
+              if x > !current_max then current_max := x;
+              running_score := !running_score + x + !current_max;
+              scores_rev := Cons !running_score !scores_rev;
+              cur := xs
+          end
+        done;
+        reverse_list !scores_rev
+    end
+
+  let lists_equal (xs: list int) (ys: list int) : bool =
+    let cur_xs = ref xs in
+    let cur_ys = ref ys in
+    let equal = ref true in
+    while !equal &&
+      (match !cur_xs, !cur_ys with
+       | Cons _ _, Cons _ _ -> true
+       | _, _ -> false
+       end) do
+      match !cur_xs, !cur_ys with
+      | Cons x xs_tail, Cons y ys_tail ->
+          if x = y then begin
+            cur_xs := xs_tail;
+            cur_ys := ys_tail
+          end else
+            equal := false
+      | _, _ -> ()
+      end
+    done;
+    if !equal then
+      match !cur_xs, !cur_ys with
+      | Nil, Nil -> true
+      | _, _ -> false
+      end
+    else
+      false
+
+  let test_000 () : bool =
+    let nums = Cons 5 (Cons 4 (Cons 3 (Cons 2 (Cons 1 (Nil))))) in
+    let expected = Cons 10 (Cons 19 (Cons 27 (Cons 34 (Cons 40 (Nil))))) in
+    let r = find_the_score_of_all_prefixes_of_an_array_list nums in
+    lists_equal r expected
+
+  let test_001 () : bool =
+    let nums = Cons 1 (Nil) in
+    let expected = Cons 2 (Nil) in
+    let r = find_the_score_of_all_prefixes_of_an_array_list nums in
+    lists_equal r expected
+
+  let test_002 () : bool =
+    let nums = Cons 1000000000 (Nil) in
+    let expected = Cons 2000000000 (Nil) in
+    let r = find_the_score_of_all_prefixes_of_an_array_list nums in
+    lists_equal r expected
+
+  let test_003 () : bool =
+    let nums = Cons 1 (Cons 1 (Cons 2 (Cons 4 (Cons 8 (Cons 16 (Nil)))))) in
+    let expected = Cons 2 (Cons 4 (Cons 8 (Cons 16 (Cons 32 (Cons 64 (Nil)))))) in
+    let r = find_the_score_of_all_prefixes_of_an_array_list nums in
+    lists_equal r expected
+
+  let test_004 () : bool =
+    let nums = Cons 2 (Cons 3 (Cons 7 (Cons 5 (Cons 10 (Nil))))) in
+    let expected = Cons 4 (Cons 10 (Cons 24 (Cons 36 (Cons 56 (Nil))))) in
+    let r = find_the_score_of_all_prefixes_of_an_array_list nums in
+    lists_equal r expected
+
+  let test_005 () : bool =
+    let nums = Cons 1 (Cons 2 (Cons 4 (Cons 8 (Cons 16 (Cons 32 (Cons 64 (Cons 128 (Cons 256 (Cons 512 (Nil)))))))))) in
+    let expected = Cons 2 (Cons 6 (Cons 14 (Cons 30 (Cons 62 (Cons 126 (Cons 254 (Cons 510 (Cons 1022 (Cons 2046 (Nil)))))))))) in
+    let r = find_the_score_of_all_prefixes_of_an_array_list nums in
+    lists_equal r expected
+
+  let test_006 () : bool =
+    let nums = Cons 5 (Cons 5 (Cons 5 (Cons 5 (Cons 5 (Nil))))) in
+    let expected = Cons 10 (Cons 20 (Cons 30 (Cons 40 (Cons 50 (Nil))))) in
+    let r = find_the_score_of_all_prefixes_of_an_array_list nums in
+    lists_equal r expected
+
+  let test_007 () : bool =
+    let nums = Cons 10 (Cons 9 (Cons 8 (Cons 7 (Cons 6 (Cons 5 (Cons 4 (Cons 3 (Cons 2 (Cons 1 (Nil)))))))))) in
+    let expected = Cons 20 (Cons 39 (Cons 57 (Cons 74 (Cons 90 (Cons 105 (Cons 119 (Cons 132 (Cons 144 (Cons 155 (Nil)))))))))) in
+    let r = find_the_score_of_all_prefixes_of_an_array_list nums in
+    lists_equal r expected
+
+  let test_008 () : bool =
+    let nums = Cons 1 (Cons 2 (Cons 3 (Cons 4 (Cons 5 (Nil))))) in
+    let expected = Cons 2 (Cons 6 (Cons 12 (Cons 20 (Cons 30 (Nil))))) in
+    let r = find_the_score_of_all_prefixes_of_an_array_list nums in
+    lists_equal r expected
+
+  let test_009 () : bool =
+    let nums = Cons 10 (Cons 9 (Cons 8 (Cons 7 (Cons 6 (Nil))))) in
+    let expected = Cons 20 (Cons 39 (Cons 57 (Cons 74 (Cons 90 (Nil))))) in
+    let r = find_the_score_of_all_prefixes_of_an_array_list nums in
+    lists_equal r expected
+
+  let test_010 () : bool =
+    let nums = Cons 1 (Cons 2 (Cons 3 (Cons 4 (Cons 5 (Cons 6 (Cons 7 (Cons 8 (Cons 9 (Cons 10 (Nil)))))))))) in
+    let expected = Cons 2 (Cons 6 (Cons 12 (Cons 20 (Cons 30 (Cons 42 (Cons 56 (Cons 72 (Cons 90 (Cons 110 (Nil)))))))))) in
+    let r = find_the_score_of_all_prefixes_of_an_array_list nums in
+    lists_equal r expected
+
+  let test_012 () : bool =
+    let nums = Cons 1000000000 (Cons 1000000000 (Cons 1000000000 (Cons 1000000000 (Cons 1000000000 (Nil))))) in
+    let expected = Cons 2000000000 (Cons 4000000000 (Cons 6000000000 (Cons 8000000000 (Cons 10000000000 (Nil))))) in
+    let r = find_the_score_of_all_prefixes_of_an_array_list nums in
+    lists_equal r expected
+
+  let test_013 () : bool =
+    let nums = Cons 1 (Cons 10 (Cons 100 (Cons 1000 (Cons 10000 (Cons 100000 (Cons 1000000 (Nil))))))) in
+    let expected = Cons 2 (Cons 22 (Cons 222 (Cons 2222 (Cons 22222 (Cons 222222 (Cons 2222222 (Nil))))))) in
+    let r = find_the_score_of_all_prefixes_of_an_array_list nums in
+    lists_equal r expected
+
+  let test_015 () : bool =
+    let nums = Cons 1 (Cons 3 (Cons 5 (Cons 7 (Cons 9 (Cons 11 (Cons 13 (Cons 15 (Cons 17 (Cons 19 (Cons 21 (Cons 23 (Cons 25 (Cons 27 (Cons 29 (Cons 31 (Nil)))))))))))))))) in
+    let expected = Cons 2 (Cons 8 (Cons 18 (Cons 32 (Cons 50 (Cons 72 (Cons 98 (Cons 128 (Cons 162 (Cons 200 (Cons 242 (Cons 288 (Cons 338 (Cons 392 (Cons 450 (Cons 512 (Nil)))))))))))))))) in
+    let r = find_the_score_of_all_prefixes_of_an_array_list nums in
+    lists_equal r expected
+
+  let test_016 () : bool =
+    let nums = Cons 100 (Cons 200 (Cons 300 (Cons 400 (Cons 500 (Cons 600 (Cons 700 (Cons 800 (Cons 900 (Cons 1000 (Nil)))))))))) in
+    let expected = Cons 200 (Cons 600 (Cons 1200 (Cons 2000 (Cons 3000 (Cons 4200 (Cons 5600 (Cons 7200 (Cons 9000 (Cons 11000 (Nil)))))))))) in
+    let r = find_the_score_of_all_prefixes_of_an_array_list nums in
+    lists_equal r expected
+
+  let test_017 () : bool =
+    let nums = Cons 1 (Cons 2 (Cons 4 (Cons 8 (Cons 16 (Cons 32 (Cons 64 (Cons 128 (Cons 256 (Cons 512 (Nil)))))))))) in
+    let expected = Cons 2 (Cons 6 (Cons 14 (Cons 30 (Cons 62 (Cons 126 (Cons 254 (Cons 510 (Cons 1022 (Cons 2046 (Nil)))))))))) in
+    let r = find_the_score_of_all_prefixes_of_an_array_list nums in
+    lists_equal r expected
+
+  let test_018 () : bool =
+    let nums = Cons 1 (Cons 2 (Cons 4 (Cons 8 (Cons 16 (Cons 32 (Cons 64 (Cons 128 (Cons 256 (Cons 512 (Cons 1024 (Cons 2048 (Cons 4096 (Cons 8192 (Cons 16384 (Cons 32768 (Cons 65536 (Cons 131072 (Cons 262144 (Cons 524288 (Nil)))))))))))))))))))) in
+    let expected = Cons 2 (Cons 6 (Cons 14 (Cons 30 (Cons 62 (Cons 126 (Cons 254 (Cons 510 (Cons 1022 (Cons 2046 (Cons 4094 (Cons 8190 (Cons 16382 (Cons 32766 (Cons 65534 (Cons 131070 (Cons 262142 (Cons 524286 (Cons 1048574 (Cons 2097150 (Nil)))))))))))))))))))) in
+    let r = find_the_score_of_all_prefixes_of_an_array_list nums in
+    lists_equal r expected
+
+  let test_021 () : bool =
+    let nums = Cons 31 (Cons 41 (Cons 59 (Cons 26 (Cons 53 (Cons 58 (Cons 97 (Cons 93 (Cons 23 (Cons 84 (Cons 62 (Cons 64 (Cons 33 (Cons 83 (Cons 27 (Nil))))))))))))))) in
+    let expected = Cons 62 (Cons 144 (Cons 262 (Cons 347 (Cons 459 (Cons 576 (Cons 770 (Cons 960 (Cons 1080 (Cons 1261 (Cons 1420 (Cons 1581 (Cons 1711 (Cons 1891 (Cons 2015 (Nil))))))))))))))) in
+    let r = find_the_score_of_all_prefixes_of_an_array_list nums in
+    lists_equal r expected
+
+  let test_022 () : bool =
+    let nums = Cons 9 (Cons 8 (Cons 7 (Cons 6 (Cons 5 (Cons 4 (Cons 3 (Cons 2 (Cons 1 (Cons 1 (Cons 2 (Cons 3 (Cons 4 (Cons 5 (Cons 6 (Cons 7 (Cons 8 (Cons 9 (Cons 1 (Cons 1 (Nil)))))))))))))))))))) in
+    let expected = Cons 18 (Cons 35 (Cons 51 (Cons 66 (Cons 80 (Cons 93 (Cons 105 (Cons 116 (Cons 126 (Cons 136 (Cons 147 (Cons 159 (Cons 172 (Cons 186 (Cons 201 (Cons 217 (Cons 234 (Cons 252 (Cons 262 (Cons 272 (Nil)))))))))))))))))))) in
+    let r = find_the_score_of_all_prefixes_of_an_array_list nums in
+    lists_equal r expected
+
+  let test_023 () : bool =
+    let nums = Cons 100 (Cons 200 (Cons 100 (Cons 300 (Cons 200 (Cons 400 (Cons 300 (Cons 500 (Cons 400 (Cons 600 (Cons 500 (Cons 700 (Cons 600 (Cons 800 (Cons 700 (Nil))))))))))))))) in
+    let expected = Cons 200 (Cons 600 (Cons 900 (Cons 1500 (Cons 2000 (Cons 2800 (Cons 3500 (Cons 4500 (Cons 5400 (Cons 6600 (Cons 7700 (Cons 9100 (Cons 10400 (Cons 12000 (Cons 13500 (Nil))))))))))))))) in
+    let r = find_the_score_of_all_prefixes_of_an_array_list nums in
+    lists_equal r expected
+
+  let run_tests () : bool =
+    if test_000 () then
+    if test_001 () then
+    if test_002 () then
+    if test_003 () then
+    if test_004 () then
+    if test_005 () then
+    if test_006 () then
+    if test_007 () then
+    if test_008 () then
+    if test_009 () then
+    if test_010 () then
+    if test_012 () then
+    if test_013 () then
+    if test_015 () then
+    if test_016 () then
+    if test_017 () then
+    if test_018 () then
+    if test_021 () then
+    if test_022 () then
+    if test_023 () then
+      true
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+
+end

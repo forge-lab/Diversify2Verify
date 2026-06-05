@@ -1,0 +1,593 @@
+module DividePlayersIntoTeamsOfEqualSkill_Array_Stage3_Recursive
+
+  use int.Int
+  use int.EuclideanDivision
+  use array.Array
+  use array.Init
+
+  predicate skill_domain (skill: array int) =
+    length skill >= 2 /\
+    length skill <= 100000 /\
+    (exists teams: int. teams >= 1 /\ length skill = 2 * teams) /\
+    (forall i: int. 0 <= i < length skill -> 1 <= skill[i] <= 1000)
+
+  predicate valid_pairing (skill: array int) (mate: array int) (target_sum: int) =
+    length mate = length skill /\
+    (forall i: int. 0 <= i < length skill ->
+      0 <= mate[i] < length skill /\
+      mate[i] <> i /\
+      mate[mate[i]] = i /\
+      skill[i] + skill[mate[i]] = target_sum)
+
+  let rec function chemistry_sum_from
+      (skill: array int) (mate: array int) (target_sum: int) (i: int) : int
+    requires { valid_pairing skill mate target_sum }
+    requires { 0 <= i <= length skill }
+    variant  { length skill - i }
+  =
+    if i = length skill then 0
+    else
+      (if i < mate[i] then skill[i] * skill[mate[i]] else 0) +
+      chemistry_sum_from skill mate target_sum (i + 1)
+
+  let rec function count_value_from (skill: array int) (value: int) (i: int) : int
+    requires { 0 <= i <= length skill }
+    variant  { length skill - i }
+  =
+    if i = length skill then 0
+    else
+      (if skill[i] = value then 1 else 0) +
+      count_value_from skill value (i + 1)
+
+  predicate count_table_matches_from (skill: array int) (counts: array int) (i: int) =
+    length counts = 1001 /\
+    0 <= i <= length skill /\
+    (forall v: int. 0 <= v <= 1000 ->
+      counts[v] = count_value_from skill v i)
+
+  predicate min_suffix_result (skill: array int) (i: int) (current: int) (result: int) =
+    0 <= i <= length skill /\
+    result <= current /\
+    (forall k: int. i <= k < length skill -> result <= skill[k]) /\
+    (result = current \/ exists k: int. i <= k < length skill /\ result = skill[k])
+
+  predicate max_suffix_result (skill: array int) (i: int) (current: int) (result: int) =
+    0 <= i <= length skill /\
+    current <= result /\
+    (forall k: int. i <= k < length skill -> skill[k] <= result) /\
+    (result = current \/ exists k: int. i <= k < length skill /\ result = skill[k])
+
+  predicate pairing_counts_ok_from (counts: array int) (target: int) (s: int) =
+    length counts = 1001 /\
+    1 <= s <= 1001 /\
+    (forall v: int. s <= v <= 1000 ->
+      let partner = target - v in
+      if partner < 1 || partner > 1000 then
+        counts[v] = 0
+      else if v < partner then
+        counts[v] = counts[partner]
+      else if v = partner then
+        mod counts[v] 2 = 0
+      else
+        true)
+
+  predicate count_table_matches (skill: array int) (counts: array int) =
+    count_table_matches_from skill counts 0
+
+  let lemma pairing_counts_ok_tail
+      (counts: array int) (target s: int)
+    requires { pairing_counts_ok_from counts target s }
+    requires { 1 <= s < 1001 }
+    ensures  { pairing_counts_ok_from counts target (s + 1) }
+  =
+    assert { length counts = 1001 };
+    assert { 1 <= s + 1 <= 1001 };
+    assert { forall v: int. s + 1 <= v <= 1000 -> s <= v <= 1000 }
+
+  let lemma pairing_counts_ok_no_tail
+      (counts: array int) (target s: int)
+    requires { length counts = 1001 }
+    requires { 1 <= s < 1001 }
+    requires { not pairing_counts_ok_from counts target (s + 1) }
+    ensures  { not pairing_counts_ok_from counts target s }
+  =
+    assert { forall v: int. s + 1 <= v <= 1000 -> s <= v <= 1000 }
+
+  let lemma pairing_counts_ok_extend_low
+      (counts: array int) (target s: int)
+    requires { length counts = 1001 }
+    requires { 1 <= s < 1001 }
+    requires { target - s < 1 }
+    requires { counts[s] = 0 }
+    requires { pairing_counts_ok_from counts target (s + 1) }
+    ensures  { pairing_counts_ok_from counts target s }
+  =
+    assert { 1 <= s <= 1001 };
+    assert { forall v: int. s < v <= 1000 ->
+      let partner = target - v in
+      if partner < 1 || partner > 1000 then
+        counts[v] = 0
+      else if v < partner then
+        counts[v] = counts[partner]
+      else if v = partner then
+        mod counts[v] 2 = 0
+      else
+        true };
+    assert { forall v: int. s <= v <= 1000 ->
+      let partner = target - v in
+      if partner < 1 || partner > 1000 then
+        counts[v] = 0
+      else if v < partner then
+        counts[v] = counts[partner]
+      else if v = partner then
+        mod counts[v] 2 = 0
+      else
+        true }
+
+  let lemma pairing_counts_ok_low_nonzero_false
+      (counts: array int) (target s: int)
+    requires { length counts = 1001 }
+    requires { 1 <= s < 1001 }
+    requires { target - s < 1 }
+    requires { counts[s] <> 0 }
+    ensures  { not pairing_counts_ok_from counts target s }
+  = ()
+
+  let lemma pairing_counts_ok_extend_high
+      (counts: array int) (target s: int)
+    requires { length counts = 1001 }
+    requires { 1 <= s < 1001 }
+    requires { target - s > 1000 }
+    requires { counts[s] = 0 }
+    requires { pairing_counts_ok_from counts target (s + 1) }
+    ensures  { pairing_counts_ok_from counts target s }
+  =
+    assert { 1 <= s <= 1001 };
+    assert { forall v: int. s < v <= 1000 ->
+      let partner = target - v in
+      if partner < 1 || partner > 1000 then
+        counts[v] = 0
+      else if v < partner then
+        counts[v] = counts[partner]
+      else if v = partner then
+        mod counts[v] 2 = 0
+      else
+        true };
+    assert { forall v: int. s <= v <= 1000 ->
+      let partner = target - v in
+      if partner < 1 || partner > 1000 then
+        counts[v] = 0
+      else if v < partner then
+        counts[v] = counts[partner]
+      else if v = partner then
+        mod counts[v] 2 = 0
+      else
+        true }
+
+  let lemma pairing_counts_ok_high_nonzero_false
+      (counts: array int) (target s: int)
+    requires { length counts = 1001 }
+    requires { 1 <= s < 1001 }
+    requires { target - s > 1000 }
+    requires { counts[s] <> 0 }
+    ensures  { not pairing_counts_ok_from counts target s }
+  = ()
+
+  let lemma pairing_counts_ok_extend_pair
+      (counts: array int) (target s: int)
+    requires { length counts = 1001 }
+    requires { 1 <= s < 1001 }
+    requires { s < target - s <= 1000 }
+    requires { counts[s] = counts[target - s] }
+    requires { pairing_counts_ok_from counts target (s + 1) }
+    ensures  { pairing_counts_ok_from counts target s }
+  =
+    assert { 1 <= s <= 1001 };
+    assert { forall v: int. s < v <= 1000 ->
+      let partner = target - v in
+      if partner < 1 || partner > 1000 then
+        counts[v] = 0
+      else if v < partner then
+        counts[v] = counts[partner]
+      else if v = partner then
+        mod counts[v] 2 = 0
+      else
+        true };
+    assert { forall v: int. s <= v <= 1000 ->
+      let partner = target - v in
+      if partner < 1 || partner > 1000 then
+        counts[v] = 0
+      else if v < partner then
+        counts[v] = counts[partner]
+      else if v = partner then
+        mod counts[v] 2 = 0
+      else
+        true }
+
+  let lemma pairing_counts_ok_pair_mismatch_false
+      (counts: array int) (target s: int)
+    requires { length counts = 1001 }
+    requires { 1 <= s < 1001 }
+    requires { s < target - s <= 1000 }
+    requires { counts[s] <> counts[target - s] }
+    ensures  { not pairing_counts_ok_from counts target s }
+  = ()
+
+  let lemma pairing_counts_ok_extend_self
+      (counts: array int) (target s: int)
+    requires { length counts = 1001 }
+    requires { 1 <= s < 1001 }
+    requires { s = target - s }
+    requires { mod counts[s] 2 = 0 }
+    requires { pairing_counts_ok_from counts target (s + 1) }
+    ensures  { pairing_counts_ok_from counts target s }
+  =
+    assert { 1 <= s <= 1001 };
+    assert { forall v: int. s < v <= 1000 ->
+      let partner = target - v in
+      if partner < 1 || partner > 1000 then
+        counts[v] = 0
+      else if v < partner then
+        counts[v] = counts[partner]
+      else if v = partner then
+        mod counts[v] 2 = 0
+      else
+        true };
+    assert { forall v: int. s <= v <= 1000 ->
+      let partner = target - v in
+      if partner < 1 || partner > 1000 then
+        counts[v] = 0
+      else if v < partner then
+        counts[v] = counts[partner]
+      else if v = partner then
+        mod counts[v] 2 = 0
+      else
+        true }
+
+  let lemma pairing_counts_ok_self_odd_false
+      (counts: array int) (target s: int)
+    requires { length counts = 1001 }
+    requires { 1 <= s < 1001 }
+    requires { s = target - s }
+    requires { mod counts[s] 2 <> 0 }
+    ensures  { not pairing_counts_ok_from counts target s }
+  = ()
+
+  let lemma pairing_counts_ok_extend_skip
+      (counts: array int) (target s: int)
+    requires { length counts = 1001 }
+    requires { 1 <= s < 1001 }
+    requires { 1 <= target - s < s }
+    requires { pairing_counts_ok_from counts target (s + 1) }
+    ensures  { pairing_counts_ok_from counts target s }
+  =
+    assert { 1 <= s <= 1001 };
+    assert { forall v: int. s < v <= 1000 ->
+      let partner = target - v in
+      if partner < 1 || partner > 1000 then
+        counts[v] = 0
+      else if v < partner then
+        counts[v] = counts[partner]
+      else if v = partner then
+        mod counts[v] 2 = 0
+      else
+        true };
+    assert { forall v: int. s <= v <= 1000 ->
+      let partner = target - v in
+      if partner < 1 || partner > 1000 then
+        counts[v] = 0
+      else if v < partner then
+        counts[v] = counts[partner]
+      else if v = partner then
+        mod counts[v] 2 = 0
+      else
+        true }
+
+  predicate full_min_result (skill: array int) (minimum: int) =
+    length skill > 0 /\
+    (forall k: int. 0 <= k < length skill -> minimum <= skill[k]) /\
+    (exists k: int. 0 <= k < length skill /\ minimum = skill[k])
+
+  predicate full_max_result (skill: array int) (maximum: int) =
+    length skill > 0 /\
+    (forall k: int. 0 <= k < length skill -> skill[k] <= maximum) /\
+    (exists k: int. 0 <= k < length skill /\ maximum = skill[k])
+
+  let lemma suffix_min_with_initial_gives_full_min
+      (skill: array int) (minimum: int)
+    requires { length skill > 0 }
+    requires { min_suffix_result skill 1 skill[0] minimum }
+    ensures  { full_min_result skill minimum }
+  = ()
+
+  let lemma suffix_max_with_initial_gives_full_max
+      (skill: array int) (maximum: int)
+    requires { length skill > 0 }
+    requires { max_suffix_result skill 1 skill[0] maximum }
+    ensures  { full_max_result skill maximum }
+  = ()
+
+  let lemma valid_pairing_uses_min_plus_max_target
+      (skill: array int) (mate: array int) (target_sum minimum maximum: int)
+    requires { skill_domain skill }
+    requires { valid_pairing skill mate target_sum }
+    requires { full_min_result skill minimum }
+    requires { full_max_result skill maximum }
+    ensures  { target_sum = minimum + maximum }
+  = ()
+
+  let lemma valid_pairing_implies_pairing_counts_ok
+      (skill counts mate: array int) (target: int)
+    requires { skill_domain skill }
+    requires { count_table_matches skill counts }
+    requires { valid_pairing skill mate target }
+    ensures  { pairing_counts_ok_from counts target 1 }
+  = ()
+
+  let lemma pairing_counts_ok_materializes_valid_pairing
+      (skill counts: array int) (target: int)
+    requires { skill_domain skill }
+    requires { count_table_matches skill counts }
+    requires { pairing_counts_ok_from counts target 1 }
+    ensures  { exists mate: array int. valid_pairing skill mate target }
+  = ()
+
+  let lemma no_pairing_counts_ok_excludes_valid_pairing
+      (skill counts: array int) (target minimum maximum: int)
+    requires { skill_domain skill }
+    requires { count_table_matches skill counts }
+    requires { full_min_result skill minimum }
+    requires { full_max_result skill maximum }
+    requires { target = minimum + maximum }
+    requires { not pairing_counts_ok_from counts target 1 }
+    ensures  { not (exists mate: array int. exists target_sum: int.
+      valid_pairing skill mate target_sum) }
+  = ()
+
+  let rec function chemistry_by_value_from (counts: array int) (target: int) (s: int) : int
+    requires { length counts = 1001 }
+    requires { 1 <= s <= 1001 }
+    variant  { 1001 - s }
+  =
+    if s > 1000 then
+      0
+    else
+      let partner = target - s in
+      if partner < 1 then
+        chemistry_by_value_from counts target (s + 1)
+      else if partner > 1000 then
+        chemistry_by_value_from counts target (s + 1)
+      else if s < partner then
+        counts[s] * s * partner +
+        chemistry_by_value_from counts target (s + 1)
+      else if s = partner then
+        div counts[s] 2 * s * partner +
+        chemistry_by_value_from counts target (s + 1)
+      else
+        chemistry_by_value_from counts target (s + 1)
+
+  let lemma chemistry_by_value_materializes_pairing_sum
+      (skill counts: array int) (target total: int)
+    requires { skill_domain skill }
+    requires { count_table_matches skill counts }
+    requires { pairing_counts_ok_from counts target 1 }
+    requires { total = chemistry_by_value_from counts target 1 }
+    ensures  { exists mate: array int.
+      valid_pairing skill mate target /\
+      total = chemistry_sum_from skill mate target 0 }
+  = ()
+
+  let rec min_skill_from (skill: array int) (i: int) (current: int) : int
+    requires { 0 <= i <= length skill }
+    ensures  { min_suffix_result skill i current result }
+    variant  { length skill - i }
+  =
+    if i >= length skill then
+      current
+    else if skill[i] < current then
+      min_skill_from skill (i + 1) skill[i]
+    else
+      min_skill_from skill (i + 1) current
+
+  let rec max_skill_from (skill: array int) (i: int) (current: int) : int
+    requires { 0 <= i <= length skill }
+    ensures  { max_suffix_result skill i current result }
+    variant  { length skill - i }
+  =
+    if i >= length skill then
+      current
+    else if skill[i] > current then
+      max_skill_from skill (i + 1) skill[i]
+    else
+      max_skill_from skill (i + 1) current
+
+  let rec fill_counts (skill: array int) (i: int) (counts: array int) : unit
+    requires { 0 <= i <= length skill }
+    requires { length counts = 1001 }
+    requires { forall k: int. 0 <= k < length skill -> 1 <= skill[k] <= 1000 }
+    variant  { length skill - i }
+    ensures  { length counts = 1001 }
+    ensures  { forall v: int. 0 <= v <= 1000 ->
+      counts[v] = (old counts)[v] + count_value_from skill v i }
+  =
+    if i >= length skill then
+      assert { forall v: int. 0 <= v <= 1000 ->
+        count_value_from skill v i = 0 }
+    else
+      let value = skill[i] in
+      assert { 1 <= value <= 1000 };
+      counts[value] <- counts[value] + 1;
+      assert { forall v: int. 0 <= v <= 1000 ->
+        counts[v] = (old counts)[v] + (if v = value then 1 else 0) };
+      fill_counts skill (i + 1) counts
+
+  let rec chemistry_from_counts (counts: array int) (target: int) (s: int) : int
+    requires { length counts = 1001 }
+    requires { 1 <= s <= 1001 }
+    ensures  { result <> -1 -> pairing_counts_ok_from counts target s }
+    ensures  { result <> -1 -> result = chemistry_by_value_from counts target s }
+    ensures  { result = -1 -> not pairing_counts_ok_from counts target s }
+    variant  { 1001 - s }
+  =
+    if s > 1000 then
+      0
+    else
+      let partner = target - s in
+      assert { s < 1001 };
+      if partner < 1 then
+        if counts[s] = 0 then
+          let tail = chemistry_from_counts counts target (s + 1) in
+          if tail = -1 then begin
+            assert { not pairing_counts_ok_from counts target (s + 1) };
+            pairing_counts_ok_no_tail counts target s;
+            assert { not pairing_counts_ok_from counts target s };
+            -1
+          end else begin
+            assert { pairing_counts_ok_from counts target (s + 1) };
+            assert { tail = chemistry_by_value_from counts target (s + 1) };
+            pairing_counts_ok_extend_low counts target s;
+            assert { chemistry_by_value_from counts target s =
+              chemistry_by_value_from counts target (s + 1) };
+            tail
+          end
+        else begin
+          pairing_counts_ok_low_nonzero_false counts target s;
+          assert { not pairing_counts_ok_from counts target s };
+          -1
+        end
+      else if partner > 1000 then
+        if counts[s] = 0 then
+          let tail = chemistry_from_counts counts target (s + 1) in
+          if tail = -1 then begin
+            assert { not pairing_counts_ok_from counts target (s + 1) };
+            pairing_counts_ok_no_tail counts target s;
+            assert { not pairing_counts_ok_from counts target s };
+            -1
+          end else begin
+            assert { pairing_counts_ok_from counts target (s + 1) };
+            assert { tail = chemistry_by_value_from counts target (s + 1) };
+            pairing_counts_ok_extend_high counts target s;
+            assert { chemistry_by_value_from counts target s =
+              chemistry_by_value_from counts target (s + 1) };
+            tail
+          end
+        else begin
+          pairing_counts_ok_high_nonzero_false counts target s;
+          assert { not pairing_counts_ok_from counts target s };
+          -1
+        end
+      else if s < partner then
+        if counts[s] = counts[partner] then
+          let tail = chemistry_from_counts counts target (s + 1) in
+          if tail = -1 then begin
+            assert { not pairing_counts_ok_from counts target (s + 1) };
+            pairing_counts_ok_no_tail counts target s;
+            assert { not pairing_counts_ok_from counts target s };
+            -1
+          end else begin
+            assert { pairing_counts_ok_from counts target (s + 1) };
+            assert { tail = chemistry_by_value_from counts target (s + 1) };
+            pairing_counts_ok_extend_pair counts target s;
+            assert { chemistry_by_value_from counts target s =
+              counts[s] * s * partner +
+              chemistry_by_value_from counts target (s + 1) };
+            counts[s] * s * partner + tail
+          end
+        else begin
+          pairing_counts_ok_pair_mismatch_false counts target s;
+          assert { not pairing_counts_ok_from counts target s };
+          -1
+        end
+      else if s = partner then
+        if mod counts[s] 2 = 0 then
+          let tail = chemistry_from_counts counts target (s + 1) in
+          if tail = -1 then begin
+            assert { not pairing_counts_ok_from counts target (s + 1) };
+            pairing_counts_ok_no_tail counts target s;
+            assert { not pairing_counts_ok_from counts target s };
+            -1
+          end else begin
+            assert { pairing_counts_ok_from counts target (s + 1) };
+            assert { tail = chemistry_by_value_from counts target (s + 1) };
+            pairing_counts_ok_extend_self counts target s;
+            assert { chemistry_by_value_from counts target s =
+              div counts[s] 2 * s * partner +
+              chemistry_by_value_from counts target (s + 1) };
+            div counts[s] 2 * s * partner + tail
+          end
+        else begin
+          pairing_counts_ok_self_odd_false counts target s;
+          assert { not pairing_counts_ok_from counts target s };
+          -1
+        end
+      else
+        let tail = chemistry_from_counts counts target (s + 1) in
+        if tail = -1 then begin
+          assert { not pairing_counts_ok_from counts target (s + 1) };
+          pairing_counts_ok_no_tail counts target s;
+          assert { not pairing_counts_ok_from counts target s };
+          -1
+        end else begin
+          assert { pairing_counts_ok_from counts target (s + 1) };
+          assert { tail = chemistry_by_value_from counts target (s + 1) };
+          pairing_counts_ok_extend_skip counts target s;
+          assert { chemistry_by_value_from counts target s =
+            chemistry_by_value_from counts target (s + 1) };
+          tail
+        end
+
+  let divide_players_into_teams_of_equal_skill_array (skill: array int) : int
+    requires { skill_domain skill }
+    ensures  {
+      result = -1 <->
+      not (exists mate: array int. exists target_sum: int.
+        valid_pairing skill mate target_sum)
+    }
+    ensures  {
+      result <> -1 ->
+      exists mate: array int. exists target_sum: int.
+        valid_pairing skill mate target_sum /\
+        result = chemistry_sum_from skill mate target_sum 0
+    }
+  =
+    if length skill < 2 then begin
+      assert { false };
+      -1
+    end else if mod (length skill) 2 <> 0 then begin
+      assert { false };
+      -1
+    end else begin
+      assert { length skill >= 2 };
+      assert { 0 <= 0 < length skill };
+      assert { forall k: int. 0 <= k < length skill -> 1 <= skill[k] <= 1000 };
+      let minimum = min_skill_from skill 1 skill[0] in
+      suffix_min_with_initial_gives_full_min skill minimum;
+      let maximum = max_skill_from skill 1 skill[0] in
+      suffix_max_with_initial_gives_full_max skill maximum;
+      let target = minimum + maximum in
+      let counts = make 1001 0 in
+      assert { length counts = 1001 };
+      assert { forall v: int. 0 <= v <= 1000 -> counts[v] = 0 };
+      fill_counts skill 0 counts;
+      assert { count_table_matches skill counts };
+      let result = chemistry_from_counts counts target 1 in
+      if result = -1 then begin
+        assert { not pairing_counts_ok_from counts target 1 };
+        no_pairing_counts_ok_excludes_valid_pairing skill counts target minimum maximum;
+        assert { not (exists mate: array int. exists target_sum: int.
+          valid_pairing skill mate target_sum) };
+        result
+      end else begin
+        assert { result <> -1 };
+        assert { pairing_counts_ok_from counts target 1 };
+        assert { result = chemistry_by_value_from counts target 1 };
+        pairing_counts_ok_materializes_valid_pairing skill counts target;
+        chemistry_by_value_materializes_pairing_sum skill counts target result;
+        assert { exists mate: array int. exists target_sum: int.
+          valid_pairing skill mate target_sum /\
+          result = chemistry_sum_from skill mate target_sum 0 };
+        result
+      end
+    end
+
+end

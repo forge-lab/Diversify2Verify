@@ -1,0 +1,169 @@
+module MaximumScoreOfAGoodSubarray_Array_Stage3_Imperative
+
+  use int.Int
+  use array.Array
+  use array.Init
+  use ref.Ref
+
+  predicate valid_good_subarray (nums: array int) (k: int) (l: int) (r: int) =
+    0 <= l <= k <= r < length nums
+
+  predicate segment_min (nums: array int) (l: int) (r: int) (m: int) =
+    0 <= l <= r < length nums /\
+    (forall i: int. l <= i <= r -> m <= nums[i]) /\
+    (exists p: int. l <= p <= r /\ nums[p] = m)
+
+  function segment_score (l: int) (r: int) (m: int) : int =
+    m * (r - l + 1)
+
+  predicate maximum_good_subarray_score (nums: array int) (k: int) (score: int) =
+    (exists l r m: int.
+       valid_good_subarray nums k l r /\
+       segment_min nums l r m /\
+       score = segment_score l r m) /\
+    (forall l r m: int.
+       valid_good_subarray nums k l r ->
+       segment_min nums l r m ->
+       segment_score l r m <= score)
+
+  predicate all_width_scores_bounded
+    (nums: array int) (k: int) (width: int) (bound: int) =
+    forall l r m: int.
+      valid_good_subarray nums k l r ->
+      segment_min nums l r m ->
+      r - l + 1 <= width ->
+      segment_score l r m <= bound
+
+  predicate greedy_width_minimality
+    (nums: array int) (k: int) (width: int) (current_min: int) =
+    forall l r m: int.
+      valid_good_subarray nums k l r ->
+      segment_min nums l r m ->
+      r - l + 1 = width ->
+      m <= current_min
+
+  let maximum_score_of_a_good_subarray_array (nums: array int) (k: int) : int
+    requires { 1 <= length nums }
+    requires { 0 <= k < length nums }
+    requires { forall i: int. 0 <= i < length nums -> 1 <= nums[i] <= 20000 }
+    ensures  { maximum_good_subarray_score nums k result }
+  =
+    let n = length nums in
+    let left = ref k in
+    let right = ref k in
+    let current_min = ref nums[k] in
+    let best = ref nums[k] in
+    while !left > 0 || !right < n - 1 do
+      invariant { n = length nums }
+      invariant { 1 <= n }
+      invariant { 0 <= k < n }
+      invariant { 0 <= !left <= k <= !right < n }
+      invariant { segment_min nums !left !right !current_min }
+      invariant { 1 <= !current_min <= 20000 }
+      invariant { 1 <= !right - !left + 1 <= n }
+      invariant { greedy_width_minimality nums k (!right - !left + 1) !current_min }
+      invariant { all_width_scores_bounded nums k (!right - !left + 1) !best }
+      invariant { exists l r m: int.
+        valid_good_subarray nums k l r /\
+        segment_min nums l r m /\
+        !best = segment_score l r m }
+      invariant { segment_score !left !right !current_min <= !best }
+      invariant { 1 <= !best }
+      variant   { !left + (n - 1 - !right) }
+
+      let old_width = !right - !left + 1 in
+      let old_best = !best in
+      assert { 1 <= old_width <= n };
+      if !left = 0 then begin
+        assert { !right < n - 1 };
+        right := !right + 1
+      end else if !right = n - 1 then begin
+        assert { 0 < !left };
+        left := !left - 1
+      end else if nums[!left - 1] < nums[!right + 1] then begin
+        assert { 0 < !left };
+        assert { !right < n - 1 };
+        right := !right + 1
+      end else begin
+        assert { 0 < !left };
+        assert { !right < n - 1 };
+        left := !left - 1
+      end;
+
+      assert { 0 <= !left <= k <= !right < n };
+      assert { !right - !left + 1 = old_width + 1 };
+
+      if nums[!left] < !current_min then
+        current_min := nums[!left];
+      if nums[!right] < !current_min then
+        current_min := nums[!right];
+
+      assert { segment_min nums !left !right !current_min };
+      assert { greedy_width_minimality nums k (!right - !left + 1) !current_min };
+
+      let width = !right - !left + 1 in
+      assert { 1 <= width <= n };
+      assert { width = old_width + 1 };
+      let score = !current_min * width in
+      assert { score = segment_score !left !right !current_min };
+      assert {
+        forall l r m: int.
+          valid_good_subarray nums k l r ->
+          segment_min nums l r m ->
+          r - l + 1 <= old_width ->
+          segment_score l r m <= old_best
+      };
+      assert {
+        forall l r m: int.
+          valid_good_subarray nums k l r ->
+          segment_min nums l r m ->
+          r - l + 1 = width ->
+          segment_score l r m <= score
+      };
+      if score > !best then
+        best := score;
+      assert { old_best <= !best };
+      assert { score <= !best };
+      assert { segment_score !left !right !current_min <= !best };
+      assert {
+        forall l r m: int.
+          valid_good_subarray nums k l r ->
+          segment_min nums l r m ->
+          r - l + 1 <= old_width ->
+          segment_score l r m <= !best
+      };
+      assert {
+        forall l r m: int.
+          valid_good_subarray nums k l r ->
+          segment_min nums l r m ->
+          r - l + 1 = width ->
+          segment_score l r m <= !best
+      };
+      assert {
+        forall l r m: int.
+          valid_good_subarray nums k l r ->
+          segment_min nums l r m ->
+          r - l + 1 <= width ->
+          segment_score l r m <= !best
+      };
+      assert { all_width_scores_bounded nums k width !best }
+    done;
+    assert { !left = 0 };
+    assert { !right = n - 1 };
+    assert { !right - !left + 1 = n };
+    assert {
+      forall l r m: int.
+        valid_good_subarray nums k l r ->
+        segment_min nums l r m ->
+        r - l + 1 <= n
+    };
+    assert {
+      forall l r m: int.
+        valid_good_subarray nums k l r ->
+        segment_min nums l r m ->
+        segment_score l r m <= !best
+    };
+    assert { maximum_good_subarray_score nums k !best };
+    !best
+
+end

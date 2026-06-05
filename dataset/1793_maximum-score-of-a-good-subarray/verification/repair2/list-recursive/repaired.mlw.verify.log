@@ -1,0 +1,540 @@
+== Stage 1: first prover on whole file ==
+Running in /Users/rubenm/Desktop/Diversify2Verify/codex-runs/repair2-split2/stage3a-rerepair/1793_maximum-score-of-a-good-subarray/list-recursive/maximum_score_of_a_good_subarray_list_stage3_dc96370c_stage3/repaired/generated/why3: why3 session create -o /Users/rubenm/Desktop/Diversify2Verify/codex-runs/repair2-split2/stage3a-rerepair/1793_maximum-score-of-a-good-subarray/list-recursive/maximum_score_of_a_good_subarray_list_stage3_dc96370c_stage3/repaired/generated/why3/.why3_sessions/repaired_stage1 -P Z3,4.8.6 -t 10 -m 8192 repaired.mlw
+Session created successfully
+Running in /Users/rubenm/Desktop/Diversify2Verify/codex-runs/repair2-split2/stage3a-rerepair/1793_maximum-score-of-a-good-subarray/list-recursive/maximum_score_of_a_good_subarray_list_stage3_dc96370c_stage3/repaired/generated/why3: why3 bench /Users/rubenm/Desktop/Diversify2Verify/codex-runs/repair2-split2/stage3a-rerepair/1793_maximum-score-of-a-good-subarray/list-recursive/maximum_score_of_a_good_subarray_list_stage3_dc96370c_stage3/repaired/generated/why3/.why3_sessions/repaired_stage1
+Progress: 13/1/0                       Progress: 12/2/0                       Progress: 11/3/0                       Progress: 10/4/0                       Progress: 9/5/0                       Progress: 8/6/0                       Progress: 8/0/1                       Progress: 7/1/1                       Progress: 6/2/1                       Progress: 5/3/1                       Progress: 4/4/1                       Progress: 3/5/1                       Progress: 3/0/1                       Progress: 2/1/1                       Progress: 1/2/1                       Progress: 0/3/1                       Progress: 0/1/2                       Progress: 0/0/1                       
+Replay completed, saving session... done
+== Stage 1 stats ==
+= Statistics for session /Users/rubenm/Desktop/Diversify2Verify/codex-runs/repair2-split2/stage3a-rerepair/1793_maximum-score-of-a-good-subarray/list-recursive/maximum_score_of_a_good_subarray_list_stage3_dc96370c_stage3/repaired/generated/why3/.why3_sessions/repaired_stage1
+
+== Number of root goals ==
+  total: 14  proved: 12
+
+== Number of sub goals ==
+  total: 0  proved: 0
+
+== Goals not proved ==
+  +-- file [../../repaired.mlw]
+    +-- theory MaximumScoreOfAGoodSubarray_List_Spec
+      +-- goal best_with_right'vc
+      +-- goal best_with_left'vc
+  
+== Goals proved by only one prover ==
+  +-- file [../../repaired.mlw]
+    +-- theory MaximumScoreOfAGoodSubarray_List_Spec
+      +-- goal take_rev_acc_shape_nil_bridge'vc: Z3 4.8.6
+      +-- goal min_on_interval_unique'vc: Z3 4.8.6
+      +-- goal fixed_interval_current_bound'vc: Z3 4.8.6
+      +-- goal best_right_nil_bridge'vc: Z3 4.8.6
+      +-- goal best_right_cons_bridge'vc: Z3 4.8.6
+      +-- goal best_left_nil_bridge'vc: Z3 4.8.6
+      +-- goal best_left_cons_bridge'vc: Z3 4.8.6
+      +-- goal min_int'vc: Z3 4.8.6
+      +-- goal max_int'vc: Z3 4.8.6
+      +-- goal drop'vc: Z3 4.8.6
+      +-- goal take_rev_acc'vc: Z3 4.8.6
+      +-- goal maximum_score_of_a_good_subarray_list'vc: Z3 4.8.6
+  
+1 session(s) read, with a total of 14 proof goals.
+== Unproved root goals after first prover ==
+MaximumScoreOfAGoodSubarray_List_Spec	best_with_right'vc
+MaximumScoreOfAGoodSubarray_List_Spec	best_with_left'vc
+== Stage 1: trying remaining goals with prover Alt-Ergo,2.4.0 ==
+---- stage1 | prover: Alt-Ergo,2.4.0 | theory: MaximumScoreOfAGoodSubarray_List_Spec | goal: best_with_right'vc ----
+File repaired.mlw:
+Goal best_with_right'vc.
+Prover result is: Timeout (10.00s, 23065 steps).
+---- stage1 | prover: Alt-Ergo,2.4.0 | theory: MaximumScoreOfAGoodSubarray_List_Spec | goal: best_with_left'vc ----
+File repaired.mlw:
+Goal best_with_left'vc.
+Prover result is: Timeout (10.00s, 85509 steps).
+Remaining after prover Alt-Ergo,2.4.0: 2
+== Stage 1: trying remaining goals with prover CVC4,1.8 ==
+---- stage1 | prover: CVC4,1.8 | theory: MaximumScoreOfAGoodSubarray_List_Spec | goal: best_with_right'vc ----
+File repaired.mlw:
+Goal best_with_right'vc.
+Prover result is: Unknown (unknown + incomplete) (0.38s, 117643 steps).
+---- stage1 | prover: CVC4,1.8 | theory: MaximumScoreOfAGoodSubarray_List_Spec | goal: best_with_left'vc ----
+File repaired.mlw:
+Goal best_with_left'vc.
+Prover result is: Timeout (10.00s, 791315 steps).
+Remaining after prover CVC4,1.8: 2
+== Goals still unproved after stage 1 ==
+MaximumScoreOfAGoodSubarray_List_Spec	best_with_right'vc
+MaximumScoreOfAGoodSubarray_List_Spec	best_with_left'vc
+== Stage 2: split_vc on unproved goal ==
+Target theory: MaximumScoreOfAGoodSubarray_List_Spec
+Target goal  : best_with_right'vc
+---- stage2 | prover: Z3,4.8.6 | theory: MaximumScoreOfAGoodSubarray_List_Spec | goal: best_with_right'vc ----
+Transforms: split_vc
+File "repaired.mlw", line 283, characters 13-57:
+Sub-goal Assertion of goal best_with_right'vc.
+Prover result is: Valid (0.01s, 41821 steps).
+
+File "repaired.mlw", line 284, characters 4-67:
+Sub-goal Precondition of goal best_with_right'vc.
+Prover result is: Valid (0.01s, 35420 steps).
+
+File "repaired.mlw", line 284, characters 4-67:
+Sub-goal Precondition of goal best_with_right'vc.
+Prover result is: Valid (0.01s, 35637 steps).
+
+File "repaired.mlw", line 284, characters 4-67:
+Sub-goal Precondition of goal best_with_right'vc.
+Prover result is: Valid (0.01s, 39110 steps).
+
+File "repaired.mlw", line 285, characters 13-66:
+Sub-goal Assertion of goal best_with_right'vc.
+Prover result is: Valid (0.01s, 2103 steps).
+
+File "repaired.mlw", line 288, characters 17-36:
+Sub-goal Assertion of goal best_with_right'vc.
+Prover result is: Valid (0.01s, 40083 steps).
+
+File "repaired.mlw", line 289, characters 8-64:
+Sub-goal Precondition of goal best_with_right'vc.
+Prover result is: Valid (0.01s, 10287 steps).
+
+File "repaired.mlw", line 289, characters 8-64:
+Sub-goal Precondition of goal best_with_right'vc.
+Prover result is: Valid (0.01s, 2229 steps).
+
+File "repaired.mlw", line 290, characters 17-57:
+Sub-goal Assertion of goal best_with_right'vc.
+Prover result is: Valid (0.01s, 2229 steps).
+
+File "repaired.mlw", line 293, characters 17-37:
+Sub-goal Assertion of goal best_with_right'vc.
+Prover result is: Valid (0.01s, 43843 steps).
+
+File "repaired.mlw", line 295, characters 17-59:
+Sub-goal Assertion of goal best_with_right'vc.
+Prover result is: Valid (0.01s, 53893 steps).
+
+File "repaired.mlw", line 296, characters 17-75:
+Sub-goal Assertion of goal best_with_right'vc.
+Prover result is: Timeout (10.00s, 275673435 steps).
+
+File "repaired.mlw", line 298, characters 10-72:
+Sub-goal Variant decrease of goal best_with_right'vc.
+Prover result is: Valid (0.01s, 44802 steps).
+
+File "repaired.mlw", line 298, characters 10-72:
+Sub-goal Precondition of goal best_with_right'vc.
+Prover result is: Valid (0.01s, 2402 steps).
+
+File "repaired.mlw", line 300, characters 8-74:
+Sub-goal Precondition of goal best_with_right'vc.
+Prover result is: Valid (0.01s, 42194 steps).
+
+File "repaired.mlw", line 300, characters 8-74:
+Sub-goal Precondition of goal best_with_right'vc.
+Prover result is: Valid (0.01s, 2461 steps).
+
+File "repaired.mlw", line 300, characters 8-74:
+Sub-goal Precondition of goal best_with_right'vc.
+Prover result is: Valid (0.01s, 2466 steps).
+
+File "repaired.mlw", line 300, characters 8-74:
+Sub-goal Precondition of goal best_with_right'vc.
+Prover result is: Valid (0.01s, 2471 steps).
+
+File "repaired.mlw", line 300, characters 8-74:
+Sub-goal Precondition of goal best_with_right'vc.
+Prover result is: Valid (0.01s, 3550 steps).
+
+File "repaired.mlw", line 300, characters 8-74:
+Sub-goal Precondition of goal best_with_right'vc.
+Prover result is: Valid (0.01s, 3547 steps).
+
+File "repaired.mlw", line 301, characters 17-48:
+Sub-goal Assertion of goal best_with_right'vc.
+Prover result is: Valid (0.01s, 2461 steps).
+
+File "repaired.mlw", line 279, characters 15-48:
+Sub-goal Postcondition of goal best_with_right'vc.
+Prover result is: Valid (0.03s, 188689 steps).
+---- stage2 | prover: Alt-Ergo,2.4.0 | theory: MaximumScoreOfAGoodSubarray_List_Spec | goal: best_with_right'vc ----
+Transforms: split_vc
+File "repaired.mlw", line 283, characters 13-57:
+Sub-goal Assertion of goal best_with_right'vc.
+Prover result is: Valid (0.01s, 15 steps).
+
+File "repaired.mlw", line 284, characters 4-67:
+Sub-goal Precondition of goal best_with_right'vc.
+Prover result is: Valid (0.01s, 8 steps).
+
+File "repaired.mlw", line 284, characters 4-67:
+Sub-goal Precondition of goal best_with_right'vc.
+Prover result is: Valid (0.01s, 9 steps).
+
+File "repaired.mlw", line 284, characters 4-67:
+Sub-goal Precondition of goal best_with_right'vc.
+Prover result is: Valid (0.01s, 11 steps).
+
+File "repaired.mlw", line 285, characters 13-66:
+Sub-goal Assertion of goal best_with_right'vc.
+Prover result is: Valid (0.01s, 6 steps).
+
+File "repaired.mlw", line 288, characters 17-36:
+Sub-goal Assertion of goal best_with_right'vc.
+Prover result is: Valid (0.01s, 78 steps).
+
+File "repaired.mlw", line 289, characters 8-64:
+Sub-goal Precondition of goal best_with_right'vc.
+Prover result is: Valid (0.01s, 10 steps).
+
+File "repaired.mlw", line 289, characters 8-64:
+Sub-goal Precondition of goal best_with_right'vc.
+Prover result is: Valid (0.01s, 11 steps).
+
+File "repaired.mlw", line 290, characters 17-57:
+Sub-goal Assertion of goal best_with_right'vc.
+Prover result is: Valid (0.01s, 12 steps).
+
+File "repaired.mlw", line 293, characters 17-37:
+Sub-goal Assertion of goal best_with_right'vc.
+Prover result is: Valid (0.02s, 240 steps).
+
+File "repaired.mlw", line 295, characters 17-59:
+Sub-goal Assertion of goal best_with_right'vc.
+Prover result is: Valid (0.04s, 834 steps).
+
+File "repaired.mlw", line 296, characters 17-75:
+Sub-goal Assertion of goal best_with_right'vc.
+Prover result is: Timeout (10.00s, 54313 steps).
+
+File "repaired.mlw", line 298, characters 10-72:
+Sub-goal Variant decrease of goal best_with_right'vc.
+Prover result is: Valid (0.01s, 217 steps).
+
+File "repaired.mlw", line 298, characters 10-72:
+Sub-goal Precondition of goal best_with_right'vc.
+Prover result is: Valid (0.01s, 16 steps).
+
+File "repaired.mlw", line 300, characters 8-74:
+Sub-goal Precondition of goal best_with_right'vc.
+Prover result is: Valid (0.01s, 38 steps).
+
+File "repaired.mlw", line 300, characters 8-74:
+Sub-goal Precondition of goal best_with_right'vc.
+Prover result is: Valid (0.01s, 24 steps).
+
+File "repaired.mlw", line 300, characters 8-74:
+Sub-goal Precondition of goal best_with_right'vc.
+Prover result is: Valid (0.01s, 24 steps).
+
+File "repaired.mlw", line 300, characters 8-74:
+Sub-goal Precondition of goal best_with_right'vc.
+Prover result is: Valid (0.01s, 24 steps).
+
+File "repaired.mlw", line 300, characters 8-74:
+Sub-goal Precondition of goal best_with_right'vc.
+Prover result is: Valid (0.01s, 24 steps).
+
+File "repaired.mlw", line 300, characters 8-74:
+Sub-goal Precondition of goal best_with_right'vc.
+Prover result is: Valid (0.01s, 24 steps).
+
+File "repaired.mlw", line 301, characters 17-48:
+Sub-goal Assertion of goal best_with_right'vc.
+Prover result is: Valid (0.01s, 24 steps).
+
+File "repaired.mlw", line 279, characters 15-48:
+Sub-goal Postcondition of goal best_with_right'vc.
+Prover result is: Valid (0.05s, 799 steps).
+---- stage2 | prover: CVC4,1.8 | theory: MaximumScoreOfAGoodSubarray_List_Spec | goal: best_with_right'vc ----
+Transforms: split_vc
+File "repaired.mlw", line 283, characters 13-57:
+Sub-goal Assertion of goal best_with_right'vc.
+Prover result is: Valid (0.05s, 17495 steps).
+
+File "repaired.mlw", line 284, characters 4-67:
+Sub-goal Precondition of goal best_with_right'vc.
+Prover result is: Valid (0.02s, 6187 steps).
+
+File "repaired.mlw", line 284, characters 4-67:
+Sub-goal Precondition of goal best_with_right'vc.
+Prover result is: Valid (0.02s, 6231 steps).
+
+File "repaired.mlw", line 284, characters 4-67:
+Sub-goal Precondition of goal best_with_right'vc.
+Prover result is: Valid (0.02s, 6467 steps).
+
+File "repaired.mlw", line 285, characters 13-66:
+Sub-goal Assertion of goal best_with_right'vc.
+Prover result is: Valid (0.02s, 5819 steps).
+
+File "repaired.mlw", line 288, characters 17-36:
+Sub-goal Assertion of goal best_with_right'vc.
+Prover result is: Valid (0.02s, 7807 steps).
+
+File "repaired.mlw", line 289, characters 8-64:
+Sub-goal Precondition of goal best_with_right'vc.
+Prover result is: Valid (0.02s, 6436 steps).
+
+File "repaired.mlw", line 289, characters 8-64:
+Sub-goal Precondition of goal best_with_right'vc.
+Prover result is: Valid (0.02s, 6195 steps).
+
+File "repaired.mlw", line 290, characters 17-57:
+Sub-goal Assertion of goal best_with_right'vc.
+Prover result is: Valid (0.02s, 6200 steps).
+
+File "repaired.mlw", line 293, characters 17-37:
+Sub-goal Assertion of goal best_with_right'vc.
+Prover result is: Valid (0.03s, 8750 steps).
+
+File "repaired.mlw", line 295, characters 17-59:
+Sub-goal Assertion of goal best_with_right'vc.
+Prover result is: Valid (0.04s, 10948 steps).
+
+File "repaired.mlw", line 296, characters 17-75:
+Sub-goal Assertion of goal best_with_right'vc.
+Prover result is: Timeout (10.00s, 416338 steps).
+
+File "repaired.mlw", line 298, characters 10-72:
+Sub-goal Variant decrease of goal best_with_right'vc.
+Prover result is: Valid (0.03s, 8273 steps).
+
+File "repaired.mlw", line 298, characters 10-72:
+Sub-goal Precondition of goal best_with_right'vc.
+Prover result is: Valid (0.02s, 6574 steps).
+
+File "repaired.mlw", line 300, characters 8-74:
+Sub-goal Precondition of goal best_with_right'vc.
+Prover result is: Valid (0.03s, 8198 steps).
+
+File "repaired.mlw", line 300, characters 8-74:
+Sub-goal Precondition of goal best_with_right'vc.
+Prover result is: Valid (0.02s, 6771 steps).
+
+File "repaired.mlw", line 300, characters 8-74:
+Sub-goal Precondition of goal best_with_right'vc.
+Prover result is: Valid (0.02s, 6774 steps).
+
+File "repaired.mlw", line 300, characters 8-74:
+Sub-goal Precondition of goal best_with_right'vc.
+Prover result is: Valid (0.02s, 6777 steps).
+
+File "repaired.mlw", line 300, characters 8-74:
+Sub-goal Precondition of goal best_with_right'vc.
+Prover result is: Valid (0.02s, 6791 steps).
+
+File "repaired.mlw", line 300, characters 8-74:
+Sub-goal Precondition of goal best_with_right'vc.
+Prover result is: Valid (0.02s, 6796 steps).
+
+File "repaired.mlw", line 301, characters 17-48:
+Sub-goal Assertion of goal best_with_right'vc.
+Prover result is: Valid (0.02s, 6771 steps).
+
+File "repaired.mlw", line 279, characters 15-48:
+Sub-goal Postcondition of goal best_with_right'vc.
+Prover result is: Timeout (10.00s, 1199109 steps).
+== Stage 2: split_vc on unproved goal ==
+Target theory: MaximumScoreOfAGoodSubarray_List_Spec
+Target goal  : best_with_left'vc
+---- stage2 | prover: Z3,4.8.6 | theory: MaximumScoreOfAGoodSubarray_List_Spec | goal: best_with_left'vc ----
+Transforms: split_vc
+File "repaired.mlw", line 317, characters 13-65:
+Sub-goal Assertion of goal best_with_left'vc.
+Prover result is: Valid (0.01s, 37563 steps).
+
+File "repaired.mlw", line 318, characters 20-76:
+Sub-goal Precondition of goal best_with_left'vc.
+Prover result is: Valid (0.01s, 2193 steps).
+
+File "repaired.mlw", line 321, characters 17-22:
+Sub-goal Assertion of goal best_with_left'vc.
+Prover result is: Valid (0.01s, 43555 steps).
+
+File "repaired.mlw", line 322, characters 8-47:
+Sub-goal Precondition of goal best_with_left'vc.
+Prover result is: Valid (0.01s, 2339 steps).
+
+File "repaired.mlw", line 322, characters 8-47:
+Sub-goal Precondition of goal best_with_left'vc.
+Prover result is: Valid (0.01s, 2344 steps).
+
+File "repaired.mlw", line 323, characters 17-50:
+Sub-goal Assertion of goal best_with_left'vc.
+Prover result is: Valid (0.01s, 2344 steps).
+
+File "repaired.mlw", line 326, characters 17-22:
+Sub-goal Assertion of goal best_with_left'vc.
+Prover result is: Valid (0.01s, 46398 steps).
+
+File "repaired.mlw", line 327, characters 17-37:
+Sub-goal Assertion of goal best_with_left'vc.
+Prover result is: Valid (0.01s, 46327 steps).
+
+File "repaired.mlw", line 329, characters 17-59:
+Sub-goal Assertion of goal best_with_left'vc.
+Prover result is: Valid (0.01s, 53717 steps).
+
+File "repaired.mlw", line 330, characters 17-78:
+Sub-goal Assertion of goal best_with_left'vc.
+Prover result is: Timeout (10.00s, 409635071 steps).
+
+File "repaired.mlw", line 332, characters 10-75:
+Sub-goal Variant decrease of goal best_with_left'vc.
+Prover result is: Valid (0.01s, 49695 steps).
+
+File "repaired.mlw", line 332, characters 10-75:
+Sub-goal Precondition of goal best_with_left'vc.
+Prover result is: Valid (0.01s, 2513 steps).
+
+File "repaired.mlw", line 334, characters 8-67:
+Sub-goal Precondition of goal best_with_left'vc.
+Prover result is: Valid (0.01s, 2565 steps).
+
+File "repaired.mlw", line 334, characters 8-67:
+Sub-goal Precondition of goal best_with_left'vc.
+Prover result is: Valid (0.01s, 2570 steps).
+
+File "repaired.mlw", line 334, characters 8-67:
+Sub-goal Precondition of goal best_with_left'vc.
+Prover result is: Valid (0.01s, 2575 steps).
+
+File "repaired.mlw", line 334, characters 8-67:
+Sub-goal Precondition of goal best_with_left'vc.
+Prover result is: Valid (0.01s, 3684 steps).
+
+File "repaired.mlw", line 334, characters 8-67:
+Sub-goal Precondition of goal best_with_left'vc.
+Prover result is: Valid (0.01s, 3681 steps).
+
+File "repaired.mlw", line 335, characters 17-45:
+Sub-goal Assertion of goal best_with_left'vc.
+Prover result is: Valid (0.01s, 2570 steps).
+
+File "repaired.mlw", line 314, characters 15-45:
+Sub-goal Postcondition of goal best_with_left'vc.
+Prover result is: Valid (0.01s, 47578 steps).
+---- stage2 | prover: Alt-Ergo,2.4.0 | theory: MaximumScoreOfAGoodSubarray_List_Spec | goal: best_with_left'vc ----
+Transforms: split_vc
+File "repaired.mlw", line 317, characters 13-65:
+Sub-goal Assertion of goal best_with_left'vc.
+Prover result is: Valid (0.01s, 20 steps).
+
+File "repaired.mlw", line 318, characters 20-76:
+Sub-goal Precondition of goal best_with_left'vc.
+Prover result is: Valid (0.01s, 4 steps).
+
+File "repaired.mlw", line 321, characters 17-22:
+Sub-goal Assertion of goal best_with_left'vc.
+Prover result is: Valid (0.01s, 41 steps).
+
+File "repaired.mlw", line 322, characters 8-47:
+Sub-goal Precondition of goal best_with_left'vc.
+Prover result is: Valid (0.01s, 10 steps).
+
+File "repaired.mlw", line 322, characters 8-47:
+Sub-goal Precondition of goal best_with_left'vc.
+Prover result is: Valid (0.01s, 10 steps).
+
+File "repaired.mlw", line 323, characters 17-50:
+Sub-goal Assertion of goal best_with_left'vc.
+Prover result is: Valid (0.01s, 12 steps).
+
+File "repaired.mlw", line 326, characters 17-22:
+Sub-goal Assertion of goal best_with_left'vc.
+Prover result is: Valid (0.01s, 55 steps).
+
+File "repaired.mlw", line 327, characters 17-37:
+Sub-goal Assertion of goal best_with_left'vc.
+Prover result is: Valid (0.01s, 126 steps).
+
+File "repaired.mlw", line 329, characters 17-59:
+Sub-goal Assertion of goal best_with_left'vc.
+Prover result is: Valid (0.02s, 424 steps).
+
+File "repaired.mlw", line 330, characters 17-78:
+Sub-goal Assertion of goal best_with_left'vc.
+Prover result is: Valid (6.59s, 82880 steps).
+
+File "repaired.mlw", line 332, characters 10-75:
+Sub-goal Variant decrease of goal best_with_left'vc.
+Prover result is: Valid (0.01s, 111 steps).
+
+File "repaired.mlw", line 332, characters 10-75:
+Sub-goal Precondition of goal best_with_left'vc.
+Prover result is: Valid (0.01s, 18 steps).
+
+File "repaired.mlw", line 334, characters 8-67:
+Sub-goal Precondition of goal best_with_left'vc.
+Prover result is: Valid (0.01s, 24 steps).
+
+File "repaired.mlw", line 334, characters 8-67:
+Sub-goal Precondition of goal best_with_left'vc.
+Prover result is: Valid (0.01s, 24 steps).
+
+File "repaired.mlw", line 334, characters 8-67:
+Sub-goal Precondition of goal best_with_left'vc.
+Prover result is: Valid (0.01s, 24 steps).
+
+File "repaired.mlw", line 334, characters 8-67:
+Sub-goal Precondition of goal best_with_left'vc.
+Prover result is: Valid (0.01s, 24 steps).
+
+File "repaired.mlw", line 334, characters 8-67:
+Sub-goal Precondition of goal best_with_left'vc.
+Prover result is: Valid (0.01s, 24 steps).
+
+File "repaired.mlw", line 335, characters 17-45:
+Sub-goal Assertion of goal best_with_left'vc.
+Prover result is: Valid (0.01s, 26 steps).
+
+File "repaired.mlw", line 314, characters 15-45:
+Sub-goal Postcondition of goal best_with_left'vc.
+Prover result is: Valid (0.15s, 2355 steps).
+Solved with split_vc using prover: Alt-Ergo,2.4.0
+== Goals still unproved after stage 2 (split_vc) ==
+MaximumScoreOfAGoodSubarray_List_Spec	best_with_right'vc
+== Stage 3: split_vc + inline_all on still-unproved goal ==
+Target theory: MaximumScoreOfAGoodSubarray_List_Spec
+Target goal  : best_with_right'vc
+---- stage3 | prover: Z3,4.8.6 | theory: MaximumScoreOfAGoodSubarray_List_Spec | goal: best_with_right'vc ----
+Transforms: split_vc inline_all
+File "repaired.mlw", line 283, characters 13-57:
+Sub-goal Assertion of goal best_with_right'vc.
+Prover result is: Timeout (10.00s, 75031942 steps).
+
+File "repaired.mlw", line 284, characters 4-67:
+Sub-goal Precondition of goal best_with_right'vc.
+Prover result is: Valid (0.01s, 16603 steps).
+
+File "repaired.mlw", line 284, characters 4-67:
+Sub-goal Precondition of goal best_with_right'vc.
+Prover result is: Valid (0.01s, 9664 steps).
+
+File "repaired.mlw", line 284, characters 4-67:
+Sub-goal Precondition of goal best_with_right'vc.
+Prover result is: Valid (0.01s, 16817 steps).
+
+File "repaired.mlw", line 285, characters 13-66:
+Sub-goal Assertion of goal best_with_right'vc.
+Prover result is: Timeout (10.00s, 131167637 steps).
+
+File "repaired.mlw", line 288, characters 17-36:
+Sub-goal Assertion of goal best_with_right'vc.
+Prover result is: Valid (0.01s, 47724 steps).
+
+File "repaired.mlw", line 289, characters 8-64:
+Sub-goal Precondition of goal best_with_right'vc.
+Prover result is: Valid (0.01s, 68894 steps).
+Infrastructure issue in stage 3 with prover Z3,4.8.6; aborting rest of stage 3.
+== Final summary ==
+Unproved root goals after first prover : 2
+Remaining failures after split_vc      : 1
+Remaining failures after stage 3       : 1
+Detailed logs stored in                : /Users/rubenm/Desktop/Diversify2Verify/codex-runs/repair2-split2/stage3a-rerepair/1793_maximum-score-of-a-good-subarray/list-recursive/maximum_score_of_a_good_subarray_list_stage3_dc96370c_stage3/repaired/generated/why3/.why3_sessions/repaired_logs
+Still unproved goals:
+MaximumScoreOfAGoodSubarray_List_Spec	best_with_right'vc
+VERIFY_RESULT: FAILURE
+VERIFY_REASON: unproved_goals_remain
+VERIFY_STAGE: stage3
+VERIFY_ROOT_TOTAL: 14
+VERIFY_ROOT_PROVED: 13
+VERIFY_ROOT_REMAINING: 1

@@ -1,0 +1,1157 @@
+== Stage 1: first prover on whole file ==
+Running in /Users/rubenm/Desktop/Diversify2Verify/codex-runs/dataset-merge-verification/stage3a-repair/870_advantage-shuffle/array-imperative/advantage_shuffle_array_stage3_db9a16ee_stage3/generated/why3: why3 session create -o /Users/rubenm/Desktop/Diversify2Verify/codex-runs/dataset-merge-verification/stage3a-repair/870_advantage-shuffle/array-imperative/advantage_shuffle_array_stage3_db9a16ee_stage3/generated/why3/.why3_sessions/repaired_stage1 -P Z3,4.8.6 -t 10 -m 8192 repaired.mlw
+Session created successfully
+Running in /Users/rubenm/Desktop/Diversify2Verify/codex-runs/dataset-merge-verification/stage3a-repair/870_advantage-shuffle/array-imperative/advantage_shuffle_array_stage3_db9a16ee_stage3/generated/why3: why3 bench /Users/rubenm/Desktop/Diversify2Verify/codex-runs/dataset-merge-verification/stage3a-repair/870_advantage-shuffle/array-imperative/advantage_shuffle_array_stage3_db9a16ee_stage3/generated/why3/.why3_sessions/repaired_stage1
+Progress: 3/1/0                       Progress: 2/2/0                       Progress: 1/3/0                       Progress: 0/4/0                       Progress: 0/1/2                       Progress: 0/0/2                       Progress: 0/0/1                       
+Replay completed, saving session... done
+== Stage 1 stats ==
+= Statistics for session /Users/rubenm/Desktop/Diversify2Verify/codex-runs/dataset-merge-verification/stage3a-repair/870_advantage-shuffle/array-imperative/advantage_shuffle_array_stage3_db9a16ee_stage3/generated/why3/.why3_sessions/repaired_stage1
+
+== Number of root goals ==
+  total: 4  proved: 2
+
+== Number of sub goals ==
+  total: 0  proved: 0
+
+== Goals not proved ==
+  +-- file [../../repaired.mlw]
+    +-- theory AdvantageShuffle_Array_Stage3_Imperative
+      +-- goal sort_array_ascending'vc
+      +-- goal advantage_shuffle_array'vc
+  
+== Goals proved by only one prover ==
+  +-- file [../../repaired.mlw]
+    +-- theory AdvantageShuffle_Array_Stage3_Imperative
+      +-- goal copy_array'vc: Z3 4.8.6
+      +-- goal sort_values_with_indices'vc: Z3 4.8.6
+  
+1 session(s) read, with a total of 4 proof goals.
+== Unproved root goals after first prover ==
+AdvantageShuffle_Array_Stage3_Imperative	sort_array_ascending'vc
+AdvantageShuffle_Array_Stage3_Imperative	advantage_shuffle_array'vc
+== Stage 1: trying remaining goals with prover Alt-Ergo,2.4.0 ==
+---- stage1 | prover: Alt-Ergo,2.4.0 | theory: AdvantageShuffle_Array_Stage3_Imperative | goal: sort_array_ascending'vc ----
+File repaired.mlw:
+Goal sort_array_ascending'vc.
+Prover result is: Valid (4.58s, 54145 steps).
+Solved in stage 1 using prover: Alt-Ergo,2.4.0
+---- stage1 | prover: Alt-Ergo,2.4.0 | theory: AdvantageShuffle_Array_Stage3_Imperative | goal: advantage_shuffle_array'vc ----
+File repaired.mlw:
+Goal advantage_shuffle_array'vc.
+Prover result is: Timeout (10.00s, 80756 steps).
+Remaining after prover Alt-Ergo,2.4.0: 1
+== Stage 1: trying remaining goals with prover CVC4,1.8 ==
+---- stage1 | prover: CVC4,1.8 | theory: AdvantageShuffle_Array_Stage3_Imperative | goal: advantage_shuffle_array'vc ----
+File repaired.mlw:
+Goal advantage_shuffle_array'vc.
+Prover result is: Timeout (8.63s, 702429 steps).
+Remaining after prover CVC4,1.8: 1
+== Goals still unproved after stage 1 ==
+AdvantageShuffle_Array_Stage3_Imperative	advantage_shuffle_array'vc
+== Stage 2: split_vc on unproved goal ==
+Target theory: AdvantageShuffle_Array_Stage3_Imperative
+Target goal  : advantage_shuffle_array'vc
+---- stage2 | prover: Z3,4.8.6 | theory: AdvantageShuffle_Array_Stage3_Imperative | goal: advantage_shuffle_array'vc ----
+Transforms: split_vc
+File "repaired.mlw", line 147, characters 13-36:
+Sub-goal Assertion of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.02s, 59438 steps).
+
+File "repaired.mlw", line 148, characters 13-38:
+Sub-goal Assertion of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.01s, 59553 steps).
+
+File "repaired.mlw", line 149, characters 13-64:
+Sub-goal Assertion of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.01s, 4284 steps).
+
+File "repaired.mlw", line 150, characters 17-25:
+Sub-goal Array creation size of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.01s, 57749 steps).
+
+File "repaired.mlw", line 154, characters 18-41:
+Sub-goal Loop invariant init of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.01s, 4325 steps).
+
+File "repaired.mlw", line 155, characters 18-41:
+Sub-goal Loop invariant init of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.01s, 4330 steps).
+
+File "repaired.mlw", line 156, characters 18-43:
+Sub-goal Loop invariant init of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.01s, 4335 steps).
+
+File "repaired.mlw", line 157, characters 18-35:
+Sub-goal Loop invariant init of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.01s, 4344 steps).
+
+File "repaired.mlw", line 158, characters 18-52:
+Sub-goal Loop invariant init of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.01s, 4349 steps).
+
+File "repaired.mlw", line 159, characters 18-69:
+Sub-goal Loop invariant init of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.01s, 4354 steps).
+
+File "repaired.mlw", line 160, characters 18-33:
+Sub-goal Loop invariant init of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.01s, 4359 steps).
+
+File "repaired.mlw", line 161, characters 18-34:
+Sub-goal Loop invariant init of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.01s, 4386 steps).
+
+File "repaired.mlw", line 162, characters 18-46:
+Sub-goal Loop invariant init of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.01s, 4421 steps).
+
+File "repaired.mlw", line 163, characters 18-37:
+Sub-goal Loop invariant init of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.01s, 4430 steps).
+
+File "repaired.mlw", line 164, characters 51-94:
+Sub-goal Loop invariant init of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.01s, 4473 steps).
+
+File "repaired.mlw", line 165, characters 18-33:
+Sub-goal Index in array bounds of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.01s, 66031 steps).
+
+File "repaired.mlw", line 166, characters 17-36:
+Sub-goal Index in array bounds of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.01s, 66103 steps).
+
+File "repaired.mlw", line 167, characters 15-36:
+Sub-goal Index in array bounds of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.01s, 66465 steps).
+
+File "repaired.mlw", line 167, characters 8-46:
+Sub-goal Index in array bounds of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.02s, 70720 steps).
+
+File "repaired.mlw", line 154, characters 18-41:
+Sub-goal Loop invariant preservation of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.01s, 5734 steps).
+
+File "repaired.mlw", line 155, characters 18-41:
+Sub-goal Loop invariant preservation of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.01s, 5739 steps).
+
+File "repaired.mlw", line 156, characters 18-43:
+Sub-goal Loop invariant preservation of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.01s, 5744 steps).
+
+File "repaired.mlw", line 157, characters 18-35:
+Sub-goal Loop invariant preservation of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.02s, 85750 steps).
+
+File "repaired.mlw", line 158, characters 18-52:
+Sub-goal Loop invariant preservation of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.01s, 5756 steps).
+
+File "repaired.mlw", line 159, characters 18-69:
+Sub-goal Loop invariant preservation of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.01s, 5761 steps).
+
+File "repaired.mlw", line 160, characters 18-33:
+Sub-goal Loop invariant preservation of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.02s, 86631 steps).
+
+File "repaired.mlw", line 161, characters 18-34:
+Sub-goal Loop invariant preservation of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.01s, 8359 steps).
+
+File "repaired.mlw", line 162, characters 18-46:
+Sub-goal Loop invariant preservation of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.01s, 19080 steps).
+
+File "repaired.mlw", line 163, characters 18-37:
+Sub-goal Loop invariant preservation of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.01s, 26922 steps).
+
+File "repaired.mlw", line 164, characters 51-94:
+Sub-goal Loop invariant preservation of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.02s, 97183 steps).
+
+File "repaired.mlw", line 170, characters 15-37:
+Sub-goal Index in array bounds of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.01s, 70386 steps).
+
+File "repaired.mlw", line 170, characters 8-47:
+Sub-goal Index in array bounds of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.02s, 70630 steps).
+
+File "repaired.mlw", line 154, characters 18-41:
+Sub-goal Loop invariant preservation of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.01s, 5744 steps).
+
+File "repaired.mlw", line 155, characters 18-41:
+Sub-goal Loop invariant preservation of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.01s, 5749 steps).
+
+File "repaired.mlw", line 156, characters 18-43:
+Sub-goal Loop invariant preservation of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.01s, 5754 steps).
+
+File "repaired.mlw", line 157, characters 18-35:
+Sub-goal Loop invariant preservation of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.02s, 85751 steps).
+
+File "repaired.mlw", line 158, characters 18-52:
+Sub-goal Loop invariant preservation of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.01s, 5766 steps).
+
+File "repaired.mlw", line 159, characters 18-69:
+Sub-goal Loop invariant preservation of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.01s, 5771 steps).
+
+File "repaired.mlw", line 160, characters 18-33:
+Sub-goal Loop invariant preservation of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.02s, 83309 steps).
+
+File "repaired.mlw", line 161, characters 18-34:
+Sub-goal Loop invariant preservation of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.02s, 86238 steps).
+
+File "repaired.mlw", line 162, characters 18-46:
+Sub-goal Loop invariant preservation of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.01s, 19142 steps).
+
+File "repaired.mlw", line 163, characters 18-37:
+Sub-goal Loop invariant preservation of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.01s, 26981 steps).
+
+File "repaired.mlw", line 164, characters 51-94:
+Sub-goal Loop invariant preservation of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.02s, 91231 steps).
+
+File "repaired.mlw", line 142, characters 15-58:
+Sub-goal Postcondition of goal advantage_shuffle_array'vc.
+Prover result is: Timeout (10.00s, 70003177 steps).
+
+File "repaired.mlw", line 142, characters 15-58:
+Goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.01s, 63485 steps).
+---- stage2 | prover: Alt-Ergo,2.4.0 | theory: AdvantageShuffle_Array_Stage3_Imperative | goal: advantage_shuffle_array'vc ----
+Transforms: split_vc
+File "repaired.mlw", line 147, characters 13-36:
+Sub-goal Assertion of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.01s, 18 steps).
+
+File "repaired.mlw", line 148, characters 13-38:
+Sub-goal Assertion of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.01s, 19 steps).
+
+File "repaired.mlw", line 149, characters 13-64:
+Sub-goal Assertion of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.01s, 20 steps).
+
+File "repaired.mlw", line 150, characters 17-25:
+Sub-goal Array creation size of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.01s, 20 steps).
+
+File "repaired.mlw", line 154, characters 18-41:
+Sub-goal Loop invariant init of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.01s, 23 steps).
+
+File "repaired.mlw", line 155, characters 18-41:
+Sub-goal Loop invariant init of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.01s, 23 steps).
+
+File "repaired.mlw", line 156, characters 18-43:
+Sub-goal Loop invariant init of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.01s, 23 steps).
+
+File "repaired.mlw", line 157, characters 18-35:
+Sub-goal Loop invariant init of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.01s, 23 steps).
+
+File "repaired.mlw", line 158, characters 18-52:
+Sub-goal Loop invariant init of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.01s, 23 steps).
+
+File "repaired.mlw", line 159, characters 18-69:
+Sub-goal Loop invariant init of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.01s, 23 steps).
+
+File "repaired.mlw", line 160, characters 18-33:
+Sub-goal Loop invariant init of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.01s, 23 steps).
+
+File "repaired.mlw", line 161, characters 18-34:
+Sub-goal Loop invariant init of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.01s, 24 steps).
+
+File "repaired.mlw", line 162, characters 18-46:
+Sub-goal Loop invariant init of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.01s, 26 steps).
+
+File "repaired.mlw", line 163, characters 18-37:
+Sub-goal Loop invariant init of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.01s, 27 steps).
+
+File "repaired.mlw", line 164, characters 51-94:
+Sub-goal Loop invariant init of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.01s, 29 steps).
+
+File "repaired.mlw", line 165, characters 18-33:
+Sub-goal Index in array bounds of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.01s, 41 steps).
+
+File "repaired.mlw", line 166, characters 17-36:
+Sub-goal Index in array bounds of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.01s, 41 steps).
+
+File "repaired.mlw", line 167, characters 15-36:
+Sub-goal Index in array bounds of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.01s, 43 steps).
+
+File "repaired.mlw", line 167, characters 8-46:
+Sub-goal Index in array bounds of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.01s, 83 steps).
+
+File "repaired.mlw", line 154, characters 18-41:
+Sub-goal Loop invariant preservation of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.01s, 54 steps).
+
+File "repaired.mlw", line 155, characters 18-41:
+Sub-goal Loop invariant preservation of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.01s, 54 steps).
+
+File "repaired.mlw", line 156, characters 18-43:
+Sub-goal Loop invariant preservation of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.01s, 54 steps).
+
+File "repaired.mlw", line 157, characters 18-35:
+Sub-goal Loop invariant preservation of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.01s, 54 steps).
+
+File "repaired.mlw", line 158, characters 18-52:
+Sub-goal Loop invariant preservation of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.01s, 54 steps).
+
+File "repaired.mlw", line 159, characters 18-69:
+Sub-goal Loop invariant preservation of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.01s, 54 steps).
+
+File "repaired.mlw", line 160, characters 18-33:
+Sub-goal Loop invariant preservation of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.01s, 55 steps).
+
+File "repaired.mlw", line 161, characters 18-34:
+Sub-goal Loop invariant preservation of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.01s, 56 steps).
+
+File "repaired.mlw", line 162, characters 18-46:
+Sub-goal Loop invariant preservation of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.01s, 56 steps).
+
+File "repaired.mlw", line 163, characters 18-37:
+Sub-goal Loop invariant preservation of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.01s, 57 steps).
+
+File "repaired.mlw", line 164, characters 51-94:
+Sub-goal Loop invariant preservation of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.01s, 160 steps).
+
+File "repaired.mlw", line 170, characters 15-37:
+Sub-goal Index in array bounds of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.01s, 43 steps).
+
+File "repaired.mlw", line 170, characters 8-47:
+Sub-goal Index in array bounds of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.01s, 84 steps).
+
+File "repaired.mlw", line 154, characters 18-41:
+Sub-goal Loop invariant preservation of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.01s, 54 steps).
+
+File "repaired.mlw", line 155, characters 18-41:
+Sub-goal Loop invariant preservation of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.01s, 54 steps).
+
+File "repaired.mlw", line 156, characters 18-43:
+Sub-goal Loop invariant preservation of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.01s, 54 steps).
+
+File "repaired.mlw", line 157, characters 18-35:
+Sub-goal Loop invariant preservation of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.01s, 54 steps).
+
+File "repaired.mlw", line 158, characters 18-52:
+Sub-goal Loop invariant preservation of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.01s, 54 steps).
+
+File "repaired.mlw", line 159, characters 18-69:
+Sub-goal Loop invariant preservation of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.01s, 54 steps).
+
+File "repaired.mlw", line 160, characters 18-33:
+Sub-goal Loop invariant preservation of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.01s, 54 steps).
+
+File "repaired.mlw", line 161, characters 18-34:
+Sub-goal Loop invariant preservation of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.01s, 55 steps).
+
+File "repaired.mlw", line 162, characters 18-46:
+Sub-goal Loop invariant preservation of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.01s, 57 steps).
+
+File "repaired.mlw", line 163, characters 18-37:
+Sub-goal Loop invariant preservation of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.01s, 57 steps).
+
+File "repaired.mlw", line 164, characters 51-94:
+Sub-goal Loop invariant preservation of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.02s, 206 steps).
+
+File "repaired.mlw", line 142, characters 15-58:
+Sub-goal Postcondition of goal advantage_shuffle_array'vc.
+Prover result is: Timeout (10.00s, 59379 steps).
+
+File "repaired.mlw", line 142, characters 15-58:
+Goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.01s, 22 steps).
+---- stage2 | prover: CVC4,1.8 | theory: AdvantageShuffle_Array_Stage3_Imperative | goal: advantage_shuffle_array'vc ----
+Transforms: split_vc
+File "repaired.mlw", line 147, characters 13-36:
+Sub-goal Assertion of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.04s, 12469 steps).
+
+File "repaired.mlw", line 148, characters 13-38:
+Sub-goal Assertion of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.03s, 12486 steps).
+
+File "repaired.mlw", line 149, characters 13-64:
+Sub-goal Assertion of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.03s, 12397 steps).
+
+File "repaired.mlw", line 150, characters 17-25:
+Sub-goal Array creation size of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.03s, 12511 steps).
+
+File "repaired.mlw", line 154, characters 18-41:
+Sub-goal Loop invariant init of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.03s, 12504 steps).
+
+File "repaired.mlw", line 155, characters 18-41:
+Sub-goal Loop invariant init of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.03s, 12507 steps).
+
+File "repaired.mlw", line 156, characters 18-43:
+Sub-goal Loop invariant init of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.03s, 12510 steps).
+
+File "repaired.mlw", line 157, characters 18-35:
+Sub-goal Loop invariant init of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.03s, 12513 steps).
+
+File "repaired.mlw", line 158, characters 18-52:
+Sub-goal Loop invariant init of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.03s, 12513 steps).
+
+File "repaired.mlw", line 159, characters 18-69:
+Sub-goal Loop invariant init of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.03s, 12516 steps).
+
+File "repaired.mlw", line 160, characters 18-33:
+Sub-goal Loop invariant init of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.03s, 12527 steps).
+
+File "repaired.mlw", line 161, characters 18-34:
+Sub-goal Loop invariant init of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.03s, 12560 steps).
+
+File "repaired.mlw", line 162, characters 18-46:
+Sub-goal Loop invariant init of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.03s, 12578 steps).
+
+File "repaired.mlw", line 163, characters 18-37:
+Sub-goal Loop invariant init of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.03s, 12585 steps).
+
+File "repaired.mlw", line 164, characters 51-94:
+Sub-goal Loop invariant init of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.03s, 12656 steps).
+
+File "repaired.mlw", line 165, characters 18-33:
+Sub-goal Index in array bounds of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.03s, 13051 steps).
+
+File "repaired.mlw", line 166, characters 17-36:
+Sub-goal Index in array bounds of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.03s, 13055 steps).
+
+File "repaired.mlw", line 167, characters 15-36:
+Sub-goal Index in array bounds of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.03s, 13112 steps).
+
+File "repaired.mlw", line 167, characters 8-46:
+Sub-goal Index in array bounds of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.04s, 15979 steps).
+
+File "repaired.mlw", line 154, characters 18-41:
+Sub-goal Loop invariant preservation of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.03s, 16291 steps).
+
+File "repaired.mlw", line 155, characters 18-41:
+Sub-goal Loop invariant preservation of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.03s, 16294 steps).
+
+File "repaired.mlw", line 156, characters 18-43:
+Sub-goal Loop invariant preservation of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.03s, 16297 steps).
+
+File "repaired.mlw", line 157, characters 18-35:
+Sub-goal Loop invariant preservation of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.04s, 16682 steps).
+
+File "repaired.mlw", line 158, characters 18-52:
+Sub-goal Loop invariant preservation of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.03s, 16313 steps).
+
+File "repaired.mlw", line 159, characters 18-69:
+Sub-goal Loop invariant preservation of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.03s, 16316 steps).
+
+File "repaired.mlw", line 160, characters 18-33:
+Sub-goal Loop invariant preservation of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.04s, 16734 steps).
+
+File "repaired.mlw", line 161, characters 18-34:
+Sub-goal Loop invariant preservation of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.03s, 16388 steps).
+
+File "repaired.mlw", line 162, characters 18-46:
+Sub-goal Loop invariant preservation of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.04s, 16777 steps).
+
+File "repaired.mlw", line 163, characters 18-37:
+Sub-goal Loop invariant preservation of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.04s, 16824 steps).
+
+File "repaired.mlw", line 164, characters 51-94:
+Sub-goal Loop invariant preservation of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.06s, 19952 steps).
+
+File "repaired.mlw", line 170, characters 15-37:
+Sub-goal Index in array bounds of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.04s, 13151 steps).
+
+File "repaired.mlw", line 170, characters 8-47:
+Sub-goal Index in array bounds of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.05s, 16488 steps).
+
+File "repaired.mlw", line 154, characters 18-41:
+Sub-goal Loop invariant preservation of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.03s, 16293 steps).
+
+File "repaired.mlw", line 155, characters 18-41:
+Sub-goal Loop invariant preservation of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.03s, 16296 steps).
+
+File "repaired.mlw", line 156, characters 18-43:
+Sub-goal Loop invariant preservation of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.03s, 16299 steps).
+
+File "repaired.mlw", line 157, characters 18-35:
+Sub-goal Loop invariant preservation of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.04s, 16584 steps).
+
+File "repaired.mlw", line 158, characters 18-52:
+Sub-goal Loop invariant preservation of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.03s, 16315 steps).
+
+File "repaired.mlw", line 159, characters 18-69:
+Sub-goal Loop invariant preservation of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.03s, 16318 steps).
+
+File "repaired.mlw", line 160, characters 18-33:
+Sub-goal Loop invariant preservation of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.04s, 16636 steps).
+
+File "repaired.mlw", line 161, characters 18-34:
+Sub-goal Loop invariant preservation of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.04s, 16718 steps).
+
+File "repaired.mlw", line 162, characters 18-46:
+Sub-goal Loop invariant preservation of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.04s, 16719 steps).
+
+File "repaired.mlw", line 163, characters 18-37:
+Sub-goal Loop invariant preservation of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.04s, 16767 steps).
+
+File "repaired.mlw", line 164, characters 51-94:
+Sub-goal Loop invariant preservation of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.05s, 20790 steps).
+
+File "repaired.mlw", line 142, characters 15-58:
+Sub-goal Postcondition of goal advantage_shuffle_array'vc.
+Prover result is: Timeout (10.00s, 918684 steps).
+
+File "repaired.mlw", line 142, characters 15-58:
+Goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.03s, 13554 steps).
+== Goals still unproved after stage 2 (split_vc) ==
+AdvantageShuffle_Array_Stage3_Imperative	advantage_shuffle_array'vc
+== Stage 3: split_vc + inline_all on still-unproved goal ==
+Target theory: AdvantageShuffle_Array_Stage3_Imperative
+Target goal  : advantage_shuffle_array'vc
+---- stage3 | prover: Z3,4.8.6 | theory: AdvantageShuffle_Array_Stage3_Imperative | goal: advantage_shuffle_array'vc ----
+Transforms: split_vc inline_all
+File "repaired.mlw", line 147, characters 13-36:
+Sub-goal Assertion of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.03s, 129783 steps).
+
+File "repaired.mlw", line 148, characters 13-38:
+Sub-goal Assertion of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.02s, 129881 steps).
+
+File "repaired.mlw", line 149, characters 13-64:
+Sub-goal Assertion of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.01s, 16203 steps).
+
+File "repaired.mlw", line 150, characters 17-25:
+Sub-goal Array creation size of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.02s, 130393 steps).
+
+File "repaired.mlw", line 154, characters 18-41:
+Sub-goal Loop invariant init of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.01s, 11377 steps).
+
+File "repaired.mlw", line 155, characters 18-41:
+Sub-goal Loop invariant init of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.01s, 11384 steps).
+
+File "repaired.mlw", line 156, characters 18-43:
+Sub-goal Loop invariant init of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.01s, 11389 steps).
+
+File "repaired.mlw", line 157, characters 18-35:
+Sub-goal Loop invariant init of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.01s, 11398 steps).
+
+File "repaired.mlw", line 158, characters 18-52:
+Sub-goal Loop invariant init of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.02s, 133441 steps).
+
+File "repaired.mlw", line 159, characters 18-69:
+Sub-goal Loop invariant init of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.01s, 16886 steps).
+
+File "repaired.mlw", line 160, characters 18-33:
+Sub-goal Loop invariant init of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.01s, 11875 steps).
+
+File "repaired.mlw", line 161, characters 18-34:
+Sub-goal Loop invariant init of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.01s, 16561 steps).
+
+File "repaired.mlw", line 162, characters 18-46:
+Sub-goal Loop invariant init of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.01s, 11946 steps).
+
+File "repaired.mlw", line 163, characters 18-37:
+Sub-goal Loop invariant init of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.01s, 16601 steps).
+
+File "repaired.mlw", line 164, characters 51-94:
+Sub-goal Loop invariant init of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.02s, 132310 steps).
+
+File "repaired.mlw", line 165, characters 18-33:
+Sub-goal Index in array bounds of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.03s, 154792 steps).
+
+File "repaired.mlw", line 166, characters 17-36:
+Sub-goal Index in array bounds of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.03s, 154686 steps).
+
+File "repaired.mlw", line 167, characters 15-36:
+Sub-goal Index in array bounds of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.03s, 156633 steps).
+
+File "repaired.mlw", line 167, characters 8-46:
+Sub-goal Index in array bounds of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.03s, 164293 steps).
+
+File "repaired.mlw", line 154, characters 18-41:
+Sub-goal Loop invariant preservation of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.01s, 12413 steps).
+
+File "repaired.mlw", line 155, characters 18-41:
+Sub-goal Loop invariant preservation of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.01s, 12420 steps).
+
+File "repaired.mlw", line 156, characters 18-43:
+Sub-goal Loop invariant preservation of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.01s, 12425 steps).
+
+File "repaired.mlw", line 157, characters 18-35:
+Sub-goal Loop invariant preservation of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.03s, 161416 steps).
+
+File "repaired.mlw", line 158, characters 18-52:
+Sub-goal Loop invariant preservation of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.03s, 166478 steps).
+
+File "repaired.mlw", line 159, characters 18-69:
+Sub-goal Loop invariant preservation of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.01s, 18710 steps).
+
+File "repaired.mlw", line 160, characters 18-33:
+Sub-goal Loop invariant preservation of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.03s, 168728 steps).
+
+File "repaired.mlw", line 161, characters 18-34:
+Sub-goal Loop invariant preservation of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.01s, 18206 steps).
+
+File "repaired.mlw", line 162, characters 18-46:
+Sub-goal Loop invariant preservation of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.01s, 39631 steps).
+
+File "repaired.mlw", line 163, characters 18-37:
+Sub-goal Loop invariant preservation of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.02s, 81487 steps).
+
+File "repaired.mlw", line 164, characters 51-94:
+Sub-goal Loop invariant preservation of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.03s, 229613 steps).
+
+File "repaired.mlw", line 170, characters 15-37:
+Sub-goal Index in array bounds of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.02s, 157458 steps).
+
+File "repaired.mlw", line 170, characters 8-47:
+Sub-goal Index in array bounds of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.03s, 166792 steps).
+
+File "repaired.mlw", line 154, characters 18-41:
+Sub-goal Loop invariant preservation of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.01s, 12417 steps).
+
+File "repaired.mlw", line 155, characters 18-41:
+Sub-goal Loop invariant preservation of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.01s, 12424 steps).
+
+File "repaired.mlw", line 156, characters 18-43:
+Sub-goal Loop invariant preservation of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.01s, 12429 steps).
+
+File "repaired.mlw", line 157, characters 18-35:
+Sub-goal Loop invariant preservation of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.02s, 161445 steps).
+
+File "repaired.mlw", line 158, characters 18-52:
+Sub-goal Loop invariant preservation of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.03s, 166509 steps).
+
+File "repaired.mlw", line 159, characters 18-69:
+Sub-goal Loop invariant preservation of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.01s, 18710 steps).
+
+File "repaired.mlw", line 160, characters 18-33:
+Sub-goal Loop invariant preservation of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.01s, 55195 steps).
+
+File "repaired.mlw", line 161, characters 18-34:
+Sub-goal Loop invariant preservation of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.03s, 170446 steps).
+
+File "repaired.mlw", line 162, characters 18-46:
+Sub-goal Loop invariant preservation of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.01s, 39677 steps).
+
+File "repaired.mlw", line 163, characters 18-37:
+Sub-goal Loop invariant preservation of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.02s, 81620 steps).
+
+File "repaired.mlw", line 164, characters 51-94:
+Sub-goal Loop invariant preservation of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.03s, 205565 steps).
+
+File "repaired.mlw", line 142, characters 15-58:
+Sub-goal Postcondition of goal advantage_shuffle_array'vc.
+Prover result is: Timeout (10.00s, 179254497 steps).
+
+File "repaired.mlw", line 142, characters 15-58:
+Goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.03s, 198357 steps).
+---- stage3 | prover: Alt-Ergo,2.4.0 | theory: AdvantageShuffle_Array_Stage3_Imperative | goal: advantage_shuffle_array'vc ----
+Transforms: split_vc inline_all
+File "repaired.mlw", line 147, characters 13-36:
+Sub-goal Assertion of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.02s, 11 steps).
+
+File "repaired.mlw", line 148, characters 13-38:
+Sub-goal Assertion of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.01s, 12 steps).
+
+File "repaired.mlw", line 149, characters 13-64:
+Sub-goal Assertion of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.02s, 133 steps).
+
+File "repaired.mlw", line 150, characters 17-25:
+Sub-goal Array creation size of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.01s, 17 steps).
+
+File "repaired.mlw", line 154, characters 18-41:
+Sub-goal Loop invariant init of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.01s, 16 steps).
+
+File "repaired.mlw", line 155, characters 18-41:
+Sub-goal Loop invariant init of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.01s, 16 steps).
+
+File "repaired.mlw", line 156, characters 18-43:
+Sub-goal Loop invariant init of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.01s, 16 steps).
+
+File "repaired.mlw", line 157, characters 18-35:
+Sub-goal Loop invariant init of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.01s, 16 steps).
+
+File "repaired.mlw", line 158, characters 18-52:
+Sub-goal Loop invariant init of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.02s, 36 steps).
+
+File "repaired.mlw", line 159, characters 18-69:
+Sub-goal Loop invariant init of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.02s, 160 steps).
+
+File "repaired.mlw", line 160, characters 18-33:
+Sub-goal Loop invariant init of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.01s, 16 steps).
+
+File "repaired.mlw", line 161, characters 18-34:
+Sub-goal Loop invariant init of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.01s, 21 steps).
+
+File "repaired.mlw", line 162, characters 18-46:
+Sub-goal Loop invariant init of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.01s, 18 steps).
+
+File "repaired.mlw", line 163, characters 18-37:
+Sub-goal Loop invariant init of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.01s, 18 steps).
+
+File "repaired.mlw", line 164, characters 51-94:
+Sub-goal Loop invariant init of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.01s, 22 steps).
+
+File "repaired.mlw", line 165, characters 18-33:
+Sub-goal Index in array bounds of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.01s, 48 steps).
+
+File "repaired.mlw", line 166, characters 17-36:
+Sub-goal Index in array bounds of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.01s, 56 steps).
+
+File "repaired.mlw", line 167, characters 15-36:
+Sub-goal Index in array bounds of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.02s, 58 steps).
+
+File "repaired.mlw", line 167, characters 8-46:
+Sub-goal Index in array bounds of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.02s, 125 steps).
+
+File "repaired.mlw", line 154, characters 18-41:
+Sub-goal Loop invariant preservation of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.01s, 42 steps).
+
+File "repaired.mlw", line 155, characters 18-41:
+Sub-goal Loop invariant preservation of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.01s, 42 steps).
+
+File "repaired.mlw", line 156, characters 18-43:
+Sub-goal Loop invariant preservation of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.01s, 42 steps).
+
+File "repaired.mlw", line 157, characters 18-35:
+Sub-goal Loop invariant preservation of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.01s, 42 steps).
+
+File "repaired.mlw", line 158, characters 18-52:
+Sub-goal Loop invariant preservation of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.02s, 106 steps).
+
+File "repaired.mlw", line 159, characters 18-69:
+Sub-goal Loop invariant preservation of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.04s, 364 steps).
+
+File "repaired.mlw", line 160, characters 18-33:
+Sub-goal Loop invariant preservation of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.01s, 62 steps).
+
+File "repaired.mlw", line 161, characters 18-34:
+Sub-goal Loop invariant preservation of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.01s, 44 steps).
+
+File "repaired.mlw", line 162, characters 18-46:
+Sub-goal Loop invariant preservation of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.01s, 44 steps).
+
+File "repaired.mlw", line 163, characters 18-37:
+Sub-goal Loop invariant preservation of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.02s, 68 steps).
+
+File "repaired.mlw", line 164, characters 51-94:
+Sub-goal Loop invariant preservation of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.03s, 334 steps).
+
+File "repaired.mlw", line 170, characters 15-37:
+Sub-goal Index in array bounds of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.01s, 62 steps).
+
+File "repaired.mlw", line 170, characters 8-47:
+Sub-goal Index in array bounds of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.02s, 90 steps).
+
+File "repaired.mlw", line 154, characters 18-41:
+Sub-goal Loop invariant preservation of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.01s, 42 steps).
+
+File "repaired.mlw", line 155, characters 18-41:
+Sub-goal Loop invariant preservation of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.01s, 42 steps).
+
+File "repaired.mlw", line 156, characters 18-43:
+Sub-goal Loop invariant preservation of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.01s, 42 steps).
+
+File "repaired.mlw", line 157, characters 18-35:
+Sub-goal Loop invariant preservation of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.01s, 42 steps).
+
+File "repaired.mlw", line 158, characters 18-52:
+Sub-goal Loop invariant preservation of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.02s, 108 steps).
+
+File "repaired.mlw", line 159, characters 18-69:
+Sub-goal Loop invariant preservation of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.05s, 578 steps).
+
+File "repaired.mlw", line 160, characters 18-33:
+Sub-goal Loop invariant preservation of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.01s, 43 steps).
+
+File "repaired.mlw", line 161, characters 18-34:
+Sub-goal Loop invariant preservation of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.02s, 76 steps).
+
+File "repaired.mlw", line 162, characters 18-46:
+Sub-goal Loop invariant preservation of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.01s, 44 steps).
+
+File "repaired.mlw", line 163, characters 18-37:
+Sub-goal Loop invariant preservation of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.02s, 77 steps).
+
+File "repaired.mlw", line 164, characters 51-94:
+Sub-goal Loop invariant preservation of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.03s, 206 steps).
+
+File "repaired.mlw", line 142, characters 15-58:
+Sub-goal Postcondition of goal advantage_shuffle_array'vc.
+Prover result is: Timeout (10.00s, 195224 steps).
+
+File "repaired.mlw", line 142, characters 15-58:
+Goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.01s, 18 steps).
+---- stage3 | prover: CVC4,1.8 | theory: AdvantageShuffle_Array_Stage3_Imperative | goal: advantage_shuffle_array'vc ----
+Transforms: split_vc inline_all
+File "repaired.mlw", line 147, characters 13-36:
+Sub-goal Assertion of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.07s, 28721 steps).
+
+File "repaired.mlw", line 148, characters 13-38:
+Sub-goal Assertion of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.06s, 28738 steps).
+
+File "repaired.mlw", line 149, characters 13-64:
+Sub-goal Assertion of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.06s, 29445 steps).
+
+File "repaired.mlw", line 150, characters 17-25:
+Sub-goal Array creation size of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.07s, 29523 steps).
+
+File "repaired.mlw", line 154, characters 18-41:
+Sub-goal Loop invariant init of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.06s, 29460 steps).
+
+File "repaired.mlw", line 155, characters 18-41:
+Sub-goal Loop invariant init of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.06s, 29463 steps).
+
+File "repaired.mlw", line 156, characters 18-43:
+Sub-goal Loop invariant init of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.06s, 29466 steps).
+
+File "repaired.mlw", line 157, characters 18-35:
+Sub-goal Loop invariant init of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.06s, 29469 steps).
+
+File "repaired.mlw", line 158, characters 18-52:
+Sub-goal Loop invariant init of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.08s, 31835 steps).
+
+File "repaired.mlw", line 159, characters 18-69:
+Sub-goal Loop invariant init of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.07s, 30602 steps).
+
+File "repaired.mlw", line 160, characters 18-33:
+Sub-goal Loop invariant init of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.06s, 30357 steps).
+
+File "repaired.mlw", line 161, characters 18-34:
+Sub-goal Loop invariant init of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.06s, 30407 steps).
+
+File "repaired.mlw", line 162, characters 18-46:
+Sub-goal Loop invariant init of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.06s, 30436 steps).
+
+File "repaired.mlw", line 163, characters 18-37:
+Sub-goal Loop invariant init of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.06s, 30443 steps).
+
+File "repaired.mlw", line 164, characters 51-94:
+Sub-goal Loop invariant init of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.07s, 30822 steps).
+
+File "repaired.mlw", line 165, characters 18-33:
+Sub-goal Index in array bounds of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.07s, 31291 steps).
+
+File "repaired.mlw", line 166, characters 17-36:
+Sub-goal Index in array bounds of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.07s, 31324 steps).
+
+File "repaired.mlw", line 167, characters 15-36:
+Sub-goal Index in array bounds of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.07s, 31388 steps).
+
+File "repaired.mlw", line 167, characters 8-46:
+Sub-goal Index in array bounds of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.08s, 33889 steps).
+
+File "repaired.mlw", line 154, characters 18-41:
+Sub-goal Loop invariant preservation of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.06s, 31607 steps).
+
+File "repaired.mlw", line 155, characters 18-41:
+Sub-goal Loop invariant preservation of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.06s, 31610 steps).
+
+File "repaired.mlw", line 156, characters 18-43:
+Sub-goal Loop invariant preservation of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.07s, 31613 steps).
+
+File "repaired.mlw", line 157, characters 18-35:
+Sub-goal Loop invariant preservation of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.08s, 32262 steps).
+
+File "repaired.mlw", line 158, characters 18-52:
+Sub-goal Loop invariant preservation of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.09s, 35525 steps).
+
+File "repaired.mlw", line 159, characters 18-69:
+Sub-goal Loop invariant preservation of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.07s, 33174 steps).
+
+File "repaired.mlw", line 160, characters 18-33:
+Sub-goal Loop invariant preservation of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.07s, 33351 steps).
+
+File "repaired.mlw", line 161, characters 18-34:
+Sub-goal Loop invariant preservation of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.06s, 32642 steps).
+
+File "repaired.mlw", line 162, characters 18-46:
+Sub-goal Loop invariant preservation of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.08s, 33328 steps).
+
+File "repaired.mlw", line 163, characters 18-37:
+Sub-goal Loop invariant preservation of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.08s, 33436 steps).
+
+File "repaired.mlw", line 164, characters 51-94:
+Sub-goal Loop invariant preservation of goal advantage_shuffle_array'vc.
+Prover result is: Timeout (6.92s, 653373 steps).
+
+File "repaired.mlw", line 170, characters 15-37:
+Sub-goal Index in array bounds of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.08s, 31550 steps).
+
+File "repaired.mlw", line 170, characters 8-47:
+Sub-goal Index in array bounds of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.08s, 34120 steps).
+
+File "repaired.mlw", line 154, characters 18-41:
+Sub-goal Loop invariant preservation of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.06s, 31609 steps).
+
+File "repaired.mlw", line 155, characters 18-41:
+Sub-goal Loop invariant preservation of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.06s, 31612 steps).
+
+File "repaired.mlw", line 156, characters 18-43:
+Sub-goal Loop invariant preservation of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.06s, 31615 steps).
+
+File "repaired.mlw", line 157, characters 18-35:
+Sub-goal Loop invariant preservation of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.08s, 32145 steps).
+
+File "repaired.mlw", line 158, characters 18-52:
+Sub-goal Loop invariant preservation of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.09s, 35462 steps).
+
+File "repaired.mlw", line 159, characters 18-69:
+Sub-goal Loop invariant preservation of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.07s, 33057 steps).
+
+File "repaired.mlw", line 160, characters 18-33:
+Sub-goal Loop invariant preservation of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.07s, 33156 steps).
+
+File "repaired.mlw", line 161, characters 18-34:
+Sub-goal Loop invariant preservation of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.07s, 33372 steps).
+
+File "repaired.mlw", line 162, characters 18-46:
+Sub-goal Loop invariant preservation of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.08s, 33277 steps).
+
+File "repaired.mlw", line 163, characters 18-37:
+Sub-goal Loop invariant preservation of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.08s, 33404 steps).
+
+File "repaired.mlw", line 164, characters 51-94:
+Sub-goal Loop invariant preservation of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.09s, 36667 steps).
+
+File "repaired.mlw", line 142, characters 15-58:
+Sub-goal Postcondition of goal advantage_shuffle_array'vc.
+Prover result is: Timeout (10.00s, 1390260 steps).
+
+File "repaired.mlw", line 142, characters 15-58:
+Goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.08s, 40823 steps).
+== Final summary ==
+Unproved root goals after first prover : 1
+Remaining failures after split_vc      : 1
+Remaining failures after stage 3       : 1
+Detailed logs stored in                : /Users/rubenm/Desktop/Diversify2Verify/codex-runs/dataset-merge-verification/stage3a-repair/870_advantage-shuffle/array-imperative/advantage_shuffle_array_stage3_db9a16ee_stage3/generated/why3/.why3_sessions/repaired_logs
+Still unproved goals:
+AdvantageShuffle_Array_Stage3_Imperative	advantage_shuffle_array'vc
+VERIFY_RESULT: FAILURE
+VERIFY_REASON: unproved_goals_remain
+VERIFY_STAGE: stage3
+VERIFY_ROOT_TOTAL: 4
+VERIFY_ROOT_PROVED: 3
+VERIFY_ROOT_REMAINING: 1

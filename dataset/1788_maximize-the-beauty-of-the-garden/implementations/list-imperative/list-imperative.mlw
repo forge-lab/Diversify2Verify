@@ -1,0 +1,182 @@
+module MaximizeTheBeautyOfTheGarden_List_Imperative
+
+  use int.Int
+  use list.List
+  use ref.Ref
+
+  let maximize_the_beauty_of_the_garden_list (flowers: list int) : int =
+    let found = ref false in
+    let best = ref 0 in
+    let outer = ref flowers in
+    while (match !outer with Cons _ (Cons _ _) -> true | _ -> false end) do
+      match !outer with
+      | Nil -> ()
+      | Cons x xs ->
+          let positive_between = ref 0 in
+          let inner = ref xs in
+          while (match !inner with Nil -> false | Cons _ _ -> true end) do
+            match !inner with
+            | Nil -> ()
+            | Cons y ys ->
+                if y = x then
+                  let candidate = x + x + !positive_between in
+                  if !found then
+                    if candidate > !best then best := candidate else ()
+                  else begin
+                    found := true;
+                    best := candidate
+                  end
+                else ();
+                if y > 0 then positive_between := !positive_between + y else ();
+                inner := ys
+            end
+          done;
+          outer := xs
+      end
+    done;
+    if !found then !best else 0
+
+  let test_000 () : bool =
+    let flowers = Cons (-10000) (Cons 10000 (Cons (-10000) (Cons 10000 (Cons (-10000) (Cons 10000 (Nil)))))) in
+    let result = maximize_the_beauty_of_the_garden_list flowers in
+    result = 30000
+
+  let test_001 () : bool =
+    let flowers = Cons 5 (Cons 8 (Cons 5 (Cons 3 (Cons 5 (Cons 2 (Cons 5 (Nil))))))) in
+    let result = maximize_the_beauty_of_the_garden_list flowers in
+    result = 33
+
+  let test_002 () : bool =
+    let flowers = Cons 100 (Cons 1 (Cons 1 (Cons (-3) (Cons 1 (Nil))))) in
+    let result = maximize_the_beauty_of_the_garden_list flowers in
+    result = 3
+
+  let test_003 () : bool =
+    let flowers = Cons 2 (Cons 3 (Cons 4 (Cons 5 (Cons 4 (Cons 3 (Cons 2 (Cons 1 (Cons 2 (Nil))))))))) in
+    let result = maximize_the_beauty_of_the_garden_list flowers in
+    result = 26
+
+  let test_004 () : bool =
+    let flowers = Cons 5 (Cons 3 (Cons 5 (Cons 2 (Cons 5 (Nil))))) in
+    let result = maximize_the_beauty_of_the_garden_list flowers in
+    result = 20
+
+  let test_005 () : bool =
+    let flowers = Cons 1 (Cons 2 (Cons 3 (Cons 1 (Cons 2 (Nil))))) in
+    let result = maximize_the_beauty_of_the_garden_list flowers in
+    result = 8
+
+  let test_006 () : bool =
+    let flowers = Cons 3 (Cons 2 (Cons 1 (Cons 2 (Cons 3 (Cons 2 (Cons 1 (Nil))))))) in
+    let result = maximize_the_beauty_of_the_garden_list flowers in
+    result = 11
+
+  let test_007 () : bool =
+    let flowers = Cons 1 (Cons 2 (Cons 3 (Cons 4 (Cons 5 (Cons 6 (Cons 7 (Cons 8 (Cons 9 (Cons 1 (Nil)))))))))) in
+    let result = maximize_the_beauty_of_the_garden_list flowers in
+    result = 46
+
+  let test_008 () : bool =
+    let flowers = Cons 2 (Cons 3 (Cons 2 (Cons 1 (Cons 2 (Cons 3 (Cons 2 (Cons 2 (Nil)))))))) in
+    let result = maximize_the_beauty_of_the_garden_list flowers in
+    result = 17
+
+  let test_009 () : bool =
+    let flowers = Cons 1 (Cons (-1) (Cons 1 (Cons (-1) (Cons 1 (Nil))))) in
+    let result = maximize_the_beauty_of_the_garden_list flowers in
+    result = 3
+
+  let test_010 () : bool =
+    let flowers = Cons (-1) (Cons (-2) (Cons 0 (Cons (-1) (Nil)))) in
+    let result = maximize_the_beauty_of_the_garden_list flowers in
+    result = (-2)
+
+  let test_011 () : bool =
+    let flowers = Cons (-1) (Cons (-2) (Cons (-3) (Cons (-4) (Cons (-1) (Nil))))) in
+    let result = maximize_the_beauty_of_the_garden_list flowers in
+    result = (-2)
+
+  let test_012 () : bool =
+    let flowers = Cons 1 (Cons (-2) (Cons 3 (Cons (-4) (Cons 5 (Cons (-6) (Cons 7 (Cons (-8) (Cons 9 (Cons (-10) (Cons 1 (Nil))))))))))) in
+    let result = maximize_the_beauty_of_the_garden_list flowers in
+    result = 26
+
+  let test_013 () : bool =
+    let flowers = Cons (-10000) (Cons 0 (Cons 10000 (Cons 0 (Cons (-10000) (Nil))))) in
+    let result = maximize_the_beauty_of_the_garden_list flowers in
+    result = 10000
+
+  let test_014 () : bool =
+    let flowers = Cons 5 (Cons 5 (Cons 5 (Cons 5 (Cons 5 (Nil))))) in
+    let result = maximize_the_beauty_of_the_garden_list flowers in
+    result = 25
+
+  let test_015 () : bool =
+    let flowers = Cons (-10000) (Cons 10000 (Cons (-10000) (Cons 10000 (Nil)))) in
+    let result = maximize_the_beauty_of_the_garden_list flowers in
+    result = 20000
+
+  let test_016 () : bool =
+    let flowers = Cons 1 (Cons (-1) (Cons 2 (Cons (-2) (Cons 1 (Cons (-1) (Nil)))))) in
+    let result = maximize_the_beauty_of_the_garden_list flowers in
+    result = 4
+
+  let test_017 () : bool =
+    let flowers = Cons (-10000) (Cons 10000 (Cons (-10000) (Nil))) in
+    let result = maximize_the_beauty_of_the_garden_list flowers in
+    result = (-10000)
+
+  let test_018 () : bool =
+    let flowers = Cons (-5) (Cons (-5) (Cons (-5) (Cons (-5) (Cons (-5) (Nil))))) in
+    let result = maximize_the_beauty_of_the_garden_list flowers in
+    result = (-10)
+
+  let test_019 () : bool =
+    let flowers = Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Nil)))))))))) in
+    let result = maximize_the_beauty_of_the_garden_list flowers in
+    result = 10
+
+  let run_tests () : bool =
+    if test_000 () then
+    if test_001 () then
+    if test_002 () then
+    if test_003 () then
+    if test_004 () then
+    if test_005 () then
+    if test_006 () then
+    if test_007 () then
+    if test_008 () then
+    if test_009 () then
+    if test_010 () then
+    if test_011 () then
+    if test_012 () then
+    if test_013 () then
+    if test_014 () then
+    if test_015 () then
+    if test_016 () then
+    if test_017 () then
+    if test_018 () then
+    if test_019 () then
+      true
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+
+end

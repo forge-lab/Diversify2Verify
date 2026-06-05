@@ -1,0 +1,102 @@
+module MaximumPointsYouCanObtainFromCards_Array_Stage3_Recursive
+
+  use int.Int
+  use array.Array
+  use array.Init
+  use array.ArraySum
+
+  predicate valid_input (cardPoints: array int) (k: int) =
+    1 <= k <= length cardPoints
+
+  predicate valid_split (cardPoints: array int) (k: int) (left: int) =
+    valid_input cardPoints k /\ 0 <= left <= k
+
+  function split_score (cardPoints: array int) (k: int) (left: int) : int =
+    ArraySum.sum cardPoints 0 left +
+    ArraySum.sum cardPoints (length cardPoints - (k - left)) (length cardPoints)
+
+  predicate split_upper_bound_at
+    (cardPoints: array int) (k: int) (res: int) (left: int) =
+    valid_split cardPoints k left -> split_score cardPoints k left <= res
+
+  predicate maximum_points_you_can_obtain_from_cards_array_spec
+    (cardPoints: array int) (k: int) (res: int) =
+    valid_input cardPoints k /\
+    (exists left: int.
+       valid_split cardPoints k left /\
+       split_score cardPoints k left = res) /\
+    (forall left: int.
+       valid_split cardPoints k left ->
+       split_score cardPoints k left <= res)
+
+  predicate best_for_prefix
+    (cardPoints: array int) (k: int) (left: int) (best: int) =
+    valid_input cardPoints k /\
+    0 <= left <= k /\
+    (exists seen: int.
+       0 <= seen <= left /\ split_score cardPoints k seen = best) /\
+    (forall seen: int.
+       0 <= seen <= left -> split_score cardPoints k seen <= best)
+
+  let lemma split_score_step (cardPoints: array int) (k: int) (left: int)
+    requires { valid_input cardPoints k }
+    requires { 0 <= left < k }
+    ensures  {
+      split_score cardPoints k (left + 1) =
+      split_score cardPoints k left +
+      cardPoints[left] -
+      cardPoints[length cardPoints - (k - left)]
+    }
+  =
+    let n = length cardPoints in
+    assert { 0 <= left < n };
+    assert { 0 <= n - (k - left) < n };
+    assert { n - (k - (left + 1)) = n - (k - left) + 1 };
+    assert { ArraySum.sum cardPoints 0 (left + 1) =
+             ArraySum.sum cardPoints 0 left + cardPoints[left] };
+    assert { ArraySum.sum cardPoints (n - (k - left)) n =
+             cardPoints[n - (k - left)] +
+             ArraySum.sum cardPoints (n - (k - (left + 1))) n }
+
+  let rec sum_suffix_count (cardPoints: array int) (i: int) (remaining: int) : int
+    requires { 0 <= i /\ 0 <= remaining /\ i + remaining <= length cardPoints }
+    variant  { remaining }
+    ensures  { result = ArraySum.sum cardPoints i (i + remaining) }
+  =
+    if remaining <= 0 then
+      0
+    else
+      cardPoints[i] + sum_suffix_count cardPoints (i + 1) (remaining - 1)
+
+  let rec scan_splits
+    (cardPoints: array int) (k: int) (left: int) (current: int) (best: int) : int
+    requires { valid_input cardPoints k }
+    requires { 0 <= left <= k }
+    requires { current = split_score cardPoints k left }
+    requires { best_for_prefix cardPoints k left best }
+    variant  { k - left }
+    ensures  { maximum_points_you_can_obtain_from_cards_array_spec cardPoints k result }
+  =
+    if left >= k then
+      best
+    else
+      let n = length cardPoints in
+      split_score_step cardPoints k left;
+      let next_current = current + cardPoints[left] - cardPoints[n - (k - left)] in
+      assert { next_current = split_score cardPoints k (left + 1) };
+      let next_best = if next_current > best then next_current else best in
+      assert { best_for_prefix cardPoints k (left + 1) next_best };
+      scan_splits cardPoints k (left + 1) next_current next_best
+
+  let maximum_points_you_can_obtain_from_cards_array
+    (cardPoints: array int) (k: int) : int
+    requires { valid_input cardPoints k }
+    ensures  { maximum_points_you_can_obtain_from_cards_array_spec cardPoints k result }
+  =
+    let n = length cardPoints in
+    let initial = sum_suffix_count cardPoints (n - k) k in
+    assert { initial = split_score cardPoints k 0 };
+    assert { best_for_prefix cardPoints k 0 initial };
+    scan_splits cardPoints k 0 initial initial
+
+end

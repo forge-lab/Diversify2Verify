@@ -1,0 +1,128 @@
+module WaysToSplitArrayIntoThreeSubarrays_List_Stage3_Imperative
+
+  use int.Int
+  use int.EuclideanDivision
+  use list.List
+  use list.Length
+  use list.Append
+  use list.Sum
+  use ref.Ref
+
+  function split_modulus : int = 1000000007
+
+  let rec predicate nonnegative_list (nums: list int)
+    variant { nums }
+  =
+    match nums with
+    | Nil -> true
+    | Cons x xs -> 0 <= x && nonnegative_list xs
+    end
+
+  predicate good_split_parts (left: list int) (mid: list int) (right: list int) =
+    left <> Nil /\
+    mid <> Nil /\
+    right <> Nil /\
+    sum left <= sum mid /\
+    sum mid <= sum right
+
+  let function good_split_indicator (left: list int) (mid: list int) (right: list int) : int =
+    if sum left <= sum mid && sum mid <= sum right then 1 else 0
+
+  let rec function count_mid_splits (left: list int) (mid: list int) (right: list int) : int
+    variant { right }
+  =
+    match right with
+    | Nil -> 0
+    | Cons x xs ->
+        good_split_indicator left mid right +
+        count_mid_splits left (mid ++ Cons x Nil) xs
+    end
+
+  let rec function count_left_splits (left: list int) (remaining: list int) : int
+    variant { remaining }
+  =
+    match remaining with
+    | Nil -> 0
+    | Cons x xs ->
+        count_mid_splits left (Cons x Nil) xs +
+        count_left_splits (left ++ Cons x Nil) xs
+    end
+
+  let function count_good_splits (nums: list int) : int =
+    match nums with
+    | Nil -> 0
+    | Cons x xs -> count_left_splits (Cons x Nil) xs
+    end
+
+  let ways_to_split_array_into_three_subarrays_list (nums: list int) : int
+    requires { length nums >= 3 }
+    requires { nonnegative_list nums }
+    ensures  { result = mod (count_good_splits nums) split_modulus }
+  =
+    let modulus = 1000000007 in
+    let total_sum = ref 0 in
+    let total_cur = ref nums in
+    while (match !total_cur with Nil -> false | Cons _ _ -> true end) do
+      invariant { 0 <= length !total_cur }
+      variant   { length !total_cur }
+      match !total_cur with
+      | Nil -> ()
+      | Cons x xs ->
+          assert { length xs < length !total_cur };
+          total_sum := !total_sum + x;
+          total_cur := xs
+      end
+    done;
+    assert { !total_cur = Nil };
+
+    let result = ref 0 in
+    let left_sum = ref 0 in
+    let left_cur = ref nums in
+    while (match !left_cur with Cons _ (Cons _ (Cons _ _)) -> true | _ -> false end) do
+      invariant { 0 <= length !left_cur }
+      invariant { 0 <= !result }
+      variant   { length !left_cur }
+      match !left_cur with
+      | Nil -> ()
+      | Cons x xs ->
+          assert { length xs < length !left_cur };
+          left_sum := !left_sum + x;
+          let mid_sum = ref 0 in
+          let right_sum = ref (!total_sum - !left_sum) in
+          let mid_cur = ref xs in
+          while (match !mid_cur with Cons _ (Cons _ _) -> true | _ -> false end) do
+            invariant { 0 <= length !mid_cur }
+            invariant { 0 <= !result }
+            variant   { length !mid_cur }
+            match !mid_cur with
+            | Nil -> ()
+            | Cons y ys ->
+                assert { length ys < length !mid_cur };
+                mid_sum := !mid_sum + y;
+                right_sum := !right_sum - y;
+                if !left_sum <= !mid_sum && !mid_sum <= !right_sum then
+                  result := !result + 1;
+                mid_cur := ys
+            end
+          done;
+          assert {
+            match !mid_cur with
+            | Nil -> true
+            | Cons _ Nil -> true
+            | Cons _ (Cons _ _) -> false
+            end
+          };
+          left_cur := xs
+      end
+    done;
+    assert {
+      match !left_cur with
+      | Cons _ (Cons _ (Cons _ _)) -> false
+      | _ -> true
+      end
+    };
+    assert { modulus = split_modulus };
+    assert { !result = count_good_splits nums };
+    mod !result modulus
+
+end

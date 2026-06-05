@@ -1,0 +1,2355 @@
+{
+  "task": {
+    "task_id": "minimum-amount-of-time-to-fill-cups",
+    "question_id": 2335,
+    "difficulty": "Easy",
+    "source_file": "bench1/2335.json"
+  },
+  "target": {
+    "name": "array",
+    "language": "why3",
+    "module_name": "MinimumAmountOfTimeToFillCups_Array_Spec",
+    "output_file": "generated/why3/array/minimum_amount_of_time_to_fill_cups_array.mlw",
+    "signature": {
+      "raw": "val minimum_amount_of_time_to_fill_cups_array (amount: array int) : int",
+      "function_name": "minimum_amount_of_time_to_fill_cups_array",
+      "parameters": [
+        {
+          "name": "amount",
+          "why3_type": "array int",
+          "semantic_type": "int_sequence"
+        }
+      ],
+      "return": {
+        "why3_type": "int",
+        "semantic_type": "int"
+      }
+    }
+  },
+  "problem": {
+    "description": "You have a water dispenser that can dispense cold, warm, and hot water. Every second, you can either fill up 2 cups with different types of water, or 1 cup of any type of water.\nYou are given a 0-indexed integer array amount of length 3 where amount[0], amount[1], and amount[2] denote the number of cold, warm, and hot water cups you need to fill respectively. Return the minimum number of seconds needed to fill up all the cups.\n \nExample 1:\n\nInput: amount = [1,4,2]\nOutput: 4\nExplanation: One way to fill up the cups is:\nSecond 1: Fill up a cold cup and a warm cup.\nSecond 2: Fill up a warm cup and a hot cup.\nSecond 3: Fill up a warm cup and a hot cup.\nSecond 4: Fill up a warm cup.\nIt can be proven that 4 is the minimum number of seconds needed.\n\nExample 2:\n\nInput: amount = [5,4,4]\nOutput: 7\nExplanation: One way to fill up the cups is:\nSecond 1: Fill up a cold cup, and a hot cup.\nSecond 2: Fill up a cold cup, and a warm cup.\nSecond 3: Fill up a cold cup, and a warm cup.\nSecond 4: Fill up a warm cup, and a hot cup.\nSecond 5: Fill up a cold cup, and a hot cup.\nSecond 6: Fill up a cold cup, and a warm cup.\nSecond 7: Fill up a hot cup.\n\nExample 3:\n\nInput: amount = [5,0,0]\nOutput: 5\nExplanation: Every second, we fill up a cold cup.\n\n \nConstraints:\n\namount.length == 3\n0 <= amount[i] <= 100\n\n"
+  },
+  "tests": [
+    {
+      "id": "test_000",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "amount": [
+          33,
+          33,
+          34
+        ]
+      },
+      "expected": 50,
+      "warnings": []
+    },
+    {
+      "id": "test_001",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "amount": [
+          0,
+          0,
+          0
+        ]
+      },
+      "expected": 0,
+      "warnings": []
+    },
+    {
+      "id": "test_002",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "amount": [
+          99,
+          1,
+          1
+        ]
+      },
+      "expected": 99,
+      "warnings": []
+    },
+    {
+      "id": "test_003",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "amount": [
+          7,
+          7,
+          7
+        ]
+      },
+      "expected": 11,
+      "warnings": []
+    },
+    {
+      "id": "test_004",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "amount": [
+          10,
+          10,
+          10
+        ]
+      },
+      "expected": 15,
+      "warnings": []
+    },
+    {
+      "id": "test_005",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "amount": [
+          1,
+          2,
+          3
+        ]
+      },
+      "expected": 3,
+      "warnings": []
+    },
+    {
+      "id": "test_006",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "amount": [
+          100,
+          0,
+          0
+        ]
+      },
+      "expected": 100,
+      "warnings": []
+    },
+    {
+      "id": "test_007",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "amount": [
+          100,
+          100,
+          100
+        ]
+      },
+      "expected": 150,
+      "warnings": []
+    },
+    {
+      "id": "test_008",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "amount": [
+          0,
+          1,
+          2
+        ]
+      },
+      "expected": 2,
+      "warnings": []
+    },
+    {
+      "id": "test_009",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "amount": [
+          1,
+          4,
+          2
+        ]
+      },
+      "expected": 4,
+      "warnings": []
+    },
+    {
+      "id": "test_010",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "amount": [
+          5,
+          0,
+          0
+        ]
+      },
+      "expected": 5,
+      "warnings": []
+    },
+    {
+      "id": "test_011",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "amount": [
+          99,
+          99,
+          1
+        ]
+      },
+      "expected": 100,
+      "warnings": []
+    },
+    {
+      "id": "test_012",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "amount": [
+          0,
+          50,
+          50
+        ]
+      },
+      "expected": 50,
+      "warnings": []
+    },
+    {
+      "id": "test_013",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "amount": [
+          5,
+          4,
+          4
+        ]
+      },
+      "expected": 7,
+      "warnings": []
+    },
+    {
+      "id": "test_014",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "amount": [
+          98,
+          1,
+          1
+        ]
+      },
+      "expected": 98,
+      "warnings": []
+    },
+    {
+      "id": "test_015",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "amount": [
+          25,
+          0,
+          75
+        ]
+      },
+      "expected": 75,
+      "warnings": []
+    },
+    {
+      "id": "test_016",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "amount": [
+          42,
+          42,
+          41
+        ]
+      },
+      "expected": 63,
+      "warnings": []
+    },
+    {
+      "id": "test_017",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "amount": [
+          60,
+          20,
+          20
+        ]
+      },
+      "expected": 60,
+      "warnings": []
+    },
+    {
+      "id": "test_018",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "amount": [
+          10,
+          50,
+          25
+        ]
+      },
+      "expected": 50,
+      "warnings": []
+    },
+    {
+      "id": "test_019",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "amount": [
+          49,
+          49,
+          49
+        ]
+      },
+      "expected": 74,
+      "warnings": []
+    },
+    {
+      "id": "test_020",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "amount": [
+          1,
+          1,
+          0
+        ]
+      },
+      "expected": 1,
+      "warnings": []
+    },
+    {
+      "id": "test_021",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "amount": [
+          80,
+          10,
+          10
+        ]
+      },
+      "expected": 80,
+      "warnings": []
+    },
+    {
+      "id": "test_022",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "amount": [
+          1,
+          10,
+          10
+        ]
+      },
+      "expected": 11,
+      "warnings": []
+    },
+    {
+      "id": "test_023",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "amount": [
+          1,
+          1,
+          100
+        ]
+      },
+      "expected": 100,
+      "warnings": []
+    },
+    {
+      "id": "test_024",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "amount": [
+          10,
+          90,
+          0
+        ]
+      },
+      "expected": 90,
+      "warnings": []
+    },
+    {
+      "id": "test_025",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "amount": [
+          10,
+          80,
+          10
+        ]
+      },
+      "expected": 80,
+      "warnings": []
+    },
+    {
+      "id": "test_026",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "amount": [
+          0,
+          0,
+          100
+        ]
+      },
+      "expected": 100,
+      "warnings": []
+    },
+    {
+      "id": "test_027",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "amount": [
+          80,
+          10,
+          10
+        ]
+      },
+      "expected": 80,
+      "warnings": []
+    },
+    {
+      "id": "test_028",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "amount": [
+          33,
+          33,
+          34
+        ]
+      },
+      "expected": 50,
+      "warnings": []
+    },
+    {
+      "id": "test_029",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "amount": [
+          70,
+          70,
+          60
+        ]
+      },
+      "expected": 100,
+      "warnings": []
+    },
+    {
+      "id": "test_030",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "amount": [
+          50,
+          25,
+          25
+        ]
+      },
+      "expected": 50,
+      "warnings": []
+    },
+    {
+      "id": "test_031",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "amount": [
+          29,
+          29,
+          42
+        ]
+      },
+      "expected": 50,
+      "warnings": []
+    },
+    {
+      "id": "test_032",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "amount": [
+          50,
+          50,
+          49
+        ]
+      },
+      "expected": 75,
+      "warnings": []
+    },
+    {
+      "id": "test_033",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "amount": [
+          99,
+          2,
+          99
+        ]
+      },
+      "expected": 100,
+      "warnings": []
+    },
+    {
+      "id": "test_034",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "amount": [
+          50,
+          49,
+          51
+        ]
+      },
+      "expected": 75,
+      "warnings": []
+    },
+    {
+      "id": "test_035",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "amount": [
+          100,
+          1,
+          1
+        ]
+      },
+      "expected": 100,
+      "warnings": []
+    },
+    {
+      "id": "test_036",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "amount": [
+          80,
+          70,
+          60
+        ]
+      },
+      "expected": 105,
+      "warnings": []
+    },
+    {
+      "id": "test_037",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "amount": [
+          100,
+          50,
+          25
+        ]
+      },
+      "expected": 100,
+      "warnings": []
+    },
+    {
+      "id": "test_038",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "amount": [
+          1,
+          0,
+          1
+        ]
+      },
+      "expected": 1,
+      "warnings": []
+    },
+    {
+      "id": "test_039",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "amount": [
+          40,
+          30,
+          20
+        ]
+      },
+      "expected": 45,
+      "warnings": []
+    },
+    {
+      "id": "test_040",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "amount": [
+          1,
+          2,
+          97
+        ]
+      },
+      "expected": 97,
+      "warnings": []
+    },
+    {
+      "id": "test_041",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "amount": [
+          1,
+          1,
+          1
+        ]
+      },
+      "expected": 2,
+      "warnings": []
+    },
+    {
+      "id": "test_042",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "amount": [
+          49,
+          50,
+          1
+        ]
+      },
+      "expected": 50,
+      "warnings": []
+    },
+    {
+      "id": "test_043",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "amount": [
+          30,
+          20,
+          10
+        ]
+      },
+      "expected": 30,
+      "warnings": []
+    },
+    {
+      "id": "test_044",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "amount": [
+          100,
+          10,
+          10
+        ]
+      },
+      "expected": 100,
+      "warnings": []
+    },
+    {
+      "id": "test_045",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "amount": [
+          2,
+          99,
+          99
+        ]
+      },
+      "expected": 100,
+      "warnings": []
+    },
+    {
+      "id": "test_046",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "amount": [
+          1,
+          98,
+          1
+        ]
+      },
+      "expected": 98,
+      "warnings": []
+    },
+    {
+      "id": "test_047",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "amount": [
+          1,
+          0,
+          99
+        ]
+      },
+      "expected": 99,
+      "warnings": []
+    },
+    {
+      "id": "test_048",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "amount": [
+          80,
+          15,
+          5
+        ]
+      },
+      "expected": 80,
+      "warnings": []
+    },
+    {
+      "id": "test_049",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "amount": [
+          45,
+          55,
+          0
+        ]
+      },
+      "expected": 55,
+      "warnings": []
+    },
+    {
+      "id": "test_050",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "amount": [
+          100,
+          1,
+          1
+        ]
+      },
+      "expected": 100,
+      "warnings": []
+    },
+    {
+      "id": "test_051",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "amount": [
+          50,
+          50,
+          1
+        ]
+      },
+      "expected": 51,
+      "warnings": []
+    },
+    {
+      "id": "test_052",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "amount": [
+          25,
+          25,
+          25
+        ]
+      },
+      "expected": 38,
+      "warnings": []
+    },
+    {
+      "id": "test_053",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "amount": [
+          42,
+          29,
+          29
+        ]
+      },
+      "expected": 50,
+      "warnings": []
+    },
+    {
+      "id": "test_054",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "amount": [
+          100,
+          50,
+          1
+        ]
+      },
+      "expected": 100,
+      "warnings": []
+    },
+    {
+      "id": "test_055",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "amount": [
+          1,
+          90,
+          10
+        ]
+      },
+      "expected": 90,
+      "warnings": []
+    },
+    {
+      "id": "test_056",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "amount": [
+          1,
+          1,
+          1
+        ]
+      },
+      "expected": 2,
+      "warnings": []
+    },
+    {
+      "id": "test_057",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "amount": [
+          0,
+          75,
+          25
+        ]
+      },
+      "expected": 75,
+      "warnings": []
+    },
+    {
+      "id": "test_058",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "amount": [
+          55,
+          45,
+          5
+        ]
+      },
+      "expected": 55,
+      "warnings": []
+    },
+    {
+      "id": "test_059",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "amount": [
+          10,
+          1,
+          90
+        ]
+      },
+      "expected": 90,
+      "warnings": []
+    },
+    {
+      "id": "test_060",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "amount": [
+          100,
+          10,
+          0
+        ]
+      },
+      "expected": 100,
+      "warnings": []
+    },
+    {
+      "id": "test_061",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "amount": [
+          80,
+          10,
+          1
+        ]
+      },
+      "expected": 80,
+      "warnings": []
+    },
+    {
+      "id": "test_062",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "amount": [
+          48,
+          48,
+          48
+        ]
+      },
+      "expected": 72,
+      "warnings": []
+    },
+    {
+      "id": "test_063",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "amount": [
+          80,
+          50,
+          30
+        ]
+      },
+      "expected": 80,
+      "warnings": []
+    },
+    {
+      "id": "test_064",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "amount": [
+          90,
+          90,
+          1
+        ]
+      },
+      "expected": 91,
+      "warnings": []
+    },
+    {
+      "id": "test_065",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "amount": [
+          1,
+          50,
+          50
+        ]
+      },
+      "expected": 51,
+      "warnings": []
+    },
+    {
+      "id": "test_066",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "amount": [
+          55,
+          0,
+          45
+        ]
+      },
+      "expected": 55,
+      "warnings": []
+    },
+    {
+      "id": "test_067",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "amount": [
+          49,
+          2,
+          49
+        ]
+      },
+      "expected": 50,
+      "warnings": []
+    },
+    {
+      "id": "test_068",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "amount": [
+          45,
+          67,
+          23
+        ]
+      },
+      "expected": 68,
+      "warnings": []
+    },
+    {
+      "id": "test_069",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "amount": [
+          20,
+          20,
+          60
+        ]
+      },
+      "expected": 60,
+      "warnings": []
+    },
+    {
+      "id": "test_070",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "amount": [
+          100,
+          100,
+          99
+        ]
+      },
+      "expected": 150,
+      "warnings": []
+    },
+    {
+      "id": "test_071",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "amount": [
+          10,
+          10,
+          100
+        ]
+      },
+      "expected": 100,
+      "warnings": []
+    },
+    {
+      "id": "test_072",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "amount": [
+          50,
+          100,
+          50
+        ]
+      },
+      "expected": 100,
+      "warnings": []
+    },
+    {
+      "id": "test_073",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "amount": [
+          10,
+          15,
+          20
+        ]
+      },
+      "expected": 23,
+      "warnings": []
+    },
+    {
+      "id": "test_074",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "amount": [
+          0,
+          100,
+          100
+        ]
+      },
+      "expected": 100,
+      "warnings": []
+    },
+    {
+      "id": "test_075",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "amount": [
+          60,
+          40,
+          20
+        ]
+      },
+      "expected": 60,
+      "warnings": []
+    },
+    {
+      "id": "test_076",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "amount": [
+          0,
+          100,
+          0
+        ]
+      },
+      "expected": 100,
+      "warnings": []
+    },
+    {
+      "id": "test_077",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "amount": [
+          50,
+          51,
+          50
+        ]
+      },
+      "expected": 76,
+      "warnings": []
+    },
+    {
+      "id": "test_078",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "amount": [
+          33,
+          33,
+          33
+        ]
+      },
+      "expected": 50,
+      "warnings": []
+    },
+    {
+      "id": "test_079",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "amount": [
+          23,
+          47,
+          29
+        ]
+      },
+      "expected": 50,
+      "warnings": []
+    },
+    {
+      "id": "test_080",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "amount": [
+          51,
+          51,
+          51
+        ]
+      },
+      "expected": 77,
+      "warnings": []
+    },
+    {
+      "id": "test_081",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "amount": [
+          50,
+          1,
+          50
+        ]
+      },
+      "expected": 51,
+      "warnings": []
+    },
+    {
+      "id": "test_082",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "amount": [
+          25,
+          10,
+          50
+        ]
+      },
+      "expected": 50,
+      "warnings": []
+    },
+    {
+      "id": "test_083",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "amount": [
+          55,
+          55,
+          45
+        ]
+      },
+      "expected": 78,
+      "warnings": []
+    },
+    {
+      "id": "test_084",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "amount": [
+          0,
+          100,
+          10
+        ]
+      },
+      "expected": 100,
+      "warnings": []
+    },
+    {
+      "id": "test_085",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "amount": [
+          90,
+          10,
+          1
+        ]
+      },
+      "expected": 90,
+      "warnings": []
+    },
+    {
+      "id": "test_086",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "amount": [
+          33,
+          66,
+          0
+        ]
+      },
+      "expected": 66,
+      "warnings": []
+    },
+    {
+      "id": "test_087",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "amount": [
+          99,
+          1,
+          0
+        ]
+      },
+      "expected": 99,
+      "warnings": []
+    },
+    {
+      "id": "test_088",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "amount": [
+          50,
+          25,
+          10
+        ]
+      },
+      "expected": 50,
+      "warnings": []
+    },
+    {
+      "id": "test_089",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "amount": [
+          49,
+          50,
+          51
+        ]
+      },
+      "expected": 75,
+      "warnings": []
+    },
+    {
+      "id": "test_090",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "amount": [
+          60,
+          60,
+          61
+        ]
+      },
+      "expected": 91,
+      "warnings": []
+    },
+    {
+      "id": "test_091",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "amount": [
+          29,
+          42,
+          29
+        ]
+      },
+      "expected": 50,
+      "warnings": []
+    },
+    {
+      "id": "test_092",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "amount": [
+          50,
+          50,
+          50
+        ]
+      },
+      "expected": 75,
+      "warnings": []
+    },
+    {
+      "id": "test_093",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "amount": [
+          25,
+          25,
+          26
+        ]
+      },
+      "expected": 38,
+      "warnings": []
+    },
+    {
+      "id": "test_094",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "amount": [
+          34,
+          33,
+          34
+        ]
+      },
+      "expected": 51,
+      "warnings": []
+    },
+    {
+      "id": "test_095",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "amount": [
+          2,
+          49,
+          49
+        ]
+      },
+      "expected": 50,
+      "warnings": []
+    },
+    {
+      "id": "test_096",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "amount": [
+          25,
+          25,
+          25
+        ]
+      },
+      "expected": 38,
+      "warnings": []
+    },
+    {
+      "id": "test_097",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "amount": [
+          1,
+          1,
+          2
+        ]
+      },
+      "expected": 2,
+      "warnings": []
+    },
+    {
+      "id": "test_098",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "amount": [
+          1,
+          1,
+          99
+        ]
+      },
+      "expected": 99,
+      "warnings": []
+    },
+    {
+      "id": "test_099",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "amount": [
+          60,
+          40,
+          20
+        ]
+      },
+      "expected": 60,
+      "warnings": []
+    },
+    {
+      "id": "test_100",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "amount": [
+          60,
+          60,
+          60
+        ]
+      },
+      "expected": 90,
+      "warnings": []
+    },
+    {
+      "id": "test_101",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "amount": [
+          33,
+          33,
+          67
+        ]
+      },
+      "expected": 67,
+      "warnings": []
+    },
+    {
+      "id": "test_102",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "amount": [
+          10,
+          100,
+          10
+        ]
+      },
+      "expected": 100,
+      "warnings": []
+    },
+    {
+      "id": "test_103",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "amount": [
+          5,
+          0,
+          5
+        ]
+      },
+      "expected": 5,
+      "warnings": []
+    },
+    {
+      "id": "test_104",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "amount": [
+          1,
+          100,
+          1
+        ]
+      },
+      "expected": 100,
+      "warnings": []
+    },
+    {
+      "id": "test_105",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "amount": [
+          80,
+          15,
+          5
+        ]
+      },
+      "expected": 80,
+      "warnings": []
+    },
+    {
+      "id": "test_106",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "amount": [
+          99,
+          99,
+          99
+        ]
+      },
+      "expected": 149,
+      "warnings": []
+    },
+    {
+      "id": "test_107",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "amount": [
+          66,
+          33,
+          0
+        ]
+      },
+      "expected": 66,
+      "warnings": []
+    },
+    {
+      "id": "test_108",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "amount": [
+          2,
+          3,
+          4
+        ]
+      },
+      "expected": 5,
+      "warnings": []
+    },
+    {
+      "id": "test_109",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "amount": [
+          5,
+          15,
+          80
+        ]
+      },
+      "expected": 80,
+      "warnings": []
+    },
+    {
+      "id": "test_110",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "amount": [
+          30,
+          0,
+          20
+        ]
+      },
+      "expected": 30,
+      "warnings": []
+    },
+    {
+      "id": "test_111",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "amount": [
+          50,
+          25,
+          25
+        ]
+      },
+      "expected": 50,
+      "warnings": []
+    },
+    {
+      "id": "test_112",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "amount": [
+          47,
+          23,
+          29
+        ]
+      },
+      "expected": 50,
+      "warnings": []
+    },
+    {
+      "id": "test_113",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "amount": [
+          100,
+          99,
+          98
+        ]
+      },
+      "expected": 149,
+      "warnings": []
+    },
+    {
+      "id": "test_114",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "amount": [
+          90,
+          85,
+          80
+        ]
+      },
+      "expected": 128,
+      "warnings": []
+    },
+    {
+      "id": "test_115",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "amount": [
+          67,
+          33,
+          33
+        ]
+      },
+      "expected": 67,
+      "warnings": []
+    },
+    {
+      "id": "test_116",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "amount": [
+          98,
+          99,
+          1
+        ]
+      },
+      "expected": 99,
+      "warnings": []
+    },
+    {
+      "id": "test_117",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "amount": [
+          15,
+          80,
+          5
+        ]
+      },
+      "expected": 80,
+      "warnings": []
+    },
+    {
+      "id": "test_118",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "amount": [
+          10,
+          10,
+          80
+        ]
+      },
+      "expected": 80,
+      "warnings": []
+    },
+    {
+      "id": "test_119",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "amount": [
+          3,
+          2,
+          1
+        ]
+      },
+      "expected": 3,
+      "warnings": []
+    },
+    {
+      "id": "test_120",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "amount": [
+          23,
+          45,
+          67
+        ]
+      },
+      "expected": 68,
+      "warnings": []
+    },
+    {
+      "id": "test_121",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "amount": [
+          50,
+          50,
+          100
+        ]
+      },
+      "expected": 100,
+      "warnings": []
+    },
+    {
+      "id": "test_122",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "amount": [
+          90,
+          10,
+          90
+        ]
+      },
+      "expected": 95,
+      "warnings": []
+    },
+    {
+      "id": "test_123",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "amount": [
+          99,
+          98,
+          97
+        ]
+      },
+      "expected": 147,
+      "warnings": []
+    },
+    {
+      "id": "test_124",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "amount": [
+          1,
+          99,
+          1
+        ]
+      },
+      "expected": 99,
+      "warnings": []
+    },
+    {
+      "id": "test_125",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "amount": [
+          45,
+          55,
+          55
+        ]
+      },
+      "expected": 78,
+      "warnings": []
+    },
+    {
+      "id": "test_126",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "amount": [
+          75,
+          25,
+          0
+        ]
+      },
+      "expected": 75,
+      "warnings": []
+    },
+    {
+      "id": "test_127",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "amount": [
+          0,
+          0,
+          100
+        ]
+      },
+      "expected": 100,
+      "warnings": []
+    },
+    {
+      "id": "test_128",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "amount": [
+          1,
+          100,
+          1
+        ]
+      },
+      "expected": 100,
+      "warnings": []
+    },
+    {
+      "id": "test_129",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "amount": [
+          1,
+          2,
+          1
+        ]
+      },
+      "expected": 2,
+      "warnings": []
+    },
+    {
+      "id": "test_130",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "amount": [
+          70,
+          20,
+          10
+        ]
+      },
+      "expected": 70,
+      "warnings": []
+    },
+    {
+      "id": "test_131",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "amount": [
+          2,
+          2,
+          1
+        ]
+      },
+      "expected": 3,
+      "warnings": []
+    },
+    {
+      "id": "test_132",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "amount": [
+          95,
+          3,
+          2
+        ]
+      },
+      "expected": 95,
+      "warnings": []
+    },
+    {
+      "id": "test_133",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "amount": [
+          1,
+          2,
+          3
+        ]
+      },
+      "expected": 3,
+      "warnings": []
+    },
+    {
+      "id": "test_134",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "amount": [
+          0,
+          99,
+          0
+        ]
+      },
+      "expected": 99,
+      "warnings": []
+    },
+    {
+      "id": "test_135",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "amount": [
+          60,
+          40,
+          0
+        ]
+      },
+      "expected": 60,
+      "warnings": []
+    },
+    {
+      "id": "test_136",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "amount": [
+          10,
+          10,
+          10
+        ]
+      },
+      "expected": 15,
+      "warnings": []
+    },
+    {
+      "id": "test_137",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "amount": [
+          33,
+          34,
+          33
+        ]
+      },
+      "expected": 50,
+      "warnings": []
+    },
+    {
+      "id": "test_138",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "amount": [
+          50,
+          50,
+          5
+        ]
+      },
+      "expected": 53,
+      "warnings": []
+    },
+    {
+      "id": "test_139",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "amount": [
+          2,
+          1,
+          1
+        ]
+      },
+      "expected": 2,
+      "warnings": []
+    },
+    {
+      "id": "test_140",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "amount": [
+          2,
+          1,
+          2
+        ]
+      },
+      "expected": 3,
+      "warnings": []
+    },
+    {
+      "id": "test_141",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "amount": [
+          10,
+          90,
+          0
+        ]
+      },
+      "expected": 90,
+      "warnings": []
+    },
+    {
+      "id": "test_142",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "amount": [
+          66,
+          33,
+          3
+        ]
+      },
+      "expected": 66,
+      "warnings": []
+    },
+    {
+      "id": "test_143",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "amount": [
+          49,
+          49,
+          2
+        ]
+      },
+      "expected": 50,
+      "warnings": []
+    },
+    {
+      "id": "test_144",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "amount": [
+          67,
+          23,
+          45
+        ]
+      },
+      "expected": 68,
+      "warnings": []
+    },
+    {
+      "id": "test_145",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "amount": [
+          50,
+          49,
+          48
+        ]
+      },
+      "expected": 74,
+      "warnings": []
+    },
+    {
+      "id": "test_146",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "amount": [
+          55,
+          45,
+          55
+        ]
+      },
+      "expected": 78,
+      "warnings": []
+    },
+    {
+      "id": "test_147",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "amount": [
+          0,
+          55,
+          45
+        ]
+      },
+      "expected": 55,
+      "warnings": []
+    },
+    {
+      "id": "test_148",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "amount": [
+          100,
+          0,
+          0
+        ]
+      },
+      "expected": 100,
+      "warnings": []
+    },
+    {
+      "id": "test_149",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "amount": [
+          0,
+          1,
+          1
+        ]
+      },
+      "expected": 1,
+      "warnings": []
+    },
+    {
+      "id": "test_150",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "amount": [
+          1,
+          1,
+          100
+        ]
+      },
+      "expected": 100,
+      "warnings": []
+    },
+    {
+      "id": "test_151",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "amount": [
+          1,
+          2,
+          2
+        ]
+      },
+      "expected": 3,
+      "warnings": []
+    },
+    {
+      "id": "test_152",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "amount": [
+          50,
+          50,
+          0
+        ]
+      },
+      "expected": 50,
+      "warnings": []
+    },
+    {
+      "id": "test_153",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "amount": [
+          34,
+          33,
+          33
+        ]
+      },
+      "expected": 50,
+      "warnings": []
+    },
+    {
+      "id": "test_154",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "amount": [
+          0,
+          100,
+          0
+        ]
+      },
+      "expected": 100,
+      "warnings": []
+    },
+    {
+      "id": "test_155",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "amount": [
+          42,
+          41,
+          42
+        ]
+      },
+      "expected": 63,
+      "warnings": []
+    },
+    {
+      "id": "test_156",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "amount": [
+          100,
+          50,
+          50
+        ]
+      },
+      "expected": 100,
+      "warnings": []
+    },
+    {
+      "id": "test_157",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "amount": [
+          99,
+          100,
+          101
+        ]
+      },
+      "expected": 150,
+      "warnings": []
+    },
+    {
+      "id": "test_158",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "amount": [
+          100,
+          50,
+          50
+        ]
+      },
+      "expected": 100,
+      "warnings": []
+    },
+    {
+      "id": "test_159",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "amount": [
+          10,
+          0,
+          100
+        ]
+      },
+      "expected": 100,
+      "warnings": []
+    },
+    {
+      "id": "test_160",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "amount": [
+          0,
+          99,
+          1
+        ]
+      },
+      "expected": 99,
+      "warnings": []
+    },
+    {
+      "id": "test_161",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "amount": [
+          99,
+          99,
+          2
+        ]
+      },
+      "expected": 100,
+      "warnings": []
+    },
+    {
+      "id": "test_162",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "amount": [
+          50,
+          0,
+          50
+        ]
+      },
+      "expected": 50,
+      "warnings": []
+    },
+    {
+      "id": "test_163",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "amount": [
+          41,
+          42,
+          42
+        ]
+      },
+      "expected": 63,
+      "warnings": []
+    },
+    {
+      "id": "test_164",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "amount": [
+          0,
+          5,
+          5
+        ]
+      },
+      "expected": 5,
+      "warnings": []
+    },
+    {
+      "id": "test_165",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "amount": [
+          1,
+          99,
+          98
+        ]
+      },
+      "expected": 99,
+      "warnings": []
+    },
+    {
+      "id": "test_166",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "amount": [
+          2,
+          2,
+          98
+        ]
+      },
+      "expected": 98,
+      "warnings": []
+    },
+    {
+      "id": "test_167",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "amount": [
+          1,
+          1,
+          98
+        ]
+      },
+      "expected": 98,
+      "warnings": []
+    },
+    {
+      "id": "test_168",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "amount": [
+          10,
+          10,
+          1
+        ]
+      },
+      "expected": 11,
+      "warnings": []
+    },
+    {
+      "id": "test_169",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "amount": [
+          1,
+          99,
+          99
+        ]
+      },
+      "expected": 100,
+      "warnings": []
+    },
+    {
+      "id": "test_170",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "amount": [
+          29,
+          47,
+          23
+        ]
+      },
+      "expected": 50,
+      "warnings": []
+    },
+    {
+      "id": "test_171",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "amount": [
+          33,
+          67,
+          33
+        ]
+      },
+      "expected": 67,
+      "warnings": []
+    },
+    {
+      "id": "test_172",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "amount": [
+          99,
+          98,
+          97
+        ]
+      },
+      "expected": 147,
+      "warnings": []
+    },
+    {
+      "id": "test_173",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "amount": [
+          10,
+          20,
+          30
+        ]
+      },
+      "expected": 30,
+      "warnings": []
+    },
+    {
+      "id": "test_174",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "amount": [
+          0,
+          50,
+          50
+        ]
+      },
+      "expected": 50,
+      "warnings": []
+    },
+    {
+      "id": "test_175",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "amount": [
+          99,
+          1,
+          0
+        ]
+      },
+      "expected": 99,
+      "warnings": []
+    },
+    {
+      "id": "test_176",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "amount": [
+          99,
+          1,
+          99
+        ]
+      },
+      "expected": 100,
+      "warnings": []
+    },
+    {
+      "id": "test_177",
+      "origin": "parsed_from_raw_test",
+      "inputs": {
+        "amount": [
+          10,
+          90,
+          10
+        ]
+      },
+      "expected": 90,
+      "warnings": []
+    }
+  ],
+  "normalization": {
+    "test_source": "python_assertions",
+    "test_count": 178,
+    "raw_test_sha256": "5b4c35d1ee034aacf016b1048a34ad663a7cce96f8dbb24aa3083056b56110aa",
+    "generated_by": "scripts/d2v-normalize-json.py",
+    "allow_extra_tests": false
+  }
+}

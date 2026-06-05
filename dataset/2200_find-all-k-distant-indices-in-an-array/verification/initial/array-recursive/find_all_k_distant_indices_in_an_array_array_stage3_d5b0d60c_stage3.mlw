@@ -1,0 +1,132 @@
+module FindAllKDistantIndicesInAnArray_Array_Stage3
+
+  use int.Int
+  use int.Abs
+  use array.Array
+  use array.Init
+  use array.NumOf as ArrayNumOf
+
+  predicate valid_input (nums: array int) (key: int) (k: int) =
+    1 <= length nums <= 1000 /\
+    (forall i: int. 0 <= i < length nums -> 1 <= nums[i] <= 1000) /\
+    (exists j: int. 0 <= j < length nums /\ nums[j] = key) /\
+    1 <= k <= length nums
+
+  predicate k_distant_index (nums: array int) (key: int) (k: int) (i: int) =
+    0 <= i < length nums /\
+    exists j: int.
+      0 <= j < length nums /\
+      nums[j] = key /\
+      abs (i - j) <= k
+
+  predicate strictly_sorted (a: array int) =
+    forall p q: int. 0 <= p < q < length a -> a[p] < a[q]
+
+  predicate output_spec (nums: array int) (key: int) (k: int) (result: array int) =
+    strictly_sorted result /\
+    (forall p: int. 0 <= p < length result ->
+      k_distant_index nums key k result[p]) /\
+    (forall i: int. k_distant_index nums key k i ->
+      exists p: int. 0 <= p < length result /\ result[p] = i)
+
+  function k_distant_count_from
+    (nums: array int) (key: int) (k: int) (i: int) : int =
+    ArrayNumOf.numof
+      (fun j _ -> k_distant_index nums key k j)
+      nums i (length nums)
+
+  let within_distance (i: int) (j: int) (k: int) : bool
+    ensures { result <-> abs (i - j) <= k }
+  =
+    if i <= j then
+      j - i <= k
+    else
+      i - j <= k
+
+  let rec exists_key_within_from
+    (nums: array int) (key: int) (k: int) (i: int) (j: int) : bool
+    requires { 0 <= j <= length nums }
+    variant  { length nums - j }
+    ensures  {
+      result <->
+      exists q: int.
+        j <= q < length nums /\
+        nums[q] = key /\
+        abs (i - q) <= k
+    }
+  =
+    if j >= length nums then
+      false
+    else if nums[j] = key then
+      if within_distance i j k then
+        true
+      else
+        exists_key_within_from nums key k i (j + 1)
+    else
+      exists_key_within_from nums key k i (j + 1)
+
+  let rec count_k_distant_from
+    (nums: array int) (key: int) (k: int) (i: int) : int
+    requires { 0 <= i <= length nums }
+    variant  { length nums - i }
+    ensures  { result = k_distant_count_from nums key k i }
+    ensures  { 0 <= result <= length nums - i }
+  =
+    if i >= length nums then
+      0
+    else
+      (if exists_key_within_from nums key k i 0 then 1 else 0) +
+      count_k_distant_from nums key k (i + 1)
+
+  let rec fill_k_distant_from
+    (nums: array int) (key: int) (k: int) (i: int) (res: array int) (out: int) : int
+    requires { 0 <= i <= length nums }
+    requires { 0 <= out <= length res }
+    requires { length res = out + k_distant_count_from nums key k i }
+    requires {
+      forall p: int.
+        0 <= p < out ->
+        0 <= res[p] < i /\ k_distant_index nums key k res[p]
+    }
+    requires {
+      forall p q: int.
+        0 <= p < q < out -> res[p] < res[q]
+    }
+    requires {
+      forall idx: int.
+        0 <= idx < i /\ k_distant_index nums key k idx ->
+        exists p: int. 0 <= p < out /\ res[p] = idx
+    }
+    variant  { length nums - i }
+    ensures  { result = length res }
+    ensures  {
+      forall p: int.
+        0 <= p < length res ->
+        0 <= res[p] < length nums /\ k_distant_index nums key k res[p]
+    }
+    ensures  { strictly_sorted res }
+    ensures  {
+      forall idx: int.
+        k_distant_index nums key k idx ->
+        exists p: int. 0 <= p < length res /\ res[p] = idx
+    }
+  =
+    if i >= length nums then
+      out
+    else if exists_key_within_from nums key k i 0 then begin
+      res[out] <- i;
+      fill_k_distant_from nums key k (i + 1) res (out + 1)
+    end else
+      fill_k_distant_from nums key k (i + 1) res out
+
+  let find_all_k_distant_indices_in_an_array_array
+    (nums: array int) (key: int) (k: int) : array int
+    requires { valid_input nums key k }
+    ensures  { output_spec nums key k result }
+  =
+    let count = count_k_distant_from nums key k 0 in
+    let result = make count 0 in
+    let _ = fill_k_distant_from nums key k 0 result 0 in
+    result
+
+end

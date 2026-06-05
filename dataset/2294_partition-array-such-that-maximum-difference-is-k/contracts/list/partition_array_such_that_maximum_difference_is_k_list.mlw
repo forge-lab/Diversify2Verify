@@ -1,0 +1,192 @@
+module PartitionArraySuchThatMaximumDifferenceIsK_List_Spec
+
+  use int.Int
+  use list.List
+  use list.Length
+
+  let rec predicate values_in_domain (nums: list int)
+    variant { nums }
+  =
+    match nums with
+    | Nil -> true
+    | Cons x xs -> 0 <= x && x <= 100000 && values_in_domain xs
+    end
+
+  predicate valid_input (nums: list int) (k: int) =
+    nums <> Nil /\
+    length nums <= 100000 /\
+    0 <= k /\ k <= 100000 /\
+    values_in_domain nums
+
+  predicate interval_covers (start: int) (k: int) (x: int) =
+    start <= x /\ x <= start + k
+
+  let rec predicate covered_by_some_interval (starts: list int) (k: int) (x: int)
+    variant { starts }
+  =
+    match starts with
+    | Nil -> false
+    | Cons start rest ->
+        (start <= x && x <= start + k) || covered_by_some_interval rest k x
+    end
+
+  let rec predicate values_covered (nums: list int) (starts: list int) (k: int)
+    variant { nums }
+  =
+    match nums with
+    | Nil -> true
+    | Cons x xs ->
+        covered_by_some_interval starts k x && values_covered xs starts k
+    end
+
+  predicate minimal_interval_cover_count (nums: list int) (k: int) (r: int) =
+    0 <= r /\
+    (exists starts: list int.
+       length starts = r /\ values_covered nums starts k) /\
+    (forall other_starts: list int.
+       values_covered nums other_starts k -> r <= length other_starts)
+
+  val partition_array_such_that_maximum_difference_is_k_list
+    (nums: list int) (k: int) : int
+    requires { valid_input nums k }
+    ensures  { result >= 1 }
+    ensures  { minimal_interval_cover_count nums k result }
+
+  let lemma check_test_000 () =
+    let nums = Cons 1 (Cons 100000 Nil) in
+    let starts = Cons 1 Nil in
+    assert { values_in_domain nums };
+    assert { valid_input nums 99999 };
+    assert { interval_covers 1 99999 1 };
+    assert { interval_covers 1 99999 100000 };
+    assert { covered_by_some_interval starts 99999 1 };
+    assert { covered_by_some_interval starts 99999 100000 };
+    assert { values_covered nums starts 99999 };
+    assert { length starts = 1 };
+    assert { forall other_starts: list int.
+      values_covered nums other_starts 99999 -> 1 <= length other_starts };
+    assert { minimal_interval_cover_count nums 99999 1 }
+
+  let lemma check_test_001 () =
+    let nums =
+      Cons 1 (Cons 2 (Cons 3 (Cons 4 (Cons 5
+        (Cons 6 (Cons 7 (Cons 8 (Cons 9 (Cons 10 Nil))))))))) in
+    let starts = Cons 1 (Cons 4 (Cons 7 (Cons 10 Nil))) in
+    assert { values_in_domain nums };
+    assert { valid_input nums 2 };
+    assert { interval_covers 1 2 1 };
+    assert { interval_covers 1 2 2 };
+    assert { interval_covers 1 2 3 };
+    assert { interval_covers 4 2 4 };
+    assert { interval_covers 4 2 5 };
+    assert { interval_covers 4 2 6 };
+    assert { interval_covers 7 2 7 };
+    assert { interval_covers 7 2 8 };
+    assert { interval_covers 7 2 9 };
+    assert { interval_covers 10 2 10 };
+    assert { covered_by_some_interval starts 2 1 };
+    assert { covered_by_some_interval starts 2 2 };
+    assert { covered_by_some_interval starts 2 3 };
+    assert { covered_by_some_interval starts 2 4 };
+    assert { covered_by_some_interval starts 2 5 };
+    assert { covered_by_some_interval starts 2 6 };
+    assert { covered_by_some_interval starts 2 7 };
+    assert { covered_by_some_interval starts 2 8 };
+    assert { covered_by_some_interval starts 2 9 };
+    assert { covered_by_some_interval starts 2 10 };
+    assert { values_covered nums starts 2 };
+    assert { length starts = 4 };
+    assert { forall other_starts: list int.
+      values_covered nums other_starts 2 -> 4 <= length other_starts };
+    assert { minimal_interval_cover_count nums 2 4 }
+
+  let lemma check_test_004 () =
+    let nums = Cons 5 (Cons 5 (Cons 5 (Cons 5 (Cons 5 Nil)))) in
+    let starts = Cons 5 Nil in
+    assert { values_in_domain nums };
+    assert { valid_input nums 0 };
+    assert { interval_covers 5 0 5 };
+    assert { covered_by_some_interval starts 0 5 };
+    assert { values_covered nums starts 0 };
+    assert { length starts = 1 };
+    assert { forall other_starts: list int.
+      values_covered nums other_starts 0 -> 1 <= length other_starts };
+    assert { minimal_interval_cover_count nums 0 1 }
+
+  let lemma check_test_005 () =
+    let nums = Cons 1 (Cons 2 (Cons 3 Nil)) in
+    let starts = Cons 1 (Cons 3 Nil) in
+    assert { values_in_domain nums };
+    assert { valid_input nums 1 };
+    assert { interval_covers 1 1 1 };
+    assert { interval_covers 1 1 2 };
+    assert { interval_covers 3 1 3 };
+    assert { covered_by_some_interval starts 1 1 };
+    assert { covered_by_some_interval starts 1 2 };
+    assert { covered_by_some_interval starts 1 3 };
+    assert { values_covered nums starts 1 };
+    assert { length starts = 2 };
+    assert { forall other_starts: list int.
+      values_covered nums other_starts 1 -> 2 <= length other_starts };
+    assert { minimal_interval_cover_count nums 1 2 }
+
+  let lemma check_test_006 () =
+    let nums = Cons 1 (Cons 3 (Cons 5 (Cons 7 (Cons 9 Nil)))) in
+    let starts = Cons 1 (Cons 3 (Cons 5 (Cons 7 (Cons 9 Nil)))) in
+    assert { values_in_domain nums };
+    assert { valid_input nums 1 };
+    assert { interval_covers 1 1 1 };
+    assert { interval_covers 3 1 3 };
+    assert { interval_covers 5 1 5 };
+    assert { interval_covers 7 1 7 };
+    assert { interval_covers 9 1 9 };
+    assert { covered_by_some_interval starts 1 1 };
+    assert { covered_by_some_interval starts 1 3 };
+    assert { covered_by_some_interval starts 1 5 };
+    assert { covered_by_some_interval starts 1 7 };
+    assert { covered_by_some_interval starts 1 9 };
+    assert { values_covered nums starts 1 };
+    assert { length starts = 5 };
+    assert { forall other_starts: list int.
+      values_covered nums other_starts 1 -> 5 <= length other_starts };
+    assert { minimal_interval_cover_count nums 1 5 }
+
+  let lemma check_test_009 () =
+    let nums = Cons 3 (Cons 6 (Cons 1 (Cons 2 (Cons 5 Nil)))) in
+    let starts = Cons 1 (Cons 5 Nil) in
+    assert { values_in_domain nums };
+    assert { valid_input nums 2 };
+    assert { interval_covers 1 2 1 };
+    assert { interval_covers 1 2 2 };
+    assert { interval_covers 1 2 3 };
+    assert { interval_covers 5 2 5 };
+    assert { interval_covers 5 2 6 };
+    assert { covered_by_some_interval starts 2 3 };
+    assert { covered_by_some_interval starts 2 6 };
+    assert { covered_by_some_interval starts 2 1 };
+    assert { covered_by_some_interval starts 2 2 };
+    assert { covered_by_some_interval starts 2 5 };
+    assert { values_covered nums starts 2 };
+    assert { length starts = 2 };
+    assert { forall other_starts: list int.
+      values_covered nums other_starts 2 -> 2 <= length other_starts };
+    assert { minimal_interval_cover_count nums 2 2 }
+
+  let lemma check_test_011 () =
+    let nums = Cons 2 (Cons 2 (Cons 4 (Cons 5 Nil))) in
+    let starts = Cons 2 (Cons 4 (Cons 5 Nil)) in
+    assert { values_in_domain nums };
+    assert { valid_input nums 0 };
+    assert { interval_covers 2 0 2 };
+    assert { interval_covers 4 0 4 };
+    assert { interval_covers 5 0 5 };
+    assert { covered_by_some_interval starts 0 2 };
+    assert { covered_by_some_interval starts 0 4 };
+    assert { covered_by_some_interval starts 0 5 };
+    assert { values_covered nums starts 0 };
+    assert { length starts = 3 };
+    assert { forall other_starts: list int.
+      values_covered nums other_starts 0 -> 3 <= length other_starts };
+    assert { minimal_interval_cover_count nums 0 3 }
+
+end

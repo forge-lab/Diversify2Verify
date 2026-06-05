@@ -1,0 +1,168 @@
+module SmallestRangeIi_List_Stage3_Imperative
+
+  use int.Int
+  use list.List
+  use list.Length
+  use list.Mem
+  use ref.Ref
+
+  let rec predicate choice_transform (nums: list int) (k: int) (changed: list int)
+    variant { nums }
+  =
+    match nums with
+    | Nil ->
+        match changed with
+        | Nil -> true
+        | Cons _ _ -> false
+        end
+    | Cons x xs ->
+        match changed with
+        | Nil -> false
+        | Cons y ys ->
+            (y = x + k || y = x - k) && choice_transform xs k ys
+        end
+    end
+
+  predicate is_min_value (l: list int) (lo: int) =
+    mem lo l /\
+    (forall x: int. mem x l -> lo <= x)
+
+  predicate is_max_value (l: list int) (hi: int) =
+    mem hi l /\
+    (forall x: int. mem x l -> x <= hi)
+
+  predicate range_score (l: list int) (score: int) =
+    exists lo hi: int.
+      is_min_value l lo /\ is_max_value l hi /\ score = hi - lo
+
+  predicate possible_score (nums: list int) (k: int) (score: int) =
+    exists changed: list int.
+      choice_transform nums k changed /\ range_score changed score
+
+  predicate optimal_score (nums: list int) (k: int) (best: int) =
+    possible_score nums k best /\
+    (forall score: int. possible_score nums k score -> best <= score)
+
+  let lemma optimal_score_implies_possible_score
+      (nums: list int) (k: int) (best: int)
+    requires { optimal_score nums k best }
+    ensures  { possible_score nums k best }
+  = ()
+
+  let min2 (a: int) (b: int) : int
+    ensures { result = a \/ result = b }
+    ensures { result <= a /\ result <= b }
+    ensures { forall z: int. z <= a /\ z <= b -> z <= result }
+  =
+    if a <= b then a else b
+
+  let max2 (a: int) (b: int) : int
+    ensures { result = a \/ result = b }
+    ensures { a <= result /\ b <= result }
+    ensures { forall z: int. a <= z /\ b <= z -> result <= z }
+  =
+    if a >= b then a else b
+
+  let insert_sorted (x: int) (l: list int) : list int =
+    let prefix = ref (Nil: list int) in
+    let suffix = ref l in
+    while (match !suffix with
+           | Nil -> false
+           | Cons y _ -> y < x
+           end) do
+      invariant { 0 <= length !suffix }
+      variant   { length !suffix }
+      match !suffix with
+      | Nil -> ()
+      | Cons y ys ->
+          prefix := Cons y !prefix;
+          suffix := ys
+      end
+    done;
+    let result = ref (Cons x !suffix) in
+    let cur = ref !prefix in
+    while (match !cur with Nil -> false | Cons _ _ -> true end) do
+      invariant { 0 <= length !cur }
+      variant   { length !cur }
+      match !cur with
+      | Nil -> ()
+      | Cons y ys ->
+          result := Cons y !result;
+          cur := ys
+      end
+    done;
+    !result
+
+  let sort_list (l: list int) : list int =
+    let sorted = ref (Nil: list int) in
+    let cur = ref l in
+    while (match !cur with Nil -> false | Cons _ _ -> true end) do
+      invariant { 0 <= length !cur }
+      variant   { length !cur }
+      match !cur with
+      | Nil -> ()
+      | Cons x xs ->
+          sorted := insert_sorted x !sorted;
+          cur := xs
+      end
+    done;
+    !sorted
+
+  let last_value_with_current (current: int) (xs: list int) : int =
+    let last = ref current in
+    let cur = ref xs in
+    while (match !cur with Nil -> false | Cons _ _ -> true end) do
+      invariant { 0 <= length !cur }
+      variant   { length !cur }
+      match !cur with
+      | Nil -> ()
+      | Cons y ys ->
+          last := y;
+          cur := ys
+      end
+    done;
+    !last
+
+  let smallest_range_ii_list (nums: list int) (k: int) : int
+    requires { nums <> Nil }
+    requires { 0 <= k <= 10000 }
+    requires { length nums <= 10000 }
+    requires { forall x: int. mem x nums -> 0 <= x <= 10000 }
+    ensures  { possible_score nums k result }
+    ensures  { forall score: int. possible_score nums k score -> result <= score }
+    ensures  { optimal_score nums k result }
+    ensures  { 0 <= result }
+  =
+    match sort_list nums with
+    | Nil -> 0
+    | Cons first rest ->
+        let last = last_value_with_current first rest in
+        let best = ref (last - first) in
+        let prev = ref first in
+        let cur = ref rest in
+        while (match !cur with Nil -> false | Cons _ _ -> true end) do
+          invariant { 0 <= length !cur }
+          variant   { length !cur }
+          match !cur with
+          | Nil -> ()
+          | Cons current tail ->
+              let high = max2 (!prev + k) (last - k) in
+              let low = min2 (first + k) (current - k) in
+              let candidate = high - low in
+              assert { high = !prev + k \/ high = last - k };
+              assert { low = first + k \/ low = current - k };
+              if candidate < !best then best := candidate;
+              prev := current;
+              cur := tail
+          end
+        done;
+        let final = !best in
+        assert { optimal_score nums k final };
+        optimal_score_implies_possible_score nums k final;
+        assert { possible_score nums k final };
+        assert { forall score: int. possible_score nums k score -> final <= score };
+        assert { 0 <= final };
+        final
+    end
+
+end

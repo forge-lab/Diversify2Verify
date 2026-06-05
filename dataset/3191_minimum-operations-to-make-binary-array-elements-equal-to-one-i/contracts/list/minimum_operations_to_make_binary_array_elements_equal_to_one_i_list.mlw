@@ -1,0 +1,167 @@
+module MinimumOperationsToMakeBinaryArrayElementsEqualToOneI_List_Spec
+
+  use int.Int
+  use list.List
+  use list.Length
+
+  let rec predicate binary_list (nums: list int)
+    variant { nums }
+  =
+    match nums with
+    | Nil -> true
+    | Cons x xs -> (x = 0 || x = 1) && binary_list xs
+    end
+
+  let function effective_bit (x: int) (prev2: int) (prev1: int) : int =
+    if prev2 = prev1 then x else 1 - x
+
+  let rec function min_ops_from (prev2: int) (prev1: int) (nums: list int) : int
+    variant { nums }
+  =
+    match nums with
+    | Nil -> 0
+    | Cons x Nil ->
+        if effective_bit x prev2 prev1 = 1 then 0 else -1
+    | Cons x (Cons y Nil) ->
+        if effective_bit x prev2 prev1 = 1 then
+          if effective_bit y prev1 0 = 1 then 0 else -1
+        else -1
+    | Cons x (Cons y (Cons z zs)) ->
+        if effective_bit x prev2 prev1 = 1 then
+          min_ops_from prev1 0 (Cons y (Cons z zs))
+        else
+          let rest = min_ops_from prev1 1 (Cons y (Cons z zs)) in
+          if rest = -1 then -1 else 1 + rest
+    end
+
+  let function minimum_operations_spec (nums: list int) : int =
+    min_ops_from 0 0 nums
+
+  val minimum_operations_to_make_binary_array_elements_equal_to_one_i_list (nums: list int) : int
+    requires { binary_list nums }
+    requires { length nums >= 3 }
+    ensures  { result = minimum_operations_spec nums }
+
+  let lemma check_test_000 () =
+    let s2 = Cons 0 (Cons 1 Nil) in
+    let s3 = Cons 1 s2 in
+    let s4 = Cons 0 s3 in
+    let s5 = Cons 1 s4 in
+    let nums = Cons 0 s5 in
+    assert { binary_list nums };
+    assert { length nums = 6 };
+    assert { min_ops_from 1 0 s2 = 0 };
+    assert { min_ops_from 1 1 s3 = 0 };
+    assert { min_ops_from 1 1 s4 = 1 };
+    assert { min_ops_from 0 1 s5 = 2 };
+    assert { minimum_operations_spec nums = 3 }
+
+  let lemma check_test_001 () =
+    let s2 = Cons 0 (Cons 0 Nil) in
+    let s3 = Cons 1 s2 in
+    let s4 = Cons 1 s3 in
+    let s5 = Cons 1 s4 in
+    let s6 = Cons 0 s5 in
+    let nums = Cons 0 s6 in
+    assert { binary_list nums };
+    assert { length nums = 7 };
+    assert { min_ops_from 1 0 s2 = -1 };
+    assert { min_ops_from 1 1 s3 = -1 };
+    assert { min_ops_from 0 1 s4 = -1 };
+    assert { min_ops_from 1 0 s5 = -1 };
+    assert { min_ops_from 0 1 s6 = -1 };
+    assert { minimum_operations_spec nums = -1 }
+
+  let lemma check_test_002 () =
+    let s2 = Cons 1 (Cons 0 Nil) in
+    let s3 = Cons 1 s2 in
+    let s4 = Cons 0 s3 in
+    let s5 = Cons 1 s4 in
+    let s6 = Cons 0 s5 in
+    let s7 = Cons 0 s6 in
+    let s8 = Cons 1 s7 in
+    let s9 = Cons 0 s8 in
+    let nums = Cons 0 s9 in
+    assert { binary_list nums };
+    assert { length nums = 10 };
+    assert { min_ops_from 1 0 s2 = 0 };
+    assert { min_ops_from 0 0 s3 = 0 };
+    assert { min_ops_from 0 0 s4 = 1 };
+    assert { min_ops_from 1 1 s5 = 1 };
+    assert { min_ops_from 1 0 s6 = 1 };
+    assert { min_ops_from 0 1 s7 = 2 };
+    assert { min_ops_from 0 0 s8 = 3 };
+    assert { min_ops_from 0 1 s9 = 3 };
+    assert { minimum_operations_spec nums = 4 }
+
+  let lemma check_test_003 () =
+    let s2 = Cons 0 (Cons 1 Nil) in
+    let s3 = Cons 1 s2 in
+    let s4 = Cons 0 s3 in
+    let s5 = Cons 1 s4 in
+    let s6 = Cons 0 s5 in
+    let s7 = Cons 1 s6 in
+    let s8 = Cons 0 s7 in
+    let nums = Cons 1 s8 in
+    assert { binary_list nums };
+    assert { length nums = 9 };
+    assert { min_ops_from 1 1 s2 = -1 };
+    assert { min_ops_from 0 1 s3 = -1 };
+    assert { min_ops_from 1 0 s4 = -1 };
+    assert { min_ops_from 1 1 s5 = -1 };
+    assert { min_ops_from 0 1 s6 = -1 };
+    assert { min_ops_from 1 0 s7 = -1 };
+    assert { min_ops_from 0 0 s8 = -1 };
+    assert { minimum_operations_spec nums = -1 }
+
+  let lemma check_test_004 () =
+    let s2 = Cons 0 (Cons 0 Nil) in
+    let s3 = Cons 0 s2 in
+    let s4 = Cons 1 s3 in
+    let s5 = Cons 1 s4 in
+    let s6 = Cons 1 s5 in
+    let s7 = Cons 0 s6 in
+    let s8 = Cons 0 s7 in
+    let nums = Cons 0 s8 in
+    assert { binary_list nums };
+    assert { length nums = 9 };
+    assert { min_ops_from 0 1 s2 = 0 };
+    assert { min_ops_from 1 1 s3 = 0 };
+    assert { min_ops_from 1 0 s4 = 1 };
+    assert { min_ops_from 0 0 s5 = 1 };
+    assert { min_ops_from 0 0 s6 = 1 };
+    assert { min_ops_from 0 1 s7 = 1 };
+    assert { min_ops_from 1 1 s8 = 1 };
+    assert { minimum_operations_spec nums = 2 }
+
+  let lemma check_test_005 () =
+    let s2 = Cons 1 (Cons 1 Nil) in
+    let s3 = Cons 1 s2 in
+    let s4 = Cons 1 s3 in
+    let s5 = Cons 1 s4 in
+    let s6 = Cons 1 s5 in
+    let nums = Cons 1 s6 in
+    assert { binary_list nums };
+    assert { length nums = 7 };
+    assert { min_ops_from 0 0 s2 = 0 };
+    assert { min_ops_from 0 0 s3 = 0 };
+    assert { min_ops_from 0 0 s4 = 0 };
+    assert { min_ops_from 0 0 s5 = 0 };
+    assert { min_ops_from 0 0 s6 = 0 };
+    assert { minimum_operations_spec nums = 0 }
+
+  let lemma check_test_006 () =
+    let s2 = Cons 0 (Cons 0 Nil) in
+    let s3 = Cons 1 s2 in
+    let s4 = Cons 0 s3 in
+    let s5 = Cons 0 s4 in
+    let nums = Cons 1 s5 in
+    assert { binary_list nums };
+    assert { length nums = 6 };
+    assert { min_ops_from 1 1 s2 = 0 };
+    assert { min_ops_from 0 1 s3 = 1 };
+    assert { min_ops_from 1 0 s4 = 1 };
+    assert { min_ops_from 0 0 s5 = 2 };
+    assert { minimum_operations_spec nums = 2 }
+
+end

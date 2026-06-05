@@ -1,0 +1,132 @@
+module MaximumNumberOfGroupsWithIncreasingLength_List_Stage3_Imperative
+
+  use int.Int
+  use int.MinMax
+  use list.List
+  use list.Length
+  use ref.Ref
+
+  let rec predicate positive_limits (usageLimits: list int)
+    variant { usageLimits }
+  =
+    match usageLimits with
+    | Nil -> true
+    | Cons limit rest -> 1 <= limit && positive_limits rest
+    end
+
+  let rec function capped_sum (usageLimits: list int) (groups: int) : int
+    variant { usageLimits }
+  =
+    match usageLimits with
+    | Nil -> 0
+    | Cons limit rest -> min limit groups + capped_sum rest groups
+    end
+
+  predicate feasible_groups (usageLimits: list int) (groups: int) =
+    0 <= groups /\
+    groups <= length usageLimits /\
+    groups * (groups + 1) <= 2 * capped_sum usageLimits groups
+
+  predicate optimal_groups (usageLimits: list int) (groups: int) =
+    feasible_groups usageLimits groups /\
+    (forall other: int. feasible_groups usageLimits other -> other <= groups)
+
+  let list_length (usageLimits: list int) : int
+    ensures { result = length usageLimits }
+  =
+    let len = ref 0 in
+    let cur = ref usageLimits in
+    while (match !cur with Nil -> false | Cons _ _ -> true end) do
+      invariant { 0 <= !len }
+      invariant { !len + length !cur = length usageLimits }
+      variant { length !cur }
+
+      match !cur with
+      | Nil ->
+          assert { false }
+      | Cons _ rest ->
+          assert { length !cur = 1 + length rest };
+          len := !len + 1;
+          cur := rest
+      end
+    done;
+    assert { !cur = Nil };
+    assert { length !cur = 0 };
+    !len
+
+  let capped_sum_upto (usageLimits: list int) (groups: int) : int
+    ensures { result = capped_sum usageLimits groups }
+  =
+    let total = ref 0 in
+    let cur = ref usageLimits in
+    while (match !cur with Nil -> false | Cons _ _ -> true end) do
+      invariant { !total + capped_sum !cur groups = capped_sum usageLimits groups }
+      variant { length !cur }
+
+      match !cur with
+      | Nil ->
+          assert { false }
+      | Cons limit rest ->
+          assert { capped_sum !cur groups = min limit groups + capped_sum rest groups };
+          total := !total + min limit groups;
+          cur := rest
+      end
+    done;
+    assert { !cur = Nil };
+    assert { capped_sum !cur groups = 0 };
+    !total
+
+  let feasible_groups_impl (usageLimits: list int) (groups: int) : bool
+    ensures { result = true <-> feasible_groups usageLimits groups }
+  =
+    0 <= groups &&
+    groups <= list_length usageLimits &&
+    groups * (groups + 1) <= 2 * capped_sum_upto usageLimits groups
+
+  let maximum_number_of_groups_with_increasing_length_list
+      (usageLimits: list int) : int
+    requires { 1 <= length usageLimits }
+    requires { positive_limits usageLimits }
+    ensures  { optimal_groups usageLimits result }
+  =
+    let n = list_length usageLimits in
+    assert { n = length usageLimits };
+    let best = ref 0 in
+    let groups = ref 1 in
+    assert { feasible_groups usageLimits 0 };
+    while !groups <= n do
+      invariant { n = length usageLimits }
+      invariant { 1 <= !groups <= n + 1 }
+      invariant { 0 <= !best < !groups }
+      invariant { feasible_groups usageLimits !best }
+      invariant {
+        forall other: int.
+          feasible_groups usageLimits other /\ other < !groups -> other <= !best
+      }
+      variant { n - !groups + 1 }
+
+      if feasible_groups_impl usageLimits !groups then begin
+        assert { feasible_groups usageLimits !groups };
+        assert {
+          forall other: int.
+            feasible_groups usageLimits other /\ other < !groups -> other <= !best
+        };
+        best := !groups
+      end else begin
+        assert { not (feasible_groups usageLimits !groups) }
+      end;
+      assert { 0 <= !best <= !groups };
+      assert {
+        forall other: int.
+          feasible_groups usageLimits other /\ other < !groups + 1 -> other <= !best
+      };
+      groups := !groups + 1
+    done;
+    assert { !groups = n + 1 };
+    assert {
+      forall other: int.
+        feasible_groups usageLimits other -> other <= !best
+    };
+    !best
+
+end

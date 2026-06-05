@@ -1,0 +1,158 @@
+module CountNumberOfNiceSubarrays_List_Spec
+
+  use int.Int
+  use int.EuclideanDivision
+  use list.List
+  use list.Length
+
+  let rec predicate all_between (nums: list int) (lo: int) (hi: int)
+    variant { nums }
+  =
+    match nums with
+    | Nil -> true
+    | Cons x xs -> lo <= x && x <= hi && all_between xs lo hi
+    end
+
+  let function odd_indicator (x: int) : int =
+    if mod x 2 = 1 then 1 else 0
+
+  let rec function count_prefixes_with_odd_count (nums: list int) (k: int) : int
+    variant { nums }
+  =
+    match nums with
+    | Nil -> if k = 0 then 1 else 0
+    | Cons x xs ->
+        (if k = 0 then 1 else 0) +
+        count_prefixes_with_odd_count xs (k - odd_indicator x)
+    end
+
+  let rec function count_nice_subarrays (nums: list int) (k: int) : int
+    variant { nums }
+  =
+    match nums with
+    | Nil -> 0
+    | Cons _ xs ->
+        count_prefixes_with_odd_count nums k + count_nice_subarrays xs k
+    end
+
+  predicate valid_input (nums: list int) (k: int) =
+    1 <= length nums <= 50000 /\
+    all_between nums 1 100000 /\
+    1 <= k <= length nums
+
+  val count_number_of_nice_subarrays_list (nums: list int) (k: int) : int
+    requires { valid_input nums k }
+    ensures  { result = count_nice_subarrays nums k }
+    ensures  { result >= 0 }
+
+  let lemma check_test_002 () =
+    let nums = Cons 2 Nil in
+    assert { odd_indicator 2 = 0 };
+    assert { count_prefixes_with_odd_count nums 1 = 0 };
+    assert { count_nice_subarrays nums 1 = 0 };
+    assert { valid_input nums 1 }
+
+  let lemma check_test_003 () =
+    let t1 = Cons 6 Nil in
+    let t2 = Cons 4 t1 in
+    let nums = Cons 2 t2 in
+    assert { odd_indicator 2 = 0 };
+    assert { odd_indicator 4 = 0 };
+    assert { odd_indicator 6 = 0 };
+    assert { count_prefixes_with_odd_count nums 1 = 0 };
+    assert { count_prefixes_with_odd_count t2 1 = 0 };
+    assert { count_prefixes_with_odd_count t1 1 = 0 };
+    assert { count_nice_subarrays nums 1 = 0 };
+    assert { valid_input nums 1 }
+
+  let lemma check_test_005 () =
+    let nums = Cons 1 Nil in
+    assert { odd_indicator 1 = 1 };
+    assert { count_prefixes_with_odd_count Nil 0 = 1 };
+    assert { count_prefixes_with_odd_count nums 1 = 1 };
+    assert { count_nice_subarrays nums 1 = 1 };
+    assert { valid_input nums 1 }
+
+  let lemma check_test_009 () =
+    let t1 = Cons 9 Nil in
+    let t2 = Cons 7 t1 in
+    let t3 = Cons 5 t2 in
+    let t4 = Cons 3 t3 in
+    let nums = Cons 1 t4 in
+    assert { odd_indicator 1 = 1 };
+    assert { odd_indicator 3 = 1 };
+    assert { odd_indicator 5 = 1 };
+    assert { count_prefixes_with_odd_count t1 2 = 0 };
+    assert { count_prefixes_with_odd_count t2 2 = 1 };
+    assert { count_prefixes_with_odd_count t3 2 = 1 };
+    assert { count_prefixes_with_odd_count t4 2 = 1 };
+    assert { count_prefixes_with_odd_count nums 2 = 1 };
+    assert { count_nice_subarrays t2 2 = 1 };
+    assert { count_nice_subarrays t3 2 = 2 };
+    assert { count_nice_subarrays t4 2 = 3 };
+    assert { count_nice_subarrays nums 2 = 4 };
+    assert { valid_input nums 2 }
+
+  let lemma check_test_010 () =
+    let t1 = Cons 1 Nil in
+    let t2 = Cons 1 t1 in
+    let t3 = Cons 2 t2 in
+    let t4 = Cons 1 t3 in
+    let nums = Cons 1 t4 in
+    assert { odd_indicator 1 = 1 };
+    assert { odd_indicator 2 = 0 };
+    assert { count_prefixes_with_odd_count t2 3 = 0 };
+    assert { count_prefixes_with_odd_count t3 3 = 0 };
+    assert { count_prefixes_with_odd_count t4 3 = 1 };
+    assert { count_prefixes_with_odd_count nums 3 = 1 };
+    assert { count_nice_subarrays t4 3 = 1 };
+    assert { count_nice_subarrays nums 3 = 2 };
+    assert { valid_input nums 3 }
+
+  let lemma check_test_008 () =
+    let t1 = Cons 2 Nil in
+    let t2 = Cons 2 t1 in
+    let t3 = Cons 2 t2 in
+    let t4 = Cons 1 t3 in
+    let t5 = Cons 2 t4 in
+    let t6 = Cons 2 t5 in
+    let t7 = Cons 1 t6 in
+    let t8 = Cons 2 t7 in
+    let t9 = Cons 2 t8 in
+    let nums = Cons 2 t9 in
+    assert { odd_indicator 1 = 1 };
+    assert { odd_indicator 2 = 0 };
+    assert { count_prefixes_with_odd_count t6 2 = 0 };
+    assert { count_prefixes_with_odd_count t7 2 = 4 };
+    assert { count_prefixes_with_odd_count t8 2 = 4 };
+    assert { count_prefixes_with_odd_count t9 2 = 4 };
+    assert { count_prefixes_with_odd_count nums 2 = 4 };
+    assert { count_nice_subarrays t7 2 = 4 };
+    assert { count_nice_subarrays t8 2 = 8 };
+    assert { count_nice_subarrays t9 2 = 12 };
+    assert { count_nice_subarrays nums 2 = 16 };
+    assert { valid_input nums 2 }
+
+  let lemma check_test_012 () =
+    let t1 = Cons 30 Nil in
+    let t2 = Cons 25 t1 in
+    let t3 = Cons 20 t2 in
+    let t4 = Cons 15 t3 in
+    let nums = Cons 10 t4 in
+    assert { odd_indicator 10 = 0 };
+    assert { odd_indicator 15 = 1 };
+    assert { odd_indicator 20 = 0 };
+    assert { odd_indicator 25 = 1 };
+    assert { odd_indicator 30 = 0 };
+    assert { count_prefixes_with_odd_count t1 1 = 0 };
+    assert { count_prefixes_with_odd_count t2 1 = 2 };
+    assert { count_prefixes_with_odd_count t3 1 = 2 };
+    assert { count_prefixes_with_odd_count t4 1 = 2 };
+    assert { count_prefixes_with_odd_count nums 1 = 2 };
+    assert { count_nice_subarrays t2 1 = 2 };
+    assert { count_nice_subarrays t3 1 = 4 };
+    assert { count_nice_subarrays t4 1 = 6 };
+    assert { count_nice_subarrays nums 1 = 8 };
+    assert { valid_input nums 1 }
+
+end

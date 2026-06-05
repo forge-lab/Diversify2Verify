@@ -1,0 +1,114 @@
+module MinimumAmountOfTimeToFillCups_Array_Recursive_Implementation
+
+  use int.Int
+  use int.MinMax
+  use int.EuclideanDivision
+  use array.Array
+  use array.Init
+
+  let rec sum_from (amount: array int) (i: int) : int
+    variant { length amount - i }
+  =
+    if i >= length amount then
+      0
+    else
+      amount[i] + sum_from amount (i + 1)
+
+  let rec max_from (amount: array int) (i: int) (current: int) : int
+    variant { length amount - i }
+  =
+    if i >= length amount then
+      current
+    else if amount[i] > current then
+      max_from amount (i + 1) amount[i]
+    else
+      max_from amount (i + 1) current
+
+  let ceil_half (n: int) : int =
+    div (n + 1) 2
+
+  let maximum_amount (amount: array int) : int =
+    if length amount = 0 then
+      0
+    else
+      max_from amount 1 amount[0]
+
+  let minimum_amount_of_time_to_fill_cups_array (amount: array int) : int =
+    let total = sum_from amount 0 in
+    let largest = maximum_amount amount in
+    let pairing_bound = ceil_half total in
+    if largest >= pairing_bound then
+      largest
+    else
+      pairing_bound
+
+  let check_case (a0: int) (a1: int) (a2: int) (expected: int) : bool =
+    let amount = init 3 [|a0; a1; a2|] in
+    let r = minimum_amount_of_time_to_fill_cups_array amount in
+    r = expected
+
+  let test_000 () : bool = check_case 33 33 34 50
+  let test_001 () : bool = check_case 0 0 0 0
+  let test_002 () : bool = check_case 99 1 1 99
+  let test_003 () : bool = check_case 7 7 7 11
+  let test_004 () : bool = check_case 10 10 10 15
+  let test_005 () : bool = check_case 1 2 3 3
+  let test_006 () : bool = check_case 100 0 0 100
+  let test_007 () : bool = check_case 100 100 100 150
+  let test_008 () : bool = check_case 0 1 2 2
+  let test_009 () : bool = check_case 1 4 2 4
+  let test_010 () : bool = check_case 5 0 0 5
+  let test_011 () : bool = check_case 99 99 1 100
+  let test_012 () : bool = check_case 0 50 50 50
+  let test_013 () : bool = check_case 5 4 4 7
+  let test_014 () : bool = check_case 98 1 1 98
+  let test_015 () : bool = check_case 25 0 75 75
+  let test_016 () : bool = check_case 42 42 41 63
+  let test_017 () : bool = check_case 60 20 20 60
+  let test_018 () : bool = check_case 10 50 25 50
+  let test_019 () : bool = check_case 49 49 49 74
+
+  let run_tests () : bool =
+    if test_000 () then
+    if test_001 () then
+    if test_002 () then
+    if test_003 () then
+    if test_004 () then
+    if test_005 () then
+    if test_006 () then
+    if test_007 () then
+    if test_008 () then
+    if test_009 () then
+    if test_010 () then
+    if test_011 () then
+    if test_012 () then
+    if test_013 () then
+    if test_014 () then
+    if test_015 () then
+    if test_016 () then
+    if test_017 () then
+    if test_018 () then
+    if test_019 () then
+      true
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+
+end

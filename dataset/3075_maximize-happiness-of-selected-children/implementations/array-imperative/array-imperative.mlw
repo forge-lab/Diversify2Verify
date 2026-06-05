@@ -1,0 +1,193 @@
+module MaximizeHappinessOfSelectedChildren_Array_Imperative
+
+  use int.Int
+  use array.Array
+  use array.Init
+  use ref.Ref
+
+  let copy_array (a: array int) : array int =
+    let n = length a in
+    let result = make n 0 in
+    for i = 0 to n - 1 do
+      result[i] <- a[i]
+    done;
+    result
+
+  let insertion_sort (a: array int) : unit =
+    let n = length a in
+    if n >= 2 then
+      for i = 1 to n - 1 do
+        let key = a[i] in
+        let j = ref (i - 1) in
+        while !j >= 0 && a[!j] > key do
+          variant { !j + 1 }
+          a[!j + 1] <- a[!j];
+          j := !j - 1
+        done;
+        a[!j + 1] <- key
+      done
+
+  let adjusted_happiness (h: int) (turn: int) : int =
+    if h > turn then h - turn else 0
+
+  let maximize_happiness_of_selected_children_array
+    (happiness: array int) (k: int) : int =
+    let n = length happiness in
+    if n = 0 || k <= 0 then
+      0
+    else begin
+      let sorted = copy_array happiness in
+      insertion_sort sorted;
+      let total = ref 0 in
+      let limit = if k <= n then k else n in
+      for turn = 0 to limit - 1 do
+        let value = sorted[n - 1 - turn] in
+        total := !total + adjusted_happiness value turn
+      done;
+      !total
+    end
+
+  let test_000 () : bool =
+    let happiness = init 10 [|10; 9; 8; 7; 6; 5; 4; 3; 2; 1|] in
+    let r = maximize_happiness_of_selected_children_array happiness 10 in
+    r = 30
+
+  let test_001 () : bool =
+    let happiness = init 5 [|10; 20; 30; 40; 50|] in
+    let r = maximize_happiness_of_selected_children_array happiness 5 in
+    r = 140
+
+  let test_002 () : bool =
+    let happiness = init 10 [|5; 5; 5; 5; 5; 5; 5; 5; 5; 5|] in
+    let r = maximize_happiness_of_selected_children_array happiness 5 in
+    r = 15
+
+  let test_003 () : bool =
+    let happiness = init 3 [|100000000; 100000000; 100000000|] in
+    let r = maximize_happiness_of_selected_children_array happiness 2 in
+    r = 199999999
+
+  let test_004 () : bool =
+    let happiness = init 10 [|1; 2; 3; 4; 5; 6; 7; 8; 9; 10|] in
+    let r = maximize_happiness_of_selected_children_array happiness 5 in
+    r = 30
+
+  let test_005 () : bool =
+    let happiness = init 1 [|1|] in
+    let r = maximize_happiness_of_selected_children_array happiness 1 in
+    r = 1
+
+  let test_006 () : bool =
+    let happiness = init 4 [|100000000; 100000000; 100000000; 100000000|] in
+    let r = maximize_happiness_of_selected_children_array happiness 2 in
+    r = 199999999
+
+  let test_007 () : bool =
+    let happiness = init 9 [|9; 8; 7; 6; 5; 4; 3; 2; 1|] in
+    let r = maximize_happiness_of_selected_children_array happiness 9 in
+    r = 25
+
+  let test_008 () : bool =
+    let happiness = init 5 [|10; 9; 8; 7; 6|] in
+    let r = maximize_happiness_of_selected_children_array happiness 3 in
+    r = 24
+
+  let test_009 () : bool =
+    let happiness = init 3 [|100; 100; 100|] in
+    let r = maximize_happiness_of_selected_children_array happiness 1 in
+    r = 100
+
+  let test_010 () : bool =
+    let happiness = init 4 [|1; 1; 1; 1|] in
+    let r = maximize_happiness_of_selected_children_array happiness 2 in
+    r = 1
+
+  let test_011 () : bool =
+    let happiness = init 10 [|1; 1; 2; 2; 3; 3; 4; 4; 5; 5|] in
+    let r = maximize_happiness_of_selected_children_array happiness 5 in
+    r = 12
+
+  let test_012 () : bool =
+    let happiness = init 3 [|1; 2; 3|] in
+    let r = maximize_happiness_of_selected_children_array happiness 2 in
+    r = 4
+
+  let test_013 () : bool =
+    let happiness = init 4 [|2; 3; 4; 5|] in
+    let r = maximize_happiness_of_selected_children_array happiness 1 in
+    r = 5
+
+  let test_014 () : bool =
+    let happiness = init 10 [|1; 1; 1; 1; 1; 1; 1; 1; 1; 1|] in
+    let r = maximize_happiness_of_selected_children_array happiness 5 in
+    r = 1
+
+  let test_015 () : bool =
+    let happiness = init 5 [|5; 4; 3; 2; 1|] in
+    let r = maximize_happiness_of_selected_children_array happiness 3 in
+    r = 9
+
+  let test_016 () : bool =
+    let happiness = init 10 [|5; 5; 5; 5; 5; 5; 5; 5; 5; 5|] in
+    let r = maximize_happiness_of_selected_children_array happiness 3 in
+    r = 12
+
+  let test_017 () : bool =
+    let happiness = init 10 [|1; 10; 1; 10; 1; 10; 1; 10; 1; 10|] in
+    let r = maximize_happiness_of_selected_children_array happiness 5 in
+    r = 40
+
+  let test_018 () : bool =
+    let happiness = init 10 [|1; 2; 3; 4; 5; 6; 7; 8; 9; 10|] in
+    let r = maximize_happiness_of_selected_children_array happiness 3 in
+    r = 24
+
+  let test_019 () : bool =
+    let happiness = init 15 [|1; 2; 2; 3; 3; 3; 4; 4; 4; 4; 5; 5; 5; 5; 5|] in
+    let r = maximize_happiness_of_selected_children_array happiness 10 in
+    r = 15
+
+  let run_tests () : bool =
+    if test_000 () then
+    if test_001 () then
+    if test_002 () then
+    if test_003 () then
+    if test_004 () then
+    if test_005 () then
+    if test_006 () then
+    if test_007 () then
+    if test_008 () then
+    if test_009 () then
+    if test_010 () then
+    if test_011 () then
+    if test_012 () then
+    if test_013 () then
+    if test_014 () then
+    if test_015 () then
+    if test_016 () then
+    if test_017 () then
+    if test_018 () then
+    if test_019 () then
+      true
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+
+end

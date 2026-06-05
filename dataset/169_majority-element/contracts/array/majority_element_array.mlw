@@ -1,0 +1,134 @@
+module MajorityElement_Array_Spec
+
+  use int.Int
+  use array.Array
+  use array.Init
+  use array.NumOfEq
+
+  function occurrences (nums: array int) (x: int) : int =
+    NumOfEq.numof nums x 0 (length nums)
+
+  predicate majority_value (nums: array int) (x: int) =
+    (exists i: int. 0 <= i < length nums /\ nums[i] = x) /\
+    2 * occurrences nums x > length nums
+
+  predicate valid_input (nums: array int) =
+    1 <= length nums <= 50000 /\
+    (forall i: int. 0 <= i < length nums ->
+      -1000000000 <= nums[i] <= 1000000000) /\
+    (exists x: int. majority_value nums x)
+
+  predicate majority_element_array_spec (nums: array int) (res: int) =
+    majority_value nums res /\
+    (forall x: int. majority_value nums x -> x = res)
+
+  val majority_element_array (nums: array int) : int
+    requires { valid_input nums }
+    ensures  { majority_element_array_spec nums result }
+
+  let lemma test_000 () =
+    let nums = init 7 [|1; 1; 2; 2; 2; 2; 2|] in
+    assert { length nums = 7 };
+    assert { nums[0] = 1 };
+    assert { nums[1] = 1 };
+    assert { nums[2] = 2 };
+    assert { nums[3] = 2 };
+    assert { nums[4] = 2 };
+    assert { nums[5] = 2 };
+    assert { nums[6] = 2 };
+    assert { occurrences nums 2 = 5 };
+    assert { majority_value nums 2 };
+    assert { majority_element_array_spec nums 2 }
+
+  let lemma test_001 () =
+    let nums = init 7 [|1; 1; 1; 1; 2; 2; 3|] in
+    assert { length nums = 7 };
+    assert { nums[0] = 1 };
+    assert { nums[1] = 1 };
+    assert { nums[2] = 1 };
+    assert { nums[3] = 1 };
+    assert { nums[4] = 2 };
+    assert { nums[5] = 2 };
+    assert { nums[6] = 3 };
+    assert { occurrences nums 1 = 4 };
+    assert { majority_value nums 1 };
+    assert { majority_element_array_spec nums 1 }
+
+  let lemma test_002 () =
+    let nums = init 7 [|2; 2; 1; 1; 1; 2; 2|] in
+    assert { length nums = 7 };
+    assert { nums[0] = 2 };
+    assert { nums[1] = 2 };
+    assert { nums[2] = 1 };
+    assert { nums[3] = 1 };
+    assert { nums[4] = 1 };
+    assert { nums[5] = 2 };
+    assert { nums[6] = 2 };
+    assert { occurrences nums 2 = 4 };
+    assert { majority_value nums 2 };
+    assert { majority_element_array_spec nums 2 }
+
+  let lemma test_004 () =
+    let nums = init 9 [|1; 2; 3; 4; 5; 4; 4; 4; 4|] in
+    assert { length nums = 9 };
+    assert { nums[0] = 1 };
+    assert { nums[1] = 2 };
+    assert { nums[2] = 3 };
+    assert { nums[3] = 4 };
+    assert { nums[4] = 5 };
+    assert { nums[5] = 4 };
+    assert { nums[6] = 4 };
+    assert { nums[7] = 4 };
+    assert { nums[8] = 4 };
+    assert { occurrences nums 4 = 5 };
+    assert { majority_value nums 4 };
+    assert { majority_element_array_spec nums 4 }
+
+  let lemma test_005 () =
+    let nums = init 7 [|4; 4; 4; 4; 2; 2; 3|] in
+    assert { length nums = 7 };
+    assert { nums[0] = 4 };
+    assert { nums[1] = 4 };
+    assert { nums[2] = 4 };
+    assert { nums[3] = 4 };
+    assert { nums[4] = 2 };
+    assert { nums[5] = 2 };
+    assert { nums[6] = 3 };
+    assert { occurrences nums 4 = 4 };
+    assert { majority_value nums 4 };
+    assert { majority_element_array_spec nums 4 }
+
+  let lemma test_006 () =
+    let nums = init 11 [|1000000000; 1000000000; 1000000000; 1000000000; 1000000000; 1000000000; 1; 1; 1; 1; 1|] in
+    assert { length nums = 11 };
+    assert { nums[0] = 1000000000 };
+    assert { nums[1] = 1000000000 };
+    assert { nums[2] = 1000000000 };
+    assert { nums[3] = 1000000000 };
+    assert { nums[4] = 1000000000 };
+    assert { nums[5] = 1000000000 };
+    assert { nums[6] = 1 };
+    assert { nums[7] = 1 };
+    assert { nums[8] = 1 };
+    assert { nums[9] = 1 };
+    assert { nums[10] = 1 };
+    assert { occurrences nums 1000000000 = 6 };
+    assert { majority_value nums 1000000000 };
+    assert { majority_element_array_spec nums 1000000000 }
+
+  let lemma test_007 () =
+    let nums = init 8 [|5; 5; 4; 5; 5; 6; 5; 5|] in
+    assert { length nums = 8 };
+    assert { nums[0] = 5 };
+    assert { nums[1] = 5 };
+    assert { nums[2] = 4 };
+    assert { nums[3] = 5 };
+    assert { nums[4] = 5 };
+    assert { nums[5] = 6 };
+    assert { nums[6] = 5 };
+    assert { nums[7] = 5 };
+    assert { occurrences nums 5 = 6 };
+    assert { majority_value nums 5 };
+    assert { majority_element_array_spec nums 5 }
+
+end

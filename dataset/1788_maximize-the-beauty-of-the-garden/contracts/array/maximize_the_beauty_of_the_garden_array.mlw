@@ -1,0 +1,196 @@
+module MaximizeTheBeautyOfTheGarden_Array_Spec
+
+  use int.Int
+  use array.Array
+  use array.Init
+
+  predicate bounded_values (flowers: array int) =
+    forall i: int. 0 <= i < length flowers -> -10000 <= flowers[i] <= 10000
+
+  let rec function positive_sum_between (flowers: array int) (lo: int) (hi: int) : int
+    variant  { hi - lo }
+  =
+    if lo >= hi then 0
+    else (if flowers[lo] > 0 then flowers[lo] else 0) + positive_sum_between flowers (lo + 1) hi
+
+  predicate valid_endpoint_pair (flowers: array int) (i: int) (j: int) =
+    0 <= i < j < length flowers /\ flowers[i] = flowers[j]
+
+  function candidate_beauty (flowers: array int) (i: int) (j: int) : int
+  =
+    flowers[i] + flowers[j] + positive_sum_between flowers (i + 1) j
+
+  predicate is_maximum_beauty (flowers: array int) (result: int) =
+    (exists i j: int. valid_endpoint_pair flowers i j /\ result = candidate_beauty flowers i j) /\
+    (forall i j: int. valid_endpoint_pair flowers i j -> candidate_beauty flowers i j <= result)
+
+  val maximize_the_beauty_of_the_garden_array (flowers: array int) : int
+    requires { 2 <= length flowers <= 100000 }
+    requires { bounded_values flowers }
+    requires { exists i j: int. valid_endpoint_pair flowers i j }
+    ensures  { is_maximum_beauty flowers result }
+
+  let lemma test_000 () =
+    let flowers = init 6 [|-10000; 10000; -10000; 10000; -10000; 10000|] in
+    assert { length flowers = 6 };
+    assert { flowers[0] = -10000 };
+    assert { flowers[1] = 10000 };
+    assert { flowers[2] = -10000 };
+    assert { flowers[3] = 10000 };
+    assert { flowers[4] = -10000 };
+    assert { flowers[5] = 10000 };
+    assert { positive_sum_between flowers 2 5 = 10000 };
+    assert { valid_endpoint_pair flowers 1 5 };
+    assert { candidate_beauty flowers 1 5 = 30000 };
+    assert {
+      forall i j: int. valid_endpoint_pair flowers i j ->
+        (i = 0 /\ j = 2) \/ (i = 0 /\ j = 4) \/
+        (i = 1 /\ j = 3) \/ (i = 1 /\ j = 5) \/
+        (i = 2 /\ j = 4) \/ (i = 3 /\ j = 5)
+    };
+    assert { candidate_beauty flowers 0 2 = -20000 };
+    assert { candidate_beauty flowers 0 4 = -10000 };
+    assert { candidate_beauty flowers 1 3 = 20000 };
+    assert { candidate_beauty flowers 1 5 = 30000 };
+    assert { candidate_beauty flowers 2 4 = -20000 };
+    assert { candidate_beauty flowers 3 5 = 20000 };
+    assert { is_maximum_beauty flowers 30000 }
+
+  let lemma test_001 () =
+    let flowers = init 7 [|5; 8; 5; 3; 5; 2; 5|] in
+    assert { length flowers = 7 };
+    assert { flowers[0] = 5 };
+    assert { flowers[1] = 8 };
+    assert { flowers[2] = 5 };
+    assert { flowers[3] = 3 };
+    assert { flowers[4] = 5 };
+    assert { flowers[5] = 2 };
+    assert { flowers[6] = 5 };
+    assert { positive_sum_between flowers 1 6 = 23 };
+    assert { valid_endpoint_pair flowers 0 6 };
+    assert { candidate_beauty flowers 0 6 = 33 };
+    assert {
+      forall i j: int. valid_endpoint_pair flowers i j ->
+        (i = 0 /\ j = 2) \/ (i = 0 /\ j = 4) \/ (i = 0 /\ j = 6) \/
+        (i = 2 /\ j = 4) \/ (i = 2 /\ j = 6) \/ (i = 4 /\ j = 6)
+    };
+    assert { candidate_beauty flowers 0 2 = 18 };
+    assert { candidate_beauty flowers 0 4 = 26 };
+    assert { candidate_beauty flowers 0 6 = 33 };
+    assert { candidate_beauty flowers 2 4 = 13 };
+    assert { candidate_beauty flowers 2 6 = 20 };
+    assert { candidate_beauty flowers 4 6 = 12 };
+    assert { is_maximum_beauty flowers 33 }
+
+  let lemma test_002 () =
+    let flowers = init 5 [|100; 1; 1; -3; 1|] in
+    assert { length flowers = 5 };
+    assert { flowers[0] = 100 };
+    assert { flowers[1] = 1 };
+    assert { flowers[2] = 1 };
+    assert { flowers[3] = -3 };
+    assert { flowers[4] = 1 };
+    assert { positive_sum_between flowers 2 4 = 1 };
+    assert { valid_endpoint_pair flowers 1 4 };
+    assert { candidate_beauty flowers 1 4 = 3 };
+    assert {
+      forall i j: int. valid_endpoint_pair flowers i j ->
+        (i = 1 /\ j = 2) \/ (i = 1 /\ j = 4) \/ (i = 2 /\ j = 4)
+    };
+    assert { candidate_beauty flowers 1 2 = 2 };
+    assert { candidate_beauty flowers 1 4 = 3 };
+    assert { candidate_beauty flowers 2 4 = 2 };
+    assert { is_maximum_beauty flowers 3 }
+
+  let lemma test_003 () =
+    let flowers = init 9 [|2; 3; 4; 5; 4; 3; 2; 1; 2|] in
+    assert { length flowers = 9 };
+    assert { flowers[0] = 2 };
+    assert { flowers[1] = 3 };
+    assert { flowers[2] = 4 };
+    assert { flowers[3] = 5 };
+    assert { flowers[4] = 4 };
+    assert { flowers[5] = 3 };
+    assert { flowers[6] = 2 };
+    assert { flowers[7] = 1 };
+    assert { flowers[8] = 2 };
+    assert { positive_sum_between flowers 1 8 = 22 };
+    assert { valid_endpoint_pair flowers 0 8 };
+    assert { candidate_beauty flowers 0 8 = 26 };
+    assert {
+      forall i j: int. valid_endpoint_pair flowers i j ->
+        (i = 0 /\ j = 6) \/ (i = 0 /\ j = 8) \/ (i = 1 /\ j = 5) \/
+        (i = 2 /\ j = 4) \/ (i = 6 /\ j = 8)
+    };
+    assert { candidate_beauty flowers 0 6 = 23 };
+    assert { candidate_beauty flowers 0 8 = 26 };
+    assert { candidate_beauty flowers 1 5 = 15 };
+    assert { candidate_beauty flowers 2 4 = 13 };
+    assert { candidate_beauty flowers 6 8 = 5 };
+    assert { is_maximum_beauty flowers 26 }
+
+  let lemma test_004 () =
+    let flowers = init 5 [|5; 3; 5; 2; 5|] in
+    assert { length flowers = 5 };
+    assert { flowers[0] = 5 };
+    assert { flowers[1] = 3 };
+    assert { flowers[2] = 5 };
+    assert { flowers[3] = 2 };
+    assert { flowers[4] = 5 };
+    assert { positive_sum_between flowers 1 4 = 10 };
+    assert { valid_endpoint_pair flowers 0 4 };
+    assert { candidate_beauty flowers 0 4 = 20 };
+    assert {
+      forall i j: int. valid_endpoint_pair flowers i j ->
+        (i = 0 /\ j = 2) \/ (i = 0 /\ j = 4) \/ (i = 2 /\ j = 4)
+    };
+    assert { candidate_beauty flowers 0 2 = 13 };
+    assert { candidate_beauty flowers 0 4 = 20 };
+    assert { candidate_beauty flowers 2 4 = 12 };
+    assert { is_maximum_beauty flowers 20 }
+
+  let lemma test_005 () =
+    let flowers = init 5 [|1; 2; 3; 1; 2|] in
+    assert { length flowers = 5 };
+    assert { flowers[0] = 1 };
+    assert { flowers[1] = 2 };
+    assert { flowers[2] = 3 };
+    assert { flowers[3] = 1 };
+    assert { flowers[4] = 2 };
+    assert { positive_sum_between flowers 2 4 = 4 };
+    assert { valid_endpoint_pair flowers 1 4 };
+    assert { candidate_beauty flowers 1 4 = 8 };
+    assert {
+      forall i j: int. valid_endpoint_pair flowers i j ->
+        (i = 0 /\ j = 3) \/ (i = 1 /\ j = 4)
+    };
+    assert { candidate_beauty flowers 0 3 = 6 };
+    assert { candidate_beauty flowers 1 4 = 8 };
+    assert { is_maximum_beauty flowers 8 }
+
+  let lemma test_006 () =
+    let flowers = init 7 [|3; 2; 1; 2; 3; 2; 1|] in
+    assert { length flowers = 7 };
+    assert { flowers[0] = 3 };
+    assert { flowers[1] = 2 };
+    assert { flowers[2] = 1 };
+    assert { flowers[3] = 2 };
+    assert { flowers[4] = 3 };
+    assert { flowers[5] = 2 };
+    assert { flowers[6] = 1 };
+    assert { positive_sum_between flowers 1 4 = 5 };
+    assert { valid_endpoint_pair flowers 0 4 };
+    assert { candidate_beauty flowers 0 4 = 11 };
+    assert {
+      forall i j: int. valid_endpoint_pair flowers i j ->
+        (i = 0 /\ j = 4) \/ (i = 1 /\ j = 3) \/ (i = 1 /\ j = 5) \/
+        (i = 2 /\ j = 6) \/ (i = 3 /\ j = 5)
+    };
+    assert { candidate_beauty flowers 0 4 = 11 };
+    assert { candidate_beauty flowers 1 3 = 5 };
+    assert { candidate_beauty flowers 1 5 = 10 };
+    assert { candidate_beauty flowers 2 6 = 8 };
+    assert { candidate_beauty flowers 3 5 = 7 };
+    assert { is_maximum_beauty flowers 11 }
+
+end

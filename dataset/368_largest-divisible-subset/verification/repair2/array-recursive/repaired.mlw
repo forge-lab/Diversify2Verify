@@ -1,0 +1,310 @@
+module LargestDivisibleSubset_Array_Spec
+
+  use int.Int
+  use int.EuclideanDivision
+  use array.Array
+
+  predicate positive_values (nums: array int) =
+    forall i: int.
+      0 <= i < length nums -> 1 <= nums[i] <= 2000000000
+
+  predicate distinct_values (nums: array int) =
+    forall i j: int.
+      0 <= i < j < length nums -> nums[i] <> nums[j]
+
+  predicate valid_input (nums: array int) =
+    1 <= length nums <= 1000 /\
+    positive_values nums /\
+    distinct_values nums
+
+  predicate contains_value (a: array int) (x: int) =
+    exists i: int. 0 <= i < length a /\ a[i] = x
+
+  predicate all_from_input (nums: array int) (answer: array int) =
+    forall k: int.
+      0 <= k < length answer -> contains_value nums answer[k]
+
+  predicate no_duplicates (a: array int) =
+    forall i j: int.
+      0 <= i < j < length a -> a[i] <> a[j]
+
+  predicate divides (x: int) (y: int) =
+    x > 0 /\ y > 0 /\ mod y x = 0
+
+  predicate pairwise_divisible (answer: array int) =
+    forall i j: int.
+      0 <= i < j < length answer ->
+        divides answer[i] answer[j] \/ divides answer[j] answer[i]
+
+  predicate divisible_subset (nums: array int) (answer: array int) =
+    length answer <= length nums /\
+    no_duplicates answer /\
+    all_from_input nums answer /\
+    pairwise_divisible answer
+
+  predicate largest_divisible_subset_array_spec
+      (nums: array int) (answer: array int) =
+    divisible_subset nums answer /\
+    forall candidate: array int.
+      divisible_subset nums candidate -> length candidate <= length answer
+
+  predicate positive_dp (dp: array int) =
+    forall k: int. 0 <= k < length dp -> 1 <= dp[k]
+
+  predicate prev_links_valid (prev: array int) =
+    forall k: int. 0 <= k < length prev -> -1 <= prev[k] < k
+
+  let rec copy_array_from (src: array int) (dst: array int) (i: int) : unit
+    requires { length dst = length src }
+    requires { 0 <= i <= length src }
+    ensures  { forall k: int. i <= k < length dst -> dst[k] = src[k] }
+    variant { length src - i }
+  =
+    if i >= length src then
+      assert { forall k: int. i <= k < length dst -> false }
+    else begin
+      assert { 0 <= i < length src };
+      assert { 0 <= i < length dst };
+      dst[i] <- src[i];
+      assert { 0 <= i + 1 <= length src };
+      copy_array_from src dst (i + 1);
+      assert { forall k: int. i + 1 <= k < length dst -> dst[k] = src[k] };
+      assert { dst[i] = src[i] };
+      assert { forall k: int. i <= k < length dst -> dst[k] = src[k] }
+    end
+
+  let copy_array (nums: array int) : array int
+    ensures { length result = length nums }
+    ensures { positive_values nums -> positive_values result }
+    ensures { forall k: int. 0 <= k < length result -> result[k] = nums[k] }
+  =
+    let n = length nums in
+    let copied = make n 0 in
+    assert { length copied = length nums };
+    copy_array_from nums copied 0;
+    assert { forall k: int. 0 <= k < length copied -> copied[k] = nums[k] };
+    assert { positive_values nums -> positive_values copied };
+    copied
+
+  let rec shift_for_insertion (a: array int) (j: int) (key: int) : unit
+    requires { length a > 0 }
+    requires { -1 <= j < length a - 1 }
+    requires { positive_values a }
+    requires { 1 <= key <= 2000000000 }
+    ensures  { positive_values a }
+    variant { j + 1 }
+  =
+    if j < 0 then begin
+      assert { 0 <= 0 < length a };
+      a[0] <- key;
+      assert { forall k: int. 0 <= k < length a -> 1 <= a[k] <= 2000000000 }
+    end
+    else if a[j] > key then begin
+      assert { 0 <= j < length a };
+      assert { 0 <= j + 1 < length a };
+      a[j + 1] <- a[j];
+      assert { positive_values a };
+      assert { -1 <= j - 1 < length a - 1 };
+      shift_for_insertion a (j - 1) key;
+      assert { positive_values a }
+    end else begin
+      assert { 0 <= j + 1 < length a };
+      a[j + 1] <- key;
+      assert { forall k: int. 0 <= k < length a -> 1 <= a[k] <= 2000000000 }
+    end
+
+  let rec insertion_sort_from (a: array int) (i: int) : unit
+    requires { 1 <= i <= length a }
+    requires { positive_values a }
+    ensures  { positive_values a }
+    variant { length a - i }
+  =
+    if i >= length a then
+      ()
+    else begin
+      assert { 1 <= i < length a };
+      let key = a[i] in
+      assert { length a > 0 };
+      assert { 1 <= key <= 2000000000 };
+      assert { -1 <= i - 1 < length a - 1 };
+      shift_for_insertion a (i - 1) key;
+      assert { positive_values a };
+      assert { 1 <= i + 1 <= length a };
+      insertion_sort_from a (i + 1)
+    end
+
+  let sort_array (a: array int) : unit
+    requires { positive_values a }
+    ensures  { positive_values a }
+  =
+    if length a >= 2 then begin
+      assert { 1 <= 1 <= length a };
+      insertion_sort_from a 1
+    end
+    else
+      ()
+
+  let rec scan_predecessors
+    (sorted: array int) (dp: array int) (prev: array int) (i: int) (j: int) : unit
+    requires { length dp = length sorted }
+    requires { length prev = length sorted }
+    requires { positive_values sorted }
+    requires { positive_dp dp }
+    requires { prev_links_valid prev }
+    requires { 0 <= i < length sorted }
+    requires { -1 <= j < i }
+    ensures  { positive_dp dp }
+    ensures  { prev_links_valid prev }
+    variant { j + 1 }
+  =
+    if j < 0 then
+      ()
+    else begin
+      assert { 0 <= j < i };
+      assert { 0 <= j < length sorted };
+      assert { 0 <= j < length dp };
+      assert { 0 <= i < length dp };
+      assert { 0 <= i < length prev };
+      assert { 1 <= sorted[j] };
+      assert { sorted[j] <> 0 };
+      assert { -1 <= j - 1 < i };
+      scan_predecessors sorted dp prev i (j - 1);
+      assert { positive_dp dp };
+      assert { prev_links_valid prev };
+      if mod sorted[i] sorted[j] = 0 then
+        if dp[j] + 1 >= dp[i] then begin
+          assert { 0 <= j < length dp };
+          assert { 0 <= i < length dp };
+          assert { 0 <= i < length prev };
+          assert { 1 <= dp[j] };
+          assert { 1 <= dp[j] + 1 };
+          dp[i] <- dp[j] + 1;
+          prev[i] <- j;
+          assert { -1 <= prev[i] < i };
+          assert { forall k: int. 0 <= k < length prev -> -1 <= prev[k] < k };
+          assert { prev_links_valid prev }
+        end;
+      assert { prev_links_valid prev }
+    end
+
+  let rec fill_dp_from (sorted: array int) (dp: array int) (prev: array int) (i: int) : unit
+    requires { length dp = length sorted }
+    requires { length prev = length sorted }
+    requires { positive_values sorted }
+    requires { positive_dp dp }
+    requires { prev_links_valid prev }
+    requires { 0 <= i <= length sorted }
+    ensures  { positive_dp dp }
+    ensures  { prev_links_valid prev }
+    variant { length sorted - i }
+  =
+    if i >= length sorted then
+      ()
+    else begin
+      assert { 0 <= i < length sorted };
+      assert { 0 <= i < length dp };
+      assert { 0 <= i < length prev };
+      dp[i] <- 1;
+      prev[i] <- -1;
+      assert { positive_dp dp };
+      assert { prev_links_valid prev };
+      assert { -1 <= i - 1 < i };
+      scan_predecessors sorted dp prev i (i - 1);
+      assert { positive_dp dp };
+      assert { prev_links_valid prev };
+      assert { 0 <= i + 1 <= length sorted };
+      fill_dp_from sorted dp prev (i + 1)
+    end
+
+  let rec first_best_end_from (dp: array int) (i: int) (best_i: int) : int
+    requires { length dp > 0 }
+    requires { 1 <= i <= length dp }
+    requires { 0 <= best_i < length dp }
+    ensures  { 0 <= result < length dp }
+    variant { length dp - i }
+  =
+    if i >= length dp then
+      best_i
+    else begin
+      assert { 1 <= i < length dp };
+      assert { 0 <= best_i < length dp };
+      if dp[i] > dp[best_i] then begin
+        assert { 0 <= i < length dp };
+        assert { 1 <= i + 1 <= length dp };
+      first_best_end_from dp (i + 1) i
+      end else begin
+        assert { 0 <= best_i < length dp };
+        assert { 1 <= i + 1 <= length dp };
+      first_best_end_from dp (i + 1) best_i
+      end
+    end
+
+  let rec fill_result_from
+    (sorted: array int) (prev: array int) (idx: int) (out: array int) (pos: int) : unit
+    requires { length prev = length sorted }
+    requires { prev_links_valid prev }
+    requires { 0 <= pos <= length out }
+    requires { idx < 0 \/ 0 <= idx < length sorted }
+    requires { idx >= 0 -> pos < length out }
+    variant { length out - pos }
+  =
+    if idx < 0 then
+      ()
+    else begin
+      assert { 0 <= idx < length sorted };
+      assert { 0 <= idx < length prev };
+      assert { 0 <= pos < length out };
+      out[pos] <- sorted[idx];
+      assert { -1 <= prev[idx] < idx };
+      assert { prev[idx] < 0 \/ 0 <= prev[idx] < length sorted };
+      assert { 0 <= pos + 1 <= length out };
+      fill_result_from sorted prev prev[idx] out (pos + 1)
+    end
+
+  let largest_divisible_subset_array (nums: array int) : array int
+    requires { valid_input nums }
+    ensures  { largest_divisible_subset_array_spec nums result }
+  =
+    let n = length nums in
+    assert { 1 <= n };
+    if n = 0 then begin
+      assert { false };
+      make 0 0
+    end else
+      let sorted = copy_array nums in
+      let dp = make n 1 in
+      let prev = make n (-1) in
+      assert { length sorted = n };
+      assert { length dp = length sorted };
+      assert { length prev = length sorted };
+      assert { positive_dp dp };
+      assert { positive_values nums };
+      assert { positive_values sorted };
+      assert { forall k: int. 0 <= k < length prev -> -1 <= prev[k] < k };
+      assert { prev_links_valid prev };
+      sort_array sorted;
+      assert { positive_values sorted };
+      fill_dp_from sorted dp prev 0;
+      assert { positive_dp dp };
+      assert { length dp > 0 };
+      let best_end = first_best_end_from dp 1 0 in
+      assert { 0 <= best_end < length dp };
+      assert { 1 <= dp[best_end] };
+      let result = make dp[best_end] 0 in
+      assert { length result = dp[best_end] };
+      assert { 0 <= 0 <= length result };
+      assert { best_end < 0 \/ 0 <= best_end < length sorted };
+      assert { prev_links_valid prev };
+      fill_result_from sorted prev best_end result 0;
+      assert { length result <= length nums };
+      assert { no_duplicates result };
+      assert { all_from_input nums result };
+      assert { pairwise_divisible result };
+      assert { divisible_subset nums result };
+      assert {
+        forall candidate: array int.
+          divisible_subset nums candidate -> length candidate <= length result
+      };
+      result
+
+end

@@ -1,0 +1,128 @@
+module DividePlayersIntoTeamsOfEqualSkill_Array_Spec
+
+  use int.Int
+  use array.Array
+  use array.Init
+
+  predicate skill_domain (skill: array int) =
+    length skill >= 2 /\
+    length skill <= 100000 /\
+    (exists teams: int. teams >= 1 /\ length skill = 2 * teams) /\
+    (forall i: int. 0 <= i < length skill -> 1 <= skill[i] <= 1000)
+
+  predicate valid_pairing (skill: array int) (mate: array int) (target_sum: int) =
+    length mate = length skill /\
+    (forall i: int. 0 <= i < length skill ->
+      0 <= mate[i] < length skill /\
+      mate[i] <> i /\
+      mate[mate[i]] = i /\
+      skill[i] + skill[mate[i]] = target_sum)
+
+  let rec function chemistry_sum_from
+      (skill: array int) (mate: array int) (target_sum: int) (i: int) : int
+    requires { valid_pairing skill mate target_sum }
+    requires { 0 <= i <= length skill }
+    variant  { length skill - i }
+  =
+    if i = length skill then 0
+    else
+      (if i < mate[i] then skill[i] * skill[mate[i]] else 0) +
+      chemistry_sum_from skill mate target_sum (i + 1)
+
+  val divide_players_into_teams_of_equal_skill_array (skill: array int) : int
+    requires { skill_domain skill }
+    ensures  {
+      result = -1 <->
+      not (exists mate: array int. exists target_sum: int.
+        valid_pairing skill mate target_sum)
+    }
+    ensures  {
+      result <> -1 ->
+      exists mate: array int. exists target_sum: int.
+        valid_pairing skill mate target_sum /\
+        result = chemistry_sum_from skill mate target_sum 0
+    }
+
+  let lemma test_000_extreme_complements () =
+    let skill = init 8 [|1; 1000; 1; 1000; 1; 1000; 1; 1000|] in
+    let mate = init 8 [|1; 0; 3; 2; 5; 4; 7; 6|] in
+    assert { length skill = 8 };
+    assert { length mate = 8 };
+    assert { skill_domain skill };
+    assert { valid_pairing skill mate 1001 };
+    assert { chemistry_sum_from skill mate 1001 8 = 0 };
+    assert { chemistry_sum_from skill mate 1001 7 = 0 };
+    assert { chemistry_sum_from skill mate 1001 6 = 1000 };
+    assert { chemistry_sum_from skill mate 1001 4 = 2000 };
+    assert { chemistry_sum_from skill mate 1001 2 = 3000 };
+    assert { chemistry_sum_from skill mate 1001 0 = 4000 }
+
+  let lemma test_001_duplicate_ladder () =
+    let skill = init 8 [|1; 1; 2; 2; 3; 3; 4; 4|] in
+    let mate = init 8 [|6; 7; 4; 5; 2; 3; 0; 1|] in
+    assert { length skill = 8 };
+    assert { length mate = 8 };
+    assert { skill_domain skill };
+    assert { valid_pairing skill mate 5 };
+    assert { chemistry_sum_from skill mate 5 8 = 0 };
+    assert { chemistry_sum_from skill mate 5 6 = 0 };
+    assert { chemistry_sum_from skill mate 5 4 = 0 };
+    assert { chemistry_sum_from skill mate 5 2 = 12 };
+    assert { chemistry_sum_from skill mate 5 0 = 20 }
+
+  let lemma test_002_no_equal_sum_pairing () =
+    let skill = init 4 [|1; 1; 2; 3|] in
+    assert { length skill = 4 };
+    assert { skill_domain skill };
+    assert { not (exists mate: array int. exists target_sum: int.
+      valid_pairing skill mate target_sum) }
+
+  let lemma test_003_ascending_values () =
+    let skill = init 8 [|1; 2; 3; 4; 5; 6; 7; 8|] in
+    let mate = init 8 [|7; 6; 5; 4; 3; 2; 1; 0|] in
+    assert { length skill = 8 };
+    assert { length mate = 8 };
+    assert { skill_domain skill };
+    assert { valid_pairing skill mate 9 };
+    assert { chemistry_sum_from skill mate 9 8 = 0 };
+    assert { chemistry_sum_from skill mate 9 6 = 0 };
+    assert { chemistry_sum_from skill mate 9 4 = 0 };
+    assert { chemistry_sum_from skill mate 9 2 = 38 };
+    assert { chemistry_sum_from skill mate 9 0 = 60 }
+
+  let lemma test_004_all_equal () =
+    let skill = init 6 [|5; 5; 5; 5; 5; 5|] in
+    let mate = init 6 [|1; 0; 3; 2; 5; 4|] in
+    assert { length skill = 6 };
+    assert { length mate = 6 };
+    assert { skill_domain skill };
+    assert { valid_pairing skill mate 10 };
+    assert { chemistry_sum_from skill mate 10 6 = 0 };
+    assert { chemistry_sum_from skill mate 10 4 = 25 };
+    assert { chemistry_sum_from skill mate 10 2 = 50 };
+    assert { chemistry_sum_from skill mate 10 0 = 75 }
+
+  let lemma test_006_two_players () =
+    let skill = init 2 [|3; 4|] in
+    let mate = init 2 [|1; 0|] in
+    assert { length skill = 2 };
+    assert { length mate = 2 };
+    assert { skill_domain skill };
+    assert { valid_pairing skill mate 7 };
+    assert { chemistry_sum_from skill mate 7 2 = 0 };
+    assert { chemistry_sum_from skill mate 7 1 = 0 };
+    assert { chemistry_sum_from skill mate 7 0 = 12 }
+
+  let lemma test_009_statement_example () =
+    let skill = init 6 [|3; 2; 5; 1; 3; 4|] in
+    let mate = init 6 [|4; 5; 3; 2; 0; 1|] in
+    assert { length skill = 6 };
+    assert { length mate = 6 };
+    assert { skill_domain skill };
+    assert { valid_pairing skill mate 6 };
+    assert { chemistry_sum_from skill mate 6 6 = 0 };
+    assert { chemistry_sum_from skill mate 6 4 = 0 };
+    assert { chemistry_sum_from skill mate 6 2 = 5 };
+    assert { chemistry_sum_from skill mate 6 0 = 22 }
+
+end

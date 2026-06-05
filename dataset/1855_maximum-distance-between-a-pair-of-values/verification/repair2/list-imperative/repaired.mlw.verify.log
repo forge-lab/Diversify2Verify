@@ -1,0 +1,82 @@
+== Stage 1: first prover on whole file ==
+Running in /Users/rubenm/Desktop/Diversify2Verify/codex-runs/repair2-split2/stage3a-rerepair/1855_maximum-distance-between-a-pair-of-values/list-imperative/maximum_distance_between_a_pair_of_values_list_stage3_aa0b5ca7_stage3/repaired/generated/why3: why3 session create -o /Users/rubenm/Desktop/Diversify2Verify/codex-runs/repair2-split2/stage3a-rerepair/1855_maximum-distance-between-a-pair-of-values/list-imperative/maximum_distance_between_a_pair_of_values_list_stage3_aa0b5ca7_stage3/repaired/generated/why3/.why3_sessions/repaired_stage1 -P Z3,4.8.6 -t 10 -m 8192 repaired.mlw
+Session created successfully
+Running in /Users/rubenm/Desktop/Diversify2Verify/codex-runs/repair2-split2/stage3a-rerepair/1855_maximum-distance-between-a-pair-of-values/list-imperative/maximum_distance_between_a_pair_of_values_list_stage3_aa0b5ca7_stage3/repaired/generated/why3: why3 bench /Users/rubenm/Desktop/Diversify2Verify/codex-runs/repair2-split2/stage3a-rerepair/1855_maximum-distance-between-a-pair-of-values/list-imperative/maximum_distance_between_a_pair_of_values_list_stage3_aa0b5ca7_stage3/repaired/generated/why3/.why3_sessions/repaired_stage1
+Progress: 5/1/0                       Progress: 4/2/0                       Progress: 3/3/0                       Progress: 2/4/0                       Progress: 1/5/0                       Progress: 0/6/0                       Progress: 0/0/2                       Progress: 0/0/1                       
+Replay completed, saving session... done
+== Stage 1 stats ==
+= Statistics for session /Users/rubenm/Desktop/Diversify2Verify/codex-runs/repair2-split2/stage3a-rerepair/1855_maximum-distance-between-a-pair-of-values/list-imperative/maximum_distance_between_a_pair_of_values_list_stage3_aa0b5ca7_stage3/repaired/generated/why3/.why3_sessions/repaired_stage1
+
+== Number of root goals ==
+  total: 6  proved: 5
+
+== Number of sub goals ==
+  total: 0  proved: 0
+
+== Goals not proved ==
+  +-- file [../../repaired.mlw]
+    +-- theory MaximumDistanceBetweenAPairOfValues_List_Stage3_Imperative
+      +-- goal suffix_at_cons_tail'vc
+  
+== Goals proved by only one prover ==
+  +-- file [../../repaired.mlw]
+    +-- theory MaximumDistanceBetweenAPairOfValues_List_Stage3_Imperative
+      +-- goal non_increasing'vc: Z3 4.8.6
+      +-- goal optional_suffix_at_cons_tail'vc: Z3 4.8.6
+      +-- goal rows_before_end_covers_all'vc: Z3 4.8.6
+      +-- goal maximum_distance_from_parts'vc: Z3 4.8.6
+      +-- goal maximum_distance_between_a_pair_of_values_list'vc: Z3 4.8.6
+  
+1 session(s) read, with a total of 6 proof goals.
+== Unproved root goals after first prover ==
+MaximumDistanceBetweenAPairOfValues_List_Stage3_Imperative	suffix_at_cons_tail'vc
+== Stage 1: trying remaining goals with prover Alt-Ergo,2.4.0 ==
+---- stage1 | prover: Alt-Ergo,2.4.0 | theory: MaximumDistanceBetweenAPairOfValues_List_Stage3_Imperative | goal: suffix_at_cons_tail'vc ----
+File repaired.mlw:
+Goal suffix_at_cons_tail'vc.
+Prover result is: Timeout (10.00s, 39638 steps).
+Remaining after prover Alt-Ergo,2.4.0: 1
+== Stage 1: trying remaining goals with prover CVC4,1.8 ==
+---- stage1 | prover: CVC4,1.8 | theory: MaximumDistanceBetweenAPairOfValues_List_Stage3_Imperative | goal: suffix_at_cons_tail'vc ----
+File repaired.mlw:
+Goal suffix_at_cons_tail'vc.
+Prover result is: Unknown (unknown + incomplete) (0.02s, 5464 steps).
+Remaining after prover CVC4,1.8: 1
+== Goals still unproved after stage 1 ==
+MaximumDistanceBetweenAPairOfValues_List_Stage3_Imperative	suffix_at_cons_tail'vc
+== Stage 2: split_vc on unproved goal ==
+Target theory: MaximumDistanceBetweenAPairOfValues_List_Stage3_Imperative
+Target goal  : suffix_at_cons_tail'vc
+---- stage2 | prover: Z3,4.8.6 | theory: MaximumDistanceBetweenAPairOfValues_List_Stage3_Imperative | goal: suffix_at_cons_tail'vc ----
+Transforms: split_vc
+File "repaired.mlw", line 67, characters 13-28:
+Sub-goal Assertion of goal suffix_at_cons_tail'vc.
+Prover result is: Valid (0.01s, 12968 steps).
+
+File "repaired.mlw", line 68, characters 13-46:
+Sub-goal Assertion of goal suffix_at_cons_tail'vc.
+Prover result is: Valid (0.01s, 14059 steps).
+
+File "repaired.mlw", line 71, characters 8-42:
+Sub-goal Assertion of goal suffix_at_cons_tail'vc.
+Prover result is: Valid (0.01s, 15300 steps).
+
+File "repaired.mlw", line 75, characters 8-43:
+Sub-goal Assertion of goal suffix_at_cons_tail'vc.
+Prover result is: Valid (0.01s, 16638 steps).
+
+File "repaired.mlw", line 65, characters 15-42:
+Sub-goal Postcondition of goal suffix_at_cons_tail'vc.
+Prover result is: Valid (0.01s, 16969 steps).
+Solved with split_vc using prover: Z3,4.8.6
+== Final summary ==
+Unproved root goals after first prover : 1
+Remaining failures after split_vc      : 0
+Remaining failures after stage 3       : 0
+Detailed logs stored in                : /Users/rubenm/Desktop/Diversify2Verify/codex-runs/repair2-split2/stage3a-rerepair/1855_maximum-distance-between-a-pair-of-values/list-imperative/maximum_distance_between_a_pair_of_values_list_stage3_aa0b5ca7_stage3/repaired/generated/why3/.why3_sessions/repaired_logs
+VERIFY_RESULT: SUCCESS
+VERIFY_REASON: proved_after_stage2
+VERIFY_STAGE: stage2
+VERIFY_ROOT_TOTAL: 6
+VERIFY_ROOT_PROVED: 6
+VERIFY_ROOT_REMAINING: 0

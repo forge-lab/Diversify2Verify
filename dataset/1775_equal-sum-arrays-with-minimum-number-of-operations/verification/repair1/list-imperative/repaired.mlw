@@ -1,0 +1,275 @@
+module EqualSumArraysWithMinimumNumberOfOperations_List_Stage3_Imperative
+
+  use int.Int
+  use list.List
+  use list.Length
+  use list.NumOcc
+  use list.Sum
+  use ref.Ref
+
+  let rec predicate dice_values (nums: list int)
+    variant { nums }
+  =
+    match nums with
+    | Nil -> true
+    | Cons x xs -> 1 <= x && x <= 6 && dice_values xs
+    end
+
+  function count_gain5_inc_first (nums1: list int) (nums2: list int) : int =
+    num_occ 1 nums1 + num_occ 6 nums2
+
+  function count_gain4_inc_first (nums1: list int) (nums2: list int) : int =
+    num_occ 2 nums1 + num_occ 5 nums2
+
+  function count_gain3_inc_first (nums1: list int) (nums2: list int) : int =
+    num_occ 3 nums1 + num_occ 4 nums2
+
+  function count_gain2_inc_first (nums1: list int) (nums2: list int) : int =
+    num_occ 4 nums1 + num_occ 3 nums2
+
+  function count_gain1_inc_first (nums1: list int) (nums2: list int) : int =
+    num_occ 5 nums1 + num_occ 2 nums2
+
+  function count_gain5_dec_first (nums1: list int) (nums2: list int) : int =
+    num_occ 6 nums1 + num_occ 1 nums2
+
+  function count_gain4_dec_first (nums1: list int) (nums2: list int) : int =
+    num_occ 5 nums1 + num_occ 2 nums2
+
+  function count_gain3_dec_first (nums1: list int) (nums2: list int) : int =
+    num_occ 4 nums1 + num_occ 3 nums2
+
+  function count_gain2_dec_first (nums1: list int) (nums2: list int) : int =
+    num_occ 3 nums1 + num_occ 4 nums2
+
+  function count_gain1_dec_first (nums1: list int) (nums2: list int) : int =
+    num_occ 2 nums1 + num_occ 5 nums2
+
+  function max_gain_with_ops (k: int) (c5: int) (c4: int) (c3: int) (c2: int) (c1: int) : int =
+    if k <= 0 then 0
+    else if k <= c5 then 5 * k
+    else if k <= c5 + c4 then 5 * c5 + 4 * (k - c5)
+    else if k <= c5 + c4 + c3 then
+      5 * c5 + 4 * c4 + 3 * (k - c5 - c4)
+    else if k <= c5 + c4 + c3 + c2 then
+      5 * c5 + 4 * c4 + 3 * c3 + 2 * (k - c5 - c4 - c3)
+    else if k <= c5 + c4 + c3 + c2 + c1 then
+      5 * c5 + 4 * c4 + 3 * c3 + 2 * c2 + (k - c5 - c4 - c3 - c2)
+    else
+      5 * c5 + 4 * c4 + 3 * c3 + 2 * c2 + c1
+
+  function best_gain_inc_first (nums1: list int) (nums2: list int) (k: int) : int =
+    max_gain_with_ops k
+      (count_gain5_inc_first nums1 nums2)
+      (count_gain4_inc_first nums1 nums2)
+      (count_gain3_inc_first nums1 nums2)
+      (count_gain2_inc_first nums1 nums2)
+      (count_gain1_inc_first nums1 nums2)
+
+  function best_gain_dec_first (nums1: list int) (nums2: list int) (k: int) : int =
+    max_gain_with_ops k
+      (count_gain5_dec_first nums1 nums2)
+      (count_gain4_dec_first nums1 nums2)
+      (count_gain3_dec_first nums1 nums2)
+      (count_gain2_dec_first nums1 nums2)
+      (count_gain1_dec_first nums1 nums2)
+
+  predicate achievable_in_ops (nums1: list int) (nums2: list int) (k: int) =
+    k >= 0 /\
+    if sum nums1 <= sum nums2 then
+      best_gain_inc_first nums1 nums2 k >= sum nums2 - sum nums1
+    else
+      best_gain_dec_first nums1 nums2 k >= sum nums1 - sum nums2
+
+  predicate impossible_to_equalize (nums1: list int) (nums2: list int) =
+    if sum nums1 <= sum nums2 then
+      best_gain_inc_first nums1 nums2 (length nums1 + length nums2) < sum nums2 - sum nums1
+    else
+      best_gain_dec_first nums1 nums2 (length nums1 + length nums2) < sum nums1 - sum nums2
+
+  predicate is_min_operations (nums1: list int) (nums2: list int) (r: int) =
+    if impossible_to_equalize nums1 nums2 then
+      r = -1
+    else
+      r >= 0 /\
+      achievable_in_ops nums1 nums2 r /\
+      (forall k: int. 0 <= k < r -> not (achievable_in_ops nums1 nums2 k))
+
+  let sum_list (nums: list int) : int
+    ensures { result = sum nums }
+  =
+    let total = ref 0 in
+    let cur = ref nums in
+    while (match !cur with Nil -> false | Cons _ _ -> true end) do
+      invariant { !total + sum !cur = sum nums }
+      variant { length !cur }
+
+      match !cur with
+      | Nil -> ()
+      | Cons x xs ->
+          total := !total + x;
+          cur := xs
+      end
+    done;
+    assert { !cur = Nil };
+    assert { sum Nil = 0 };
+    !total
+
+  let equal_sum_arrays_with_minimum_number_of_operations_list
+      (nums1: list int) (nums2: list int) : int
+    requires { length nums1 >= 1 }
+    requires { length nums2 >= 1 }
+    requires { dice_values nums1 }
+    requires { dice_values nums2 }
+    ensures  { is_min_operations nums1 nums2 result }
+  =
+    let sum1 = sum_list nums1 in
+    let sum2 = sum_list nums2 in
+    if sum1 = sum2 then 0 else
+    let diff = ref (if sum1 < sum2 then sum2 - sum1 else sum1 - sum2) in
+    let c1 = ref 0 in
+    let c2 = ref 0 in
+    let c3 = ref 0 in
+    let c4 = ref 0 in
+    let c5 = ref 0 in
+    if sum1 < sum2 then (
+      let cur1 = ref nums1 in
+      while (match !cur1 with Nil -> false | Cons _ _ -> true end) do
+        invariant { !c5 = num_occ 1 nums1 - num_occ 1 !cur1 }
+        invariant { !c4 = num_occ 2 nums1 - num_occ 2 !cur1 }
+        invariant { !c3 = num_occ 3 nums1 - num_occ 3 !cur1 }
+        invariant { !c2 = num_occ 4 nums1 - num_occ 4 !cur1 }
+        invariant { !c1 = num_occ 5 nums1 - num_occ 5 !cur1 }
+        variant { length !cur1 }
+
+        match !cur1 with
+        | Nil -> ()
+        | Cons x xs ->
+            let gain = 6 - x in
+            if gain = 5 then c5 := !c5 + 1
+            else if gain = 4 then c4 := !c4 + 1
+            else if gain = 3 then c3 := !c3 + 1
+            else if gain = 2 then c2 := !c2 + 1
+            else if gain = 1 then c1 := !c1 + 1;
+            cur1 := xs
+        end
+      done;
+      assert { match !cur1 with Nil -> true | Cons _ _ -> false end };
+      assert { !cur1 = Nil };
+      let cur2 = ref nums2 in
+      while (match !cur2 with Nil -> false | Cons _ _ -> true end) do
+        invariant { !c5 = num_occ 1 nums1 + num_occ 6 nums2 - num_occ 6 !cur2 }
+        invariant { !c4 = num_occ 2 nums1 + num_occ 5 nums2 - num_occ 5 !cur2 }
+        invariant { !c3 = num_occ 3 nums1 + num_occ 4 nums2 - num_occ 4 !cur2 }
+        invariant { !c2 = num_occ 4 nums1 + num_occ 3 nums2 - num_occ 3 !cur2 }
+        invariant { !c1 = num_occ 5 nums1 + num_occ 2 nums2 - num_occ 2 !cur2 }
+        variant { length !cur2 }
+
+        match !cur2 with
+        | Nil -> ()
+        | Cons y ys ->
+            let gain = y - 1 in
+            if gain = 5 then c5 := !c5 + 1
+            else if gain = 4 then c4 := !c4 + 1
+            else if gain = 3 then c3 := !c3 + 1
+            else if gain = 2 then c2 := !c2 + 1
+            else if gain = 1 then c1 := !c1 + 1;
+            cur2 := ys
+        end
+      done;
+      assert { match !cur2 with Nil -> true | Cons _ _ -> false end };
+      assert { !cur2 = Nil };
+      assert { !c5 = count_gain5_inc_first nums1 nums2 };
+      assert { !c4 = count_gain4_inc_first nums1 nums2 };
+      assert { !c3 = count_gain3_inc_first nums1 nums2 };
+      assert { !c2 = count_gain2_inc_first nums1 nums2 };
+      assert { !c1 = count_gain1_inc_first nums1 nums2 }
+    ) else (
+      let cur1 = ref nums1 in
+      while (match !cur1 with Nil -> false | Cons _ _ -> true end) do
+        invariant { !c5 = num_occ 6 nums1 - num_occ 6 !cur1 }
+        invariant { !c4 = num_occ 5 nums1 - num_occ 5 !cur1 }
+        invariant { !c3 = num_occ 4 nums1 - num_occ 4 !cur1 }
+        invariant { !c2 = num_occ 3 nums1 - num_occ 3 !cur1 }
+        invariant { !c1 = num_occ 2 nums1 - num_occ 2 !cur1 }
+        variant { length !cur1 }
+
+        match !cur1 with
+        | Nil -> ()
+        | Cons x xs ->
+            let gain = x - 1 in
+            if gain = 5 then c5 := !c5 + 1
+            else if gain = 4 then c4 := !c4 + 1
+            else if gain = 3 then c3 := !c3 + 1
+            else if gain = 2 then c2 := !c2 + 1
+            else if gain = 1 then c1 := !c1 + 1;
+            cur1 := xs
+        end
+      done;
+      assert { !cur1 = Nil };
+      let cur2 = ref nums2 in
+      while (match !cur2 with Nil -> false | Cons _ _ -> true end) do
+        invariant { !c5 = num_occ 6 nums1 + num_occ 1 nums2 - num_occ 1 !cur2 }
+        invariant { !c4 = num_occ 5 nums1 + num_occ 2 nums2 - num_occ 2 !cur2 }
+        invariant { !c3 = num_occ 4 nums1 + num_occ 3 nums2 - num_occ 3 !cur2 }
+        invariant { !c2 = num_occ 3 nums1 + num_occ 4 nums2 - num_occ 4 !cur2 }
+        invariant { !c1 = num_occ 2 nums1 + num_occ 5 nums2 - num_occ 5 !cur2 }
+        variant { length !cur2 }
+
+        match !cur2 with
+        | Nil -> ()
+        | Cons y ys ->
+            let gain = 6 - y in
+            if gain = 5 then c5 := !c5 + 1
+            else if gain = 4 then c4 := !c4 + 1
+            else if gain = 3 then c3 := !c3 + 1
+            else if gain = 2 then c2 := !c2 + 1
+            else if gain = 1 then c1 := !c1 + 1;
+            cur2 := ys
+        end
+      done;
+      assert { !cur2 = Nil };
+      assert { !c5 = count_gain5_dec_first nums1 nums2 };
+      assert { !c4 = count_gain4_dec_first nums1 nums2 };
+      assert { !c3 = count_gain3_dec_first nums1 nums2 };
+      assert { !c2 = count_gain2_dec_first nums1 nums2 };
+      assert { !c1 = count_gain1_dec_first nums1 nums2 }
+    );
+    let available = 5 * !c5 + 4 * !c4 + 3 * !c3 + 2 * !c2 + !c1 in
+    if available < !diff then -1 else
+    let ops = ref 0 in
+    while !diff > 0 do
+      invariant { !ops >= 0 }
+      invariant { !c1 >= 0 }
+      invariant { !c2 >= 0 }
+      invariant { !c3 >= 0 }
+      invariant { !c4 >= 0 }
+      invariant { !c5 >= 0 }
+      invariant { 5 * !c5 + 4 * !c4 + 3 * !c3 + 2 * !c2 + !c1 + !diff <= available }
+      variant { 5 * !c5 + 4 * !c4 + 3 * !c3 + 2 * !c2 + !c1 }
+
+      if !c5 > 0 then (
+        c5 := !c5 - 1;
+        diff := !diff - 5;
+        ops := !ops + 1
+      ) else if !c4 > 0 then (
+        c4 := !c4 - 1;
+        diff := !diff - 4;
+        ops := !ops + 1
+      ) else if !c3 > 0 then (
+        c3 := !c3 - 1;
+        diff := !diff - 3;
+        ops := !ops + 1
+      ) else if !c2 > 0 then (
+        c2 := !c2 - 1;
+        diff := !diff - 2;
+        ops := !ops + 1
+      ) else (
+        c1 := !c1 - 1;
+        diff := !diff - 1;
+        ops := !ops + 1
+      )
+    done;
+    !ops
+
+end

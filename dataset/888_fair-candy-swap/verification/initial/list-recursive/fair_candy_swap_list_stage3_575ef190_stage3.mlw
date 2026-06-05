@@ -1,0 +1,105 @@
+module FairCandySwap_List_Spec
+
+  use int.Int
+  use int.EuclideanDivision
+  use list.List
+  use list.Mem
+  use list.Sum
+
+  let rec predicate positive_sizes (sizes: list int)
+    variant { sizes }
+  =
+    match sizes with
+    | Nil -> true
+    | Cons x xs -> 1 <= x && positive_sizes xs
+    end
+
+  predicate valid_swap_pair
+    (aliceSizes: list int) (bobSizes: list int) (a: int) (b: int) =
+    mem a aliceSizes /\
+    mem b bobSizes /\
+    sum aliceSizes - a + b = sum bobSizes - b + a
+
+  predicate valid_swap_answer
+    (aliceSizes: list int) (bobSizes: list int) (answer: list int) =
+    exists a b: int.
+      answer = Cons a (Cons b Nil) /\
+      valid_swap_pair aliceSizes bobSizes a b
+
+  predicate delta_swap_pair
+    (aliceSizes: list int) (bobSizes: list int) (delta: int) (a: int) (b: int) =
+    mem a aliceSizes /\
+    mem b bobSizes /\
+    b = a - delta
+
+  let make_pair (x: int) (y: int) : list int
+    ensures { result = Cons x (Cons y Nil) }
+  =
+    Cons x (Cons y Nil)
+
+  let rec sum_list (sizes: list int) : int
+    ensures { result = sum sizes }
+    variant { sizes }
+  =
+    match sizes with
+    | Nil -> 0
+    | Cons x xs -> x + sum_list xs
+    end
+
+  let rec contains (sizes: list int) (target: int) : bool
+    ensures { result = true -> mem target sizes }
+    ensures { result = false -> not mem target sizes }
+    variant { sizes }
+  =
+    match sizes with
+    | Nil -> false
+    | Cons x xs ->
+        if x = target then true else contains xs target
+    end
+
+  let rec find_swap_from (aliceSizes: list int) (bobSizes: list int) (delta: int) : list int
+    requires { exists a b: int. delta_swap_pair aliceSizes bobSizes delta a b }
+    ensures  { exists a b: int.
+      result = Cons a (Cons b Nil) /\
+      delta_swap_pair aliceSizes bobSizes delta a b }
+    variant { aliceSizes }
+  =
+    match aliceSizes with
+    | Nil ->
+        absurd
+    | Cons a rest ->
+        let b = a - delta in
+        if contains bobSizes b then begin
+          assert { mem a aliceSizes };
+          assert { mem b bobSizes };
+          make_pair a b
+        end else begin
+          assert { not mem b bobSizes };
+          assert { exists x y: int. delta_swap_pair rest bobSizes delta x y };
+          find_swap_from rest bobSizes delta
+        end
+    end
+
+  let fair_candy_swap_list (aliceSizes: list int) (bobSizes: list int) : list int
+    requires { positive_sizes aliceSizes }
+    requires { positive_sizes bobSizes }
+    requires { sum aliceSizes <> sum bobSizes }
+    requires { exists a b: int. valid_swap_pair aliceSizes bobSizes a b }
+    ensures  { valid_swap_answer aliceSizes bobSizes result }
+  =
+    let alice_total = sum_list aliceSizes in
+    let bob_total = sum_list bobSizes in
+    assert { alice_total = sum aliceSizes };
+    assert { bob_total = sum bobSizes };
+    let delta = div (alice_total - bob_total) 2 in
+    assert { exists a b: int.
+      valid_swap_pair aliceSizes bobSizes a b /\
+      delta_swap_pair aliceSizes bobSizes delta a b };
+    let result = find_swap_from aliceSizes bobSizes delta in
+    assert { exists a b: int.
+      result = Cons a (Cons b Nil) /\
+      delta_swap_pair aliceSizes bobSizes delta a b };
+    assert { valid_swap_answer aliceSizes bobSizes result };
+    result
+
+end

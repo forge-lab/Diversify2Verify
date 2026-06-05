@@ -1,0 +1,105 @@
+module FindTheStudentThatWillReplaceTheChalk_List_Stage3_Recursive
+
+  use int.Int
+  use int.EuclideanDivision
+  use list.List
+  use list.Length
+  use list.Sum
+
+  let rec predicate all_positive (chalk: list int)
+    variant { chalk }
+  =
+    match chalk with
+    | Nil -> true
+    | Cons c rest -> 0 < c && all_positive rest
+    end
+
+  let rec predicate replacement_index (chalk: list int) (rem: int) (idx: int)
+    variant { chalk }
+  =
+    match chalk with
+    | Nil -> false
+    | Cons c rest ->
+        (rem < c && idx = 0) ||
+        (c <= rem && 0 < idx && replacement_index rest (rem - c) (idx - 1))
+    end
+
+  predicate replacement_result (chalk: list int) (k: int) (idx: int) =
+    0 <= idx < length chalk /\
+    (exists rounds: int, rem: int.
+       0 <= rounds /\
+       0 <= rem < sum chalk /\
+       k = rounds * sum chalk + rem /\
+       replacement_index chalk rem idx)
+
+  let rec sum_list (chalk: list int) : int
+    ensures { result = sum chalk }
+    ensures { all_positive chalk -> 0 <= result }
+    ensures { chalk <> Nil /\ all_positive chalk -> 0 < result }
+    variant { chalk }
+  =
+    match chalk with
+    | Nil ->
+        assert { sum Nil = 0 };
+        0
+    | Cons c rest ->
+        let s = sum_list rest in
+        assert { sum chalk = c + sum rest };
+        c + s
+    end
+
+  let rec find_index (chalk: list int) (rem: int) (idx: int) : int
+    requires { all_positive chalk }
+    requires { 0 <= rem < sum chalk }
+    requires { 0 <= idx }
+    ensures  { idx <= result < idx + length chalk }
+    ensures  { replacement_index chalk rem (result - idx) }
+    variant { chalk }
+  =
+    match chalk with
+    | Nil ->
+        assert { sum Nil = 0 };
+        absurd
+    | Cons c rest ->
+        assert { 0 < c };
+        if rem < c then begin
+          assert { idx - idx = 0 };
+          assert { replacement_index chalk rem (idx - idx) };
+          idx
+        end else begin
+          assert { c <= rem };
+          assert { all_positive rest };
+          assert { sum chalk = c + sum rest };
+          assert { 0 <= rem - c };
+          assert { rem - c < sum rest };
+          let r = find_index rest (rem - c) (idx + 1) in
+          assert { idx + 1 <= r < idx + 1 + length rest };
+          assert { replacement_index rest (rem - c) (r - (idx + 1)) };
+          assert { 0 < r - idx };
+          assert { r - (idx + 1) = r - idx - 1 };
+          assert { replacement_index chalk rem (r - idx) };
+          r
+        end
+    end
+
+  let find_the_student_that_will_replace_the_chalk_list (chalk: list int) (k: int) : int
+    requires { chalk <> Nil }
+    requires { all_positive chalk }
+    requires { 0 <= k }
+    ensures  { replacement_result chalk k result }
+  =
+    let total = sum_list chalk in
+    assert { total = sum chalk };
+    assert { 0 < total };
+    let rem = mod k total in
+    assert { 0 <= rem < total };
+    assert { k = (div k total) * total + rem };
+    let r = find_index chalk rem 0 in
+    assert { 0 <= r < length chalk };
+    assert { replacement_index chalk rem r };
+    assert { 0 <= div k total };
+    assert { k = (div k total) * sum chalk + rem };
+    assert { replacement_result chalk k r };
+    r
+
+end

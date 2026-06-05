@@ -1,0 +1,73 @@
+module IntervalsBetweenIdenticalElements_Array_Stage3_Recursive
+
+  use int.Int
+  use int.Abs
+  use array.Array
+  use array.Init
+
+  predicate valid_input (arr: array int) =
+    1 <= length arr <= 100000 /\
+    forall i: int. 0 <= i < length arr -> 1 <= arr[i] <= 100000
+
+  let function interval_contribution (arr: array int) (i: int) (j: int) : int
+    requires { 0 <= i < length arr }
+    requires { 0 <= j < length arr }
+  =
+    if arr[i] = arr[j] then abs (i - j) else 0
+
+  let rec function interval_sum_from (arr: array int) (i: int) (j: int) : int
+    requires { 0 <= i < length arr }
+    requires { 0 <= j <= length arr }
+    variant  { length arr - j }
+  =
+    if j = length arr then 0
+    else interval_contribution arr i j + interval_sum_from arr i (j + 1)
+
+  let function interval_sum_at (arr: array int) (i: int) : int
+    requires { 0 <= i < length arr }
+  =
+    interval_sum_from arr i 0
+
+  predicate expected_at (arr: array int) (res: array int) (i: int) =
+    length res = length arr /\ 0 <= i < length arr ->
+      res[i] = interval_sum_at arr i
+
+  predicate intervals_between_identical_elements_array_spec
+    (arr: array int) (res: array int) =
+    length res = length arr /\
+    forall i: int. 0 <= i < length arr -> expected_at arr res i
+
+  let rec fill_result (arr: array int) (res: array int) (i: int) : unit
+    requires { 0 <= i <= length arr }
+    requires { length res = length arr }
+    ensures  { length res = length arr }
+    ensures  { forall k: int. 0 <= k < i -> res[k] = (old res)[k] }
+    ensures  { forall k: int. i <= k < length arr -> res[k] = interval_sum_at arr k }
+    variant  { length arr - i }
+  =
+    if i >= length arr then
+      ()
+    else begin
+      res[i] <- interval_sum_from arr i 0;
+      assert { res[i] = interval_sum_at arr i };
+      fill_result arr res (i + 1);
+      assert { forall k: int. i + 1 <= k < length arr -> res[k] = interval_sum_at arr k };
+      assert { res[i] = interval_sum_at arr i }
+    end
+
+  let intervals_between_identical_elements_array (arr: array int) : array int
+    requires { valid_input arr }
+    ensures  { intervals_between_identical_elements_array_spec arr result }
+  =
+    let n = length arr in
+    assert { 1 <= n };
+    if n = 0 then
+      make 0 0
+    else
+      let res = make n 0 in
+      fill_result arr res 0;
+      assert { length res = length arr };
+      assert { forall i: int. 0 <= i < length arr -> res[i] = interval_sum_at arr i };
+      res
+
+end

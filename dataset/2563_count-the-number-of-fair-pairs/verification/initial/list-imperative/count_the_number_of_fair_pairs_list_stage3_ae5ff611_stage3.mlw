@@ -1,0 +1,74 @@
+module CountTheNumberOfFairPairs_List_Stage3_Imperative
+
+  use int.Int
+  use list.List
+  use list.Length
+  use ref.Ref
+
+  let rec function count_fair_with (x: int) (ys: list int) (lower: int) (upper: int) : int
+    variant { ys }
+  =
+    match ys with
+    | Nil -> 0
+    | Cons y rest ->
+        (if lower <= x + y && x + y <= upper then 1 else 0) +
+        count_fair_with x rest lower upper
+    end
+
+  let rec function fair_pair_count (nums: list int) (lower: int) (upper: int) : int
+    variant { nums }
+  =
+    match nums with
+    | Nil -> 0
+    | Cons x rest ->
+        count_fair_with x rest lower upper +
+        fair_pair_count rest lower upper
+    end
+
+  let count_the_number_of_fair_pairs_list (nums: list int) (lower: int) (upper: int) : int
+    ensures { result = fair_pair_count nums lower upper }
+  =
+    let total = ref 0 in
+    let outer = ref nums in
+    while (match !outer with Nil -> false | Cons _ _ -> true end) do
+      invariant { !total + fair_pair_count !outer lower upper = fair_pair_count nums lower upper }
+      variant { length !outer }
+
+      match !outer with
+      | Nil -> ()
+      | Cons x xs ->
+          assert { fair_pair_count (Cons x xs) lower upper =
+                   count_fair_with x xs lower upper + fair_pair_count xs lower upper };
+          let inner = ref xs in
+          while (match !inner with Nil -> false | Cons _ _ -> true end) do
+            invariant { !total + count_fair_with x !inner lower upper + fair_pair_count xs lower upper =
+                        fair_pair_count nums lower upper }
+            variant { length !inner }
+
+            match !inner with
+            | Nil -> ()
+            | Cons y ys ->
+                let pair_sum = x + y in
+                if lower <= pair_sum && pair_sum <= upper then begin
+                  assert { count_fair_with x (Cons y ys) lower upper =
+                           1 + count_fair_with x ys lower upper };
+                  total := !total + 1
+                end else begin
+                  assert { count_fair_with x (Cons y ys) lower upper =
+                           count_fair_with x ys lower upper }
+                end;
+                inner := ys
+            end
+          done;
+          assert { !inner = Nil };
+          assert { count_fair_with x Nil lower upper = 0 };
+          assert { !total + fair_pair_count xs lower upper =
+                   fair_pair_count nums lower upper };
+          outer := xs
+      end
+    done;
+    assert { !outer = Nil };
+    assert { fair_pair_count Nil lower upper = 0 };
+    !total
+
+end

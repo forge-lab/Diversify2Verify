@@ -1,0 +1,71 @@
+module KeepMultiplyingFoundValuesByTwo_Array_Stage3_Recursive
+
+  use int.Int
+  use int.Power
+  use array.Array
+  use array.Init
+
+  predicate valid_input (nums: array int) (original: int) =
+    1 <= length nums <= 1000 /\
+    1 <= original <= 1000 /\
+    forall i: int. 0 <= i < length nums -> 1 <= nums[i] <= 1000
+
+  predicate contains_value (nums: array int) (x: int) =
+    exists i: int. 0 <= i < length nums /\ nums[i] = x
+
+  function doubled_value (original: int) (steps: int) : int =
+    original * power 2 steps
+
+  predicate doubling_prefix_found (nums: array int) (original: int) (steps: int) =
+    forall t: int. 0 <= t < steps -> contains_value nums (doubled_value original t)
+
+  predicate final_value (nums: array int) (original: int) (res: int) =
+    exists steps: int.
+      0 <= steps <= length nums /\
+      res = doubled_value original steps /\
+      doubling_prefix_found nums original steps /\
+      not (contains_value nums res)
+
+  let rec contains_value_from (nums: array int) (target: int) (i: int) : bool
+    requires { 0 <= i <= length nums }
+    ensures  { result <-> exists j: int. i <= j < length nums /\ nums[j] = target }
+    variant  { length nums - i }
+  =
+    if i = length nums then
+      false
+    else if nums[i] = target then
+      true
+    else
+      contains_value_from nums target (i + 1)
+
+  let contains_value_exec (nums: array int) (target: int) : bool
+    ensures { result <-> contains_value nums target }
+  =
+    contains_value_from nums target 0
+
+  let rec keep_multiplying_from (nums: array int) (current: int) (remaining: int) : int
+    requires { 0 <= remaining }
+    ensures  {
+      exists steps: int.
+        0 <= steps <= remaining /\
+        result = current * power 2 steps /\
+        (forall t: int. 0 <= t < steps -> contains_value nums (current * power 2 t)) /\
+        (steps = remaining \/ not (contains_value nums result))
+    }
+    variant { remaining }
+  =
+    if remaining = 0 then
+      current
+    else if contains_value_exec nums current then
+      keep_multiplying_from nums (current * 2) (remaining - 1)
+    else
+      current
+
+  let keep_multiplying_found_values_by_two_array (nums: array int) (original: int) : int
+    requires { valid_input nums original }
+    ensures  { final_value nums original result }
+  =
+    let result = keep_multiplying_from nums original (length nums + 1) in
+    result
+
+end

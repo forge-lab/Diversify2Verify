@@ -1,0 +1,153 @@
+module IntervalsBetweenIdenticalElements_List_Stage3_Imperative
+
+  use int.Int
+  use int.Abs
+  use list.List
+  use list.Length
+  use list.Append
+  use list.Reverse
+  use ref.Ref
+
+  let rec function distance_sum_from (l: list int) (x: int) (i: int) (j: int) : int
+    variant { l }
+  =
+    match l with
+    | Nil -> 0
+    | Cons y ys ->
+        (if y = x then abs (i - j) else 0) + distance_sum_from ys x i (j + 1)
+    end
+
+  let rec predicate intervals_from (arr: list int) (remaining: list int) (i: int) (out: list int)
+    variant { remaining }
+  =
+    match remaining with
+    | Nil ->
+        match out with
+        | Nil -> true
+        | Cons _ _ -> false
+        end
+    | Cons x xs ->
+        match out with
+        | Nil -> false
+        | Cons r rs ->
+            r = distance_sum_from arr x i 0 &&
+            intervals_from arr xs (i + 1) rs
+        end
+    end
+
+  let rec function intervals_values (arr: list int) (remaining: list int) (i: int) : list int
+    variant { remaining }
+  =
+    match remaining with
+    | Nil -> Nil
+    | Cons x xs ->
+        Cons (distance_sum_from arr x i 0) (intervals_values arr xs (i + 1))
+    end
+
+  let rec lemma intervals_values_spec (arr: list int) (remaining: list int) (i: int)
+    ensures { intervals_from arr remaining i (intervals_values arr remaining i) }
+    variant { remaining }
+  =
+    match remaining with
+    | Nil -> ()
+    | Cons _ xs ->
+        intervals_values_spec arr xs (i + 1)
+    end
+
+  let is_nonempty (l: list int) : bool
+    ensures { result = true <-> l <> Nil }
+    ensures { result = false <-> l = Nil }
+  =
+    match l with
+    | Nil -> false
+    | Cons _ _ -> true
+    end
+
+  let reverse_list (l: list int) : list int
+    ensures { reverse result = l }
+  =
+    let cur = ref l in
+    let acc = ref Nil in
+    while is_nonempty !cur do
+      invariant { reverse !acc ++ !cur = l }
+      invariant { 0 <= length !cur }
+      variant { length !cur }
+
+      match !cur with
+      | Nil ->
+          absurd
+      | Cons x xs ->
+          acc := Cons x !acc;
+          cur := xs
+      end
+    done;
+    assert { !cur = Nil };
+    assert { reverse !acc ++ !cur = l };
+    !acc
+
+  let distance_sum_for_value_at_index (arr: list int) (x: int) (i: int) : int
+    ensures { result = distance_sum_from arr x i 0 }
+  =
+    let total = ref 0 in
+    let j = ref 0 in
+    let cur = ref arr in
+    while is_nonempty !cur do
+      invariant { 0 <= length !cur }
+      invariant { 0 <= !j }
+      invariant { !total + distance_sum_from !cur x i !j = distance_sum_from arr x i 0 }
+      variant { length !cur }
+
+      match !cur with
+      | Nil ->
+          absurd
+      | Cons y ys ->
+          assert { distance_sum_from !cur x i !j =
+                   (if y = x then abs (i - !j) else 0) +
+                   distance_sum_from ys x i (!j + 1) };
+          if y = x then begin
+            total := !total + abs (i - !j)
+          end;
+          j := !j + 1;
+          cur := ys
+      end
+    done;
+    assert { !cur = Nil };
+    assert { distance_sum_from !cur x i !j = 0 };
+    !total
+
+  let intervals_between_identical_elements_list (arr: list int) : list int
+    ensures { intervals_from arr arr 0 result }
+  =
+    let rev_out = ref Nil in
+    let cur = ref arr in
+    let i = ref 0 in
+    while is_nonempty !cur do
+      invariant { 0 <= length !cur }
+      invariant { 0 <= !i }
+      invariant { reverse !rev_out ++ intervals_values arr !cur !i =
+                  intervals_values arr arr 0 }
+      variant { length !cur }
+
+      match !cur with
+      | Nil ->
+          absurd
+      | Cons x xs ->
+          assert { intervals_values arr !cur !i =
+                   Cons (distance_sum_from arr x !i 0)
+                     (intervals_values arr xs (!i + 1)) };
+          let distance = distance_sum_for_value_at_index arr x !i in
+          assert { distance = distance_sum_from arr x !i 0 };
+          rev_out := Cons distance !rev_out;
+          i := !i + 1;
+          cur := xs
+      end
+    done;
+    assert { !cur = Nil };
+    assert { intervals_values arr !cur !i = Nil };
+    assert { reverse !rev_out ++ intervals_values arr !cur !i =
+             intervals_values arr arr 0 };
+    let result = reverse_list !rev_out in
+    intervals_values_spec arr arr 0;
+    result
+
+end

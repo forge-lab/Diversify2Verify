@@ -1,0 +1,193 @@
+module ContainerWithMostWater_List_Recursive_Implementation
+
+  use int.Int
+  use list.List
+  use list.Length
+  use list.Mem
+
+  let min_int (a: int) (b: int) : int =
+    if a <= b then a else b
+
+  let max_int (a: int) (b: int) : int =
+    if a >= b then a else b
+
+  let rec best_with_left
+      (left_height: int)
+      (left_index: int)
+      (rights: list int)
+      (right_index: int) : int
+    variant { rights }
+  =
+    match rights with
+    | Nil -> 0
+    | Cons right_height rest ->
+        let area = (right_index - left_index) * min_int left_height right_height in
+        let best_rest = best_with_left left_height left_index rest (right_index + 1) in
+        max_int area best_rest
+    end
+
+  let rec scan_lefts (heights: list int) (left_index: int) : int
+    variant { heights }
+  =
+    match heights with
+    | Nil -> 0
+    | Cons left_height rights ->
+        match rights with
+        | Nil -> 0
+        | _ ->
+            let best_here = best_with_left left_height left_index rights (left_index + 1) in
+            let best_rest = scan_lefts rights (left_index + 1) in
+            max_int best_here best_rest
+        end
+    end
+
+  let container_with_most_water_list (height: list int) : int
+    requires { 2 <= length height }
+    requires { forall x: int. mem x height -> 0 <= x }
+  =
+    scan_lefts height 0
+
+  let test_000 () : bool =
+    let height = Cons 1 (Cons 1 Nil) in
+    let r = container_with_most_water_list height in
+    r = 1
+
+  let test_001 () : bool =
+    let height = Cons 4 (Cons 3 (Cons 2 (Cons 1 (Cons 4 Nil)))) in
+    let r = container_with_most_water_list height in
+    r = 16
+
+  let test_002 () : bool =
+    let height = Cons 8 (Cons 10 (Cons 14 (Cons 0 (Cons 13 (Cons 10 (Cons 9 (Cons 9 (Cons 8 (Cons 9 Nil))))))))) in
+    let r = container_with_most_water_list height in
+    r = 72
+
+  let test_003 () : bool =
+    let height = Cons 1 (Cons 8 (Cons 6 (Cons 2 (Cons 5 (Cons 4 (Cons 8 (Cons 3 (Cons 7 Nil)))))))) in
+    let r = container_with_most_water_list height in
+    r = 49
+
+  let test_005 () : bool =
+    let height = Cons 2 (Cons 3 (Cons 10 (Cons 5 (Cons 7 (Cons 8 (Cons 9 Nil)))))) in
+    let r = container_with_most_water_list height in
+    r = 36
+
+  let test_006 () : bool =
+    let height = Cons 1 (Cons 2 (Cons 3 (Cons 4 (Cons 5 (Cons 6 (Cons 7 (Cons 8 (Cons 9 (Cons 10 Nil))))))))) in
+    let r = container_with_most_water_list height in
+    r = 25
+
+  let test_007 () : bool =
+    let height = Cons 1 (Cons 2 (Cons 4 (Cons 3 Nil))) in
+    let r = container_with_most_water_list height in
+    r = 4
+
+  let test_008 () : bool =
+    let height = Cons 1 (Cons 2 (Cons 3 (Cons 4 (Cons 5 Nil)))) in
+    let r = container_with_most_water_list height in
+    r = 6
+
+  let test_009 () : bool =
+    let height = Cons 1 (Cons 3 (Cons 2 (Cons 5 (Cons 25 (Cons 24 (Cons 5 Nil)))))) in
+    let r = container_with_most_water_list height in
+    r = 24
+
+  let test_010 () : bool =
+    let height = Cons 1 (Cons 2 (Cons 1 Nil)) in
+    let r = container_with_most_water_list height in
+    r = 2
+
+  let test_011 () : bool =
+    let height = Cons 10 (Cons 9 (Cons 8 (Cons 7 (Cons 6 (Cons 5 (Cons 4 (Cons 3 (Cons 2 (Cons 1 Nil))))))))) in
+    let r = container_with_most_water_list height in
+    r = 25
+
+  let test_014 () : bool =
+    let height = Cons 10 (Cons 20 (Cons 10 (Cons 20 (Cons 10 (Cons 20 (Cons 10 (Cons 20 (Cons 10 (Cons 20 Nil))))))))) in
+    let r = container_with_most_water_list height in
+    r = 160
+
+  let test_019 () : bool =
+    let height = Cons 5 (Cons 4 (Cons 3 (Cons 2 (Cons 1 (Cons 1 (Cons 2 (Cons 3 (Cons 4 (Cons 5 (Cons 5 (Cons 4 (Cons 3 (Cons 2 (Cons 1 Nil)))))))))))))) in
+    let r = container_with_most_water_list height in
+    r = 50
+
+  let test_023 () : bool =
+    let height = Cons 1 (Cons 3 (Cons 2 (Cons 5 (Cons 25 (Cons 24 (Cons 5 (Cons 2 (Cons 3 (Cons 1 Nil))))))))) in
+    let r = container_with_most_water_list height in
+    r = 24
+
+  let test_026 () : bool =
+    let height = Cons 5000 (Cons 5000 (Cons 5000 (Cons 5000 (Cons 5000 (Cons 5000 (Cons 5000 (Cons 5000 (Cons 5000 (Cons 5000 Nil))))))))) in
+    let r = container_with_most_water_list height in
+    r = 45000
+
+  let test_028 () : bool =
+    let height = Cons 10000 (Cons 9000 (Cons 8000 (Cons 7000 (Cons 6000 (Cons 5000 (Cons 4000 (Cons 3000 (Cons 2000 (Cons 1000 Nil))))))))) in
+    let r = container_with_most_water_list height in
+    r = 25000
+
+  let test_030 () : bool =
+    let height = Cons 5 (Cons 4 (Cons 3 (Cons 2 (Cons 1 (Cons 2 (Cons 3 (Cons 4 (Cons 5 (Cons 6 (Cons 7 (Cons 8 (Cons 9 (Cons 10 (Cons 9 (Cons 8 (Cons 7 (Cons 6 (Cons 5 (Cons 4 (Cons 3 (Cons 2 (Cons 1 Nil)))))))))))))))))))))) in
+    let r = container_with_most_water_list height in
+    r = 90
+
+  let test_032 () : bool =
+    let height = Cons 10 (Cons 10 (Cons 10 (Cons 10 (Cons 10 (Cons 10 (Cons 10 (Cons 10 (Cons 10 (Cons 10 (Cons 10 (Cons 10 (Cons 10 Nil)))))))))))) in
+    let r = container_with_most_water_list height in
+    r = 120
+
+  let test_033 () : bool =
+    let height = Cons 1 (Cons 3 (Cons 2 (Cons 4 (Cons 3 (Cons 5 (Cons 4 (Cons 6 (Cons 5 (Cons 7 (Cons 6 (Cons 8 (Cons 7 (Cons 9 (Cons 8 (Cons 10 (Cons 9 (Cons 11 (Cons 10 Nil)))))))))))))))))) in
+    let r = container_with_most_water_list height in
+    r = 66
+
+  let test_039 () : bool =
+    let height = Cons 10000 (Cons 9999 (Cons 9998 (Cons 9997 (Cons 9996 (Cons 9995 (Cons 9994 (Cons 9993 (Cons 9992 (Cons 9991 (Cons 9990 (Cons 9989 (Cons 9988 (Cons 9987 (Cons 9986 Nil)))))))))))))) in
+    let r = container_with_most_water_list height in
+    r = 139804
+
+  let run_tests () : bool =
+    if test_000 () then
+    if test_001 () then
+    if test_002 () then
+    if test_003 () then
+    if test_005 () then
+    if test_006 () then
+    if test_007 () then
+    if test_008 () then
+    if test_009 () then
+    if test_010 () then
+    if test_011 () then
+    if test_014 () then
+    if test_019 () then
+    if test_023 () then
+    if test_026 () then
+    if test_028 () then
+    if test_030 () then
+    if test_032 () then
+    if test_033 () then
+    if test_039 () then
+      true
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+
+end

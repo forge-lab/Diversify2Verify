@@ -1,0 +1,225 @@
+module SubsequenceOfSizeKWithTheLargestEvenSum_Array_Spec
+
+  use int.Int
+  use int.EuclideanDivision
+  use int.Sum as IntSum
+  use array.Array
+  use array.Init
+  use ref.Ref
+
+  predicate valid_nums (nums: array int) =
+    1 <= length nums <= 100000 /\
+    forall i: int. 0 <= i < length nums -> 0 <= nums[i] <= 100000
+
+  predicate valid_choice (nums: array int) (k: int) (choice: array int) =
+    length choice = k /\
+    (forall t: int. 0 <= t < k -> 0 <= choice[t] < length nums) /\
+    (forall i j: int. 0 <= i < j < k -> choice[i] < choice[j])
+
+  function subsequence_sum (nums: array int) (choice: array int) : int =
+    IntSum.sum (fun t -> nums[choice[t]]) 0 (length choice)
+
+  predicate even_candidate_sum (nums: array int) (k: int) (s: int) =
+    exists choice: array int.
+      valid_choice nums k choice /\
+      s = subsequence_sum nums choice /\
+      mod s 2 = 0
+
+  predicate optimal_even_subsequence_sum
+      (nums: array int) (k: int) (result: int) =
+    (result = -1 /\
+     forall s: int. not (even_candidate_sum nums k s)) \/
+    (even_candidate_sum nums k result /\
+     forall s: int. even_candidate_sum nums k s -> s <= result)
+
+  predicate prefix_choice
+      (nums: array int) (prefix: int) (k: int) (choice: array int) =
+    0 <= prefix <= length nums /\
+    length choice = k /\
+    (forall t: int. 0 <= t < k -> 0 <= choice[t] < prefix) /\
+    (forall i j: int. 0 <= i < j < k -> choice[i] < choice[j])
+
+  predicate prefix_candidate_sum
+      (nums: array int) (prefix: int) (k: int) (parity: int) (s: int) =
+    exists choice: array int.
+      prefix_choice nums prefix k choice /\
+      s = subsequence_sum nums choice /\
+      mod s 2 = parity
+
+  predicate optimal_prefix_parity
+      (nums: array int) (prefix: int) (k: int) (parity: int) (best: int) =
+    0 <= prefix <= length nums /\
+    (parity = 0 \/ parity = 1) /\
+    ((best = -1 /\
+      forall s: int. not (prefix_candidate_sum nums prefix k parity s)) \/
+     (prefix_candidate_sum nums prefix k parity best /\
+      forall s: int. prefix_candidate_sum nums prefix k parity s -> s <= best))
+
+  predicate dp_cell_state
+      (nums: array int) (prefix: int) (j: int)
+      (even_best: int) (odd_best: int) =
+    optimal_prefix_parity nums prefix j 0 even_best /\
+    optimal_prefix_parity nums prefix j 1 odd_best
+
+  predicate dp_arrays_prefix
+      (nums: array int) (prefix: int) (k: int)
+      (best_even: array int) (best_odd: array int) =
+    0 <= prefix <= length nums /\
+    length best_even = k + 1 /\
+    length best_odd = k + 1 /\
+    (forall j: int. 0 <= j <= k ->
+      dp_cell_state nums prefix j best_even[j] best_odd[j])
+
+  predicate dp_arrays_mixed
+      (nums: array int) (old_prefix: int) (k: int) (limit: int) (cursor: int)
+      (best_even: array int) (best_odd: array int) =
+    0 <= old_prefix < length nums /\
+    0 <= cursor <= limit <= k /\
+    length best_even = k + 1 /\
+    length best_odd = k + 1 /\
+    (forall j: int. 0 <= j <= k ->
+      if 1 <= j /\ j <= limit /\ cursor < j then
+        dp_cell_state nums (old_prefix + 1) j best_even[j] best_odd[j]
+      else
+        dp_cell_state nums old_prefix j best_even[j] best_odd[j])
+
+  lemma dp_initial_arrays:
+    forall nums: array int, k: int, best_even best_odd: array int.
+      valid_nums nums ->
+      1 <= k <= length nums ->
+      length best_even = k + 1 ->
+      length best_odd = k + 1 ->
+      best_even[0] = 0 ->
+      best_odd[0] = -1 ->
+      (forall j: int. 1 <= j <= k -> best_even[j] = -1 /\ best_odd[j] = -1) ->
+      dp_arrays_prefix nums 0 k best_even best_odd
+
+  lemma dp_transition_even_value:
+    forall nums: array int, prefix k limit j: int,
+           old_even old_odd: array int, new_even new_odd: array int.
+      valid_nums nums ->
+      1 <= k <= length nums ->
+      0 <= prefix < length nums ->
+      1 <= j <= limit <= k ->
+      dp_arrays_mixed nums prefix k limit j old_even old_odd ->
+      length new_even = k + 1 ->
+      length new_odd = k + 1 ->
+      (forall q: int. 0 <= q <= k /\ q <> j ->
+        new_even[q] = old_even[q] /\ new_odd[q] = old_odd[q]) ->
+      (mod nums[prefix] 2 = 0 ->
+        ((old_even[j - 1] >= 0 /\ old_even[j - 1] + nums[prefix] > old_even[j]) ->
+          new_even[j] = old_even[j - 1] + nums[prefix]) /\
+        ((old_even[j - 1] < 0 \/ old_even[j - 1] + nums[prefix] <= old_even[j]) ->
+          new_even[j] = old_even[j]) /\
+        ((old_odd[j - 1] >= 0 /\ old_odd[j - 1] + nums[prefix] > old_odd[j]) ->
+          new_odd[j] = old_odd[j - 1] + nums[prefix]) /\
+        ((old_odd[j - 1] < 0 \/ old_odd[j - 1] + nums[prefix] <= old_odd[j]) ->
+          new_odd[j] = old_odd[j])) ->
+      (mod nums[prefix] 2 <> 0 ->
+        ((old_odd[j - 1] >= 0 /\ old_odd[j - 1] + nums[prefix] > old_even[j]) ->
+          new_even[j] = old_odd[j - 1] + nums[prefix]) /\
+        ((old_odd[j - 1] < 0 \/ old_odd[j - 1] + nums[prefix] <= old_even[j]) ->
+          new_even[j] = old_even[j]) /\
+        ((old_even[j - 1] >= 0 /\ old_even[j - 1] + nums[prefix] > old_odd[j]) ->
+          new_odd[j] = old_even[j - 1] + nums[prefix]) /\
+        ((old_even[j - 1] < 0 \/ old_even[j - 1] + nums[prefix] <= old_odd[j]) ->
+          new_odd[j] = old_odd[j])) ->
+      dp_arrays_mixed nums prefix k limit (j - 1) new_even new_odd
+
+  lemma dp_after_inner_loop:
+    forall nums: array int, prefix k limit: int, best_even best_odd: array int.
+      valid_nums nums ->
+      1 <= k <= length nums ->
+      0 <= prefix < length nums ->
+      limit = (if prefix + 1 < k then prefix + 1 else k) ->
+      dp_arrays_mixed nums prefix k limit 0 best_even best_odd ->
+      dp_arrays_prefix nums (prefix + 1) k best_even best_odd
+
+  lemma full_prefix_even_is_stage1:
+    forall nums: array int, k result: int.
+      valid_nums nums ->
+      1 <= k <= length nums ->
+      optimal_prefix_parity nums (length nums) k 0 result ->
+      optimal_even_subsequence_sum nums k result
+
+  let subsequence_of_size_k_with_the_largest_even_sum_array
+      (nums: array int) (k: int) : int
+    requires { valid_nums nums }
+    requires { 1 <= k <= length nums }
+    ensures  { optimal_even_subsequence_sum nums k result }
+  =
+    let n = length nums in
+    let best_even = make (k + 1) (-1) in
+    let best_odd = make (k + 1) (-1) in
+    best_even[0] <- 0;
+    assert { length best_even = k + 1 };
+    assert { length best_odd = k + 1 };
+    assert { best_even[0] = 0 };
+    assert { best_odd[0] = -1 };
+    assert { forall j: int. 1 <= j <= k -> best_even[j] = -1 /\ best_odd[j] = -1 };
+    assert { dp_arrays_prefix nums 0 k best_even best_odd };
+    for i = 0 to n - 1 do
+      invariant { n = length nums }
+      invariant { length best_even = k + 1 }
+      invariant { length best_odd = k + 1 }
+      invariant { 0 <= i <= n }
+      invariant { best_even[0] = 0 }
+      invariant { best_odd[0] = -1 }
+      invariant { dp_arrays_prefix nums i k best_even best_odd }
+      let x = nums[i] in
+      assert { x = nums[i] };
+      let limit = if i + 1 < k then i + 1 else k in
+      assert { 0 <= limit <= k };
+      assert { dp_arrays_mixed nums i k limit limit best_even best_odd };
+      let j = ref limit in
+      while !j >= 1 do
+        invariant { n = length nums }
+        invariant { length best_even = k + 1 }
+        invariant { length best_odd = k + 1 }
+        invariant { 0 <= !j <= limit }
+        invariant { 0 <= limit <= k }
+        invariant { best_even[0] = 0 }
+        invariant { best_odd[0] = -1 }
+        invariant { dp_arrays_mixed nums i k limit !j best_even best_odd }
+        variant { !j }
+        let prev = !j - 1 in
+        assert { 0 <= prev < k };
+        assert { 1 <= !j <= k };
+        assert { x = nums[i] };
+        if mod x 2 = 0 then begin
+          let prev_even = best_even[prev] in
+          if prev_even >= 0 then
+            let cand = prev_even + x in
+            if cand > best_even[!j] then best_even[!j] <- cand else ()
+          else ();
+          let prev_odd = best_odd[prev] in
+          if prev_odd >= 0 then
+            let cand = prev_odd + x in
+            if cand > best_odd[!j] then best_odd[!j] <- cand else ()
+          else ()
+        end else begin
+          let prev_odd = best_odd[prev] in
+          if prev_odd >= 0 then
+            let cand = prev_odd + x in
+            if cand > best_even[!j] then best_even[!j] <- cand else ()
+          else ();
+          let prev_even = best_even[prev] in
+          if prev_even >= 0 then
+            let cand = prev_even + x in
+            if cand > best_odd[!j] then best_odd[!j] <- cand else ()
+          else ()
+        end;
+        assert { dp_arrays_mixed nums i k limit (!j - 1) best_even best_odd };
+        j := !j - 1
+      done;
+      assert { !j = 0 };
+      assert { dp_arrays_mixed nums i k limit 0 best_even best_odd };
+      assert { dp_arrays_prefix nums (i + 1) k best_even best_odd }
+    done;
+    assert { dp_arrays_prefix nums n k best_even best_odd };
+    assert { optimal_prefix_parity nums n k 0 best_even[k] };
+    assert { n = length nums };
+    assert { optimal_even_subsequence_sum nums k best_even[k] };
+    best_even[k]
+
+end

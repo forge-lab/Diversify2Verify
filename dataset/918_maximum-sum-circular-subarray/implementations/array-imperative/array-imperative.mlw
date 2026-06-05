@@ -1,0 +1,183 @@
+module MaximumSumCircularSubarray_Array_Imperative
+
+  use int.Int
+  use array.Array
+  use array.Init
+  use ref.Ref
+
+  predicate leetcode_input (nums: array int) =
+    1 <= length nums <= 30000 /\
+    forall i: int. 0 <= i < length nums -> -30000 <= nums[i] <= 30000
+
+  let maximum_sum_circular_subarray_array (nums: array int) : int
+    requires { leetcode_input nums }
+  =
+    let total = ref nums[0] in
+    let current_max = ref nums[0] in
+    let best_max = ref nums[0] in
+    let current_min = ref nums[0] in
+    let best_min = ref nums[0] in
+    for i = 1 to length nums - 1 do
+      let x = nums[i] in
+      total := !total + x;
+      if !current_max + x > x then
+        current_max := !current_max + x
+      else
+        current_max := x;
+      if !current_max > !best_max then
+        best_max := !current_max;
+      if !current_min + x < x then
+        current_min := !current_min + x
+      else
+        current_min := x;
+      if !current_min < !best_min then
+        best_min := !current_min
+    done;
+    if !best_max < 0 then !best_max else
+      let wrap = !total - !best_min in
+      if wrap > !best_max then wrap else !best_max
+
+  let test_000 () : bool =
+    let nums = init 4 [|1; -2; 3; -2|] in
+    let r = maximum_sum_circular_subarray_array nums in
+    r = 3
+
+  let test_001 () : bool =
+    let nums = init 7 [|10; -2; 5; 1; -4; 3; -1|] in
+    let r = maximum_sum_circular_subarray_array nums in
+    r = 16
+
+  let test_002 () : bool =
+    let nums = init 5 [|2; 3; -4; 5; 7|] in
+    let r = maximum_sum_circular_subarray_array nums in
+    r = 17
+
+  let test_003 () : bool =
+    let nums = init 3 [|5; -3; 5|] in
+    let r = maximum_sum_circular_subarray_array nums in
+    r = 10
+
+  let test_004 () : bool =
+    let nums = init 4 [|3; -1; 2; -1|] in
+    let r = maximum_sum_circular_subarray_array nums in
+    r = 4
+
+  let test_005 () : bool =
+    let nums = init 4 [|2; -2; 2; 7|] in
+    let r = maximum_sum_circular_subarray_array nums in
+    r = 11
+
+  let test_006 () : bool =
+    let nums = init 4 [|-1; -2; -3; 4|] in
+    let r = maximum_sum_circular_subarray_array nums in
+    r = 4
+
+  let test_007 () : bool =
+    let nums = init 5 [|9; -4; 7; 3; -2|] in
+    let r = maximum_sum_circular_subarray_array nums in
+    r = 17
+
+  let test_008 () : bool =
+    let nums = init 7 [|10; 0; 3; 5; -10; 2; 4|] in
+    let r = maximum_sum_circular_subarray_array nums in
+    r = 24
+
+  let test_009 () : bool =
+    let nums = init 5 [|1; 2; 3; 4; 5|] in
+    let r = maximum_sum_circular_subarray_array nums in
+    r = 15
+
+  let test_010 () : bool =
+    let nums = init 4 [|-1; -2; -3; -4|] in
+    let r = maximum_sum_circular_subarray_array nums in
+    r = (-1)
+
+  let test_011 () : bool =
+    let nums = init 4 [|1; -4; 7; 2|] in
+    let r = maximum_sum_circular_subarray_array nums in
+    r = 10
+
+  let test_012 () : bool =
+    let nums = init 5 [|-1; -2; -3; -4; -5|] in
+    let r = maximum_sum_circular_subarray_array nums in
+    r = (-1)
+
+  let test_013 () : bool =
+    let nums = init 5 [|9; -4; 7; 2; -1|] in
+    let r = maximum_sum_circular_subarray_array nums in
+    r = 17
+
+  let test_014 () : bool =
+    let nums = init 3 [|-3; -2; -3|] in
+    let r = maximum_sum_circular_subarray_array nums in
+    r = (-2)
+
+  let test_015 () : bool =
+    let nums = init 15 [|100; -1; -2; -3; -4; -5; -6; -7; -8; -9; 100; 100; -200; 100; 100|] in
+    let r = maximum_sum_circular_subarray_array nums in
+    r = 455
+
+  let test_016 () : bool =
+    let nums = init 8 [|-10; -20; -30; 15; 20; 25; -10; -5|] in
+    let r = maximum_sum_circular_subarray_array nums in
+    r = 60
+
+  let test_017 () : bool =
+    let nums = init 10 [|5; -3; 5; -2; 3; -4; 7; -6; 8; -1|] in
+    let r = maximum_sum_circular_subarray_array nums in
+    r = 18
+
+  let test_018 () : bool =
+    let nums = init 10 [|3; -1; 4; -1; 5; -9; 2; 6; -3; 8|] in
+    let r = maximum_sum_circular_subarray_array nums in
+    r = 23
+
+  let test_019 () : bool =
+    let nums = init 11 [|10; -3; 4; -2; -1; 10; -10; 5; 6; -5; 2|] in
+    let r = maximum_sum_circular_subarray_array nums in
+    r = 26
+
+  let run_tests () : bool =
+    if test_000 () then
+    if test_001 () then
+    if test_002 () then
+    if test_003 () then
+    if test_004 () then
+    if test_005 () then
+    if test_006 () then
+    if test_007 () then
+    if test_008 () then
+    if test_009 () then
+    if test_010 () then
+    if test_011 () then
+    if test_012 () then
+    if test_013 () then
+    if test_014 () then
+    if test_015 () then
+    if test_016 () then
+    if test_017 () then
+    if test_018 () then
+    if test_019 () then
+      true
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+
+end

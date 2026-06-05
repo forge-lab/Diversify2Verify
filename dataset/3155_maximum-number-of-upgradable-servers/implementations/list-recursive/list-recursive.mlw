@@ -1,0 +1,272 @@
+module MaximumNumberOfUpgradableServers_List_Recursive_Implementation
+
+  use int.Int
+  use int.MinMax
+  use int.EuclideanDivision
+  use list.List
+
+  let maximum_upgrades_amount (c: int) (u: int) (s: int) (m: int) : int =
+    if u + s <= 0 then 0 else min c (div (m + c * s) (u + s))
+
+  let rec equal_int_lists (xs: list int) (ys: list int) : bool
+    variant { xs }
+  =
+    match xs with
+    | Nil ->
+        match ys with
+        | Nil -> true
+        | Cons _ _ -> false
+        end
+    | Cons x xt ->
+        match ys with
+        | Nil -> false
+        | Cons y yt ->
+            if x = y then equal_int_lists xt yt else false
+        end
+    end
+
+  let rec maximum_number_of_upgradable_servers_list
+      (count: list int) (upgrade: list int) (sell: list int) (money: list int) : list int
+    variant { count }
+  =
+    match count with
+    | Nil ->
+        match upgrade with
+        | Nil ->
+            match sell with
+            | Nil ->
+                match money with
+                | Nil -> Nil
+                | Cons _ _ -> Nil
+                end
+            | Cons _ _ -> Nil
+            end
+        | Cons _ _ -> Nil
+        end
+    | Cons c cs ->
+        match upgrade with
+        | Nil -> Nil
+        | Cons u us ->
+            match sell with
+            | Nil -> Nil
+            | Cons s ss ->
+                match money with
+                | Nil -> Nil
+                | Cons m ms ->
+                    Cons (maximum_upgrades_amount c u s m)
+                      (maximum_number_of_upgradable_servers_list cs us ss ms)
+                end
+            end
+        end
+    end
+
+  let check_case
+      (count: list int) (upgrade: list int) (sell: list int) (money: list int)
+      (expected: list int) : bool =
+    let result = maximum_number_of_upgradable_servers_list count upgrade sell money in
+    equal_int_lists result expected
+
+  let test_test_000 () : bool =
+    let count = Cons 100000 Nil in
+    let upgrade = Cons 100000 Nil in
+    let sell = Cons 100000 Nil in
+    let money = Cons 1000000000 Nil in
+    let expected = Cons 55000 Nil in
+    check_case count upgrade sell money expected
+
+  let test_test_001 () : bool =
+    let count = Cons 10 (Cons 20 (Cons 30 Nil)) in
+    let upgrade = Cons 5 (Cons 4 (Cons 3 Nil)) in
+    let sell = Cons 1 (Cons 2 (Cons 3 Nil)) in
+    let money = Cons 50 (Cons 100 (Cons 150 Nil)) in
+    let expected = Cons 10 (Cons 20 (Cons 30 Nil)) in
+    check_case count upgrade sell money expected
+
+  let test_test_002 () : bool =
+    let count = Cons 10 (Cons 20 (Cons 30 Nil)) in
+    let upgrade = Cons 1 (Cons 2 (Cons 3 Nil)) in
+    let sell = Cons 4 (Cons 5 (Cons 6 Nil)) in
+    let money = Cons 100 (Cons 100 (Cons 100 Nil)) in
+    let expected = Cons 10 (Cons 20 (Cons 30 Nil)) in
+    check_case count upgrade sell money expected
+
+  let test_test_003 () : bool =
+    let count = Cons 4 (Cons 3 Nil) in
+    let upgrade = Cons 3 (Cons 5 Nil) in
+    let sell = Cons 4 (Cons 2 Nil) in
+    let money = Cons 8 (Cons 9 Nil) in
+    let expected = Cons 3 (Cons 2 Nil) in
+    check_case count upgrade sell money expected
+
+  let test_test_004 () : bool =
+    let count = Cons 5 (Cons 5 (Cons 5 Nil)) in
+    let upgrade = Cons 10 (Cons 20 (Cons 30 Nil)) in
+    let sell = Cons 5 (Cons 10 (Cons 15 Nil)) in
+    let money = Cons 100 (Cons 100 (Cons 100 Nil)) in
+    let expected = Cons 5 (Cons 5 (Cons 3 Nil)) in
+    check_case count upgrade sell money expected
+
+  let test_test_005 () : bool =
+    let count = Cons 1 Nil in
+    let upgrade = Cons 2 Nil in
+    let sell = Cons 1 Nil in
+    let money = Cons 1 Nil in
+    let expected = Cons 0 Nil in
+    check_case count upgrade sell money expected
+
+  let test_test_006 () : bool =
+    let count = Cons 10 (Cons 20 (Cons 30 Nil)) in
+    let upgrade = Cons 5 (Cons 10 (Cons 15 Nil)) in
+    let sell = Cons 1 (Cons 2 (Cons 3 Nil)) in
+    let money = Cons 100 (Cons 200 (Cons 300 Nil)) in
+    let expected = Cons 10 (Cons 20 (Cons 21 Nil)) in
+    check_case count upgrade sell money expected
+
+  let test_test_007 () : bool =
+    let count = Cons 10 (Cons 20 (Cons 30 Nil)) in
+    let upgrade = Cons 1 (Cons 2 (Cons 3 Nil)) in
+    let sell = Cons 4 (Cons 5 (Cons 6 Nil)) in
+    let money = Cons 50 (Cons 100 (Cons 150 Nil)) in
+    let expected = Cons 10 (Cons 20 (Cons 30 Nil)) in
+    check_case count upgrade sell money expected
+
+  let test_test_008 () : bool =
+    let count = Cons 5 (Cons 5 (Cons 5 Nil)) in
+    let upgrade = Cons 10 (Cons 20 (Cons 30 Nil)) in
+    let sell = Cons 5 (Cons 15 (Cons 25 Nil)) in
+    let money = Cons 100 (Cons 150 (Cons 200 Nil)) in
+    let expected = Cons 5 (Cons 5 (Cons 5 Nil)) in
+    check_case count upgrade sell money expected
+
+  let test_test_009 () : bool =
+    let count = Cons 5 (Cons 5 (Cons 5 Nil)) in
+    let upgrade = Cons 1 (Cons 2 (Cons 3 Nil)) in
+    let sell = Cons 3 (Cons 2 (Cons 1 Nil)) in
+    let money = Cons 10 (Cons 10 (Cons 10 Nil)) in
+    let expected = Cons 5 (Cons 5 (Cons 3 Nil)) in
+    check_case count upgrade sell money expected
+
+  let test_test_010 () : bool =
+    let count = Cons 100 (Cons 100 (Cons 100 Nil)) in
+    let upgrade = Cons 1000 (Cons 1000 (Cons 1000 Nil)) in
+    let sell = Cons 500 (Cons 500 (Cons 500 Nil)) in
+    let money = Cons 50000 (Cons 50000 (Cons 50000 Nil)) in
+    let expected = Cons 66 (Cons 66 (Cons 66 Nil)) in
+    check_case count upgrade sell money expected
+
+  let test_test_011 () : bool =
+    let count = Cons 100 Nil in
+    let upgrade = Cons 10 Nil in
+    let sell = Cons 5 Nil in
+    let money = Cons 500 Nil in
+    let expected = Cons 66 Nil in
+    check_case count upgrade sell money expected
+
+  let test_test_012 () : bool =
+    let count = Cons 10 (Cons 20 (Cons 30 Nil)) in
+    let upgrade = Cons 1 (Cons 2 (Cons 3 Nil)) in
+    let sell = Cons 3 (Cons 2 (Cons 1 Nil)) in
+    let money = Cons 100 (Cons 200 (Cons 300 Nil)) in
+    let expected = Cons 10 (Cons 20 (Cons 30 Nil)) in
+    check_case count upgrade sell money expected
+
+  let test_test_013 () : bool =
+    let count = Cons 5 (Cons 5 (Cons 5 Nil)) in
+    let upgrade = Cons 10 (Cons 10 (Cons 10 Nil)) in
+    let sell = Cons 5 (Cons 5 (Cons 5 Nil)) in
+    let money = Cons 50 (Cons 50 (Cons 50 Nil)) in
+    let expected = Cons 5 (Cons 5 (Cons 5 Nil)) in
+    check_case count upgrade sell money expected
+
+  let test_test_014 () : bool =
+    let count = Cons 5 (Cons 5 (Cons 5 Nil)) in
+    let upgrade = Cons 10 (Cons 10 (Cons 10 Nil)) in
+    let sell = Cons 5 (Cons 5 (Cons 5 Nil)) in
+    let money = Cons 20 (Cons 20 (Cons 20 Nil)) in
+    let expected = Cons 3 (Cons 3 (Cons 3 Nil)) in
+    check_case count upgrade sell money expected
+
+  let test_test_015 () : bool =
+    let count = Cons 2 (Cons 4 (Cons 6 Nil)) in
+    let upgrade = Cons 1 (Cons 2 (Cons 3 Nil)) in
+    let sell = Cons 2 (Cons 4 (Cons 6 Nil)) in
+    let money = Cons 10 (Cons 20 (Cons 30 Nil)) in
+    let expected = Cons 2 (Cons 4 (Cons 6 Nil)) in
+    check_case count upgrade sell money expected
+
+  let test_test_016 () : bool =
+    let count = Cons 100 (Cons 200 (Cons 300 (Cons 400 Nil))) in
+    let upgrade = Cons 5 (Cons 10 (Cons 15 (Cons 20 Nil))) in
+    let sell = Cons 20 (Cons 15 (Cons 10 (Cons 5 Nil))) in
+    let money = Cons 500 (Cons 1000 (Cons 1500 (Cons 2000 Nil))) in
+    let expected = Cons 100 (Cons 160 (Cons 180 (Cons 160 Nil))) in
+    check_case count upgrade sell money expected
+
+  let test_test_017 () : bool =
+    let count = Cons 100 (Cons 200 (Cons 300 (Cons 400 (Cons 500 Nil)))) in
+    let upgrade = Cons 5 (Cons 10 (Cons 15 (Cons 20 (Cons 25 Nil)))) in
+    let sell = Cons 20 (Cons 15 (Cons 10 (Cons 5 (Cons 1 Nil)))) in
+    let money = Cons 1000 (Cons 2000 (Cons 3000 (Cons 4000 (Cons 5000 Nil)))) in
+    let expected = Cons 100 (Cons 200 (Cons 240 (Cons 240 (Cons 211 Nil)))) in
+    check_case count upgrade sell money expected
+
+  let test_test_018 () : bool =
+    let count = Cons 1 (Cons 2 (Cons 3 (Cons 4 (Cons 5 Nil)))) in
+    let upgrade = Cons 10 (Cons 20 (Cons 30 (Cons 40 (Cons 50 Nil)))) in
+    let sell = Cons 50 (Cons 40 (Cons 30 (Cons 20 (Cons 10 Nil)))) in
+    let money = Cons 100 (Cons 200 (Cons 300 (Cons 400 (Cons 500 Nil)))) in
+    let expected = Cons 1 (Cons 2 (Cons 3 (Cons 4 (Cons 5 Nil)))) in
+    check_case count upgrade sell money expected
+
+  let test_test_019 () : bool =
+    let count = Cons 15 (Cons 25 (Cons 35 (Cons 45 Nil))) in
+    let upgrade = Cons 2 (Cons 3 (Cons 4 (Cons 5 Nil))) in
+    let sell = Cons 5 (Cons 4 (Cons 3 (Cons 2 Nil))) in
+    let money = Cons 150 (Cons 250 (Cons 350 (Cons 450 Nil))) in
+    let expected = Cons 15 (Cons 25 (Cons 35 (Cons 45 Nil))) in
+    check_case count upgrade sell money expected
+
+  let run_tests () : bool =
+    if test_test_000 () then
+    if test_test_001 () then
+    if test_test_002 () then
+    if test_test_003 () then
+    if test_test_004 () then
+    if test_test_005 () then
+    if test_test_006 () then
+    if test_test_007 () then
+    if test_test_008 () then
+    if test_test_009 () then
+    if test_test_010 () then
+    if test_test_011 () then
+    if test_test_012 () then
+    if test_test_013 () then
+    if test_test_014 () then
+    if test_test_015 () then
+    if test_test_016 () then
+    if test_test_017 () then
+    if test_test_018 () then
+    if test_test_019 () then
+      true
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+
+end

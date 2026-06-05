@@ -1,0 +1,749 @@
+== Stage 1: first prover on whole file ==
+Running in /Users/rubenm/Desktop/Diversify2Verify/codex-runs/dataset-merge/719_find-k-th-smallest-pair-distance/stage3a/array-imperative/find_k_th_smallest_pair_distance_array_stage3_b3d47507/generated/why3/array: why3 session create -o /Users/rubenm/Desktop/Diversify2Verify/codex-runs/dataset-merge/719_find-k-th-smallest-pair-distance/stage3a/array-imperative/find_k_th_smallest_pair_distance_array_stage3_b3d47507/generated/why3/array/.why3_sessions/find_k_th_smallest_pair_distance_array_stage3_b3d47507_stage3_stage1 -P Z3,4.8.6 -t 10 -m 8192 find_k_th_smallest_pair_distance_array_stage3_b3d47507_stage3.mlw
+Session created successfully
+Running in /Users/rubenm/Desktop/Diversify2Verify/codex-runs/dataset-merge/719_find-k-th-smallest-pair-distance/stage3a/array-imperative/find_k_th_smallest_pair_distance_array_stage3_b3d47507/generated/why3/array: why3 bench /Users/rubenm/Desktop/Diversify2Verify/codex-runs/dataset-merge/719_find-k-th-smallest-pair-distance/stage3a/array-imperative/find_k_th_smallest_pair_distance_array_stage3_b3d47507/generated/why3/array/.why3_sessions/find_k_th_smallest_pair_distance_array_stage3_b3d47507_stage3_stage1
+Progress: 9/1/0                       Progress: 8/2/0                       Progress: 7/3/0                       Progress: 6/4/0                       Progress: 5/5/0                       Progress: 4/6/0                       Progress: 4/0/0                       Progress: 3/1/0                       Progress: 2/2/0                       Progress: 1/3/0                       Progress: 0/4/0                       Progress: 0/0/1                       
+Replay completed, saving session... done
+== Stage 1 stats ==
+= Statistics for session /Users/rubenm/Desktop/Diversify2Verify/codex-runs/dataset-merge/719_find-k-th-smallest-pair-distance/stage3a/array-imperative/find_k_th_smallest_pair_distance_array_stage3_b3d47507/generated/why3/array/.why3_sessions/find_k_th_smallest_pair_distance_array_stage3_b3d47507_stage3_stage1
+
+== Number of root goals ==
+  total: 10  proved: 8
+
+== Number of sub goals ==
+  total: 0  proved: 0
+
+== Goals not proved ==
+  +-- file [../../find_k_th_smallest_pair_distance_array_stage3_b3d47507_stage3.mlw]
+    +-- theory FindKThSmallestPairDistance_Array_Stage3_Imperative
+      +-- goal count_pairs_at_most_exec'vc
+      +-- goal find_k_th_smallest_pair_distance_array'vc
+  
+== Goals proved by only one prover ==
+  +-- file [../../find_k_th_smallest_pair_distance_array_stage3_b3d47507_stage3.mlw]
+    +-- theory FindKThSmallestPairDistance_Array_Stage3_Imperative
+      +-- goal count_pairs_lt_from_j'vc: Z3 4.8.6
+      +-- goal count_pairs_lt_from_i'vc: Z3 4.8.6
+      +-- goal count_pairs_less'vc: Z3 4.8.6
+      +-- goal count_pairs_le_from_j'vc: Z3 4.8.6
+      +-- goal count_pairs_le_from_i'vc: Z3 4.8.6
+      +-- goal count_pairs_at_most'vc: Z3 4.8.6
+      +-- goal array_min'vc: Z3 4.8.6
+      +-- goal array_max'vc: Z3 4.8.6
+  
+1 session(s) read, with a total of 10 proof goals.
+== Unproved root goals after first prover ==
+FindKThSmallestPairDistance_Array_Stage3_Imperative	count_pairs_at_most_exec'vc
+FindKThSmallestPairDistance_Array_Stage3_Imperative	find_k_th_smallest_pair_distance_array'vc
+== Stage 1: trying remaining goals with prover Alt-Ergo,2.4.0 ==
+---- stage1 | prover: Alt-Ergo,2.4.0 | theory: FindKThSmallestPairDistance_Array_Stage3_Imperative | goal: count_pairs_at_most_exec'vc ----
+File find_k_th_smallest_pair_distance_array_stage3_b3d47507_stage3.mlw:
+Goal count_pairs_at_most_exec'vc.
+Prover result is: Timeout (10.00s, 88782 steps).
+---- stage1 | prover: Alt-Ergo,2.4.0 | theory: FindKThSmallestPairDistance_Array_Stage3_Imperative | goal: find_k_th_smallest_pair_distance_array'vc ----
+File find_k_th_smallest_pair_distance_array_stage3_b3d47507_stage3.mlw:
+Goal find_k_th_smallest_pair_distance_array'vc.
+Prover result is: Timeout (10.00s, 139732 steps).
+Remaining after prover Alt-Ergo,2.4.0: 2
+== Stage 1: trying remaining goals with prover CVC4,1.8 ==
+---- stage1 | prover: CVC4,1.8 | theory: FindKThSmallestPairDistance_Array_Stage3_Imperative | goal: count_pairs_at_most_exec'vc ----
+File find_k_th_smallest_pair_distance_array_stage3_b3d47507_stage3.mlw:
+Goal count_pairs_at_most_exec'vc.
+Prover result is: Timeout (10.00s, 1673900 steps).
+---- stage1 | prover: CVC4,1.8 | theory: FindKThSmallestPairDistance_Array_Stage3_Imperative | goal: find_k_th_smallest_pair_distance_array'vc ----
+File find_k_th_smallest_pair_distance_array_stage3_b3d47507_stage3.mlw:
+Goal find_k_th_smallest_pair_distance_array'vc.
+Prover result is: Timeout (10.00s, 1424128 steps).
+Remaining after prover CVC4,1.8: 2
+== Goals still unproved after stage 1 ==
+FindKThSmallestPairDistance_Array_Stage3_Imperative	count_pairs_at_most_exec'vc
+FindKThSmallestPairDistance_Array_Stage3_Imperative	find_k_th_smallest_pair_distance_array'vc
+== Stage 2: split_vc on unproved goal ==
+Target theory: FindKThSmallestPairDistance_Array_Stage3_Imperative
+Target goal  : count_pairs_at_most_exec'vc
+---- stage2 | prover: Z3,4.8.6 | theory: FindKThSmallestPairDistance_Array_Stage3_Imperative | goal: count_pairs_at_most_exec'vc ----
+Transforms: split_vc
+File "find_k_th_smallest_pair_distance_array_stage3_b3d47507_stage3.mlw", line 83, characters 20-31:
+Sub-goal Loop invariant init of goal count_pairs_at_most_exec'vc.
+Prover result is: Valid (0.01s, 477 steps).
+
+File "find_k_th_smallest_pair_distance_array_stage3_b3d47507_stage3.mlw", line 85, characters 22-33:
+Sub-goal Loop invariant init of goal count_pairs_at_most_exec'vc.
+Prover result is: Valid (0.01s, 519 steps).
+
+File "find_k_th_smallest_pair_distance_array_stage3_b3d47507_stage3.mlw", line 86, characters 28-35:
+Sub-goal Index in array bounds of goal count_pairs_at_most_exec'vc.
+Prover result is: Valid (0.01s, 6765 steps).
+
+File "find_k_th_smallest_pair_distance_array_stage3_b3d47507_stage3.mlw", line 86, characters 18-25:
+Sub-goal Index in array bounds of goal count_pairs_at_most_exec'vc.
+Prover result is: Valid (0.01s, 6593 steps).
+
+File "find_k_th_smallest_pair_distance_array_stage3_b3d47507_stage3.mlw", line 85, characters 22-33:
+Sub-goal Loop invariant preservation of goal count_pairs_at_most_exec'vc.
+Prover result is: Valid (0.01s, 10115 steps).
+
+File "find_k_th_smallest_pair_distance_array_stage3_b3d47507_stage3.mlw", line 85, characters 22-33:
+Sub-goal Loop invariant preservation of goal count_pairs_at_most_exec'vc.
+Prover result is: Valid (0.01s, 744 steps).
+
+File "find_k_th_smallest_pair_distance_array_stage3_b3d47507_stage3.mlw", line 83, characters 20-31:
+Sub-goal Loop invariant preservation of goal count_pairs_at_most_exec'vc.
+Prover result is: Valid (0.01s, 524 steps).
+
+File "find_k_th_smallest_pair_distance_array_stage3_b3d47507_stage3.mlw", line 83, characters 20-31:
+Sub-goal Loop invariant preservation of goal count_pairs_at_most_exec'vc.
+Prover result is: Valid (0.01s, 527 steps).
+
+File "find_k_th_smallest_pair_distance_array_stage3_b3d47507_stage3.mlw", line 76, characters 14-49:
+Sub-goal Postcondition of goal count_pairs_at_most_exec'vc.
+Prover result is: Timeout (10.00s, 756786669 steps).
+
+File "find_k_th_smallest_pair_distance_array_stage3_b3d47507_stage3.mlw", line 77, characters 14-25:
+Sub-goal Postcondition of goal count_pairs_at_most_exec'vc.
+Prover result is: Valid (0.01s, 770 steps).
+
+File find_k_th_smallest_pair_distance_array_stage3_b3d47507_stage3.mlw:
+Sub-goal Out of loop bounds of goal count_pairs_at_most_exec'vc.
+Prover result is: Valid (0.01s, 9711 steps).
+
+File "find_k_th_smallest_pair_distance_array_stage3_b3d47507_stage3.mlw", line 76, characters 14-49:
+Sub-goal Postcondition of goal count_pairs_at_most_exec'vc.
+Prover result is: Valid (0.01s, 9715 steps).
+
+File "find_k_th_smallest_pair_distance_array_stage3_b3d47507_stage3.mlw", line 77, characters 14-25:
+Sub-goal Postcondition of goal count_pairs_at_most_exec'vc.
+Prover result is: Valid (0.01s, 746 steps).
+---- stage2 | prover: Alt-Ergo,2.4.0 | theory: FindKThSmallestPairDistance_Array_Stage3_Imperative | goal: count_pairs_at_most_exec'vc ----
+Transforms: split_vc
+File "find_k_th_smallest_pair_distance_array_stage3_b3d47507_stage3.mlw", line 83, characters 20-31:
+Sub-goal Loop invariant init of goal count_pairs_at_most_exec'vc.
+Prover result is: Valid (0.00s, 3 steps).
+
+File "find_k_th_smallest_pair_distance_array_stage3_b3d47507_stage3.mlw", line 85, characters 22-33:
+Sub-goal Loop invariant init of goal count_pairs_at_most_exec'vc.
+Prover result is: Valid (0.01s, 10 steps).
+
+File "find_k_th_smallest_pair_distance_array_stage3_b3d47507_stage3.mlw", line 86, characters 28-35:
+Sub-goal Index in array bounds of goal count_pairs_at_most_exec'vc.
+Prover result is: Valid (0.01s, 16 steps).
+
+File "find_k_th_smallest_pair_distance_array_stage3_b3d47507_stage3.mlw", line 86, characters 18-25:
+Sub-goal Index in array bounds of goal count_pairs_at_most_exec'vc.
+Prover result is: Valid (0.01s, 16 steps).
+
+File "find_k_th_smallest_pair_distance_array_stage3_b3d47507_stage3.mlw", line 85, characters 22-33:
+Sub-goal Loop invariant preservation of goal count_pairs_at_most_exec'vc.
+Prover result is: Valid (0.01s, 20 steps).
+
+File "find_k_th_smallest_pair_distance_array_stage3_b3d47507_stage3.mlw", line 85, characters 22-33:
+Sub-goal Loop invariant preservation of goal count_pairs_at_most_exec'vc.
+Prover result is: Valid (0.01s, 18 steps).
+
+File "find_k_th_smallest_pair_distance_array_stage3_b3d47507_stage3.mlw", line 83, characters 20-31:
+Sub-goal Loop invariant preservation of goal count_pairs_at_most_exec'vc.
+Prover result is: Valid (0.01s, 12 steps).
+
+File "find_k_th_smallest_pair_distance_array_stage3_b3d47507_stage3.mlw", line 83, characters 20-31:
+Sub-goal Loop invariant preservation of goal count_pairs_at_most_exec'vc.
+Prover result is: Valid (0.00s, 9 steps).
+
+File "find_k_th_smallest_pair_distance_array_stage3_b3d47507_stage3.mlw", line 76, characters 14-49:
+Sub-goal Postcondition of goal count_pairs_at_most_exec'vc.
+Prover result is: Timeout (10.00s, 106756 steps).
+
+File "find_k_th_smallest_pair_distance_array_stage3_b3d47507_stage3.mlw", line 77, characters 14-25:
+Sub-goal Postcondition of goal count_pairs_at_most_exec'vc.
+Prover result is: Valid (0.01s, 7 steps).
+
+File find_k_th_smallest_pair_distance_array_stage3_b3d47507_stage3.mlw:
+Sub-goal Out of loop bounds of goal count_pairs_at_most_exec'vc.
+Prover result is: Valid (0.00s, 2 steps).
+
+File "find_k_th_smallest_pair_distance_array_stage3_b3d47507_stage3.mlw", line 76, characters 14-49:
+Sub-goal Postcondition of goal count_pairs_at_most_exec'vc.
+Prover result is: Valid (0.01s, 10 steps).
+
+File "find_k_th_smallest_pair_distance_array_stage3_b3d47507_stage3.mlw", line 77, characters 14-25:
+Sub-goal Postcondition of goal count_pairs_at_most_exec'vc.
+Prover result is: Valid (0.00s, 4 steps).
+---- stage2 | prover: CVC4,1.8 | theory: FindKThSmallestPairDistance_Array_Stage3_Imperative | goal: count_pairs_at_most_exec'vc ----
+Transforms: split_vc
+File "find_k_th_smallest_pair_distance_array_stage3_b3d47507_stage3.mlw", line 83, characters 20-31:
+Sub-goal Loop invariant init of goal count_pairs_at_most_exec'vc.
+Prover result is: Valid (0.01s, 1294 steps).
+
+File "find_k_th_smallest_pair_distance_array_stage3_b3d47507_stage3.mlw", line 85, characters 22-33:
+Sub-goal Loop invariant init of goal count_pairs_at_most_exec'vc.
+Prover result is: Valid (0.01s, 1388 steps).
+
+File "find_k_th_smallest_pair_distance_array_stage3_b3d47507_stage3.mlw", line 86, characters 28-35:
+Sub-goal Index in array bounds of goal count_pairs_at_most_exec'vc.
+Prover result is: Valid (0.01s, 1537 steps).
+
+File "find_k_th_smallest_pair_distance_array_stage3_b3d47507_stage3.mlw", line 86, characters 18-25:
+Sub-goal Index in array bounds of goal count_pairs_at_most_exec'vc.
+Prover result is: Valid (0.01s, 1474 steps).
+
+File "find_k_th_smallest_pair_distance_array_stage3_b3d47507_stage3.mlw", line 85, characters 22-33:
+Sub-goal Loop invariant preservation of goal count_pairs_at_most_exec'vc.
+Prover result is: Valid (0.01s, 2032 steps).
+
+File "find_k_th_smallest_pair_distance_array_stage3_b3d47507_stage3.mlw", line 85, characters 22-33:
+Sub-goal Loop invariant preservation of goal count_pairs_at_most_exec'vc.
+Prover result is: Valid (0.01s, 1934 steps).
+
+File "find_k_th_smallest_pair_distance_array_stage3_b3d47507_stage3.mlw", line 83, characters 20-31:
+Sub-goal Loop invariant preservation of goal count_pairs_at_most_exec'vc.
+Prover result is: Valid (0.01s, 1405 steps).
+
+File "find_k_th_smallest_pair_distance_array_stage3_b3d47507_stage3.mlw", line 83, characters 20-31:
+Sub-goal Loop invariant preservation of goal count_pairs_at_most_exec'vc.
+Prover result is: Valid (0.01s, 1390 steps).
+
+File "find_k_th_smallest_pair_distance_array_stage3_b3d47507_stage3.mlw", line 76, characters 14-49:
+Sub-goal Postcondition of goal count_pairs_at_most_exec'vc.
+Prover result is: Timeout (10.00s, 1644095 steps).
+
+File "find_k_th_smallest_pair_distance_array_stage3_b3d47507_stage3.mlw", line 77, characters 14-25:
+Sub-goal Postcondition of goal count_pairs_at_most_exec'vc.
+Prover result is: Valid (0.01s, 2111 steps).
+
+File find_k_th_smallest_pair_distance_array_stage3_b3d47507_stage3.mlw:
+Sub-goal Out of loop bounds of goal count_pairs_at_most_exec'vc.
+Prover result is: Valid (0.01s, 2145 steps).
+
+File "find_k_th_smallest_pair_distance_array_stage3_b3d47507_stage3.mlw", line 76, characters 14-49:
+Sub-goal Postcondition of goal count_pairs_at_most_exec'vc.
+Prover result is: Valid (0.01s, 2388 steps).
+
+File "find_k_th_smallest_pair_distance_array_stage3_b3d47507_stage3.mlw", line 77, characters 14-25:
+Sub-goal Postcondition of goal count_pairs_at_most_exec'vc.
+Prover result is: Valid (0.01s, 2076 steps).
+== Stage 2: split_vc on unproved goal ==
+Target theory: FindKThSmallestPairDistance_Array_Stage3_Imperative
+Target goal  : find_k_th_smallest_pair_distance_array'vc
+---- stage2 | prover: Z3,4.8.6 | theory: FindKThSmallestPairDistance_Array_Stage3_Imperative | goal: find_k_th_smallest_pair_distance_array'vc ----
+Transforms: split_vc
+File "find_k_th_smallest_pair_distance_array_stage3_b3d47507_stage3.mlw", line 126, characters 37-51:
+Sub-goal Precondition of goal find_k_th_smallest_pair_distance_array'vc.
+Prover result is: Valid (0.01s, 8659 steps).
+
+File "find_k_th_smallest_pair_distance_array_stage3_b3d47507_stage3.mlw", line 126, characters 20-34:
+Sub-goal Precondition of goal find_k_th_smallest_pair_distance_array'vc.
+Prover result is: Valid (0.01s, 10401 steps).
+
+File "find_k_th_smallest_pair_distance_array_stage3_b3d47507_stage3.mlw", line 128, characters 18-27:
+Sub-goal Loop invariant init of goal
+find_k_th_smallest_pair_distance_array'vc.
+Prover result is: Valid (0.01s, 850 steps).
+
+File "find_k_th_smallest_pair_distance_array_stage3_b3d47507_stage3.mlw", line 129, characters 18-31:
+Sub-goal Loop invariant init of goal
+find_k_th_smallest_pair_distance_array'vc.
+Prover result is: Valid (0.01s, 12286 steps).
+
+File "find_k_th_smallest_pair_distance_array_stage3_b3d47507_stage3.mlw", line 131, characters 23-43:
+Sub-goal Precondition of goal find_k_th_smallest_pair_distance_array'vc.
+Prover result is: Valid (0.01s, 877 steps).
+
+File "find_k_th_smallest_pair_distance_array_stage3_b3d47507_stage3.mlw", line 130, characters 18-30:
+Sub-goal Loop variant decrease of goal
+find_k_th_smallest_pair_distance_array'vc.
+Prover result is: Valid (0.01s, 21917 steps).
+
+File "find_k_th_smallest_pair_distance_array_stage3_b3d47507_stage3.mlw", line 128, characters 18-27:
+Sub-goal Loop invariant preservation of goal
+find_k_th_smallest_pair_distance_array'vc.
+Prover result is: Valid (0.01s, 20976 steps).
+
+File "find_k_th_smallest_pair_distance_array_stage3_b3d47507_stage3.mlw", line 129, characters 18-31:
+Sub-goal Loop invariant preservation of goal
+find_k_th_smallest_pair_distance_array'vc.
+Prover result is: Valid (0.01s, 21108 steps).
+
+File "find_k_th_smallest_pair_distance_array_stage3_b3d47507_stage3.mlw", line 130, characters 18-30:
+Sub-goal Loop variant decrease of goal
+find_k_th_smallest_pair_distance_array'vc.
+Prover result is: Valid (0.01s, 21912 steps).
+
+File "find_k_th_smallest_pair_distance_array_stage3_b3d47507_stage3.mlw", line 128, characters 18-27:
+Sub-goal Loop invariant preservation of goal
+find_k_th_smallest_pair_distance_array'vc.
+Prover result is: Valid (0.01s, 1506 steps).
+
+File "find_k_th_smallest_pair_distance_array_stage3_b3d47507_stage3.mlw", line 129, characters 18-31:
+Sub-goal Loop invariant preservation of goal
+find_k_th_smallest_pair_distance_array'vc.
+Prover result is: Valid (0.01s, 20882 steps).
+
+File "find_k_th_smallest_pair_distance_array_stage3_b3d47507_stage3.mlw", line 123, characters 15-51:
+Sub-goal Postcondition of goal find_k_th_smallest_pair_distance_array'vc.
+Prover result is: Unknown (unknown) (0.15s, 4895227 steps).
+---- stage2 | prover: Alt-Ergo,2.4.0 | theory: FindKThSmallestPairDistance_Array_Stage3_Imperative | goal: find_k_th_smallest_pair_distance_array'vc ----
+Transforms: split_vc
+File "find_k_th_smallest_pair_distance_array_stage3_b3d47507_stage3.mlw", line 126, characters 37-51:
+Sub-goal Precondition of goal find_k_th_smallest_pair_distance_array'vc.
+Prover result is: Valid (0.00s, 5 steps).
+
+File "find_k_th_smallest_pair_distance_array_stage3_b3d47507_stage3.mlw", line 126, characters 20-34:
+Sub-goal Precondition of goal find_k_th_smallest_pair_distance_array'vc.
+Prover result is: Valid (0.00s, 10 steps).
+
+File "find_k_th_smallest_pair_distance_array_stage3_b3d47507_stage3.mlw", line 128, characters 18-27:
+Sub-goal Loop invariant init of goal
+find_k_th_smallest_pair_distance_array'vc.
+Prover result is: Valid (0.01s, 18 steps).
+
+File "find_k_th_smallest_pair_distance_array_stage3_b3d47507_stage3.mlw", line 129, characters 18-31:
+Sub-goal Loop invariant init of goal
+find_k_th_smallest_pair_distance_array'vc.
+Prover result is: Valid (0.01s, 21 steps).
+
+File "find_k_th_smallest_pair_distance_array_stage3_b3d47507_stage3.mlw", line 131, characters 23-43:
+Sub-goal Precondition of goal find_k_th_smallest_pair_distance_array'vc.
+Prover result is: Valid (0.01s, 24 steps).
+
+File "find_k_th_smallest_pair_distance_array_stage3_b3d47507_stage3.mlw", line 130, characters 18-30:
+Sub-goal Loop variant decrease of goal
+find_k_th_smallest_pair_distance_array'vc.
+Prover result is: Valid (0.01s, 65 steps).
+
+File "find_k_th_smallest_pair_distance_array_stage3_b3d47507_stage3.mlw", line 128, characters 18-27:
+Sub-goal Loop invariant preservation of goal
+find_k_th_smallest_pair_distance_array'vc.
+Prover result is: Valid (0.01s, 65 steps).
+
+File "find_k_th_smallest_pair_distance_array_stage3_b3d47507_stage3.mlw", line 129, characters 18-31:
+Sub-goal Loop invariant preservation of goal
+find_k_th_smallest_pair_distance_array'vc.
+Prover result is: Valid (0.01s, 66 steps).
+
+File "find_k_th_smallest_pair_distance_array_stage3_b3d47507_stage3.mlw", line 130, characters 18-30:
+Sub-goal Loop variant decrease of goal
+find_k_th_smallest_pair_distance_array'vc.
+Prover result is: Valid (0.01s, 52 steps).
+
+File "find_k_th_smallest_pair_distance_array_stage3_b3d47507_stage3.mlw", line 128, characters 18-27:
+Sub-goal Loop invariant preservation of goal
+find_k_th_smallest_pair_distance_array'vc.
+Prover result is: Valid (0.01s, 51 steps).
+
+File "find_k_th_smallest_pair_distance_array_stage3_b3d47507_stage3.mlw", line 129, characters 18-31:
+Sub-goal Loop invariant preservation of goal
+find_k_th_smallest_pair_distance_array'vc.
+Prover result is: Valid (0.01s, 51 steps).
+
+File "find_k_th_smallest_pair_distance_array_stage3_b3d47507_stage3.mlw", line 123, characters 15-51:
+Sub-goal Postcondition of goal find_k_th_smallest_pair_distance_array'vc.
+Prover result is: Timeout (10.00s, 38103 steps).
+---- stage2 | prover: CVC4,1.8 | theory: FindKThSmallestPairDistance_Array_Stage3_Imperative | goal: find_k_th_smallest_pair_distance_array'vc ----
+Transforms: split_vc
+File "find_k_th_smallest_pair_distance_array_stage3_b3d47507_stage3.mlw", line 126, characters 37-51:
+Sub-goal Precondition of goal find_k_th_smallest_pair_distance_array'vc.
+Prover result is: Valid (0.01s, 1726 steps).
+
+File "find_k_th_smallest_pair_distance_array_stage3_b3d47507_stage3.mlw", line 126, characters 20-34:
+Sub-goal Precondition of goal find_k_th_smallest_pair_distance_array'vc.
+Prover result is: Valid (0.01s, 2022 steps).
+
+File "find_k_th_smallest_pair_distance_array_stage3_b3d47507_stage3.mlw", line 128, characters 18-27:
+Sub-goal Loop invariant init of goal
+find_k_th_smallest_pair_distance_array'vc.
+Prover result is: Valid (0.01s, 2129 steps).
+
+File "find_k_th_smallest_pair_distance_array_stage3_b3d47507_stage3.mlw", line 129, characters 18-31:
+Sub-goal Loop invariant init of goal
+find_k_th_smallest_pair_distance_array'vc.
+Prover result is: Valid (0.01s, 2700 steps).
+
+File "find_k_th_smallest_pair_distance_array_stage3_b3d47507_stage3.mlw", line 131, characters 23-43:
+Sub-goal Precondition of goal find_k_th_smallest_pair_distance_array'vc.
+Prover result is: Valid (0.01s, 2191 steps).
+
+File "find_k_th_smallest_pair_distance_array_stage3_b3d47507_stage3.mlw", line 130, characters 18-30:
+Sub-goal Loop variant decrease of goal
+find_k_th_smallest_pair_distance_array'vc.
+Prover result is: Valid (0.02s, 6301 steps).
+
+File "find_k_th_smallest_pair_distance_array_stage3_b3d47507_stage3.mlw", line 128, characters 18-27:
+Sub-goal Loop invariant preservation of goal
+find_k_th_smallest_pair_distance_array'vc.
+Prover result is: Valid (0.02s, 6262 steps).
+
+File "find_k_th_smallest_pair_distance_array_stage3_b3d47507_stage3.mlw", line 129, characters 18-31:
+Sub-goal Loop invariant preservation of goal
+find_k_th_smallest_pair_distance_array'vc.
+Prover result is: Valid (0.02s, 6285 steps).
+
+File "find_k_th_smallest_pair_distance_array_stage3_b3d47507_stage3.mlw", line 130, characters 18-30:
+Sub-goal Loop variant decrease of goal
+find_k_th_smallest_pair_distance_array'vc.
+Prover result is: Valid (0.02s, 6288 steps).
+
+File "find_k_th_smallest_pair_distance_array_stage3_b3d47507_stage3.mlw", line 128, characters 18-27:
+Sub-goal Loop invariant preservation of goal
+find_k_th_smallest_pair_distance_array'vc.
+Prover result is: Valid (0.02s, 5685 steps).
+
+File "find_k_th_smallest_pair_distance_array_stage3_b3d47507_stage3.mlw", line 129, characters 18-31:
+Sub-goal Loop invariant preservation of goal
+find_k_th_smallest_pair_distance_array'vc.
+Prover result is: Valid (0.02s, 6258 steps).
+
+File "find_k_th_smallest_pair_distance_array_stage3_b3d47507_stage3.mlw", line 123, characters 15-51:
+Sub-goal Postcondition of goal find_k_th_smallest_pair_distance_array'vc.
+Prover result is: Timeout (10.00s, 1505028 steps).
+== Goals still unproved after stage 2 (split_vc) ==
+FindKThSmallestPairDistance_Array_Stage3_Imperative	count_pairs_at_most_exec'vc
+FindKThSmallestPairDistance_Array_Stage3_Imperative	find_k_th_smallest_pair_distance_array'vc
+== Stage 3: split_vc + inline_all on still-unproved goal ==
+Target theory: FindKThSmallestPairDistance_Array_Stage3_Imperative
+Target goal  : count_pairs_at_most_exec'vc
+---- stage3 | prover: Z3,4.8.6 | theory: FindKThSmallestPairDistance_Array_Stage3_Imperative | goal: count_pairs_at_most_exec'vc ----
+Transforms: split_vc inline_all
+File "find_k_th_smallest_pair_distance_array_stage3_b3d47507_stage3.mlw", line 83, characters 20-31:
+Sub-goal Loop invariant init of goal count_pairs_at_most_exec'vc.
+Prover result is: Valid (0.01s, 620 steps).
+
+File "find_k_th_smallest_pair_distance_array_stage3_b3d47507_stage3.mlw", line 85, characters 22-33:
+Sub-goal Loop invariant init of goal count_pairs_at_most_exec'vc.
+Prover result is: Valid (0.01s, 1066 steps).
+
+File "find_k_th_smallest_pair_distance_array_stage3_b3d47507_stage3.mlw", line 86, characters 28-35:
+Sub-goal Index in array bounds of goal count_pairs_at_most_exec'vc.
+Prover result is: Valid (0.01s, 9950 steps).
+
+File "find_k_th_smallest_pair_distance_array_stage3_b3d47507_stage3.mlw", line 86, characters 18-25:
+Sub-goal Index in array bounds of goal count_pairs_at_most_exec'vc.
+Prover result is: Valid (0.01s, 9416 steps).
+
+File "find_k_th_smallest_pair_distance_array_stage3_b3d47507_stage3.mlw", line 85, characters 22-33:
+Sub-goal Loop invariant preservation of goal count_pairs_at_most_exec'vc.
+Prover result is: Valid (0.01s, 10097 steps).
+
+File "find_k_th_smallest_pair_distance_array_stage3_b3d47507_stage3.mlw", line 85, characters 22-33:
+Sub-goal Loop invariant preservation of goal count_pairs_at_most_exec'vc.
+Prover result is: Valid (0.01s, 1226 steps).
+
+File "find_k_th_smallest_pair_distance_array_stage3_b3d47507_stage3.mlw", line 83, characters 20-31:
+Sub-goal Loop invariant preservation of goal count_pairs_at_most_exec'vc.
+Prover result is: Valid (0.01s, 1081 steps).
+
+File "find_k_th_smallest_pair_distance_array_stage3_b3d47507_stage3.mlw", line 83, characters 20-31:
+Sub-goal Loop invariant preservation of goal count_pairs_at_most_exec'vc.
+Prover result is: Valid (0.01s, 1046 steps).
+
+File "find_k_th_smallest_pair_distance_array_stage3_b3d47507_stage3.mlw", line 76, characters 14-49:
+Sub-goal Postcondition of goal count_pairs_at_most_exec'vc.
+Prover result is: Unknown (unknown) (0.03s, 499459 steps).
+
+File "find_k_th_smallest_pair_distance_array_stage3_b3d47507_stage3.mlw", line 77, characters 14-25:
+Sub-goal Postcondition of goal count_pairs_at_most_exec'vc.
+Prover result is: Valid (0.01s, 1440 steps).
+
+File find_k_th_smallest_pair_distance_array_stage3_b3d47507_stage3.mlw:
+Sub-goal Out of loop bounds of goal count_pairs_at_most_exec'vc.
+Prover result is: Valid (0.01s, 11460 steps).
+
+File "find_k_th_smallest_pair_distance_array_stage3_b3d47507_stage3.mlw", line 76, characters 14-49:
+Sub-goal Postcondition of goal count_pairs_at_most_exec'vc.
+Prover result is: Valid (0.01s, 11364 steps).
+
+File "find_k_th_smallest_pair_distance_array_stage3_b3d47507_stage3.mlw", line 77, characters 14-25:
+Sub-goal Postcondition of goal count_pairs_at_most_exec'vc.
+Prover result is: Valid (0.01s, 941 steps).
+---- stage3 | prover: Alt-Ergo,2.4.0 | theory: FindKThSmallestPairDistance_Array_Stage3_Imperative | goal: count_pairs_at_most_exec'vc ----
+Transforms: split_vc inline_all
+File "find_k_th_smallest_pair_distance_array_stage3_b3d47507_stage3.mlw", line 83, characters 20-31:
+Sub-goal Loop invariant init of goal count_pairs_at_most_exec'vc.
+Prover result is: Valid (0.01s, 4 steps).
+
+File "find_k_th_smallest_pair_distance_array_stage3_b3d47507_stage3.mlw", line 85, characters 22-33:
+Sub-goal Loop invariant init of goal count_pairs_at_most_exec'vc.
+Prover result is: Valid (0.01s, 8 steps).
+
+File "find_k_th_smallest_pair_distance_array_stage3_b3d47507_stage3.mlw", line 86, characters 28-35:
+Sub-goal Index in array bounds of goal count_pairs_at_most_exec'vc.
+Prover result is: Valid (0.01s, 33 steps).
+
+File "find_k_th_smallest_pair_distance_array_stage3_b3d47507_stage3.mlw", line 86, characters 18-25:
+Sub-goal Index in array bounds of goal count_pairs_at_most_exec'vc.
+Prover result is: Valid (0.01s, 20 steps).
+
+File "find_k_th_smallest_pair_distance_array_stage3_b3d47507_stage3.mlw", line 85, characters 22-33:
+Sub-goal Loop invariant preservation of goal count_pairs_at_most_exec'vc.
+Prover result is: Valid (0.01s, 34 steps).
+
+File "find_k_th_smallest_pair_distance_array_stage3_b3d47507_stage3.mlw", line 85, characters 22-33:
+Sub-goal Loop invariant preservation of goal count_pairs_at_most_exec'vc.
+Prover result is: Valid (0.01s, 19 steps).
+
+File "find_k_th_smallest_pair_distance_array_stage3_b3d47507_stage3.mlw", line 83, characters 20-31:
+Sub-goal Loop invariant preservation of goal count_pairs_at_most_exec'vc.
+Prover result is: Valid (0.01s, 9 steps).
+
+File "find_k_th_smallest_pair_distance_array_stage3_b3d47507_stage3.mlw", line 83, characters 20-31:
+Sub-goal Loop invariant preservation of goal count_pairs_at_most_exec'vc.
+Prover result is: Valid (0.00s, 8 steps).
+
+File "find_k_th_smallest_pair_distance_array_stage3_b3d47507_stage3.mlw", line 76, characters 14-49:
+Sub-goal Postcondition of goal count_pairs_at_most_exec'vc.
+Prover result is: Timeout (10.00s, 159636 steps).
+
+File "find_k_th_smallest_pair_distance_array_stage3_b3d47507_stage3.mlw", line 77, characters 14-25:
+Sub-goal Postcondition of goal count_pairs_at_most_exec'vc.
+Prover result is: Valid (0.01s, 7 steps).
+
+File find_k_th_smallest_pair_distance_array_stage3_b3d47507_stage3.mlw:
+Sub-goal Out of loop bounds of goal count_pairs_at_most_exec'vc.
+Prover result is: Valid (0.00s, 7 steps).
+
+File "find_k_th_smallest_pair_distance_array_stage3_b3d47507_stage3.mlw", line 76, characters 14-49:
+Sub-goal Postcondition of goal count_pairs_at_most_exec'vc.
+Prover result is: Valid (0.01s, 17 steps).
+
+File "find_k_th_smallest_pair_distance_array_stage3_b3d47507_stage3.mlw", line 77, characters 14-25:
+Sub-goal Postcondition of goal count_pairs_at_most_exec'vc.
+Prover result is: Valid (0.00s, 7 steps).
+---- stage3 | prover: CVC4,1.8 | theory: FindKThSmallestPairDistance_Array_Stage3_Imperative | goal: count_pairs_at_most_exec'vc ----
+Transforms: split_vc inline_all
+File "find_k_th_smallest_pair_distance_array_stage3_b3d47507_stage3.mlw", line 83, characters 20-31:
+Sub-goal Loop invariant init of goal count_pairs_at_most_exec'vc.
+Prover result is: Valid (0.01s, 1984 steps).
+
+File "find_k_th_smallest_pair_distance_array_stage3_b3d47507_stage3.mlw", line 85, characters 22-33:
+Sub-goal Loop invariant init of goal count_pairs_at_most_exec'vc.
+Prover result is: Valid (0.01s, 2202 steps).
+
+File "find_k_th_smallest_pair_distance_array_stage3_b3d47507_stage3.mlw", line 86, characters 28-35:
+Sub-goal Index in array bounds of goal count_pairs_at_most_exec'vc.
+Prover result is: Valid (0.01s, 2641 steps).
+
+File "find_k_th_smallest_pair_distance_array_stage3_b3d47507_stage3.mlw", line 86, characters 18-25:
+Sub-goal Index in array bounds of goal count_pairs_at_most_exec'vc.
+Prover result is: Valid (0.01s, 2516 steps).
+
+File "find_k_th_smallest_pair_distance_array_stage3_b3d47507_stage3.mlw", line 85, characters 22-33:
+Sub-goal Loop invariant preservation of goal count_pairs_at_most_exec'vc.
+Prover result is: Valid (0.01s, 2608 steps).
+
+File "find_k_th_smallest_pair_distance_array_stage3_b3d47507_stage3.mlw", line 85, characters 22-33:
+Sub-goal Loop invariant preservation of goal count_pairs_at_most_exec'vc.
+Prover result is: Valid (0.01s, 2309 steps).
+
+File "find_k_th_smallest_pair_distance_array_stage3_b3d47507_stage3.mlw", line 83, characters 20-31:
+Sub-goal Loop invariant preservation of goal count_pairs_at_most_exec'vc.
+Prover result is: Valid (0.01s, 2246 steps).
+
+File "find_k_th_smallest_pair_distance_array_stage3_b3d47507_stage3.mlw", line 83, characters 20-31:
+Sub-goal Loop invariant preservation of goal count_pairs_at_most_exec'vc.
+Prover result is: Valid (0.01s, 2176 steps).
+
+File "find_k_th_smallest_pair_distance_array_stage3_b3d47507_stage3.mlw", line 76, characters 14-49:
+Sub-goal Postcondition of goal count_pairs_at_most_exec'vc.
+Prover result is: Timeout (10.00s, 1502749 steps).
+
+File "find_k_th_smallest_pair_distance_array_stage3_b3d47507_stage3.mlw", line 77, characters 14-25:
+Sub-goal Postcondition of goal count_pairs_at_most_exec'vc.
+Prover result is: Valid (0.01s, 2828 steps).
+
+File find_k_th_smallest_pair_distance_array_stage3_b3d47507_stage3.mlw:
+Sub-goal Out of loop bounds of goal count_pairs_at_most_exec'vc.
+Prover result is: Valid (0.01s, 2801 steps).
+
+File "find_k_th_smallest_pair_distance_array_stage3_b3d47507_stage3.mlw", line 76, characters 14-49:
+Sub-goal Postcondition of goal count_pairs_at_most_exec'vc.
+Prover result is: Valid (0.01s, 3172 steps).
+
+File "find_k_th_smallest_pair_distance_array_stage3_b3d47507_stage3.mlw", line 77, characters 14-25:
+Sub-goal Postcondition of goal count_pairs_at_most_exec'vc.
+Prover result is: Valid (0.01s, 2730 steps).
+== Stage 3: split_vc + inline_all on still-unproved goal ==
+Target theory: FindKThSmallestPairDistance_Array_Stage3_Imperative
+Target goal  : find_k_th_smallest_pair_distance_array'vc
+---- stage3 | prover: Z3,4.8.6 | theory: FindKThSmallestPairDistance_Array_Stage3_Imperative | goal: find_k_th_smallest_pair_distance_array'vc ----
+Transforms: split_vc inline_all
+File "find_k_th_smallest_pair_distance_array_stage3_b3d47507_stage3.mlw", line 126, characters 37-51:
+Sub-goal Precondition of goal find_k_th_smallest_pair_distance_array'vc.
+Prover result is: Valid (0.01s, 8634 steps).
+
+File "find_k_th_smallest_pair_distance_array_stage3_b3d47507_stage3.mlw", line 126, characters 20-34:
+Sub-goal Precondition of goal find_k_th_smallest_pair_distance_array'vc.
+Prover result is: Valid (0.01s, 10273 steps).
+
+File "find_k_th_smallest_pair_distance_array_stage3_b3d47507_stage3.mlw", line 128, characters 18-27:
+Sub-goal Loop invariant init of goal
+find_k_th_smallest_pair_distance_array'vc.
+Prover result is: Valid (0.01s, 1053 steps).
+
+File "find_k_th_smallest_pair_distance_array_stage3_b3d47507_stage3.mlw", line 129, characters 18-31:
+Sub-goal Loop invariant init of goal
+find_k_th_smallest_pair_distance_array'vc.
+Prover result is: Valid (0.01s, 12142 steps).
+
+File "find_k_th_smallest_pair_distance_array_stage3_b3d47507_stage3.mlw", line 131, characters 23-43:
+Sub-goal Precondition of goal find_k_th_smallest_pair_distance_array'vc.
+Prover result is: Valid (0.01s, 1108 steps).
+
+File "find_k_th_smallest_pair_distance_array_stage3_b3d47507_stage3.mlw", line 130, characters 18-30:
+Sub-goal Loop variant decrease of goal
+find_k_th_smallest_pair_distance_array'vc.
+Prover result is: Valid (0.01s, 25305 steps).
+
+File "find_k_th_smallest_pair_distance_array_stage3_b3d47507_stage3.mlw", line 128, characters 18-27:
+Sub-goal Loop invariant preservation of goal
+find_k_th_smallest_pair_distance_array'vc.
+Prover result is: Valid (0.01s, 24292 steps).
+
+File "find_k_th_smallest_pair_distance_array_stage3_b3d47507_stage3.mlw", line 129, characters 18-31:
+Sub-goal Loop invariant preservation of goal
+find_k_th_smallest_pair_distance_array'vc.
+Prover result is: Valid (0.01s, 24515 steps).
+
+File "find_k_th_smallest_pair_distance_array_stage3_b3d47507_stage3.mlw", line 130, characters 18-30:
+Sub-goal Loop variant decrease of goal
+find_k_th_smallest_pair_distance_array'vc.
+Prover result is: Valid (0.01s, 25288 steps).
+
+File "find_k_th_smallest_pair_distance_array_stage3_b3d47507_stage3.mlw", line 128, characters 18-27:
+Sub-goal Loop invariant preservation of goal
+find_k_th_smallest_pair_distance_array'vc.
+Prover result is: Valid (0.01s, 2748 steps).
+
+File "find_k_th_smallest_pair_distance_array_stage3_b3d47507_stage3.mlw", line 129, characters 18-31:
+Sub-goal Loop invariant preservation of goal
+find_k_th_smallest_pair_distance_array'vc.
+Prover result is: Valid (0.01s, 24115 steps).
+
+File "find_k_th_smallest_pair_distance_array_stage3_b3d47507_stage3.mlw", line 123, characters 15-51:
+Sub-goal Postcondition of goal find_k_th_smallest_pair_distance_array'vc.
+Prover result is: Timeout (10.00s, 173954918 steps).
+---- stage3 | prover: Alt-Ergo,2.4.0 | theory: FindKThSmallestPairDistance_Array_Stage3_Imperative | goal: find_k_th_smallest_pair_distance_array'vc ----
+Transforms: split_vc inline_all
+File "find_k_th_smallest_pair_distance_array_stage3_b3d47507_stage3.mlw", line 126, characters 37-51:
+Sub-goal Precondition of goal find_k_th_smallest_pair_distance_array'vc.
+Prover result is: Valid (0.01s, 13 steps).
+
+File "find_k_th_smallest_pair_distance_array_stage3_b3d47507_stage3.mlw", line 126, characters 20-34:
+Sub-goal Precondition of goal find_k_th_smallest_pair_distance_array'vc.
+Prover result is: Valid (0.01s, 15 steps).
+
+File "find_k_th_smallest_pair_distance_array_stage3_b3d47507_stage3.mlw", line 128, characters 18-27:
+Sub-goal Loop invariant init of goal
+find_k_th_smallest_pair_distance_array'vc.
+Prover result is: Valid (0.01s, 17 steps).
+
+File "find_k_th_smallest_pair_distance_array_stage3_b3d47507_stage3.mlw", line 129, characters 18-31:
+Sub-goal Loop invariant init of goal
+find_k_th_smallest_pair_distance_array'vc.
+Prover result is: Valid (0.01s, 34 steps).
+
+File "find_k_th_smallest_pair_distance_array_stage3_b3d47507_stage3.mlw", line 131, characters 23-43:
+Sub-goal Precondition of goal find_k_th_smallest_pair_distance_array'vc.
+Prover result is: Valid (0.01s, 20 steps).
+
+File "find_k_th_smallest_pair_distance_array_stage3_b3d47507_stage3.mlw", line 130, characters 18-30:
+Sub-goal Loop variant decrease of goal
+find_k_th_smallest_pair_distance_array'vc.
+Prover result is: Valid (0.01s, 83 steps).
+
+File "find_k_th_smallest_pair_distance_array_stage3_b3d47507_stage3.mlw", line 128, characters 18-27:
+Sub-goal Loop invariant preservation of goal
+find_k_th_smallest_pair_distance_array'vc.
+Prover result is: Valid (0.01s, 90 steps).
+
+File "find_k_th_smallest_pair_distance_array_stage3_b3d47507_stage3.mlw", line 129, characters 18-31:
+Sub-goal Loop invariant preservation of goal
+find_k_th_smallest_pair_distance_array'vc.
+Prover result is: Valid (0.01s, 84 steps).
+
+File "find_k_th_smallest_pair_distance_array_stage3_b3d47507_stage3.mlw", line 130, characters 18-30:
+Sub-goal Loop variant decrease of goal
+find_k_th_smallest_pair_distance_array'vc.
+Prover result is: Valid (0.01s, 72 steps).
+
+File "find_k_th_smallest_pair_distance_array_stage3_b3d47507_stage3.mlw", line 128, characters 18-27:
+Sub-goal Loop invariant preservation of goal
+find_k_th_smallest_pair_distance_array'vc.
+Prover result is: Valid (0.01s, 69 steps).
+
+File "find_k_th_smallest_pair_distance_array_stage3_b3d47507_stage3.mlw", line 129, characters 18-31:
+Sub-goal Loop invariant preservation of goal
+find_k_th_smallest_pair_distance_array'vc.
+Prover result is: Valid (0.01s, 72 steps).
+
+File "find_k_th_smallest_pair_distance_array_stage3_b3d47507_stage3.mlw", line 123, characters 15-51:
+Sub-goal Postcondition of goal find_k_th_smallest_pair_distance_array'vc.
+Prover result is: Timeout (10.00s, 196515 steps).
+---- stage3 | prover: CVC4,1.8 | theory: FindKThSmallestPairDistance_Array_Stage3_Imperative | goal: find_k_th_smallest_pair_distance_array'vc ----
+Transforms: split_vc inline_all
+File "find_k_th_smallest_pair_distance_array_stage3_b3d47507_stage3.mlw", line 126, characters 37-51:
+Sub-goal Precondition of goal find_k_th_smallest_pair_distance_array'vc.
+Prover result is: Valid (0.01s, 2180 steps).
+
+File "find_k_th_smallest_pair_distance_array_stage3_b3d47507_stage3.mlw", line 126, characters 20-34:
+Sub-goal Precondition of goal find_k_th_smallest_pair_distance_array'vc.
+Prover result is: Valid (0.01s, 2461 steps).
+
+File "find_k_th_smallest_pair_distance_array_stage3_b3d47507_stage3.mlw", line 128, characters 18-27:
+Sub-goal Loop invariant init of goal
+find_k_th_smallest_pair_distance_array'vc.
+Prover result is: Valid (0.01s, 2629 steps).
+
+File "find_k_th_smallest_pair_distance_array_stage3_b3d47507_stage3.mlw", line 129, characters 18-31:
+Sub-goal Loop invariant init of goal
+find_k_th_smallest_pair_distance_array'vc.
+Prover result is: Valid (0.02s, 3291 steps).
+
+File "find_k_th_smallest_pair_distance_array_stage3_b3d47507_stage3.mlw", line 131, characters 23-43:
+Sub-goal Precondition of goal find_k_th_smallest_pair_distance_array'vc.
+Prover result is: Valid (0.01s, 2741 steps).
+
+File "find_k_th_smallest_pair_distance_array_stage3_b3d47507_stage3.mlw", line 130, characters 18-30:
+Sub-goal Loop variant decrease of goal
+find_k_th_smallest_pair_distance_array'vc.
+Prover result is: Valid (0.02s, 7073 steps).
+
+File "find_k_th_smallest_pair_distance_array_stage3_b3d47507_stage3.mlw", line 128, characters 18-27:
+Sub-goal Loop invariant preservation of goal
+find_k_th_smallest_pair_distance_array'vc.
+Prover result is: Valid (0.02s, 7299 steps).
+
+File "find_k_th_smallest_pair_distance_array_stage3_b3d47507_stage3.mlw", line 129, characters 18-31:
+Sub-goal Loop invariant preservation of goal
+find_k_th_smallest_pair_distance_array'vc.
+Prover result is: Valid (0.02s, 7123 steps).
+
+File "find_k_th_smallest_pair_distance_array_stage3_b3d47507_stage3.mlw", line 130, characters 18-30:
+Sub-goal Loop variant decrease of goal
+find_k_th_smallest_pair_distance_array'vc.
+Prover result is: Valid (0.02s, 7065 steps).
+
+File "find_k_th_smallest_pair_distance_array_stage3_b3d47507_stage3.mlw", line 128, characters 18-27:
+Sub-goal Loop invariant preservation of goal
+find_k_th_smallest_pair_distance_array'vc.
+Prover result is: Valid (0.02s, 6385 steps).
+
+File "find_k_th_smallest_pair_distance_array_stage3_b3d47507_stage3.mlw", line 129, characters 18-31:
+Sub-goal Loop invariant preservation of goal
+find_k_th_smallest_pair_distance_array'vc.
+Prover result is: Valid (0.02s, 7067 steps).
+
+File "find_k_th_smallest_pair_distance_array_stage3_b3d47507_stage3.mlw", line 123, characters 15-51:
+Sub-goal Postcondition of goal find_k_th_smallest_pair_distance_array'vc.
+Prover result is: Timeout (10.00s, 2031751 steps).
+== Final summary ==
+Unproved root goals after first prover : 2
+Remaining failures after split_vc      : 2
+Remaining failures after stage 3       : 2
+Detailed logs stored in                : /Users/rubenm/Desktop/Diversify2Verify/codex-runs/dataset-merge/719_find-k-th-smallest-pair-distance/stage3a/array-imperative/find_k_th_smallest_pair_distance_array_stage3_b3d47507/generated/why3/array/.why3_sessions/find_k_th_smallest_pair_distance_array_stage3_b3d47507_stage3_logs
+Still unproved goals:
+FindKThSmallestPairDistance_Array_Stage3_Imperative	count_pairs_at_most_exec'vc
+FindKThSmallestPairDistance_Array_Stage3_Imperative	find_k_th_smallest_pair_distance_array'vc
+VERIFY_RESULT: FAILURE
+VERIFY_REASON: unproved_goals_remain
+VERIFY_STAGE: stage3
+VERIFY_ROOT_TOTAL: 10
+VERIFY_ROOT_PROVED: 8
+VERIFY_ROOT_REMAINING: 2

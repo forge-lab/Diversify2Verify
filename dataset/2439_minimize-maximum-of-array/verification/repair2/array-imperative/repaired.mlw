@@ -1,0 +1,220 @@
+module MinimizeMaximumOfArray_Array_Stage3_Imperative
+
+  use int.Int
+  use int.EuclideanDivision
+  use array.Array
+  use array.ArraySum
+  use ref.Ref
+
+  predicate nonnegative_bounded_array (nums: array int) =
+    forall i: int. 0 <= i < length nums -> 0 <= nums[i] <= 1000000000
+
+  predicate valid_input (nums: array int) =
+    2 <= length nums <= 100000 /\ nonnegative_bounded_array nums
+
+  predicate prefix_bound_at (nums: array int) (m: int) (k: int) =
+    1 <= k <= length nums -> sum nums 0 k <= m * k
+
+  predicate prefix_bounded_by (nums: array int) (m: int) =
+    forall k: int. 1 <= k <= length nums -> sum nums 0 k <= m * k
+
+  predicate minimum_possible_maximum (nums: array int) (m: int) =
+    prefix_bounded_by nums m /\
+    forall candidate: int. prefix_bounded_by nums candidate -> m <= candidate
+
+  function prefix_ceiling (nums: array int) (k: int) : int =
+    div (sum nums 0 k + k - 1) k
+
+  predicate processed_prefix_ceiling_max (nums: array int) (upto: int) (best: int) =
+    0 <= best /\
+    (forall k: int. 1 <= k <= upto -> prefix_ceiling nums k <= best) /\
+    (forall candidate: int.
+       0 <= candidate ->
+       (forall k: int. 1 <= k <= upto -> prefix_ceiling nums k <= candidate) ->
+       best <= candidate)
+
+  let lemma prefix_sum_extend (nums: array int) (k: int)
+    requires { 0 <= k < length nums }
+    ensures  { sum nums 0 (k + 1) = sum nums 0 k + nums[k] }
+  = ()
+
+  let lemma prefix_sum_nonnegative (nums: array int) (k: int)
+    requires { nonnegative_bounded_array nums }
+    requires { 0 <= k <= length nums }
+    ensures  { 0 <= sum nums 0 k }
+  = ()
+
+  let lemma prefix_bounded_candidate_nonnegative (nums: array int) (candidate: int)
+    requires { valid_input nums }
+    requires { prefix_bounded_by nums candidate }
+    ensures  { 0 <= candidate }
+  = ()
+
+  let lemma prefix_ceiling_bounds_prefix (nums: array int) (k: int)
+    requires { nonnegative_bounded_array nums }
+    requires { 1 <= k <= length nums }
+    ensures  { sum nums 0 k <= prefix_ceiling nums k * k }
+  = ()
+
+  let lemma prefix_ceiling_le_of_bound (nums: array int) (k: int) (candidate: int)
+    requires { nonnegative_bounded_array nums }
+    requires { 1 <= k <= length nums }
+    requires { sum nums 0 k <= candidate * k }
+    ensures  { prefix_ceiling nums k <= candidate }
+  = ()
+
+  let lemma best_prefix_ceiling_to_minimum (nums: array int) (best: int)
+    requires { valid_input nums }
+    requires { processed_prefix_ceiling_max nums (length nums) best }
+    ensures  { minimum_possible_maximum nums best }
+  =
+    assert { prefix_bounded_by nums best };
+    assert {
+      forall candidate: int. prefix_bounded_by nums candidate -> best <= candidate
+    }
+
+  let lemma processed_prefix_ceiling_max_raise (nums: array int) (upto: int)
+      (old_best: int) (candidate: int)
+    requires { 0 <= upto < length nums }
+    requires { processed_prefix_ceiling_max nums upto old_best }
+    requires { candidate = prefix_ceiling nums (upto + 1) }
+    requires { old_best < candidate }
+    ensures  { processed_prefix_ceiling_max nums (upto + 1) candidate }
+  =
+    assert { 0 <= old_best };
+    assert { 0 <= candidate };
+    assert {
+      forall k: int. 1 <= k <= upto ->
+        prefix_ceiling nums k <= old_best
+    };
+    assert {
+      forall k: int. 1 <= k <= upto ->
+        prefix_ceiling nums k <= candidate
+    };
+    assert { prefix_ceiling nums (upto + 1) <= candidate };
+    assert {
+      forall k: int. 1 <= k <= upto + 1 ->
+        k <= upto \/ k = upto + 1
+    };
+    assert {
+      forall k: int. 1 <= k <= upto + 1 ->
+        prefix_ceiling nums k <= candidate
+    };
+    assert {
+      forall bound: int.
+        0 <= bound ->
+        (forall k: int. 1 <= k <= upto + 1 -> prefix_ceiling nums k <= bound) ->
+        prefix_ceiling nums (upto + 1) <= bound
+    };
+    assert {
+      forall bound: int.
+        0 <= bound ->
+        (forall k: int. 1 <= k <= upto + 1 -> prefix_ceiling nums k <= bound) ->
+        candidate <= bound
+    }
+
+  let lemma prefix_ceiling_upper_extend_keep (nums: array int) (upto: int)
+      (best: int) (candidate: int)
+    requires { 0 <= upto < length nums }
+    requires { forall k: int. 1 <= k <= upto -> prefix_ceiling nums k <= best }
+    requires { candidate = prefix_ceiling nums (upto + 1) }
+    requires { candidate <= best }
+    ensures  { forall k: int. 1 <= k <= upto + 1 -> prefix_ceiling nums k <= best }
+  =
+    assert { prefix_ceiling nums (upto + 1) <= best };
+    assert {
+      forall k: int. 1 <= k <= upto + 1 ->
+        k <= upto \/ k = upto + 1
+    }
+
+  let lemma prefix_ceiling_bound_shrink (nums: array int) (upto: int)
+      (bound: int)
+    requires { 0 <= upto < length nums }
+    requires { forall k: int. 1 <= k <= upto + 1 -> prefix_ceiling nums k <= bound }
+    ensures  { forall k: int. 1 <= k <= upto -> prefix_ceiling nums k <= bound }
+  = ()
+
+  let lemma processed_prefix_ceiling_max_keep_optimal_bound
+      (nums: array int) (upto: int) (best: int) (bound: int)
+    requires { 0 <= upto < length nums }
+    requires { processed_prefix_ceiling_max nums upto best }
+    requires { 0 <= bound }
+    requires { forall k: int. 1 <= k <= upto + 1 -> prefix_ceiling nums k <= bound }
+    ensures  { best <= bound }
+  =
+    prefix_ceiling_bound_shrink nums upto bound;
+    assert { forall k: int. 1 <= k <= upto -> prefix_ceiling nums k <= bound }
+
+  let lemma processed_prefix_ceiling_max_keep_optimal_all
+      (nums: array int) (upto: int) (best: int)
+    requires { 0 <= upto < length nums }
+    requires { processed_prefix_ceiling_max nums upto best }
+    ensures  {
+      forall bound: int.
+        0 <= bound ->
+        (forall k: int. 1 <= k <= upto + 1 -> prefix_ceiling nums k <= bound) ->
+        best <= bound
+    }
+  =
+    assert {
+      forall bound: int.
+        0 <= bound ->
+        (forall k: int. 1 <= k <= upto + 1 -> prefix_ceiling nums k <= bound) ->
+        best <= bound
+    }
+
+  let lemma processed_prefix_ceiling_max_keep (nums: array int) (upto: int)
+      (best: int) (candidate: int)
+    requires { 0 <= upto < length nums }
+    requires { processed_prefix_ceiling_max nums upto best }
+    requires { candidate = prefix_ceiling nums (upto + 1) }
+    requires { candidate <= best }
+    ensures  { processed_prefix_ceiling_max nums (upto + 1) best }
+  =
+    assert {
+      forall k: int. 1 <= k <= upto ->
+        prefix_ceiling nums k <= best
+    };
+    prefix_ceiling_upper_extend_keep nums upto best candidate;
+    processed_prefix_ceiling_max_keep_optimal_all nums upto best;
+    assert {
+      forall bound: int.
+        0 <= bound ->
+        (forall k: int. 1 <= k <= upto + 1 -> prefix_ceiling nums k <= bound) ->
+        best <= bound
+    }
+
+  let minimize_maximum_of_array_array (nums: array int) : int
+    requires { valid_input nums }
+    ensures  { minimum_possible_maximum nums result }
+  =
+    let prefix_sum = ref 0 in
+    let best = ref 0 in
+    for i = 0 to length nums - 1 do
+      invariant { 0 <= i <= length nums }
+      invariant { !prefix_sum = sum nums 0 i }
+      invariant { processed_prefix_ceiling_max nums i !best }
+      prefix_sum_extend nums i;
+      prefix_sum := !prefix_sum + nums[i];
+      assert { !prefix_sum = sum nums 0 (i + 1) };
+      let count = i + 1 in
+      assert { 1 <= count <= length nums };
+      let candidate = div (!prefix_sum + count - 1) count in
+      assert { candidate = prefix_ceiling nums count };
+      prefix_sum_nonnegative nums count;
+      prefix_ceiling_bounds_prefix nums count;
+      if candidate > !best then begin
+        processed_prefix_ceiling_max_raise nums i !best candidate;
+        best := candidate;
+        assert { processed_prefix_ceiling_max nums count !best }
+      end else begin
+        assert { candidate <= !best };
+        processed_prefix_ceiling_max_keep nums i !best candidate;
+        assert { processed_prefix_ceiling_max nums count !best }
+      end
+    done;
+    assert { processed_prefix_ceiling_max nums (length nums) !best };
+    best_prefix_ceiling_to_minimum nums !best;
+    !best
+
+end

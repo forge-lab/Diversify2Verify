@@ -1,0 +1,190 @@
+module FairCandySwap_Array_Spec
+
+  use int.Int
+  use array.Array
+  use array.Init
+  use array.ArraySum
+
+  predicate in_array (a: array int) (x: int) =
+    exists i: int. 0 <= i < length a /\ a[i] = x
+
+  function candy_total (a: array int) : int =
+    ArraySum.sum a 0 (length a)
+
+  predicate exchange_equalizes
+    (aliceSizes: array int) (bobSizes: array int) (aliceBox: int) (bobBox: int) =
+    in_array aliceSizes aliceBox /\
+    in_array bobSizes bobBox /\
+    candy_total aliceSizes - aliceBox + bobBox =
+    candy_total bobSizes - bobBox + aliceBox
+
+  predicate values_in_constraint_range (a: array int) =
+    forall i: int. 0 <= i < length a -> 1 <= a[i] <= 100000
+
+  predicate valid_problem_input (aliceSizes: array int) (bobSizes: array int) =
+    1 <= length aliceSizes <= 10000 /\
+    1 <= length bobSizes <= 10000 /\
+    values_in_constraint_range aliceSizes /\
+    values_in_constraint_range bobSizes /\
+    candy_total aliceSizes <> candy_total bobSizes /\
+    exists i j: int.
+      0 <= i < length aliceSizes /\
+      0 <= j < length bobSizes /\
+      candy_total aliceSizes - aliceSizes[i] + bobSizes[j] =
+      candy_total bobSizes - bobSizes[j] + aliceSizes[i]
+
+  predicate fair_candy_swap_array_spec
+    (aliceSizes: array int) (bobSizes: array int) (result: array int) =
+    length result = 2 /\
+    exchange_equalizes aliceSizes bobSizes result[0] result[1]
+
+  val fair_candy_swap_array (aliceSizes: array int) (bobSizes: array int) : array int
+    requires { valid_problem_input aliceSizes bobSizes }
+    ensures  { fair_candy_swap_array_spec aliceSizes bobSizes result }
+
+  let lemma test_002 () =
+    let aliceSizes = init 2 [|1; 1|] in
+    let bobSizes = init 2 [|2; 2|] in
+    let expected = init 2 [|1; 2|] in
+    assert { length aliceSizes = 2 };
+    assert { length bobSizes = 2 };
+    assert { length expected = 2 };
+    assert { aliceSizes[0] = 1 /\ aliceSizes[1] = 1 };
+    assert { bobSizes[0] = 2 /\ bobSizes[1] = 2 };
+    assert { expected[0] = 1 /\ expected[1] = 2 };
+    assert { candy_total aliceSizes = 2 };
+    assert { candy_total bobSizes = 4 };
+    assert { 0 <= 0 < length aliceSizes /\ aliceSizes[0] = 1 };
+    assert { 0 <= 0 < length bobSizes /\ bobSizes[0] = 2 };
+    assert { in_array aliceSizes 1 };
+    assert { in_array bobSizes 2 };
+    assert { exchange_equalizes aliceSizes bobSizes 1 2 };
+    assert { fair_candy_swap_array_spec aliceSizes bobSizes expected }
+
+  let lemma test_003 () =
+    let aliceSizes = init 3 [|5; 4; 3|] in
+    let bobSizes = init 3 [|7; 8; 9|] in
+    let expected = init 2 [|3; 9|] in
+    assert { length aliceSizes = 3 };
+    assert { length bobSizes = 3 };
+    assert { length expected = 2 };
+    assert { aliceSizes[0] = 5 /\ aliceSizes[1] = 4 /\ aliceSizes[2] = 3 };
+    assert { bobSizes[0] = 7 /\ bobSizes[1] = 8 /\ bobSizes[2] = 9 };
+    assert { expected[0] = 3 /\ expected[1] = 9 };
+    assert { candy_total aliceSizes = 12 };
+    assert { candy_total bobSizes = 24 };
+    assert { 0 <= 2 < length aliceSizes /\ aliceSizes[2] = 3 };
+    assert { 0 <= 2 < length bobSizes /\ bobSizes[2] = 9 };
+    assert { in_array aliceSizes 3 };
+    assert { in_array bobSizes 9 };
+    assert { exchange_equalizes aliceSizes bobSizes 3 9 };
+    assert { fair_candy_swap_array_spec aliceSizes bobSizes expected }
+
+  let lemma test_006 () =
+    let aliceSizes = init 3 [|1; 2; 5|] in
+    let bobSizes = init 2 [|2; 4|] in
+    let expected = init 2 [|5; 4|] in
+    assert { length aliceSizes = 3 };
+    assert { length bobSizes = 2 };
+    assert { length expected = 2 };
+    assert { aliceSizes[0] = 1 /\ aliceSizes[1] = 2 /\ aliceSizes[2] = 5 };
+    assert { bobSizes[0] = 2 /\ bobSizes[1] = 4 };
+    assert { expected[0] = 5 /\ expected[1] = 4 };
+    assert { candy_total aliceSizes = 8 };
+    assert { candy_total bobSizes = 6 };
+    assert { 0 <= 2 < length aliceSizes /\ aliceSizes[2] = 5 };
+    assert { 0 <= 1 < length bobSizes /\ bobSizes[1] = 4 };
+    assert { in_array aliceSizes 5 };
+    assert { in_array bobSizes 4 };
+    assert { exchange_equalizes aliceSizes bobSizes 5 4 };
+    assert { fair_candy_swap_array_spec aliceSizes bobSizes expected }
+
+  let lemma test_008 () =
+    let aliceSizes = init 2 [|1; 2|] in
+    let bobSizes = init 2 [|2; 3|] in
+    let expected = init 2 [|1; 2|] in
+    assert { length aliceSizes = 2 };
+    assert { length bobSizes = 2 };
+    assert { length expected = 2 };
+    assert { aliceSizes[0] = 1 /\ aliceSizes[1] = 2 };
+    assert { bobSizes[0] = 2 /\ bobSizes[1] = 3 };
+    assert { expected[0] = 1 /\ expected[1] = 2 };
+    assert { candy_total aliceSizes = 3 };
+    assert { candy_total bobSizes = 5 };
+    assert { 0 <= 0 < length aliceSizes /\ aliceSizes[0] = 1 };
+    assert { 0 <= 0 < length bobSizes /\ bobSizes[0] = 2 };
+    assert { in_array aliceSizes 1 };
+    assert { in_array bobSizes 2 };
+    assert { exchange_equalizes aliceSizes bobSizes 1 2 };
+    assert { fair_candy_swap_array_spec aliceSizes bobSizes expected }
+
+  let lemma test_010 () =
+    let aliceSizes = init 1 [|2|] in
+    let bobSizes = init 2 [|1; 3|] in
+    let expected = init 2 [|2; 3|] in
+    assert { length aliceSizes = 1 };
+    assert { length bobSizes = 2 };
+    assert { length expected = 2 };
+    assert { aliceSizes[0] = 2 };
+    assert { bobSizes[0] = 1 /\ bobSizes[1] = 3 };
+    assert { expected[0] = 2 /\ expected[1] = 3 };
+    assert { candy_total aliceSizes = 2 };
+    assert { candy_total bobSizes = 4 };
+    assert { 0 <= 0 < length aliceSizes /\ aliceSizes[0] = 2 };
+    assert { 0 <= 1 < length bobSizes /\ bobSizes[1] = 3 };
+    assert { in_array aliceSizes 2 };
+    assert { in_array bobSizes 3 };
+    assert { exchange_equalizes aliceSizes bobSizes 2 3 };
+    assert { fair_candy_swap_array_spec aliceSizes bobSizes expected }
+
+  let lemma test_011 () =
+    let aliceSizes = init 5 [|35; 17; 4; 24; 10|] in
+    let bobSizes = init 5 [|66; 56; 5; 1; 58|] in
+    let expected = init 2 [|10; 58|] in
+    assert { length aliceSizes = 5 };
+    assert { length bobSizes = 5 };
+    assert { length expected = 2 };
+    assert {
+      aliceSizes[0] = 35 /\ aliceSizes[1] = 17 /\ aliceSizes[2] = 4 /\
+      aliceSizes[3] = 24 /\ aliceSizes[4] = 10
+    };
+    assert {
+      bobSizes[0] = 66 /\ bobSizes[1] = 56 /\ bobSizes[2] = 5 /\
+      bobSizes[3] = 1 /\ bobSizes[4] = 58
+    };
+    assert { expected[0] = 10 /\ expected[1] = 58 };
+    assert { candy_total aliceSizes = 90 };
+    assert { candy_total bobSizes = 186 };
+    assert { 0 <= 4 < length aliceSizes /\ aliceSizes[4] = 10 };
+    assert { 0 <= 4 < length bobSizes /\ bobSizes[4] = 58 };
+    assert { in_array aliceSizes 10 };
+    assert { in_array bobSizes 58 };
+    assert { exchange_equalizes aliceSizes bobSizes 10 58 };
+    assert { fair_candy_swap_array_spec aliceSizes bobSizes expected }
+
+  let lemma test_012 () =
+    let aliceSizes = init 4 [|4; 1; 2; 1|] in
+    let bobSizes = init 4 [|1; 2; 2; 3|] in
+    let expected = init 2 [|1; 1|] in
+    assert { length aliceSizes = 4 };
+    assert { length bobSizes = 4 };
+    assert { length expected = 2 };
+    assert {
+      aliceSizes[0] = 4 /\ aliceSizes[1] = 1 /\
+      aliceSizes[2] = 2 /\ aliceSizes[3] = 1
+    };
+    assert {
+      bobSizes[0] = 1 /\ bobSizes[1] = 2 /\
+      bobSizes[2] = 2 /\ bobSizes[3] = 3
+    };
+    assert { expected[0] = 1 /\ expected[1] = 1 };
+    assert { candy_total aliceSizes = 8 };
+    assert { candy_total bobSizes = 8 };
+    assert { 0 <= 1 < length aliceSizes /\ aliceSizes[1] = 1 };
+    assert { 0 <= 0 < length bobSizes /\ bobSizes[0] = 1 };
+    assert { in_array aliceSizes 1 };
+    assert { in_array bobSizes 1 };
+    assert { exchange_equalizes aliceSizes bobSizes 1 1 };
+    assert { fair_candy_swap_array_spec aliceSizes bobSizes expected }
+
+end

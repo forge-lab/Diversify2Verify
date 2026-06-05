@@ -1,0 +1,284 @@
+module FindTheStudentThatWillReplaceTheChalk_List_Stage3_Imperative
+
+  use int.Int
+  use int.EuclideanDivision
+  use list.List
+  use list.Length
+  use list.Sum
+  use ref.Ref
+
+  let rec predicate all_positive (chalk: list int)
+    variant { chalk }
+  =
+    match chalk with
+    | Nil -> true
+    | Cons c rest -> 0 < c && all_positive rest
+    end
+
+  let rec predicate replacement_index (chalk: list int) (rem: int) (idx: int)
+    variant { chalk }
+  =
+    match chalk with
+    | Nil -> false
+    | Cons c rest ->
+        (rem < c && idx = 0) ||
+        (c <= rem && 0 < idx && replacement_index rest (rem - c) (idx - 1))
+    end
+
+  predicate replacement_result (chalk: list int) (k: int) (idx: int) =
+    0 <= idx < length chalk /\
+    (exists rounds: int, rem: int.
+       0 <= rounds /\
+       0 <= rem < sum chalk /\
+       k = rounds * sum chalk + rem /\
+       replacement_index chalk rem idx)
+
+  let rec function same_list (left: list int) (right: list int) : bool
+    variant { left }
+  =
+    match left with
+    | Nil ->
+        match right with
+        | Nil -> true
+        | Cons _ _ -> false
+        end
+    | Cons x xs ->
+        match right with
+        | Nil -> false
+        | Cons y ys -> x = y && same_list xs ys
+        end
+    end
+
+  let rec predicate dropped_prefix
+      (whole: list int) (cur: list int) (start_rem: int) (rem: int) (idx: int)
+    variant { idx }
+  =
+    if idx = 0 then
+      same_list cur whole && rem = start_rem
+    else
+      match whole with
+      | Nil -> false
+      | Cons c rest ->
+          c <= start_rem &&
+          0 < idx &&
+          dropped_prefix rest cur (start_rem - c) rem (idx - 1)
+      end
+
+  let rec lemma same_list_eq (left: list int) (right: list int)
+    requires { same_list left right }
+    ensures  { left = right }
+    variant  { left }
+  =
+    match left with
+    | Nil ->
+        match right with
+        | Nil -> ()
+        | Cons _ _ ->
+            assert { false }
+        end
+    | Cons x xs ->
+        match right with
+        | Nil ->
+            assert { false }
+        | Cons y ys ->
+            assert { x = y };
+            assert { same_list xs ys };
+            same_list_eq xs ys;
+            assert { xs = ys };
+            assert { left = right }
+        end
+    end
+
+  let rec lemma positive_sum_nonempty (chalk: list int)
+    requires { chalk <> Nil }
+    requires { all_positive chalk }
+    ensures  { 0 < sum chalk }
+    variant  { chalk }
+  =
+    match chalk with
+    | Nil ->
+        assert { false }
+    | Cons c rest ->
+        assert { 0 < c };
+        match rest with
+        | Nil ->
+            assert { sum chalk = c }
+        | Cons _ _ ->
+            positive_sum_nonempty rest;
+            assert { 0 < sum rest }
+        end
+    end
+
+  let rec lemma dropped_prefix_step
+      (whole: list int) (rest: list int) (c: int)
+      (start_rem: int) (rem: int) (idx: int)
+    requires { dropped_prefix whole (Cons c rest) start_rem rem idx }
+    requires { c <= rem }
+    ensures  { dropped_prefix whole rest start_rem (rem - c) (idx + 1) }
+    variant  { idx }
+  =
+    if idx = 0 then begin
+      same_list_eq (Cons c rest) whole;
+      assert { whole = Cons c rest };
+      assert { rem = start_rem };
+      assert { c <= start_rem };
+      assert { dropped_prefix rest rest (start_rem - c) (rem - c) 0 }
+    end else begin
+      match whole with
+      | Nil ->
+          assert { false }
+      | Cons h tail ->
+          assert { h <= start_rem };
+          assert { 0 < idx };
+          assert { dropped_prefix tail (Cons c rest) (start_rem - h) rem (idx - 1) };
+          dropped_prefix_step tail rest c (start_rem - h) rem (idx - 1);
+          assert { dropped_prefix tail rest (start_rem - h) (rem - c) idx }
+      end
+    end
+
+  let rec lemma dropped_prefix_to_replacement
+      (whole: list int) (cur: list int) (start_rem: int) (rem: int) (idx: int)
+    requires { dropped_prefix whole cur start_rem rem idx }
+    requires { match cur with Nil -> false | Cons c _ -> rem < c end }
+    ensures  { replacement_index whole start_rem idx }
+    variant  { idx }
+  =
+    if idx = 0 then begin
+      same_list_eq cur whole;
+      assert { cur = whole };
+      match whole with
+      | Nil ->
+          assert { cur = Nil };
+          assert { false }
+      | Cons c _ ->
+          assert { rem = start_rem };
+          assert { rem < c };
+          assert { replacement_index whole start_rem 0 }
+      end
+    end else begin
+      match whole with
+      | Nil ->
+          assert { false }
+      | Cons c rest ->
+          assert { c <= start_rem };
+          assert { 0 < idx };
+          assert { dropped_prefix rest cur (start_rem - c) rem (idx - 1) };
+          dropped_prefix_to_replacement rest cur (start_rem - c) rem (idx - 1);
+          assert { replacement_index rest (start_rem - c) (idx - 1) };
+          assert { replacement_index whole start_rem idx }
+      end
+    end
+
+  let rec lemma replacement_index_bounds (chalk: list int) (rem: int) (idx: int)
+    requires { replacement_index chalk rem idx }
+    ensures  { 0 <= idx < length chalk }
+    variant  { chalk }
+  =
+    match chalk with
+    | Nil ->
+        assert { false }
+    | Cons c rest ->
+        if idx = 0 then
+          assert { 0 <= idx < length chalk }
+        else begin
+          assert { c <= rem };
+          assert { 0 < idx };
+          assert { replacement_index rest (rem - c) (idx - 1) };
+          replacement_index_bounds rest (rem - c) (idx - 1);
+          assert { 0 <= idx < length chalk }
+        end
+    end
+
+  let total_chalk (chalk: list int) : int
+    requires { all_positive chalk }
+    ensures  { result = sum chalk }
+  =
+    let total = ref 0 in
+    let cur = ref chalk in
+    while (match !cur with Nil -> false | Cons _ _ -> true end) do
+      invariant { !total + sum !cur = sum chalk }
+      invariant { all_positive !cur }
+      variant   { length !cur }
+
+      match !cur with
+      | Nil ->
+          assert { false }
+      | Cons c rest ->
+          assert { sum !cur = c + sum rest };
+          total := !total + c;
+          cur := rest
+      end
+    done;
+    assert { !cur = Nil };
+    assert { sum !cur = 0 };
+    !total
+
+  let find_the_student_that_will_replace_the_chalk_list (chalk: list int) (k: int) : int
+    requires { chalk <> Nil }
+    requires { all_positive chalk }
+    requires { 0 <= k }
+    ensures  { replacement_result chalk k result }
+  =
+    positive_sum_nonempty chalk;
+    let total = total_chalk chalk in
+    assert { total = sum chalk };
+    assert { 0 < total };
+    let rounds = div k total in
+    let initial_remaining = mod k total in
+    assert { 0 <= rounds };
+    assert { 0 <= initial_remaining < total };
+    assert { k = rounds * total + initial_remaining };
+    let remaining = ref initial_remaining in
+    let index = ref 0 in
+    let cur = ref chalk in
+    while (match !cur with Nil -> false | Cons c _ -> !remaining >= c end) do
+      invariant { dropped_prefix chalk !cur initial_remaining !remaining !index }
+      invariant { all_positive !cur }
+      invariant { 0 <= !remaining < sum !cur }
+      invariant { 0 <= !index }
+      variant   { length !cur }
+
+      match !cur with
+      | Nil ->
+          assert { false }
+      | Cons c rest ->
+          assert { 0 < c };
+          assert { c <= !remaining };
+          assert { sum !cur = c + sum rest };
+          assert { all_positive rest };
+          assert { !remaining < c + sum rest };
+          assert { 0 <= !remaining - c };
+          assert { !remaining - c < sum rest };
+          dropped_prefix_step chalk rest c initial_remaining !remaining !index;
+          remaining := !remaining - c;
+          index := !index + 1;
+          cur := rest;
+          assert { dropped_prefix chalk !cur initial_remaining !remaining !index };
+          assert { all_positive !cur };
+          assert { 0 <= !remaining < sum !cur };
+          assert { 0 <= !index }
+      end
+    done;
+    assert { !cur <> Nil };
+    match !cur with
+    | Nil ->
+        assert { false };
+        0
+    | Cons c _ ->
+        assert { !remaining < c };
+        dropped_prefix_to_replacement chalk !cur initial_remaining !remaining !index;
+        assert { replacement_index chalk initial_remaining !index };
+        replacement_index_bounds chalk initial_remaining !index;
+        assert { 0 <= !index < length chalk };
+        assert { 0 <= initial_remaining < sum chalk };
+        assert { k = rounds * sum chalk + initial_remaining };
+        assert { exists r: int, m: int.
+          0 <= r /\
+          0 <= m < sum chalk /\
+          k = r * sum chalk + m /\
+          replacement_index chalk m !index };
+        assert { replacement_result chalk k !index };
+        !index
+    end
+
+end

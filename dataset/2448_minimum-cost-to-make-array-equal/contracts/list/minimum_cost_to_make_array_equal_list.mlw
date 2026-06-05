@@ -1,0 +1,120 @@
+module MinimumCostToMakeArrayEqual_List_Spec
+
+  use int.Int
+  use int.Abs
+  use list.List
+  use list.Length
+
+  let rec predicate positive_list (l: list int)
+    variant { l }
+  =
+    match l with
+    | Nil -> true
+    | Cons x xs -> x > 0 && positive_list xs
+    end
+
+  let rec function weighted_cost_to (nums: list int) (costs: list int) (target: int) : int
+    variant { nums }
+  =
+    match nums with
+    | Nil -> 0
+    | Cons n ns ->
+        match costs with
+        | Nil -> 0
+        | Cons c cs -> c * abs (n - target) + weighted_cost_to ns cs target
+        end
+    end
+
+  predicate valid_input (nums: list int) (costs: list int) =
+    nums <> Nil /\
+    length nums = length costs /\
+    positive_list nums /\
+    positive_list costs
+
+  predicate minimum_cost_spec (nums: list int) (costs: list int) (result: int) =
+    result >= 0 /\
+    (exists target: int. result = weighted_cost_to nums costs target) /\
+    (forall target: int. result <= weighted_cost_to nums costs target)
+
+  val minimum_cost_to_make_array_equal_list (nums: list int) (cost: list int) : int
+    requires { valid_input nums cost }
+    ensures  { minimum_cost_spec nums cost result }
+
+  let lemma check_test_000 () =
+    let nums = Cons 6 (Cons 1 (Cons 3 (Cons 9 (Cons 3 Nil)))) in
+    let costs = Cons 2 (Cons 1 (Cons 2 (Cons 1 (Cons 2 Nil)))) in
+    assert { valid_input nums costs };
+    assert { weighted_cost_to Nil Nil 3 = 0 };
+    assert { weighted_cost_to (Cons 3 Nil) (Cons 2 Nil) 3 = 0 };
+    assert { weighted_cost_to (Cons 9 (Cons 3 Nil)) (Cons 1 (Cons 2 Nil)) 3 = 6 };
+    assert { weighted_cost_to nums costs 3 = 14 };
+    assert { forall target: int. 14 <= weighted_cost_to nums costs target };
+    assert { minimum_cost_spec nums costs 14 }
+
+  let lemma check_test_001 () =
+    let nums = Cons 1 (Cons 3 (Cons 5 (Cons 2 Nil))) in
+    let costs = Cons 2 (Cons 3 (Cons 1 (Cons 14 Nil))) in
+    assert { valid_input nums costs };
+    assert { weighted_cost_to Nil Nil 2 = 0 };
+    assert { weighted_cost_to (Cons 2 Nil) (Cons 14 Nil) 2 = 0 };
+    assert { weighted_cost_to (Cons 5 (Cons 2 Nil)) (Cons 1 (Cons 14 Nil)) 2 = 3 };
+    assert { weighted_cost_to nums costs 2 = 8 };
+    assert { forall target: int. 8 <= weighted_cost_to nums costs target };
+    assert { minimum_cost_spec nums costs 8 }
+
+  let lemma check_test_002 () =
+    let nums = Cons 2 (Cons 2 (Cons 2 (Cons 2 (Cons 2 Nil)))) in
+    let costs = Cons 4 (Cons 2 (Cons 8 (Cons 1 (Cons 3 Nil)))) in
+    assert { valid_input nums costs };
+    assert { weighted_cost_to Nil Nil 2 = 0 };
+    assert { weighted_cost_to (Cons 2 Nil) (Cons 3 Nil) 2 = 0 };
+    assert { weighted_cost_to (Cons 2 (Cons 2 Nil)) (Cons 1 (Cons 3 Nil)) 2 = 0 };
+    assert { weighted_cost_to nums costs 2 = 0 };
+    assert { forall target: int. 0 <= weighted_cost_to nums costs target };
+    assert { minimum_cost_spec nums costs 0 }
+
+  let lemma check_test_003 () =
+    let nums = Cons 6 (Cons 1 (Cons 9 Nil)) in
+    let costs = Cons 2 (Cons 5 (Cons 7 Nil)) in
+    assert { valid_input nums costs };
+    assert { weighted_cost_to Nil Nil 6 = 0 };
+    assert { weighted_cost_to (Cons 9 Nil) (Cons 7 Nil) 6 = 21 };
+    assert { weighted_cost_to (Cons 1 (Cons 9 Nil)) (Cons 5 (Cons 7 Nil)) 6 = 46 };
+    assert { weighted_cost_to nums costs 6 = 46 };
+    assert { forall target: int. 46 <= weighted_cost_to nums costs target };
+    assert { minimum_cost_spec nums costs 46 }
+
+  let lemma check_test_004 () =
+    let nums = Cons 1 (Cons 2 (Cons 3 Nil)) in
+    let costs = Cons 1 (Cons 2 (Cons 3 Nil)) in
+    assert { valid_input nums costs };
+    assert { weighted_cost_to Nil Nil 2 = 0 };
+    assert { weighted_cost_to (Cons 3 Nil) (Cons 3 Nil) 2 = 3 };
+    assert { weighted_cost_to (Cons 2 (Cons 3 Nil)) (Cons 2 (Cons 3 Nil)) 2 = 3 };
+    assert { weighted_cost_to nums costs 2 = 4 };
+    assert { forall target: int. 4 <= weighted_cost_to nums costs target };
+    assert { minimum_cost_spec nums costs 4 }
+
+  let lemma check_test_005 () =
+    let nums = Cons 10 (Cons 1 (Cons 10 Nil)) in
+    let costs = Cons 1 (Cons 100 (Cons 1 Nil)) in
+    assert { valid_input nums costs };
+    assert { weighted_cost_to Nil Nil 1 = 0 };
+    assert { weighted_cost_to (Cons 10 Nil) (Cons 1 Nil) 1 = 9 };
+    assert { weighted_cost_to (Cons 1 (Cons 10 Nil)) (Cons 100 (Cons 1 Nil)) 1 = 9 };
+    assert { weighted_cost_to nums costs 1 = 18 };
+    assert { forall target: int. 18 <= weighted_cost_to nums costs target };
+    assert { minimum_cost_spec nums costs 18 }
+
+  let lemma check_test_006 () =
+    let nums = Cons 6 (Cons 1 (Cons 9 (Cons 8 (Cons 2 Nil)))) in
+    let costs = Cons 4 (Cons 2 (Cons 8 (Cons 1 (Cons 3 Nil)))) in
+    assert { valid_input nums costs };
+    assert { weighted_cost_to Nil Nil 6 = 0 };
+    assert { weighted_cost_to (Cons 2 Nil) (Cons 3 Nil) 6 = 12 };
+    assert { weighted_cost_to (Cons 8 (Cons 2 Nil)) (Cons 1 (Cons 3 Nil)) 6 = 14 };
+    assert { weighted_cost_to nums costs 6 = 48 };
+    assert { forall target: int. 48 <= weighted_cost_to nums costs target };
+    assert { minimum_cost_spec nums costs 48 }
+
+end

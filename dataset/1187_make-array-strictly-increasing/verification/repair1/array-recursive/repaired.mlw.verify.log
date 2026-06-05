@@ -1,0 +1,146 @@
+== Stage 1: first prover on whole file ==
+Running in /Users/rubenm/Desktop/Diversify2Verify/codex-runs/dataset-merge-verification/stage3a-repair/1187_make-array-strictly-increasing/array-recursive/make_array_strictly_increasing_array_stage3_580cd748_stage3/generated/why3: why3 session create -o /Users/rubenm/Desktop/Diversify2Verify/codex-runs/dataset-merge-verification/stage3a-repair/1187_make-array-strictly-increasing/array-recursive/make_array_strictly_increasing_array_stage3_580cd748_stage3/generated/why3/.why3_sessions/repaired_stage1 -P Z3,4.8.6 -t 10 -m 8192 repaired.mlw
+Session created successfully
+Running in /Users/rubenm/Desktop/Diversify2Verify/codex-runs/dataset-merge-verification/stage3a-repair/1187_make-array-strictly-increasing/array-recursive/make_array_strictly_increasing_array_stage3_580cd748_stage3/generated/why3: why3 bench /Users/rubenm/Desktop/Diversify2Verify/codex-runs/dataset-merge-verification/stage3a-repair/1187_make-array-strictly-increasing/array-recursive/make_array_strictly_increasing_array_stage3_580cd748_stage3/generated/why3/.why3_sessions/repaired_stage1
+Progress: 6/1/0                       Progress: 5/2/0                       Progress: 4/3/0                       Progress: 3/4/0                       Progress: 2/5/0                       Progress: 1/6/0                       Progress: 1/0/0                       Progress: 0/1/0                       
+Replay completed, saving session... done
+== Stage 1 stats ==
+= Statistics for session /Users/rubenm/Desktop/Diversify2Verify/codex-runs/dataset-merge-verification/stage3a-repair/1187_make-array-strictly-increasing/array-recursive/make_array_strictly_increasing_array_stage3_580cd748_stage3/generated/why3/.why3_sessions/repaired_stage1
+
+== Number of root goals ==
+  total: 7  proved: 6
+
+== Number of sub goals ==
+  total: 0  proved: 0
+
+== Goals not proved ==
+  +-- file [../../repaired.mlw]
+    +-- theory MakeArrayStrictlyIncreasing_Array_Spec
+      +-- goal solve_from_initial_correct'vc
+  
+== Goals proved by only one prover ==
+  +-- file [../../repaired.mlw]
+    +-- theory MakeArrayStrictlyIncreasing_Array_Spec
+      +-- goal changes_from'vc: Z3 4.8.6
+      +-- goal min2'vc: Z3 4.8.6
+      +-- goal find_smallest_greater_from'vc: Z3 4.8.6
+      +-- goal smallest_greater'vc: Z3 4.8.6
+      +-- goal solve_from'vc: Z3 4.8.6
+      +-- goal make_array_strictly_increasing_array'vc: Z3 4.8.6
+  
+1 session(s) read, with a total of 7 proof goals.
+== Unproved root goals after first prover ==
+MakeArrayStrictlyIncreasing_Array_Spec	solve_from_initial_correct'vc
+== Stage 1: trying remaining goals with prover Alt-Ergo,2.4.0 ==
+---- stage1 | prover: Alt-Ergo,2.4.0 | theory: MakeArrayStrictlyIncreasing_Array_Spec | goal: solve_from_initial_correct'vc ----
+File repaired.mlw:
+Goal solve_from_initial_correct'vc.
+Prover result is: Timeout (10.00s, 151820 steps).
+Remaining after prover Alt-Ergo,2.4.0: 1
+== Stage 1: trying remaining goals with prover CVC4,1.8 ==
+---- stage1 | prover: CVC4,1.8 | theory: MakeArrayStrictlyIncreasing_Array_Spec | goal: solve_from_initial_correct'vc ----
+File repaired.mlw:
+Goal solve_from_initial_correct'vc.
+Prover result is: Timeout (10.00s, 1660634 steps).
+Remaining after prover CVC4,1.8: 1
+== Goals still unproved after stage 1 ==
+MakeArrayStrictlyIncreasing_Array_Spec	solve_from_initial_correct'vc
+== Stage 2: split_vc on unproved goal ==
+Target theory: MakeArrayStrictlyIncreasing_Array_Spec
+Target goal  : solve_from_initial_correct'vc
+---- stage2 | prover: Z3,4.8.6 | theory: MakeArrayStrictlyIncreasing_Array_Spec | goal: solve_from_initial_correct'vc ----
+Transforms: split_vc
+File "repaired.mlw", line 111, characters 13-22:
+Sub-goal Assertion of goal solve_from_initial_correct'vc.
+Prover result is: Valid (0.01s, 668 steps).
+
+File "repaired.mlw", line 108, characters 38-71:
+Sub-goal Postcondition of goal solve_from_initial_correct'vc.
+Prover result is: Unknown (unknown) (0.08s, 998109 steps).
+
+File "repaired.mlw", line 109, characters 37-68:
+Sub-goal Postcondition of goal solve_from_initial_correct'vc.
+Prover result is: Unknown (unknown) (0.02s, 124320 steps).
+---- stage2 | prover: Alt-Ergo,2.4.0 | theory: MakeArrayStrictlyIncreasing_Array_Spec | goal: solve_from_initial_correct'vc ----
+Transforms: split_vc
+File "repaired.mlw", line 111, characters 13-22:
+Sub-goal Assertion of goal solve_from_initial_correct'vc.
+Prover result is: Valid (0.01s, 10 steps).
+
+File "repaired.mlw", line 108, characters 38-71:
+Sub-goal Postcondition of goal solve_from_initial_correct'vc.
+Prover result is: Timeout (10.00s, 62053 steps).
+
+File "repaired.mlw", line 109, characters 37-68:
+Sub-goal Postcondition of goal solve_from_initial_correct'vc.
+Prover result is: Timeout (10.00s, 162551 steps).
+---- stage2 | prover: CVC4,1.8 | theory: MakeArrayStrictlyIncreasing_Array_Spec | goal: solve_from_initial_correct'vc ----
+Transforms: split_vc
+File "repaired.mlw", line 111, characters 13-22:
+Sub-goal Assertion of goal solve_from_initial_correct'vc.
+Prover result is: Valid (0.01s, 1768 steps).
+
+File "repaired.mlw", line 108, characters 38-71:
+Sub-goal Postcondition of goal solve_from_initial_correct'vc.
+Prover result is: Unknown (unknown + incomplete) (0.02s, 3370 steps).
+
+File "repaired.mlw", line 109, characters 37-68:
+Sub-goal Postcondition of goal solve_from_initial_correct'vc.
+Prover result is: Timeout (10.00s, 1668414 steps).
+== Goals still unproved after stage 2 (split_vc) ==
+MakeArrayStrictlyIncreasing_Array_Spec	solve_from_initial_correct'vc
+== Stage 3: split_vc + inline_all on still-unproved goal ==
+Target theory: MakeArrayStrictlyIncreasing_Array_Spec
+Target goal  : solve_from_initial_correct'vc
+---- stage3 | prover: Z3,4.8.6 | theory: MakeArrayStrictlyIncreasing_Array_Spec | goal: solve_from_initial_correct'vc ----
+Transforms: split_vc inline_all
+File "repaired.mlw", line 111, characters 13-22:
+Sub-goal Assertion of goal solve_from_initial_correct'vc.
+Prover result is: Valid (0.01s, 1194 steps).
+
+File "repaired.mlw", line 108, characters 38-71:
+Sub-goal Postcondition of goal solve_from_initial_correct'vc.
+Prover result is: Timeout (10.00s, 172561645 steps).
+
+File "repaired.mlw", line 109, characters 37-68:
+Sub-goal Postcondition of goal solve_from_initial_correct'vc.
+Prover result is: Timeout (10.00s, 167209823 steps).
+---- stage3 | prover: Alt-Ergo,2.4.0 | theory: MakeArrayStrictlyIncreasing_Array_Spec | goal: solve_from_initial_correct'vc ----
+Transforms: split_vc inline_all
+File "repaired.mlw", line 111, characters 13-22:
+Sub-goal Assertion of goal solve_from_initial_correct'vc.
+Prover result is: Valid (0.01s, 6 steps).
+
+File "repaired.mlw", line 108, characters 38-71:
+Sub-goal Postcondition of goal solve_from_initial_correct'vc.
+Prover result is: Timeout (10.00s, 35978 steps).
+
+File "repaired.mlw", line 109, characters 37-68:
+Sub-goal Postcondition of goal solve_from_initial_correct'vc.
+Prover result is: Timeout (10.00s, 34601 steps).
+---- stage3 | prover: CVC4,1.8 | theory: MakeArrayStrictlyIncreasing_Array_Spec | goal: solve_from_initial_correct'vc ----
+Transforms: split_vc inline_all
+File "repaired.mlw", line 111, characters 13-22:
+Sub-goal Assertion of goal solve_from_initial_correct'vc.
+Prover result is: Valid (0.01s, 2283 steps).
+
+File "repaired.mlw", line 108, characters 38-71:
+Sub-goal Postcondition of goal solve_from_initial_correct'vc.
+Prover result is: Timeout (10.00s, 1320076 steps).
+
+File "repaired.mlw", line 109, characters 37-68:
+Sub-goal Postcondition of goal solve_from_initial_correct'vc.
+Prover result is: Timeout (10.00s, 5421893 steps).
+== Final summary ==
+Unproved root goals after first prover : 1
+Remaining failures after split_vc      : 1
+Remaining failures after stage 3       : 1
+Detailed logs stored in                : /Users/rubenm/Desktop/Diversify2Verify/codex-runs/dataset-merge-verification/stage3a-repair/1187_make-array-strictly-increasing/array-recursive/make_array_strictly_increasing_array_stage3_580cd748_stage3/generated/why3/.why3_sessions/repaired_logs
+Still unproved goals:
+MakeArrayStrictlyIncreasing_Array_Spec	solve_from_initial_correct'vc
+VERIFY_RESULT: FAILURE
+VERIFY_REASON: unproved_goals_remain
+VERIFY_STAGE: stage3
+VERIFY_ROOT_TOTAL: 7
+VERIFY_ROOT_PROVED: 6
+VERIFY_ROOT_REMAINING: 1

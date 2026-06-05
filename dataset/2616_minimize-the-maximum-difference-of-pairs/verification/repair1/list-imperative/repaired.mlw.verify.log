@@ -1,0 +1,154 @@
+== Stage 1: first prover on whole file ==
+Running in /Users/rubenm/Desktop/Diversify2Verify/codex-runs/dataset-merge-verification/stage3a-repair/2616_minimize-the-maximum-difference-of-pairs/list-imperative/minimize_the_maximum_difference_of_pairs_list_stage3_b6e6828f_stage3/generated/why3: why3 session create -o /Users/rubenm/Desktop/Diversify2Verify/codex-runs/dataset-merge-verification/stage3a-repair/2616_minimize-the-maximum-difference-of-pairs/list-imperative/minimize_the_maximum_difference_of_pairs_list_stage3_b6e6828f_stage3/generated/why3/.why3_sessions/repaired_stage1 -P Z3,4.8.6 -t 10 -m 8192 repaired.mlw
+Session created successfully
+Running in /Users/rubenm/Desktop/Diversify2Verify/codex-runs/dataset-merge-verification/stage3a-repair/2616_minimize-the-maximum-difference-of-pairs/list-imperative/minimize_the_maximum_difference_of_pairs_list_stage3_b6e6828f_stage3/generated/why3: why3 bench /Users/rubenm/Desktop/Diversify2Verify/codex-runs/dataset-merge-verification/stage3a-repair/2616_minimize-the-maximum-difference-of-pairs/list-imperative/minimize_the_maximum_difference_of_pairs_list_stage3_b6e6828f_stage3/generated/why3/.why3_sessions/repaired_stage1
+Progress: 8/1/0                       Progress: 7/2/0                       Progress: 6/3/0                       Progress: 5/4/0                       Progress: 4/5/0                       Progress: 3/6/0                       Progress: 3/4/2                       Progress: 3/2/2                       Progress: 2/3/2                       Progress: 1/4/2                       Progress: 1/2/2                       Progress: 0/3/2                       Progress: 0/1/2                       Progress: 0/0/2                       Progress: 0/0/1                       
+Replay completed, saving session... done
+== Stage 1 stats ==
+= Statistics for session /Users/rubenm/Desktop/Diversify2Verify/codex-runs/dataset-merge-verification/stage3a-repair/2616_minimize-the-maximum-difference-of-pairs/list-imperative/minimize_the_maximum_difference_of_pairs_list_stage3_b6e6828f_stage3/generated/why3/.why3_sessions/repaired_stage1
+
+== Number of root goals ==
+  total: 9  proved: 6
+
+== Number of sub goals ==
+  total: 0  proved: 0
+
+== Goals not proved ==
+  +-- file [../../repaired.mlw]
+    +-- theory MinimizeTheMaximumDifferenceOfPairs_List_Stage3_Imperative
+      +-- goal sorted_non_decreasing'vc
+      +-- goal count_pairs_with_bound'vc
+      +-- goal minimize_the_maximum_difference_of_pairs_list'vc
+  
+== Goals proved by only one prover ==
+  +-- file [../../repaired.mlw]
+    +-- theory MinimizeTheMaximumDifferenceOfPairs_List_Stage3_Imperative
+      +-- goal endpoint_occ_pairs'vc: Z3 4.8.6
+      +-- goal pair_diffs_at_most'vc: Z3 4.8.6
+      +-- goal reverse_onto'vc: Z3 4.8.6
+      +-- goal insert_sorted'vc: Z3 4.8.6
+      +-- goal sort_list'vc: Z3 4.8.6
+      +-- goal last_of_sorted'vc: Z3 4.8.6
+  
+1 session(s) read, with a total of 9 proof goals.
+== Unproved root goals after first prover ==
+MinimizeTheMaximumDifferenceOfPairs_List_Stage3_Imperative	sorted_non_decreasing'vc
+MinimizeTheMaximumDifferenceOfPairs_List_Stage3_Imperative	count_pairs_with_bound'vc
+MinimizeTheMaximumDifferenceOfPairs_List_Stage3_Imperative	minimize_the_maximum_difference_of_pairs_list'vc
+== Stage 1: trying remaining goals with prover Alt-Ergo,2.4.0 ==
+---- stage1 | prover: Alt-Ergo,2.4.0 | theory: MinimizeTheMaximumDifferenceOfPairs_List_Stage3_Imperative | goal: sorted_non_decreasing'vc ----
+File repaired.mlw:
+Goal sorted_non_decreasing'vc.
+Prover result is: Valid (0.01s, 62 steps).
+Solved in stage 1 using prover: Alt-Ergo,2.4.0
+---- stage1 | prover: Alt-Ergo,2.4.0 | theory: MinimizeTheMaximumDifferenceOfPairs_List_Stage3_Imperative | goal: count_pairs_with_bound'vc ----
+File repaired.mlw:
+Goal count_pairs_with_bound'vc.
+Prover result is: Valid (0.02s, 189 steps).
+Solved in stage 1 using prover: Alt-Ergo,2.4.0
+---- stage1 | prover: Alt-Ergo,2.4.0 | theory: MinimizeTheMaximumDifferenceOfPairs_List_Stage3_Imperative | goal: minimize_the_maximum_difference_of_pairs_list'vc ----
+File repaired.mlw:
+Goal minimize_the_maximum_difference_of_pairs_list'vc.
+Prover result is: Timeout (10.00s, 785459 steps).
+Remaining after prover Alt-Ergo,2.4.0: 1
+== Stage 1: trying remaining goals with prover CVC4,1.8 ==
+---- stage1 | prover: CVC4,1.8 | theory: MinimizeTheMaximumDifferenceOfPairs_List_Stage3_Imperative | goal: minimize_the_maximum_difference_of_pairs_list'vc ----
+File repaired.mlw:
+Goal minimize_the_maximum_difference_of_pairs_list'vc.
+Prover result is: Unknown (unknown + incomplete) (0.04s, 15039 steps).
+Remaining after prover CVC4,1.8: 1
+== Goals still unproved after stage 1 ==
+MinimizeTheMaximumDifferenceOfPairs_List_Stage3_Imperative	minimize_the_maximum_difference_of_pairs_list'vc
+== Stage 2: split_vc on unproved goal ==
+Target theory: MinimizeTheMaximumDifferenceOfPairs_List_Stage3_Imperative
+Target goal  : minimize_the_maximum_difference_of_pairs_list'vc
+---- stage2 | prover: Z3,4.8.6 | theory: MinimizeTheMaximumDifferenceOfPairs_List_Stage3_Imperative | goal: minimize_the_maximum_difference_of_pairs_list'vc ----
+Transforms: split_vc
+File "repaired.mlw", line 145, characters 15-20:
+Sub-goal Assertion of goal minimize_the_maximum_difference_of_pairs_list'vc.
+Prover result is: Valid (0.01s, 19674 steps).
+
+File "repaired.mlw", line 146, characters 15-69:
+Sub-goal Assertion of goal minimize_the_maximum_difference_of_pairs_list'vc.
+Prover result is: Valid (0.01s, 45132 steps).
+
+File "repaired.mlw", line 147, characters 15-48:
+Sub-goal Assertion of goal minimize_the_maximum_difference_of_pairs_list'vc.
+Prover result is: Valid (0.01s, 41003 steps).
+
+File "repaired.mlw", line 142, characters 15-53:
+Sub-goal Postcondition of goal
+minimize_the_maximum_difference_of_pairs_list'vc.
+Prover result is: Valid (0.01s, 2699 steps).
+
+File "repaired.mlw", line 150, characters 15-20:
+Sub-goal Assertion of goal minimize_the_maximum_difference_of_pairs_list'vc.
+Prover result is: Valid (0.01s, 1594 steps).
+
+File "repaired.mlw", line 152, characters 15-48:
+Sub-goal Assertion of goal minimize_the_maximum_difference_of_pairs_list'vc.
+Prover result is: Timeout (10.00s, 123790699 steps).
+
+File "repaired.mlw", line 155, characters 19-24:
+Sub-goal Assertion of goal minimize_the_maximum_difference_of_pairs_list'vc.
+Prover result is: Timeout (10.00s, 97631119 steps).
+
+File "repaired.mlw", line 142, characters 15-53:
+Sub-goal Postcondition of goal
+minimize_the_maximum_difference_of_pairs_list'vc.
+Prover result is: Valid (0.01s, 1367 steps).
+Infrastructure issue in stage 2 with prover Z3,4.8.6; aborting rest of stage 2.
+== Goals still unproved after stage 2 (split_vc) ==
+MinimizeTheMaximumDifferenceOfPairs_List_Stage3_Imperative	minimize_the_maximum_difference_of_pairs_list'vc
+== Stage 3: split_vc + inline_all on still-unproved goal ==
+Target theory: MinimizeTheMaximumDifferenceOfPairs_List_Stage3_Imperative
+Target goal  : minimize_the_maximum_difference_of_pairs_list'vc
+---- stage3 | prover: Alt-Ergo,2.4.0 | theory: MinimizeTheMaximumDifferenceOfPairs_List_Stage3_Imperative | goal: minimize_the_maximum_difference_of_pairs_list'vc ----
+Transforms: split_vc inline_all
+File "repaired.mlw", line 145, characters 15-20:
+Sub-goal Assertion of goal minimize_the_maximum_difference_of_pairs_list'vc.
+Prover result is: Valid (0.01s, 5 steps).
+
+File "repaired.mlw", line 146, characters 15-69:
+Sub-goal Assertion of goal minimize_the_maximum_difference_of_pairs_list'vc.
+Prover result is: Valid (0.01s, 57 steps).
+
+File "repaired.mlw", line 147, characters 15-48:
+Sub-goal Assertion of goal minimize_the_maximum_difference_of_pairs_list'vc.
+Prover result is: Valid (0.01s, 69 steps).
+
+File "repaired.mlw", line 142, characters 15-53:
+Sub-goal Postcondition of goal
+minimize_the_maximum_difference_of_pairs_list'vc.
+Prover result is: Valid (0.01s, 115 steps).
+
+File "repaired.mlw", line 150, characters 15-20:
+Sub-goal Assertion of goal minimize_the_maximum_difference_of_pairs_list'vc.
+Prover result is: Valid (0.01s, 8 steps).
+
+File "repaired.mlw", line 152, characters 15-48:
+Sub-goal Assertion of goal minimize_the_maximum_difference_of_pairs_list'vc.
+Prover result is: Timeout (10.00s, 314575 steps).
+
+File "repaired.mlw", line 155, characters 19-24:
+Sub-goal Assertion of goal minimize_the_maximum_difference_of_pairs_list'vc.
+Prover result is: Timeout (10.00s, 423023 steps).
+
+File "repaired.mlw", line 142, characters 15-53:
+Sub-goal Postcondition of goal
+minimize_the_maximum_difference_of_pairs_list'vc.
+Prover result is: Valid (0.01s, 12 steps).
+Infrastructure issue in stage 3 with prover Alt-Ergo,2.4.0; aborting rest of stage 3.
+== Final summary ==
+Unproved root goals after first prover : 1
+Remaining failures after split_vc      : 1
+Remaining failures after stage 3       : 1
+Detailed logs stored in                : /Users/rubenm/Desktop/Diversify2Verify/codex-runs/dataset-merge-verification/stage3a-repair/2616_minimize-the-maximum-difference-of-pairs/list-imperative/minimize_the_maximum_difference_of_pairs_list_stage3_b6e6828f_stage3/generated/why3/.why3_sessions/repaired_logs
+Still unproved goals:
+MinimizeTheMaximumDifferenceOfPairs_List_Stage3_Imperative	minimize_the_maximum_difference_of_pairs_list'vc
+VERIFY_RESULT: FAILURE
+VERIFY_REASON: unproved_goals_remain
+VERIFY_STAGE: stage3
+VERIFY_ROOT_TOTAL: 9
+VERIFY_ROOT_PROVED: 8
+VERIFY_ROOT_REMAINING: 1

@@ -1,0 +1,179 @@
+module KDiffPairsInAnArray_List_Stage3_Imperative
+
+  use int.Int
+  use list.List
+  use list.Length
+  use ref.Ref
+
+  let rec function occ (x: int) (l: list int) : int
+    variant { l }
+  =
+    match l with
+    | Nil -> 0
+    | Cons y ys -> (if y = x then 1 else 0) + occ x ys
+    end
+
+  let function pair_contribution (x: int) (nums: list int) (k: int) : int =
+    if k = 0 then
+      if occ x nums >= 2 then 1 else 0
+    else
+      if occ (x + k) nums >= 1 then 1 else 0
+
+  let rec function count_unique_kdiff_from
+      (seen: list int) (remaining: list int) (nums: list int) (k: int) : int
+    variant { remaining }
+  =
+    match remaining with
+    | Nil -> 0
+    | Cons x xs ->
+        (if occ x seen = 0 then pair_contribution x nums k else 0) +
+        count_unique_kdiff_from (Cons x seen) xs nums k
+    end
+
+  let function k_diff_pair_count (nums: list int) (k: int) : int =
+    count_unique_kdiff_from Nil nums nums k
+
+  let rec lemma occ_nonnegative (x: int) (l: list int)
+    ensures { occ x l >= 0 }
+    variant { l }
+  =
+    match l with
+    | Nil -> ()
+    | Cons _ ys -> occ_nonnegative x ys
+    end
+
+  let rec function count_unique_kdiff_unique_seen_from
+      (seen: list int) (remaining: list int) (nums: list int) (k: int) : int
+    variant { remaining }
+  =
+    match remaining with
+    | Nil -> 0
+    | Cons x xs ->
+        if occ x seen = 0 then
+          pair_contribution x nums k +
+          count_unique_kdiff_unique_seen_from (Cons x seen) xs nums k
+        else
+          count_unique_kdiff_unique_seen_from seen xs nums k
+    end
+
+  exception Found
+
+  let mem_list (x: int) (l: list int) : bool
+    ensures { result <-> occ x l >= 1 }
+  =
+    try
+      let cur = ref l in
+      while (match !cur with Nil -> false | Cons _ _ -> true end) do
+        invariant { occ x l = occ x !cur }
+        variant { length !cur }
+        match !cur with
+        | Nil -> ()
+        | Cons y ys ->
+            if y = x then begin
+              assert { occ x !cur = 1 + occ x ys };
+              occ_nonnegative x ys;
+              assert { occ x l >= 1 };
+              raise Found
+            end;
+            assert { y <> x };
+            assert { occ x !cur = occ x ys };
+            cur := ys
+        end
+      done;
+      assert { !cur = Nil };
+      assert { occ x !cur = 0 };
+      assert { occ x l = 0 };
+      false
+    with Found ->
+      true
+    end
+
+  let count_occurrences (x: int) (l: list int) : int
+    ensures { result = occ x l }
+  =
+    let count = ref 0 in
+    let cur = ref l in
+    while (match !cur with Nil -> false | Cons _ _ -> true end) do
+      invariant { !count + occ x !cur = occ x l }
+      invariant { !count >= 0 }
+      variant { length !cur }
+      match !cur with
+      | Nil -> ()
+      | Cons y ys ->
+          if y = x then begin
+            assert { occ x !cur = 1 + occ x ys };
+            count := !count + 1
+          end else begin
+            assert { occ x !cur = occ x ys }
+          end;
+          cur := ys
+      end
+    done;
+    assert { !cur = Nil };
+    assert { occ x !cur = 0 };
+    !count
+
+  let k_diff_pairs_in_an_array_list (nums: list int) (k: int) : int
+    requires { k >= 0 }
+    ensures  { result = k_diff_pair_count nums k }
+  =
+    let seen = ref Nil in
+    let count = ref 0 in
+    let cur = ref nums in
+    while (match !cur with Nil -> false | Cons _ _ -> true end) do
+      invariant { !count + count_unique_kdiff_from !seen !cur nums k =
+                  k_diff_pair_count nums k }
+      invariant { !count >= 0 }
+      variant { length !cur }
+      match !cur with
+      | Nil -> ()
+      | Cons x xs ->
+          let seen0 = !seen in
+          let count0 = !count in
+          assert { !cur = Cons x xs };
+          if not (mem_list x seen0) then begin
+            assert { occ x seen0 = 0 };
+            if k = 0 then begin
+              let c = count_occurrences x nums in
+              assert { c = occ x nums };
+              if c >= 2 then begin
+                assert { pair_contribution x nums k = 1 };
+                count := !count + 1
+              end else begin
+                assert { pair_contribution x nums k = 0 }
+              end
+            end else begin
+              assert { k <> 0 };
+              let present = mem_list (x + k) nums in
+              assert { present <-> occ (x + k) nums >= 1 };
+              if present then begin
+                assert { occ (x + k) nums >= 1 };
+                assert { pair_contribution x nums k = 1 };
+                count := !count + 1
+              end else begin
+                assert { not (occ (x + k) nums >= 1) };
+                assert { pair_contribution x nums k = 0 }
+              end
+            end;
+            assert { !count = count0 + pair_contribution x nums k };
+            assert { count_unique_kdiff_from seen0 (Cons x xs) nums k =
+                     pair_contribution x nums k +
+                     count_unique_kdiff_from (Cons x seen0) xs nums k };
+            seen := Cons x seen0;
+            assert { !seen = Cons x seen0 }
+          end else begin
+            assert { occ x seen0 >= 1 };
+            assert { !count = count0 };
+            assert { count_unique_kdiff_from seen0 (Cons x xs) nums k =
+                     count_unique_kdiff_from (Cons x seen0) xs nums k };
+            seen := Cons x seen0;
+            assert { !seen = Cons x seen0 }
+          end;
+          cur := xs
+      end
+    done;
+    assert { !cur = Nil };
+    assert { count_unique_kdiff_from !seen Nil nums k = 0 };
+    !count
+
+end

@@ -1,0 +1,153 @@
+module MinimumOperationsToMakeAllArrayElementsEqual_List_Stage3_Imperative
+
+  use int.Int
+  use int.Abs
+  use list.List
+  use list.Length
+  use list.Append
+  use list.Reverse
+  use list.RevAppend
+  use ref.Ref
+
+  let rec function operations_for_query (nums: list int) (q: int) : int
+    variant { nums }
+  =
+    match nums with
+    | Nil -> 0
+    | Cons x xs -> abs (x - q) + operations_for_query xs q
+    end
+
+  let rec function operation_results (nums: list int) (queries: list int) : list int
+    variant { queries }
+  =
+    match queries with
+    | Nil -> Nil
+    | Cons q qs -> Cons (operations_for_query nums q) (operation_results nums qs)
+    end
+
+  let rec function operation_results_rev_acc
+      (nums: list int) (queries: list int) (acc: list int) : list int
+    variant { queries }
+  =
+    match queries with
+    | Nil -> acc
+    | Cons q qs ->
+        operation_results_rev_acc nums qs (Cons (operations_for_query nums q) acc)
+    end
+
+  let rec lemma operation_results_rev_acc_def
+      (nums: list int) (queries: list int) (acc: list int)
+    ensures { operation_results_rev_acc nums queries acc =
+              rev_append (operation_results nums queries) acc }
+    variant { queries }
+  =
+    match queries with
+    | Nil ->
+        assert { operation_results_rev_acc nums Nil acc = acc };
+        assert { operation_results nums Nil = Nil };
+        assert { rev_append Nil acc = acc }
+    | Cons q qs ->
+        operation_results_rev_acc_def nums qs
+          (Cons (operations_for_query nums q) acc);
+        assert { operation_results_rev_acc nums (Cons q qs) acc =
+                 operation_results_rev_acc nums qs
+                   (Cons (operations_for_query nums q) acc) };
+        assert { operation_results nums (Cons q qs) =
+                 Cons (operations_for_query nums q) (operation_results nums qs) };
+        assert { rev_append (operation_results nums (Cons q qs)) acc =
+                 rev_append (operation_results nums qs)
+                   (Cons (operations_for_query nums q) acc) }
+    end
+
+  let rec lemma operation_results_length (nums: list int) (queries: list int)
+    ensures { length (operation_results nums queries) = length queries }
+    variant { queries }
+  =
+    match queries with
+    | Nil -> ()
+    | Cons _ qs ->
+        operation_results_length nums qs
+    end
+
+  let reverse_list (l: list int) : list int
+    ensures { result = rev_append l Nil }
+    ensures { length result = length l }
+  =
+    let acc = ref Nil in
+    let cur = ref l in
+    while (match !cur with Nil -> false | Cons _ _ -> true end) do
+      invariant { rev_append !cur !acc = rev_append l Nil }
+      invariant { length !cur + length !acc = length l }
+      variant { length !cur }
+      match !cur with
+      | Nil -> ()
+      | Cons x xs ->
+          acc := Cons x !acc;
+          cur := xs
+      end
+    done;
+    assert { !cur = Nil };
+    assert { rev_append Nil !acc = !acc };
+    !acc
+
+  let operations_for_query_imp (nums: list int) (q: int) : int
+    ensures { result = operations_for_query nums q }
+  =
+    let total = ref 0 in
+    let cur = ref nums in
+    while (match !cur with Nil -> false | Cons _ _ -> true end) do
+      invariant { !total + operations_for_query !cur q = operations_for_query nums q }
+      variant { length !cur }
+      match !cur with
+      | Nil -> ()
+      | Cons x xs ->
+          assert { operations_for_query !cur q =
+                   abs (x - q) + operations_for_query xs q };
+          total := !total + abs (x - q);
+          cur := xs
+      end
+    done;
+    assert { !cur = Nil };
+    assert { operations_for_query Nil q = 0 };
+    !total
+
+  let minimum_operations_to_make_all_array_elements_equal_list
+      (nums: list int) (queries: list int) : list int
+    ensures { result = operation_results nums queries }
+    ensures { length result = length queries }
+  =
+    let results_rev = ref Nil in
+    let cur_queries = ref queries in
+    while (match !cur_queries with Nil -> false | Cons _ _ -> true end) do
+      invariant { operation_results_rev_acc nums !cur_queries !results_rev =
+                  operation_results_rev_acc nums queries Nil }
+      variant { length !cur_queries }
+      match !cur_queries with
+      | Nil -> ()
+      | Cons q qs ->
+          let total = operations_for_query_imp nums q in
+          assert { total = operations_for_query nums q };
+          assert { operation_results_rev_acc nums !cur_queries !results_rev =
+                   operation_results_rev_acc nums qs
+                     (Cons (operations_for_query nums q) !results_rev) };
+          results_rev := Cons total !results_rev;
+          cur_queries := qs
+      end
+    done;
+    assert { !cur_queries = Nil };
+    assert { operation_results_rev_acc nums !cur_queries !results_rev = !results_rev };
+    assert { !results_rev = operation_results_rev_acc nums queries Nil };
+    operation_results_rev_acc_def nums queries Nil;
+    assert { !results_rev = rev_append (operation_results nums queries) Nil };
+    let answer = reverse_list !results_rev in
+    assert { answer = rev_append !results_rev Nil };
+    assert { answer =
+             rev_append (rev_append (operation_results nums queries) Nil) Nil };
+    assert { rev_append (operation_results nums queries) Nil =
+             reverse (operation_results nums queries) };
+    assert { answer = reverse (reverse (operation_results nums queries)) };
+    assert { answer = operation_results nums queries };
+    operation_results_length nums queries;
+    answer
+
+end

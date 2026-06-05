@@ -1,0 +1,214 @@
+module LeftAndRightSumDifferences_Array_Spec
+
+  use int.Int
+  use int.Abs
+  use array.Array
+  use array.Init
+  use array.ArraySum
+
+  function left_sum (nums: array int) (i: int) : int =
+    sum nums 0 i
+
+  function right_sum (nums: array int) (i: int) : int =
+    sum nums (i + 1) (length nums)
+
+  predicate answer_at (nums: array int) (answer: array int) (i: int) =
+    0 <= i < length nums /\
+    0 <= i < length answer /\
+    answer[i] = abs (left_sum nums i - right_sum nums i)
+
+  predicate left_right_sum_differences_spec (nums: array int) (answer: array int) =
+    length answer = length nums /\
+    forall i: int. 0 <= i < length nums -> answer_at nums answer i
+
+  val left_and_right_sum_differences_array (nums: array int) : array int
+    ensures { left_right_sum_differences_spec nums result }
+
+  let lemma test_001_singleton () =
+    let nums = init 1 [|1|] in
+    let expected = init 1 [|0|] in
+    assert { length nums = 1 };
+    assert { length expected = 1 };
+    assert { nums[0] = 1 };
+    assert { expected[0] = 0 };
+    assert { left_sum nums 0 = 0 };
+    assert { right_sum nums 0 = 0 };
+    assert { answer_at nums expected 0 };
+    assert {
+      forall i: int. 0 <= i < length nums ->
+        i = 0
+    };
+    assert { left_right_sum_differences_spec nums expected }
+
+  let lemma test_009_two_elements () =
+    let nums = init 2 [|1; 2|] in
+    let expected = init 2 [|2; 1|] in
+    assert { length nums = 2 };
+    assert { length expected = 2 };
+    assert { nums[0] = 1 };
+    assert { nums[1] = 2 };
+    assert { expected[0] = 2 };
+    assert { expected[1] = 1 };
+    assert { left_sum nums 0 = 0 };
+    assert { right_sum nums 0 = 2 };
+    assert { left_sum nums 1 = 1 };
+    assert { right_sum nums 1 = 0 };
+    assert { answer_at nums expected 0 };
+    assert { answer_at nums expected 1 };
+    assert {
+      forall i: int. 0 <= i < length nums ->
+        i = 0 \/ i = 1
+    };
+    assert { left_right_sum_differences_spec nums expected }
+
+  let lemma test_003_three_distinct_values () =
+    let nums = init 3 [|10; 20; 30|] in
+    let expected = init 3 [|50; 20; 30|] in
+    assert { length nums = 3 };
+    assert { length expected = 3 };
+    assert { nums[0] = 10 };
+    assert { nums[1] = 20 };
+    assert { nums[2] = 30 };
+    assert { expected[0] = 50 };
+    assert { expected[1] = 20 };
+    assert { expected[2] = 30 };
+    assert { left_sum nums 0 = 0 };
+    assert { right_sum nums 0 = 50 };
+    assert { left_sum nums 1 = 10 };
+    assert { right_sum nums 1 = 30 };
+    assert { left_sum nums 2 = 30 };
+    assert { right_sum nums 2 = 0 };
+    assert { answer_at nums expected 0 };
+    assert { answer_at nums expected 1 };
+    assert { answer_at nums expected 2 };
+    assert {
+      forall i: int. 0 <= i < length nums ->
+        i = 0 \/ i = 1 \/ i = 2
+    };
+    assert { left_right_sum_differences_spec nums expected }
+
+  let lemma test_016_official_example () =
+    let nums = init 4 [|10; 4; 8; 3|] in
+    let expected = init 4 [|15; 1; 11; 22|] in
+    assert { length nums = 4 };
+    assert { length expected = 4 };
+    assert { nums[0] = 10 };
+    assert { nums[1] = 4 };
+    assert { nums[2] = 8 };
+    assert { nums[3] = 3 };
+    assert { expected[0] = 15 };
+    assert { expected[1] = 1 };
+    assert { expected[2] = 11 };
+    assert { expected[3] = 22 };
+    assert { left_sum nums 0 = 0 };
+    assert { right_sum nums 0 = 15 };
+    assert { left_sum nums 1 = 10 };
+    assert { right_sum nums 1 = 11 };
+    assert { left_sum nums 2 = 14 };
+    assert { right_sum nums 2 = 3 };
+    assert { left_sum nums 3 = 22 };
+    assert { right_sum nums 3 = 0 };
+    assert { answer_at nums expected 0 };
+    assert { answer_at nums expected 1 };
+    assert { answer_at nums expected 2 };
+    assert { answer_at nums expected 3 };
+    assert {
+      forall i: int. 0 <= i < length nums ->
+        i = 0 \/ i = 1 \/ i = 2 \/ i = 3
+    };
+    assert { left_right_sum_differences_spec nums expected }
+
+  let lemma test_000_descending_five () =
+    let nums = init 5 [|5; 4; 3; 2; 1|] in
+    let expected = init 5 [|10; 1; 6; 11; 14|] in
+    assert { length nums = 5 };
+    assert { length expected = 5 };
+    assert { nums[0] = 5 };
+    assert { nums[1] = 4 };
+    assert { nums[2] = 3 };
+    assert { nums[3] = 2 };
+    assert { nums[4] = 1 };
+    assert { expected[0] = 10 };
+    assert { expected[1] = 1 };
+    assert { expected[2] = 6 };
+    assert { expected[3] = 11 };
+    assert { expected[4] = 14 };
+    assert { left_sum nums 0 = 0 };
+    assert { right_sum nums 0 = 10 };
+    assert { left_sum nums 1 = 5 };
+    assert { right_sum nums 1 = 6 };
+    assert { left_sum nums 2 = 9 };
+    assert { right_sum nums 2 = 3 };
+    assert { left_sum nums 3 = 12 };
+    assert { right_sum nums 3 = 1 };
+    assert { left_sum nums 4 = 14 };
+    assert { right_sum nums 4 = 0 };
+    assert { answer_at nums expected 0 };
+    assert { answer_at nums expected 1 };
+    assert { answer_at nums expected 2 };
+    assert { answer_at nums expected 3 };
+    assert { answer_at nums expected 4 };
+    assert {
+      forall i: int. 0 <= i < length nums ->
+        i = 0 \/ i = 1 \/ i = 2 \/ i = 3 \/ i = 4
+    };
+    assert { left_right_sum_differences_spec nums expected }
+
+  let lemma test_005_repeated_large_values () =
+    let nums = init 3 [|100000; 100000; 100000|] in
+    let expected = init 3 [|200000; 0; 200000|] in
+    assert { length nums = 3 };
+    assert { length expected = 3 };
+    assert { nums[0] = 100000 };
+    assert { nums[1] = 100000 };
+    assert { nums[2] = 100000 };
+    assert { expected[0] = 200000 };
+    assert { expected[1] = 0 };
+    assert { expected[2] = 200000 };
+    assert { left_sum nums 0 = 0 };
+    assert { right_sum nums 0 = 200000 };
+    assert { left_sum nums 1 = 100000 };
+    assert { right_sum nums 1 = 100000 };
+    assert { left_sum nums 2 = 200000 };
+    assert { right_sum nums 2 = 0 };
+    assert { answer_at nums expected 0 };
+    assert { answer_at nums expected 1 };
+    assert { answer_at nums expected 2 };
+    assert {
+      forall i: int. 0 <= i < length nums ->
+        i = 0 \/ i = 1 \/ i = 2
+    };
+    assert { left_right_sum_differences_spec nums expected }
+
+  let lemma test_010_large_head_small_tail () =
+    let nums = init 4 [|100000; 1; 1; 1|] in
+    let expected = init 4 [|3; 99998; 100000; 100002|] in
+    assert { length nums = 4 };
+    assert { length expected = 4 };
+    assert { nums[0] = 100000 };
+    assert { nums[1] = 1 };
+    assert { nums[2] = 1 };
+    assert { nums[3] = 1 };
+    assert { expected[0] = 3 };
+    assert { expected[1] = 99998 };
+    assert { expected[2] = 100000 };
+    assert { expected[3] = 100002 };
+    assert { left_sum nums 0 = 0 };
+    assert { right_sum nums 0 = 3 };
+    assert { left_sum nums 1 = 100000 };
+    assert { right_sum nums 1 = 2 };
+    assert { left_sum nums 2 = 100001 };
+    assert { right_sum nums 2 = 1 };
+    assert { left_sum nums 3 = 100002 };
+    assert { right_sum nums 3 = 0 };
+    assert { answer_at nums expected 0 };
+    assert { answer_at nums expected 1 };
+    assert { answer_at nums expected 2 };
+    assert { answer_at nums expected 3 };
+    assert {
+      forall i: int. 0 <= i < length nums ->
+        i = 0 \/ i = 1 \/ i = 2 \/ i = 3
+    };
+    assert { left_right_sum_differences_spec nums expected }
+
+end

@@ -1,0 +1,108 @@
+== Stage 1: first prover on whole file ==
+Running in /Users/rubenm/Desktop/Diversify2Verify/codex-runs/dataset-merge-verification/stage3a-repair/532_k-diff-pairs-in-an-array/array-imperative/k_diff_pairs_in_an_array_array_stage3_b6252961_stage3/generated/why3: why3 session create -o /Users/rubenm/Desktop/Diversify2Verify/codex-runs/dataset-merge-verification/stage3a-repair/532_k-diff-pairs-in-an-array/array-imperative/k_diff_pairs_in_an_array_array_stage3_b6252961_stage3/generated/why3/.why3_sessions/repaired_stage1 -P Z3,4.8.6 -t 10 -m 8192 repaired.mlw
+Session created successfully
+Running in /Users/rubenm/Desktop/Diversify2Verify/codex-runs/dataset-merge-verification/stage3a-repair/532_k-diff-pairs-in-an-array/array-imperative/k_diff_pairs_in_an_array_array_stage3_b6252961_stage3/generated/why3: why3 bench /Users/rubenm/Desktop/Diversify2Verify/codex-runs/dataset-merge-verification/stage3a-repair/532_k-diff-pairs-in-an-array/array-imperative/k_diff_pairs_in_an_array_array_stage3_b6252961_stage3/generated/why3/.why3_sessions/repaired_stage1
+Progress: 10/1/0                       Progress: 9/2/0                       Progress: 8/3/0                       Progress: 7/4/0                       Progress: 6/5/0                       Progress: 5/6/0                       Progress: 5/0/0                       Progress: 4/1/0                       Progress: 3/2/0                       Progress: 2/3/0                       Progress: 1/4/0                       Progress: 0/5/0                       Progress: 0/1/2                       Progress: 0/0/2                       Progress: 0/0/1                       
+Replay completed, saving session... done
+== Stage 1 stats ==
+= Statistics for session /Users/rubenm/Desktop/Diversify2Verify/codex-runs/dataset-merge-verification/stage3a-repair/532_k-diff-pairs-in-an-array/array-imperative/k_diff_pairs_in_an_array_array_stage3_b6252961_stage3/generated/why3/.why3_sessions/repaired_stage1
+
+== Number of root goals ==
+  total: 11  proved: 9
+
+== Number of sub goals ==
+  total: 0  proved: 0
+
+== Goals not proved ==
+  +-- file [../../repaired.mlw]
+    +-- theory KDiffPairsInAnArray_Array_Stage3_Imperative
+      +-- goal indexed_count_matches_spec
+      +-- goal k_diff_pairs_in_an_array_array'vc
+  
+== Goals proved by only one prover ==
+  +-- file [../../repaired.mlw]
+    +-- theory KDiffPairsInAnArray_Array_Stage3_Imperative
+      +-- goal counted_index_step_add: Z3 4.8.6
+      +-- goal counted_index_step_skip: Z3 4.8.6
+      +-- goal counted_index_nonnegative: Z3 4.8.6
+      +-- goal first_duplicate_equiv_later: Z3 4.8.6
+      +-- goal first_positive_kdiff_equiv_value: Z3 4.8.6
+      +-- goal first_zero_kdiff_equiv_later: Z3 4.8.6
+      +-- goal is_first_occurrence'vc: Z3 4.8.6
+      +-- goal has_value'vc: Z3 4.8.6
+      +-- goal has_later_duplicate'vc: Z3 4.8.6
+  
+1 session(s) read, with a total of 11 proof goals.
+== Unproved root goals after first prover ==
+KDiffPairsInAnArray_Array_Stage3_Imperative	indexed_count_matches_spec
+KDiffPairsInAnArray_Array_Stage3_Imperative	k_diff_pairs_in_an_array_array'vc
+== Stage 1: trying remaining goals with prover Alt-Ergo,2.4.0 ==
+---- stage1 | prover: Alt-Ergo,2.4.0 | theory: KDiffPairsInAnArray_Array_Stage3_Imperative | goal: indexed_count_matches_spec ----
+File "repaired.mlw", line 77, character 4 to line 81, character 72:
+Goal indexed_count_matches_spec.
+Prover result is: Timeout (10.00s, 217206 steps).
+---- stage1 | prover: Alt-Ergo,2.4.0 | theory: KDiffPairsInAnArray_Array_Stage3_Imperative | goal: k_diff_pairs_in_an_array_array'vc ----
+File repaired.mlw:
+Goal k_diff_pairs_in_an_array_array'vc.
+Prover result is: Valid (0.76s, 14243 steps).
+Solved in stage 1 using prover: Alt-Ergo,2.4.0
+Remaining after prover Alt-Ergo,2.4.0: 1
+== Stage 1: trying remaining goals with prover CVC4,1.8 ==
+---- stage1 | prover: CVC4,1.8 | theory: KDiffPairsInAnArray_Array_Stage3_Imperative | goal: indexed_count_matches_spec ----
+File "repaired.mlw", line 77, character 4 to line 81, character 72:
+Goal indexed_count_matches_spec.
+Prover result is: Timeout (10.00s, 1109571 steps).
+Remaining after prover CVC4,1.8: 1
+== Goals still unproved after stage 1 ==
+KDiffPairsInAnArray_Array_Stage3_Imperative	indexed_count_matches_spec
+== Stage 2: split_vc on unproved goal ==
+Target theory: KDiffPairsInAnArray_Array_Stage3_Imperative
+Target goal  : indexed_count_matches_spec
+---- stage2 | prover: Z3,4.8.6 | theory: KDiffPairsInAnArray_Array_Stage3_Imperative | goal: indexed_count_matches_spec ----
+Transforms: split_vc
+File "repaired.mlw", line 81, characters 6-72:
+Goal indexed_count_matches_spec.
+Prover result is: Timeout (10.00s, 55488206 steps).
+---- stage2 | prover: Alt-Ergo,2.4.0 | theory: KDiffPairsInAnArray_Array_Stage3_Imperative | goal: indexed_count_matches_spec ----
+Transforms: split_vc
+File "repaired.mlw", line 81, characters 6-72:
+Goal indexed_count_matches_spec.
+Prover result is: Timeout (10.00s, 230640 steps).
+---- stage2 | prover: CVC4,1.8 | theory: KDiffPairsInAnArray_Array_Stage3_Imperative | goal: indexed_count_matches_spec ----
+Transforms: split_vc
+File "repaired.mlw", line 81, characters 6-72:
+Goal indexed_count_matches_spec.
+Prover result is: Timeout (10.00s, 1116521 steps).
+== Goals still unproved after stage 2 (split_vc) ==
+KDiffPairsInAnArray_Array_Stage3_Imperative	indexed_count_matches_spec
+== Stage 3: split_vc + inline_all on still-unproved goal ==
+Target theory: KDiffPairsInAnArray_Array_Stage3_Imperative
+Target goal  : indexed_count_matches_spec
+---- stage3 | prover: Z3,4.8.6 | theory: KDiffPairsInAnArray_Array_Stage3_Imperative | goal: indexed_count_matches_spec ----
+Transforms: split_vc inline_all
+File "repaired.mlw", line 81, characters 6-72:
+Goal indexed_count_matches_spec.
+Prover result is: Timeout (10.00s, 58200656 steps).
+---- stage3 | prover: Alt-Ergo,2.4.0 | theory: KDiffPairsInAnArray_Array_Stage3_Imperative | goal: indexed_count_matches_spec ----
+Transforms: split_vc inline_all
+File "repaired.mlw", line 81, characters 6-72:
+Goal indexed_count_matches_spec.
+Prover result is: Timeout (10.00s, 106217 steps).
+---- stage3 | prover: CVC4,1.8 | theory: KDiffPairsInAnArray_Array_Stage3_Imperative | goal: indexed_count_matches_spec ----
+Transforms: split_vc inline_all
+File "repaired.mlw", line 81, characters 6-72:
+Goal indexed_count_matches_spec.
+Prover result is: Timeout (10.00s, 916737 steps).
+== Final summary ==
+Unproved root goals after first prover : 1
+Remaining failures after split_vc      : 1
+Remaining failures after stage 3       : 1
+Detailed logs stored in                : /Users/rubenm/Desktop/Diversify2Verify/codex-runs/dataset-merge-verification/stage3a-repair/532_k-diff-pairs-in-an-array/array-imperative/k_diff_pairs_in_an_array_array_stage3_b6252961_stage3/generated/why3/.why3_sessions/repaired_logs
+Still unproved goals:
+KDiffPairsInAnArray_Array_Stage3_Imperative	indexed_count_matches_spec
+VERIFY_RESULT: FAILURE
+VERIFY_REASON: unproved_goals_remain
+VERIFY_STAGE: stage3
+VERIFY_ROOT_TOTAL: 11
+VERIFY_ROOT_PROVED: 10
+VERIFY_ROOT_REMAINING: 1

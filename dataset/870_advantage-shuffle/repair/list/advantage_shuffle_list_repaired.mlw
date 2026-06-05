@@ -1,0 +1,121 @@
+module AdvantageShuffle_List_Spec
+
+  use int.Int
+  use list.List
+  use list.Length
+  use list.Permut
+
+  let rec function advantage_count (chosen: list int) (targets: list int) : int
+    variant { chosen }
+  =
+    match chosen with
+    | Nil -> 0
+    | Cons x xs ->
+        match targets with
+        | Nil -> 0
+        | Cons y ys ->
+            (if x > y then 1 else 0) + advantage_count xs ys
+        end
+    end
+
+  predicate valid_advantage_shuffle (nums1: list int) (nums2: list int) (out: list int) =
+    length nums1 = length nums2 /\
+    length out = length nums2 /\
+    permut out nums1 /\
+    (forall candidate: list int.
+       permut candidate nums1 ->
+       advantage_count out nums2 >= advantage_count candidate nums2)
+
+  val advantage_shuffle_list (nums1: list int) (nums2: list int) : list int
+    requires { length nums1 = length nums2 }
+    ensures  { valid_advantage_shuffle nums1 nums2 result }
+
+  let lemma check_test_000 () =
+    let nums1 = Cons 10 (Cons 20 (Cons 30 (Cons 40 (Cons 50 Nil)))) in
+    let nums2 = Cons 5 (Cons 15 (Cons 25 (Cons 35 (Cons 45 Nil)))) in
+    let expected = Cons 10 (Cons 20 (Cons 30 (Cons 40 (Cons 50 Nil)))) in
+    assert { length nums1 = 5 };
+    assert { length nums2 = 5 };
+    assert { length expected = 5 };
+    assert { advantage_count Nil Nil = 0 };
+    assert { advantage_count (Cons 50 Nil) (Cons 45 Nil) = 1 };
+    assert { advantage_count (Cons 40 (Cons 50 Nil)) (Cons 35 (Cons 45 Nil)) = 2 };
+    assert { advantage_count (Cons 30 (Cons 40 (Cons 50 Nil))) (Cons 25 (Cons 35 (Cons 45 Nil))) = 3 };
+    assert { advantage_count (Cons 20 (Cons 30 (Cons 40 (Cons 50 Nil)))) (Cons 15 (Cons 25 (Cons 35 (Cons 45 Nil)))) = 4 };
+    assert { advantage_count expected nums2 = 5 }
+
+  let lemma check_test_001 () =
+    let nums1 = Cons 5 (Cons 15 (Cons 25 (Cons 35 Nil))) in
+    let nums2 = Cons 10 (Cons 20 (Cons 30 (Cons 40 Nil))) in
+    let expected = Cons 15 (Cons 25 (Cons 35 (Cons 5 Nil))) in
+    assert { length nums1 = 4 };
+    assert { length nums2 = 4 };
+    assert { length expected = 4 };
+    assert { advantage_count (Cons 5 Nil) (Cons 40 Nil) = 0 };
+    assert { advantage_count (Cons 35 (Cons 5 Nil)) (Cons 30 (Cons 40 Nil)) = 1 };
+    assert { advantage_count (Cons 25 (Cons 35 (Cons 5 Nil))) (Cons 20 (Cons 30 (Cons 40 Nil))) = 2 };
+    assert { advantage_count expected nums2 = 3 }
+
+  let lemma check_test_002 () =
+    let nums1 = Cons 2 (Cons 7 (Cons 11 (Cons 15 Nil))) in
+    let nums2 = Cons 1 (Cons 10 (Cons 4 (Cons 11 Nil))) in
+    let expected = Cons 2 (Cons 11 (Cons 7 (Cons 15 Nil))) in
+    assert { length nums1 = 4 };
+    assert { length nums2 = 4 };
+    assert { length expected = 4 };
+    assert { advantage_count (Cons 15 Nil) (Cons 11 Nil) = 1 };
+    assert { advantage_count (Cons 7 (Cons 15 Nil)) (Cons 4 (Cons 11 Nil)) = 2 };
+    assert { advantage_count (Cons 11 (Cons 7 (Cons 15 Nil))) (Cons 10 (Cons 4 (Cons 11 Nil))) = 3 };
+    assert { advantage_count expected nums2 = 4 }
+
+  let lemma check_test_003 () =
+    let nums1 = Cons 100 (Cons 90 (Cons 80 (Cons 70 (Cons 60 Nil)))) in
+    let nums2 = Cons 60 (Cons 70 (Cons 80 (Cons 90 (Cons 100 Nil)))) in
+    let expected = Cons 70 (Cons 80 (Cons 90 (Cons 100 (Cons 60 Nil)))) in
+    assert { length nums1 = 5 };
+    assert { length nums2 = 5 };
+    assert { length expected = 5 };
+    assert { advantage_count (Cons 60 Nil) (Cons 100 Nil) = 0 };
+    assert { advantage_count (Cons 100 (Cons 60 Nil)) (Cons 90 (Cons 100 Nil)) = 1 };
+    assert { advantage_count (Cons 90 (Cons 100 (Cons 60 Nil))) (Cons 80 (Cons 90 (Cons 100 Nil))) = 2 };
+    assert { advantage_count (Cons 80 (Cons 90 (Cons 100 (Cons 60 Nil)))) (Cons 70 (Cons 80 (Cons 90 (Cons 100 Nil)))) = 3 };
+    assert { advantage_count expected nums2 = 4 }
+
+  let lemma check_test_004 () =
+    let nums1 = Cons 9 (Cons 12 (Cons 24 (Cons 22 (Cons 15 Nil)))) in
+    let nums2 = Cons 14 (Cons 13 (Cons 25 (Cons 17 (Cons 22 Nil)))) in
+    let expected = Cons 22 (Cons 15 (Cons 9 (Cons 24 (Cons 12 Nil)))) in
+    assert { length nums1 = 5 };
+    assert { length nums2 = 5 };
+    assert { length expected = 5 };
+    assert { advantage_count (Cons 12 Nil) (Cons 22 Nil) = 0 };
+    assert { advantage_count (Cons 24 (Cons 12 Nil)) (Cons 17 (Cons 22 Nil)) = 1 };
+    assert { advantage_count (Cons 9 (Cons 24 (Cons 12 Nil))) (Cons 25 (Cons 17 (Cons 22 Nil))) = 1 };
+    assert { advantage_count (Cons 15 (Cons 9 (Cons 24 (Cons 12 Nil)))) (Cons 13 (Cons 25 (Cons 17 (Cons 22 Nil)))) = 2 };
+    assert { advantage_count expected nums2 = 3 }
+
+  let lemma check_test_008 () =
+    let nums1 = Cons 12 (Cons 24 (Cons 8 (Cons 32 Nil))) in
+    let nums2 = Cons 13 (Cons 25 (Cons 32 (Cons 11 Nil))) in
+    let expected = Cons 24 (Cons 32 (Cons 8 (Cons 12 Nil))) in
+    assert { length nums1 = 4 };
+    assert { length nums2 = 4 };
+    assert { length expected = 4 };
+    assert { advantage_count (Cons 12 Nil) (Cons 11 Nil) = 1 };
+    assert { advantage_count (Cons 8 (Cons 12 Nil)) (Cons 32 (Cons 11 Nil)) = 1 };
+    assert { advantage_count (Cons 32 (Cons 8 (Cons 12 Nil))) (Cons 25 (Cons 32 (Cons 11 Nil))) = 2 };
+    assert { advantage_count expected nums2 = 3 }
+
+  let lemma check_test_010 () =
+    let nums1 = Cons 1 (Cons 2 (Cons 3 (Cons 4 Nil))) in
+    let nums2 = Cons 1 (Cons 2 (Cons 3 (Cons 4 Nil))) in
+    let expected = Cons 2 (Cons 3 (Cons 4 (Cons 1 Nil))) in
+    assert { length nums1 = 4 };
+    assert { length nums2 = 4 };
+    assert { length expected = 4 };
+    assert { advantage_count (Cons 1 Nil) (Cons 4 Nil) = 0 };
+    assert { advantage_count (Cons 4 (Cons 1 Nil)) (Cons 3 (Cons 4 Nil)) = 1 };
+    assert { advantage_count (Cons 3 (Cons 4 (Cons 1 Nil))) (Cons 2 (Cons 3 (Cons 4 Nil))) = 2 };
+    assert { advantage_count expected nums2 = 3 }
+
+end

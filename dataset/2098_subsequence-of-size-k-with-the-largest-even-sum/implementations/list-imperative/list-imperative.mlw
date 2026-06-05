@@ -1,0 +1,271 @@
+module SubsequenceOfSizeKWithTheLargestEvenSum_List_Imperative
+
+  use int.Int
+  use int.EuclideanDivision
+  use list.List
+  use ref.Ref
+
+  let is_even (x: int) : bool =
+    mod x 2 = 0
+
+  let rec insert_nondecreasing (x: int) (l: list int) : list int =
+    match l with
+    | Nil -> Cons x Nil
+    | Cons y ys ->
+        if x <= y then Cons x l else Cons y (insert_nondecreasing x ys)
+    end
+
+  let record_remainder
+      (x: int)
+      (has_even: ref bool)
+      (best_even: ref int)
+      (has_odd: ref bool)
+      (best_odd: ref int) : unit =
+    if is_even x then
+      if !has_even then
+        if x > !best_even then best_even := x else ()
+      else begin
+        has_even := true;
+        best_even := x
+      end
+    else
+      if !has_odd then
+        if x > !best_odd then best_odd := x else ()
+      else begin
+        has_odd := true;
+        best_odd := x
+      end
+
+  let subsequence_of_size_k_with_the_largest_even_sum_list
+      (nums: list int) (k: int) : int =
+    let selected = ref (Nil : list int) in
+    let selected_len = ref 0 in
+    let selected_sum = ref 0 in
+    let has_rest_even = ref false in
+    let best_rest_even = ref 0 in
+    let has_rest_odd = ref false in
+    let best_rest_odd = ref 0 in
+    let cur = ref nums in
+    while (match !cur with Nil -> false | Cons _ _ -> true end) do
+      match !cur with
+      | Nil -> ()
+      | Cons x xs ->
+          if !selected_len < k then begin
+            selected := insert_nondecreasing x !selected;
+            selected_len := !selected_len + 1;
+            selected_sum := !selected_sum + x
+          end else
+            match !selected with
+            | Nil -> ()
+            | Cons smallest rest ->
+                if x > smallest then begin
+                  selected := insert_nondecreasing x rest;
+                  selected_sum := !selected_sum - smallest + x;
+                  record_remainder smallest
+                    has_rest_even best_rest_even
+                    has_rest_odd best_rest_odd
+                end else
+                  record_remainder x
+                    has_rest_even best_rest_even
+                    has_rest_odd best_rest_odd
+            end;
+          cur := xs
+      end
+    done;
+    if is_even !selected_sum then
+      !selected_sum
+    else
+      let has_selected_even = ref false in
+      let smallest_selected_even = ref 0 in
+      let has_selected_odd = ref false in
+      let smallest_selected_odd = ref 0 in
+      let selected_cur = ref !selected in
+      while (match !selected_cur with Nil -> false | Cons _ _ -> true end) do
+        match !selected_cur with
+        | Nil -> ()
+        | Cons x xs ->
+            if is_even x then
+              if not !has_selected_even then begin
+                has_selected_even := true;
+                smallest_selected_even := x
+              end
+            else if not !has_selected_odd then begin
+              has_selected_odd := true;
+              smallest_selected_odd := x
+            end;
+            selected_cur := xs
+        end
+      done;
+      let best = ref (-1) in
+      if !has_selected_odd && !has_rest_even then
+        best := !selected_sum - !smallest_selected_odd + !best_rest_even;
+      if !has_selected_even && !has_rest_odd then begin
+        let candidate = !selected_sum - !smallest_selected_even + !best_rest_odd in
+        if candidate > !best then best := candidate else ()
+      end;
+      !best
+
+  let test_000 () : bool =
+    let nums = Cons 0 (Cons 0 (Cons 0 (Cons 0 (Cons 0 Nil)))) in
+    let r = subsequence_of_size_k_with_the_largest_even_sum_list nums 2 in
+    r = 0
+
+  let test_001 () : bool =
+    let nums = Cons 0 (Cons 0 (Cons 0 (Cons 0 Nil))) in
+    let r = subsequence_of_size_k_with_the_largest_even_sum_list nums 2 in
+    r = 0
+
+  let test_002 () : bool =
+    let nums = Cons 4 (Cons 6 (Cons 2 Nil)) in
+    let r = subsequence_of_size_k_with_the_largest_even_sum_list nums 3 in
+    r = 12
+
+  let test_003 () : bool =
+    let nums =
+      Cons 1 (Cons 2 (Cons 3 (Cons 4 (Cons 5
+      (Cons 6 (Cons 7 (Cons 8 (Cons 9 (Cons 10 Nil))))))))) in
+    let r = subsequence_of_size_k_with_the_largest_even_sum_list nums 5 in
+    r = 40
+
+  let test_004 () : bool =
+    let nums = Cons 1 (Cons 3 (Cons 5 Nil)) in
+    let r = subsequence_of_size_k_with_the_largest_even_sum_list nums 1 in
+    r = (-1)
+
+  let test_005 () : bool =
+    let nums =
+      Cons 5 (Cons 5 (Cons 5 (Cons 5 (Cons 5
+      (Cons 5 (Cons 5 (Cons 5 (Cons 5 (Cons 5 Nil))))))))) in
+    let r = subsequence_of_size_k_with_the_largest_even_sum_list nums 4 in
+    r = 20
+
+  let test_006 () : bool =
+    let nums = Cons 1 (Cons 2 (Cons 3 (Cons 4 (Cons 5 (Cons 6 Nil))))) in
+    let r = subsequence_of_size_k_with_the_largest_even_sum_list nums 4 in
+    r = 18
+
+  let test_007 () : bool =
+    let nums = Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 Nil))))) in
+    let r = subsequence_of_size_k_with_the_largest_even_sum_list nums 3 in
+    r = (-1)
+
+  let test_008 () : bool =
+    let nums =
+      Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1
+      (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 Nil))))))))) in
+    let r = subsequence_of_size_k_with_the_largest_even_sum_list nums 5 in
+    r = (-1)
+
+  let test_009 () : bool =
+    let nums = Cons 2 (Cons 2 (Cons 2 (Cons 2 (Cons 2 Nil)))) in
+    let r = subsequence_of_size_k_with_the_largest_even_sum_list nums 2 in
+    r = 4
+
+  let test_010 () : bool =
+    let nums =
+      Cons 1 (Cons 2 (Cons 3 (Cons 4 (Cons 5
+      (Cons 6 (Cons 7 (Cons 8 (Cons 9 (Cons 10 Nil))))))))) in
+    let r = subsequence_of_size_k_with_the_largest_even_sum_list nums 4 in
+    r = 34
+
+  let test_011 () : bool =
+    let nums = Cons 4 (Cons 1 (Cons 5 (Cons 3 (Cons 1 Nil)))) in
+    let r = subsequence_of_size_k_with_the_largest_even_sum_list nums 3 in
+    r = 12
+
+  let test_012 () : bool =
+    let nums = Cons 2 (Cons 4 (Cons 6 (Cons 8 (Cons 10 Nil)))) in
+    let r = subsequence_of_size_k_with_the_largest_even_sum_list nums 5 in
+    r = 30
+
+  let test_013 () : bool =
+    let nums =
+      Cons 0 (Cons 0 (Cons 0 (Cons 0 (Cons 0
+      (Cons 0 (Cons 0 (Cons 0 (Cons 0 (Cons 0 Nil))))))))) in
+    let r = subsequence_of_size_k_with_the_largest_even_sum_list nums 3 in
+    r = 0
+
+  let test_014 () : bool =
+    let nums = Cons 8 (Cons 6 (Cons 4 (Cons 2 (Cons 0 Nil)))) in
+    let r = subsequence_of_size_k_with_the_largest_even_sum_list nums 3 in
+    r = 18
+
+  let test_015 () : bool =
+    let nums = Cons 10 (Cons 20 (Cons 30 (Cons 40 (Cons 50 Nil)))) in
+    let r = subsequence_of_size_k_with_the_largest_even_sum_list nums 3 in
+    r = 120
+
+  let test_016 () : bool =
+    let nums =
+      Cons 10 (Cons 21 (Cons 32 (Cons 43 (Cons 54
+      (Cons 65 (Cons 76 (Cons 87 (Cons 98 (Cons 109 Nil))))))))) in
+    let r = subsequence_of_size_k_with_the_largest_even_sum_list nums 4 in
+    r = 370
+
+  let test_017 () : bool =
+    let nums =
+      Cons 1 (Cons 2 (Cons 3 (Cons 4 (Cons 5
+      (Cons 6 (Cons 7 (Cons 8 (Cons 9 (Cons 10
+      (Cons 11 (Cons 12 (Cons 13 (Cons 14 (Cons 15
+      (Cons 16 (Cons 17 (Cons 18 (Cons 19 (Cons 20 Nil))))))))))))))))))) in
+    let r = subsequence_of_size_k_with_the_largest_even_sum_list nums 19 in
+    r = 208
+
+  let test_018 () : bool =
+    let nums =
+      Cons 100000 (Cons 99999 (Cons 99998 (Cons 99997 (Cons 99996
+      (Cons 99995 (Cons 99994 (Cons 99993 (Cons 99992 (Cons 99991 Nil))))))))) in
+    let r = subsequence_of_size_k_with_the_largest_even_sum_list nums 5 in
+    r = 499990
+
+  let test_019 () : bool =
+    let nums =
+      Cons 2 (Cons 2 (Cons 2 (Cons 2 (Cons 2
+      (Cons 2 (Cons 2 (Cons 2 (Cons 2 (Cons 2 Nil))))))))) in
+    let r = subsequence_of_size_k_with_the_largest_even_sum_list nums 4 in
+    r = 8
+
+  let run_tests () : bool =
+    if test_000 () then
+    if test_001 () then
+    if test_002 () then
+    if test_003 () then
+    if test_004 () then
+    if test_005 () then
+    if test_006 () then
+    if test_007 () then
+    if test_008 () then
+    if test_009 () then
+    if test_010 () then
+    if test_011 () then
+    if test_012 () then
+    if test_013 () then
+    if test_014 () then
+    if test_015 () then
+    if test_016 () then
+    if test_017 () then
+    if test_018 () then
+    if test_019 () then
+      true
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+
+end

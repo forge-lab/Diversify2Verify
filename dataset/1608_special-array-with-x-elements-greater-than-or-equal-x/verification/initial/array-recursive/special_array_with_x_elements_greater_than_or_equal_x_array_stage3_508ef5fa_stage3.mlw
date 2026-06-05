@@ -1,0 +1,73 @@
+module SpecialArrayWithXElementsGreaterThanOrEqualX_Array_Stage3
+
+  use int.Int
+  use array.Array
+  use array.NumOf
+
+  function count_ge (nums: array int) (x: int) : int =
+    NumOf.numof (fun _ v -> v >= x) nums 0 (length nums)
+
+  predicate special_candidate (nums: array int) (x: int) =
+    0 <= x <= length nums /\ count_ge nums x = x
+
+  predicate special_array_result (nums: array int) (result: int) =
+    (result = -1 /\
+      forall x: int. 0 <= x <= length nums -> not (special_candidate nums x)) \/
+    (special_candidate nums result /\
+      forall x: int. special_candidate nums x -> x = result)
+
+  lemma count_ge_monotone_threshold:
+    forall nums: array int, x y: int.
+      x <= y -> count_ge nums y <= count_ge nums x
+
+  lemma special_candidate_unique:
+    forall nums: array int, x y: int.
+      special_candidate nums x -> special_candidate nums y -> x = y
+
+  let rec count_ge_from_exec (nums: array int) (x: int) (i: int) : int
+    requires { 0 <= i <= length nums }
+    ensures  { result = NumOf.numof (fun _ v -> v >= x) nums i (length nums) }
+    ensures  { 0 <= result <= length nums - i }
+    variant  { length nums - i }
+  =
+    if i >= length nums then
+      0
+    else
+      (if nums[i] >= x then 1 else 0) + count_ge_from_exec nums x (i + 1)
+
+  let count_ge_exec (nums: array int) (x: int) : int
+    ensures { result = count_ge nums x }
+    ensures { 0 <= result <= length nums }
+  =
+    count_ge_from_exec nums x 0
+
+  let rec find_special_candidate (nums: array int) (x: int) : int
+    requires { 0 <= x <= length nums + 1 }
+    ensures  { result = -1 \/ x <= result <= length nums }
+    ensures  { result <> -1 -> special_candidate nums result }
+    ensures  { result = -1 ->
+      forall y: int. x <= y <= length nums -> not (special_candidate nums y) }
+    variant  { length nums - x + 1 }
+  =
+    if x > length nums then
+      -1
+    else
+      let count = count_ge_exec nums x in
+      if count = x then
+        x
+      else
+        find_special_candidate nums (x + 1)
+
+  let special_array_with_x_elements_greater_than_or_equal_x_array (nums: array int) : int
+    ensures { special_array_result nums result }
+  =
+    let result = find_special_candidate nums 0 in
+    if result = -1 then
+      result
+    else begin
+      assert { special_candidate nums result };
+      assert { forall x: int. special_candidate nums x -> x = result };
+      result
+    end
+
+end

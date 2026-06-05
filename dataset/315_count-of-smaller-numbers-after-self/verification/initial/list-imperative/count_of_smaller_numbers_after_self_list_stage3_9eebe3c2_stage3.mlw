@@ -1,0 +1,103 @@
+module CountOfSmallerNumbersAfterSelf_List_Stage3_Imperative
+
+  use int.Int
+  use list.List
+  use list.Length
+  use list.Reverse
+  use list.RevAppend
+  use ref.Ref
+
+  let rec function count_smaller_than (x: int) (l: list int) : int
+    variant { l }
+  =
+    match l with
+    | Nil -> 0
+    | Cons y ys -> (if y < x then 1 else 0) + count_smaller_than x ys
+    end
+
+  let rec function smaller_counts (nums: list int) : list int
+    variant { nums }
+  =
+    match nums with
+    | Nil -> Nil
+    | Cons x xs -> Cons (count_smaller_than x xs) (smaller_counts xs)
+    end
+
+  let reverse_list (l: list int) : list int
+    ensures { result = reverse l }
+  =
+    let cur = ref l in
+    let acc = ref Nil in
+    while (match !cur with Nil -> false | Cons _ _ -> true end) do
+      invariant { rev_append !cur !acc = rev_append l Nil }
+      variant { length !cur }
+
+      match !cur with
+      | Nil -> ()
+      | Cons x xs ->
+          acc := Cons x !acc;
+          cur := xs
+      end
+    done;
+    assert { !cur = Nil };
+    assert { rev_append Nil !acc = !acc };
+    assert { rev_append l Nil = reverse l };
+    !acc
+
+  let count_smaller_than_tail (x: int) (l: list int) : int
+    ensures { result = count_smaller_than x l }
+  =
+    let count = ref 0 in
+    let cur = ref l in
+    while (match !cur with Nil -> false | Cons _ _ -> true end) do
+      invariant { !count + count_smaller_than x !cur = count_smaller_than x l }
+      variant { length !cur }
+
+      match !cur with
+      | Nil -> ()
+      | Cons y ys ->
+          if y < x then begin
+            assert { count_smaller_than x (Cons y ys) = 1 + count_smaller_than x ys };
+            count := !count + 1
+          end else begin
+            assert { count_smaller_than x (Cons y ys) = count_smaller_than x ys }
+          end;
+          cur := ys
+      end
+    done;
+    assert { !cur = Nil };
+    assert { count_smaller_than x Nil = 0 };
+    !count
+
+  let count_of_smaller_numbers_after_self_list (nums: list int) : list int
+    ensures { result = smaller_counts nums }
+  =
+    let cur = ref nums in
+    let rev_result = ref Nil in
+    while (match !cur with Nil -> false | Cons _ _ -> true end) do
+      invariant { rev_append (smaller_counts !cur) !rev_result = rev_append (smaller_counts nums) Nil }
+      variant { length !cur }
+
+      match !cur with
+      | Nil -> ()
+      | Cons x xs ->
+          let count = count_smaller_than_tail x xs in
+          assert { count = count_smaller_than x xs };
+          assert { smaller_counts (Cons x xs) = Cons count (smaller_counts xs) };
+          assert { rev_append (smaller_counts (Cons x xs)) !rev_result =
+                   rev_append (smaller_counts xs) (Cons count !rev_result) };
+          rev_result := Cons count !rev_result;
+          cur := xs
+      end
+    done;
+    assert { !cur = Nil };
+    assert { smaller_counts Nil = Nil };
+    assert { rev_append Nil !rev_result = !rev_result };
+    assert { rev_append (smaller_counts nums) Nil = reverse (smaller_counts nums) };
+    assert { !rev_result = reverse (smaller_counts nums) };
+    let result = reverse_list !rev_result in
+    assert { result = reverse !rev_result };
+    assert { reverse (reverse (smaller_counts nums)) = smaller_counts nums };
+    result
+
+end

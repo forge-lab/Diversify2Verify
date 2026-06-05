@@ -1,0 +1,123 @@
+module MinimumAmountOfTimeToFillCups_Array_Spec
+
+  use int.Int
+  use int.MinMax
+  use array.Array
+  use array.Init
+  use array.ArraySum
+
+  predicate valid_amount (amount: array int) =
+    length amount = 3 /\
+    forall i: int. 0 <= i < length amount -> 0 <= amount[i] <= 100
+
+  function cups_total (amount: array int) : int =
+    ArraySum.sum amount 0 3
+
+  function largest_type_amount (amount: array int) : int =
+    max (amount[0]) (max (amount[1]) (amount[2]))
+
+  predicate feasible_time (amount: array int) (seconds: int) =
+    0 <= seconds /\
+    largest_type_amount amount <= seconds /\
+    cups_total amount <= 2 * seconds
+
+  predicate minimum_fill_time (amount: array int) (seconds: int) =
+    feasible_time amount seconds /\
+    forall other: int. feasible_time amount other -> seconds <= other
+
+  val minimum_amount_of_time_to_fill_cups_array (amount: array int) : int
+    requires { valid_amount amount }
+    ensures  { minimum_fill_time amount result }
+
+  let lemma test_000_python_assertions () =
+    let amount = init 3 [|33; 33; 34|] in
+    assert { length amount = 3 };
+    assert { amount[0] = 33 };
+    assert { amount[1] = 33 };
+    assert { amount[2] = 34 };
+    assert { valid_amount amount };
+    assert { cups_total amount = 100 };
+    assert { largest_type_amount amount = 34 };
+    assert { feasible_time amount 50 };
+    assert { forall other: int. feasible_time amount other -> 50 <= other };
+    assert { minimum_fill_time amount 50 }
+
+  let lemma test_001_python_assertions () =
+    let amount = init 3 [|0; 0; 0|] in
+    assert { length amount = 3 };
+    assert { amount[0] = 0 };
+    assert { amount[1] = 0 };
+    assert { amount[2] = 0 };
+    assert { valid_amount amount };
+    assert { cups_total amount = 0 };
+    assert { largest_type_amount amount = 0 };
+    assert { feasible_time amount 0 };
+    assert { forall other: int. feasible_time amount other -> 0 <= other };
+    assert { minimum_fill_time amount 0 }
+
+  let lemma test_002_python_assertions () =
+    let amount = init 3 [|99; 1; 1|] in
+    assert { length amount = 3 };
+    assert { amount[0] = 99 };
+    assert { amount[1] = 1 };
+    assert { amount[2] = 1 };
+    assert { valid_amount amount };
+    assert { cups_total amount = 101 };
+    assert { largest_type_amount amount = 99 };
+    assert { feasible_time amount 99 };
+    assert { forall other: int. feasible_time amount other -> 99 <= other };
+    assert { minimum_fill_time amount 99 }
+
+  let lemma test_005_python_assertions () =
+    let amount = init 3 [|1; 2; 3|] in
+    assert { length amount = 3 };
+    assert { amount[0] = 1 };
+    assert { amount[1] = 2 };
+    assert { amount[2] = 3 };
+    assert { valid_amount amount };
+    assert { cups_total amount = 6 };
+    assert { largest_type_amount amount = 3 };
+    assert { feasible_time amount 3 };
+    assert { forall other: int. feasible_time amount other -> 3 <= other };
+    assert { minimum_fill_time amount 3 }
+
+  let lemma test_007_python_assertions () =
+    let amount = init 3 [|100; 100; 100|] in
+    assert { length amount = 3 };
+    assert { amount[0] = 100 };
+    assert { amount[1] = 100 };
+    assert { amount[2] = 100 };
+    assert { valid_amount amount };
+    assert { cups_total amount = 300 };
+    assert { largest_type_amount amount = 100 };
+    assert { feasible_time amount 150 };
+    assert { forall other: int. feasible_time amount other -> 150 <= other };
+    assert { minimum_fill_time amount 150 }
+
+  let lemma test_013_python_assertions () =
+    let amount = init 3 [|5; 4; 4|] in
+    assert { length amount = 3 };
+    assert { amount[0] = 5 };
+    assert { amount[1] = 4 };
+    assert { amount[2] = 4 };
+    assert { valid_amount amount };
+    assert { cups_total amount = 13 };
+    assert { largest_type_amount amount = 5 };
+    assert { feasible_time amount 7 };
+    assert { forall other: int. feasible_time amount other -> 7 <= other };
+    assert { minimum_fill_time amount 7 }
+
+  let lemma test_177_python_assertions () =
+    let amount = init 3 [|10; 90; 10|] in
+    assert { length amount = 3 };
+    assert { amount[0] = 10 };
+    assert { amount[1] = 90 };
+    assert { amount[2] = 10 };
+    assert { valid_amount amount };
+    assert { cups_total amount = 110 };
+    assert { largest_type_amount amount = 90 };
+    assert { feasible_time amount 90 };
+    assert { forall other: int. feasible_time amount other -> 90 <= other };
+    assert { minimum_fill_time amount 90 }
+
+end

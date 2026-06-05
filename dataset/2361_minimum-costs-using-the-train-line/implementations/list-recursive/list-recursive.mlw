@@ -1,0 +1,229 @@
+module MinimumCostsUsingTheTrainLine_List_Recursive_Implementation
+
+  use int.Int
+  use int.MinMax
+  use list.List
+
+  let rec minimum_costs_from
+      (regular: list int) (express: list int) (expressCost: int)
+      (regular_so_far: int) (express_so_far: int) : list int
+    variant { regular }
+  =
+    match regular with
+    | Nil -> Nil
+    | Cons r rs ->
+        match express with
+        | Nil -> Nil
+        | Cons e es ->
+            let next_regular = (min regular_so_far express_so_far) + r in
+            let next_express = (min (regular_so_far + expressCost) express_so_far) + e in
+            Cons (min next_regular next_express)
+              (minimum_costs_from rs es expressCost next_regular next_express)
+        end
+    end
+
+  let minimum_costs_using_the_train_line_list
+      (regular: list int) (express: list int) (expressCost: int) : list int =
+    minimum_costs_from regular express expressCost 0 expressCost
+
+  let rec equal_int_list (xs: list int) (ys: list int) : bool
+    variant { xs }
+  =
+    match xs with
+    | Nil ->
+        match ys with
+        | Nil -> true
+        | Cons _ _ -> false
+        end
+    | Cons x xs' ->
+        match ys with
+        | Nil -> false
+        | Cons y ys' ->
+            if x = y then equal_int_list xs' ys' else false
+        end
+    end
+
+  let test_000 () : bool =
+    let regular = Cons 1 (Cons 1 (Cons 1 (Cons 1 Nil))) in
+    let express = Cons 1 (Cons 1 (Cons 1 (Cons 1 Nil))) in
+    let expected = Cons 1 (Cons 2 (Cons 3 (Cons 4 Nil))) in
+    let result = minimum_costs_using_the_train_line_list regular express 1 in
+    equal_int_list result expected
+
+  let test_001 () : bool =
+    let regular = Cons 10 (Cons 20 (Cons 30 Nil)) in
+    let express = Cons 5 (Cons 15 (Cons 25 Nil)) in
+    let expected = Cons 7 (Cons 22 (Cons 47 Nil)) in
+    let result = minimum_costs_using_the_train_line_list regular express 2 in
+    equal_int_list result expected
+
+  let test_002 () : bool =
+    let regular = Cons 2 (Cons 4 (Cons 6 (Cons 8 Nil))) in
+    let express = Cons 1 (Cons 3 (Cons 5 (Cons 7 Nil))) in
+    let expected = Cons 2 (Cons 6 (Cons 12 (Cons 20 Nil))) in
+    let result = minimum_costs_using_the_train_line_list regular express 10 in
+    equal_int_list result expected
+
+  let test_003 () : bool =
+    let regular = Cons 10 (Cons 20 (Cons 30 Nil)) in
+    let express = Cons 5 (Cons 15 (Cons 25 Nil)) in
+    let expected = Cons 10 (Cons 30 (Cons 55 Nil)) in
+    let result = minimum_costs_using_the_train_line_list regular express 10 in
+    equal_int_list result expected
+
+  let test_004 () : bool =
+    let regular = Cons 5 (Cons 5 (Cons 5 Nil)) in
+    let express = Cons 10 (Cons 10 (Cons 10 Nil)) in
+    let expected = Cons 5 (Cons 10 (Cons 15 Nil)) in
+    let result = minimum_costs_using_the_train_line_list regular express 1 in
+    equal_int_list result expected
+
+  let test_005 () : bool =
+    let regular = Cons 5 Nil in
+    let express = Cons 10 Nil in
+    let expected = Cons 5 Nil in
+    let result = minimum_costs_using_the_train_line_list regular express 7 in
+    equal_int_list result expected
+
+  let test_006 () : bool =
+    let regular = Cons 2 (Cons 4 (Cons 6 (Cons 8 Nil))) in
+    let express = Cons 1 (Cons 3 (Cons 5 (Cons 7 Nil))) in
+    let expected = Cons 2 (Cons 6 (Cons 12 (Cons 20 Nil))) in
+    let result = minimum_costs_using_the_train_line_list regular express 5 in
+    equal_int_list result expected
+
+  let test_007 () : bool =
+    let regular = Cons 1 (Cons 2 (Cons 3 (Cons 4 (Cons 5 Nil)))) in
+    let express = Cons 5 (Cons 4 (Cons 3 (Cons 2 (Cons 1 Nil)))) in
+    let expected = Cons 1 (Cons 3 (Cons 6 (Cons 10 (Cons 15 Nil)))) in
+    let result = minimum_costs_using_the_train_line_list regular express 10 in
+    equal_int_list result expected
+
+  let test_008 () : bool =
+    let regular = Cons 100 (Cons 200 (Cons 300 Nil)) in
+    let express = Cons 150 (Cons 250 (Cons 350 Nil)) in
+    let expected = Cons 100 (Cons 300 (Cons 600 Nil)) in
+    let result = minimum_costs_using_the_train_line_list regular express 10 in
+    equal_int_list result expected
+
+  let test_009 () : bool =
+    let regular = Cons 1 (Cons 6 (Cons 9 (Cons 5 Nil))) in
+    let express = Cons 5 (Cons 2 (Cons 3 (Cons 10 Nil))) in
+    let expected = Cons 1 (Cons 7 (Cons 14 (Cons 19 Nil))) in
+    let result = minimum_costs_using_the_train_line_list regular express 8 in
+    equal_int_list result expected
+
+  let test_010 () : bool =
+    let regular = Cons 5 (Cons 10 (Cons 15 Nil)) in
+    let express = Cons 3 (Cons 6 (Cons 9 Nil)) in
+    let expected = Cons 5 (Cons 14 (Cons 23 Nil)) in
+    let result = minimum_costs_using_the_train_line_list regular express 5 in
+    equal_int_list result expected
+
+  let test_011 () : bool =
+    let regular = Cons 3 (Cons 3 (Cons 3 Nil)) in
+    let express = Cons 1 (Cons 1 (Cons 1 Nil)) in
+    let expected = Cons 3 (Cons 6 (Cons 8 Nil)) in
+    let result = minimum_costs_using_the_train_line_list regular express 5 in
+    equal_int_list result expected
+
+  let test_012 () : bool =
+    let regular = Cons 10 (Cons 20 (Cons 30 Nil)) in
+    let express = Cons 15 (Cons 25 (Cons 35 Nil)) in
+    let expected = Cons 10 (Cons 30 (Cons 60 Nil)) in
+    let result = minimum_costs_using_the_train_line_list regular express 10 in
+    equal_int_list result expected
+
+  let test_013 () : bool =
+    let regular = Cons 3 (Cons 3 (Cons 3 Nil)) in
+    let express = Cons 4 (Cons 4 (Cons 4 Nil)) in
+    let expected = Cons 3 (Cons 6 (Cons 9 Nil)) in
+    let result = minimum_costs_using_the_train_line_list regular express 5 in
+    equal_int_list result expected
+
+  let test_014 () : bool =
+    let regular = Cons 11 (Cons 5 (Cons 13 Nil)) in
+    let express = Cons 7 (Cons 10 (Cons 6 Nil)) in
+    let expected = Cons 10 (Cons 15 (Cons 24 Nil)) in
+    let result = minimum_costs_using_the_train_line_list regular express 3 in
+    equal_int_list result expected
+
+  let test_015 () : bool =
+    let regular = Cons 5 (Cons 5 (Cons 5 (Cons 5 (Cons 5 (Cons 5 (Cons 5 (Cons 5 (Cons 5 (Cons 5 (Cons 5 (Cons 5 (Cons 5 (Cons 5 (Cons 5 Nil)))))))))))))) in
+    let express = Cons 3 (Cons 3 (Cons 3 (Cons 3 (Cons 3 (Cons 3 (Cons 3 (Cons 3 (Cons 3 (Cons 3 (Cons 3 (Cons 3 (Cons 3 (Cons 3 (Cons 3 Nil)))))))))))))) in
+    let expected = Cons 5 (Cons 10 (Cons 15 (Cons 20 (Cons 25 (Cons 28 (Cons 31 (Cons 34 (Cons 37 (Cons 40 (Cons 43 (Cons 46 (Cons 49 (Cons 52 (Cons 55 Nil)))))))))))))) in
+    let result = minimum_costs_using_the_train_line_list regular express 10 in
+    equal_int_list result expected
+
+  let test_016 () : bool =
+    let regular = Cons 100 (Cons 100 (Cons 100 (Cons 100 (Cons 100 (Cons 100 (Cons 100 (Cons 100 (Cons 100 (Cons 100 Nil))))))))) in
+    let express = Cons 1 (Cons 2 (Cons 3 (Cons 4 (Cons 5 (Cons 6 (Cons 7 (Cons 8 (Cons 9 (Cons 10 Nil))))))))) in
+    let expected = Cons 100 (Cons 153 (Cons 156 (Cons 160 (Cons 165 (Cons 171 (Cons 178 (Cons 186 (Cons 195 (Cons 205 Nil))))))))) in
+    let result = minimum_costs_using_the_train_line_list regular express 150 in
+    equal_int_list result expected
+
+  let test_017 () : bool =
+    let regular = Cons 100000 (Cons 100000 (Cons 100000 Nil)) in
+    let express = Cons 100000 (Cons 100000 (Cons 100000 Nil)) in
+    let expected = Cons 100000 (Cons 200000 (Cons 300000 Nil)) in
+    let result = minimum_costs_using_the_train_line_list regular express 1 in
+    equal_int_list result expected
+
+  let test_018 () : bool =
+    let regular = Cons 1 (Cons 3 (Cons 5 (Cons 7 (Cons 9 (Cons 11 (Cons 13 (Cons 15 (Cons 17 (Cons 19 Nil))))))))) in
+    let express = Cons 2 (Cons 4 (Cons 6 (Cons 8 (Cons 10 (Cons 12 (Cons 14 (Cons 16 (Cons 18 (Cons 20 Nil))))))))) in
+    let expected = Cons 1 (Cons 4 (Cons 9 (Cons 16 (Cons 25 (Cons 36 (Cons 49 (Cons 64 (Cons 81 (Cons 100 Nil))))))))) in
+    let result = minimum_costs_using_the_train_line_list regular express 100 in
+    equal_int_list result expected
+
+  let test_019 () : bool =
+    let regular = Cons 5 (Cons 5 (Cons 5 (Cons 5 (Cons 5 (Cons 5 (Cons 5 (Cons 5 (Cons 5 (Cons 5 (Cons 5 (Cons 5 (Cons 5 (Cons 5 (Cons 5 (Cons 5 (Cons 5 (Cons 5 (Cons 5 (Cons 5 Nil))))))))))))))))))) in
+    let express = Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 Nil))))))))))))))))))) in
+    let expected = Cons 5 (Cons 10 (Cons 13 (Cons 14 (Cons 15 (Cons 16 (Cons 17 (Cons 18 (Cons 19 (Cons 20 (Cons 21 (Cons 22 (Cons 23 (Cons 24 (Cons 25 (Cons 26 (Cons 27 (Cons 28 (Cons 29 (Cons 30 Nil))))))))))))))))))) in
+    let result = minimum_costs_using_the_train_line_list regular express 10 in
+    equal_int_list result expected
+
+  let run_tests () : bool =
+    if test_000 () then
+    if test_001 () then
+    if test_002 () then
+    if test_003 () then
+    if test_004 () then
+    if test_005 () then
+    if test_006 () then
+    if test_007 () then
+    if test_008 () then
+    if test_009 () then
+    if test_010 () then
+    if test_011 () then
+    if test_012 () then
+    if test_013 () then
+    if test_014 () then
+    if test_015 () then
+    if test_016 () then
+    if test_017 () then
+    if test_018 () then
+    if test_019 () then
+      true
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+
+end

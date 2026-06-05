@@ -1,0 +1,126 @@
+module MinimizeTheMaximumDifferenceOfPairs_Array_Stage3
+
+  use int.Int
+  use int.Abs
+  use int.EuclideanDivision
+  use array.Array
+  use array.Init
+  use list.List
+
+  predicate pair_within_threshold (nums: array int) (d: int) (i: int) (j: int) =
+    0 <= i < j < length nums /\ abs (nums[i] - nums[j]) <= d
+
+  predicate pair_arrays_disjoint (lefts: array int) (rights: array int) (p: int) =
+    forall k l: int.
+      0 <= k < p -> 0 <= l < p -> k <> l ->
+        lefts[k] <> lefts[l] /\
+        lefts[k] <> rights[l] /\
+        rights[k] <> lefts[l] /\
+        rights[k] <> rights[l]
+
+  predicate valid_pair_selection
+    (nums: array int) (p: int) (d: int) (lefts: array int) (rights: array int) =
+    0 <= p /\
+    0 <= d /\
+    length lefts = p /\
+    length rights = p /\
+    (forall k: int. 0 <= k < p -> pair_within_threshold nums d lefts[k] rights[k]) /\
+    pair_arrays_disjoint lefts rights p
+
+  predicate feasible_threshold (nums: array int) (p: int) (d: int) =
+    0 <= p /\
+    0 <= d /\
+    (p = 0 \/
+     exists lefts rights: array int. valid_pair_selection nums p d lefts rights)
+
+  predicate optimal_max_difference (nums: array int) (p: int) (r: int) =
+    0 <= r /\
+    feasible_threshold nums p r /\
+    (forall d: int. feasible_threshold nums p d -> r <= d)
+
+  let rec array_to_list (a: array int) (i: int) : list int
+    variant { length a - i }
+  =
+    if i >= length a then
+      Nil
+    else
+      Cons a[i] (array_to_list a (i + 1))
+
+  let rec insert_sorted (sorted_nums: list int) (x: int) : list int
+    variant { sorted_nums }
+  =
+    match sorted_nums with
+    | Nil -> Cons x Nil
+    | Cons y ys ->
+        if x <= y then
+          Cons x (Cons y ys)
+        else
+          Cons y (insert_sorted ys x)
+    end
+
+  let rec sort_list (nums: list int) : list int
+    variant { nums }
+  =
+    match nums with
+    | Nil -> Nil
+    | Cons x xs -> insert_sorted (sort_list xs) x
+    end
+
+  let rec last_of_sorted_from (sorted_nums: list int) (current: int) : int
+    variant { sorted_nums }
+  =
+    match sorted_nums with
+    | Nil -> current
+    | Cons x xs -> last_of_sorted_from xs x
+    end
+
+  let last_of_sorted (sorted_nums: list int) : int =
+    match sorted_nums with
+    | Nil -> 0
+    | Cons x xs -> last_of_sorted_from xs x
+    end
+
+  let rec count_pairs_with_bound (sorted_nums: list int) (d: int) : int
+    variant { sorted_nums }
+  =
+    match sorted_nums with
+    | Nil -> 0
+    | Cons _ Nil -> 0
+    | Cons x (Cons y ys) ->
+        if y - x <= d then
+          1 + count_pairs_with_bound ys d
+        else
+          count_pairs_with_bound (Cons y ys) d
+    end
+
+  let rec lower_bound_threshold (sorted_nums: list int) (p: int) (lo: int) (hi: int) : int
+    variant { hi - lo }
+  =
+    if lo >= hi then
+      lo
+    else
+      let mid = lo + div (hi - lo) 2 in
+      if count_pairs_with_bound sorted_nums mid >= p then
+        lower_bound_threshold sorted_nums p lo mid
+      else
+        lower_bound_threshold sorted_nums p (mid + 1) hi
+
+  let minimize_the_maximum_difference_of_pairs_array (nums: array int) (p: int) : int
+    requires { 1 <= length nums }
+    requires { 0 <= p }
+    requires { 2 * p <= length nums }
+    requires { forall i: int. 0 <= i < length nums -> 0 <= nums[i] <= 1000000000 }
+    ensures  { optimal_max_difference nums p result }
+  =
+    if p <= 0 then
+      0
+    else
+      let sorted_nums = sort_list (array_to_list nums 0) in
+      match sorted_nums with
+      | Nil -> 0
+      | Cons first _ ->
+          let hi = last_of_sorted sorted_nums - first in
+          lower_bound_threshold sorted_nums p 0 hi
+      end
+
+end

@@ -1,0 +1,204 @@
+== Stage 1: first prover on whole file ==
+Running in /Users/rubenm/Desktop/Diversify2Verify/codex-runs/dataset-merge/888_fair-candy-swap/stage3a/list-recursive/fair_candy_swap_list_stage3_575ef190/generated/why3/list: why3 session create -o /Users/rubenm/Desktop/Diversify2Verify/codex-runs/dataset-merge/888_fair-candy-swap/stage3a/list-recursive/fair_candy_swap_list_stage3_575ef190/generated/why3/list/.why3_sessions/fair_candy_swap_list_stage3_575ef190_stage3_stage1 -P Z3,4.8.6 -t 10 -m 8192 fair_candy_swap_list_stage3_575ef190_stage3.mlw
+Session created successfully
+Running in /Users/rubenm/Desktop/Diversify2Verify/codex-runs/dataset-merge/888_fair-candy-swap/stage3a/list-recursive/fair_candy_swap_list_stage3_575ef190/generated/why3/list: why3 bench /Users/rubenm/Desktop/Diversify2Verify/codex-runs/dataset-merge/888_fair-candy-swap/stage3a/list-recursive/fair_candy_swap_list_stage3_575ef190/generated/why3/list/.why3_sessions/fair_candy_swap_list_stage3_575ef190_stage3_stage1
+Progress: 5/1/0                       Progress: 4/2/0                       Progress: 3/3/0                       Progress: 2/4/0                       Progress: 1/5/0                       Progress: 0/6/0                       Progress: 0/1/2                       
+Replay completed, saving session... done
+== Stage 1 stats ==
+= Statistics for session /Users/rubenm/Desktop/Diversify2Verify/codex-runs/dataset-merge/888_fair-candy-swap/stage3a/list-recursive/fair_candy_swap_list_stage3_575ef190/generated/why3/list/.why3_sessions/fair_candy_swap_list_stage3_575ef190_stage3_stage1
+
+== Number of root goals ==
+  total: 6  proved: 4
+
+== Number of sub goals ==
+  total: 0  proved: 0
+
+== Goals not proved ==
+  +-- file [../../fair_candy_swap_list_stage3_575ef190_stage3.mlw]
+    +-- theory FairCandySwap_List_Spec
+      +-- goal contains'vc
+      +-- goal find_swap_from'vc
+  
+== Goals proved by only one prover ==
+  +-- file [../../fair_candy_swap_list_stage3_575ef190_stage3.mlw]
+    +-- theory FairCandySwap_List_Spec
+      +-- goal positive_sizes'vc: Z3 4.8.6
+      +-- goal make_pair'vc: Z3 4.8.6
+      +-- goal sum_list'vc: Z3 4.8.6
+      +-- goal fair_candy_swap_list'vc: Z3 4.8.6
+  
+1 session(s) read, with a total of 6 proof goals.
+== Unproved root goals after first prover ==
+FairCandySwap_List_Spec	contains'vc
+FairCandySwap_List_Spec	find_swap_from'vc
+== Stage 1: trying remaining goals with prover Alt-Ergo,2.4.0 ==
+---- stage1 | prover: Alt-Ergo,2.4.0 | theory: FairCandySwap_List_Spec | goal: contains'vc ----
+File fair_candy_swap_list_stage3_575ef190_stage3.mlw:
+Goal contains'vc.
+Prover result is: Valid (0.01s, 48 steps).
+Solved in stage 1 using prover: Alt-Ergo,2.4.0
+---- stage1 | prover: Alt-Ergo,2.4.0 | theory: FairCandySwap_List_Spec | goal: find_swap_from'vc ----
+File fair_candy_swap_list_stage3_575ef190_stage3.mlw:
+Goal find_swap_from'vc.
+Prover result is: Timeout (10.00s, 11369 steps).
+Remaining after prover Alt-Ergo,2.4.0: 1
+== Stage 1: trying remaining goals with prover CVC4,1.8 ==
+---- stage1 | prover: CVC4,1.8 | theory: FairCandySwap_List_Spec | goal: find_swap_from'vc ----
+File fair_candy_swap_list_stage3_575ef190_stage3.mlw:
+Goal find_swap_from'vc.
+Prover result is: Unknown (unknown + incomplete) (0.05s, 16819 steps).
+Remaining after prover CVC4,1.8: 1
+== Goals still unproved after stage 1 ==
+FairCandySwap_List_Spec	find_swap_from'vc
+== Stage 2: split_vc on unproved goal ==
+Target theory: FairCandySwap_List_Spec
+Target goal  : find_swap_from'vc
+---- stage2 | prover: Z3,4.8.6 | theory: FairCandySwap_List_Spec | goal: find_swap_from'vc ----
+Transforms: split_vc
+File "fair_candy_swap_list_stage3_575ef190_stage3.mlw", line 69, characters 8-14:
+Sub-goal Unreachable point of goal find_swap_from'vc.
+Prover result is: Valid (0.01s, 9969 steps).
+
+File "fair_candy_swap_list_stage3_575ef190_stage3.mlw", line 73, characters 19-35:
+Sub-goal Assertion of goal find_swap_from'vc.
+Prover result is: Timeout (10.00s, 154253455 steps).
+
+File "fair_candy_swap_list_stage3_575ef190_stage3.mlw", line 74, characters 19-33:
+Sub-goal Assertion of goal find_swap_from'vc.
+Prover result is: Valid (0.01s, 785 steps).
+
+File "fair_candy_swap_list_stage3_575ef190_stage3.mlw", line 77, characters 19-37:
+Sub-goal Assertion of goal find_swap_from'vc.
+Prover result is: Valid (0.01s, 1157 steps).
+
+File "fair_candy_swap_list_stage3_575ef190_stage3.mlw", line 78, characters 19-75:
+Sub-goal Assertion of goal find_swap_from'vc.
+Prover result is: Timeout (10.00s, 158328085 steps).
+
+File "fair_candy_swap_list_stage3_575ef190_stage3.mlw", line 79, characters 10-44:
+Sub-goal Variant decrease of goal find_swap_from'vc.
+Prover result is: Valid (0.01s, 13357 steps).
+
+File "fair_candy_swap_list_stage3_575ef190_stage3.mlw", line 79, characters 10-44:
+Sub-goal Precondition of goal find_swap_from'vc.
+Prover result is: Valid (0.01s, 11000 steps).
+
+File "fair_candy_swap_list_stage3_575ef190_stage3.mlw", line 62, character 15 to line 64, character 51:
+Sub-goal Postcondition of goal find_swap_from'vc.
+Prover result is: Valid (4.94s, 90443319 steps).
+---- stage2 | prover: Alt-Ergo,2.4.0 | theory: FairCandySwap_List_Spec | goal: find_swap_from'vc ----
+Transforms: split_vc
+File "fair_candy_swap_list_stage3_575ef190_stage3.mlw", line 69, characters 8-14:
+Sub-goal Unreachable point of goal find_swap_from'vc.
+Prover result is: Valid (0.01s, 14 steps).
+
+File "fair_candy_swap_list_stage3_575ef190_stage3.mlw", line 73, characters 19-35:
+Sub-goal Assertion of goal find_swap_from'vc.
+Prover result is: Valid (0.01s, 10 steps).
+
+File "fair_candy_swap_list_stage3_575ef190_stage3.mlw", line 74, characters 19-33:
+Sub-goal Assertion of goal find_swap_from'vc.
+Prover result is: Valid (0.01s, 10 steps).
+
+File "fair_candy_swap_list_stage3_575ef190_stage3.mlw", line 77, characters 19-37:
+Sub-goal Assertion of goal find_swap_from'vc.
+Prover result is: Valid (0.01s, 10 steps).
+
+File "fair_candy_swap_list_stage3_575ef190_stage3.mlw", line 78, characters 19-75:
+Sub-goal Assertion of goal find_swap_from'vc.
+Prover result is: Timeout (10.00s, 16842 steps).
+
+File "fair_candy_swap_list_stage3_575ef190_stage3.mlw", line 79, characters 10-44:
+Sub-goal Variant decrease of goal find_swap_from'vc.
+Prover result is: Valid (0.01s, 43 steps).
+
+File "fair_candy_swap_list_stage3_575ef190_stage3.mlw", line 79, characters 10-44:
+Sub-goal Precondition of goal find_swap_from'vc.
+Prover result is: Valid (0.01s, 14 steps).
+
+File "fair_candy_swap_list_stage3_575ef190_stage3.mlw", line 62, character 15 to line 64, character 51:
+Sub-goal Postcondition of goal find_swap_from'vc.
+Prover result is: Valid (0.06s, 1504 steps).
+---- stage2 | prover: CVC4,1.8 | theory: FairCandySwap_List_Spec | goal: find_swap_from'vc ----
+Transforms: split_vc
+File "fair_candy_swap_list_stage3_575ef190_stage3.mlw", line 69, characters 8-14:
+Sub-goal Unreachable point of goal find_swap_from'vc.
+Prover result is: Valid (0.01s, 2065 steps).
+
+File "fair_candy_swap_list_stage3_575ef190_stage3.mlw", line 73, characters 19-35:
+Sub-goal Assertion of goal find_swap_from'vc.
+Prover result is: Valid (0.01s, 2103 steps).
+
+File "fair_candy_swap_list_stage3_575ef190_stage3.mlw", line 74, characters 19-33:
+Sub-goal Assertion of goal find_swap_from'vc.
+Prover result is: Valid (0.01s, 1989 steps).
+
+File "fair_candy_swap_list_stage3_575ef190_stage3.mlw", line 77, characters 19-37:
+Sub-goal Assertion of goal find_swap_from'vc.
+Prover result is: Valid (0.01s, 2010 steps).
+
+File "fair_candy_swap_list_stage3_575ef190_stage3.mlw", line 78, characters 19-75:
+Sub-goal Assertion of goal find_swap_from'vc.
+Prover result is: Unknown (unknown + incomplete) (0.01s, 2982 steps).
+
+File "fair_candy_swap_list_stage3_575ef190_stage3.mlw", line 79, characters 10-44:
+Sub-goal Variant decrease of goal find_swap_from'vc.
+Prover result is: Valid (0.01s, 2650 steps).
+
+File "fair_candy_swap_list_stage3_575ef190_stage3.mlw", line 79, characters 10-44:
+Sub-goal Precondition of goal find_swap_from'vc.
+Prover result is: Valid (0.01s, 2165 steps).
+
+File "fair_candy_swap_list_stage3_575ef190_stage3.mlw", line 62, character 15 to line 64, character 51:
+Sub-goal Postcondition of goal find_swap_from'vc.
+Prover result is: Unknown (unknown + incomplete) (0.02s, 4227 steps).
+== Goals still unproved after stage 2 (split_vc) ==
+FairCandySwap_List_Spec	find_swap_from'vc
+== Stage 3: split_vc + inline_all on still-unproved goal ==
+Target theory: FairCandySwap_List_Spec
+Target goal  : find_swap_from'vc
+---- stage3 | prover: Z3,4.8.6 | theory: FairCandySwap_List_Spec | goal: find_swap_from'vc ----
+Transforms: split_vc inline_all
+File "fair_candy_swap_list_stage3_575ef190_stage3.mlw", line 69, characters 8-14:
+Sub-goal Unreachable point of goal find_swap_from'vc.
+Prover result is: Valid (0.01s, 8876 steps).
+
+File "fair_candy_swap_list_stage3_575ef190_stage3.mlw", line 73, characters 19-35:
+Sub-goal Assertion of goal find_swap_from'vc.
+Prover result is: Valid (0.14s, 1877410 steps).
+
+File "fair_candy_swap_list_stage3_575ef190_stage3.mlw", line 74, characters 19-33:
+Sub-goal Assertion of goal find_swap_from'vc.
+Prover result is: Valid (0.01s, 768 steps).
+
+File "fair_candy_swap_list_stage3_575ef190_stage3.mlw", line 77, characters 19-37:
+Sub-goal Assertion of goal find_swap_from'vc.
+Prover result is: Valid (0.01s, 1134 steps).
+
+File "fair_candy_swap_list_stage3_575ef190_stage3.mlw", line 78, characters 19-75:
+Sub-goal Assertion of goal find_swap_from'vc.
+Prover result is: Valid (1.62s, 28908479 steps).
+
+File "fair_candy_swap_list_stage3_575ef190_stage3.mlw", line 79, characters 10-44:
+Sub-goal Variant decrease of goal find_swap_from'vc.
+Prover result is: Valid (0.01s, 13844 steps).
+
+File "fair_candy_swap_list_stage3_575ef190_stage3.mlw", line 79, characters 10-44:
+Sub-goal Precondition of goal find_swap_from'vc.
+Prover result is: Valid (0.01s, 11863 steps).
+
+File "fair_candy_swap_list_stage3_575ef190_stage3.mlw", line 62, character 15 to line 64, character 51:
+Sub-goal Postcondition of goal find_swap_from'vc.
+Prover result is: Valid (0.30s, 4683263 steps).
+Solved with split_vc + inline_all using prover: Z3,4.8.6
+== Final summary ==
+Unproved root goals after first prover : 1
+Remaining failures after split_vc      : 1
+Remaining failures after stage 3       : 0
+Detailed logs stored in                : /Users/rubenm/Desktop/Diversify2Verify/codex-runs/dataset-merge/888_fair-candy-swap/stage3a/list-recursive/fair_candy_swap_list_stage3_575ef190/generated/why3/list/.why3_sessions/fair_candy_swap_list_stage3_575ef190_stage3_logs
+VERIFY_RESULT: SUCCESS
+VERIFY_REASON: proved_after_stage3
+VERIFY_STAGE: stage3
+VERIFY_ROOT_TOTAL: 6
+VERIFY_ROOT_PROVED: 6
+VERIFY_ROOT_REMAINING: 0

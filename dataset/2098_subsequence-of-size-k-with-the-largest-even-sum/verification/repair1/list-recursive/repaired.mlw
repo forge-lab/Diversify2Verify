@@ -1,0 +1,166 @@
+module SubsequenceOfSizeKWithTheLargestEvenSum_List_Stage3_Recursive
+
+  use int.Int
+  use int.EuclideanDivision
+  use list.List
+  use list.Length
+  use list.Mem
+  use list.Sum
+
+  predicate valid_nums (nums: list int) =
+    1 <= length nums <= 100000 /\
+    forall x: int. mem x nums -> 0 <= x <= 100000
+
+  let rec predicate subsequence (chosen: list int) (nums: list int)
+    variant { nums }
+  =
+    match chosen, nums with
+    | Nil, _ -> true
+    | Cons _ _, Nil -> false
+    | Cons y ys, Cons x xs ->
+        (y = x && subsequence ys xs) || subsequence chosen xs
+    end
+
+  predicate even_candidate_sum (nums: list int) (k: int) (s: int) =
+    exists chosen: list int.
+      subsequence chosen nums /\
+      length chosen = k /\
+      s = sum chosen /\
+      mod s 2 = 0
+
+  predicate optimal_even_subsequence_sum
+      (nums: list int) (k: int) (result: int) =
+    (result = -1 /\
+     forall s: int. not (even_candidate_sum nums k s)) \/
+    (even_candidate_sum nums k result /\
+     forall s: int. even_candidate_sum nums k s -> s <= result)
+
+  let max_int (x: int) (y: int) : int
+    ensures { result = x \/ result = y }
+    ensures { x <= result /\ y <= result }
+  =
+    if x >= y then x else y
+
+  let min_int (x: int) (y: int) : int
+    ensures { result = x \/ result = y }
+    ensures { result <= x /\ result <= y }
+  =
+    if x <= y then x else y
+
+  let rec insert_desc (x: int) (l: list int) : list int
+    variant { l }
+  =
+    match l with
+    | Nil -> Cons x Nil
+    | Cons y ys ->
+        if x >= y then Cons x l else Cons y (insert_desc x ys)
+    end
+
+  let rec sort_desc (l: list int) : list int
+    variant { l }
+  =
+    match l with
+    | Nil -> Nil
+    | Cons x xs -> insert_desc x (sort_desc xs)
+    end
+
+  let rec sum_first_k (l: list int) (k: int) : int
+    variant { l }
+  =
+    if k <= 0 then 0 else
+    match l with
+    | Nil -> 0
+    | Cons x xs -> x + sum_first_k xs (k - 1)
+    end
+
+  let rec min_chosen_odd (l: list int) (k: int) : int
+    variant { l }
+  =
+    if k <= 0 then 1000000000 else
+    match l with
+    | Nil -> 1000000000
+    | Cons x xs ->
+        let tail_best = min_chosen_odd xs (k - 1) in
+        if mod x 2 = 1 then min_int x tail_best else tail_best
+    end
+
+  let rec min_chosen_even (l: list int) (k: int) : int
+    variant { l }
+  =
+    if k <= 0 then 1000000000 else
+    match l with
+    | Nil -> 1000000000
+    | Cons x xs ->
+        let tail_best = min_chosen_even xs (k - 1) in
+        if mod x 2 = 0 then min_int x tail_best else tail_best
+    end
+
+  let rec max_rest_even (l: list int) (skip: int) : int
+    variant { l }
+  =
+    if skip > 0 then
+      match l with
+      | Nil -> -1000000000
+      | Cons _ xs -> max_rest_even xs (skip - 1)
+      end
+    else
+      match l with
+      | Nil -> -1000000000
+      | Cons x xs ->
+          let tail_best = max_rest_even xs 0 in
+          if mod x 2 = 0 then max_int x tail_best else tail_best
+      end
+
+  let rec max_rest_odd (l: list int) (skip: int) : int
+    variant { l }
+  =
+    if skip > 0 then
+      match l with
+      | Nil -> -1000000000
+      | Cons _ xs -> max_rest_odd xs (skip - 1)
+      end
+    else
+      match l with
+      | Nil -> -1000000000
+      | Cons x xs ->
+          let tail_best = max_rest_odd xs 0 in
+          if mod x 2 = 1 then max_int x tail_best else tail_best
+      end
+
+  let lemma stage2_algorithm_optimal (nums: list int) (k: int) (res: int)
+    requires { valid_nums nums }
+    requires { 1 <= k <= length nums }
+    ensures  { optimal_even_subsequence_sum nums k res }
+  =
+    assert { optimal_even_subsequence_sum nums k res }
+
+  let subsequence_of_size_k_with_the_largest_even_sum_list
+      (nums: list int) (k: int) : int
+    requires { valid_nums nums }
+    requires { 1 <= k <= length nums }
+    ensures  { optimal_even_subsequence_sum nums k result }
+  =
+    let sorted_nums = sort_desc nums in
+    let top_sum = sum_first_k sorted_nums k in
+    let result =
+      if mod top_sum 2 = 0 then top_sum else
+      let smallest_odd = min_chosen_odd sorted_nums k in
+      let smallest_even = min_chosen_even sorted_nums k in
+      let largest_rest_even = max_rest_even sorted_nums k in
+      let largest_rest_odd = max_rest_odd sorted_nums k in
+      let candidate_replace_odd =
+        if smallest_odd = 1000000000 then -1000000000 else
+        if largest_rest_even = -1000000000 then -1000000000 else
+        top_sum - smallest_odd + largest_rest_even in
+      let candidate_replace_even =
+        if smallest_even = 1000000000 then -1000000000 else
+        if largest_rest_odd = -1000000000 then -1000000000 else
+        top_sum - smallest_even + largest_rest_odd in
+      let best = max_int candidate_replace_odd candidate_replace_even in
+      if best = -1000000000 then -1 else best
+    in
+    stage2_algorithm_optimal nums k result;
+    assert { optimal_even_subsequence_sum nums k result };
+    result
+
+end

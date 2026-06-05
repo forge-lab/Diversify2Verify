@@ -1,0 +1,192 @@
+module ContainerWithMostWater_List_Stage3_Imperative
+
+  use int.Int
+  use int.MinMax
+  use list.List
+  use list.Length
+  use list.Mem
+  use list.NthNoOpt
+  use ref.Ref
+
+  predicate valid_pair (height: list int) (i: int) (j: int) =
+    0 <= i /\ i < j /\ j < length height
+
+  function water_area (height: list int) (i: int) (j: int) : int =
+    (j - i) * min (nth i height) (nth j height)
+
+  predicate max_container_area (height: list int) (m: int) =
+    0 <= m /\
+    (exists i: int. exists j: int.
+       valid_pair height i j /\ m = water_area height i j) /\
+    (forall i: int. forall j: int.
+       valid_pair height i j -> water_area height i j <= m)
+
+  let rec function drop (n: int) (l: list int) : list int
+    variant { l }
+  =
+    if n <= 0 then l else
+    match l with
+    | Nil -> Nil
+    | Cons _ r -> drop (n - 1) r
+    end
+
+  let rec lemma nth_drop_head (height: list int) (idx: int) (x: int) (xs: list int)
+    requires { 0 <= idx }
+    requires { drop idx height = Cons x xs }
+    ensures  { nth idx height = x }
+    variant  { height }
+  =
+    if idx = 0 then
+      assert { nth idx height = nth 0 (Cons x xs) }
+    else
+      match height with
+      | Nil -> absurd
+      | Cons _ tail ->
+          assert { drop (idx - 1) tail = Cons x xs };
+          nth_drop_head tail (idx - 1) x xs;
+          assert { nth idx height = nth (idx - 1) tail }
+      end
+
+  let rec lemma drop_succ_tail (height: list int) (idx: int) (x: int) (xs: list int)
+    requires { 0 <= idx }
+    requires { drop idx height = Cons x xs }
+    ensures  { drop (idx + 1) height = xs }
+    variant  { height }
+  =
+    if idx = 0 then
+      assert { drop (idx + 1) height = xs }
+    else
+      match height with
+      | Nil -> absurd
+      | Cons _ tail ->
+          assert { drop (idx - 1) tail = Cons x xs };
+          drop_succ_tail tail (idx - 1) x xs;
+          assert { drop (idx + 1) height = drop idx tail }
+      end
+
+  let min_int (a: int) (b: int) : int
+    ensures { result = min a b }
+    ensures { result <= a /\ result <= b }
+    ensures { result = a \/ result = b }
+  =
+    if a <= b then a else b
+
+  let container_with_most_water_list (height: list int) : int
+    requires { 2 <= length height }
+    requires { forall x: int. mem x height -> 0 <= x }
+    ensures  { max_container_area height result }
+    ensures  { 0 <= result }
+  =
+    let best = ref 0 in
+    let left_idx = ref 0 in
+    let left_cur = ref height in
+    while (match !left_cur with Cons _ (Cons _ _) -> true | _ -> false end) do
+      invariant { 0 <= !best }
+      invariant { 0 <= !left_idx }
+      invariant { !left_idx + length !left_cur = length height }
+      invariant { !left_cur = drop !left_idx height }
+      invariant {
+        !best = 0 \/
+        (exists i: int. exists j: int.
+           valid_pair height i j /\ !best = water_area height i j)
+      }
+      invariant {
+        forall i: int. forall j: int.
+          valid_pair height i j /\ i < !left_idx -> water_area height i j <= !best
+      }
+      variant { length !left_cur }
+      match !left_cur with
+      | Nil -> ()
+      | Cons left left_tail ->
+          assert { !left_cur = Cons left left_tail };
+          nth_drop_head height !left_idx left left_tail;
+          drop_succ_tail height !left_idx left left_tail;
+          assert { nth !left_idx height = left };
+          assert { left_tail = drop (!left_idx + 1) height };
+          let right_idx = ref (!left_idx + 1) in
+          let right_cur = ref left_tail in
+          while (match !right_cur with Nil -> false | Cons _ _ -> true end) do
+            invariant { 0 <= !best }
+            invariant { 0 <= !left_idx < !right_idx }
+            invariant { !right_idx + length !right_cur = length height }
+            invariant { nth !left_idx height = left }
+            invariant { !right_cur = drop !right_idx height }
+            invariant {
+              !best = 0 \/
+              (exists i: int. exists j: int.
+                 valid_pair height i j /\ !best = water_area height i j)
+            }
+            invariant {
+              forall i: int. forall j: int.
+                valid_pair height i j /\ i < !left_idx -> water_area height i j <= !best
+            }
+            invariant {
+              forall j: int.
+                valid_pair height !left_idx j /\ j < !right_idx ->
+                water_area height !left_idx j <= !best
+            }
+            variant { length !right_cur }
+            match !right_cur with
+            | Nil -> ()
+            | Cons right right_tail ->
+                let area = (!right_idx - !left_idx) * min_int left right in
+                assert { !right_cur = Cons right right_tail };
+                nth_drop_head height !right_idx right right_tail;
+                drop_succ_tail height !right_idx right right_tail;
+                assert { nth !right_idx height = right };
+                assert { area = (!right_idx - !left_idx) * min left right };
+                assert {
+                  area =
+                  (!right_idx - !left_idx) *
+                  min (nth !left_idx height) (nth !right_idx height)
+                };
+                assert { area = water_area height !left_idx !right_idx };
+                assert { valid_pair height !left_idx !right_idx };
+                let old_best = !best in
+                if area > !best then best := area;
+                assert { old_best <= !best };
+                assert { area <= !best };
+                assert {
+                  forall i: int. forall j: int.
+                    valid_pair height i j /\ i < !left_idx ->
+                    water_area height i j <= !best
+                };
+                assert {
+                  forall j: int.
+                    valid_pair height !left_idx j /\ j < !right_idx + 1 ->
+                    water_area height !left_idx j <= !best
+                };
+                assert { right_tail = drop (!right_idx + 1) height };
+                right_idx := !right_idx + 1;
+                right_cur := right_tail;
+                assert { !right_cur = drop !right_idx height }
+            end
+          done;
+          assert { !right_cur = Nil };
+          assert {
+            forall j: int.
+              valid_pair height !left_idx j -> water_area height !left_idx j <= !best
+          };
+          assert {
+            forall i: int. forall j: int.
+              valid_pair height i j /\ i < !left_idx + 1 ->
+              water_area height i j <= !best
+          };
+          assert { left_tail = drop (!left_idx + 1) height };
+          left_idx := !left_idx + 1;
+          left_cur := left_tail;
+          assert { !left_cur = drop !left_idx height }
+      end
+    done;
+    assert { !left_cur = Nil \/ exists x: int. !left_cur = Cons x Nil };
+    assert {
+      forall i: int. forall j: int.
+        valid_pair height i j -> water_area height i j <= !best
+    };
+    assert {
+      exists i: int. exists j: int.
+        valid_pair height i j /\ !best = water_area height i j
+    };
+    !best
+
+end

@@ -1,0 +1,164 @@
+== Stage 1: first prover on whole file ==
+Running in /Users/rubenm/Desktop/Diversify2Verify/codex-runs/repair2-split2/stage3a-rerepair/1425_constrained-subsequence-sum/list-recursive/constrained_subsequence_sum_list_stage3_a348e800_stage3/repaired/generated/why3: why3 session create -o /Users/rubenm/Desktop/Diversify2Verify/codex-runs/repair2-split2/stage3a-rerepair/1425_constrained-subsequence-sum/list-recursive/constrained_subsequence_sum_list_stage3_a348e800_stage3/repaired/generated/why3/.why3_sessions/repaired_stage1 -P Z3,4.8.6 -t 10 -m 8192 repaired.mlw
+Session created successfully
+Running in /Users/rubenm/Desktop/Diversify2Verify/codex-runs/repair2-split2/stage3a-rerepair/1425_constrained-subsequence-sum/list-recursive/constrained_subsequence_sum_list_stage3_a348e800_stage3/repaired/generated/why3: why3 bench /Users/rubenm/Desktop/Diversify2Verify/codex-runs/repair2-split2/stage3a-rerepair/1425_constrained-subsequence-sum/list-recursive/constrained_subsequence_sum_list_stage3_a348e800_stage3/repaired/generated/why3/.why3_sessions/repaired_stage1
+Progress: 12/1/0                       Progress: 11/2/0                       Progress: 10/3/0                       Progress: 9/4/0                       Progress: 8/5/0                       Progress: 7/6/0                       Progress: 7/0/0                       Progress: 6/1/0                       Progress: 5/2/0                       Progress: 4/3/0                       Progress: 3/4/0                       Progress: 2/5/0                       Progress: 1/6/0                       Progress: 1/3/2                       Progress: 0/4/2                       Progress: 0/0/2                       
+Replay completed, saving session... done
+== Stage 1 stats ==
+= Statistics for session /Users/rubenm/Desktop/Diversify2Verify/codex-runs/repair2-split2/stage3a-rerepair/1425_constrained-subsequence-sum/list-recursive/constrained_subsequence_sum_list_stage3_a348e800_stage3/repaired/generated/why3/.why3_sessions/repaired_stage1
+
+== Number of root goals ==
+  total: 13  proved: 9
+
+== Number of sub goals ==
+  total: 0  proved: 0
+
+== Goals not proved ==
+  +-- file [../../repaired.mlw]
+    +-- theory ConstrainedSubsequenceSum_List_Spec
+      +-- goal css_model_feasible'vc
+      +-- goal css_model_optimal'vc
+      +-- goal solve'vc
+      +-- goal constrained_subsequence_sum_list'vc
+  
+== Goals proved by only one prover ==
+  +-- file [../../repaired.mlw]
+    +-- theory ConstrainedSubsequenceSum_List_Spec
+      +-- goal constrained_tail_sum'vc: Z3 4.8.6
+      +-- goal constrained_nonempty_sum'vc: Z3 4.8.6
+      +-- goal imax_left_bound'vc: Z3 4.8.6
+      +-- goal imax_right_bound'vc: Z3 4.8.6
+      +-- goal imax_upper_bound'vc: Z3 4.8.6
+      +-- goal max_recent_or_zero_model'vc: Z3 4.8.6
+      +-- goal solve_model'vc: Z3 4.8.6
+      +-- goal css_model_correct'vc: Z3 4.8.6
+      +-- goal max_recent_or_zero'vc: Z3 4.8.6
+  
+1 session(s) read, with a total of 13 proof goals.
+== Unproved root goals after first prover ==
+ConstrainedSubsequenceSum_List_Spec	css_model_feasible'vc
+ConstrainedSubsequenceSum_List_Spec	css_model_optimal'vc
+ConstrainedSubsequenceSum_List_Spec	solve'vc
+ConstrainedSubsequenceSum_List_Spec	constrained_subsequence_sum_list'vc
+== Stage 1: trying remaining goals with prover Alt-Ergo,2.4.0 ==
+---- stage1 | prover: Alt-Ergo,2.4.0 | theory: ConstrainedSubsequenceSum_List_Spec | goal: css_model_feasible'vc ----
+File repaired.mlw:
+Goal css_model_feasible'vc.
+Prover result is: Timeout (10.00s, 18514 steps).
+---- stage1 | prover: Alt-Ergo,2.4.0 | theory: ConstrainedSubsequenceSum_List_Spec | goal: css_model_optimal'vc ----
+File repaired.mlw:
+Goal css_model_optimal'vc.
+Prover result is: Timeout (10.00s, 20058 steps).
+---- stage1 | prover: Alt-Ergo,2.4.0 | theory: ConstrainedSubsequenceSum_List_Spec | goal: solve'vc ----
+File repaired.mlw:
+Goal solve'vc.
+Prover result is: Valid (0.01s, 222 steps).
+Solved in stage 1 using prover: Alt-Ergo,2.4.0
+---- stage1 | prover: Alt-Ergo,2.4.0 | theory: ConstrainedSubsequenceSum_List_Spec | goal: constrained_subsequence_sum_list'vc ----
+File repaired.mlw:
+Goal constrained_subsequence_sum_list'vc.
+Prover result is: Valid (0.01s, 200 steps).
+Solved in stage 1 using prover: Alt-Ergo,2.4.0
+Remaining after prover Alt-Ergo,2.4.0: 2
+== Stage 1: trying remaining goals with prover CVC4,1.8 ==
+---- stage1 | prover: CVC4,1.8 | theory: ConstrainedSubsequenceSum_List_Spec | goal: css_model_feasible'vc ----
+File repaired.mlw:
+Goal css_model_feasible'vc.
+Prover result is: Unknown (unknown + incomplete) (0.02s, 3925 steps).
+---- stage1 | prover: CVC4,1.8 | theory: ConstrainedSubsequenceSum_List_Spec | goal: css_model_optimal'vc ----
+File repaired.mlw:
+Goal css_model_optimal'vc.
+Prover result is: Unknown (unknown + incomplete) (0.02s, 4232 steps).
+Remaining after prover CVC4,1.8: 2
+== Goals still unproved after stage 1 ==
+ConstrainedSubsequenceSum_List_Spec	css_model_feasible'vc
+ConstrainedSubsequenceSum_List_Spec	css_model_optimal'vc
+== Stage 2: split_vc on unproved goal ==
+Target theory: ConstrainedSubsequenceSum_List_Spec
+Target goal  : css_model_feasible'vc
+---- stage2 | prover: Z3,4.8.6 | theory: ConstrainedSubsequenceSum_List_Spec | goal: css_model_feasible'vc ----
+Transforms: split_vc
+File "repaired.mlw", line 78, characters 15-65:
+Sub-goal Postcondition of goal css_model_feasible'vc.
+Prover result is: Timeout (10.00s, 41239795 steps).
+---- stage2 | prover: Alt-Ergo,2.4.0 | theory: ConstrainedSubsequenceSum_List_Spec | goal: css_model_feasible'vc ----
+Transforms: split_vc
+File "repaired.mlw", line 78, characters 15-65:
+Sub-goal Postcondition of goal css_model_feasible'vc.
+Prover result is: Timeout (10.00s, 17645 steps).
+---- stage2 | prover: CVC4,1.8 | theory: ConstrainedSubsequenceSum_List_Spec | goal: css_model_feasible'vc ----
+Transforms: split_vc
+File "repaired.mlw", line 78, characters 15-65:
+Sub-goal Postcondition of goal css_model_feasible'vc.
+Prover result is: Unknown (unknown + incomplete) (0.02s, 3819 steps).
+== Stage 2: split_vc on unproved goal ==
+Target theory: ConstrainedSubsequenceSum_List_Spec
+Target goal  : css_model_optimal'vc
+---- stage2 | prover: Z3,4.8.6 | theory: ConstrainedSubsequenceSum_List_Spec | goal: css_model_optimal'vc ----
+Transforms: split_vc
+File "repaired.mlw", line 84, characters 67-88:
+Sub-goal Postcondition of goal css_model_optimal'vc.
+Prover result is: Timeout (10.00s, 30485708 steps).
+---- stage2 | prover: Alt-Ergo,2.4.0 | theory: ConstrainedSubsequenceSum_List_Spec | goal: css_model_optimal'vc ----
+Transforms: split_vc
+File "repaired.mlw", line 84, characters 67-88:
+Sub-goal Postcondition of goal css_model_optimal'vc.
+Prover result is: Timeout (10.00s, 20399 steps).
+---- stage2 | prover: CVC4,1.8 | theory: ConstrainedSubsequenceSum_List_Spec | goal: css_model_optimal'vc ----
+Transforms: split_vc
+File "repaired.mlw", line 84, characters 67-88:
+Sub-goal Postcondition of goal css_model_optimal'vc.
+Prover result is: Unknown (unknown + incomplete) (0.02s, 4032 steps).
+== Goals still unproved after stage 2 (split_vc) ==
+ConstrainedSubsequenceSum_List_Spec	css_model_feasible'vc
+ConstrainedSubsequenceSum_List_Spec	css_model_optimal'vc
+== Stage 3: split_vc + inline_all on still-unproved goal ==
+Target theory: ConstrainedSubsequenceSum_List_Spec
+Target goal  : css_model_feasible'vc
+---- stage3 | prover: Z3,4.8.6 | theory: ConstrainedSubsequenceSum_List_Spec | goal: css_model_feasible'vc ----
+Transforms: split_vc inline_all
+File "repaired.mlw", line 78, characters 15-65:
+Sub-goal Postcondition of goal css_model_feasible'vc.
+Prover result is: Timeout (10.00s, 27673458 steps).
+---- stage3 | prover: Alt-Ergo,2.4.0 | theory: ConstrainedSubsequenceSum_List_Spec | goal: css_model_feasible'vc ----
+Transforms: split_vc inline_all
+File "repaired.mlw", line 78, characters 15-65:
+Sub-goal Postcondition of goal css_model_feasible'vc.
+Prover result is: Timeout (10.00s, 269661 steps).
+---- stage3 | prover: CVC4,1.8 | theory: ConstrainedSubsequenceSum_List_Spec | goal: css_model_feasible'vc ----
+Transforms: split_vc inline_all
+File "repaired.mlw", line 78, characters 15-65:
+Sub-goal Postcondition of goal css_model_feasible'vc.
+Prover result is: Unknown (unknown + incomplete) (0.02s, 5413 steps).
+== Stage 3: split_vc + inline_all on still-unproved goal ==
+Target theory: ConstrainedSubsequenceSum_List_Spec
+Target goal  : css_model_optimal'vc
+---- stage3 | prover: Z3,4.8.6 | theory: ConstrainedSubsequenceSum_List_Spec | goal: css_model_optimal'vc ----
+Transforms: split_vc inline_all
+File "repaired.mlw", line 84, characters 67-88:
+Sub-goal Postcondition of goal css_model_optimal'vc.
+Prover result is: Timeout (10.00s, 24681138 steps).
+---- stage3 | prover: Alt-Ergo,2.4.0 | theory: ConstrainedSubsequenceSum_List_Spec | goal: css_model_optimal'vc ----
+Transforms: split_vc inline_all
+File "repaired.mlw", line 84, characters 67-88:
+Sub-goal Postcondition of goal css_model_optimal'vc.
+Prover result is: Timeout (10.00s, 297488 steps).
+---- stage3 | prover: CVC4,1.8 | theory: ConstrainedSubsequenceSum_List_Spec | goal: css_model_optimal'vc ----
+Transforms: split_vc inline_all
+File "repaired.mlw", line 84, characters 67-88:
+Sub-goal Postcondition of goal css_model_optimal'vc.
+Prover result is: Unknown (unknown + incomplete) (0.02s, 5831 steps).
+== Final summary ==
+Unproved root goals after first prover : 2
+Remaining failures after split_vc      : 2
+Remaining failures after stage 3       : 2
+Detailed logs stored in                : /Users/rubenm/Desktop/Diversify2Verify/codex-runs/repair2-split2/stage3a-rerepair/1425_constrained-subsequence-sum/list-recursive/constrained_subsequence_sum_list_stage3_a348e800_stage3/repaired/generated/why3/.why3_sessions/repaired_logs
+Still unproved goals:
+ConstrainedSubsequenceSum_List_Spec	css_model_feasible'vc
+ConstrainedSubsequenceSum_List_Spec	css_model_optimal'vc
+VERIFY_RESULT: FAILURE
+VERIFY_REASON: unproved_goals_remain
+VERIFY_STAGE: stage3
+VERIFY_ROOT_TOTAL: 13
+VERIFY_ROOT_PROVED: 11
+VERIFY_ROOT_REMAINING: 2

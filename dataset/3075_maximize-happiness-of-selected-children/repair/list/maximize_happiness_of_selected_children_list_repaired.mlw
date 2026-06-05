@@ -1,0 +1,186 @@
+module MaximizeHappinessOfSelectedChildren_List_Spec
+
+  use int.Int
+  use int.MinMax
+  use list.List
+  use list.Length
+  use list.NumOcc
+
+  let rec predicate all_positive (happiness: list int)
+    variant { happiness }
+  =
+    match happiness with
+    | Nil -> true
+    | Cons h rest -> 1 <= h && all_positive rest
+    end
+
+  let function adjusted_happiness (h: int) (turn: int) : int =
+    max (h - turn) 0
+
+  let rec function score_from (picked: list int) (turn: int) : int
+    variant { picked }
+  =
+    match picked with
+    | Nil -> 0
+    | Cons h rest -> adjusted_happiness h turn + score_from rest (turn + 1)
+    end
+
+  function selection_score (picked: list int) : int =
+    score_from picked 0
+
+  predicate selected_from (happiness: list int) (picked: list int) =
+    forall x: int. num_occ x picked <= num_occ x happiness
+
+  predicate valid_selection (happiness: list int) (k: int) (picked: list int) =
+    0 <= k <= length happiness /\
+    length picked = k /\
+    selected_from happiness picked
+
+  predicate maximized_happiness_score
+    (happiness: list int) (k: int) (score: int) =
+    0 <= k <= length happiness /\
+    (exists picked: list int.
+       valid_selection happiness k picked /\
+       score = selection_score picked) /\
+    (forall picked: list int.
+       valid_selection happiness k picked ->
+       selection_score picked <= score)
+
+  val maximize_happiness_of_selected_children_list
+    (happiness: list int) (k: int) : int
+    requires { happiness <> Nil }
+    requires { 1 <= k <= length happiness }
+    requires { all_positive happiness }
+    ensures  { maximized_happiness_score happiness k result }
+
+  let lemma test_005_single_child () =
+    let happiness = Cons 1 Nil in
+    let picked = Cons 1 Nil in
+    assert { length happiness = 1 };
+    assert { all_positive happiness };
+    assert { num_occ 1 picked = 1 };
+    assert { num_occ 1 happiness = 1 };
+    assert { selected_from happiness picked };
+    assert { adjusted_happiness 1 0 = 1 };
+    assert { score_from Nil 1 = 0 };
+    assert { score_from picked 0 = 1 };
+    assert { valid_selection happiness 1 picked };
+    assert { selection_score picked = 1 };
+    assert {
+      forall other: list int.
+        valid_selection happiness 1 other ->
+        selection_score other <= 1
+    };
+    assert { maximized_happiness_score happiness 1 1 }
+
+  let lemma test_010_all_ones_clip_to_zero () =
+    let happiness = Cons 1 (Cons 1 (Cons 1 (Cons 1 Nil))) in
+    let picked = Cons 1 (Cons 1 Nil) in
+    assert { length happiness = 4 };
+    assert { all_positive happiness };
+    assert { num_occ 1 picked = 2 };
+    assert { num_occ 1 happiness = 4 };
+    assert { selected_from happiness picked };
+    assert { adjusted_happiness 1 0 = 1 };
+    assert { adjusted_happiness 1 1 = 0 };
+    assert { score_from (Cons 1 Nil) 1 = 0 };
+    assert { score_from picked 0 = 1 };
+    assert { valid_selection happiness 2 picked };
+    assert { selection_score picked = 1 }
+
+  let lemma test_012_small_increasing_example () =
+    let happiness = Cons 1 (Cons 2 (Cons 3 Nil)) in
+    let picked = Cons 3 (Cons 2 Nil) in
+    assert { length happiness = 3 };
+    assert { all_positive happiness };
+    assert { num_occ 3 picked = 1 };
+    assert { num_occ 2 picked = 1 };
+    assert { num_occ 3 happiness = 1 };
+    assert { num_occ 2 happiness = 1 };
+    assert { selected_from happiness picked };
+    assert { adjusted_happiness 3 0 = 3 };
+    assert { adjusted_happiness 2 1 = 1 };
+    assert { score_from (Cons 2 Nil) 1 = 1 };
+    assert { score_from picked 0 = 4 };
+    assert { valid_selection happiness 2 picked };
+    assert { selection_score picked = 4 }
+
+  let lemma test_013_single_pick_maximum () =
+    let happiness = Cons 2 (Cons 3 (Cons 4 (Cons 5 Nil))) in
+    let picked = Cons 5 Nil in
+    assert { length happiness = 4 };
+    assert { all_positive happiness };
+    assert { num_occ 5 picked = 1 };
+    assert { num_occ 5 happiness = 1 };
+    assert { selected_from happiness picked };
+    assert { adjusted_happiness 5 0 = 5 };
+    assert { score_from picked 0 = 5 };
+    assert { valid_selection happiness 1 picked };
+    assert { selection_score picked = 5 }
+
+  let lemma test_015_descending_three_picks () =
+    let happiness = Cons 5 (Cons 4 (Cons 3 (Cons 2 (Cons 1 Nil)))) in
+    let picked = Cons 5 (Cons 4 (Cons 3 Nil)) in
+    assert { length happiness = 5 };
+    assert { all_positive happiness };
+    assert { num_occ 5 picked = 1 };
+    assert { num_occ 4 picked = 1 };
+    assert { num_occ 3 picked = 1 };
+    assert { num_occ 5 happiness = 1 };
+    assert { num_occ 4 happiness = 1 };
+    assert { num_occ 3 happiness = 1 };
+    assert { selected_from happiness picked };
+    assert { adjusted_happiness 5 0 = 5 };
+    assert { adjusted_happiness 4 1 = 3 };
+    assert { adjusted_happiness 3 2 = 1 };
+    assert { score_from (Cons 3 Nil) 2 = 1 };
+    assert { score_from (Cons 4 (Cons 3 Nil)) 1 = 4 };
+    assert { score_from picked 0 = 9 };
+    assert { valid_selection happiness 3 picked };
+    assert { selection_score picked = 9 }
+
+  let lemma test_025_large_increasing_three_picks () =
+    let happiness = Cons 10 (Cons 20 (Cons 30 (Cons 40 (Cons 50 Nil)))) in
+    let picked = Cons 50 (Cons 40 (Cons 30 Nil)) in
+    assert { length happiness = 5 };
+    assert { all_positive happiness };
+    assert { num_occ 50 picked = 1 };
+    assert { num_occ 40 picked = 1 };
+    assert { num_occ 30 picked = 1 };
+    assert { num_occ 50 happiness = 1 };
+    assert { num_occ 40 happiness = 1 };
+    assert { num_occ 30 happiness = 1 };
+    assert { selected_from happiness picked };
+    assert { adjusted_happiness 50 0 = 50 };
+    assert { adjusted_happiness 40 1 = 39 };
+    assert { adjusted_happiness 30 2 = 28 };
+    assert { score_from (Cons 30 Nil) 2 = 28 };
+    assert { score_from (Cons 40 (Cons 30 Nil)) 1 = 67 };
+    assert { score_from picked 0 = 117 };
+    assert { valid_selection happiness 3 picked };
+    assert { selection_score picked = 117 }
+
+  let lemma test_026_mixed_repeated_values () =
+    let happiness =
+      Cons 3 (Cons 1 (Cons 4 (Cons 1 (Cons 5 (Cons 9
+        (Cons 2 (Cons 6 (Cons 5 (Cons 3 (Cons 5 (Cons 9 Nil))))))))))) in
+    let picked = Cons 9 (Cons 9 (Cons 6 (Cons 5 (Cons 5 (Cons 5 (Cons 4 Nil)))))) in
+    assert { length happiness = 12 };
+    assert { all_positive happiness };
+    assert { adjusted_happiness 9 0 = 9 };
+    assert { adjusted_happiness 9 1 = 8 };
+    assert { adjusted_happiness 6 2 = 4 };
+    assert { adjusted_happiness 5 3 = 2 };
+    assert { adjusted_happiness 5 4 = 1 };
+    assert { adjusted_happiness 5 5 = 0 };
+    assert { adjusted_happiness 4 6 = 0 };
+    assert { score_from (Cons 4 Nil) 6 = 0 };
+    assert { score_from (Cons 5 (Cons 4 Nil)) 5 = 0 };
+    assert { score_from (Cons 5 (Cons 5 (Cons 4 Nil))) 4 = 1 };
+    assert { score_from (Cons 5 (Cons 5 (Cons 5 (Cons 4 Nil)))) 3 = 3 };
+    assert { score_from (Cons 6 (Cons 5 (Cons 5 (Cons 5 (Cons 4 Nil))))) 2 = 7 };
+    assert { score_from (Cons 9 (Cons 6 (Cons 5 (Cons 5 (Cons 5 (Cons 4 Nil)))))) 1 = 15 };
+    assert { score_from picked 0 = 24 };
+    assert { selection_score picked = 24 }
+
+end

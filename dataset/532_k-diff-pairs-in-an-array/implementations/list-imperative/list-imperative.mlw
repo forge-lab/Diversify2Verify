@@ -1,0 +1,204 @@
+module KDiffPairsInAnArray_List_Imperative_Implementation
+
+  use int.Int
+  use list.List
+  use ref.Ref
+
+  exception Found
+
+  let mem_list (x: int) (l: list int) : bool =
+    try
+      let cur = ref l in
+      while (match !cur with Nil -> false | Cons _ _ -> true end) do
+        match !cur with
+        | Nil -> ()
+        | Cons y ys ->
+            if y = x then raise Found;
+            cur := ys
+        end
+      done;
+      false
+    with Found ->
+      true
+    end
+
+  let count_occurrences (x: int) (l: list int) : int =
+    let count = ref 0 in
+    let cur = ref l in
+    while (match !cur with Nil -> false | Cons _ _ -> true end) do
+      match !cur with
+      | Nil -> ()
+      | Cons y ys ->
+          if y = x then count := !count + 1;
+          cur := ys
+      end
+    done;
+    !count
+
+  let k_diff_pairs_in_an_array_list (nums: list int) (k: int) : int
+    requires { k >= 0 }
+  =
+    let seen = ref Nil in
+    let count = ref 0 in
+    let cur = ref nums in
+    while (match !cur with Nil -> false | Cons _ _ -> true end) do
+      match !cur with
+      | Nil -> ()
+      | Cons x xs ->
+          if not (mem_list x !seen) then begin
+            if k = 0 then begin
+              if count_occurrences x nums >= 2 then count := !count + 1
+            end else begin
+              if mem_list (x + k) nums then count := !count + 1
+            end;
+            seen := Cons x !seen
+          end;
+          cur := xs
+      end
+    done;
+    !count
+
+  let test_000 () : bool =
+    let nums = Cons 1 (Cons 2 (Cons 3 (Cons 4 (Cons 5 (Nil))))) in
+    let r = k_diff_pairs_in_an_array_list nums 3 in
+    r = 2
+
+  let test_001 () : bool =
+    let nums = Cons 6 (Cons 3 (Cons 5 (Cons 7 (Cons 2 (Cons 3 (Cons 3 (Cons 8 (Cons 2 (Cons 4 (Nil)))))))))) in
+    let r = k_diff_pairs_in_an_array_list nums 2 in
+    r = 5
+
+  let test_002 () : bool =
+    let nums = Cons 10 (Cons 20 (Cons 30 (Cons 40 (Cons 50 (Nil))))) in
+    let r = k_diff_pairs_in_an_array_list nums 10 in
+    r = 4
+
+  let test_003 () : bool =
+    let nums = Cons 1 (Cons 2 (Cons 3 (Cons 4 (Cons 5 (Cons 6 (Cons 7 (Cons 8 (Cons 9 (Cons 10 (Nil)))))))))) in
+    let r = k_diff_pairs_in_an_array_list nums 5 in
+    r = 5
+
+  let test_004 () : bool =
+    let nums = Cons 1 (Cons 3 (Cons 1 (Cons 5 (Cons 4 (Nil))))) in
+    let r = k_diff_pairs_in_an_array_list nums 0 in
+    r = 1
+
+  let test_005 () : bool =
+    let nums = Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Nil))))) in
+    let r = k_diff_pairs_in_an_array_list nums 0 in
+    r = 1
+
+  let test_006 () : bool =
+    let nums = Cons (-1) (Cons (-1) (Cons (-1) (Cons 2 (Cons 2 (Cons 2 (Nil)))))) in
+    let r = k_diff_pairs_in_an_array_list nums 3 in
+    r = 1
+
+  let test_007 () : bool =
+    let nums = Cons (-1) (Cons (-2) (Cons (-3) (Cons (-4) (Cons (-5) (Nil))))) in
+    let r = k_diff_pairs_in_an_array_list nums 1 in
+    r = 4
+
+  let test_008 () : bool =
+    let nums = Cons 1 (Cons 1 (Cons 2 (Cons 2 (Cons 3 (Cons 3 (Nil)))))) in
+    let r = k_diff_pairs_in_an_array_list nums 1 in
+    r = 2
+
+  let test_009 () : bool =
+    let nums = Cons 3 (Cons 1 (Cons 4 (Cons 1 (Cons 5 (Nil))))) in
+    let r = k_diff_pairs_in_an_array_list nums 2 in
+    r = 2
+
+  let test_010 () : bool =
+    let nums = Cons 1 (Cons 2 (Cons 2 (Cons 3 (Cons 3 (Cons 4 (Cons 4 (Nil))))))) in
+    let r = k_diff_pairs_in_an_array_list nums 2 in
+    r = 2
+
+  let test_011 () : bool =
+    let nums = Cons 1 (Cons 3 (Cons 5 (Cons 7 (Cons 9 (Nil))))) in
+    let r = k_diff_pairs_in_an_array_list nums 2 in
+    r = 4
+
+  let test_012 () : bool =
+    let nums = Cons 0 (Cons 0 (Cons 0 (Cons 0 (Cons 0 (Nil))))) in
+    let r = k_diff_pairs_in_an_array_list nums 0 in
+    r = 1
+
+  let test_013 () : bool =
+    let nums = Cons 1 (Cons 2 (Cons 3 (Cons 4 (Cons 5 (Nil))))) in
+    let r = k_diff_pairs_in_an_array_list nums 1 in
+    r = 4
+
+  let test_014 () : bool =
+    let nums = Cons (-10000000) (Cons (-9999999) (Cons (-9999998) (Cons (-9999997) (Cons (-9999996) (Cons (-9999995) (Cons (-9999994) (Cons (-9999993) (Cons (-9999992) (Cons (-9999991) (Nil)))))))))) in
+    let r = k_diff_pairs_in_an_array_list nums 1 in
+    r = 9
+
+  let test_015 () : bool =
+    let nums = Cons (-1) (Cons (-2) (Cons (-3) (Cons (-1) (Cons (-2) (Cons (-3) (Cons (-4) (Cons (-5) (Cons (-6) (Cons (-7) (Cons (-8) (Cons (-9) (Nil)))))))))))) in
+    let r = k_diff_pairs_in_an_array_list nums 1 in
+    r = 8
+
+  let test_016 () : bool =
+    let nums = Cons 0 (Cons 0 (Cons 0 (Cons 0 (Cons 0 (Cons 0 (Cons 0 (Cons 0 (Cons 0 (Cons 0 (Nil)))))))))) in
+    let r = k_diff_pairs_in_an_array_list nums 0 in
+    r = 1
+
+  let test_017 () : bool =
+    let nums = Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 2 (Cons 2 (Cons 2 (Cons 2 (Cons 2 (Cons 3 (Cons 3 (Cons 3 (Cons 3 (Cons 3 (Nil))))))))))))))) in
+    let r = k_diff_pairs_in_an_array_list nums 1 in
+    r = 2
+
+  let test_018 () : bool =
+    let nums = Cons 1 (Cons 2 (Cons 3 (Cons 4 (Cons 5 (Cons 6 (Cons 7 (Cons 8 (Cons 9 (Cons 10 (Cons 11 (Cons 12 (Cons 13 (Cons 14 (Cons 15 (Cons 16 (Cons 17 (Cons 18 (Cons 19 (Cons 20 (Nil)))))))))))))))))))) in
+    let r = k_diff_pairs_in_an_array_list nums 19 in
+    r = 1
+
+  let test_019 () : bool =
+    let nums = Cons 100 (Cons 101 (Cons 102 (Cons 103 (Cons 104 (Cons 105 (Cons 106 (Cons 107 (Cons 108 (Cons 109 (Cons 110 (Nil))))))))))) in
+    let r = k_diff_pairs_in_an_array_list nums 1 in
+    r = 10
+
+  let run_tests () : bool =
+    if test_000 () then
+    if test_001 () then
+    if test_002 () then
+    if test_003 () then
+    if test_004 () then
+    if test_005 () then
+    if test_006 () then
+    if test_007 () then
+    if test_008 () then
+    if test_009 () then
+    if test_010 () then
+    if test_011 () then
+    if test_012 () then
+    if test_013 () then
+    if test_014 () then
+    if test_015 () then
+    if test_016 () then
+    if test_017 () then
+    if test_018 () then
+    if test_019 () then
+      true
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+
+end

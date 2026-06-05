@@ -1,0 +1,133 @@
+module MinimumAmountOfTimeToFillCups_Array_Stage3_Imperative
+
+  use int.Int
+  use int.MinMax
+  use int.EuclideanDivision
+  use array.Array
+  use array.ArraySum
+  use ref.Ref
+
+  predicate valid_amount (amount: array int) =
+    length amount = 3 /\
+    forall i: int. 0 <= i < length amount -> 0 <= amount[i] <= 100
+
+  function cups_total (amount: array int) : int =
+    ArraySum.sum amount 0 3
+
+  function largest_type_amount (amount: array int) : int =
+    max (amount[0]) (max (amount[1]) (amount[2]))
+
+  predicate feasible_time (amount: array int) (seconds: int) =
+    0 <= seconds /\
+    largest_type_amount amount <= seconds /\
+    cups_total amount <= 2 * seconds
+
+  predicate minimum_fill_time (amount: array int) (seconds: int) =
+    feasible_time amount seconds /\
+    forall other: int. feasible_time amount other -> seconds <= other
+
+  predicate prefix_largest (amount: array int) (i: int) (largest: int) =
+    (forall j: int. 0 <= j < i -> amount[j] <= largest) /\
+    (0 < i -> exists j: int. 0 <= j < i /\ amount[j] = largest)
+
+  let lemma ceil_half_feasible (n: int)
+    requires { 0 <= n }
+    ensures  { n <= 2 * div (n + 1) 2 }
+  =
+    assert { n + 1 = 2 * div (n + 1) 2 + mod (n + 1) 2 };
+    assert { 0 <= mod (n + 1) 2 < 2 }
+
+  let lemma ceil_half_lower_bound (n other: int)
+    requires { 0 <= n }
+    requires { n <= 2 * other }
+    ensures  { div (n + 1) 2 <= other }
+  =
+    let q = div (n + 1) 2 in
+    let r = mod (n + 1) 2 in
+    assert { n + 1 = 2 * q + r };
+    assert { 0 <= r < 2 };
+    if q > other then begin
+      assert { other + 1 <= q };
+      assert { 2 * other + 2 <= 2 * q };
+      assert { 2 * other + 2 <= n + 1 };
+      assert { 2 * other + 1 <= n };
+      assert { false }
+    end
+
+  let minimum_amount_of_time_to_fill_cups_array (amount: array int) : int
+    requires { valid_amount amount }
+    ensures  { minimum_fill_time amount result }
+  =
+    let total = ref 0 in
+    let largest = ref 0 in
+    let i = ref 0 in
+    let n = length amount in
+
+    while !i < n do
+      invariant { 0 <= !i <= n }
+      invariant { n = length amount }
+      invariant { !total = ArraySum.sum amount 0 !i }
+      invariant { 0 <= !total }
+      invariant { 0 <= !largest }
+      invariant { !i = 0 -> !largest = 0 }
+      invariant { prefix_largest amount !i !largest }
+      variant   { n - !i }
+
+      assert { 0 <= !i < length amount };
+      let current = amount[!i] in
+      assert { 0 <= current <= 100 };
+      total := !total + current;
+      if current > !largest then begin
+        assert { amount[!i] = current };
+        largest := current;
+        assert { amount[!i] = !largest };
+        assert { forall j: int. 0 <= j < !i -> amount[j] <= !largest };
+        assert { forall j: int. 0 <= j < !i + 1 -> amount[j] <= !largest };
+        assert { 0 <= !i < !i + 1 /\ amount[!i] = !largest };
+        assert { exists j: int. 0 <= j < !i + 1 /\ amount[j] = !largest };
+        assert { prefix_largest amount (!i + 1) !largest }
+      end else begin
+        assert { amount[!i] = current };
+        assert { current <= !largest };
+        if !i = 0 then begin
+          assert { !largest = 0 };
+          assert { current = 0 };
+          assert { amount[!i] = !largest };
+          assert { 0 <= !i < !i + 1 /\ amount[!i] = !largest };
+          assert { exists j: int. 0 <= j < !i + 1 /\ amount[j] = !largest }
+        end else begin
+          assert { 0 < !i };
+          assert { exists j: int. 0 <= j < !i /\ amount[j] = !largest };
+          assert { exists j: int. 0 <= j < !i + 1 /\ amount[j] = !largest }
+        end;
+        assert { forall j: int. 0 <= j < !i + 1 -> amount[j] <= !largest };
+        assert { prefix_largest amount (!i + 1) !largest }
+      end;
+      i := !i + 1;
+      assert { prefix_largest amount !i !largest }
+    done;
+
+    assert { !i = n };
+    assert { n = 3 };
+    assert { !total = ArraySum.sum amount 0 3 };
+    assert { !total = cups_total amount };
+    assert { prefix_largest amount 3 !largest };
+    assert { amount[0] <= !largest };
+    assert { amount[1] <= !largest };
+    assert { amount[2] <= !largest };
+    assert { exists j: int. 0 <= j < 3 /\ amount[j] = !largest };
+    assert { !largest = largest_type_amount amount };
+
+    let result = max !largest (div (!total + 1) 2) in
+    assert { 0 <= result };
+    assert { largest_type_amount amount <= result };
+    assert { cups_total amount <= 2 * result };
+    assert { feasible_time amount result };
+    assert {
+      forall other: int.
+        feasible_time amount other -> result <= other
+    };
+    assert { minimum_fill_time amount result };
+    result
+
+end

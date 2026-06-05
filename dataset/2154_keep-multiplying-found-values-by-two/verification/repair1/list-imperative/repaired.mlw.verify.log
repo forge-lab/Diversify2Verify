@@ -1,0 +1,756 @@
+== Stage 1: first prover on whole file ==
+Running in /Users/rubenm/Desktop/Diversify2Verify/codex-runs/dataset-merge-verification/stage3a-repair/2154_keep-multiplying-found-values-by-two/list-imperative/keep_multiplying_found_values_by_two_list_stage3_7bf77fde_stage3/generated/why3: why3 session create -o /Users/rubenm/Desktop/Diversify2Verify/codex-runs/dataset-merge-verification/stage3a-repair/2154_keep-multiplying-found-values-by-two/list-imperative/keep_multiplying_found_values_by_two_list_stage3_7bf77fde_stage3/generated/why3/.why3_sessions/repaired_stage1 -P Z3,4.8.6 -t 10 -m 8192 repaired.mlw
+Session created successfully
+Running in /Users/rubenm/Desktop/Diversify2Verify/codex-runs/dataset-merge-verification/stage3a-repair/2154_keep-multiplying-found-values-by-two/list-imperative/keep_multiplying_found_values_by_two_list_stage3_7bf77fde_stage3/generated/why3: why3 bench /Users/rubenm/Desktop/Diversify2Verify/codex-runs/dataset-merge-verification/stage3a-repair/2154_keep-multiplying-found-values-by-two/list-imperative/keep_multiplying_found_values_by_two_list_stage3_7bf77fde_stage3/generated/why3/.why3_sessions/repaired_stage1
+Progress: 4/1/0                       Progress: 3/2/0                       Progress: 2/3/0                       Progress: 1/4/0                       Progress: 0/5/0                       Progress: 0/2/2                       Progress: 0/1/2                       Progress: 0/0/2                       Progress: 0/0/1                       
+Replay completed, saving session... done
+== Stage 1 stats ==
+= Statistics for session /Users/rubenm/Desktop/Diversify2Verify/codex-runs/dataset-merge-verification/stage3a-repair/2154_keep-multiplying-found-values-by-two/list-imperative/keep_multiplying_found_values_by_two_list_stage3_7bf77fde_stage3/generated/why3/.why3_sessions/repaired_stage1
+
+== Number of root goals ==
+  total: 5  proved: 1
+
+== Number of sub goals ==
+  total: 0  proved: 0
+
+== Goals not proved ==
+  +-- file [../../repaired.mlw]
+    +-- theory KeepMultiplyingFoundValuesByTwo_List_Stage3_Imperative
+      +-- goal doubled_value_succ'vc
+      +-- goal doubling_prefix_extend'vc
+      +-- goal mem_int_imp'vc
+      +-- goal keep_multiplying_found_values_by_two_list'vc
+  
+== Goals proved by only one prover ==
+  +-- file [../../repaired.mlw]
+    +-- theory KeepMultiplyingFoundValuesByTwo_List_Stage3_Imperative
+      +-- goal doubled_value_zero'vc: Z3 4.8.6
+  
+1 session(s) read, with a total of 5 proof goals.
+== Unproved root goals after first prover ==
+KeepMultiplyingFoundValuesByTwo_List_Stage3_Imperative	doubled_value_succ'vc
+KeepMultiplyingFoundValuesByTwo_List_Stage3_Imperative	doubling_prefix_extend'vc
+KeepMultiplyingFoundValuesByTwo_List_Stage3_Imperative	mem_int_imp'vc
+KeepMultiplyingFoundValuesByTwo_List_Stage3_Imperative	keep_multiplying_found_values_by_two_list'vc
+== Stage 1: trying remaining goals with prover Alt-Ergo,2.4.0 ==
+---- stage1 | prover: Alt-Ergo,2.4.0 | theory: KeepMultiplyingFoundValuesByTwo_List_Stage3_Imperative | goal: doubled_value_succ'vc ----
+File repaired.mlw:
+Goal doubled_value_succ'vc.
+Prover result is: Valid (0.01s, 41 steps).
+Solved in stage 1 using prover: Alt-Ergo,2.4.0
+---- stage1 | prover: Alt-Ergo,2.4.0 | theory: KeepMultiplyingFoundValuesByTwo_List_Stage3_Imperative | goal: doubling_prefix_extend'vc ----
+File repaired.mlw:
+Goal doubling_prefix_extend'vc.
+Prover result is: Valid (0.18s, 4713 steps).
+Solved in stage 1 using prover: Alt-Ergo,2.4.0
+---- stage1 | prover: Alt-Ergo,2.4.0 | theory: KeepMultiplyingFoundValuesByTwo_List_Stage3_Imperative | goal: mem_int_imp'vc ----
+File repaired.mlw:
+Goal mem_int_imp'vc.
+Prover result is: Valid (0.01s, 134 steps).
+Solved in stage 1 using prover: Alt-Ergo,2.4.0
+---- stage1 | prover: Alt-Ergo,2.4.0 | theory: KeepMultiplyingFoundValuesByTwo_List_Stage3_Imperative | goal: keep_multiplying_found_values_by_two_list'vc ----
+File repaired.mlw:
+Goal keep_multiplying_found_values_by_two_list'vc.
+Prover result is: Timeout (10.00s, 247991 steps).
+Remaining after prover Alt-Ergo,2.4.0: 1
+== Stage 1: trying remaining goals with prover CVC4,1.8 ==
+---- stage1 | prover: CVC4,1.8 | theory: KeepMultiplyingFoundValuesByTwo_List_Stage3_Imperative | goal: keep_multiplying_found_values_by_two_list'vc ----
+File repaired.mlw:
+Goal keep_multiplying_found_values_by_two_list'vc.
+Prover result is: Timeout (10.00s, 551527 steps).
+Remaining after prover CVC4,1.8: 1
+== Goals still unproved after stage 1 ==
+KeepMultiplyingFoundValuesByTwo_List_Stage3_Imperative	keep_multiplying_found_values_by_two_list'vc
+== Stage 2: split_vc on unproved goal ==
+Target theory: KeepMultiplyingFoundValuesByTwo_List_Stage3_Imperative
+Target goal  : keep_multiplying_found_values_by_two_list'vc
+---- stage2 | prover: Z3,4.8.6 | theory: KeepMultiplyingFoundValuesByTwo_List_Stage3_Imperative | goal: keep_multiplying_found_values_by_two_list'vc ----
+Transforms: split_vc
+File "repaired.mlw", line 98, characters 13-53:
+Sub-goal Assertion of goal keep_multiplying_found_values_by_two_list'vc.
+Prover result is: Valid (0.01s, 8154 steps).
+
+File "repaired.mlw", line 100, characters 18-44:
+Sub-goal Loop invariant init of goal
+keep_multiplying_found_values_by_two_list'vc.
+Prover result is: Valid (0.01s, 17858 steps).
+
+File "repaired.mlw", line 101, characters 18-58:
+Sub-goal Loop invariant init of goal
+keep_multiplying_found_values_by_two_list'vc.
+Prover result is: Valid (0.01s, 1409 steps).
+
+File "repaired.mlw", line 102, characters 18-60:
+Sub-goal Loop invariant init of goal
+keep_multiplying_found_values_by_two_list'vc.
+Prover result is: Valid (0.01s, 18059 steps).
+
+File "repaired.mlw", line 106, characters 15-32:
+Sub-goal Assertion of goal keep_multiplying_found_values_by_two_list'vc.
+Prover result is: Valid (0.01s, 1470 steps).
+
+File "repaired.mlw", line 107, characters 15-58:
+Sub-goal Assertion of goal keep_multiplying_found_values_by_two_list'vc.
+Prover result is: Valid (0.01s, 1479 steps).
+
+File "repaired.mlw", line 108, characters 6-52:
+Sub-goal Precondition of goal keep_multiplying_found_values_by_two_list'vc.
+Prover result is: Valid (0.01s, 1484 steps).
+
+File "repaired.mlw", line 108, characters 6-52:
+Sub-goal Precondition of goal keep_multiplying_found_values_by_two_list'vc.
+Prover result is: Valid (0.01s, 1489 steps).
+
+File "repaired.mlw", line 108, characters 6-52:
+Sub-goal Precondition of goal keep_multiplying_found_values_by_two_list'vc.
+Prover result is: Valid (0.01s, 7169 steps).
+
+File "repaired.mlw", line 109, characters 15-66:
+Sub-goal Assertion of goal keep_multiplying_found_values_by_two_list'vc.
+Prover result is: Valid (0.01s, 1497 steps).
+
+File "repaired.mlw", line 111, characters 15-62:
+Sub-goal Assertion of goal keep_multiplying_found_values_by_two_list'vc.
+Prover result is: Valid (0.01s, 5165 steps).
+
+File "repaired.mlw", line 112, characters 6-43:
+Sub-goal Precondition of goal keep_multiplying_found_values_by_two_list'vc.
+Prover result is: Valid (0.01s, 1520 steps).
+
+File "repaired.mlw", line 113, characters 15-64:
+Sub-goal Assertion of goal keep_multiplying_found_values_by_two_list'vc.
+Prover result is: Valid (0.01s, 10513 steps).
+
+File "repaired.mlw", line 115, characters 15-37:
+Sub-goal Assertion of goal keep_multiplying_found_values_by_two_list'vc.
+Prover result is: Valid (0.01s, 1543 steps).
+
+File "repaired.mlw", line 116, characters 15-55:
+Sub-goal Assertion of goal keep_multiplying_found_values_by_two_list'vc.
+Prover result is: Valid (0.01s, 7490 steps).
+
+File "repaired.mlw", line 117, characters 15-57:
+Sub-goal Assertion of goal keep_multiplying_found_values_by_two_list'vc.
+Prover result is: Valid (0.01s, 7526 steps).
+
+File "repaired.mlw", line 103, characters 16-36:
+Sub-goal Loop variant decrease of goal
+keep_multiplying_found_values_by_two_list'vc.
+Prover result is: Valid (0.01s, 10859 steps).
+
+File "repaired.mlw", line 100, characters 18-44:
+Sub-goal Loop invariant preservation of goal
+keep_multiplying_found_values_by_two_list'vc.
+Prover result is: Timeout (10.00s, 237429226 steps).
+
+File "repaired.mlw", line 101, characters 18-58:
+Sub-goal Loop invariant preservation of goal
+keep_multiplying_found_values_by_two_list'vc.
+Prover result is: Valid (0.01s, 1579 steps).
+
+File "repaired.mlw", line 102, characters 18-60:
+Sub-goal Loop invariant preservation of goal
+keep_multiplying_found_values_by_two_list'vc.
+Prover result is: Valid (0.01s, 1584 steps).
+
+File "repaired.mlw", line 119, characters 13-36:
+Sub-goal Assertion of goal keep_multiplying_found_values_by_two_list'vc.
+Prover result is: Valid (0.01s, 1476 steps).
+
+File "repaired.mlw", line 120, characters 13-39:
+Sub-goal Assertion of goal keep_multiplying_found_values_by_two_list'vc.
+Prover result is: Valid (0.01s, 2169 steps).
+
+File "repaired.mlw", line 121, characters 13-53:
+Sub-goal Assertion of goal keep_multiplying_found_values_by_two_list'vc.
+Prover result is: Valid (0.01s, 1500 steps).
+
+File "repaired.mlw", line 122, characters 13-55:
+Sub-goal Assertion of goal keep_multiplying_found_values_by_two_list'vc.
+Prover result is: Valid (0.01s, 1505 steps).
+
+File "repaired.mlw", line 123, characters 13-47:
+Sub-goal Assertion of goal keep_multiplying_found_values_by_two_list'vc.
+Prover result is: Valid (0.01s, 24379 steps).
+
+File "repaired.mlw", line 93, characters 15-47:
+Sub-goal Postcondition of goal keep_multiplying_found_values_by_two_list'vc.
+Prover result is: Valid (0.01s, 1580 steps).
+---- stage2 | prover: Alt-Ergo,2.4.0 | theory: KeepMultiplyingFoundValuesByTwo_List_Stage3_Imperative | goal: keep_multiplying_found_values_by_two_list'vc ----
+Transforms: split_vc
+File "repaired.mlw", line 98, characters 13-53:
+Sub-goal Assertion of goal keep_multiplying_found_values_by_two_list'vc.
+Prover result is: Valid (0.01s, 4 steps).
+
+File "repaired.mlw", line 100, characters 18-44:
+Sub-goal Loop invariant init of goal
+keep_multiplying_found_values_by_two_list'vc.
+Prover result is: Valid (0.01s, 13 steps).
+
+File "repaired.mlw", line 101, characters 18-58:
+Sub-goal Loop invariant init of goal
+keep_multiplying_found_values_by_two_list'vc.
+Prover result is: Valid (0.01s, 7 steps).
+
+File "repaired.mlw", line 102, characters 18-60:
+Sub-goal Loop invariant init of goal
+keep_multiplying_found_values_by_two_list'vc.
+Prover result is: Valid (0.01s, 41 steps).
+
+File "repaired.mlw", line 106, characters 15-32:
+Sub-goal Assertion of goal keep_multiplying_found_values_by_two_list'vc.
+Prover result is: Valid (0.01s, 14 steps).
+
+File "repaired.mlw", line 107, characters 15-58:
+Sub-goal Assertion of goal keep_multiplying_found_values_by_two_list'vc.
+Prover result is: Valid (0.01s, 14 steps).
+
+File "repaired.mlw", line 108, characters 6-52:
+Sub-goal Precondition of goal keep_multiplying_found_values_by_two_list'vc.
+Prover result is: Valid (0.01s, 14 steps).
+
+File "repaired.mlw", line 108, characters 6-52:
+Sub-goal Precondition of goal keep_multiplying_found_values_by_two_list'vc.
+Prover result is: Valid (0.01s, 14 steps).
+
+File "repaired.mlw", line 108, characters 6-52:
+Sub-goal Precondition of goal keep_multiplying_found_values_by_two_list'vc.
+Prover result is: Valid (0.01s, 14 steps).
+
+File "repaired.mlw", line 109, characters 15-66:
+Sub-goal Assertion of goal keep_multiplying_found_values_by_two_list'vc.
+Prover result is: Valid (0.01s, 16 steps).
+
+File "repaired.mlw", line 111, characters 15-62:
+Sub-goal Assertion of goal keep_multiplying_found_values_by_two_list'vc.
+Prover result is: Valid (0.01s, 18 steps).
+
+File "repaired.mlw", line 112, characters 6-43:
+Sub-goal Precondition of goal keep_multiplying_found_values_by_two_list'vc.
+Prover result is: Valid (0.01s, 19 steps).
+
+File "repaired.mlw", line 113, characters 15-64:
+Sub-goal Assertion of goal keep_multiplying_found_values_by_two_list'vc.
+Prover result is: Valid (0.01s, 21 steps).
+
+File "repaired.mlw", line 115, characters 15-37:
+Sub-goal Assertion of goal keep_multiplying_found_values_by_two_list'vc.
+Prover result is: Valid (0.01s, 24 steps).
+
+File "repaired.mlw", line 116, characters 15-55:
+Sub-goal Assertion of goal keep_multiplying_found_values_by_two_list'vc.
+Prover result is: Valid (0.01s, 24 steps).
+
+File "repaired.mlw", line 117, characters 15-57:
+Sub-goal Assertion of goal keep_multiplying_found_values_by_two_list'vc.
+Prover result is: Valid (0.01s, 25 steps).
+
+File "repaired.mlw", line 103, characters 16-36:
+Sub-goal Loop variant decrease of goal
+keep_multiplying_found_values_by_two_list'vc.
+Prover result is: Valid (0.01s, 26 steps).
+
+File "repaired.mlw", line 100, characters 18-44:
+Sub-goal Loop invariant preservation of goal
+keep_multiplying_found_values_by_two_list'vc.
+Prover result is: Timeout (10.00s, 52368 steps).
+
+File "repaired.mlw", line 101, characters 18-58:
+Sub-goal Loop invariant preservation of goal
+keep_multiplying_found_values_by_two_list'vc.
+Prover result is: Valid (0.01s, 29 steps).
+
+File "repaired.mlw", line 102, characters 18-60:
+Sub-goal Loop invariant preservation of goal
+keep_multiplying_found_values_by_two_list'vc.
+Prover result is: Valid (0.01s, 29 steps).
+
+File "repaired.mlw", line 119, characters 13-36:
+Sub-goal Assertion of goal keep_multiplying_found_values_by_two_list'vc.
+Prover result is: Valid (0.01s, 14 steps).
+
+File "repaired.mlw", line 120, characters 13-39:
+Sub-goal Assertion of goal keep_multiplying_found_values_by_two_list'vc.
+Prover result is: Valid (0.01s, 14 steps).
+
+File "repaired.mlw", line 121, characters 13-53:
+Sub-goal Assertion of goal keep_multiplying_found_values_by_two_list'vc.
+Prover result is: Valid (0.01s, 14 steps).
+
+File "repaired.mlw", line 122, characters 13-55:
+Sub-goal Assertion of goal keep_multiplying_found_values_by_two_list'vc.
+Prover result is: Valid (0.01s, 14 steps).
+
+File "repaired.mlw", line 123, characters 13-47:
+Sub-goal Assertion of goal keep_multiplying_found_values_by_two_list'vc.
+Prover result is: Valid (0.01s, 535 steps).
+
+File "repaired.mlw", line 93, characters 15-47:
+Sub-goal Postcondition of goal keep_multiplying_found_values_by_two_list'vc.
+Prover result is: Valid (0.01s, 16 steps).
+---- stage2 | prover: CVC4,1.8 | theory: KeepMultiplyingFoundValuesByTwo_List_Stage3_Imperative | goal: keep_multiplying_found_values_by_two_list'vc ----
+Transforms: split_vc
+File "repaired.mlw", line 98, characters 13-53:
+Sub-goal Assertion of goal keep_multiplying_found_values_by_two_list'vc.
+Prover result is: Valid (0.02s, 3343 steps).
+
+File "repaired.mlw", line 100, characters 18-44:
+Sub-goal Loop invariant init of goal
+keep_multiplying_found_values_by_two_list'vc.
+Prover result is: Valid (0.02s, 3997 steps).
+
+File "repaired.mlw", line 101, characters 18-58:
+Sub-goal Loop invariant init of goal
+keep_multiplying_found_values_by_two_list'vc.
+Prover result is: Valid (0.01s, 3555 steps).
+
+File "repaired.mlw", line 102, characters 18-60:
+Sub-goal Loop invariant init of goal
+keep_multiplying_found_values_by_two_list'vc.
+Prover result is: Valid (0.02s, 4056 steps).
+
+File "repaired.mlw", line 106, characters 15-32:
+Sub-goal Assertion of goal keep_multiplying_found_values_by_two_list'vc.
+Prover result is: Valid (0.01s, 3753 steps).
+
+File "repaired.mlw", line 107, characters 15-58:
+Sub-goal Assertion of goal keep_multiplying_found_values_by_two_list'vc.
+Prover result is: Valid (0.01s, 3756 steps).
+
+File "repaired.mlw", line 108, characters 6-52:
+Sub-goal Precondition of goal keep_multiplying_found_values_by_two_list'vc.
+Prover result is: Valid (0.01s, 3762 steps).
+
+File "repaired.mlw", line 108, characters 6-52:
+Sub-goal Precondition of goal keep_multiplying_found_values_by_two_list'vc.
+Prover result is: Valid (0.01s, 3762 steps).
+
+File "repaired.mlw", line 108, characters 6-52:
+Sub-goal Precondition of goal keep_multiplying_found_values_by_two_list'vc.
+Prover result is: Valid (0.02s, 3847 steps).
+
+File "repaired.mlw", line 109, characters 15-66:
+Sub-goal Assertion of goal keep_multiplying_found_values_by_two_list'vc.
+Prover result is: Valid (0.01s, 3794 steps).
+
+File "repaired.mlw", line 111, characters 15-62:
+Sub-goal Assertion of goal keep_multiplying_found_values_by_two_list'vc.
+Prover result is: Valid (0.01s, 3855 steps).
+
+File "repaired.mlw", line 112, characters 6-43:
+Sub-goal Precondition of goal keep_multiplying_found_values_by_two_list'vc.
+Prover result is: Valid (0.01s, 3852 steps).
+
+File "repaired.mlw", line 113, characters 15-64:
+Sub-goal Assertion of goal keep_multiplying_found_values_by_two_list'vc.
+Prover result is: Valid (0.02s, 3986 steps).
+
+File "repaired.mlw", line 115, characters 15-37:
+Sub-goal Assertion of goal keep_multiplying_found_values_by_two_list'vc.
+Prover result is: Valid (0.01s, 3916 steps).
+
+File "repaired.mlw", line 116, characters 15-55:
+Sub-goal Assertion of goal keep_multiplying_found_values_by_two_list'vc.
+Prover result is: Valid (0.02s, 4131 steps).
+
+File "repaired.mlw", line 117, characters 15-57:
+Sub-goal Assertion of goal keep_multiplying_found_values_by_two_list'vc.
+Prover result is: Valid (0.02s, 4134 steps).
+
+File "repaired.mlw", line 103, characters 16-36:
+Sub-goal Loop variant decrease of goal
+keep_multiplying_found_values_by_two_list'vc.
+Prover result is: Valid (0.01s, 4059 steps).
+
+File "repaired.mlw", line 100, characters 18-44:
+Sub-goal Loop invariant preservation of goal
+keep_multiplying_found_values_by_two_list'vc.
+Prover result is: Timeout (10.00s, 594872 steps).
+
+File "repaired.mlw", line 101, characters 18-58:
+Sub-goal Loop invariant preservation of goal
+keep_multiplying_found_values_by_two_list'vc.
+Prover result is: Valid (0.01s, 3993 steps).
+
+File "repaired.mlw", line 102, characters 18-60:
+Sub-goal Loop invariant preservation of goal
+keep_multiplying_found_values_by_two_list'vc.
+Prover result is: Valid (0.01s, 3996 steps).
+
+File "repaired.mlw", line 119, characters 13-36:
+Sub-goal Assertion of goal keep_multiplying_found_values_by_two_list'vc.
+Prover result is: Valid (0.01s, 3755 steps).
+
+File "repaired.mlw", line 120, characters 13-39:
+Sub-goal Assertion of goal keep_multiplying_found_values_by_two_list'vc.
+Prover result is: Valid (0.01s, 3774 steps).
+
+File "repaired.mlw", line 121, characters 13-53:
+Sub-goal Assertion of goal keep_multiplying_found_values_by_two_list'vc.
+Prover result is: Valid (0.01s, 3776 steps).
+
+File "repaired.mlw", line 122, characters 13-55:
+Sub-goal Assertion of goal keep_multiplying_found_values_by_two_list'vc.
+Prover result is: Valid (0.01s, 3779 steps).
+
+File "repaired.mlw", line 123, characters 13-47:
+Sub-goal Assertion of goal keep_multiplying_found_values_by_two_list'vc.
+Prover result is: Valid (0.02s, 5267 steps).
+
+File "repaired.mlw", line 93, characters 15-47:
+Sub-goal Postcondition of goal keep_multiplying_found_values_by_two_list'vc.
+Prover result is: Valid (0.01s, 4023 steps).
+== Goals still unproved after stage 2 (split_vc) ==
+KeepMultiplyingFoundValuesByTwo_List_Stage3_Imperative	keep_multiplying_found_values_by_two_list'vc
+== Stage 3: split_vc + inline_all on still-unproved goal ==
+Target theory: KeepMultiplyingFoundValuesByTwo_List_Stage3_Imperative
+Target goal  : keep_multiplying_found_values_by_two_list'vc
+---- stage3 | prover: Z3,4.8.6 | theory: KeepMultiplyingFoundValuesByTwo_List_Stage3_Imperative | goal: keep_multiplying_found_values_by_two_list'vc ----
+Transforms: split_vc inline_all
+File "repaired.mlw", line 98, characters 13-53:
+Sub-goal Assertion of goal keep_multiplying_found_values_by_two_list'vc.
+Prover result is: Valid (0.01s, 9845 steps).
+
+File "repaired.mlw", line 100, characters 18-44:
+Sub-goal Loop invariant init of goal
+keep_multiplying_found_values_by_two_list'vc.
+Prover result is: Valid (0.01s, 21322 steps).
+
+File "repaired.mlw", line 101, characters 18-58:
+Sub-goal Loop invariant init of goal
+keep_multiplying_found_values_by_two_list'vc.
+Prover result is: Valid (0.01s, 1913 steps).
+
+File "repaired.mlw", line 102, characters 18-60:
+Sub-goal Loop invariant init of goal
+keep_multiplying_found_values_by_two_list'vc.
+Prover result is: Valid (0.01s, 21236 steps).
+
+File "repaired.mlw", line 106, characters 15-32:
+Sub-goal Assertion of goal keep_multiplying_found_values_by_two_list'vc.
+Prover result is: Valid (0.01s, 2011 steps).
+
+File "repaired.mlw", line 107, characters 15-58:
+Sub-goal Assertion of goal keep_multiplying_found_values_by_two_list'vc.
+Prover result is: Valid (0.01s, 2020 steps).
+
+File "repaired.mlw", line 108, characters 6-52:
+Sub-goal Precondition of goal keep_multiplying_found_values_by_two_list'vc.
+Prover result is: Valid (0.01s, 2935 steps).
+
+File "repaired.mlw", line 108, characters 6-52:
+Sub-goal Precondition of goal keep_multiplying_found_values_by_two_list'vc.
+Prover result is: Valid (0.01s, 27893 steps).
+
+File "repaired.mlw", line 108, characters 6-52:
+Sub-goal Precondition of goal keep_multiplying_found_values_by_two_list'vc.
+Prover result is: Valid (0.01s, 9571 steps).
+
+File "repaired.mlw", line 109, characters 15-66:
+Sub-goal Assertion of goal keep_multiplying_found_values_by_two_list'vc.
+Prover result is: Valid (0.01s, 28670 steps).
+
+File "repaired.mlw", line 111, characters 15-62:
+Sub-goal Assertion of goal keep_multiplying_found_values_by_two_list'vc.
+Prover result is: Valid (0.01s, 7116 steps).
+
+File "repaired.mlw", line 112, characters 6-43:
+Sub-goal Precondition of goal keep_multiplying_found_values_by_two_list'vc.
+Prover result is: Valid (0.01s, 3147 steps).
+
+File "repaired.mlw", line 113, characters 15-64:
+Sub-goal Assertion of goal keep_multiplying_found_values_by_two_list'vc.
+Prover result is: Valid (0.01s, 14143 steps).
+
+File "repaired.mlw", line 115, characters 15-37:
+Sub-goal Assertion of goal keep_multiplying_found_values_by_two_list'vc.
+Prover result is: Valid (0.01s, 2198 steps).
+
+File "repaired.mlw", line 116, characters 15-55:
+Sub-goal Assertion of goal keep_multiplying_found_values_by_two_list'vc.
+Prover result is: Valid (0.01s, 10188 steps).
+
+File "repaired.mlw", line 117, characters 15-57:
+Sub-goal Assertion of goal keep_multiplying_found_values_by_two_list'vc.
+Prover result is: Valid (0.01s, 30610 steps).
+
+File "repaired.mlw", line 103, characters 16-36:
+Sub-goal Loop variant decrease of goal
+keep_multiplying_found_values_by_two_list'vc.
+Prover result is: Valid (0.01s, 14911 steps).
+
+File "repaired.mlw", line 100, characters 18-44:
+Sub-goal Loop invariant preservation of goal
+keep_multiplying_found_values_by_two_list'vc.
+Prover result is: Timeout (10.00s, 78919433 steps).
+
+File "repaired.mlw", line 101, characters 18-58:
+Sub-goal Loop invariant preservation of goal
+keep_multiplying_found_values_by_two_list'vc.
+Prover result is: Valid (0.01s, 2320 steps).
+
+File "repaired.mlw", line 102, characters 18-60:
+Sub-goal Loop invariant preservation of goal
+keep_multiplying_found_values_by_two_list'vc.
+Prover result is: Valid (0.01s, 31398 steps).
+
+File "repaired.mlw", line 119, characters 13-36:
+Sub-goal Assertion of goal keep_multiplying_found_values_by_two_list'vc.
+Prover result is: Valid (0.01s, 2017 steps).
+
+File "repaired.mlw", line 120, characters 13-39:
+Sub-goal Assertion of goal keep_multiplying_found_values_by_two_list'vc.
+Prover result is: Valid (0.01s, 2954 steps).
+
+File "repaired.mlw", line 121, characters 13-53:
+Sub-goal Assertion of goal keep_multiplying_found_values_by_two_list'vc.
+Prover result is: Valid (0.01s, 2053 steps).
+
+File "repaired.mlw", line 122, characters 13-55:
+Sub-goal Assertion of goal keep_multiplying_found_values_by_two_list'vc.
+Prover result is: Valid (0.01s, 27902 steps).
+
+File "repaired.mlw", line 123, characters 13-47:
+Sub-goal Assertion of goal keep_multiplying_found_values_by_two_list'vc.
+Prover result is: Timeout (10.00s, 78123782 steps).
+
+File "repaired.mlw", line 93, characters 15-47:
+Sub-goal Postcondition of goal keep_multiplying_found_values_by_two_list'vc.
+Prover result is: Valid (0.01s, 2392 steps).
+---- stage3 | prover: Alt-Ergo,2.4.0 | theory: KeepMultiplyingFoundValuesByTwo_List_Stage3_Imperative | goal: keep_multiplying_found_values_by_two_list'vc ----
+Transforms: split_vc inline_all
+File "repaired.mlw", line 98, characters 13-53:
+Sub-goal Assertion of goal keep_multiplying_found_values_by_two_list'vc.
+Prover result is: Valid (0.01s, 10 steps).
+
+File "repaired.mlw", line 100, characters 18-44:
+Sub-goal Loop invariant init of goal
+keep_multiplying_found_values_by_two_list'vc.
+Prover result is: Valid (0.01s, 30 steps).
+
+File "repaired.mlw", line 101, characters 18-58:
+Sub-goal Loop invariant init of goal
+keep_multiplying_found_values_by_two_list'vc.
+Prover result is: Valid (0.01s, 14 steps).
+
+File "repaired.mlw", line 102, characters 18-60:
+Sub-goal Loop invariant init of goal
+keep_multiplying_found_values_by_two_list'vc.
+Prover result is: Valid (0.01s, 27 steps).
+
+File "repaired.mlw", line 106, characters 15-32:
+Sub-goal Assertion of goal keep_multiplying_found_values_by_two_list'vc.
+Prover result is: Valid (0.01s, 47 steps).
+
+File "repaired.mlw", line 107, characters 15-58:
+Sub-goal Assertion of goal keep_multiplying_found_values_by_two_list'vc.
+Prover result is: Valid (0.01s, 47 steps).
+
+File "repaired.mlw", line 108, characters 6-52:
+Sub-goal Precondition of goal keep_multiplying_found_values_by_two_list'vc.
+Prover result is: Valid (0.01s, 47 steps).
+
+File "repaired.mlw", line 108, characters 6-52:
+Sub-goal Precondition of goal keep_multiplying_found_values_by_two_list'vc.
+Prover result is: Valid (0.02s, 795 steps).
+
+File "repaired.mlw", line 108, characters 6-52:
+Sub-goal Precondition of goal keep_multiplying_found_values_by_two_list'vc.
+Prover result is: Valid (0.01s, 50 steps).
+
+File "repaired.mlw", line 109, characters 15-66:
+Sub-goal Assertion of goal keep_multiplying_found_values_by_two_list'vc.
+Prover result is: Valid (0.02s, 811 steps).
+
+File "repaired.mlw", line 111, characters 15-62:
+Sub-goal Assertion of goal keep_multiplying_found_values_by_two_list'vc.
+Prover result is: Valid (0.01s, 59 steps).
+
+File "repaired.mlw", line 112, characters 6-43:
+Sub-goal Precondition of goal keep_multiplying_found_values_by_two_list'vc.
+Prover result is: Valid (0.01s, 59 steps).
+
+File "repaired.mlw", line 113, characters 15-64:
+Sub-goal Assertion of goal keep_multiplying_found_values_by_two_list'vc.
+Prover result is: Valid (0.01s, 92 steps).
+
+File "repaired.mlw", line 115, characters 15-37:
+Sub-goal Assertion of goal keep_multiplying_found_values_by_two_list'vc.
+Prover result is: Valid (0.01s, 110 steps).
+
+File "repaired.mlw", line 116, characters 15-55:
+Sub-goal Assertion of goal keep_multiplying_found_values_by_two_list'vc.
+Prover result is: Valid (0.01s, 127 steps).
+
+File "repaired.mlw", line 117, characters 15-57:
+Sub-goal Assertion of goal keep_multiplying_found_values_by_two_list'vc.
+Prover result is: Valid (0.24s, 3892 steps).
+
+File "repaired.mlw", line 103, characters 16-36:
+Sub-goal Loop variant decrease of goal
+keep_multiplying_found_values_by_two_list'vc.
+Prover result is: Valid (0.01s, 171 steps).
+
+File "repaired.mlw", line 100, characters 18-44:
+Sub-goal Loop invariant preservation of goal
+keep_multiplying_found_values_by_two_list'vc.
+Prover result is: Timeout (10.00s, 59042 steps).
+
+File "repaired.mlw", line 101, characters 18-58:
+Sub-goal Loop invariant preservation of goal
+keep_multiplying_found_values_by_two_list'vc.
+Prover result is: Valid (0.01s, 173 steps).
+
+File "repaired.mlw", line 102, characters 18-60:
+Sub-goal Loop invariant preservation of goal
+keep_multiplying_found_values_by_two_list'vc.
+Prover result is: Valid (0.24s, 3945 steps).
+
+File "repaired.mlw", line 119, characters 13-36:
+Sub-goal Assertion of goal keep_multiplying_found_values_by_two_list'vc.
+Prover result is: Valid (0.01s, 47 steps).
+
+File "repaired.mlw", line 120, characters 13-39:
+Sub-goal Assertion of goal keep_multiplying_found_values_by_two_list'vc.
+Prover result is: Valid (0.01s, 50 steps).
+
+File "repaired.mlw", line 121, characters 13-53:
+Sub-goal Assertion of goal keep_multiplying_found_values_by_two_list'vc.
+Prover result is: Valid (0.01s, 47 steps).
+
+File "repaired.mlw", line 122, characters 13-55:
+Sub-goal Assertion of goal keep_multiplying_found_values_by_two_list'vc.
+Prover result is: Valid (0.02s, 792 steps).
+
+File "repaired.mlw", line 123, characters 13-47:
+Sub-goal Assertion of goal keep_multiplying_found_values_by_two_list'vc.
+Prover result is: Valid (0.05s, 2673 steps).
+
+File "repaired.mlw", line 93, characters 15-47:
+Sub-goal Postcondition of goal keep_multiplying_found_values_by_two_list'vc.
+Prover result is: Valid (0.22s, 8467 steps).
+---- stage3 | prover: CVC4,1.8 | theory: KeepMultiplyingFoundValuesByTwo_List_Stage3_Imperative | goal: keep_multiplying_found_values_by_two_list'vc ----
+Transforms: split_vc inline_all
+File "repaired.mlw", line 98, characters 13-53:
+Sub-goal Assertion of goal keep_multiplying_found_values_by_two_list'vc.
+Prover result is: Valid (0.02s, 4841 steps).
+
+File "repaired.mlw", line 100, characters 18-44:
+Sub-goal Loop invariant init of goal
+keep_multiplying_found_values_by_two_list'vc.
+Prover result is: Valid (0.02s, 5079 steps).
+
+File "repaired.mlw", line 101, characters 18-58:
+Sub-goal Loop invariant init of goal
+keep_multiplying_found_values_by_two_list'vc.
+Prover result is: Valid (0.02s, 4888 steps).
+
+File "repaired.mlw", line 102, characters 18-60:
+Sub-goal Loop invariant init of goal
+keep_multiplying_found_values_by_two_list'vc.
+Prover result is: Valid (0.02s, 5193 steps).
+
+File "repaired.mlw", line 106, characters 15-32:
+Sub-goal Assertion of goal keep_multiplying_found_values_by_two_list'vc.
+Prover result is: Valid (0.02s, 5118 steps).
+
+File "repaired.mlw", line 107, characters 15-58:
+Sub-goal Assertion of goal keep_multiplying_found_values_by_two_list'vc.
+Prover result is: Valid (0.02s, 5124 steps).
+
+File "repaired.mlw", line 108, characters 6-52:
+Sub-goal Precondition of goal keep_multiplying_found_values_by_two_list'vc.
+Prover result is: Valid (0.02s, 5127 steps).
+
+File "repaired.mlw", line 108, characters 6-52:
+Sub-goal Precondition of goal keep_multiplying_found_values_by_two_list'vc.
+Prover result is: Valid (0.03s, 10588 steps).
+
+File "repaired.mlw", line 108, characters 6-52:
+Sub-goal Precondition of goal keep_multiplying_found_values_by_two_list'vc.
+Prover result is: Valid (0.02s, 5470 steps).
+
+File "repaired.mlw", line 109, characters 15-66:
+Sub-goal Assertion of goal keep_multiplying_found_values_by_two_list'vc.
+Prover result is: Valid (0.03s, 11047 steps).
+
+File "repaired.mlw", line 111, characters 15-62:
+Sub-goal Assertion of goal keep_multiplying_found_values_by_two_list'vc.
+Prover result is: Valid (0.02s, 5458 steps).
+
+File "repaired.mlw", line 112, characters 6-43:
+Sub-goal Precondition of goal keep_multiplying_found_values_by_two_list'vc.
+Prover result is: Valid (0.02s, 5455 steps).
+
+File "repaired.mlw", line 113, characters 15-64:
+Sub-goal Assertion of goal keep_multiplying_found_values_by_two_list'vc.
+Prover result is: Valid (0.02s, 5724 steps).
+
+File "repaired.mlw", line 115, characters 15-37:
+Sub-goal Assertion of goal keep_multiplying_found_values_by_two_list'vc.
+Prover result is: Valid (0.02s, 5534 steps).
+
+File "repaired.mlw", line 116, characters 15-55:
+Sub-goal Assertion of goal keep_multiplying_found_values_by_two_list'vc.
+Prover result is: Valid (0.02s, 6069 steps).
+
+File "repaired.mlw", line 117, characters 15-57:
+Sub-goal Assertion of goal keep_multiplying_found_values_by_two_list'vc.
+Prover result is: Valid (0.04s, 12778 steps).
+
+File "repaired.mlw", line 103, characters 16-36:
+Sub-goal Loop variant decrease of goal
+keep_multiplying_found_values_by_two_list'vc.
+Prover result is: Valid (0.02s, 5825 steps).
+
+File "repaired.mlw", line 100, characters 18-44:
+Sub-goal Loop invariant preservation of goal
+keep_multiplying_found_values_by_two_list'vc.
+Prover result is: Timeout (10.00s, 686746 steps).
+
+File "repaired.mlw", line 101, characters 18-58:
+Sub-goal Loop invariant preservation of goal
+keep_multiplying_found_values_by_two_list'vc.
+Prover result is: Valid (0.02s, 5797 steps).
+
+File "repaired.mlw", line 102, characters 18-60:
+Sub-goal Loop invariant preservation of goal
+keep_multiplying_found_values_by_two_list'vc.
+Prover result is: Valid (0.04s, 13303 steps).
+
+File "repaired.mlw", line 119, characters 13-36:
+Sub-goal Assertion of goal keep_multiplying_found_values_by_two_list'vc.
+Prover result is: Valid (0.02s, 5120 steps).
+
+File "repaired.mlw", line 120, characters 13-39:
+Sub-goal Assertion of goal keep_multiplying_found_values_by_two_list'vc.
+Prover result is: Valid (0.02s, 5139 steps).
+
+File "repaired.mlw", line 121, characters 13-53:
+Sub-goal Assertion of goal keep_multiplying_found_values_by_two_list'vc.
+Prover result is: Valid (0.02s, 5144 steps).
+
+File "repaired.mlw", line 122, characters 13-55:
+Sub-goal Assertion of goal keep_multiplying_found_values_by_two_list'vc.
+Prover result is: Valid (0.03s, 10417 steps).
+
+File "repaired.mlw", line 123, characters 13-47:
+Sub-goal Assertion of goal keep_multiplying_found_values_by_two_list'vc.
+Prover result is: Valid (0.04s, 13620 steps).
+
+File "repaired.mlw", line 93, characters 15-47:
+Sub-goal Postcondition of goal keep_multiplying_found_values_by_two_list'vc.
+Prover result is: Valid (0.02s, 6227 steps).
+== Final summary ==
+Unproved root goals after first prover : 1
+Remaining failures after split_vc      : 1
+Remaining failures after stage 3       : 1
+Detailed logs stored in                : /Users/rubenm/Desktop/Diversify2Verify/codex-runs/dataset-merge-verification/stage3a-repair/2154_keep-multiplying-found-values-by-two/list-imperative/keep_multiplying_found_values_by_two_list_stage3_7bf77fde_stage3/generated/why3/.why3_sessions/repaired_logs
+Still unproved goals:
+KeepMultiplyingFoundValuesByTwo_List_Stage3_Imperative	keep_multiplying_found_values_by_two_list'vc
+VERIFY_RESULT: FAILURE
+VERIFY_REASON: unproved_goals_remain
+VERIFY_STAGE: stage3
+VERIFY_ROOT_TOTAL: 5
+VERIFY_ROOT_PROVED: 4
+VERIFY_ROOT_REMAINING: 1

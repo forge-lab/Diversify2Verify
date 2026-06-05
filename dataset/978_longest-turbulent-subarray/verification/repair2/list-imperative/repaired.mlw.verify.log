@@ -1,0 +1,75 @@
+== Stage 1: first prover on whole file ==
+Running in /Users/rubenm/Desktop/Diversify2Verify/codex-runs/repair2-split2/stage3a-rerepair/978_longest-turbulent-subarray/list-imperative/longest_turbulent_subarray_list_stage3_998f750d_stage3/repaired/generated/why3: why3 session create -o /Users/rubenm/Desktop/Diversify2Verify/codex-runs/repair2-split2/stage3a-rerepair/978_longest-turbulent-subarray/list-imperative/longest_turbulent_subarray_list_stage3_998f750d_stage3/repaired/generated/why3/.why3_sessions/repaired_stage1 -P Z3,4.8.6 -t 10 -m 8192 repaired.mlw
+Session created successfully
+Running in /Users/rubenm/Desktop/Diversify2Verify/codex-runs/repair2-split2/stage3a-rerepair/978_longest-turbulent-subarray/list-imperative/longest_turbulent_subarray_list_stage3_998f750d_stage3/repaired/generated/why3: why3 bench /Users/rubenm/Desktop/Diversify2Verify/codex-runs/repair2-split2/stage3a-rerepair/978_longest-turbulent-subarray/list-imperative/longest_turbulent_subarray_list_stage3_998f750d_stage3/repaired/generated/why3/.why3_sessions/repaired_stage1
+Progress: 12/1/0                       Progress: 11/2/0                       Progress: 10/3/0                       Progress: 9/4/0                       Progress: 8/5/0                       Progress: 7/6/0                       Progress: 7/0/0                       Progress: 6/1/0                       Progress: 5/2/0                       Progress: 4/3/0                       Progress: 3/4/0                       Progress: 2/5/0                       Progress: 1/6/0                       Progress: 1/2/2                       Progress: 0/3/2                       Progress: 0/2/2                       Progress: 0/0/2                       Progress: 0/0/1                       
+Replay completed, saving session... done
+== Stage 1 stats ==
+= Statistics for session /Users/rubenm/Desktop/Diversify2Verify/codex-runs/repair2-split2/stage3a-rerepair/978_longest-turbulent-subarray/list-imperative/longest_turbulent_subarray_list_stage3_998f750d_stage3/repaired/generated/why3/.why3_sessions/repaired_stage1
+
+== Number of root goals ==
+  total: 13  proved: 10
+
+== Number of sub goals ==
+  total: 0  proved: 0
+
+== Goals not proved ==
+  +-- file [../../repaired.mlw]
+    +-- theory LongestTurbulentSubarray_List_Stage3_Imperative
+      +-- goal scan_best_lower_bound'vc
+      +-- goal scan_best_state'vc
+      +-- goal longest_turbulent_subarray_list'vc
+  
+== Goals proved by only one prover ==
+  +-- file [../../repaired.mlw]
+    +-- theory LongestTurbulentSubarray_List_Stage3_Imperative
+      +-- goal run_len_from'vc: Z3 4.8.6
+      +-- goal turbulent_prefix_len'vc: Z3 4.8.6
+      +-- goal longest_turbulent_length'vc: Z3 4.8.6
+      +-- goal scan_best'vc: Z3 4.8.6
+      +-- goal run_len_from_bounds'vc: Z3 4.8.6
+      +-- goal run_len_from_positive'vc: Z3 4.8.6
+      +-- goal turbulent_prefix_len_bounds'vc: Z3 4.8.6
+      +-- goal longest_turbulent_length_bounds'vc: Z3 4.8.6
+      +-- goal longest_turbulent_nonempty'vc: Z3 4.8.6
+      +-- goal scan_best_initial'vc: Z3 4.8.6
+  
+1 session(s) read, with a total of 13 proof goals.
+== Unproved root goals after first prover ==
+LongestTurbulentSubarray_List_Stage3_Imperative	scan_best_lower_bound'vc
+LongestTurbulentSubarray_List_Stage3_Imperative	scan_best_state'vc
+LongestTurbulentSubarray_List_Stage3_Imperative	longest_turbulent_subarray_list'vc
+== Stage 1: trying remaining goals with prover Alt-Ergo,2.4.0 ==
+---- stage1 | prover: Alt-Ergo,2.4.0 | theory: LongestTurbulentSubarray_List_Stage3_Imperative | goal: scan_best_lower_bound'vc ----
+File repaired.mlw:
+Goal scan_best_lower_bound'vc.
+Prover result is: Valid (0.01s, 190 steps).
+Solved in stage 1 using prover: Alt-Ergo,2.4.0
+---- stage1 | prover: Alt-Ergo,2.4.0 | theory: LongestTurbulentSubarray_List_Stage3_Imperative | goal: scan_best_state'vc ----
+File repaired.mlw:
+Goal scan_best_state'vc.
+Prover result is: Timeout (10.00s, 140660 steps).
+---- stage1 | prover: Alt-Ergo,2.4.0 | theory: LongestTurbulentSubarray_List_Stage3_Imperative | goal: longest_turbulent_subarray_list'vc ----
+File repaired.mlw:
+Goal longest_turbulent_subarray_list'vc.
+Prover result is: Timeout (10.00s, 146762 steps).
+Remaining after prover Alt-Ergo,2.4.0: 2
+== Stage 1: trying remaining goals with prover CVC4,1.8 ==
+---- stage1 | prover: CVC4,1.8 | theory: LongestTurbulentSubarray_List_Stage3_Imperative | goal: scan_best_state'vc ----
+File repaired.mlw:
+Goal scan_best_state'vc.
+Prover result is: Valid (0.66s, 118650 steps).
+Solved in stage 1 using prover: CVC4,1.8
+---- stage1 | prover: CVC4,1.8 | theory: LongestTurbulentSubarray_List_Stage3_Imperative | goal: longest_turbulent_subarray_list'vc ----
+File repaired.mlw:
+Goal longest_turbulent_subarray_list'vc.
+Prover result is: Valid (1.35s, 203825 steps).
+Solved in stage 1 using prover: CVC4,1.8
+Remaining after prover CVC4,1.8: 0
+All goals proved after sequential stage 1. No need to continue.
+VERIFY_RESULT: SUCCESS
+VERIFY_REASON: proved_after_stage1
+VERIFY_STAGE: stage1
+VERIFY_ROOT_TOTAL: 13
+VERIFY_ROOT_PROVED: 13
+VERIFY_ROOT_REMAINING: 0

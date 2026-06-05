@@ -1,0 +1,113 @@
+module MinimumDifferenceBetweenLargestAndSmallestValueInThreeMoves_Array_Stage3_Recursive
+
+  use int.Int
+  use array.Array
+  use array.Init
+  use list.List
+
+  predicate values_in_bounds (nums: array int) =
+    forall i: int. 0 <= i < length nums -> -1000000000 <= nums[i] <= 1000000000
+
+  predicate valid_input (nums: array int) =
+    1 <= length nums <= 100000 /\
+    values_in_bounds nums
+
+  let rec function kept_count_from (nums: array int) (lo: int) (hi: int) (i: int) : int
+    requires { 0 <= i <= length nums }
+    variant  { length nums - i }
+  = if i = length nums then 0 else
+      (if lo <= nums[i] then
+         if nums[i] <= hi then 1 else 0
+       else 0) + kept_count_from nums lo hi (i + 1)
+
+  function kept_count (nums: array int) (lo: int) (hi: int) : int =
+    kept_count_from nums lo hi 0
+
+  predicate achievable_difference (nums: array int) (diff: int) =
+    0 <= diff /\
+    exists lo hi: int.
+      lo <= hi /\
+      hi - lo = diff /\
+      kept_count nums lo hi >= length nums - 3
+
+  predicate minimum_difference_between_largest_and_smallest_value_in_three_moves_array_spec
+      (nums: array int) (res: int) =
+    achievable_difference nums res /\
+    forall d: int. 0 <= d < res -> not (achievable_difference nums d)
+
+  let rec function list_length (l: list int) : int
+    variant { l }
+  =
+    match l with
+    | Nil -> 0
+    | Cons _ xs -> 1 + list_length xs
+    end
+
+  let rec array_to_list_from (nums: array int) (i: int) : list int
+    requires { 0 <= i <= length nums }
+    variant { length nums - i }
+    ensures { list_length result = length nums - i }
+  =
+    if i = length nums then
+      Nil
+    else begin
+      assert { 0 <= i < length nums };
+      let tail = array_to_list_from nums (i + 1) in
+      assert { list_length tail = length nums - (i + 1) };
+      Cons nums[i] tail
+    end
+
+  let rec insert_sorted (x: int) (l: list int) : list int
+    variant { l }
+    ensures { list_length result = 1 + list_length l }
+  =
+    match l with
+    | Nil -> Cons x Nil
+    | Cons y ys ->
+        if x <= y then Cons x l else Cons y (insert_sorted x ys)
+    end
+
+  let rec insertion_sort (l: list int) : list int
+    variant { l }
+    ensures { list_length result = list_length l }
+  =
+    match l with
+    | Nil -> Nil
+    | Cons x xs -> insert_sorted x (insertion_sort xs)
+    end
+
+  let rec nth_default (l: list int) (i: int) (default: int) : int
+    variant { l }
+  =
+    match l with
+    | Nil -> default
+    | Cons x xs ->
+        if i <= 0 then x else nth_default xs (i - 1) default
+    end
+
+  let min2 (a: int) (b: int) : int =
+    if a <= b then a else b
+
+  let min4 (a: int) (b: int) (c: int) (d: int) : int =
+    min2 (min2 a b) (min2 c d)
+
+  let minimum_difference_between_largest_and_smallest_value_in_three_moves_array
+      (nums: array int) : int
+    requires { valid_input nums }
+    ensures  { minimum_difference_between_largest_and_smallest_value_in_three_moves_array_spec nums result }
+  =
+    let nums_list = array_to_list_from nums 0 in
+    let n = list_length nums_list in
+    assert { n = length nums };
+    if n <= 4 then
+      0
+    else
+      let sorted = insertion_sort nums_list in
+      assert { list_length sorted = n };
+      let d0 = nth_default sorted (n - 4) 0 - nth_default sorted 0 0 in
+      let d1 = nth_default sorted (n - 3) 0 - nth_default sorted 1 0 in
+      let d2 = nth_default sorted (n - 2) 0 - nth_default sorted 2 0 in
+      let d3 = nth_default sorted (n - 1) 0 - nth_default sorted 3 0 in
+      min4 d0 d1 d2 d3
+
+end

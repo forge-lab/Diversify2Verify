@@ -1,0 +1,170 @@
+module SumOfFlooredPairs_Array_Imperative
+
+  use int.Int
+  use int.EuclideanDivision
+  use array.Array
+  use array.Init
+  use ref.Ref
+
+  predicate valid_problem_values (nums: array int) =
+    forall i: int. 0 <= i < length nums -> 1 <= nums[i] <= 100000
+
+  predicate valid_problem_input (nums: array int) =
+    1 <= length nums <= 100000 /\
+    valid_problem_values nums
+
+  let sum_of_floored_pairs_array (nums: array int) : int
+    requires { valid_problem_input nums }
+  =
+    let total = ref 0 in
+    for i = 0 to length nums - 1 do
+      for j = 0 to length nums - 1 do
+        total := mod (!total + div nums[i] nums[j]) 1000000007
+      done
+    done;
+    !total
+
+  let test_002 () : bool =
+    let nums = init 3 [|2; 5; 9|] in
+    let r = sum_of_floored_pairs_array nums in
+    r = 10
+
+  let test_003 () : bool =
+    let nums = init 3 [|100000; 1; 100000|] in
+    let r = sum_of_floored_pairs_array nums in
+    r = 200005
+
+  let test_009 () : bool =
+    let nums = init 3 [|100000; 100000; 100000|] in
+    let r = sum_of_floored_pairs_array nums in
+    r = 9
+
+  let test_004 () : bool =
+    let nums = init 5 [|100000; 50000; 25000; 12500; 6250|] in
+    let r = sum_of_floored_pairs_array nums in
+    r = 57
+
+  let test_006 () : bool =
+    let nums = init 5 [|10; 20; 30; 40; 50|] in
+    let r = sum_of_floored_pairs_array nums in
+    r = 27
+
+  let test_008 () : bool =
+    let nums = init 5 [|1; 2; 3; 4; 5|] in
+    let r = sum_of_floored_pairs_array nums in
+    r = 27
+
+  let test_035 () : bool =
+    let nums = init 6 [|1; 10; 100; 1000; 10000; 100000|] in
+    let r = sum_of_floored_pairs_array nums in
+    r = 123456
+
+  let test_000 () : bool =
+    let nums = init 7 [|7; 7; 7; 7; 7; 7; 7|] in
+    let r = sum_of_floored_pairs_array nums in
+    r = 49
+
+  let test_001 () : bool =
+    let nums = init 10 [|1; 1; 1; 1; 1; 1; 1; 1; 1; 1|] in
+    let r = sum_of_floored_pairs_array nums in
+    r = 100
+
+  let test_007 () : bool =
+    let nums = init 10 [|1; 3; 5; 7; 9; 11; 13; 15; 17; 19|] in
+    let r = sum_of_floored_pairs_array nums in
+    r = 178
+
+  let test_013 () : bool =
+    let nums = init 10 [|100000; 90000; 80000; 70000; 60000; 50000; 40000; 30000; 20000; 10000|] in
+    let r = sum_of_floored_pairs_array nums in
+    r = 127
+
+  let test_017 () : bool =
+    let nums = init 10 [|100; 200; 300; 400; 500; 600; 700; 800; 900; 1000|] in
+    let r = sum_of_floored_pairs_array nums in
+    r = 127
+
+  let test_024 () : bool =
+    let nums = init 10 [|99999; 99998; 99997; 99996; 99995; 99994; 99993; 99992; 99991; 99990|] in
+    let r = sum_of_floored_pairs_array nums in
+    r = 55
+
+  let test_025 () : bool =
+    let nums = init 10 [|50000; 50000; 50000; 50000; 50000; 50000; 50000; 50000; 50000; 50000|] in
+    let r = sum_of_floored_pairs_array nums in
+    r = 100
+
+  let test_027 () : bool =
+    let nums = init 10 [|1; 3; 6; 10; 15; 21; 28; 36; 45; 55|] in
+    let r = sum_of_floored_pairs_array nums in
+    r = 371
+
+  let test_036 () : bool =
+    let nums = init 10 [|10000; 20000; 30000; 40000; 50000; 60000; 70000; 80000; 90000; 100000|] in
+    let r = sum_of_floored_pairs_array nums in
+    r = 127
+
+  let test_037 () : bool =
+    let nums = init 10 [|100000; 100000; 50000; 50000; 25000; 25000; 12500; 12500; 6250; 6250|] in
+    let r = sum_of_floored_pairs_array nums in
+    r = 228
+
+  let test_038 () : bool =
+    let nums = init 10 [|1; 2; 3; 4; 5; 6; 7; 8; 9; 10|] in
+    let r = sum_of_floored_pairs_array nums in
+    r = 127
+
+  let test_043 () : bool =
+    let nums = init 10 [|2; 4; 8; 16; 32; 64; 128; 256; 512; 1024|] in
+    let r = sum_of_floored_pairs_array nums in
+    r = 2036
+
+  let test_044 () : bool =
+    let nums = init 10 [|10; 20; 30; 40; 50; 60; 70; 80; 90; 100|] in
+    let r = sum_of_floored_pairs_array nums in
+    r = 127
+
+  let run_tests () : bool =
+    if test_002 () then
+    if test_003 () then
+    if test_009 () then
+    if test_004 () then
+    if test_006 () then
+    if test_008 () then
+    if test_035 () then
+    if test_000 () then
+    if test_001 () then
+    if test_007 () then
+    if test_013 () then
+    if test_017 () then
+    if test_024 () then
+    if test_025 () then
+    if test_027 () then
+    if test_036 () then
+    if test_037 () then
+    if test_038 () then
+    if test_043 () then
+    if test_044 () then
+      true
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+
+end

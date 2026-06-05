@@ -1,0 +1,189 @@
+module CountNumberOfNiceSubarrays_Array_Spec
+
+  use int.Int
+  use int.EuclideanDivision
+  use int.NumOf as IntNumOf
+  use array.Array
+  use array.Init
+  use array.NumOf as ArrayNumOf
+
+  predicate valid_input (nums: array int) (k: int) =
+    1 <= length nums <= 50000 /\
+    1 <= k <= length nums /\
+    forall i: int. 0 <= i < length nums -> 1 <= nums[i] <= 100000
+
+  function odd_count (nums: array int) (l: int) (r: int) : int =
+    ArrayNumOf.numof (fun _ v -> mod v 2 = 1) nums l r
+
+  predicate valid_subarray (nums: array int) (l: int) (r: int) =
+    0 <= l < r <= length nums
+
+  predicate nice_subarray (nums: array int) (k: int) (l: int) (r: int) =
+    valid_subarray nums l r /\
+    odd_count nums l r = k
+
+  function encoded_bound (nums: array int) : int =
+    (length nums + 1) * (length nums + 1)
+
+  function pair_start (nums: array int) (code: int) : int =
+    div code (length nums + 1)
+
+  function pair_end (nums: array int) (code: int) : int =
+    mod code (length nums + 1)
+
+  predicate encoded_nice_subarray (nums: array int) (k: int) (code: int) =
+    nice_subarray nums k (pair_start nums code) (pair_end nums code)
+
+  function nice_subarray_count (nums: array int) (k: int) : int =
+    IntNumOf.numof (fun code -> encoded_nice_subarray nums k code)
+      0 (encoded_bound nums)
+
+  predicate count_number_of_nice_subarrays_array_spec
+    (nums: array int) (k: int) (res: int) =
+    res = nice_subarray_count nums k
+
+  val count_number_of_nice_subarrays_array (nums: array int) (k: int) : int
+    requires { valid_input nums k }
+    ensures  { count_number_of_nice_subarrays_array_spec nums k result }
+
+  let lemma test_002_python_assertions () =
+    let nums = init 1 [|2|] in
+    assert { length nums = 1 };
+    assert { nums[0] = 2 };
+    assert { valid_input nums 1 };
+    assert { odd_count nums 0 1 = 0 };
+    assert { not (nice_subarray nums 1 0 1) };
+    assert { encoded_bound nums = 4 };
+    assert { nice_subarray_count nums 1 = 0 };
+    assert { count_number_of_nice_subarrays_array_spec nums 1 0 }
+
+  let lemma test_003_python_assertions () =
+    let nums = init 3 [|2; 4; 6|] in
+    assert { length nums = 3 };
+    assert { nums[0] = 2 };
+    assert { nums[1] = 4 };
+    assert { nums[2] = 6 };
+    assert { valid_input nums 1 };
+    assert { odd_count nums 0 1 = 0 };
+    assert { odd_count nums 0 2 = 0 };
+    assert { odd_count nums 0 3 = 0 };
+    assert { odd_count nums 1 2 = 0 };
+    assert { odd_count nums 1 3 = 0 };
+    assert { odd_count nums 2 3 = 0 };
+    assert { encoded_bound nums = 16 };
+    assert { nice_subarray_count nums 1 = 0 };
+    assert { count_number_of_nice_subarrays_array_spec nums 1 0 }
+
+  let lemma test_005_python_assertions () =
+    let nums = init 1 [|1|] in
+    assert { length nums = 1 };
+    assert { nums[0] = 1 };
+    assert { valid_input nums 1 };
+    assert { odd_count nums 0 1 = 1 };
+    assert { nice_subarray nums 1 0 1 };
+    assert { pair_start nums 1 = 0 };
+    assert { pair_end nums 1 = 1 };
+    assert { encoded_nice_subarray nums 1 1 };
+    assert { nice_subarray_count nums 1 = 1 };
+    assert { count_number_of_nice_subarrays_array_spec nums 1 1 }
+
+  let lemma test_008_python_assertions () =
+    let nums = init 10 [|2; 2; 2; 1; 2; 2; 1; 2; 2; 2|] in
+    assert { length nums = 10 };
+    assert { nums[0] = 2 };
+    assert { nums[1] = 2 };
+    assert { nums[2] = 2 };
+    assert { nums[3] = 1 };
+    assert { nums[4] = 2 };
+    assert { nums[5] = 2 };
+    assert { nums[6] = 1 };
+    assert { nums[7] = 2 };
+    assert { nums[8] = 2 };
+    assert { nums[9] = 2 };
+    assert { valid_input nums 2 };
+    assert { odd_count nums 0 7 = 2 };
+    assert { odd_count nums 1 7 = 2 };
+    assert { odd_count nums 2 7 = 2 };
+    assert { odd_count nums 3 7 = 2 };
+    assert { odd_count nums 0 6 = 1 };
+    assert { odd_count nums 4 10 = 1 };
+    assert { nice_subarray nums 2 0 7 };
+    assert { nice_subarray nums 2 3 10 };
+    assert { not (nice_subarray nums 2 0 6) };
+    assert { encoded_bound nums = 121 };
+    assert { encoded_nice_subarray nums 2 7 };
+    assert { encoded_nice_subarray nums 2 43 };
+    assert { nice_subarray_count nums 2 = 16 };
+    assert { count_number_of_nice_subarrays_array_spec nums 2 16 }
+
+  let lemma test_009_python_assertions () =
+    let nums = init 5 [|1; 3; 5; 7; 9|] in
+    assert { length nums = 5 };
+    assert { nums[0] = 1 };
+    assert { nums[1] = 3 };
+    assert { nums[2] = 5 };
+    assert { nums[3] = 7 };
+    assert { nums[4] = 9 };
+    assert { valid_input nums 2 };
+    assert { odd_count nums 0 2 = 2 };
+    assert { odd_count nums 1 3 = 2 };
+    assert { odd_count nums 2 4 = 2 };
+    assert { odd_count nums 3 5 = 2 };
+    assert { odd_count nums 0 1 = 1 };
+    assert { odd_count nums 0 3 = 3 };
+    assert { nice_subarray nums 2 0 2 };
+    assert { nice_subarray nums 2 3 5 };
+    assert { encoded_bound nums = 36 };
+    assert { encoded_nice_subarray nums 2 2 };
+    assert { encoded_nice_subarray nums 2 23 };
+    assert { nice_subarray_count nums 2 = 4 };
+    assert { count_number_of_nice_subarrays_array_spec nums 2 4 }
+
+  let lemma test_010_python_assertions () =
+    let nums = init 5 [|1; 1; 2; 1; 1|] in
+    assert { length nums = 5 };
+    assert { nums[0] = 1 };
+    assert { nums[1] = 1 };
+    assert { nums[2] = 2 };
+    assert { nums[3] = 1 };
+    assert { nums[4] = 1 };
+    assert { valid_input nums 3 };
+    assert { odd_count nums 0 4 = 3 };
+    assert { odd_count nums 1 5 = 3 };
+    assert { odd_count nums 0 3 = 2 };
+    assert { odd_count nums 2 5 = 2 };
+    assert { nice_subarray nums 3 0 4 };
+    assert { nice_subarray nums 3 1 5 };
+    assert { not (nice_subarray nums 3 0 3) };
+    assert { encoded_bound nums = 36 };
+    assert { encoded_nice_subarray nums 3 4 };
+    assert { encoded_nice_subarray nums 3 11 };
+    assert { nice_subarray_count nums 3 = 2 };
+    assert { count_number_of_nice_subarrays_array_spec nums 3 2 }
+
+  let lemma test_012_python_assertions () =
+    let nums = init 5 [|10; 15; 20; 25; 30|] in
+    assert { length nums = 5 };
+    assert { nums[0] = 10 };
+    assert { nums[1] = 15 };
+    assert { nums[2] = 20 };
+    assert { nums[3] = 25 };
+    assert { nums[4] = 30 };
+    assert { valid_input nums 1 };
+    assert { odd_count nums 0 2 = 1 };
+    assert { odd_count nums 1 2 = 1 };
+    assert { odd_count nums 1 4 = 2 };
+    assert { odd_count nums 2 4 = 1 };
+    assert { odd_count nums 3 5 = 1 };
+    assert { nice_subarray nums 1 0 2 };
+    assert { nice_subarray nums 1 2 4 };
+    assert { nice_subarray nums 1 3 5 };
+    assert { not (nice_subarray nums 1 1 4) };
+    assert { encoded_bound nums = 36 };
+    assert { encoded_nice_subarray nums 1 2 };
+    assert { encoded_nice_subarray nums 1 16 };
+    assert { encoded_nice_subarray nums 1 23 };
+    assert { nice_subarray_count nums 1 = 8 };
+    assert { count_number_of_nice_subarrays_array_spec nums 1 8 }
+
+end

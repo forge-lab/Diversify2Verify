@@ -1,0 +1,236 @@
+module MinimumDifferenceBetweenLargestAndSmallestValueInThreeMoves_List_Stage3_Recursive
+
+  use int.Int
+  use list.List
+  use list.Length
+  use list.Mem
+  use list.SortedInt
+  use list.Permut
+
+  predicate values_in_bounds (nums: list int) =
+    forall x: int. mem x nums -> -1000000000 <= x <= 1000000000
+
+  predicate valid_input (nums: list int) =
+    1 <= length nums <= 100000 /\
+    values_in_bounds nums
+
+  let rec function kept_count (nums: list int) (lo: int) (hi: int) : int
+    variant { nums }
+  =
+    match nums with
+    | Nil -> 0
+    | Cons x xs -> (if lo <= x <= hi then 1 else 0) + kept_count xs lo hi
+    end
+
+  predicate achievable_difference (nums: list int) (diff: int) =
+    0 <= diff /\
+    exists lo hi: int.
+      lo <= hi /\
+      hi - lo = diff /\
+      kept_count nums lo hi >= length nums - 3
+
+  predicate minimum_difference_between_largest_and_smallest_value_in_three_moves_list_spec
+      (nums: list int) (res: int) =
+    achievable_difference nums res /\
+    forall d: int. 0 <= d < res -> not (achievable_difference nums d)
+
+  let rec insert_sorted (x: int) (l: list int) : list int
+    ensures { length result = length l + 1 }
+    ensures { sorted l -> sorted result }
+    ensures { permut result (Cons x l) }
+    variant { l }
+  =
+    match l with
+    | Nil ->
+        assert { sorted (Cons x Nil) };
+        assert { permut (Cons x Nil) (Cons x Nil) };
+        assert { length (Cons x Nil) = length (Nil: list int) + 1 };
+        Cons x Nil
+    | Cons y ys ->
+        if x <= y then begin
+          assert { sorted l -> sorted (Cons x l) };
+          assert { permut (Cons x l) (Cons x l) };
+          assert { length (Cons x l) = length l + 1 };
+          Cons x l
+        end else begin
+          let tail = insert_sorted x ys in
+          assert { length tail = length ys + 1 };
+          assert { sorted ys -> sorted tail };
+          assert { sorted l -> sorted tail };
+          assert { sorted l -> sorted (Cons y tail) };
+          assert { permut tail (Cons x ys) };
+          assert { permut (Cons y tail) (Cons y (Cons x ys)) };
+          assert { permut (Cons y (Cons x ys)) (Cons x (Cons y ys)) };
+          assert { length (Cons y tail) = length l + 1 };
+          assert { permut (Cons y tail) (Cons x l) };
+          Cons y tail
+        end
+    end
+
+  let rec insertion_sort (l: list int) : list int
+    ensures { length result = length l }
+    ensures { sorted result }
+    ensures { permut result l }
+    variant { l }
+  =
+    match l with
+    | Nil ->
+        assert { sorted (Nil: list int) };
+        assert { permut (Nil: list int) (Nil: list int) };
+        Nil
+    | Cons x xs ->
+        let sx = insertion_sort xs in
+        assert { length sx = length xs };
+        assert { sorted sx };
+        assert { permut sx xs };
+        let r = insert_sorted x sx in
+        assert { length r = length sx + 1 };
+        assert { sorted r };
+        assert { permut r (Cons x sx) };
+        assert { permut (Cons x sx) (Cons x xs) };
+        assert { length r = length l };
+        assert { permut r l };
+        r
+    end
+
+  let rec list_length (l: list int) : int
+    ensures { result = length l }
+    variant { l }
+  =
+    match l with
+    | Nil ->
+        assert { length (Nil: list int) = 0 };
+        0
+    | Cons _ xs ->
+        let r = list_length xs in
+        assert { r = length xs };
+        assert { length l = length xs + 1 };
+        1 + r
+    end
+
+  let rec function nth_default (l: list int) (i: int) (default: int) : int
+    ensures { l = Nil -> result = default }
+    variant { l }
+  =
+    match l with
+    | Nil -> default
+    | Cons x xs ->
+        if i <= 0 then x else nth_default xs (i - 1) default
+    end
+
+  let function min2 (a: int) (b: int) : int
+    ensures { result = a \/ result = b }
+    ensures { result <= a /\ result <= b }
+    ensures { (forall x: int. x <= a /\ x <= b -> x <= result) }
+  =
+    if a <= b then a else b
+
+  let function min4 (a: int) (b: int) (c: int) (d: int) : int
+    ensures { result = a \/ result = b \/ result = c \/ result = d }
+    ensures { result <= a /\ result <= b /\ result <= c /\ result <= d }
+    ensures { (forall x: int. x <= a /\ x <= b /\ x <= c /\ x <= d -> x <= result) }
+  =
+    min2 (min2 a b) (min2 c d)
+
+  let lemma valid_input_has_member (nums: list int)
+    requires { valid_input nums }
+    ensures  { exists x: int. mem x nums }
+  =
+    match nums with
+    | Nil -> absurd
+    | Cons x _ -> assert { mem x nums }
+    end
+
+  let rec lemma kept_count_nonnegative (nums: list int) (lo hi: int)
+    ensures { kept_count nums lo hi >= 0 }
+    variant { nums }
+  =
+    match nums with
+    | Nil -> ()
+    | Cons _ xs -> kept_count_nonnegative xs lo hi
+    end
+
+  let rec lemma mem_kept_count_self (nums: list int) (x: int)
+    requires { mem x nums }
+    ensures  { kept_count nums x x >= 1 }
+    variant  { nums }
+  =
+    match nums with
+    | Nil -> absurd
+    | Cons y ys ->
+        if x = y then begin
+          assert { x <= y <= x };
+          kept_count_nonnegative ys x x;
+          assert { kept_count ys x x >= 0 };
+          assert { kept_count nums x x = 1 + kept_count ys x x }
+        end else begin
+          assert { mem x ys };
+          assert { not (x <= y <= x) };
+          mem_kept_count_self ys x;
+          assert { kept_count ys x x >= 1 };
+          assert { kept_count nums x x = kept_count ys x x }
+        end
+    end
+
+  let lemma small_input_spec (nums: list int)
+    requires { valid_input nums }
+    requires { length nums <= 4 }
+    ensures  { minimum_difference_between_largest_and_smallest_value_in_three_moves_list_spec nums 0 }
+  =
+    valid_input_has_member nums;
+    assert { exists x: int. mem x nums };
+    assert { forall x: int. mem x nums -> kept_count nums x x >= 1 };
+    assert { length nums - 3 <= 1 };
+    assert { exists lo hi: int.
+      lo <= hi /\ hi - lo = 0 /\ kept_count nums lo hi >= length nums - 3 };
+    assert { achievable_difference nums 0 };
+    assert { forall d: int. 0 <= d < 0 -> not (achievable_difference nums d) }
+
+  let lemma sorted_gap_algorithm_spec (nums sorted_nums: list int)
+      (n d0 d1 d2 d3 res: int)
+    requires { valid_input nums }
+    requires { n = length nums }
+    requires { n > 4 }
+    requires { length sorted_nums = n }
+    requires { sorted sorted_nums }
+    requires { permut sorted_nums nums }
+    requires { d0 = nth_default sorted_nums (n - 4) 0 - nth_default sorted_nums 0 0 }
+    requires { d1 = nth_default sorted_nums (n - 3) 0 - nth_default sorted_nums 1 0 }
+    requires { d2 = nth_default sorted_nums (n - 2) 0 - nth_default sorted_nums 2 0 }
+    requires { d3 = nth_default sorted_nums (n - 1) 0 - nth_default sorted_nums 3 0 }
+    requires { res = min4 d0 d1 d2 d3 }
+    ensures  { minimum_difference_between_largest_and_smallest_value_in_three_moves_list_spec nums res }
+  =
+    assert { 0 <= d0 \/ d0 < 0 };
+    assert { 0 <= d1 \/ d1 < 0 };
+    assert { 0 <= d2 \/ d2 < 0 };
+    assert { 0 <= d3 \/ d3 < 0 };
+    assert { res = d0 \/ res = d1 \/ res = d2 \/ res = d3 }
+
+  let minimum_difference_between_largest_and_smallest_value_in_three_moves_list
+      (nums: list int) : int
+    requires { valid_input nums }
+    ensures  { minimum_difference_between_largest_and_smallest_value_in_three_moves_list_spec nums result }
+  =
+    let n = list_length nums in
+    assert { n = length nums };
+    if n <= 4 then begin
+      small_input_spec nums;
+      0
+    end else begin
+      assert { n > 4 };
+      let sorted_nums = insertion_sort nums in
+      assert { length sorted_nums = n };
+      assert { sorted sorted_nums };
+      assert { permut sorted_nums nums };
+      let d0 = nth_default sorted_nums (n - 4) 0 - nth_default sorted_nums 0 0 in
+      let d1 = nth_default sorted_nums (n - 3) 0 - nth_default sorted_nums 1 0 in
+      let d2 = nth_default sorted_nums (n - 2) 0 - nth_default sorted_nums 2 0 in
+      let d3 = nth_default sorted_nums (n - 1) 0 - nth_default sorted_nums 3 0 in
+      let res = min4 d0 d1 d2 d3 in
+      assert { res = min4 d0 d1 d2 d3 };
+      sorted_gap_algorithm_spec nums sorted_nums n d0 d1 d2 d3 res;
+      res
+    end
+
+end

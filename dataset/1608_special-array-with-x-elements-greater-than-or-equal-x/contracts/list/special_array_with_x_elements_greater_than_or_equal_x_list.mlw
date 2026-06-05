@@ -1,0 +1,125 @@
+module SpecialArrayWithXElementsGreaterThanOrEqualX_List_Spec
+
+  use int.Int
+  use list.List
+  use list.Length
+
+  let rec function count_ge (nums: list int) (x: int) : int
+    variant { nums }
+  =
+    match nums with
+    | Nil -> 0
+    | Cons y ys -> (if y >= x then 1 else 0) + count_ge ys x
+    end
+
+  predicate special_value (nums: list int) (x: int) =
+    count_ge nums x = x
+
+  predicate no_special_value (nums: list int) =
+    forall x: int. not (special_value nums x)
+
+  predicate valid_special_result (nums: list int) (r: int) =
+    (r = -1 /\ no_special_value nums) \/
+    (r <> -1 /\ special_value nums r /\
+     (forall x: int. special_value nums x -> x = r))
+
+  val special_array_with_x_elements_greater_than_or_equal_x_list (nums: list int) : int
+    ensures { valid_special_result nums result }
+    ensures { result = -1 \/ 0 <= result <= length nums }
+
+  let lemma check_test_000 () =
+    let l = Cons 6 (Cons 5 (Cons 4 (Cons 3 (Cons 2 (Cons 1 Nil))))) in
+    assert { count_ge Nil 1 = 0 };
+    assert { count_ge (Cons 1 Nil) 1 = 1 };
+    assert { count_ge (Cons 2 (Cons 1 Nil)) 2 = 1 };
+    assert { count_ge (Cons 3 (Cons 2 (Cons 1 Nil))) 3 = 1 };
+    assert { count_ge (Cons 4 (Cons 3 (Cons 2 (Cons 1 Nil)))) 4 = 1 };
+    assert { count_ge l 1 = 6 };
+    assert { count_ge l 2 = 5 };
+    assert { count_ge l 3 = 4 };
+    assert { count_ge l 4 = 3 };
+    assert { count_ge l 5 = 2 };
+    assert { count_ge l 6 = 1 };
+    assert { no_special_value l };
+    assert { valid_special_result l (-1) }
+
+  let lemma check_test_001 () =
+    let l =
+      Cons 100 (Cons 100 (Cons 100 (Cons 100 (Cons 100
+        (Cons 100 (Cons 100 (Cons 100 (Cons 100 (Cons 100 Nil)))))))))
+    in
+    assert { count_ge Nil 10 = 0 };
+    assert { count_ge (Cons 100 Nil) 10 = 1 };
+    assert { count_ge (Cons 100 (Cons 100 Nil)) 10 = 2 };
+    assert { count_ge (Cons 100 (Cons 100 (Cons 100 Nil))) 10 = 3 };
+    assert { count_ge (Cons 100 (Cons 100 (Cons 100 (Cons 100 Nil)))) 10 = 4 };
+    assert { count_ge l 10 = 10 };
+    assert { special_value l 10 };
+    assert { forall x: int. special_value l x -> x = 10 };
+    assert { valid_special_result l 10 }
+
+  let lemma check_test_002 () =
+    let l = Cons 0 (Cons 1 (Cons 2 (Cons 3 (Cons 4 (Cons 5 Nil))))) in
+    assert { count_ge Nil 3 = 0 };
+    assert { count_ge (Cons 5 Nil) 3 = 1 };
+    assert { count_ge (Cons 4 (Cons 5 Nil)) 3 = 2 };
+    assert { count_ge (Cons 3 (Cons 4 (Cons 5 Nil))) 3 = 3 };
+    assert { count_ge l 3 = 3 };
+    assert { count_ge l 0 = 6 };
+    assert { count_ge l 1 = 5 };
+    assert { count_ge l 2 = 4 };
+    assert { count_ge l 4 = 2 };
+    assert { special_value l 3 };
+    assert { forall x: int. special_value l x -> x = 3 };
+    assert { valid_special_result l 3 }
+
+  let lemma check_test_005 () =
+    let l = Cons 0 (Cons 0 Nil) in
+    assert { count_ge Nil 0 = 0 };
+    assert { count_ge (Cons 0 Nil) 0 = 1 };
+    assert { count_ge l 0 = 2 };
+    assert { count_ge l 1 = 0 };
+    assert { count_ge l 2 = 0 };
+    assert { no_special_value l };
+    assert { valid_special_result l (-1) }
+
+  let lemma check_test_006 () =
+    let l = Cons 1 Nil in
+    assert { count_ge Nil 1 = 0 };
+    assert { count_ge l 1 = 1 };
+    assert { special_value l 1 };
+    assert { forall x: int. special_value l x -> x = 1 };
+    assert { valid_special_result l 1 }
+
+  let lemma check_test_007 () =
+    let l =
+      Cons 1 (Cons 1 (Cons 2 (Cons 2 (Cons 3
+        (Cons 3 (Cons 4 (Cons 4 (Cons 5 (Cons 5 Nil)))))))))
+    in
+    assert { count_ge Nil 4 = 0 };
+    assert { count_ge (Cons 5 Nil) 4 = 1 };
+    assert { count_ge (Cons 5 (Cons 5 Nil)) 4 = 2 };
+    assert { count_ge (Cons 4 (Cons 5 (Cons 5 Nil))) 4 = 3 };
+    assert { count_ge (Cons 4 (Cons 4 (Cons 5 (Cons 5 Nil)))) 4 = 4 };
+    assert { count_ge l 4 = 4 };
+    assert { count_ge l 3 = 6 };
+    assert { count_ge l 5 = 2 };
+    assert { special_value l 4 };
+    assert { forall x: int. special_value l x -> x = 4 };
+    assert { valid_special_result l 4 }
+
+  let lemma check_test_010 () =
+    let l = Cons 0 (Cons 0 (Cons 0 (Cons 0 (Cons 0 Nil)))) in
+    assert { count_ge Nil 0 = 0 };
+    assert { count_ge (Cons 0 Nil) 0 = 1 };
+    assert { count_ge (Cons 0 (Cons 0 Nil)) 0 = 2 };
+    assert { count_ge l 0 = 5 };
+    assert { count_ge l 1 = 0 };
+    assert { count_ge l 2 = 0 };
+    assert { count_ge l 3 = 0 };
+    assert { count_ge l 4 = 0 };
+    assert { count_ge l 5 = 0 };
+    assert { no_special_value l };
+    assert { valid_special_result l (-1) }
+
+end

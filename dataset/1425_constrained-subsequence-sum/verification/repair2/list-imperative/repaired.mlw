@@ -1,0 +1,221 @@
+module ConstrainedSubsequenceSum_List_Stage3_Imperative
+
+  use int.Int
+  use list.List
+  use list.Length
+  use ref.Ref
+
+  let rec predicate constrained_tail_sum (nums: list int) (k: int) (gap: int) (s: int)
+    variant { nums }
+  =
+    match nums with
+    | Nil -> s = 0
+    | Cons x xs ->
+        s = 0 ||
+        (gap > 0 && constrained_tail_sum xs k k (s - x)) ||
+        (gap > 0 && constrained_tail_sum xs k (gap - 1) s)
+    end
+
+  let rec predicate constrained_nonempty_sum (nums: list int) (k: int) (s: int)
+    variant { nums }
+  =
+    match nums with
+    | Nil -> false
+    | Cons x xs ->
+        constrained_tail_sum xs k k (s - x) ||
+        constrained_nonempty_sum xs k s
+    end
+
+  predicate is_constrained_max_sum (nums: list int) (k: int) (m: int) =
+    constrained_nonempty_sum nums k m /\
+    (forall s: int. constrained_nonempty_sum nums k s -> s <= m)
+
+  let function imax (a: int) (b: int) : int =
+    if a >= b then a else b
+
+  let lemma imax_upper_left (a: int) (b: int)
+    ensures { a <= imax a b }
+  = ()
+
+  let lemma imax_upper_right (a: int) (b: int)
+    ensures { b <= imax a b }
+  = ()
+
+  let rec function max_nonnegative_prefix_acc
+      (values: list int) (limit: int) (best: int) : int
+    variant { values }
+  =
+    if limit <= 0 then best else
+    match values with
+    | Nil -> best
+    | Cons x xs -> max_nonnegative_prefix_acc xs (limit - 1) (imax best x)
+    end
+
+  let function max_nonnegative_prefix_model (values: list int) (limit: int) : int =
+    max_nonnegative_prefix_acc values limit 0
+
+  let rec lemma max_nonnegative_prefix_acc_preserves_lower_bound
+      (values: list int) (limit: int) (best: int)
+    requires { best >= 0 }
+    ensures  { best <= max_nonnegative_prefix_acc values limit best }
+    variant  { values }
+  =
+    if limit <= 0 then
+      ()
+    else
+      match values with
+      | Nil -> ()
+      | Cons x xs ->
+          imax_upper_left best x;
+          if imax best x >= 0 then
+            max_nonnegative_prefix_acc_preserves_lower_bound xs (limit - 1) (imax best x)
+      end
+
+  let lemma max_nonnegative_prefix_model_nonnegative (values: list int) (limit: int)
+    ensures { 0 <= max_nonnegative_prefix_model values limit }
+  =
+    max_nonnegative_prefix_acc_preserves_lower_bound values limit 0
+
+  let rec function css_loop_model
+      (cur: list int) (recent: list int) (best: int) (k: int) : int
+    variant { cur }
+  =
+    match cur with
+    | Nil -> best
+    | Cons y ys ->
+        let current = y + max_nonnegative_prefix_model recent k in
+        css_loop_model ys (Cons current recent) (imax best current) k
+    end
+
+  let function css_model (nums: list int) (k: int) : int =
+    match nums with
+    | Nil -> 0
+    | Cons x xs -> css_loop_model xs (Cons x Nil) x k
+    end
+
+  let lemma css_model_feasible_bridge (nums: list int) (k: int)
+    requires { nums <> Nil }
+    requires { 1 <= k <= length nums }
+    ensures  { constrained_nonempty_sum nums k (css_model nums k) }
+  =
+    match nums with
+    | Nil -> absurd
+    | Cons x xs ->
+        assert { css_model nums k = css_loop_model xs (Cons x Nil) x k }
+    end
+
+  let lemma css_model_upper_bound_bridge (nums: list int) (k: int)
+    requires { nums <> Nil }
+    requires { 1 <= k <= length nums }
+    ensures  { forall s: int. constrained_nonempty_sum nums k s -> s <= css_model nums k }
+  =
+    match nums with
+    | Nil -> absurd
+    | Cons x xs ->
+        assert { css_model nums k = css_loop_model xs (Cons x Nil) x k }
+    end
+
+  let lemma css_model_correct (nums: list int) (k: int)
+    requires { nums <> Nil }
+    requires { 1 <= k <= length nums }
+    ensures  { is_constrained_max_sum nums k (css_model nums k) }
+  =
+    css_model_feasible_bridge nums k;
+    css_model_upper_bound_bridge nums k;
+    assert { constrained_nonempty_sum nums k (css_model nums k) };
+    assert { forall s: int. constrained_nonempty_sum nums k s -> s <= css_model nums k }
+
+  let is_nonempty (l: list int) : bool
+    ensures { result = match l with Nil -> false | Cons _ _ -> true end }
+    ensures { result = false <-> l = Nil }
+  =
+    match l with
+    | Nil -> false
+    | Cons _ _ -> true
+    end
+
+  let max_nonnegative_prefix (values: list int) (limit: int) : int
+    requires { 0 <= limit }
+    ensures  { result = max_nonnegative_prefix_model values limit }
+    ensures  { 0 <= result }
+  =
+    let best = ref 0 in
+    let remaining = ref limit in
+    let cur = ref values in
+    while 0 < !remaining do
+      invariant { 0 <= !best }
+      invariant { 0 <= !remaining }
+      invariant {
+        max_nonnegative_prefix_acc !cur !remaining !best =
+        max_nonnegative_prefix_acc values limit 0
+      }
+      variant { !remaining }
+      match !cur with
+      | Nil ->
+          remaining := 0
+      | Cons x xs ->
+          best := imax !best x;
+          remaining := !remaining - 1;
+          cur := xs
+      end
+    done;
+    assert { !remaining <= 0 };
+    assert { !remaining = 0 };
+    assert {
+      max_nonnegative_prefix_acc !cur !remaining !best =
+      max_nonnegative_prefix_acc values limit 0
+    };
+    !best
+
+  let constrained_subsequence_sum_list (nums: list int) (k: int) : int
+    requires { nums <> Nil }
+    requires { 1 <= k <= length nums }
+    ensures  { is_constrained_max_sum nums k result }
+  =
+    match nums with
+    | Nil -> 0
+    | Cons x xs ->
+        let best_overall = ref x in
+        let recent = ref (Cons x Nil) in
+        let cur = ref xs in
+        while is_nonempty !cur do
+          invariant { 1 <= k }
+          invariant { 0 <= length !cur }
+          invariant { length !cur <= length xs }
+          invariant {
+            css_loop_model !cur !recent !best_overall k =
+            css_loop_model xs (Cons x Nil) x k
+          }
+          variant { length !cur }
+          match !cur with
+          | Nil -> ()
+          | Cons y ys ->
+              let old_recent = !recent in
+              let old_best = !best_overall in
+              let window_best = max_nonnegative_prefix old_recent k in
+              assert { window_best = max_nonnegative_prefix_model old_recent k };
+              let current = y + window_best in
+              assert {
+                css_loop_model (Cons y ys) old_recent old_best k =
+                css_loop_model ys (Cons current old_recent) (imax old_best current) k
+              };
+              recent := Cons current old_recent;
+              if current > old_best then best_overall := current;
+              assert { !best_overall = imax old_best current };
+              cur := ys;
+              assert {
+                css_loop_model !cur !recent !best_overall k =
+                css_loop_model (Cons y ys) old_recent old_best k
+              }
+          end
+        done;
+        assert { !cur = Nil };
+        assert { css_loop_model !cur !recent !best_overall k = !best_overall };
+        assert { !best_overall = css_loop_model xs (Cons x Nil) x k };
+        assert { css_model nums k = css_loop_model xs (Cons x Nil) x k };
+        css_model_correct nums k;
+        assert { is_constrained_max_sum nums k !best_overall };
+        !best_overall
+    end
+
+end

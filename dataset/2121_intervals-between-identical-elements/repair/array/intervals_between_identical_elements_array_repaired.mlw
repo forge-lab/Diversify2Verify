@@ -1,0 +1,280 @@
+module IntervalsBetweenIdenticalElements_Array_Spec
+
+  use int.Int
+  use int.Abs
+  use array.Array
+  use array.Init
+
+  predicate valid_input (arr: array int) =
+    1 <= length arr <= 100000 /\
+    forall i: int. 0 <= i < length arr -> 1 <= arr[i] <= 100000
+
+  let function interval_contribution (arr: array int) (i: int) (j: int) : int
+    requires { 0 <= i < length arr }
+    requires { 0 <= j < length arr }
+  =
+    if arr[i] = arr[j] then abs (i - j) else 0
+
+  let rec function interval_sum_from (arr: array int) (i: int) (j: int) : int
+    requires { 0 <= i < length arr }
+    requires { 0 <= j <= length arr }
+    variant  { length arr - j }
+  =
+    if j = length arr then 0
+    else interval_contribution arr i j + interval_sum_from arr i (j + 1)
+
+  let function interval_sum_at (arr: array int) (i: int) : int
+    requires { 0 <= i < length arr }
+  =
+    interval_sum_from arr i 0
+
+  predicate expected_at (arr: array int) (res: array int) (i: int) =
+    length res = length arr /\ 0 <= i < length arr ->
+      res[i] = interval_sum_at arr i
+
+  predicate intervals_between_identical_elements_array_spec
+    (arr: array int) (res: array int) =
+    length res = length arr /\
+    forall i: int. 0 <= i < length arr -> expected_at arr res i
+
+  val intervals_between_identical_elements_array (arr: array int) : array int
+    requires { valid_input arr }
+    ensures  { intervals_between_identical_elements_array_spec arr result }
+
+  let lemma test_001_python_assertions () =
+    let arr = init 5 [|5; 4; 3; 2; 1|] in
+    let expected = init 5 [|0; 0; 0; 0; 0|] in
+    assert { length arr = 5 };
+    assert { length expected = 5 };
+    assert { arr[0] = 5 };
+    assert { arr[1] = 4 };
+    assert { arr[2] = 3 };
+    assert { arr[3] = 2 };
+    assert { arr[4] = 1 };
+    assert { expected[0] = 0 };
+    assert { expected[1] = 0 };
+    assert { expected[2] = 0 };
+    assert { expected[3] = 0 };
+    assert { expected[4] = 0 };
+    assert { interval_sum_at arr 0 = 0 };
+    assert { interval_sum_at arr 1 = 0 };
+    assert { interval_sum_at arr 2 = 0 };
+    assert { interval_sum_at arr 3 = 0 };
+    assert { interval_sum_at arr 4 = 0 };
+    assert { expected_at arr expected 0 };
+    assert { expected_at arr expected 1 };
+    assert { expected_at arr expected 2 };
+    assert { expected_at arr expected 3 };
+    assert { expected_at arr expected 4 };
+    assert {
+      forall i: int. 0 <= i < length arr ->
+        i = 0 \/ i = 1 \/ i = 2 \/ i = 3 \/ i = 4
+    };
+    assert { intervals_between_identical_elements_array_spec arr expected }
+
+  let lemma test_003_python_assertions () =
+    let arr = init 10 [|1; 2; 3; 4; 5; 1; 2; 3; 4; 5|] in
+    let expected = init 10 [|5; 5; 5; 5; 5; 5; 5; 5; 5; 5|] in
+    assert { length arr = 10 };
+    assert { length expected = 10 };
+    assert { arr[0] = 1 /\ arr[5] = 1 };
+    assert { arr[1] = 2 /\ arr[6] = 2 };
+    assert { arr[2] = 3 /\ arr[7] = 3 };
+    assert { arr[3] = 4 /\ arr[8] = 4 };
+    assert { arr[4] = 5 /\ arr[9] = 5 };
+    assert { interval_contribution arr 0 5 = 5 };
+    assert { interval_contribution arr 5 0 = 5 };
+    assert { interval_sum_at arr 0 = 5 };
+    assert { interval_sum_at arr 1 = 5 };
+    assert { interval_sum_at arr 2 = 5 };
+    assert { interval_sum_at arr 3 = 5 };
+    assert { interval_sum_at arr 4 = 5 };
+    assert { interval_sum_at arr 5 = 5 };
+    assert { interval_sum_at arr 6 = 5 };
+    assert { interval_sum_at arr 7 = 5 };
+    assert { interval_sum_at arr 8 = 5 };
+    assert { interval_sum_at arr 9 = 5 };
+    assert { expected_at arr expected 0 };
+    assert { expected_at arr expected 1 };
+    assert { expected_at arr expected 2 };
+    assert { expected_at arr expected 3 };
+    assert { expected_at arr expected 4 };
+    assert { expected_at arr expected 5 };
+    assert { expected_at arr expected 6 };
+    assert { expected_at arr expected 7 };
+    assert { expected_at arr expected 8 };
+    assert { expected_at arr expected 9 };
+    assert {
+      forall i: int. 0 <= i < length arr ->
+        i = 0 \/ i = 1 \/ i = 2 \/ i = 3 \/ i = 4 \/
+        i = 5 \/ i = 6 \/ i = 7 \/ i = 8 \/ i = 9
+    };
+    assert { intervals_between_identical_elements_array_spec arr expected }
+
+  let lemma test_006_python_assertions () =
+    let arr = init 4 [|10; 5; 10; 10|] in
+    let expected = init 4 [|5; 0; 3; 4|] in
+    assert { length arr = 4 };
+    assert { length expected = 4 };
+    assert { arr[0] = 10 };
+    assert { arr[1] = 5 };
+    assert { arr[2] = 10 };
+    assert { arr[3] = 10 };
+    assert { interval_contribution arr 0 2 = 2 };
+    assert { interval_contribution arr 0 3 = 3 };
+    assert { interval_contribution arr 2 0 = 2 };
+    assert { interval_contribution arr 2 3 = 1 };
+    assert { interval_contribution arr 3 0 = 3 };
+    assert { interval_contribution arr 3 2 = 1 };
+    assert { interval_sum_at arr 0 = 5 };
+    assert { interval_sum_at arr 1 = 0 };
+    assert { interval_sum_at arr 2 = 3 };
+    assert { interval_sum_at arr 3 = 4 };
+    assert { expected_at arr expected 0 };
+    assert { expected_at arr expected 1 };
+    assert { expected_at arr expected 2 };
+    assert { expected_at arr expected 3 };
+    assert {
+      forall i: int. 0 <= i < length arr ->
+        i = 0 \/ i = 1 \/ i = 2 \/ i = 3
+    };
+    assert { intervals_between_identical_elements_array_spec arr expected }
+
+  let lemma test_007_python_assertions () =
+    let arr = init 5 [|5; 5; 5; 5; 5|] in
+    let expected = init 5 [|10; 7; 6; 7; 10|] in
+    assert { length arr = 5 };
+    assert { length expected = 5 };
+    assert { arr[0] = 5 };
+    assert { arr[1] = 5 };
+    assert { arr[2] = 5 };
+    assert { arr[3] = 5 };
+    assert { arr[4] = 5 };
+    assert { interval_contribution arr 0 4 = 4 };
+    assert { interval_contribution arr 2 0 = 2 };
+    assert { interval_contribution arr 2 4 = 2 };
+    assert { interval_sum_at arr 0 = 10 };
+    assert { interval_sum_at arr 1 = 7 };
+    assert { interval_sum_at arr 2 = 6 };
+    assert { interval_sum_at arr 3 = 7 };
+    assert { interval_sum_at arr 4 = 10 };
+    assert { expected_at arr expected 0 };
+    assert { expected_at arr expected 1 };
+    assert { expected_at arr expected 2 };
+    assert { expected_at arr expected 3 };
+    assert { expected_at arr expected 4 };
+    assert {
+      forall i: int. 0 <= i < length arr ->
+        i = 0 \/ i = 1 \/ i = 2 \/ i = 3 \/ i = 4
+    };
+    assert { intervals_between_identical_elements_array_spec arr expected }
+
+  let lemma test_009_python_assertions () =
+    let arr = init 8 [|1; 1; 2; 2; 3; 3; 4; 4|] in
+    let expected = init 8 [|1; 1; 1; 1; 1; 1; 1; 1|] in
+    assert { length arr = 8 };
+    assert { length expected = 8 };
+    assert { arr[0] = 1 /\ arr[1] = 1 };
+    assert { arr[2] = 2 /\ arr[3] = 2 };
+    assert { arr[4] = 3 /\ arr[5] = 3 };
+    assert { arr[6] = 4 /\ arr[7] = 4 };
+    assert { interval_contribution arr 0 1 = 1 };
+    assert { interval_contribution arr 2 3 = 1 };
+    assert { interval_contribution arr 4 5 = 1 };
+    assert { interval_contribution arr 6 7 = 1 };
+    assert { interval_sum_at arr 0 = 1 };
+    assert { interval_sum_at arr 1 = 1 };
+    assert { interval_sum_at arr 2 = 1 };
+    assert { interval_sum_at arr 3 = 1 };
+    assert { interval_sum_at arr 4 = 1 };
+    assert { interval_sum_at arr 5 = 1 };
+    assert { interval_sum_at arr 6 = 1 };
+    assert { interval_sum_at arr 7 = 1 };
+    assert { expected_at arr expected 0 };
+    assert { expected_at arr expected 1 };
+    assert { expected_at arr expected 2 };
+    assert { expected_at arr expected 3 };
+    assert { expected_at arr expected 4 };
+    assert { expected_at arr expected 5 };
+    assert { expected_at arr expected 6 };
+    assert { expected_at arr expected 7 };
+    assert {
+      forall i: int. 0 <= i < length arr ->
+        i = 0 \/ i = 1 \/ i = 2 \/ i = 3 \/
+        i = 4 \/ i = 5 \/ i = 6 \/ i = 7
+    };
+    assert { intervals_between_identical_elements_array_spec arr expected }
+
+  let lemma test_010_python_assertions () =
+    let arr = init 7 [|2; 1; 3; 1; 2; 3; 3|] in
+    let expected = init 7 [|4; 2; 7; 2; 4; 4; 5|] in
+    assert { length arr = 7 };
+    assert { length expected = 7 };
+    assert { arr[0] = 2 /\ arr[4] = 2 };
+    assert { arr[1] = 1 /\ arr[3] = 1 };
+    assert { arr[2] = 3 /\ arr[5] = 3 /\ arr[6] = 3 };
+    assert { interval_contribution arr 0 4 = 4 };
+    assert { interval_contribution arr 1 3 = 2 };
+    assert { interval_contribution arr 2 5 = 3 };
+    assert { interval_contribution arr 2 6 = 4 };
+    assert { interval_contribution arr 5 2 = 3 };
+    assert { interval_contribution arr 5 6 = 1 };
+    assert { interval_sum_at arr 0 = 4 };
+    assert { interval_sum_at arr 1 = 2 };
+    assert { interval_sum_at arr 2 = 7 };
+    assert { interval_sum_at arr 3 = 2 };
+    assert { interval_sum_at arr 4 = 4 };
+    assert { interval_sum_at arr 5 = 4 };
+    assert { interval_sum_at arr 6 = 5 };
+    assert { expected_at arr expected 0 };
+    assert { expected_at arr expected 1 };
+    assert { expected_at arr expected 2 };
+    assert { expected_at arr expected 3 };
+    assert { expected_at arr expected 4 };
+    assert { expected_at arr expected 5 };
+    assert { expected_at arr expected 6 };
+    assert {
+      forall i: int. 0 <= i < length arr ->
+        i = 0 \/ i = 1 \/ i = 2 \/ i = 3 \/
+        i = 4 \/ i = 5 \/ i = 6
+    };
+    assert { intervals_between_identical_elements_array_spec arr expected }
+
+  let lemma test_035_python_assertions () =
+    let arr = init 9 [|5; 2; 5; 5; 3; 2; 5; 3; 5|] in
+    let expected = init 9 [|19; 4; 13; 12; 3; 4; 15; 3; 21|] in
+    assert { length arr = 9 };
+    assert { length expected = 9 };
+    assert { arr[0] = 5 /\ arr[2] = 5 /\ arr[3] = 5 /\ arr[6] = 5 /\ arr[8] = 5 };
+    assert { arr[1] = 2 /\ arr[5] = 2 };
+    assert { arr[4] = 3 /\ arr[7] = 3 };
+    assert { interval_contribution arr 0 8 = 8 };
+    assert { interval_contribution arr 1 5 = 4 };
+    assert { interval_contribution arr 4 7 = 3 };
+    assert { interval_contribution arr 8 0 = 8 };
+    assert { interval_sum_at arr 0 = 19 };
+    assert { interval_sum_at arr 1 = 4 };
+    assert { interval_sum_at arr 2 = 13 };
+    assert { interval_sum_at arr 3 = 12 };
+    assert { interval_sum_at arr 4 = 3 };
+    assert { interval_sum_at arr 5 = 4 };
+    assert { interval_sum_at arr 6 = 15 };
+    assert { interval_sum_at arr 7 = 3 };
+    assert { interval_sum_at arr 8 = 21 };
+    assert { expected_at arr expected 0 };
+    assert { expected_at arr expected 1 };
+    assert { expected_at arr expected 2 };
+    assert { expected_at arr expected 3 };
+    assert { expected_at arr expected 4 };
+    assert { expected_at arr expected 5 };
+    assert { expected_at arr expected 6 };
+    assert { expected_at arr expected 7 };
+    assert { expected_at arr expected 8 };
+    assert {
+      forall i: int. 0 <= i < length arr ->
+        i = 0 \/ i = 1 \/ i = 2 \/ i = 3 \/ i = 4 \/
+        i = 5 \/ i = 6 \/ i = 7 \/ i = 8
+    };
+    assert { intervals_between_identical_elements_array_spec arr expected }
+
+end

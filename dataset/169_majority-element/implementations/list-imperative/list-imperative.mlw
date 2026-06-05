@@ -1,0 +1,192 @@
+module MajorityElement_List_Imperative_Implementation
+
+  use int.Int
+  use list.List
+  use ref.Ref
+
+  let majority_element_list (nums: list int) : int =
+    match nums with
+    | Nil -> 0
+    | Cons h t ->
+        let candidate = ref h in
+        let balance = ref 1 in
+        let cur = ref t in
+        while (match !cur with Nil -> false | Cons _ _ -> true end) do
+          match !cur with
+          | Nil -> ()
+          | Cons x xs ->
+              if !balance = 0 then (
+                candidate := x;
+                balance := 1
+              ) else if x = !candidate then
+                balance := !balance + 1
+              else
+                balance := !balance - 1;
+              cur := xs
+          end
+        done;
+        !candidate
+    end
+
+  let test_test_000 () : bool =
+    let l = Cons 1 (Cons 1 (Cons 2 (Cons 2 (Cons 2 (Cons 2 (Cons 2 Nil)))))) in
+    let r = majority_element_list l in
+    r = 2
+
+  let test_test_001 () : bool =
+    let l = Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 2 (Cons 2 (Cons 3 Nil)))))) in
+    let r = majority_element_list l in
+    r = 1
+
+  let test_test_002 () : bool =
+    let l = Cons 2 (Cons 2 (Cons 1 (Cons 1 (Cons 1 (Cons 2 (Cons 2 Nil)))))) in
+    let r = majority_element_list l in
+    r = 2
+
+  let test_test_003 () : bool =
+    let l = Cons (-1) (Cons 100 (Cons (-1) (Cons (-1) (Cons (-1) (Cons (-1)
+      (Cons 1 (Cons 1 (Cons 1 (Cons 1 Nil))))))))) in
+    let r = majority_element_list l in
+    r = (-1)
+
+  let test_test_004 () : bool =
+    let l = Cons 1 (Cons 2 (Cons 3 (Cons 4 (Cons 5 (Cons 4 (Cons 4 (Cons 4
+      (Cons 4 Nil)))))))) in
+    let r = majority_element_list l in
+    r = 4
+
+  let test_test_005 () : bool =
+    let l = Cons 4 (Cons 4 (Cons 4 (Cons 4 (Cons 2 (Cons 2 (Cons 3 Nil)))))) in
+    let r = majority_element_list l in
+    r = 4
+
+  let test_test_006 () : bool =
+    let l = Cons 1000000000 (Cons 1000000000 (Cons 1000000000
+      (Cons 1000000000 (Cons 1000000000 (Cons 1000000000
+      (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 Nil)))))))))) in
+    let r = majority_element_list l in
+    r = 1000000000
+
+  let test_test_007 () : bool =
+    let l = Cons 5 (Cons 5 (Cons 4 (Cons 5 (Cons 5 (Cons 6 (Cons 5 (Cons 5
+      Nil))))))) in
+    let r = majority_element_list l in
+    r = 5
+
+  let test_test_008 () : bool =
+    let l = Cons 1 (Cons 2 (Cons 3 (Cons 4 (Cons 5 (Cons 1 (Cons 1 (Cons 1
+      (Cons 1 (Cons 1 Nil))))))))) in
+    let r = majority_element_list l in
+    r = 1
+
+  let test_test_009 () : bool =
+    let l = Cons 1000000000 (Cons (-1000000000) (Cons 1000000000
+      (Cons 1000000000 (Cons 1000000000 Nil)))) in
+    let r = majority_element_list l in
+    r = 1000000000
+
+  let test_test_010 () : bool =
+    let l = Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 2 (Cons 2 (Cons 3 (Cons 3
+      (Cons 3 (Cons 3 (Cons 3 Nil)))))))))) in
+    let r = majority_element_list l in
+    r = 3
+
+  let test_test_011 () : bool =
+    let l = Cons 5 (Cons 5 (Cons 5 (Cons 5 (Cons 5 (Cons 5 (Cons 5 (Cons 5
+      (Cons 5 (Cons 5 (Cons 5 (Cons 5 (Cons 5 (Cons 5 (Cons 5 (Cons 5
+      (Cons 5 (Cons 5 (Cons 5 (Cons 5 Nil))))))))))))))))))) in
+    let r = majority_element_list l in
+    r = 5
+
+  let test_test_012 () : bool =
+    let l = Cons 7 (Cons 7 (Cons 7 (Cons 7 (Cons 7 (Cons 7 (Cons 7 (Cons 7
+      (Cons 0 (Cons 0 (Cons 0 (Cons 0 (Cons 0 Nil)))))))))))) in
+    let r = majority_element_list l in
+    r = 7
+
+  let test_test_013 () : bool =
+    let l = Cons (-1000000000) (Cons (-1000000000) (Cons (-1000000000)
+      (Cons (-1000000000) (Cons (-1000000000) (Cons (-1000000000)
+      (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 Nil)))))))))) in
+    let r = majority_element_list l in
+    r = (-1000000000)
+
+  let test_test_014 () : bool =
+    let l = Cons 1 (Cons 1 (Cons 2 (Cons 2 (Cons 1 (Cons 1 (Cons 1 Nil)))))) in
+    let r = majority_element_list l in
+    r = 1
+
+  let test_test_015 () : bool =
+    let l = Cons 8 (Cons 8 (Cons 8 (Cons 8 (Cons 8 (Cons 8 (Cons 8 (Cons 8
+      (Cons 8 (Cons 8 Nil))))))))) in
+    let r = majority_element_list l in
+    r = 8
+
+  let test_test_016 () : bool =
+    let tail = Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 Nil)))) in
+    let l = Cons 5 (Cons 5 (Cons 5 (Cons 5 (Cons 5 (Cons 5 (Cons 5 (Cons 5
+      (Cons 5 (Cons 5 tail))))))))) in
+    let r = majority_element_list l in
+    r = 5
+
+  let test_test_017 () : bool =
+    let l = Cons 1 (Cons 2 (Cons 3 (Cons 4 (Cons 5 (Cons 6 (Cons 7 (Cons 8
+      (Cons 9 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 Nil)))))))))))))) in
+    let r = majority_element_list l in
+    r = 1
+
+  let test_test_018 () : bool =
+    let l = Cons 3 (Cons 2 (Cons 3 Nil)) in
+    let r = majority_element_list l in
+    r = 3
+
+  let test_test_019 () : bool =
+    let l = Cons 0 (Cons 0 (Cons 0 (Cons 0 (Cons 0 (Cons 0 (Cons 0 (Cons 0
+      (Cons 0 (Cons 0 (Cons 0 (Cons 0 (Cons 0 (Cons 0 (Cons 0 Nil)))))))))))))) in
+    let r = majority_element_list l in
+    r = 0
+
+  let run_tests () : bool =
+    if test_test_000 () then
+    if test_test_001 () then
+    if test_test_002 () then
+    if test_test_003 () then
+    if test_test_004 () then
+    if test_test_005 () then
+    if test_test_006 () then
+    if test_test_007 () then
+    if test_test_008 () then
+    if test_test_009 () then
+    if test_test_010 () then
+    if test_test_011 () then
+    if test_test_012 () then
+    if test_test_013 () then
+    if test_test_014 () then
+    if test_test_015 () then
+    if test_test_016 () then
+    if test_test_017 () then
+    if test_test_018 () then
+    if test_test_019 () then
+      true
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+
+end

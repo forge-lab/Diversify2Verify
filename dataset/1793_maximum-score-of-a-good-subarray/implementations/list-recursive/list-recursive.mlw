@@ -1,0 +1,209 @@
+module MaximumScoreOfAGoodSubarray_List_Recursive_Implementation
+
+  use int.Int
+  use list.List
+
+  let min_int (x: int) (y: int) : int =
+    if x <= y then x else y
+
+  let max_int (x: int) (y: int) : int =
+    if x >= y then x else y
+
+  let rec drop (l: list int) (n: int) : list int
+    variant { l }
+  =
+    if n <= 0 then l else
+    match l with
+    | Nil -> Nil
+    | Cons _ xs -> drop xs (n - 1)
+    end
+
+  let rec take_rev_acc (l: list int) (n: int) (acc: list int) : list int
+    variant { l }
+  =
+    if n <= 0 then acc else
+    match l with
+    | Nil -> acc
+    | Cons x xs -> take_rev_acc xs (n - 1) (Cons x acc)
+    end
+
+  let rec best_with_right (current_min: int) (current_len: int) (right: list int) : int
+    variant { right }
+  =
+    let current_score = current_min * current_len in
+    match right with
+    | Nil -> current_score
+    | Cons x xs ->
+        let next_min = min_int current_min x in
+        let extended_best = best_with_right next_min (current_len + 1) xs in
+        max_int current_score extended_best
+    end
+
+  let rec best_with_left
+      (left_rev: list int)
+      (current_min: int)
+      (current_len: int)
+      (right: list int) : int
+    variant { left_rev }
+  =
+    let best_here = best_with_right current_min current_len right in
+    match left_rev with
+    | Nil -> best_here
+    | Cons x xs ->
+        let next_min = min_int current_min x in
+        let extended_best = best_with_left xs next_min (current_len + 1) right in
+        max_int best_here extended_best
+    end
+
+  let maximum_score_of_a_good_subarray_list (nums: list int) (k: int) : int =
+    let left_rev = take_rev_acc nums k Nil in
+    let suffix = drop nums k in
+    match suffix with
+    | Nil -> 0
+    | Cons pivot right -> best_with_left left_rev pivot 1 right
+    end
+
+  let test_test_000 () : bool =
+    let nums = Cons 5 (Cons 5 (Cons 4 (Cons 5 (Cons 4 (Cons 1 (Cons 1 (Cons 1 (Nil)))))))) in
+    let r = maximum_score_of_a_good_subarray_list nums 0 in
+    r = 20
+
+  let test_test_001 () : bool =
+    let nums = Cons 10 (Cons 10 (Cons 10 (Cons 10 (Cons 10 (Nil))))) in
+    let r = maximum_score_of_a_good_subarray_list nums 2 in
+    r = 50
+
+  let test_test_002 () : bool =
+    let nums = Cons 9 (Cons 8 (Cons 7 (Cons 6 (Cons 5 (Cons 4 (Cons 3 (Cons 2 (Cons 1 (Nil))))))))) in
+    let r = maximum_score_of_a_good_subarray_list nums 4 in
+    r = 25
+
+  let test_test_003 () : bool =
+    let nums = Cons 1 (Cons 100 (Cons 1 (Cons 100 (Cons 1 (Cons 100 (Cons 1 (Cons 100 (Cons 1 (Cons 100 (Nil)))))))))) in
+    let r = maximum_score_of_a_good_subarray_list nums 4 in
+    r = 10
+
+  let test_test_004 () : bool =
+    let nums = Cons 9 (Cons 7 (Cons 5 (Cons 3 (Cons 1 (Nil))))) in
+    let r = maximum_score_of_a_good_subarray_list nums 2 in
+    r = 15
+
+  let test_test_005 () : bool =
+    let nums = Cons 2 (Cons 2 (Cons 2 (Cons 2 (Cons 2 (Cons 2 (Cons 2 (Cons 2 (Cons 2 (Cons 2 (Nil)))))))))) in
+    let r = maximum_score_of_a_good_subarray_list nums 5 in
+    r = 20
+
+  let test_test_006 () : bool =
+    let nums = Cons 1 (Cons 2 (Cons 3 (Cons 4 (Cons 5 (Cons 6 (Cons 7 (Cons 8 (Cons 9 (Cons 10 (Nil)))))))))) in
+    let r = maximum_score_of_a_good_subarray_list nums 5 in
+    r = 30
+
+  let test_test_007 () : bool =
+    let nums = Cons 1 (Cons 2 (Cons 3 (Cons 4 (Cons 5 (Nil))))) in
+    let r = maximum_score_of_a_good_subarray_list nums 2 in
+    r = 9
+
+  let test_test_008 () : bool =
+    let nums = Cons 2 (Cons 1 (Cons 3 (Cons 4 (Cons 5 (Cons 6 (Cons 7 (Cons 8 (Cons 9 (Nil))))))))) in
+    let r = maximum_score_of_a_good_subarray_list nums 2 in
+    r = 21
+
+  let test_test_009 () : bool =
+    let nums = Cons 1 (Cons 4 (Cons 3 (Cons 7 (Cons 4 (Cons 5 (Nil)))))) in
+    let r = maximum_score_of_a_good_subarray_list nums 3 in
+    r = 15
+
+  let test_test_010 () : bool =
+    let nums = Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Nil)))))))))) in
+    let r = maximum_score_of_a_good_subarray_list nums 5 in
+    r = 10
+
+  let test_test_011 () : bool =
+    let nums = Cons 1 (Cons 3 (Cons 5 (Cons 7 (Cons 9 (Cons 7 (Cons 5 (Cons 3 (Cons 1 (Nil))))))))) in
+    let r = maximum_score_of_a_good_subarray_list nums 4 in
+    r = 25
+
+  let test_test_012 () : bool =
+    let nums = Cons 100 (Cons 200 (Cons 300 (Cons 400 (Cons 500 (Cons 400 (Cons 300 (Cons 200 (Cons 100 (Nil))))))))) in
+    let r = maximum_score_of_a_good_subarray_list nums 4 in
+    r = 1500
+
+  let test_test_013 () : bool =
+    let nums = Cons 10 (Cons 20 (Cons 30 (Cons 40 (Cons 50 (Nil))))) in
+    let r = maximum_score_of_a_good_subarray_list nums 2 in
+    r = 90
+
+  let test_test_014 () : bool =
+    let nums = Cons 10 (Cons 9 (Cons 8 (Cons 7 (Cons 6 (Cons 5 (Cons 4 (Cons 3 (Cons 2 (Cons 1 (Nil)))))))))) in
+    let r = maximum_score_of_a_good_subarray_list nums 5 in
+    r = 30
+
+  let test_test_015 () : bool =
+    let nums = Cons 1 (Cons 3 (Cons 5 (Cons 7 (Cons 9 (Cons 11 (Cons 13 (Cons 15 (Cons 17 (Cons 19 (Nil)))))))))) in
+    let r = maximum_score_of_a_good_subarray_list nums 4 in
+    r = 54
+
+  let test_test_016 () : bool =
+    let nums = Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Nil))))))) in
+    let r = maximum_score_of_a_good_subarray_list nums 3 in
+    r = 7
+
+  let test_test_017 () : bool =
+    let nums = Cons 1 (Cons 2 (Cons 3 (Cons 4 (Cons 5 (Cons 6 (Cons 7 (Cons 8 (Cons 9 (Cons 10 (Nil)))))))))) in
+    let r = maximum_score_of_a_good_subarray_list nums 4 in
+    r = 30
+
+  let test_test_018 () : bool =
+    let nums = Cons 2 (Cons 3 (Cons 4 (Cons 5 (Cons 6 (Cons 7 (Cons 8 (Cons 9 (Cons 10 (Nil))))))))) in
+    let r = maximum_score_of_a_good_subarray_list nums 4 in
+    r = 30
+
+  let test_test_019 () : bool =
+    let nums = Cons 5 (Cons 3 (Cons 8 (Cons 6 (Cons 2 (Cons 7 (Cons 4 (Cons 1 (Cons 9 (Cons 10 (Cons 1 (Cons 2 (Cons 3 (Cons 4 (Cons 5 (Nil))))))))))))))) in
+    let r = maximum_score_of_a_good_subarray_list nums 9 in
+    r = 18
+
+  let run_tests () : bool =
+    if test_test_000 () then
+    if test_test_001 () then
+    if test_test_002 () then
+    if test_test_003 () then
+    if test_test_004 () then
+    if test_test_005 () then
+    if test_test_006 () then
+    if test_test_007 () then
+    if test_test_008 () then
+    if test_test_009 () then
+    if test_test_010 () then
+    if test_test_011 () then
+    if test_test_012 () then
+    if test_test_013 () then
+    if test_test_014 () then
+    if test_test_015 () then
+    if test_test_016 () then
+    if test_test_017 () then
+    if test_test_018 () then
+    if test_test_019 () then
+      true
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+
+end

@@ -1,0 +1,172 @@
+module FindTwoNonOverlappingSubArraysEachWithTargetSum_List_Spec
+
+  use int.Int
+  use list.List
+  use list.Length
+  use list.Append
+  use list.Sum
+
+  let rec predicate all_between (l: list int) (lo: int) (hi: int)
+    variant { l }
+  =
+    match l with
+    | Nil -> true
+    | Cons x xs -> lo <= x && x <= hi && all_between xs lo hi
+    end
+
+  predicate target_sum_segment (target: int) (segment: list int) =
+    segment <> Nil /\ sum segment = target
+
+  predicate ordered_target_segments
+    (arr: list int) (target: int) (first: list int) (second: list int)
+  =
+    exists prefix middle suffix: list int.
+      arr = prefix ++ (first ++ (middle ++ (second ++ suffix))) /\
+      target_sum_segment target first /\
+      target_sum_segment target second
+
+  predicate target_segment_pair_total
+    (arr: list int) (target: int) (total: int)
+  =
+    exists first second: list int.
+      ordered_target_segments arr target first second /\
+      total = length first + length second
+
+  predicate no_target_segment_pair (arr: list int) (target: int) =
+    forall first second: list int.
+      not (ordered_target_segments arr target first second)
+
+  predicate minimum_target_segment_pair_result
+    (arr: list int) (target: int) (r: int)
+  =
+    (r = -1 /\ no_target_segment_pair arr target) \/
+    (r > 0 /\
+     target_segment_pair_total arr target r /\
+     (forall total: int.
+        target_segment_pair_total arr target total -> r <= total))
+
+  predicate minimum_pair_total_value
+    (arr: list int) (target: int) (best: int)
+  =
+    (best >= 1000000000 /\ no_target_segment_pair arr target) \/
+    (0 < best /\ best < 1000000000 /\
+     target_segment_pair_total arr target best /\
+     (forall total: int.
+        target_segment_pair_total arr target total -> best <= total))
+
+  let lemma minimum_pair_total_value_to_result
+    (arr: list int) (target: int) (best: int)
+    requires { minimum_pair_total_value arr target best }
+    ensures  {
+      minimum_target_segment_pair_result arr target
+        (if best >= 1000000000 then -1 else best)
+    }
+  =
+    if best >= 1000000000 then
+      assert { no_target_segment_pair arr target }
+    else begin
+      assert { best > 0 };
+      assert { target_segment_pair_total arr target best };
+      assert {
+        forall total: int.
+          target_segment_pair_total arr target total -> best <= total
+      }
+    end
+
+  let min_int (a: int) (b: int) : int
+    ensures { result = a \/ result = b }
+    ensures { result <= a /\ result <= b }
+    ensures { forall c: int. c <= a /\ c <= b -> c <= result }
+  =
+    if a <= b then a else b
+
+  let rec prefix_len_from_start
+    (arr: list int) (target: int) (current_sum: int) (current_len: int) : int
+    ensures { result = 1000000000 \/ result > current_len }
+    variant { arr }
+  =
+    match arr with
+    | Nil -> 1000000000
+    | Cons x xs ->
+        let next_sum = current_sum + x in
+        let next_len = current_len + 1 in
+        if next_sum = target then
+          next_len
+        else
+          prefix_len_from_start xs target next_sum next_len
+    end
+
+  let prefix_len (arr: list int) (target: int) : int
+    ensures { result = 1000000000 \/ result > 0 }
+  =
+    prefix_len_from_start arr target 0 0
+
+  let rec drop (n: int) (arr: list int) : list int
+    ensures { n <= 0 -> result = arr }
+    ensures { 0 <= n -> length result <= length arr }
+    variant { arr }
+  =
+    if n <= 0 then
+      arr
+    else
+      match arr with
+      | Nil -> Nil
+      | Cons _ xs -> drop (n - 1) xs
+      end
+
+  let rec min_single_target_segment (arr: list int) (target: int) : int
+    ensures { result = 1000000000 \/ result > 0 }
+    variant { arr }
+  =
+    match arr with
+    | Nil -> 1000000000
+    | Cons _ xs ->
+        let here = prefix_len arr target in
+        let later = min_single_target_segment xs target in
+        min_int here later
+    end
+
+  let rec min_target_segment_pair_total (arr: list int) (target: int) : int
+    requires { 0 <= length arr <= 100000 }
+    requires { all_between arr 1 1000 }
+    requires { 1 <= target <= 100000000 }
+    ensures  { minimum_pair_total_value arr target result }
+    variant { arr }
+  =
+    match arr with
+    | Nil ->
+        assert { no_target_segment_pair arr target };
+        1000000000
+    | Cons _ xs ->
+        let first_len = prefix_len arr target in
+        let with_here =
+          if first_len >= 1000000000 then
+            1000000000
+          else
+            let rest = drop first_len arr in
+            let second_len = min_single_target_segment rest target in
+            if second_len >= 1000000000 then
+              1000000000
+            else
+              first_len + second_len
+        in
+        let without_here = min_target_segment_pair_total xs target in
+        min_int with_here without_here
+    end
+
+  let find_two_non_overlapping_sub_arrays_each_with_target_sum_list
+    (arr: list int) (target: int) : int
+    requires { 1 <= length arr <= 100000 }
+    requires { all_between arr 1 1000 }
+    requires { 1 <= target <= 100000000 }
+    ensures  { minimum_target_segment_pair_result arr target result }
+  =
+    let best = min_target_segment_pair_total arr target in
+    minimum_pair_total_value_to_result arr target best;
+    assert {
+      minimum_target_segment_pair_result arr target
+        (if best >= 1000000000 then -1 else best)
+    };
+    if best >= 1000000000 then -1 else best
+
+end

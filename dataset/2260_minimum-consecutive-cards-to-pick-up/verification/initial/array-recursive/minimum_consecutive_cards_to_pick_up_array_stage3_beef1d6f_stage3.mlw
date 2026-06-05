@@ -1,0 +1,116 @@
+module MinimumConsecutiveCardsToPickUp_Array_Stage3_Recursive
+
+  use int.Int
+  use array.Array
+  use array.Init
+
+  predicate valid_cards (cards: array int) =
+    1 <= length cards <= 100000 /\
+    forall i: int. 0 <= i < length cards -> 0 <= cards[i] <= 1000000
+
+  predicate matching_pair (cards: array int) (i: int) (j: int) =
+    0 <= i < j < length cards /\ cards[i] = cards[j]
+
+  predicate no_matching_pair (cards: array int) =
+    forall i j: int. 0 <= i < j < length cards -> cards[i] <> cards[j]
+
+  predicate has_pickup_length (cards: array int) (r: int) =
+    exists i j: int. matching_pair cards i j /\ r = j - i + 1
+
+  predicate minimum_pickup_result (cards: array int) (r: int) =
+    (r = -1 /\ no_matching_pair cards) \/
+    (2 <= r <= length cards /\
+     has_pickup_length cards r /\
+     forall i j: int. matching_pair cards i j -> r <= j - i + 1)
+
+  predicate matching_pair_from (cards: array int) (start: int) (i: int) (j: int) =
+    start <= i /\ matching_pair cards i j
+
+  predicate no_matching_pair_from (cards: array int) (start: int) =
+    forall i j: int. matching_pair_from cards start i j -> false
+
+  predicate has_pickup_length_from (cards: array int) (start: int) (r: int) =
+    exists i j: int. matching_pair_from cards start i j /\ r = j - i + 1
+
+  predicate minimum_pickup_result_from (cards: array int) (start: int) (r: int) =
+    (r = -1 /\ no_matching_pair_from cards start) \/
+    (2 <= r <= length cards /\
+     has_pickup_length_from cards start r /\
+     forall i j: int.
+       matching_pair_from cards start i j -> r <= j - i + 1)
+
+  predicate first_match_result (cards: array int) (i: int) (j: int) (r: int) =
+    (r = -1 /\
+     forall k: int. j <= k < length cards -> cards[k] <> cards[i]) \/
+    (exists k: int.
+       j <= k < length cards /\
+       cards[k] = cards[i] /\
+       r = k - i + 1 /\
+       forall t: int. j <= t < k -> cards[t] <> cards[i])
+
+  let rec first_match_length (cards: array int) (i: int) (j: int) : int
+    requires { 0 <= i < j <= length cards }
+    variant  { length cards - j }
+    ensures  { first_match_result cards i j result }
+  =
+    if j >= length cards then begin
+      assert { forall k: int. j <= k < length cards -> cards[k] <> cards[i] };
+      -1
+    end else if cards[i] = cards[j] then begin
+      assert { j <= j < length cards };
+      assert { cards[j] = cards[i] };
+      j - i + 1
+    end else begin
+      assert { j < length cards };
+      assert { cards[j] <> cards[i] };
+      first_match_length cards i (j + 1)
+    end
+
+  let rec minimum_consecutive_cards_to_pick_up_array_from
+      (cards: array int) (i: int) : int
+    requires { 0 <= i <= length cards }
+    variant  { length cards - i }
+    ensures  { minimum_pickup_result_from cards i result }
+  =
+    if i >= length cards then begin
+      assert { i = length cards };
+      assert { no_matching_pair_from cards i };
+      -1
+    end else begin
+      assert { 0 <= i < length cards };
+      let current = first_match_length cards i (i + 1) in
+      assert { first_match_result cards i (i + 1) current };
+      let rest = minimum_consecutive_cards_to_pick_up_array_from cards (i + 1) in
+      assert { minimum_pickup_result_from cards (i + 1) rest };
+      if current = -1 then begin
+        assert {
+          forall j: int.
+            i < j < length cards -> cards[j] <> cards[i]
+        };
+        rest
+      end else if rest = -1 then begin
+        assert { first_match_result cards i (i + 1) current };
+        current
+      end else if current < rest then begin
+        assert { current < rest };
+        current
+      end else begin
+        assert { rest <= current };
+        rest
+      end
+    end
+
+  let minimum_consecutive_cards_to_pick_up_array (cards: array int) : int
+    requires { valid_cards cards }
+    ensures  { minimum_pickup_result cards result }
+  =
+    let r = minimum_consecutive_cards_to_pick_up_array_from cards 0 in
+    assert { minimum_pickup_result_from cards 0 r };
+    assert {
+      forall i j: int.
+        matching_pair cards i j -> matching_pair_from cards 0 i j
+    };
+    assert { minimum_pickup_result cards r };
+    r
+
+end

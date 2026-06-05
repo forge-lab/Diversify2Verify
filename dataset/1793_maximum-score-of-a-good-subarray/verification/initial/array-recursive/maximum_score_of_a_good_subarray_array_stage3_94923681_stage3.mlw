@@ -1,0 +1,122 @@
+module MaximumScoreOfAGoodSubarray_Array_Stage3_Recursive
+
+  use int.Int
+  use array.Array
+
+  predicate valid_good_subarray (nums: array int) (k: int) (l: int) (r: int) =
+    0 <= l <= k <= r < length nums
+
+  predicate segment_min (nums: array int) (l: int) (r: int) (m: int) =
+    0 <= l <= r < length nums /\
+    (forall i: int. l <= i <= r -> m <= nums[i]) /\
+    (exists p: int. l <= p <= r /\ nums[p] = m)
+
+  function segment_score (l: int) (r: int) (m: int) : int =
+    m * (r - l + 1)
+
+  predicate maximum_good_subarray_score (nums: array int) (k: int) (score: int) =
+    (exists l r m: int.
+       valid_good_subarray nums k l r /\
+       segment_min nums l r m /\
+       score = segment_score l r m) /\
+    (forall l r m: int.
+       valid_good_subarray nums k l r ->
+       segment_min nums l r m ->
+       segment_score l r m <= score)
+
+  predicate right_range_scores_bounded
+    (nums: array int) (k: int) (l: int) (lo: int) (hi: int) (bound: int) =
+    forall r m: int.
+      lo <= r < hi ->
+      valid_good_subarray nums k l r ->
+      segment_min nums l r m ->
+      segment_score l r m <= bound
+
+  predicate right_range_has_witness
+    (nums: array int) (k: int) (l: int) (lo: int) (hi: int) (score: int) =
+    exists r m: int.
+      lo <= r < hi /\
+      valid_good_subarray nums k l r /\
+      segment_min nums l r m /\
+      score = segment_score l r m
+
+  predicate left_range_scores_bounded
+    (nums: array int) (k: int) (lo: int) (hi: int) (bound: int) =
+    forall l r m: int.
+      lo <= l < hi ->
+      valid_good_subarray nums k l r ->
+      segment_min nums l r m ->
+      segment_score l r m <= bound
+
+  predicate left_range_has_witness
+    (nums: array int) (k: int) (lo: int) (hi: int) (score: int) =
+    exists l r m: int.
+      lo <= l < hi /\
+      valid_good_subarray nums k l r /\
+      segment_min nums l r m /\
+      score = segment_score l r m
+
+  let min2 (x: int) (y: int) : int
+    ensures { result = x \/ result = y }
+    ensures { result <= x /\ result <= y }
+    ensures { x <= y -> result = x }
+    ensures { y <= x -> result = y }
+  =
+    if x <= y then x else y
+
+  let max2 (x: int) (y: int) : int
+    ensures { result = x \/ result = y }
+    ensures { x <= result /\ y <= result }
+    ensures { x >= y -> result = x }
+    ensures { y >= x -> result = y }
+  =
+    if x >= y then x else y
+
+  let rec best_with_right
+    (nums: array int) (k: int) (l: int) (r: int) (current_min: int) (best: int) : int
+    requires { 0 <= l <= k < length nums }
+    requires { k <= r <= length nums }
+    requires { right_range_scores_bounded nums k l k r best }
+    requires { right_range_has_witness nums k l k r best }
+    variant  { length nums - r }
+    ensures  { best <= result }
+    ensures  { right_range_scores_bounded nums k l k (length nums) result }
+    ensures  { right_range_has_witness nums k l k (length nums) result }
+  =
+    if r >= length nums then
+      best
+    else
+      let next_min = min2 current_min nums[r] in
+      let score = next_min * (r - l + 1) in
+      let next_best = max2 best score in
+      best_with_right nums k l (r + 1) next_min next_best
+
+  let rec best_from_left
+    (nums: array int) (k: int) (l: int) (left_min: int) (best: int) : int
+    requires { 0 <= k < length nums }
+    requires { -1 <= l <= k }
+    requires { left_range_scores_bounded nums k (l + 1) (k + 1) best }
+    requires { left_range_has_witness nums k (l + 1) (k + 1) best }
+    variant  { l + 1 }
+    ensures  { best <= result }
+    ensures  { left_range_scores_bounded nums k 0 (k + 1) result }
+    ensures  { left_range_has_witness nums k 0 (k + 1) result }
+  =
+    if l < 0 then
+      best
+    else
+      let next_left_min = min2 left_min nums[l] in
+      let best_for_l = best_with_right nums k l k next_left_min best in
+      best_from_left nums k (l - 1) next_left_min best_for_l
+
+  let maximum_score_of_a_good_subarray_array (nums: array int) (k: int) : int
+    requires { 1 <= length nums }
+    requires { 0 <= k < length nums }
+    requires { forall i: int. 0 <= i < length nums -> 1 <= nums[i] <= 20000 }
+    ensures  { maximum_good_subarray_score nums k result }
+  =
+    let initial = nums[k] in
+    let initial_best = initial * 1 in
+    best_from_left nums k k initial initial_best
+
+end

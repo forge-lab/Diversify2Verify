@@ -1,0 +1,179 @@
+module TwoSumLessThanK_Array_Recursive_Implementation
+
+  use int.Int
+  use array.Array
+  use array.Init
+
+  let rec best_pair_with_i
+    (nums: array int) (k: int) (i: int) (j: int) (best: int) : int
+    variant { length nums - j }
+  =
+    if j >= length nums then
+      best
+    else
+      let sum = nums[i] + nums[j] in
+      let next_best =
+        if sum < k then
+          if sum > best then sum else best
+        else
+          best
+      in
+      best_pair_with_i nums k i (j + 1) next_best
+
+  let rec scan_pairs_from
+    (nums: array int) (k: int) (i: int) (best: int) : int
+    variant { length nums - i }
+  =
+    if i >= length nums then
+      best
+    else
+      let next_best = best_pair_with_i nums k i (i + 1) best in
+      scan_pairs_from nums k (i + 1) next_best
+
+  let two_sum_less_than_k_array (nums: array int) (k: int) : int =
+    scan_pairs_from nums k 0 (-1)
+
+  let test_000 () : bool =
+    let nums = init 4 [|500; 500; 500; 500|] in
+    let r = two_sum_less_than_k_array nums 1000 in
+    r = (-1)
+
+  let test_001 () : bool =
+    let nums = init 4 [|5; 15; 25; 35|] in
+    let r = two_sum_less_than_k_array nums 50 in
+    r = 40
+
+  let test_002 () : bool =
+    let nums = init 5 [|1; 2; 3; 4; 5|] in
+    let r = two_sum_less_than_k_array nums 8 in
+    r = 7
+
+  let test_003 () : bool =
+    let nums = init 4 [|999; 998; 997; 996|] in
+    let r = two_sum_less_than_k_array nums 1995 in
+    r = 1994
+
+  let test_004 () : bool =
+    let nums = init 5 [|5; 15; 25; 35; 45|] in
+    let r = two_sum_less_than_k_array nums 50 in
+    r = 40
+
+  let test_005 () : bool =
+    let nums = init 4 [|5; 5; 5; 5|] in
+    let r = two_sum_less_than_k_array nums 10 in
+    r = (-1)
+
+  let test_006 () : bool =
+    let nums = init 4 [|999; 998; 997; 996|] in
+    let r = two_sum_less_than_k_array nums 2000 in
+    r = 1997
+
+  let test_007 () : bool =
+    let nums = init 1 [|1|] in
+    let r = two_sum_less_than_k_array nums 2 in
+    r = (-1)
+
+  let test_008 () : bool =
+    let nums = init 5 [|999; 998; 997; 996; 995|] in
+    let r = two_sum_less_than_k_array nums 1995 in
+    r = 1994
+
+  let test_009 () : bool =
+    let nums = init 5 [|1; 2; 3; 4; 5|] in
+    let r = two_sum_less_than_k_array nums 10 in
+    r = 9
+
+  let test_010 () : bool =
+    let nums = init 3 [|10; 20; 30|] in
+    let r = two_sum_less_than_k_array nums 15 in
+    r = (-1)
+
+  let test_011 () : bool =
+    let nums = init 4 [|100; 200; 300; 400|] in
+    let r = two_sum_less_than_k_array nums 1000 in
+    r = 700
+
+  let test_012 () : bool =
+    let nums = init 8 [|34; 23; 1; 24; 75; 33; 54; 8|] in
+    let r = two_sum_less_than_k_array nums 60 in
+    r = 58
+
+  let test_013 () : bool =
+    let nums = init 4 [|1; 1; 1; 1|] in
+    let r = two_sum_less_than_k_array nums 3 in
+    r = 2
+
+  let test_014 () : bool =
+    let nums = init 5 [|100; 200; 300; 400; 500|] in
+    let r = two_sum_less_than_k_array nums 1000 in
+    r = 900
+
+  let test_015 () : bool =
+    let nums = init 10 [|100; 90; 80; 70; 60; 50; 40; 30; 20; 10|] in
+    let r = two_sum_less_than_k_array nums 150 in
+    r = 140
+
+  let test_016 () : bool =
+    let nums = init 10 [|50; 100; 150; 200; 250; 300; 350; 400; 450; 500|] in
+    let r = two_sum_less_than_k_array nums 850 in
+    r = 800
+
+  let test_017 () : bool =
+    let nums = init 10 [|999; 999; 999; 999; 999; 999; 999; 999; 999; 999|] in
+    let r = two_sum_less_than_k_array nums 1998 in
+    r = (-1)
+
+  let test_018 () : bool =
+    let nums = init 5 [|500; 400; 300; 200; 100|] in
+    let r = two_sum_less_than_k_array nums 800 in
+    r = 700
+
+  let test_019 () : bool =
+    let nums = init 20 [|1; 1; 2; 2; 3; 3; 4; 4; 5; 5; 6; 6; 7; 7; 8; 8; 9; 9; 10; 10|] in
+    let r = two_sum_less_than_k_array nums 18 in
+    r = 17
+
+  let run_tests () : bool =
+    if test_000 () then
+    if test_001 () then
+    if test_002 () then
+    if test_003 () then
+    if test_004 () then
+    if test_005 () then
+    if test_006 () then
+    if test_007 () then
+    if test_008 () then
+    if test_009 () then
+    if test_010 () then
+    if test_011 () then
+    if test_012 () then
+    if test_013 () then
+    if test_014 () then
+    if test_015 () then
+    if test_016 () then
+    if test_017 () then
+    if test_018 () then
+    if test_019 () then
+      true
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+
+end

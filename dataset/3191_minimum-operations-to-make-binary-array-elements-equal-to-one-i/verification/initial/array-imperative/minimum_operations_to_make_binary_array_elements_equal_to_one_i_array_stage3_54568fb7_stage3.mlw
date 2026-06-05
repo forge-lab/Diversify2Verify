@@ -1,0 +1,120 @@
+module MinimumOperationsToMakeBinaryArrayElementsEqualToOneI_Array_Stage3
+
+  use int.Int
+  use int.EuclideanDivision
+  use array.Array
+  use array.Init
+  use ref.Ref
+
+  predicate valid_input (nums: array int) =
+    3 <= length nums <= 100000 /\
+    forall i: int. 0 <= i < length nums -> nums[i] = 0 \/ nums[i] = 1
+
+  predicate valid_operation_plan (nums: array int) (ops: array int) =
+    length ops = length nums - 2 /\
+    forall i: int. 0 <= i < length ops -> ops[i] = 0 \/ ops[i] = 1
+
+  let function selected_operation_at (ops: array int) (i: int) : int =
+    if 0 <= i < length ops then
+      if ops[i] = 1 then 1 else 0
+    else 0
+
+  let rec function operation_count_from (ops: array int) (i: int) : int
+    requires { 0 <= i <= length ops }
+    variant  { length ops - i }
+  =
+    if i = length ops then 0
+    else selected_operation_at ops i + operation_count_from ops (i + 1)
+
+  function operation_count (ops: array int) : int =
+    operation_count_from ops 0
+
+  function affecting_flip_count (ops: array int) (i: int) : int =
+    selected_operation_at ops i +
+    selected_operation_at ops (i - 1) +
+    selected_operation_at ops (i - 2)
+
+  predicate final_one_at (nums: array int) (ops: array int) (i: int) =
+    0 <= i < length nums /\
+    ((mod (affecting_flip_count ops i) 2 = 0 -> nums[i] = 1) /\
+     (mod (affecting_flip_count ops i) 2 = 1 -> nums[i] = 0))
+
+  predicate makes_all_one (nums: array int) (ops: array int) =
+    valid_operation_plan nums ops /\
+    forall i: int. 0 <= i < length nums -> final_one_at nums ops i
+
+  predicate feasible_with_operations (nums: array int) (k: int) =
+    exists ops: array int.
+      valid_operation_plan nums ops /\
+      makes_all_one nums ops /\
+      operation_count ops = k
+
+  predicate no_feasible_operation_plan (nums: array int) =
+    forall ops: array int.
+      valid_operation_plan nums ops -> not (makes_all_one nums ops)
+
+  predicate minimum_operation_result (nums: array int) (res: int) =
+    (res = -1 /\ no_feasible_operation_plan nums) \/
+    (0 <= res /\
+     feasible_with_operations nums res /\
+     forall k: int. feasible_with_operations nums k -> res <= k)
+
+  let minimum_operations_to_make_binary_array_elements_equal_to_one_i_array
+      (nums: array int) : int
+    requires { valid_input nums }
+    ensures  { result = -1 \/ 0 <= result <= length nums - 2 }
+    ensures  { minimum_operation_result nums result }
+  =
+    let n = length nums in
+    assert { 3 <= n <= 100000 };
+    let ghost ops = make (n - 2) 0 in
+    assert { length ops = n - 2 };
+    let prev2 = ref 0 in
+    let prev1 = ref 0 in
+    let count = ref 0 in
+    for i = 0 to n - 3 do
+      invariant { 0 <= i <= n - 2 }
+      invariant { length ops = n - 2 }
+      invariant { 0 <= !count <= i }
+      invariant { !prev2 = selected_operation_at ops (i - 2) }
+      invariant { !prev1 = selected_operation_at ops (i - 1) }
+      invariant { forall j: int. 0 <= j < length ops -> ops[j] = 0 \/ ops[j] = 1 }
+      invariant { forall j: int. i <= j < length ops -> ops[j] = 0 }
+      invariant { forall j: int. 0 <= j < i -> final_one_at nums ops j }
+      invariant { operation_count_from ops i = 0 }
+      invariant { operation_count ops = !count }
+      let current = mod (nums[i] + !prev2 + !prev1) 2 in
+      assert { affecting_flip_count ops i =
+               selected_operation_at ops i + !prev1 + !prev2 };
+      if current = 0 then begin
+        ghost (ops[i] <- 1);
+        count := !count + 1;
+        prev2 := !prev1;
+        prev1 := 1;
+        assert { final_one_at nums ops i }
+      end else begin
+        prev2 := !prev1;
+        prev1 := 0;
+        assert { final_one_at nums ops i }
+      end
+    done;
+    assert { valid_operation_plan nums ops };
+    assert { forall j: int. 0 <= j < n - 2 -> final_one_at nums ops j };
+    assert { !prev2 = selected_operation_at ops (n - 4) };
+    assert { !prev1 = selected_operation_at ops (n - 3) };
+    let second_last = mod (nums[n - 2] + !prev2 + !prev1) 2 in
+    let last = mod (nums[n - 1] + !prev1) 2 in
+    assert { affecting_flip_count ops (n - 2) = !prev2 + !prev1 };
+    assert { affecting_flip_count ops (n - 1) = !prev1 };
+    if second_last = 1 && last = 1 then begin
+      assert { final_one_at nums ops (n - 2) };
+      assert { final_one_at nums ops (n - 1) };
+      assert { makes_all_one nums ops };
+      assert { feasible_with_operations nums !count };
+      !count
+    end else begin
+      assert { no_feasible_operation_plan nums };
+      -1
+    end
+
+end

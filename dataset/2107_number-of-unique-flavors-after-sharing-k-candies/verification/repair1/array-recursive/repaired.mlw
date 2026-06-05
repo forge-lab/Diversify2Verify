@@ -1,0 +1,201 @@
+module NumberOfUniqueFlavorsAfterSharingKCandies_Array_Stage3
+
+  use int.Int
+  use array.Array
+  use array.NumOf as ArrayNumOf
+
+  predicate valid_input (candies: array int) (k: int) =
+    0 <= length candies <= 100000 /\
+    0 <= k <= length candies /\
+    forall i: int. 0 <= i < length candies -> 1 <= candies[i] <= 100000
+
+  predicate kept_flavor_after_sharing
+    (candies: array int) (k: int) (start: int) (flavor: int) =
+    0 <= start <= length candies - k /\
+    1 <= flavor <= 100000 /\
+    exists i: int.
+      0 <= i < length candies /\
+      (i < start \/ start + k <= i) /\
+      candies[i] = flavor
+
+  predicate kept_first_index_after_sharing
+    (candies: array int) (k: int) (start: int) (i: int) =
+    0 <= start <= length candies - k /\
+    0 <= i < length candies /\
+    (i < start \/ start + k <= i) /\
+    forall j: int.
+      0 <= j < i ->
+      (start <= j < start + k \/ candies[j] <> candies[i])
+
+  function unique_flavors_kept
+    (candies: array int) (k: int) (start: int) : int =
+    ArrayNumOf.numof
+      (fun i _ -> kept_first_index_after_sharing candies k start i)
+      candies 0 (length candies)
+
+  predicate optimal_kept_flavor_count
+    (candies: array int) (k: int) (answer: int) =
+    valid_input candies k /\
+    0 <= answer <= length candies /\
+    (exists start: int.
+       0 <= start <= length candies - k /\
+       answer = unique_flavors_kept candies k start) /\
+    (forall start: int.
+       0 <= start <= length candies - k ->
+       unique_flavors_kept candies k start <= answer)
+
+  function unique_flavors_kept_from
+    (candies: array int) (k: int) (start: int) (i: int) : int =
+    ArrayNumOf.numof
+      (fun j _ -> kept_first_index_after_sharing candies k start j)
+      candies i (length candies)
+
+  let lemma unique_flavors_kept_from_zero
+    (candies: array int) (k: int) (start: int)
+    requires { valid_input candies k }
+    requires { 0 <= start <= length candies - k }
+    ensures  { unique_flavors_kept_from candies k start 0 =
+               unique_flavors_kept candies k start }
+  = ()
+
+  predicate best_kept_flavor_count_from
+    (candies: array int) (k: int) (start: int) (answer: int) =
+    valid_input candies k /\
+    0 <= start <= length candies - k /\
+    0 <= answer <= length candies /\
+    (exists s: int.
+       start <= s <= length candies - k /\
+       answer = unique_flavors_kept candies k s) /\
+    (forall s: int.
+       start <= s <= length candies - k ->
+       unique_flavors_kept candies k s <= answer)
+
+  let kept_index (start: int) (k: int) (i: int) : bool
+    ensures { result <-> i < start \/ start + k <= i }
+  =
+    if i < start then
+      true
+    else if start + k <= i then
+      true
+    else
+      false
+
+  let rec flavor_seen_in_kept_prefix
+    (candies: array int) (start: int) (k: int) (i: int) (flavor: int) : bool
+    requires { 0 <= i <= length candies }
+    variant  { i }
+    ensures  {
+      result <->
+      exists j: int.
+        0 <= j < i /\
+        (j < start \/ start + k <= j) /\
+        candies[j] = flavor
+    }
+  =
+    if i <= 0 then
+      false
+    else
+      let j = i - 1 in
+      if kept_index start k j then
+        if candies[j] = flavor then
+          true
+        else
+          flavor_seen_in_kept_prefix candies start k j flavor
+      else
+        flavor_seen_in_kept_prefix candies start k j flavor
+
+  let rec unique_kept_count_from
+    (candies: array int) (start: int) (k: int) (i: int) : int
+    requires { valid_input candies k }
+    requires { 0 <= start <= length candies - k }
+    requires { 0 <= i <= length candies }
+    variant  { length candies - i }
+    ensures  { result = unique_flavors_kept_from candies k start i }
+    ensures  { 0 <= result <= length candies - i }
+  =
+    if i >= length candies then
+      0
+    else if kept_index start k i then
+      let rest = unique_kept_count_from candies start k (i + 1) in
+      if flavor_seen_in_kept_prefix candies start k i candies[i] then
+        rest
+      else
+        1 + rest
+    else
+      unique_kept_count_from candies start k (i + 1)
+
+  let rec best_unique_kept_count_from
+    (candies: array int) (k: int) (start: int) : int
+    requires { valid_input candies k }
+    requires { 0 <= start <= length candies - k }
+    variant  { length candies - k - start }
+    ensures  { best_kept_flavor_count_from candies k start result }
+  =
+    if start > length candies - k then
+      0
+    else
+      let current = unique_kept_count_from candies start k 0 in
+      assert { current = unique_flavors_kept candies k start };
+      if start = length candies - k then
+        begin
+        assert {
+          forall s: int.
+            start <= s <= length candies - k ->
+            s = start
+        };
+        assert {
+          forall s: int.
+            start <= s <= length candies - k ->
+            unique_flavors_kept candies k s <= current
+        };
+        assert { best_kept_flavor_count_from candies k start current };
+        current
+        end
+      else
+        begin
+        assert { start < length candies - k };
+        let best_rest = best_unique_kept_count_from candies k (start + 1) in
+        assert {
+          best_kept_flavor_count_from candies k (start + 1) best_rest
+        };
+        if current >= best_rest then
+          begin
+          assert {
+            forall s: int.
+              start <= s <= length candies - k ->
+              s = start \/ start + 1 <= s <= length candies - k
+          };
+          assert {
+            forall s: int.
+              start <= s <= length candies - k ->
+              unique_flavors_kept candies k s <= current
+          };
+          assert { best_kept_flavor_count_from candies k start current };
+          current
+          end
+        else
+          begin
+          assert { current < best_rest };
+          assert {
+            forall s: int.
+              start <= s <= length candies - k ->
+              s = start \/ start + 1 <= s <= length candies - k
+          };
+          assert {
+            forall s: int.
+              start <= s <= length candies - k ->
+              unique_flavors_kept candies k s <= best_rest
+          };
+          assert { best_kept_flavor_count_from candies k start best_rest };
+          best_rest
+          end
+        end
+
+  let number_of_unique_flavors_after_sharing_k_candies_array
+    (candies: array int) (k: int) : int
+    requires { valid_input candies k }
+    ensures  { optimal_kept_flavor_count candies k result }
+  =
+    best_unique_kept_count_from candies k 0
+
+end

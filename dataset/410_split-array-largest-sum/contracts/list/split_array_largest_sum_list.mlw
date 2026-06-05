@@ -1,0 +1,188 @@
+module SplitArrayLargestSum_List_Spec
+
+  use int.Int
+  use list.List
+  use list.Length
+  use list.Append
+  use list.Sum
+
+  let rec predicate bounded_nonnegative_list (nums: list int)
+    variant { nums }
+  =
+    match nums with
+    | Nil -> true
+    | Cons x xs -> 0 <= x && x <= 1000000 && bounded_nonnegative_list xs
+    end
+
+  let rec function concat_segments (segments: list (list int)) : list int
+    variant { segments }
+  =
+    match segments with
+    | Nil -> Nil
+    | Cons segment rest -> segment ++ concat_segments rest
+    end
+
+  let rec predicate all_nonempty_segments (segments: list (list int))
+    variant { segments }
+  =
+    match segments with
+    | Nil -> true
+    | Cons segment rest ->
+        match segment with
+        | Nil -> false
+        | Cons _ _ -> all_nonempty_segments rest
+        end
+    end
+
+  let rec predicate all_segment_sums_le (segments: list (list int)) (bound: int)
+    variant { segments }
+  =
+    match segments with
+    | Nil -> true
+    | Cons segment rest -> sum segment <= bound && all_segment_sums_le rest bound
+    end
+
+  predicate partition_with_bound (nums: list int) (k: int) (bound: int) =
+    exists segments: list (list int).
+      length segments = k /\
+      concat_segments segments = nums /\
+      all_nonempty_segments segments /\
+      all_segment_sums_le segments bound
+
+  predicate optimal_largest_sum (nums: list int) (k: int) (answer: int) =
+    partition_with_bound nums k answer /\
+    (forall bound: int. bound < answer -> not (partition_with_bound nums k bound))
+
+  val split_array_largest_sum_list (nums: list int) (k: int) : int
+    requires { 1 <= length nums <= 1000 }
+    requires { bounded_nonnegative_list nums }
+    requires { 1 <= k <= length nums }
+    requires { k <= 50 }
+    ensures  { optimal_largest_sum nums k result }
+
+  let lemma check_test_000 () =
+    let nums = Cons 7 (Cons 2 (Cons 5 (Cons 10 (Cons 8 Nil)))) in
+    let first = Cons 7 (Cons 2 (Cons 5 Nil)) in
+    let second = Cons 10 (Cons 8 Nil) in
+    let segments = Cons first (Cons second Nil) in
+    assert { length nums = 5 };
+    assert { bounded_nonnegative_list nums };
+    assert { sum first = 14 };
+    assert { sum second = 18 };
+    assert { length segments = 2 };
+    assert { concat_segments segments = nums };
+    assert { all_nonempty_segments segments };
+    assert { all_segment_sums_le segments 18 };
+    assert { partition_with_bound nums 2 18 };
+    assert { forall bound: int. bound < 18 -> not (partition_with_bound nums 2 bound) };
+    assert { optimal_largest_sum nums 2 18 }
+
+  let lemma check_test_001 () =
+    let nums = Cons 5 (Cons 5 (Cons 5 (Cons 5 (Cons 5 Nil)))) in
+    let s1 = Cons 5 Nil in
+    let s2 = Cons 5 Nil in
+    let s3 = Cons 5 Nil in
+    let s4 = Cons 5 Nil in
+    let s5 = Cons 5 Nil in
+    let segments = Cons s1 (Cons s2 (Cons s3 (Cons s4 (Cons s5 Nil)))) in
+    assert { length nums = 5 };
+    assert { bounded_nonnegative_list nums };
+    assert { sum s1 = 5 };
+    assert { sum s2 = 5 };
+    assert { sum s3 = 5 };
+    assert { sum s4 = 5 };
+    assert { sum s5 = 5 };
+    assert { length segments = 5 };
+    assert { concat_segments segments = nums };
+    assert { all_nonempty_segments segments };
+    assert { all_segment_sums_le segments 5 };
+    assert { partition_with_bound nums 5 5 };
+    assert { forall bound: int. bound < 5 -> not (partition_with_bound nums 5 bound) };
+    assert { optimal_largest_sum nums 5 5 }
+
+  let lemma check_test_002 () =
+    let nums = Cons 10 (Cons 10 (Cons 10 (Cons 10 Nil))) in
+    let first = Cons 10 (Cons 10 Nil) in
+    let second = Cons 10 (Cons 10 Nil) in
+    let segments = Cons first (Cons second Nil) in
+    assert { length nums = 4 };
+    assert { bounded_nonnegative_list nums };
+    assert { sum first = 20 };
+    assert { sum second = 20 };
+    assert { length segments = 2 };
+    assert { concat_segments segments = nums };
+    assert { all_nonempty_segments segments };
+    assert { all_segment_sums_le segments 20 };
+    assert { partition_with_bound nums 2 20 };
+    assert { forall bound: int. bound < 20 -> not (partition_with_bound nums 2 bound) };
+    assert { optimal_largest_sum nums 2 20 }
+
+  let lemma check_test_007 () =
+    let nums = Cons 1 (Cons 2 (Cons 3 (Cons 4 (Cons 5 Nil)))) in
+    let first = Cons 1 (Cons 2 (Cons 3 Nil)) in
+    let second = Cons 4 (Cons 5 Nil) in
+    let segments = Cons first (Cons second Nil) in
+    assert { length nums = 5 };
+    assert { bounded_nonnegative_list nums };
+    assert { sum first = 6 };
+    assert { sum second = 9 };
+    assert { length segments = 2 };
+    assert { concat_segments segments = nums };
+    assert { all_nonempty_segments segments };
+    assert { all_segment_sums_le segments 9 };
+    assert { partition_with_bound nums 2 9 };
+    assert { forall bound: int. bound < 9 -> not (partition_with_bound nums 2 bound) };
+    assert { optimal_largest_sum nums 2 9 }
+
+  let lemma check_test_008 () =
+    let nums = Cons 1 (Cons 1000000 (Cons 1 Nil)) in
+    let first = Cons 1 (Cons 1000000 Nil) in
+    let second = Cons 1 Nil in
+    let segments = Cons first (Cons second Nil) in
+    assert { length nums = 3 };
+    assert { bounded_nonnegative_list nums };
+    assert { sum first = 1000001 };
+    assert { sum second = 1 };
+    assert { length segments = 2 };
+    assert { concat_segments segments = nums };
+    assert { all_nonempty_segments segments };
+    assert { all_segment_sums_le segments 1000001 };
+    assert { partition_with_bound nums 2 1000001 };
+    assert { forall bound: int. bound < 1000001 -> not (partition_with_bound nums 2 bound) };
+    assert { optimal_largest_sum nums 2 1000001 }
+
+  let lemma check_test_009 () =
+    let nums = Cons 1 (Cons 4 (Cons 4 Nil)) in
+    let s1 = Cons 1 Nil in
+    let s2 = Cons 4 Nil in
+    let s3 = Cons 4 Nil in
+    let segments = Cons s1 (Cons s2 (Cons s3 Nil)) in
+    assert { length nums = 3 };
+    assert { bounded_nonnegative_list nums };
+    assert { sum s1 = 1 };
+    assert { sum s2 = 4 };
+    assert { sum s3 = 4 };
+    assert { length segments = 3 };
+    assert { concat_segments segments = nums };
+    assert { all_nonempty_segments segments };
+    assert { all_segment_sums_le segments 4 };
+    assert { partition_with_bound nums 3 4 };
+    assert { forall bound: int. bound < 4 -> not (partition_with_bound nums 3 bound) };
+    assert { optimal_largest_sum nums 3 4 }
+
+  let lemma check_test_016 () =
+    let nums = Cons 1000000 Nil in
+    let only = Cons 1000000 Nil in
+    let segments = Cons only Nil in
+    assert { length nums = 1 };
+    assert { bounded_nonnegative_list nums };
+    assert { sum only = 1000000 };
+    assert { length segments = 1 };
+    assert { concat_segments segments = nums };
+    assert { all_nonempty_segments segments };
+    assert { all_segment_sums_le segments 1000000 };
+    assert { partition_with_bound nums 1 1000000 };
+    assert { forall bound: int. bound < 1000000 -> not (partition_with_bound nums 1 bound) };
+    assert { optimal_largest_sum nums 1 1000000 }
+
+end

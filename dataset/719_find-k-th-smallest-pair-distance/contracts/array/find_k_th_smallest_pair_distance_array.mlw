@@ -1,0 +1,205 @@
+module FindKThSmallestPairDistance_Array_Spec
+
+  use int.Int
+  use int.Abs
+  use array.Array
+  use array.Init
+
+  predicate valid_pair (nums: array int) (i: int) (j: int) =
+    0 <= i < j < length nums
+
+  function pair_distance (nums: array int) (i: int) (j: int) : int =
+    abs (nums[i] - nums[j])
+
+  let rec function count_pairs_lt_from_j
+    (nums: array int) (i: int) (j: int) (d: int) : int
+    requires { 0 <= i < length nums }
+    requires { i < j <= length nums }
+    variant  { length nums - j }
+  =
+    if j = length nums then 0
+    else
+      (if abs (nums[i] - nums[j]) < d then 1 else 0) +
+      count_pairs_lt_from_j nums i (j + 1) d
+
+  let rec function count_pairs_lt_from_i
+    (nums: array int) (i: int) (d: int) : int
+    requires { 0 <= i <= length nums }
+    variant  { length nums - i }
+  =
+    if i + 1 >= length nums then 0
+    else
+      count_pairs_lt_from_j nums i (i + 1) d +
+      count_pairs_lt_from_i nums (i + 1) d
+
+  let function count_pairs_less (nums: array int) (d: int) : int =
+    count_pairs_lt_from_i nums 0 d
+
+  let rec function count_pairs_le_from_j
+    (nums: array int) (i: int) (j: int) (d: int) : int
+    requires { 0 <= i < length nums }
+    requires { i < j <= length nums }
+    variant  { length nums - j }
+  =
+    if j = length nums then 0
+    else
+      (if abs (nums[i] - nums[j]) <= d then 1 else 0) +
+      count_pairs_le_from_j nums i (j + 1) d
+
+  let rec function count_pairs_le_from_i
+    (nums: array int) (i: int) (d: int) : int
+    requires { 0 <= i <= length nums }
+    variant  { length nums - i }
+  =
+    if i + 1 >= length nums then 0
+    else
+      count_pairs_le_from_j nums i (i + 1) d +
+      count_pairs_le_from_i nums (i + 1) d
+
+  let function count_pairs_at_most (nums: array int) (d: int) : int =
+    count_pairs_le_from_i nums 0 d
+
+  predicate input_constraints (nums: array int) (k: int) =
+    2 <= length nums /\
+    (forall i: int. 0 <= i < length nums -> 0 <= nums[i] <= 1000000) /\
+    1 <= k /\
+    2 * k <= length nums * (length nums - 1)
+
+  predicate kth_pair_distance_spec (nums: array int) (k: int) (d: int) =
+    0 <= d /\
+    count_pairs_less nums d < k /\
+    k <= count_pairs_at_most nums d
+
+  val find_k_th_smallest_pair_distance_array (nums: array int) (k: int) : int
+    requires { input_constraints nums k }
+    ensures  { kth_pair_distance_spec nums k result }
+
+  let lemma test_004_sample_duplicate_zero () =
+    let nums = init 3 [|1; 3; 1|] in
+    assert { length nums = 3 };
+    assert { nums[0] = 1 };
+    assert { nums[1] = 3 };
+    assert { nums[2] = 1 };
+    assert { input_constraints nums 1 };
+    assert { valid_pair nums 0 1 };
+    assert { valid_pair nums 0 2 };
+    assert { valid_pair nums 1 2 };
+    assert { pair_distance nums 0 1 = 2 };
+    assert { pair_distance nums 0 2 = 0 };
+    assert { pair_distance nums 1 2 = 2 };
+    assert { count_pairs_less nums 0 = 0 };
+    assert { count_pairs_at_most nums 0 = 1 };
+    assert { kth_pair_distance_spec nums 1 0 }
+
+  let lemma test_011_all_equal_second_zero () =
+    let nums = init 3 [|1; 1; 1|] in
+    assert { length nums = 3 };
+    assert { nums[0] = 1 };
+    assert { nums[1] = 1 };
+    assert { nums[2] = 1 };
+    assert { input_constraints nums 2 };
+    assert { valid_pair nums 0 1 };
+    assert { valid_pair nums 0 2 };
+    assert { valid_pair nums 1 2 };
+    assert { pair_distance nums 0 1 = 0 };
+    assert { pair_distance nums 0 2 = 0 };
+    assert { pair_distance nums 1 2 = 0 };
+    assert { count_pairs_less nums 0 = 0 };
+    assert { count_pairs_at_most nums 0 = 3 };
+    assert { kth_pair_distance_spec nums 2 0 }
+
+  let lemma test_009_sample_third_largest () =
+    let nums = init 3 [|1; 6; 1|] in
+    assert { length nums = 3 };
+    assert { nums[0] = 1 };
+    assert { nums[1] = 6 };
+    assert { nums[2] = 1 };
+    assert { input_constraints nums 3 };
+    assert { valid_pair nums 0 1 };
+    assert { valid_pair nums 0 2 };
+    assert { valid_pair nums 1 2 };
+    assert { pair_distance nums 0 1 = 5 };
+    assert { pair_distance nums 0 2 = 0 };
+    assert { pair_distance nums 1 2 = 5 };
+    assert { count_pairs_less nums 5 = 1 };
+    assert { count_pairs_at_most nums 5 = 3 };
+    assert { kth_pair_distance_spec nums 3 5 }
+
+  let lemma test_003_reverse_consecutive_first () =
+    let nums = init 5 [|5; 4; 3; 2; 1|] in
+    assert { length nums = 5 };
+    assert { nums[0] = 5 };
+    assert { nums[1] = 4 };
+    assert { nums[2] = 3 };
+    assert { nums[3] = 2 };
+    assert { nums[4] = 1 };
+    assert { input_constraints nums 1 };
+    assert { valid_pair nums 0 1 };
+    assert { valid_pair nums 1 2 };
+    assert { valid_pair nums 2 3 };
+    assert { valid_pair nums 3 4 };
+    assert { pair_distance nums 0 1 = 1 };
+    assert { pair_distance nums 1 2 = 1 };
+    assert { pair_distance nums 2 3 = 1 };
+    assert { pair_distance nums 3 4 = 1 };
+    assert { count_pairs_less nums 1 = 0 };
+    assert { count_pairs_at_most nums 1 = 4 };
+    assert { kth_pair_distance_spec nums 1 1 }
+
+  let lemma test_007_middle_rank_mixed_order () =
+    let nums = init 4 [|4; 2; 1; 3|] in
+    assert { length nums = 4 };
+    assert { nums[0] = 4 };
+    assert { nums[1] = 2 };
+    assert { nums[2] = 1 };
+    assert { nums[3] = 3 };
+    assert { input_constraints nums 5 };
+    assert { valid_pair nums 0 1 };
+    assert { valid_pair nums 0 2 };
+    assert { valid_pair nums 0 3 };
+    assert { valid_pair nums 1 2 };
+    assert { valid_pair nums 1 3 };
+    assert { valid_pair nums 2 3 };
+    assert { pair_distance nums 0 1 = 2 };
+    assert { pair_distance nums 0 2 = 3 };
+    assert { pair_distance nums 0 3 = 1 };
+    assert { pair_distance nums 1 2 = 1 };
+    assert { pair_distance nums 1 3 = 1 };
+    assert { pair_distance nums 2 3 = 2 };
+    assert { count_pairs_less nums 2 = 3 };
+    assert { count_pairs_at_most nums 2 = 5 };
+    assert { kth_pair_distance_spec nums 5 2 }
+
+  let lemma test_000_increasing_last_pair_distance () =
+    let nums = init 5 [|1; 2; 3; 4; 5|] in
+    assert { length nums = 5 };
+    assert { nums[0] = 1 };
+    assert { nums[1] = 2 };
+    assert { nums[2] = 3 };
+    assert { nums[3] = 4 };
+    assert { nums[4] = 5 };
+    assert { input_constraints nums 10 };
+    assert { valid_pair nums 0 4 };
+    assert { pair_distance nums 0 4 = 4 };
+    assert { count_pairs_less nums 4 = 9 };
+    assert { count_pairs_at_most nums 4 = 10 };
+    assert { kth_pair_distance_spec nums 10 4 }
+
+  let lemma test_002_sparse_second_smallest () =
+    let nums = init 5 [|62; 24; 6; 4; 40|] in
+    assert { length nums = 5 };
+    assert { nums[0] = 62 };
+    assert { nums[1] = 24 };
+    assert { nums[2] = 6 };
+    assert { nums[3] = 4 };
+    assert { nums[4] = 40 };
+    assert { input_constraints nums 2 };
+    assert { valid_pair nums 1 4 };
+    assert { valid_pair nums 2 3 };
+    assert { pair_distance nums 1 4 = 16 };
+    assert { pair_distance nums 2 3 = 2 };
+    assert { count_pairs_less nums 16 = 1 };
+    assert { count_pairs_at_most nums 16 = 2 };
+    assert { kth_pair_distance_spec nums 2 16 }
+
+end

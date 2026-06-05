@@ -1,0 +1,156 @@
+module SpecialArrayWithXElementsGreaterThanOrEqualX_List_Stage3_Recursive
+
+  use int.Int
+  use list.List
+  use list.Length
+
+  let rec function count_ge (nums: list int) (x: int) : int
+    variant { nums }
+  =
+    match nums with
+    | Nil -> 0
+    | Cons y ys -> (if y >= x then 1 else 0) + count_ge ys x
+    end
+
+  predicate special_value (nums: list int) (x: int) =
+    count_ge nums x = x
+
+  predicate no_special_value (nums: list int) =
+    forall x: int. not (special_value nums x)
+
+  predicate valid_special_result (nums: list int) (r: int) =
+    (r = -1 /\ no_special_value nums) \/
+    (r <> -1 /\ special_value nums r /\
+     (forall x: int. special_value nums x -> x = r))
+
+  let rec lemma count_ge_bounds (nums: list int) (x: int)
+    ensures { 0 <= count_ge nums x <= length nums }
+    variant { nums }
+  =
+    match nums with
+    | Nil ->
+        ()
+    | Cons _ ys ->
+        count_ge_bounds ys x;
+        assert { length nums = 1 + length ys }
+    end
+
+  let rec lemma count_ge_monotone_threshold (nums: list int) (x y: int)
+    requires { x <= y }
+    ensures { count_ge nums y <= count_ge nums x }
+    variant { nums }
+  =
+    match nums with
+    | Nil ->
+        ()
+    | Cons z zs ->
+        count_ge_monotone_threshold zs x y;
+        if z >= y then assert { z >= x } else ();
+        assert { (if z >= y then 1 else 0) <= (if z >= x then 1 else 0) }
+    end
+
+  let lemma special_value_range (nums: list int) (x: int)
+    requires { special_value nums x }
+    ensures { 0 <= x <= length nums }
+  =
+    count_ge_bounds nums x
+
+  let lemma special_value_unique (nums: list int) (x y: int)
+    requires { special_value nums x }
+    requires { special_value nums y }
+    ensures { x = y }
+  =
+    if x < y then begin
+      count_ge_monotone_threshold nums x y;
+      assert { count_ge nums y <= count_ge nums x };
+      assert { y <= x };
+      assert { false }
+    end else if y < x then begin
+      count_ge_monotone_threshold nums y x;
+      assert { count_ge nums x <= count_ge nums y };
+      assert { x <= y };
+      assert { false }
+    end else
+      ()
+
+  let rec list_length (nums: list int) : int
+    ensures { result = length nums }
+    ensures { 0 <= result }
+    variant { nums }
+  =
+    match nums with
+    | Nil -> 0
+    | Cons _ rest -> 1 + list_length rest
+    end
+
+  let rec count_ge_exec (nums: list int) (x: int) : int
+    ensures { result = count_ge nums x }
+    ensures { 0 <= result <= length nums }
+    variant { nums }
+  =
+    match nums with
+    | Nil -> 0
+    | Cons y ys ->
+        (if y >= x then 1 else 0) + count_ge_exec ys x
+    end
+
+  let rec find_special_from (nums: list int) (x: int) : int
+    requires { 0 <= x <= length nums }
+    ensures { result = -1 \/ 0 <= result <= x }
+    ensures { result <> -1 -> special_value nums result }
+    ensures { result = -1 ->
+      forall y: int. 0 <= y <= x -> not (special_value nums y) }
+    variant { x }
+  =
+    if x = 0 then
+      let c = count_ge_exec nums 0 in
+      if c = 0 then begin
+        assert { special_value nums 0 };
+        0
+      end else begin
+        assert { not (special_value nums 0) };
+        -1
+      end
+    else
+      let c = count_ge_exec nums x in
+      if c = x then begin
+        assert { special_value nums x };
+        x
+      end else begin
+        assert { not (special_value nums x) };
+        let r = find_special_from nums (x - 1) in
+        if r = -1 then begin
+          assert {
+            forall y: int. 0 <= y <= x ->
+              not (special_value nums y)
+          };
+          r
+        end else
+          r
+      end
+
+  let special_array_with_x_elements_greater_than_or_equal_x_list (nums: list int) : int
+    ensures { valid_special_result nums result }
+    ensures { result = -1 \/ 0 <= result <= length nums }
+  =
+    let n = list_length nums in
+    let r = find_special_from nums n in
+    if r = -1 then begin
+      assert {
+        forall x: int. special_value nums x ->
+          0 <= x <= length nums
+      };
+      assert {
+        forall x: int. special_value nums x -> false
+      };
+      assert { no_special_value nums };
+      r
+    end else begin
+      assert { special_value nums r };
+      assert {
+        forall x: int. special_value nums x -> x = r
+      };
+      r
+    end
+
+end

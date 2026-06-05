@@ -1,0 +1,172 @@
+module SumOfFlooredPairs_Array_Recursive_Implementation
+
+  use int.Int
+  use int.EuclideanDivision
+  use array.Array
+  use array.Init
+
+  let result_modulus : int = 1000000007
+
+  let rec pair_row_sum_from (nums: array int) (i: int) (j: int) : int
+    variant { length nums - j }
+  =
+    if j = length nums then
+      0
+    else
+      div nums[i] nums[j] + pair_row_sum_from nums i (j + 1)
+
+  let rec floored_pair_sum_from (nums: array int) (i: int) : int
+    variant { length nums - i }
+  =
+    if i = length nums then
+      0
+    else
+      pair_row_sum_from nums i 0 + floored_pair_sum_from nums (i + 1)
+
+  let sum_of_floored_pairs_array (nums: array int) : int =
+    mod (floored_pair_sum_from nums 0) result_modulus
+
+  let test_000 () : bool =
+    let nums = init 7 [|7; 7; 7; 7; 7; 7; 7|] in
+    let r = sum_of_floored_pairs_array nums in
+    r = 49
+
+  let test_001 () : bool =
+    let nums = init 10 [|1; 1; 1; 1; 1; 1; 1; 1; 1; 1|] in
+    let r = sum_of_floored_pairs_array nums in
+    r = 100
+
+  let test_002 () : bool =
+    let nums = init 3 [|2; 5; 9|] in
+    let r = sum_of_floored_pairs_array nums in
+    r = 10
+
+  let test_003 () : bool =
+    let nums = init 3 [|100000; 1; 100000|] in
+    let r = sum_of_floored_pairs_array nums in
+    r = 200005
+
+  let test_004 () : bool =
+    let nums = init 5 [|100000; 50000; 25000; 12500; 6250|] in
+    let r = sum_of_floored_pairs_array nums in
+    r = 57
+
+  let test_005 () : bool =
+    let nums = init 20 [|5; 5; 5; 5; 5; 5; 5; 5; 5; 5; 5; 5; 5; 5; 5; 5; 5; 5; 5; 5|] in
+    let r = sum_of_floored_pairs_array nums in
+    r = 400
+
+  let test_006 () : bool =
+    let nums = init 5 [|10; 20; 30; 40; 50|] in
+    let r = sum_of_floored_pairs_array nums in
+    r = 27
+
+  let test_007 () : bool =
+    let nums = init 10 [|1; 3; 5; 7; 9; 11; 13; 15; 17; 19|] in
+    let r = sum_of_floored_pairs_array nums in
+    r = 178
+
+  let test_008 () : bool =
+    let nums = init 5 [|1; 2; 3; 4; 5|] in
+    let r = sum_of_floored_pairs_array nums in
+    r = 27
+
+  let test_009 () : bool =
+    let nums = init 3 [|100000; 100000; 100000|] in
+    let r = sum_of_floored_pairs_array nums in
+    r = 9
+
+  let test_010 () : bool =
+    let nums = init 15 [|1; 2; 4; 8; 16; 32; 64; 128; 256; 512; 1024; 2048; 4096; 8192; 16384|] in
+    let r = sum_of_floored_pairs_array nums in
+    r = 65519
+
+  let test_011 () : bool =
+    let nums = init 20 [|99999; 99998; 99997; 99996; 99995; 99994; 99993; 99992; 99991; 99990; 99989; 99988; 99987; 99986; 99985; 99984; 99983; 99982; 99981; 99980|] in
+    let r = sum_of_floored_pairs_array nums in
+    r = 210
+
+  let test_012 () : bool =
+    let nums = init 20 [|5; 10; 15; 20; 25; 30; 35; 40; 45; 50; 55; 60; 65; 70; 75; 80; 85; 90; 95; 100|] in
+    let r = sum_of_floored_pairs_array nums in
+    r = 600
+
+  let test_013 () : bool =
+    let nums = init 10 [|100000; 90000; 80000; 70000; 60000; 50000; 40000; 30000; 20000; 10000|] in
+    let r = sum_of_floored_pairs_array nums in
+    r = 127
+
+  let test_014 () : bool =
+    let nums = init 57 [|1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1|] in
+    let r = sum_of_floored_pairs_array nums in
+    r = 3249
+
+  let test_016 () : bool =
+    let nums = init 30 [|1; 2; 3; 4; 5; 6; 7; 8; 9; 10; 11; 12; 13; 14; 15; 16; 17; 18; 19; 20; 21; 22; 23; 24; 25; 26; 27; 28; 29; 30|] in
+    let r = sum_of_floored_pairs_array nums in
+    r = 1492
+
+  let test_017 () : bool =
+    let nums = init 10 [|100; 200; 300; 400; 500; 600; 700; 800; 900; 1000|] in
+    let r = sum_of_floored_pairs_array nums in
+    r = 127
+
+  let test_018 () : bool =
+    let nums = init 40 [|1; 1; 2; 2; 3; 3; 4; 4; 5; 5; 6; 6; 7; 7; 8; 8; 9; 9; 10; 10; 11; 11; 12; 12; 13; 13; 14; 14; 15; 15; 16; 16; 17; 17; 18; 18; 19; 19; 20; 20|] in
+    let r = sum_of_floored_pairs_array nums in
+    r = 2400
+
+  let test_020 () : bool =
+    let nums = init 50 [|1; 3; 5; 7; 9; 11; 13; 15; 17; 19; 21; 23; 25; 27; 29; 31; 33; 35; 37; 39; 41; 43; 45; 47; 49; 51; 53; 55; 57; 59; 61; 63; 65; 67; 69; 71; 73; 75; 77; 79; 81; 83; 85; 87; 89; 91; 93; 95; 97; 99|] in
+    let r = sum_of_floored_pairs_array nums in
+    r = 6268
+
+  let test_021 () : bool =
+    let nums = init 20 [|1; 3; 5; 7; 9; 11; 13; 15; 17; 19; 21; 23; 25; 27; 29; 31; 33; 35; 37; 39|] in
+    let r = sum_of_floored_pairs_array nums in
+    r = 834
+
+  let run_tests () : bool =
+    if test_000 () then
+    if test_001 () then
+    if test_002 () then
+    if test_003 () then
+    if test_004 () then
+    if test_005 () then
+    if test_006 () then
+    if test_007 () then
+    if test_008 () then
+    if test_009 () then
+    if test_010 () then
+    if test_011 () then
+    if test_012 () then
+    if test_013 () then
+    if test_014 () then
+    if test_016 () then
+    if test_017 () then
+    if test_018 () then
+    if test_020 () then
+    if test_021 () then
+      true
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+
+end

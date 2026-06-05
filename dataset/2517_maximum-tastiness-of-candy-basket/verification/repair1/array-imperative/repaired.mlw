@@ -1,0 +1,214 @@
+module MaximumTastinessOfCandyBasket_Array_Stage3_Imperative
+
+  use int.Int
+  use int.Abs
+  use int.EuclideanDivision
+  use array.Array
+  use array.IntArraySorted
+  use array.ArrayPermut
+  use ref.Ref
+
+  predicate valid_selection (price: array int) (k: int) (pick: array int) =
+    length pick = k /\
+    forall t: int. 0 <= t < k -> 0 <= pick[t] < length price
+
+  predicate distinct_selection (pick: array int) (k: int) =
+    forall x y: int. 0 <= x < y < k -> pick[x] <> pick[y]
+
+  predicate selection_tastiness_at_least
+    (price: array int) (pick: array int) (k: int) (d: int) =
+    forall x y: int. 0 <= x < y < k ->
+      abs (price[pick[x]] - price[pick[y]]) >= d
+
+  predicate basket_witness
+    (price: array int) (k: int) (pick: array int) (d: int) =
+    valid_selection price k pick /\
+    distinct_selection pick k /\
+    selection_tastiness_at_least price pick k d
+
+  predicate feasible_tastiness (price: array int) (k: int) (d: int) =
+    0 <= d /\
+    exists pick: array int. basket_witness price k pick d
+
+  predicate maximum_tastiness_spec (price: array int) (k: int) (m: int) =
+    0 <= m /\
+    feasible_tastiness price k m /\
+    forall d: int. feasible_tastiness price k d -> d <= m
+
+  predicate sorted_gap_witness (a: array int) (k: int) (gap: int) =
+    exists pick: array int.
+      length pick = k /\
+      (forall t: int. 0 <= t < k -> 0 <= pick[t] < length a) /\
+      (forall t: int. 0 <= t < k - 1 -> pick[t] < pick[t + 1]) /\
+      (forall t: int. 0 <= t < k - 1 -> a[pick[t + 1]] - a[pick[t]] >= gap)
+
+  let lemma sorted_gap_witness_monotone (a: array int) (k: int) (small big: int)
+    requires { 0 <= small <= big }
+    requires { sorted_gap_witness a k big }
+    ensures  { sorted_gap_witness a k small }
+  =
+    assert { sorted_gap_witness a k small }
+
+  let lemma sorted_gap_witness_absent_above (a: array int) (k: int) (gap: int)
+    requires { 0 <= gap }
+    requires { not sorted_gap_witness a k gap }
+    ensures  { forall d: int. gap <= d -> not sorted_gap_witness a k d }
+  =
+    assert { forall d: int. gap <= d -> not sorted_gap_witness a k d }
+
+  let lemma zero_gap_witness (a: array int) (k: int)
+    requires { 1 <= k <= length a }
+    ensures  { sorted_gap_witness a k 0 }
+  =
+    assert { sorted_gap_witness a k 0 }
+
+  let lemma sorted_gap_witness_upper_bound (a: array int) (k gap: int)
+    requires { sorted a }
+    requires { 1 <= k <= length a }
+    requires { sorted_gap_witness a k gap }
+    ensures  { gap <= a[length a - 1] - a[0] }
+  =
+    assert { gap <= a[length a - 1] - a[0] }
+
+  let lemma sorted_gap_to_feasible_tastiness
+      (price sorted_price: array int) (k gap: int)
+    requires { permut_all price sorted_price }
+    requires { sorted sorted_price }
+    requires { 1 <= k <= length price }
+    requires { sorted_gap_witness sorted_price k gap }
+    ensures  { feasible_tastiness price k gap }
+  =
+    assert { feasible_tastiness price k gap }
+
+  let lemma feasible_tastiness_to_sorted_gap
+      (price sorted_price: array int) (k gap: int)
+    requires { permut_all price sorted_price }
+    requires { sorted sorted_price }
+    requires { 1 <= k <= length price }
+    requires { feasible_tastiness price k gap }
+    ensures  { sorted_gap_witness sorted_price k gap }
+  =
+    assert { sorted_gap_witness sorted_price k gap }
+
+  let copy_array (a: array int) : array int
+    ensures { length result = length a }
+    ensures { forall i: int. 0 <= i < length a -> result[i] = a[i] }
+  =
+    let n = length a in
+    let b = make n 0 in
+    for i = 0 to n - 1 do
+      invariant { length b = n }
+      invariant { forall j: int. 0 <= j < i -> b[j] = a[j] }
+      b[i] <- a[i]
+    done;
+    b
+
+  let sort_array (a: array int) : array int
+    ensures { length result = length a }
+    ensures { sorted result }
+    ensures { permut_all a result }
+  =
+    let b = copy_array a in
+    let n = length b in
+    for i = 0 to n - 1 do
+      invariant { length b = n }
+      invariant { 0 <= i <= n }
+      invariant { permut_all a b }
+      invariant { sorted_sub b 0 i }
+      invariant { forall p q: int. 0 <= p < i <= q < n -> b[p] <= b[q] }
+      let min_idx = ref i in
+      for j = i + 1 to n - 1 do
+        invariant { length b = n }
+        invariant { i <= !min_idx < n }
+        invariant { i + 1 <= j <= n }
+        invariant { forall q: int. i <= q < j -> b[!min_idx] <= b[q] }
+        if b[j] < b[!min_idx] then
+          min_idx := j
+      done;
+      let tmp = b[i] in
+      b[i] <- b[!min_idx];
+      b[!min_idx] <- tmp
+    done;
+    b
+
+  let can_pick_with_gap (sorted_price: array int) (k: int) (gap: int) : bool
+    requires { 1 <= k <= length sorted_price }
+    requires { sorted sorted_price }
+    requires { 0 <= gap }
+    ensures  { result = true -> sorted_gap_witness sorted_price k gap }
+    ensures  { result = false -> not sorted_gap_witness sorted_price k gap }
+  =
+    let picked = ref 1 in
+    let last = ref sorted_price[0] in
+    assert { 0 <= 0 < 1 /\ !last = sorted_price[0] };
+    for i = 1 to length sorted_price - 1 do
+      invariant { 1 <= !picked <= i }
+      invariant { sorted_price[0] <= !last }
+      invariant { exists j: int. 0 <= j < i /\ !last = sorted_price[j] }
+      invariant { !picked >= k -> sorted_gap_witness sorted_price k gap }
+      if sorted_price[i] - !last >= gap then begin
+        assert { 0 <= i < length sorted_price };
+        picked := !picked + 1;
+        last := sorted_price[i];
+        assert { exists j: int. 0 <= j < i + 1 /\ !last = sorted_price[j] }
+      end
+    done;
+    if !picked >= k then begin
+      assert { sorted_gap_witness sorted_price k gap }
+    end else begin
+      assert { not sorted_gap_witness sorted_price k gap }
+    end;
+    !picked >= k
+
+  let maximum_tastiness_of_candy_basket_array (price: array int) (k: int) : int
+    requires { 2 <= k <= length price }
+    ensures  { maximum_tastiness_spec price k result }
+  =
+    let sorted_price = sort_array price in
+    let low = ref 0 in
+    let high = ref (sorted_price[length sorted_price - 1] - sorted_price[0]) in
+    assert { length sorted_price = length price };
+    assert { sorted sorted_price };
+    assert { permut_all price sorted_price };
+    assert { 1 <= k <= length sorted_price };
+    assert { 0 <= !high };
+    zero_gap_witness sorted_price k;
+    assert { sorted_gap_witness sorted_price k 0 };
+    assert {
+      forall d: int. !high < d -> not sorted_gap_witness sorted_price k d
+    };
+    while !low < !high do
+      invariant { 0 <= !low <= !high }
+      invariant { !high <= sorted_price[length sorted_price - 1] - sorted_price[0] }
+      invariant { forall d: int. 0 <= d <= !low -> sorted_gap_witness sorted_price k d }
+      invariant { forall d: int. !high < d -> not sorted_gap_witness sorted_price k d }
+      variant { !high - !low }
+      let mid = !low + div (!high - !low + 1) 2 in
+      assert { !low < mid <= !high };
+      assert { 0 <= mid };
+      if can_pick_with_gap sorted_price k mid then begin
+        assert { sorted_gap_witness sorted_price k mid };
+        assert {
+          forall d: int. 0 <= d <= mid -> sorted_gap_witness sorted_price k d
+        };
+        low := mid
+      end else begin
+        assert { not sorted_gap_witness sorted_price k mid };
+        sorted_gap_witness_absent_above sorted_price k mid;
+        assert {
+          forall d: int. mid <= d -> not sorted_gap_witness sorted_price k d
+        };
+        high := mid - 1
+      end
+    done;
+    assert { !low = !high };
+    assert { sorted_gap_witness sorted_price k !low };
+    sorted_gap_to_feasible_tastiness price sorted_price k !low;
+    assert { feasible_tastiness price k !low };
+    assert {
+      forall d: int. feasible_tastiness price k d -> d <= !low
+    };
+    assert { maximum_tastiness_spec price k !low };
+    !low
+
+end

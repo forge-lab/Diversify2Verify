@@ -1,0 +1,279 @@
+module MakeArrayStrictlyIncreasing_Array_Imperative
+
+  use int.Int
+  use array.Array
+  use array.Init
+  use ref.Ref
+
+  let copy_array (a: array int) : array int =
+    let n = length a in
+    let b = make n 0 in
+    for i = 0 to n - 1 do
+      b[i] <- a[i]
+    done;
+    b
+
+  let sort_array (a: array int) : array int =
+    let b = copy_array a in
+    let n = length b in
+    if n >= 2 then
+      for i = 0 to n - 2 do
+        let min_idx = ref i in
+        for j = i + 1 to n - 1 do
+          if b[j] < b[!min_idx] then
+            min_idx := j
+        done;
+        if !min_idx <> i then
+          (
+            let tmp = b[i] in
+            b[i] <- b[!min_idx];
+            b[!min_idx] <- tmp
+          )
+      done;
+    b
+
+  let sort_unique (a: array int) : array int =
+    let n = length a in
+    if n = 0 then
+      make 0 0
+    else
+      let sorted = sort_array a in
+      let count = ref 1 in
+      for i = 1 to n - 1 do
+        if sorted[i] <> sorted[i - 1] then
+          count := !count + 1
+      done;
+      let out = make !count 0 in
+      out[0] <- sorted[0];
+      let k = ref 1 in
+      for i = 1 to n - 1 do
+        if sorted[i] <> sorted[i - 1] then
+          (
+            out[!k] <- sorted[i];
+            k := !k + 1
+          )
+      done;
+      out
+
+  let index_of (a: array int) (x: int) : int =
+    let idx = ref 0 in
+    for i = 0 to length a - 1 do
+      if a[i] = x then
+        idx := i
+    done;
+    !idx
+
+  let build_candidate_values (arr1: array int) (arr2u: array int) : array int =
+    let n1 = length arr1 in
+    let n2 = length arr2u in
+    let raw = make (1 + n1 + n2) 0 in
+    raw[0] <- -1;
+    for i = 0 to n1 - 1 do
+      raw[i + 1] <- arr1[i]
+    done;
+    for j = 0 to n2 - 1 do
+      raw[1 + n1 + j] <- arr2u[j]
+    done;
+    sort_unique raw
+
+  let make_array_strictly_increasing_array (arr1: array int) (arr2: array int) : int =
+    let n = length arr1 in
+    let arr2u = sort_unique arr2 in
+    let values = build_candidate_values arr1 arr2u in
+    let m = length values in
+    let inf = n + 1 in
+    let dp_next = make m 0 in
+    let dp_cur = make m 0 in
+    let i = ref (n - 1) in
+    while !i >= 0 do
+      let current = arr1[!i] in
+      let current_idx = index_of values current in
+      for prev_idx = 0 to m - 1 do
+        dp_cur[prev_idx] <- inf;
+        let prev_value = values[prev_idx] in
+        if current > prev_value then
+          if dp_next[current_idx] < dp_cur[prev_idx] then
+            dp_cur[prev_idx] <- dp_next[current_idx];
+        if length arr2u > 0 then
+          for j = 0 to length arr2u - 1 do
+            let candidate = arr2u[j] in
+            if candidate > prev_value then
+              let candidate_idx = index_of values candidate in
+              let replace_cost = 1 + dp_next[candidate_idx] in
+              if replace_cost < dp_cur[prev_idx] then
+                dp_cur[prev_idx] <- replace_cost
+          done
+      done;
+      for prev_idx = 0 to m - 1 do
+        dp_next[prev_idx] <- dp_cur[prev_idx]
+      done;
+      i := !i - 1
+    done;
+    let start_idx = index_of values (-1) in
+    let answer = dp_next[start_idx] in
+    if answer > n then -1 else answer
+
+  let test_000 () : bool =
+    let arr1 = init 4 [|1; 3; 5; 7|] in
+    let arr2 = init 4 [|2; 4; 6; 8|] in
+    let r = make_array_strictly_increasing_array arr1 arr2 in
+    r = 0
+
+  let test_001 () : bool =
+    let arr1 = init 5 [|1; 5; 3; 6; 7|] in
+    let arr2 = init 4 [|1; 6; 3; 3|] in
+    let r = make_array_strictly_increasing_array arr1 arr2 in
+    r = -1
+
+  let test_002 () : bool =
+    let arr1 = init 5 [|1; 2; 3; 4; 5|] in
+    let arr2 = init 4 [|6; 7; 8; 9|] in
+    let r = make_array_strictly_increasing_array arr1 arr2 in
+    r = 0
+
+  let test_003 () : bool =
+    let arr1 = init 5 [|1; 5; 3; 6; 7|] in
+    let arr2 = init 4 [|1; 3; 2; 4|] in
+    let r = make_array_strictly_increasing_array arr1 arr2 in
+    r = 1
+
+  let test_004 () : bool =
+    let arr1 = init 3 [|10; 11; 12|] in
+    let arr2 = init 3 [|5; 6; 7|] in
+    let r = make_array_strictly_increasing_array arr1 arr2 in
+    r = 0
+
+  let test_005 () : bool =
+    let arr1 = init 1 [|1|] in
+    let arr2 = init 1 [|2|] in
+    let r = make_array_strictly_increasing_array arr1 arr2 in
+    r = 0
+
+  let test_006 () : bool =
+    let arr1 = init 5 [|1; 5; 3; 6; 7|] in
+    let arr2 = init 3 [|4; 3; 1|] in
+    let r = make_array_strictly_increasing_array arr1 arr2 in
+    r = 2
+
+  let test_007 () : bool =
+    let arr1 = init 5 [|5; 4; 3; 2; 1|] in
+    let arr2 = init 5 [|1; 2; 3; 4; 5|] in
+    let r = make_array_strictly_increasing_array arr1 arr2 in
+    r = 4
+
+  let test_008 () : bool =
+    let arr1 = init 4 [|1; 2; 3; 4|] in
+    let arr2 = init 4 [|2; 3; 4; 5|] in
+    let r = make_array_strictly_increasing_array arr1 arr2 in
+    r = 0
+
+  let test_009 () : bool =
+    let arr1 = init 5 [|10; 9; 8; 7; 6|] in
+    let arr2 = init 5 [|1; 2; 3; 4; 5|] in
+    let r = make_array_strictly_increasing_array arr1 arr2 in
+    r = 4
+
+  let test_010 () : bool =
+    let arr1 = init 5 [|1; 2; 3; 4; 5|] in
+    let arr2 = init 5 [|5; 4; 3; 2; 1|] in
+    let r = make_array_strictly_increasing_array arr1 arr2 in
+    r = 0
+
+  let test_011 () : bool =
+    let arr1 = init 5 [|1; 3; 5; 7; 9|] in
+    let arr2 = init 5 [|2; 4; 6; 8; 10|] in
+    let r = make_array_strictly_increasing_array arr1 arr2 in
+    r = 0
+
+  let test_012 () : bool =
+    let arr1 = init 4 [|1; 10; 20; 30|] in
+    let arr2 = init 4 [|5; 15; 25; 35|] in
+    let r = make_array_strictly_increasing_array arr1 arr2 in
+    r = 0
+
+  let test_013 () : bool =
+    let arr1 = init 5 [|1; 2; 2; 3; 4|] in
+    let arr2 = init 5 [|2; 3; 4; 5; 6|] in
+    let r = make_array_strictly_increasing_array arr1 arr2 in
+    r = 3
+
+  let test_014 () : bool =
+    let arr1 = init 5 [|10; 9; 8; 7; 6|] in
+    let arr2 = init 5 [|5; 4; 3; 2; 1|] in
+    let r = make_array_strictly_increasing_array arr1 arr2 in
+    r = 4
+
+  let test_015 () : bool =
+    let arr1 = init 4 [|1; 1; 1; 1|] in
+    let arr2 = init 4 [|2; 2; 2; 2|] in
+    let r = make_array_strictly_increasing_array arr1 arr2 in
+    r = -1
+
+  let test_016 () : bool =
+    let arr1 = init 5 [|1; 2; 3; 4; 5|] in
+    let arr2 = init 5 [|6; 7; 8; 9; 10|] in
+    let r = make_array_strictly_increasing_array arr1 arr2 in
+    r = 0
+
+  let test_017 () : bool =
+    let arr1 = init 3 [|1; 1; 1|] in
+    let arr2 = init 3 [|2; 2; 2|] in
+    let r = make_array_strictly_increasing_array arr1 arr2 in
+    r = -1
+
+  let test_018 () : bool =
+    let arr1 = init 5 [|1; 1; 1; 1; 1|] in
+    let arr2 = init 5 [|2; 2; 2; 2; 2|] in
+    let r = make_array_strictly_increasing_array arr1 arr2 in
+    r = -1
+
+  let test_019 () : bool =
+    let arr1 = init 2 [|1; 2000|] in
+    let arr2 = init 1 [|1000|] in
+    let r = make_array_strictly_increasing_array arr1 arr2 in
+    r = 0
+
+  let run_tests () : bool =
+    if test_000 () then
+    if test_001 () then
+    if test_002 () then
+    if test_003 () then
+    if test_004 () then
+    if test_005 () then
+    if test_006 () then
+    if test_007 () then
+    if test_008 () then
+    if test_009 () then
+    if test_010 () then
+    if test_011 () then
+    if test_012 () then
+    if test_013 () then
+    if test_014 () then
+    if test_015 () then
+    if test_016 () then
+    if test_017 () then
+    if test_018 () then
+    if test_019 () then
+      true
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+
+end

@@ -1,0 +1,117 @@
+== Stage 1: first prover on whole file ==
+Running in /Users/rubenm/Desktop/Diversify2Verify/codex-runs/dataset-merge/169_majority-element/stage3a/list-recursive/majority_element_list_stage3_eb247075/generated/why3/list: why3 session create -o /Users/rubenm/Desktop/Diversify2Verify/codex-runs/dataset-merge/169_majority-element/stage3a/list-recursive/majority_element_list_stage3_eb247075/generated/why3/list/.why3_sessions/majority_element_list_stage3_eb247075_stage3_stage1 -P Z3,4.8.6 -t 10 -m 8192 majority_element_list_stage3_eb247075_stage3.mlw
+Session created successfully
+Running in /Users/rubenm/Desktop/Diversify2Verify/codex-runs/dataset-merge/169_majority-element/stage3a/list-recursive/majority_element_list_stage3_eb247075/generated/why3/list: why3 bench /Users/rubenm/Desktop/Diversify2Verify/codex-runs/dataset-merge/169_majority-element/stage3a/list-recursive/majority_element_list_stage3_eb247075/generated/why3/list/.why3_sessions/majority_element_list_stage3_eb247075_stage3_stage1
+Progress: 1/1/0                       Progress: 0/2/0                       Progress: 0/0/1                       
+Replay completed, saving session... done
+== Stage 1 stats ==
+= Statistics for session /Users/rubenm/Desktop/Diversify2Verify/codex-runs/dataset-merge/169_majority-element/stage3a/list-recursive/majority_element_list_stage3_eb247075/generated/why3/list/.why3_sessions/majority_element_list_stage3_eb247075_stage3_stage1
+
+== Number of root goals ==
+  total: 2  proved: 1
+
+== Number of sub goals ==
+  total: 0  proved: 0
+
+== Goals not proved ==
+  +-- file [../../majority_element_list_stage3_eb247075_stage3.mlw]
+    +-- theory MajorityElement_List_Stage3_Recursive
+      +-- goal majority_element_list'vc
+  
+== Goals proved by only one prover ==
+  +-- file [../../majority_element_list_stage3_eb247075_stage3.mlw]
+    +-- theory MajorityElement_List_Stage3_Recursive
+      +-- goal majority_candidate'vc: Z3 4.8.6
+  
+1 session(s) read, with a total of 2 proof goals.
+== Unproved root goals after first prover ==
+MajorityElement_List_Stage3_Recursive	majority_element_list'vc
+== Stage 1: trying remaining goals with prover Alt-Ergo,2.4.0 ==
+---- stage1 | prover: Alt-Ergo,2.4.0 | theory: MajorityElement_List_Stage3_Recursive | goal: majority_element_list'vc ----
+File majority_element_list_stage3_eb247075_stage3.mlw:
+Goal majority_element_list'vc.
+Prover result is: Timeout (10.00s, 134394 steps).
+Remaining after prover Alt-Ergo,2.4.0: 1
+== Stage 1: trying remaining goals with prover CVC4,1.8 ==
+---- stage1 | prover: CVC4,1.8 | theory: MajorityElement_List_Stage3_Recursive | goal: majority_element_list'vc ----
+File majority_element_list_stage3_eb247075_stage3.mlw:
+Goal majority_element_list'vc.
+Prover result is: Timeout (10.00s, 6628943 steps).
+Remaining after prover CVC4,1.8: 1
+== Goals still unproved after stage 1 ==
+MajorityElement_List_Stage3_Recursive	majority_element_list'vc
+== Stage 2: split_vc on unproved goal ==
+Target theory: MajorityElement_List_Stage3_Recursive
+Target goal  : majority_element_list'vc
+---- stage2 | prover: Z3,4.8.6 | theory: MajorityElement_List_Stage3_Recursive | goal: majority_element_list'vc ----
+Transforms: split_vc
+File "majority_element_list_stage3_eb247075_stage3.mlw", line 30, characters 15-38:
+Sub-goal Postcondition of goal majority_element_list'vc.
+Prover result is: Valid (0.01s, 26995 steps).
+
+File "majority_element_list_stage3_eb247075_stage3.mlw", line 30, characters 15-38:
+Sub-goal Postcondition of goal majority_element_list'vc.
+Prover result is: Timeout (10.00s, 25184361 steps).
+---- stage2 | prover: Alt-Ergo,2.4.0 | theory: MajorityElement_List_Stage3_Recursive | goal: majority_element_list'vc ----
+Transforms: split_vc
+File "majority_element_list_stage3_eb247075_stage3.mlw", line 30, characters 15-38:
+Sub-goal Postcondition of goal majority_element_list'vc.
+Prover result is: Valid (0.01s, 57 steps).
+
+File "majority_element_list_stage3_eb247075_stage3.mlw", line 30, characters 15-38:
+Sub-goal Postcondition of goal majority_element_list'vc.
+Prover result is: Timeout (10.00s, 111348 steps).
+---- stage2 | prover: CVC4,1.8 | theory: MajorityElement_List_Stage3_Recursive | goal: majority_element_list'vc ----
+Transforms: split_vc
+File "majority_element_list_stage3_eb247075_stage3.mlw", line 30, characters 15-38:
+Sub-goal Postcondition of goal majority_element_list'vc.
+Prover result is: Valid (0.02s, 6056 steps).
+
+File "majority_element_list_stage3_eb247075_stage3.mlw", line 30, characters 15-38:
+Sub-goal Postcondition of goal majority_element_list'vc.
+Prover result is: Timeout (10.00s, 7203241 steps).
+== Goals still unproved after stage 2 (split_vc) ==
+MajorityElement_List_Stage3_Recursive	majority_element_list'vc
+== Stage 3: split_vc + inline_all on still-unproved goal ==
+Target theory: MajorityElement_List_Stage3_Recursive
+Target goal  : majority_element_list'vc
+---- stage3 | prover: Z3,4.8.6 | theory: MajorityElement_List_Stage3_Recursive | goal: majority_element_list'vc ----
+Transforms: split_vc inline_all
+File "majority_element_list_stage3_eb247075_stage3.mlw", line 30, characters 15-38:
+Sub-goal Postcondition of goal majority_element_list'vc.
+Prover result is: Valid (0.01s, 29141 steps).
+
+File "majority_element_list_stage3_eb247075_stage3.mlw", line 30, characters 15-38:
+Sub-goal Postcondition of goal majority_element_list'vc.
+Prover result is: Timeout (10.00s, 39993657 steps).
+---- stage3 | prover: Alt-Ergo,2.4.0 | theory: MajorityElement_List_Stage3_Recursive | goal: majority_element_list'vc ----
+Transforms: split_vc inline_all
+File "majority_element_list_stage3_eb247075_stage3.mlw", line 30, characters 15-38:
+Sub-goal Postcondition of goal majority_element_list'vc.
+Prover result is: Valid (0.01s, 27 steps).
+
+File "majority_element_list_stage3_eb247075_stage3.mlw", line 30, characters 15-38:
+Sub-goal Postcondition of goal majority_element_list'vc.
+Prover result is: Timeout (10.00s, 124971 steps).
+---- stage3 | prover: CVC4,1.8 | theory: MajorityElement_List_Stage3_Recursive | goal: majority_element_list'vc ----
+Transforms: split_vc inline_all
+File "majority_element_list_stage3_eb247075_stage3.mlw", line 30, characters 15-38:
+Sub-goal Postcondition of goal majority_element_list'vc.
+Prover result is: Valid (0.02s, 5707 steps).
+
+File "majority_element_list_stage3_eb247075_stage3.mlw", line 30, characters 15-38:
+Sub-goal Postcondition of goal majority_element_list'vc.
+Prover result is: Timeout (10.00s, 1692389 steps).
+== Final summary ==
+Unproved root goals after first prover : 1
+Remaining failures after split_vc      : 1
+Remaining failures after stage 3       : 1
+Detailed logs stored in                : /Users/rubenm/Desktop/Diversify2Verify/codex-runs/dataset-merge/169_majority-element/stage3a/list-recursive/majority_element_list_stage3_eb247075/generated/why3/list/.why3_sessions/majority_element_list_stage3_eb247075_stage3_logs
+Still unproved goals:
+MajorityElement_List_Stage3_Recursive	majority_element_list'vc
+VERIFY_RESULT: FAILURE
+VERIFY_REASON: unproved_goals_remain
+VERIFY_STAGE: stage3
+VERIFY_ROOT_TOTAL: 2
+VERIFY_ROOT_PROVED: 1
+VERIFY_ROOT_REMAINING: 1

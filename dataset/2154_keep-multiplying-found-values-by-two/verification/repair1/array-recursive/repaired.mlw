@@ -1,0 +1,266 @@
+module KeepMultiplyingFoundValuesByTwo_Array_Stage3_Recursive
+
+  use int.Int
+  use int.Power
+  use bool.Bool
+  use array.Array
+  use array.Init
+
+  predicate valid_input (nums: array int) (original: int) =
+    1 <= length nums <= 1000 /\
+    1 <= original <= 1000 /\
+    forall i: int. 0 <= i < length nums -> 1 <= nums[i] <= 1000
+
+  predicate contains_value (nums: array int) (x: int) =
+    exists i: int. 0 <= i < length nums /\ nums[i] = x
+
+  function doubled_value (original: int) (steps: int) : int =
+    original * power 2 steps
+
+  predicate doubling_prefix_found (nums: array int) (original: int) (steps: int) =
+    forall t: int. 0 <= t < steps -> contains_value nums (doubled_value original t)
+
+  predicate final_value (nums: array int) (original: int) (res: int) =
+    exists steps: int.
+      0 <= steps <= length nums /\
+      res = doubled_value original steps /\
+      doubling_prefix_found nums original steps /\
+      not (contains_value nums res)
+
+  let rec function contains_value_from_bool (nums: array int) (target: int) (i: int) : bool
+    requires { 0 <= i <= length nums }
+    variant  { length nums - i }
+  =
+    if i = length nums then False
+    else if nums[i] = target then True
+    else contains_value_from_bool nums target (i + 1)
+
+  let rec lemma contains_value_from_bool_equiv (nums: array int) (target: int) (i: int)
+    requires { 0 <= i <= length nums }
+    ensures  { contains_value_from_bool nums target i = True <->
+               exists j: int. i <= j < length nums /\ nums[j] = target }
+    variant  { length nums - i }
+  =
+    if i = length nums then
+      assert { contains_value_from_bool nums target i = False }
+    else if nums[i] = target then
+      assert { contains_value_from_bool nums target i = True }
+    else begin
+      contains_value_from_bool_equiv nums target (i + 1);
+      assert { contains_value_from_bool nums target i =
+               contains_value_from_bool nums target (i + 1) }
+    end
+
+  let rec function first_index_from (nums: array int) (target: int) (i: int) : int
+    requires { 0 <= i <= length nums }
+    variant  { length nums - i }
+  =
+    if i = length nums then length nums
+    else if nums[i] = target then i
+    else first_index_from nums target (i + 1)
+
+  let rec lemma first_index_from_found (nums: array int) (target: int) (i: int)
+    requires { 0 <= i <= length nums }
+    requires { exists j: int. i <= j < length nums /\ nums[j] = target }
+    ensures  { i <= first_index_from nums target i < length nums }
+    ensures  { nums[first_index_from nums target i] = target }
+    variant  { length nums - i }
+  =
+    if i = length nums then
+      assert { false }
+    else if nums[i] = target then
+      assert { first_index_from nums target i = i }
+    else begin
+      first_index_from_found nums target (i + 1);
+      assert { first_index_from nums target i = first_index_from nums target (i + 1) }
+    end
+
+  function witness_index (nums: array int) (original: int) (t: int) : int =
+    first_index_from nums (doubled_value original t) 0
+
+  let lemma power_shift (base: int) (steps: int)
+    requires { 0 <= steps }
+    ensures  { (base * 2) * power 2 steps = base * power 2 (steps + 1) }
+  =
+    assert { power 2 (steps + 1) = 2 * power 2 steps }
+
+  let rec lemma power_two_strict (lo: int) (hi: int)
+    requires { 0 <= lo < hi }
+    ensures  { power 2 lo < power 2 hi }
+    variant  { hi - lo }
+  =
+    if lo + 1 = hi then begin
+      assert { power 2 hi = 2 * power 2 lo };
+      assert { power 2 lo > 0 }
+    end else begin
+      power_two_strict lo (hi - 1);
+      assert { power 2 hi = 2 * power 2 (hi - 1) };
+      assert { power 2 (hi - 1) > 0 }
+    end
+
+  let lemma doubled_value_injective (original: int) (s: int) (t: int)
+    requires { 1 <= original }
+    requires { 0 <= s }
+    requires { 0 <= t }
+    ensures  { doubled_value original s = doubled_value original t -> s = t }
+  =
+    if s < t then begin
+      power_two_strict s t;
+      assert { doubled_value original s < doubled_value original t }
+    end else if t < s then begin
+      power_two_strict t s;
+      assert { doubled_value original t < doubled_value original s }
+    end
+
+  let lemma doubling_prefix_bound (nums: array int) (original: int) (steps: int)
+    requires { valid_input nums original }
+    requires { 0 <= steps }
+    requires { doubling_prefix_found nums original steps }
+    ensures  { steps <= length nums }
+  =
+    if steps > length nums then begin
+      assert { forall t: int. 0 <= t < steps ->
+        exists j: int. 0 <= j < length nums /\ nums[j] = doubled_value original t };
+      assert { forall t: int. 0 <= t < steps ->
+        0 <= witness_index nums original t < length nums /\
+        nums[witness_index nums original t] = doubled_value original t };
+      assert { exists t1, t2: int.
+        0 <= t1 < t2 < steps /\
+        witness_index nums original t1 = witness_index nums original t2 };
+      assert { forall t1, t2: int.
+        0 <= t1 < t2 < steps /\
+        witness_index nums original t1 = witness_index nums original t2 ->
+        doubled_value original t1 = doubled_value original t2 };
+      assert { false }
+    end
+
+  let rec function keep_steps (nums: array int) (current: int) (remaining: int) : int
+    requires { 0 <= remaining }
+    variant  { remaining }
+  =
+    if remaining = 0 then 0
+    else if contains_value_from_bool nums current 0 then
+      1 + keep_steps nums (current * 2) (remaining - 1)
+    else
+      0
+
+  let rec lemma keep_steps_bounds (nums: array int) (current: int) (remaining: int)
+    requires { 0 <= remaining }
+    ensures  { 0 <= keep_steps nums current remaining <= remaining }
+    variant  { remaining }
+  =
+    if remaining = 0 then
+      assert { keep_steps nums current remaining = 0 }
+    else if contains_value_from_bool nums current 0 then
+      keep_steps_bounds nums (current * 2) (remaining - 1)
+    else
+      assert { keep_steps nums current remaining = 0 }
+
+  let rec lemma keep_steps_prefix (nums: array int) (current: int) (remaining: int)
+    requires { 0 <= remaining }
+    ensures  { forall t: int. 0 <= t < keep_steps nums current remaining ->
+               contains_value nums (current * power 2 t) }
+    variant  { remaining }
+  =
+    if remaining = 0 then
+      assert { keep_steps nums current remaining = 0 }
+    else if contains_value_from_bool nums current 0 then begin
+      contains_value_from_bool_equiv nums current 0;
+      keep_steps_prefix nums (current * 2) (remaining - 1);
+      assert { contains_value nums current };
+      assert { forall t: int. 1 <= t < keep_steps nums current remaining ->
+        contains_value nums ((current * 2) * power 2 (t - 1)) };
+      assert { forall t: int. 1 <= t < keep_steps nums current remaining ->
+        (current * 2) * power 2 (t - 1) = current * power 2 t };
+      assert { forall t: int. 0 <= t < keep_steps nums current remaining ->
+        contains_value nums (current * power 2 t) }
+    end else
+      assert { keep_steps nums current remaining = 0 }
+
+  let rec lemma keep_steps_stop (nums: array int) (current: int) (remaining: int)
+    requires { 0 <= remaining }
+    ensures  { keep_steps nums current remaining < remaining ->
+               not (contains_value nums (current * power 2 (keep_steps nums current remaining))) }
+    variant  { remaining }
+  =
+    if remaining = 0 then
+      assert { keep_steps nums current remaining = 0 }
+    else if contains_value_from_bool nums current 0 then begin
+      keep_steps_stop nums (current * 2) (remaining - 1);
+      power_shift current (keep_steps nums (current * 2) (remaining - 1));
+      assert { keep_steps nums current remaining =
+               1 + keep_steps nums (current * 2) (remaining - 1) };
+      assert { current * power 2 (keep_steps nums current remaining) =
+               (current * 2) * power 2 (keep_steps nums (current * 2) (remaining - 1)) }
+    end else begin
+      contains_value_from_bool_equiv nums current 0;
+      assert { keep_steps nums current remaining = 0 };
+      assert { not (contains_value nums current) }
+    end
+
+  let rec contains_value_from (nums: array int) (target: int) (i: int) : bool
+    requires { 0 <= i <= length nums }
+    ensures  { result = contains_value_from_bool nums target i }
+    ensures  { result <-> exists j: int. i <= j < length nums /\ nums[j] = target }
+    variant  { length nums - i }
+  =
+    if i = length nums then
+      false
+    else if nums[i] = target then
+      true
+    else
+      contains_value_from nums target (i + 1)
+
+  let contains_value_exec (nums: array int) (target: int) : bool
+    ensures { result = contains_value_from_bool nums target 0 }
+    ensures { result <-> contains_value nums target }
+  =
+    contains_value_from nums target 0
+
+  let rec keep_multiplying_from (nums: array int) (current: int) (remaining: int) : int
+    requires { 0 <= remaining }
+    ensures  { result = current * power 2 (keep_steps nums current remaining) }
+    ensures  { 0 <= keep_steps nums current remaining <= remaining }
+    ensures  { forall t: int. 0 <= t < keep_steps nums current remaining ->
+               contains_value nums (current * power 2 t) }
+    ensures  { keep_steps nums current remaining < remaining ->
+               not (contains_value nums result) }
+    variant { remaining }
+  =
+    if remaining = 0 then begin
+      assert { keep_steps nums current remaining = 0 };
+      current
+    end else if contains_value_exec nums current then begin
+      let result = keep_multiplying_from nums (current * 2) (remaining - 1) in
+      power_shift current (keep_steps nums (current * 2) (remaining - 1));
+      assert { keep_steps nums current remaining =
+               1 + keep_steps nums (current * 2) (remaining - 1) };
+      keep_steps_bounds nums current remaining;
+      keep_steps_prefix nums current remaining;
+      keep_steps_stop nums current remaining;
+      assert { result = current * power 2 (keep_steps nums current remaining) };
+      result
+    end else begin
+      contains_value_from_bool_equiv nums current 0;
+      assert { keep_steps nums current remaining = 0 };
+      current
+    end
+
+  let keep_multiplying_found_values_by_two_array (nums: array int) (original: int) : int
+    requires { valid_input nums original }
+    ensures  { final_value nums original result }
+  =
+    let result = keep_multiplying_from nums original (length nums + 1) in
+    let ghost steps = keep_steps nums original (length nums + 1) in
+    keep_steps_bounds nums original (length nums + 1);
+    keep_steps_prefix nums original (length nums + 1);
+    assert { doubling_prefix_found nums original steps };
+    doubling_prefix_bound nums original steps;
+    keep_steps_stop nums original (length nums + 1);
+    assert { steps < length nums + 1 };
+    assert { not (contains_value nums result) };
+    assert { result = doubled_value original steps };
+    assert { final_value nums original result };
+    result
+
+end

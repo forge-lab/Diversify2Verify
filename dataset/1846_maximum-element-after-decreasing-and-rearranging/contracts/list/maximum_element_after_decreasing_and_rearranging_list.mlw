@@ -1,0 +1,126 @@
+module MaximumElementAfterDecreasingAndRearranging_List_Spec
+
+  use int.Int
+  use list.List
+  use list.Length
+  use list.Mem
+
+  predicate all_positive (arr: list int) =
+    forall x: int. mem x arr -> 1 <= x
+
+  let rec function count_ge (arr: list int) (threshold: int) : int
+    variant { arr }
+  =
+    match arr with
+    | Nil -> 0
+    | Cons x xs -> (if threshold <= x then 1 else 0) + count_ge xs threshold
+    end
+
+  predicate can_build_height (arr: list int) (height: int) =
+    1 <= height <= length arr /\
+    (forall target: int.
+       1 <= target <= height ->
+       count_ge arr target >= height - target + 1)
+
+  predicate maximum_possible_height (arr: list int) (height: int) =
+    can_build_height arr height /\
+    (forall candidate: int. can_build_height arr candidate -> candidate <= height)
+
+  val maximum_element_after_decreasing_and_rearranging_list (arr: list int) : int
+    requires { arr <> Nil }
+    requires { all_positive arr }
+    ensures  { maximum_possible_height arr result }
+
+  let lemma test_000_spec () =
+    let arr = Cons 3 (Cons 2 (Cons 1 Nil)) in
+    assert { length arr = 3 };
+    assert { count_ge arr 1 = 3 };
+    assert { count_ge arr 2 = 2 };
+    assert { count_ge arr 3 = 1 };
+    assert { count_ge arr 4 = 0 };
+    assert { can_build_height arr 3 };
+    assert { forall candidate: int. can_build_height arr candidate -> candidate <= 3 };
+    assert { maximum_possible_height arr 3 }
+
+  let lemma test_001_spec () =
+    let arr = Cons 5 (Cons 4 (Cons 3 (Cons 2 (Cons 1 Nil)))) in
+    assert { length arr = 5 };
+    assert { count_ge arr 1 = 5 };
+    assert { count_ge arr 2 = 4 };
+    assert { count_ge arr 3 = 3 };
+    assert { count_ge arr 4 = 2 };
+    assert { count_ge arr 5 = 1 };
+    assert { count_ge arr 6 = 0 };
+    assert { can_build_height arr 5 };
+    assert { forall candidate: int. can_build_height arr candidate -> candidate <= 5 };
+    assert { maximum_possible_height arr 5 }
+
+  let lemma test_002_spec () =
+    let arr =
+      Cons 1 (Cons 1000000000 (Cons 2 (Cons 3 (Cons 4 Nil)))) in
+    assert { length arr = 5 };
+    assert { count_ge arr 1 = 5 };
+    assert { count_ge arr 2 = 4 };
+    assert { count_ge arr 3 = 3 };
+    assert { count_ge arr 4 = 2 };
+    assert { count_ge arr 5 = 1 };
+    assert { count_ge arr 6 = 1 };
+    assert { can_build_height arr 5 };
+    assert { forall candidate: int. can_build_height arr candidate -> candidate <= 5 };
+    assert { maximum_possible_height arr 5 }
+
+  let lemma test_003_spec () =
+    let arr = Cons 9 (Cons 7 (Cons 5 (Cons 3 (Cons 1 Nil)))) in
+    assert { length arr = 5 };
+    assert { count_ge arr 1 = 5 };
+    assert { count_ge arr 2 = 4 };
+    assert { count_ge arr 3 = 4 };
+    assert { count_ge arr 4 = 3 };
+    assert { count_ge arr 5 = 3 };
+    assert { count_ge arr 6 = 2 };
+    assert { can_build_height arr 5 };
+    assert { forall candidate: int. can_build_height arr candidate -> candidate <= 5 };
+    assert { maximum_possible_height arr 5 }
+
+  let lemma test_004_spec () =
+    let arr = Cons 5 (Cons 5 (Cons 5 (Cons 5 (Cons 5 Nil)))) in
+    assert { length arr = 5 };
+    assert { count_ge arr 1 = 5 };
+    assert { count_ge arr 2 = 5 };
+    assert { count_ge arr 3 = 5 };
+    assert { count_ge arr 4 = 5 };
+    assert { count_ge arr 5 = 5 };
+    assert { count_ge arr 6 = 0 };
+    assert { can_build_height arr 5 };
+    assert { forall candidate: int. can_build_height arr candidate -> candidate <= 5 };
+    assert { maximum_possible_height arr 5 }
+
+  let lemma test_005_spec () =
+    let arr =
+      Cons 1000000000
+        (Cons 1 (Cons 1000000000 (Cons 1 (Cons 1000000000 Nil)))) in
+    assert { length arr = 5 };
+    assert { count_ge arr 1 = 5 };
+    assert { count_ge arr 2 = 3 };
+    assert { count_ge arr 3 = 3 };
+    assert { count_ge arr 4 = 3 };
+    assert { count_ge arr 5 = 3 };
+    assert { can_build_height arr 4 };
+    assert { not (can_build_height arr 5) };
+    assert { forall candidate: int. can_build_height arr candidate -> candidate <= 4 };
+    assert { maximum_possible_height arr 4 }
+
+  let lemma test_006_spec () =
+    let arr = Cons 1 (Cons 10 (Cons 20 (Cons 30 (Cons 40 Nil)))) in
+    assert { length arr = 5 };
+    assert { count_ge arr 1 = 5 };
+    assert { count_ge arr 2 = 4 };
+    assert { count_ge arr 3 = 4 };
+    assert { count_ge arr 4 = 4 };
+    assert { count_ge arr 5 = 4 };
+    assert { count_ge arr 6 = 4 };
+    assert { can_build_height arr 5 };
+    assert { forall candidate: int. can_build_height arr candidate -> candidate <= 5 };
+    assert { maximum_possible_height arr 5 }
+
+end

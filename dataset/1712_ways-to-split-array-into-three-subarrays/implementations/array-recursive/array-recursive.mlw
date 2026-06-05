@@ -1,0 +1,201 @@
+module WaysToSplitArrayIntoThreeSubarrays_Array_Recursive_Implementation
+
+  use int.Int
+  use int.EuclideanDivision
+  use array.Array
+  use array.Init
+
+  let rec sum_range_from (nums: array int) (i: int) (hi: int) : int
+    requires { 0 <= i <= hi <= length nums }
+    variant { hi - i }
+  =
+    if i >= hi then
+      0
+    else
+      nums[i] + sum_range_from nums (i + 1) hi
+
+  let sum_range (nums: array int) (lo: int) (hi: int) : int
+    requires { 0 <= lo <= hi <= length nums }
+  =
+    sum_range_from nums lo hi
+
+  let is_good_split (nums: array int) (i: int) (j: int) : bool
+    requires { 1 <= i < j < length nums }
+  =
+    let left = sum_range nums 0 i in
+    let middle = sum_range nums i j in
+    let right = sum_range nums j (length nums) in
+    if left <= middle then
+      middle <= right
+    else
+      false
+
+  let rec count_splits_from_j (nums: array int) (i: int) (j: int) : int
+    requires { 1 <= i < length nums /\ i + 1 <= j <= length nums }
+    variant { length nums - j }
+  =
+    if j >= length nums then
+      0
+    else
+      let add = if is_good_split nums i j then 1 else 0 in
+      add + count_splits_from_j nums i (j + 1)
+
+  let rec count_splits_from_i (nums: array int) (i: int) : int
+    requires { 1 <= i <= length nums }
+    variant { length nums - i }
+  =
+    if i >= length nums then
+      0
+    else
+      count_splits_from_j nums i (i + 1) + count_splits_from_i nums (i + 1)
+
+  let ways_to_split_array_into_three_subarrays_array (nums: array int) : int =
+    if length nums < 3 then
+      0
+    else
+      mod (count_splits_from_i nums 1) 1000000007
+
+  let test_000 () : bool =
+    let nums = init 3 [|10000; 10000; 10000|] in
+    let r = ways_to_split_array_into_three_subarrays_array nums in
+    r = 1
+
+  let test_001 () : bool =
+    let nums = init 9 [|1; 2; 3; 4; 5; 6; 7; 8; 9|] in
+    let r = ways_to_split_array_into_three_subarrays_array nums in
+    r = 12
+
+  let test_002 () : bool =
+    let nums = init 10 [|1; 3; 2; 3; 1; 1; 1; 3; 2; 3|] in
+    let r = ways_to_split_array_into_three_subarrays_array nums in
+    r = 9
+
+  let test_003 () : bool =
+    let nums = init 5 [|9; 4; 2; 5; 1|] in
+    let r = ways_to_split_array_into_three_subarrays_array nums in
+    r = 0
+
+  let test_004 () : bool =
+    let nums = init 10 [|10; 10; 10; 10; 10; 10; 10; 10; 10; 10|] in
+    let r = ways_to_split_array_into_three_subarrays_array nums in
+    r = 8
+
+  let test_005 () : bool =
+    let nums = init 10 [|1; 1; 2; 2; 3; 3; 4; 4; 5; 5|] in
+    let r = ways_to_split_array_into_three_subarrays_array nums in
+    r = 15
+
+  let test_006 () : bool =
+    let nums = init 8 [|1; 3; 2; 4; 1; 2; 3; 4|] in
+    let r = ways_to_split_array_into_three_subarrays_array nums in
+    r = 6
+
+  let test_007 () : bool =
+    let nums = init 3 [|1; 1; 1|] in
+    let r = ways_to_split_array_into_three_subarrays_array nums in
+    r = 1
+
+  let test_008 () : bool =
+    let nums = init 10 [|5; 5; 5; 5; 5; 5; 5; 5; 5; 5|] in
+    let r = ways_to_split_array_into_three_subarrays_array nums in
+    r = 8
+
+  let test_009 () : bool =
+    let nums = init 4 [|10; 4; -8; 7|] in
+    let r = ways_to_split_array_into_three_subarrays_array nums in
+    r = 0
+
+  let test_010 () : bool =
+    let nums = init 5 [|10; 10; 10; 10; 10|] in
+    let r = ways_to_split_array_into_three_subarrays_array nums in
+    r = 2
+
+  let test_011 () : bool =
+    let nums = init 5 [|1; 3; 1; 1; 2|] in
+    let r = ways_to_split_array_into_three_subarrays_array nums in
+    r = 1
+
+  let test_012 () : bool =
+    let nums = init 3 [|3; 2; 1|] in
+    let r = ways_to_split_array_into_three_subarrays_array nums in
+    r = 0
+
+  let test_013 () : bool =
+    let nums = init 5 [|0; 0; 0; 0; 0|] in
+    let r = ways_to_split_array_into_three_subarrays_array nums in
+    r = 6
+
+  let test_014 () : bool =
+    let nums = init 6 [|1; 2; 2; 2; 5; 0|] in
+    let r = ways_to_split_array_into_three_subarrays_array nums in
+    r = 3
+
+  let test_015 () : bool =
+    let nums = init 9 [|9; 8; 7; 6; 5; 4; 3; 2; 1|] in
+    let r = ways_to_split_array_into_three_subarrays_array nums in
+    r = 1
+
+  let test_016 () : bool =
+    let nums = init 10 [|1; 0; 0; 0; 0; 0; 0; 0; 0; 2|] in
+    let r = ways_to_split_array_into_three_subarrays_array nums in
+    r = 0
+
+  let test_017 () : bool =
+    let nums = init 6 [|1; 3; 2; 2; 1; 1|] in
+    let r = ways_to_split_array_into_three_subarrays_array nums in
+    r = 1
+
+  let test_018 () : bool =
+    let nums = init 30 [|1; 1; 2; 2; 3; 3; 4; 4; 5; 5; 6; 6; 7; 7; 8; 8; 9; 9; 10; 10; 11; 11; 12; 12; 13; 13; 14; 14; 15; 15|] in
+    let r = ways_to_split_array_into_three_subarrays_array nums in
+    r = 160
+
+  let test_019 () : bool =
+    let nums = init 30 [|10; 9; 8; 7; 6; 5; 4; 3; 2; 1; 1; 2; 3; 4; 5; 6; 7; 8; 9; 10; 1; 2; 3; 4; 5; 6; 7; 8; 9; 10|] in
+    let r = ways_to_split_array_into_three_subarrays_array nums in
+    r = 50
+
+  let run_tests () : bool =
+    if test_000 () then
+    if test_001 () then
+    if test_002 () then
+    if test_003 () then
+    if test_004 () then
+    if test_005 () then
+    if test_006 () then
+    if test_007 () then
+    if test_008 () then
+    if test_009 () then
+    if test_010 () then
+    if test_011 () then
+    if test_012 () then
+    if test_013 () then
+    if test_014 () then
+    if test_015 () then
+    if test_016 () then
+    if test_017 () then
+    if test_018 () then
+    if test_019 () then
+      true
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+
+end

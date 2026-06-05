@@ -1,0 +1,135 @@
+module MinimizeMaximumOfArray_Array_Stage3_Recursive
+
+  use int.Int
+  use int.EuclideanDivision
+  use array.Array
+  use array.ArraySum
+
+  predicate nonnegative_bounded_array (nums: array int) =
+    forall i: int. 0 <= i < length nums -> 0 <= nums[i] <= 1000000000
+
+  predicate valid_input (nums: array int) =
+    2 <= length nums <= 100000 /\ nonnegative_bounded_array nums
+
+  predicate prefix_bound_at (nums: array int) (m: int) (k: int) =
+    1 <= k <= length nums -> sum nums 0 k <= m * k
+
+  predicate prefix_bounded_by (nums: array int) (m: int) =
+    forall k: int. 1 <= k <= length nums -> sum nums 0 k <= m * k
+
+  predicate minimum_possible_maximum (nums: array int) (m: int) =
+    prefix_bounded_by nums m /\
+    forall candidate: int. prefix_bounded_by nums candidate -> m <= candidate
+
+  predicate processed_prefix_summary (nums: array int) (i: int) (best: int) =
+    (i = 0 /\ best = 0) \/
+    (1 <= i <= length nums /\
+     (forall k: int. 1 <= k <= i -> sum nums 0 k <= best * k) /\
+     (forall candidate: int.
+        (forall k: int. 1 <= k <= i -> sum nums 0 k <= candidate * k) ->
+        best <= candidate))
+
+  let lemma processed_summary_prefix_bound
+      (nums: array int) (i: int) (best: int)
+    requires { 1 <= i <= length nums }
+    requires { processed_prefix_summary nums i best }
+    ensures  { forall k: int. 1 <= k <= i -> sum nums 0 k <= best * k }
+  =
+    ()
+
+  let lemma processed_summary_minimal_candidate
+      (nums: array int) (i: int) (best: int) (candidate: int)
+    requires { 1 <= i <= length nums }
+    requires { processed_prefix_summary nums i best }
+    requires { forall k: int. 1 <= k <= i -> sum nums 0 k <= candidate * k }
+    ensures  { best <= candidate }
+  =
+    ()
+
+  let lemma processed_summary_full_minimum
+      (nums: array int) (best: int)
+    requires { valid_input nums }
+    requires { processed_prefix_summary nums (length nums) best }
+    ensures  { prefix_bounded_by nums best }
+    ensures  { forall candidate: int. prefix_bounded_by nums candidate -> best <= candidate }
+    ensures  { minimum_possible_maximum nums best }
+  =
+    assert { 1 <= length nums <= length nums };
+    processed_summary_prefix_bound nums (length nums) best;
+    assert { prefix_bounded_by nums best };
+    assert {
+      forall candidate: int.
+        prefix_bounded_by nums candidate ->
+        (forall k: int. 1 <= k <= length nums -> sum nums 0 k <= candidate * k)
+    };
+    assert {
+      forall candidate: int.
+        prefix_bounded_by nums candidate -> best <= candidate
+    }
+
+  let lemma ceil_minimal_candidate
+      (x: int) (y: int) (q: int) (candidate: int)
+    requires { forall z: int. x <= z * y -> q <= z }
+    requires { x <= candidate * y }
+    ensures  { q <= candidate }
+  =
+    ()
+
+  let lemma ceil_minimal_all
+      (x: int) (y: int) (q: int)
+    requires { forall z: int. x <= z * y -> q <= z }
+    ensures  { forall candidate: int. x <= candidate * y -> q <= candidate }
+  =
+    ()
+
+  let ceil_div_nonneg (x: int) (y: int) : int
+    requires { 0 <= x }
+    requires { 0 < y }
+    ensures  { x <= result * y }
+    ensures  { forall z: int. x <= z * y -> result <= z }
+  =
+    div (x + y - 1) y
+
+  let rec minimize_maximum_from
+      (nums: array int) (i: int) (prefix_sum: int) (best: int) : int
+    requires { valid_input nums }
+    requires { 0 <= i <= length nums }
+    requires { prefix_sum = sum nums 0 i }
+    requires { processed_prefix_summary nums i best }
+    ensures  { minimum_possible_maximum nums result }
+    variant  { length nums - i }
+  =
+    if i >= length nums then
+      begin
+        assert { i = length nums };
+        assert { 1 <= i <= length nums };
+        processed_summary_full_minimum nums best;
+        best
+      end
+    else
+      begin
+        assert { 0 <= i < length nums };
+        assert { 0 <= nums[i] };
+        let next_sum = prefix_sum + nums[i] in
+        let prefix_len = i + 1 in
+        assert { prefix_len = i + 1 };
+        assert { 1 <= prefix_len <= length nums };
+        assert { 0 <= next_sum };
+        assert { next_sum = sum nums 0 prefix_len };
+        let needed = ceil_div_nonneg next_sum prefix_len in
+        assert { sum nums 0 prefix_len <= needed * prefix_len };
+        ceil_minimal_all next_sum prefix_len needed;
+        let next_best = if needed > best then needed else best in
+        assert { best <= next_best };
+        assert { needed <= next_best };
+        assert { processed_prefix_summary nums prefix_len next_best };
+        minimize_maximum_from nums (i + 1) next_sum next_best
+      end
+
+  let minimize_maximum_of_array_array (nums: array int) : int
+    requires { valid_input nums }
+    ensures  { minimum_possible_maximum nums result }
+  =
+    minimize_maximum_from nums 0 0 0
+
+end

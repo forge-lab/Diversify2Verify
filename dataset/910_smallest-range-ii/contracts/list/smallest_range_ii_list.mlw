@@ -1,0 +1,157 @@
+module SmallestRangeIi_List_Spec
+
+  use int.Int
+  use list.List
+  use list.Length
+  use list.Mem
+
+  let rec predicate choice_transform (nums: list int) (k: int) (changed: list int)
+    variant { nums }
+  =
+    match nums with
+    | Nil ->
+        match changed with
+        | Nil -> true
+        | Cons _ _ -> false
+        end
+    | Cons x xs ->
+        match changed with
+        | Nil -> false
+        | Cons y ys ->
+            (y = x + k || y = x - k) && choice_transform xs k ys
+        end
+    end
+
+  predicate is_min_value (l: list int) (lo: int) =
+    mem lo l /\
+    (forall x: int. mem x l -> lo <= x)
+
+  predicate is_max_value (l: list int) (hi: int) =
+    mem hi l /\
+    (forall x: int. mem x l -> x <= hi)
+
+  predicate range_score (l: list int) (score: int) =
+    exists lo hi: int.
+      is_min_value l lo /\ is_max_value l hi /\ score = hi - lo
+
+  predicate possible_score (nums: list int) (k: int) (score: int) =
+    exists changed: list int.
+      choice_transform nums k changed /\ range_score changed score
+
+  predicate optimal_score (nums: list int) (k: int) (best: int) =
+    possible_score nums k best /\
+    (forall score: int. possible_score nums k score -> best <= score)
+
+  val smallest_range_ii_list (nums: list int) (k: int) : int
+    requires { nums <> Nil }
+    requires { 0 <= k <= 10000 }
+    requires { length nums <= 10000 }
+    requires { forall x: int. mem x nums -> 0 <= x <= 10000 }
+    ensures  { possible_score nums k result }
+    ensures  { forall score: int. possible_score nums k score -> result <= score }
+    ensures  { optimal_score nums k result }
+    ensures  { 0 <= result }
+
+  let lemma check_test_000 () =
+    let nums = Cons 0 (Cons 10 Nil) in
+    let changed = Cons 2 (Cons 8 Nil) in
+    assert { choice_transform nums 2 changed };
+    assert { mem 2 changed };
+    assert { mem 8 changed };
+    assert { forall x: int. mem x changed -> x = 2 \/ x = 8 };
+    assert { is_min_value changed 2 };
+    assert { is_max_value changed 8 };
+    assert { range_score changed 6 };
+    assert { possible_score nums 2 6 };
+    assert { forall score: int. possible_score nums 2 score -> 6 <= score };
+    assert { optimal_score nums 2 6 }
+
+  let lemma check_test_001 () =
+    let nums = Cons 1 (Cons 5 (Cons 8 Nil)) in
+    let changed = Cons 3 (Cons 3 (Cons 6 Nil)) in
+    assert { choice_transform nums 2 changed };
+    assert { mem 3 changed };
+    assert { mem 6 changed };
+    assert { forall x: int. mem x changed -> x = 3 \/ x = 6 };
+    assert { is_min_value changed 3 };
+    assert { is_max_value changed 6 };
+    assert { range_score changed 3 };
+    assert { possible_score nums 2 3 };
+    assert { forall score: int. possible_score nums 2 score -> 3 <= score };
+    assert { optimal_score nums 2 3 }
+
+  let lemma check_test_002 () =
+    let nums = Cons 6 (Cons 3 (Cons 4 (Cons 7 Nil))) in
+    let changed = Cons 3 (Cons 6 (Cons 7 (Cons 4 Nil))) in
+    assert { choice_transform nums 3 changed };
+    assert { mem 3 changed };
+    assert { mem 6 changed };
+    assert { mem 7 changed };
+    assert { mem 4 changed };
+    assert { forall x: int. mem x changed -> x = 3 \/ x = 6 \/ x = 7 \/ x = 4 };
+    assert { is_min_value changed 3 };
+    assert { is_max_value changed 7 };
+    assert { range_score changed 4 };
+    assert { possible_score nums 3 4 };
+    assert { forall score: int. possible_score nums 3 score -> 4 <= score };
+    assert { optimal_score nums 3 4 }
+
+  let lemma check_test_004 () =
+    let nums = Cons 4 (Cons 9 (Cons 6 Nil)) in
+    let changed = Cons 6 (Cons 7 (Cons 8 Nil)) in
+    assert { choice_transform nums 2 changed };
+    assert { mem 6 changed };
+    assert { mem 7 changed };
+    assert { mem 8 changed };
+    assert { forall x: int. mem x changed -> x = 6 \/ x = 7 \/ x = 8 };
+    assert { is_min_value changed 6 };
+    assert { is_max_value changed 8 };
+    assert { range_score changed 2 };
+    assert { possible_score nums 2 2 };
+    assert { forall score: int. possible_score nums 2 score -> 2 <= score };
+    assert { optimal_score nums 2 2 }
+
+  let lemma check_test_005 () =
+    let nums = Cons 1 (Cons 3 (Cons 6 Nil)) in
+    let changed = Cons 4 (Cons 6 (Cons 3 Nil)) in
+    assert { choice_transform nums 3 changed };
+    assert { mem 4 changed };
+    assert { mem 6 changed };
+    assert { mem 3 changed };
+    assert { forall x: int. mem x changed -> x = 4 \/ x = 6 \/ x = 3 };
+    assert { is_min_value changed 3 };
+    assert { is_max_value changed 6 };
+    assert { range_score changed 3 };
+    assert { possible_score nums 3 3 };
+    assert { forall score: int. possible_score nums 3 score -> 3 <= score };
+    assert { optimal_score nums 3 3 }
+
+  let lemma check_test_006 () =
+    let nums = Cons 7 (Cons 8 (Cons 8 (Cons 10 Nil))) in
+    let changed = Cons 4 (Cons 5 (Cons 5 (Cons 7 Nil))) in
+    assert { choice_transform nums 3 changed };
+    assert { mem 4 changed };
+    assert { mem 5 changed };
+    assert { mem 7 changed };
+    assert { forall x: int. mem x changed -> x = 4 \/ x = 5 \/ x = 7 };
+    assert { is_min_value changed 4 };
+    assert { is_max_value changed 7 };
+    assert { range_score changed 3 };
+    assert { possible_score nums 3 3 };
+    assert { forall score: int. possible_score nums 3 score -> 3 <= score };
+    assert { optimal_score nums 3 3 }
+
+  let lemma check_test_007 () =
+    let nums = Cons 1 Nil in
+    let changed = Cons 1 Nil in
+    assert { choice_transform nums 0 changed };
+    assert { mem 1 changed };
+    assert { forall x: int. mem x changed -> x = 1 };
+    assert { is_min_value changed 1 };
+    assert { is_max_value changed 1 };
+    assert { range_score changed 0 };
+    assert { possible_score nums 0 0 };
+    assert { forall score: int. possible_score nums 0 score -> 0 <= score };
+    assert { optimal_score nums 0 0 }
+
+end

@@ -1,0 +1,1226 @@
+== Stage 1: first prover on whole file ==
+Running in /Users/rubenm/Desktop/Diversify2Verify/codex-runs/repair2-split2/stage3a-rerepair/368_largest-divisible-subset/array-recursive/largest_divisible_subset_array_stage3_5fc77cde_stage3/repaired/generated/why3: why3 session create -o /Users/rubenm/Desktop/Diversify2Verify/codex-runs/repair2-split2/stage3a-rerepair/368_largest-divisible-subset/array-recursive/largest_divisible_subset_array_stage3_5fc77cde_stage3/repaired/generated/why3/.why3_sessions/repaired_stage1 -P Z3,4.8.6 -t 10 -m 8192 repaired.mlw
+Session created successfully
+Running in /Users/rubenm/Desktop/Diversify2Verify/codex-runs/repair2-split2/stage3a-rerepair/368_largest-divisible-subset/array-recursive/largest_divisible_subset_array_stage3_5fc77cde_stage3/repaired/generated/why3: why3 bench /Users/rubenm/Desktop/Diversify2Verify/codex-runs/repair2-split2/stage3a-rerepair/368_largest-divisible-subset/array-recursive/largest_divisible_subset_array_stage3_5fc77cde_stage3/repaired/generated/why3/.why3_sessions/repaired_stage1
+Progress: 9/1/0                       Progress: 8/2/0                       Progress: 7/3/0                       Progress: 6/4/0                       Progress: 5/5/0                       Progress: 4/6/0                       Progress: 4/0/1                       Progress: 3/1/1                       Progress: 2/2/1                       Progress: 1/3/1                       Progress: 0/4/1                       Progress: 0/1/2                       Progress: 0/0/2                       Progress: 0/0/1                       
+Replay completed, saving session... done
+== Stage 1 stats ==
+= Statistics for session /Users/rubenm/Desktop/Diversify2Verify/codex-runs/repair2-split2/stage3a-rerepair/368_largest-divisible-subset/array-recursive/largest_divisible_subset_array_stage3_5fc77cde_stage3/repaired/generated/why3/.why3_sessions/repaired_stage1
+
+== Number of root goals ==
+  total: 10  proved: 7
+
+== Number of sub goals ==
+  total: 0  proved: 0
+
+== Goals not proved ==
+  +-- file [../../repaired.mlw]
+    +-- theory LargestDivisibleSubset_Array_Spec
+      +-- goal copy_array_from'vc
+      +-- goal fill_result_from'vc
+      +-- goal largest_divisible_subset_array'vc
+  
+== Goals proved by only one prover ==
+  +-- file [../../repaired.mlw]
+    +-- theory LargestDivisibleSubset_Array_Spec
+      +-- goal copy_array'vc: Z3 4.8.6
+      +-- goal shift_for_insertion'vc: Z3 4.8.6
+      +-- goal insertion_sort_from'vc: Z3 4.8.6
+      +-- goal sort_array'vc: Z3 4.8.6
+      +-- goal scan_predecessors'vc: Z3 4.8.6
+      +-- goal fill_dp_from'vc: Z3 4.8.6
+      +-- goal first_best_end_from'vc: Z3 4.8.6
+  
+1 session(s) read, with a total of 10 proof goals.
+== Unproved root goals after first prover ==
+LargestDivisibleSubset_Array_Spec	copy_array_from'vc
+LargestDivisibleSubset_Array_Spec	fill_result_from'vc
+LargestDivisibleSubset_Array_Spec	largest_divisible_subset_array'vc
+== Stage 1: trying remaining goals with prover Alt-Ergo,2.4.0 ==
+---- stage1 | prover: Alt-Ergo,2.4.0 | theory: LargestDivisibleSubset_Array_Spec | goal: copy_array_from'vc ----
+File repaired.mlw:
+Goal copy_array_from'vc.
+Prover result is: Timeout (10.00s, 14471 steps).
+---- stage1 | prover: Alt-Ergo,2.4.0 | theory: LargestDivisibleSubset_Array_Spec | goal: fill_result_from'vc ----
+File repaired.mlw:
+Goal fill_result_from'vc.
+Prover result is: Timeout (10.00s, 51180 steps).
+---- stage1 | prover: Alt-Ergo,2.4.0 | theory: LargestDivisibleSubset_Array_Spec | goal: largest_divisible_subset_array'vc ----
+File repaired.mlw:
+Goal largest_divisible_subset_array'vc.
+Prover result is: Timeout (10.00s, 190006 steps).
+Remaining after prover Alt-Ergo,2.4.0: 3
+== Stage 1: trying remaining goals with prover CVC4,1.8 ==
+---- stage1 | prover: CVC4,1.8 | theory: LargestDivisibleSubset_Array_Spec | goal: copy_array_from'vc ----
+File repaired.mlw:
+Goal copy_array_from'vc.
+Prover result is: Timeout (10.00s, 1523655 steps).
+---- stage1 | prover: CVC4,1.8 | theory: LargestDivisibleSubset_Array_Spec | goal: fill_result_from'vc ----
+File repaired.mlw:
+Goal fill_result_from'vc.
+Prover result is: Timeout (10.00s, 1469007 steps).
+---- stage1 | prover: CVC4,1.8 | theory: LargestDivisibleSubset_Array_Spec | goal: largest_divisible_subset_array'vc ----
+File repaired.mlw:
+Goal largest_divisible_subset_array'vc.
+Prover result is: Timeout (10.00s, 1204314 steps).
+Remaining after prover CVC4,1.8: 3
+== Goals still unproved after stage 1 ==
+LargestDivisibleSubset_Array_Spec	copy_array_from'vc
+LargestDivisibleSubset_Array_Spec	fill_result_from'vc
+LargestDivisibleSubset_Array_Spec	largest_divisible_subset_array'vc
+== Stage 2: split_vc on unproved goal ==
+Target theory: LargestDivisibleSubset_Array_Spec
+Target goal  : copy_array_from'vc
+---- stage2 | prover: Z3,4.8.6 | theory: LargestDivisibleSubset_Array_Spec | goal: copy_array_from'vc ----
+Transforms: split_vc
+File "repaired.mlw", line 64, characters 53-58:
+Sub-goal Assertion of goal copy_array_from'vc.
+Prover result is: Valid (0.01s, 6441 steps).
+
+File "repaired.mlw", line 60, characters 53-68:
+Sub-goal Postcondition of goal copy_array_from'vc.
+Prover result is: Valid (0.01s, 7660 steps).
+
+File "repaired.mlw", line 66, characters 15-34:
+Sub-goal Assertion of goal copy_array_from'vc.
+Prover result is: Valid (0.01s, 729 steps).
+
+File "repaired.mlw", line 67, characters 15-34:
+Sub-goal Assertion of goal copy_array_from'vc.
+Prover result is: Valid (0.01s, 6310 steps).
+
+File "repaired.mlw", line 68, characters 16-22:
+Sub-goal Index in array bounds of goal copy_array_from'vc.
+Prover result is: Valid (0.01s, 767 steps).
+
+File "repaired.mlw", line 68, characters 6-22:
+Sub-goal Index in array bounds of goal copy_array_from'vc.
+Prover result is: Valid (0.01s, 767 steps).
+
+File "repaired.mlw", line 69, characters 15-39:
+Sub-goal Assertion of goal copy_array_from'vc.
+Prover result is: Valid (0.01s, 9729 steps).
+
+File "repaired.mlw", line 70, characters 6-37:
+Sub-goal Variant decrease of goal copy_array_from'vc.
+Prover result is: Valid (0.01s, 5264 steps).
+
+File "repaired.mlw", line 70, characters 6-37:
+Sub-goal Precondition of goal copy_array_from'vc.
+Prover result is: Valid (0.01s, 9818 steps).
+
+File "repaired.mlw", line 70, characters 6-37:
+Sub-goal Precondition of goal copy_array_from'vc.
+Prover result is: Valid (0.01s, 1093 steps).
+
+File "repaired.mlw", line 71, characters 57-72:
+Sub-goal Assertion of goal copy_array_from'vc.
+Prover result is: Valid (0.01s, 11406 steps).
+
+File "repaired.mlw", line 72, characters 15-30:
+Sub-goal Assertion of goal copy_array_from'vc.
+Prover result is: Timeout (10.00s, 159154235 steps).
+
+File "repaired.mlw", line 73, characters 53-68:
+Sub-goal Assertion of goal copy_array_from'vc.
+Prover result is: Valid (0.01s, 11851 steps).
+
+File "repaired.mlw", line 60, characters 53-68:
+Sub-goal Postcondition of goal copy_array_from'vc.
+Prover result is: Valid (0.01s, 12223 steps).
+---- stage2 | prover: Alt-Ergo,2.4.0 | theory: LargestDivisibleSubset_Array_Spec | goal: copy_array_from'vc ----
+Transforms: split_vc
+File "repaired.mlw", line 64, characters 53-58:
+Sub-goal Assertion of goal copy_array_from'vc.
+Prover result is: Valid (0.01s, 11 steps).
+
+File "repaired.mlw", line 60, characters 53-68:
+Sub-goal Postcondition of goal copy_array_from'vc.
+Prover result is: Valid (0.01s, 11 steps).
+
+File "repaired.mlw", line 66, characters 15-34:
+Sub-goal Assertion of goal copy_array_from'vc.
+Prover result is: Valid (0.01s, 8 steps).
+
+File "repaired.mlw", line 67, characters 15-34:
+Sub-goal Assertion of goal copy_array_from'vc.
+Prover result is: Valid (0.01s, 9 steps).
+
+File "repaired.mlw", line 68, characters 16-22:
+Sub-goal Index in array bounds of goal copy_array_from'vc.
+Prover result is: Valid (0.01s, 10 steps).
+
+File "repaired.mlw", line 68, characters 6-22:
+Sub-goal Index in array bounds of goal copy_array_from'vc.
+Prover result is: Valid (0.01s, 10 steps).
+
+File "repaired.mlw", line 69, characters 15-39:
+Sub-goal Assertion of goal copy_array_from'vc.
+Prover result is: Valid (0.01s, 16 steps).
+
+File "repaired.mlw", line 70, characters 6-37:
+Sub-goal Variant decrease of goal copy_array_from'vc.
+Prover result is: Valid (0.01s, 18 steps).
+
+File "repaired.mlw", line 70, characters 6-37:
+Sub-goal Precondition of goal copy_array_from'vc.
+Prover result is: Valid (0.01s, 18 steps).
+
+File "repaired.mlw", line 70, characters 6-37:
+Sub-goal Precondition of goal copy_array_from'vc.
+Prover result is: Valid (0.01s, 19 steps).
+
+File "repaired.mlw", line 71, characters 57-72:
+Sub-goal Assertion of goal copy_array_from'vc.
+Prover result is: Valid (0.01s, 34 steps).
+
+File "repaired.mlw", line 72, characters 15-30:
+Sub-goal Assertion of goal copy_array_from'vc.
+Prover result is: Timeout (10.00s, 28561 steps).
+
+File "repaired.mlw", line 73, characters 53-68:
+Sub-goal Assertion of goal copy_array_from'vc.
+Prover result is: Valid (0.01s, 48 steps).
+
+File "repaired.mlw", line 60, characters 53-68:
+Sub-goal Postcondition of goal copy_array_from'vc.
+Prover result is: Valid (0.01s, 36 steps).
+---- stage2 | prover: CVC4,1.8 | theory: LargestDivisibleSubset_Array_Spec | goal: copy_array_from'vc ----
+Transforms: split_vc
+File "repaired.mlw", line 64, characters 53-58:
+Sub-goal Assertion of goal copy_array_from'vc.
+Prover result is: Valid (0.01s, 1404 steps).
+
+File "repaired.mlw", line 60, characters 53-68:
+Sub-goal Postcondition of goal copy_array_from'vc.
+Prover result is: Valid (0.01s, 1777 steps).
+
+File "repaired.mlw", line 66, characters 15-34:
+Sub-goal Assertion of goal copy_array_from'vc.
+Prover result is: Valid (0.01s, 1337 steps).
+
+File "repaired.mlw", line 67, characters 15-34:
+Sub-goal Assertion of goal copy_array_from'vc.
+Prover result is: Valid (0.01s, 1416 steps).
+
+File "repaired.mlw", line 68, characters 16-22:
+Sub-goal Index in array bounds of goal copy_array_from'vc.
+Prover result is: Valid (0.01s, 1381 steps).
+
+File "repaired.mlw", line 68, characters 6-22:
+Sub-goal Index in array bounds of goal copy_array_from'vc.
+Prover result is: Valid (0.01s, 1381 steps).
+
+File "repaired.mlw", line 69, characters 15-39:
+Sub-goal Assertion of goal copy_array_from'vc.
+Prover result is: Valid (0.01s, 1964 steps).
+
+File "repaired.mlw", line 70, characters 6-37:
+Sub-goal Variant decrease of goal copy_array_from'vc.
+Prover result is: Valid (0.01s, 1940 steps).
+
+File "repaired.mlw", line 70, characters 6-37:
+Sub-goal Precondition of goal copy_array_from'vc.
+Prover result is: Valid (0.01s, 1989 steps).
+
+File "repaired.mlw", line 70, characters 6-37:
+Sub-goal Precondition of goal copy_array_from'vc.
+Prover result is: Valid (0.01s, 1913 steps).
+
+File "repaired.mlw", line 71, characters 57-72:
+Sub-goal Assertion of goal copy_array_from'vc.
+Prover result is: Valid (0.01s, 2535 steps).
+
+File "repaired.mlw", line 72, characters 15-30:
+Sub-goal Assertion of goal copy_array_from'vc.
+Prover result is: Timeout (10.00s, 1574074 steps).
+
+File "repaired.mlw", line 73, characters 53-68:
+Sub-goal Assertion of goal copy_array_from'vc.
+Prover result is: Valid (0.01s, 2715 steps).
+
+File "repaired.mlw", line 60, characters 53-68:
+Sub-goal Postcondition of goal copy_array_from'vc.
+Prover result is: Valid (0.01s, 2824 steps).
+== Stage 2: split_vc on unproved goal ==
+Target theory: LargestDivisibleSubset_Array_Spec
+Target goal  : fill_result_from'vc
+---- stage2 | prover: Z3,4.8.6 | theory: LargestDivisibleSubset_Array_Spec | goal: fill_result_from'vc ----
+Transforms: split_vc
+File "repaired.mlw", line 254, characters 15-39:
+Sub-goal Assertion of goal fill_result_from'vc.
+Prover result is: Valid (0.01s, 917 steps).
+
+File "repaired.mlw", line 255, characters 15-37:
+Sub-goal Assertion of goal fill_result_from'vc.
+Prover result is: Valid (0.01s, 8574 steps).
+
+File "repaired.mlw", line 256, characters 15-36:
+Sub-goal Assertion of goal fill_result_from'vc.
+Prover result is: Valid (0.01s, 995 steps).
+
+File "repaired.mlw", line 257, characters 18-29:
+Sub-goal Index in array bounds of goal fill_result_from'vc.
+Prover result is: Valid (0.01s, 962 steps).
+
+File "repaired.mlw", line 257, characters 6-29:
+Sub-goal Index in array bounds of goal fill_result_from'vc.
+Prover result is: Valid (0.01s, 990 steps).
+
+File "repaired.mlw", line 258, characters 15-36:
+Sub-goal Assertion of goal fill_result_from'vc.
+Prover result is: Valid (0.01s, 13401 steps).
+
+File "repaired.mlw", line 259, characters 15-62:
+Sub-goal Assertion of goal fill_result_from'vc.
+Prover result is: Valid (0.01s, 12601 steps).
+
+File "repaired.mlw", line 260, characters 15-41:
+Sub-goal Assertion of goal fill_result_from'vc.
+Prover result is: Valid (0.01s, 13919 steps).
+
+File "repaired.mlw", line 261, characters 35-44:
+Sub-goal Index in array bounds of goal fill_result_from'vc.
+Prover result is: Valid (0.01s, 1405 steps).
+
+File "repaired.mlw", line 261, characters 6-58:
+Sub-goal Variant decrease of goal fill_result_from'vc.
+Prover result is: Valid (0.01s, 7369 steps).
+
+File "repaired.mlw", line 261, characters 6-58:
+Sub-goal Precondition of goal fill_result_from'vc.
+Prover result is: Valid (0.01s, 935 steps).
+
+File "repaired.mlw", line 261, characters 6-58:
+Sub-goal Precondition of goal fill_result_from'vc.
+Prover result is: Valid (0.01s, 940 steps).
+
+File "repaired.mlw", line 261, characters 6-58:
+Sub-goal Precondition of goal fill_result_from'vc.
+Prover result is: Valid (0.01s, 1421 steps).
+
+File "repaired.mlw", line 261, characters 6-58:
+Sub-goal Precondition of goal fill_result_from'vc.
+Prover result is: Valid (0.01s, 1440 steps).
+
+File "repaired.mlw", line 261, characters 6-58:
+Sub-goal Precondition of goal fill_result_from'vc.
+Prover result is: Timeout (10.00s, 176592892 steps).
+---- stage2 | prover: Alt-Ergo,2.4.0 | theory: LargestDivisibleSubset_Array_Spec | goal: fill_result_from'vc ----
+Transforms: split_vc
+File "repaired.mlw", line 254, characters 15-39:
+Sub-goal Assertion of goal fill_result_from'vc.
+Prover result is: Valid (0.01s, 16 steps).
+
+File "repaired.mlw", line 255, characters 15-37:
+Sub-goal Assertion of goal fill_result_from'vc.
+Prover result is: Valid (0.01s, 16 steps).
+
+File "repaired.mlw", line 256, characters 15-36:
+Sub-goal Assertion of goal fill_result_from'vc.
+Prover result is: Valid (0.01s, 17 steps).
+
+File "repaired.mlw", line 257, characters 18-29:
+Sub-goal Index in array bounds of goal fill_result_from'vc.
+Prover result is: Valid (0.01s, 17 steps).
+
+File "repaired.mlw", line 257, characters 6-29:
+Sub-goal Index in array bounds of goal fill_result_from'vc.
+Prover result is: Valid (0.01s, 17 steps).
+
+File "repaired.mlw", line 258, characters 15-36:
+Sub-goal Assertion of goal fill_result_from'vc.
+Prover result is: Valid (0.01s, 40 steps).
+
+File "repaired.mlw", line 259, characters 15-62:
+Sub-goal Assertion of goal fill_result_from'vc.
+Prover result is: Valid (0.01s, 29 steps).
+
+File "repaired.mlw", line 260, characters 15-41:
+Sub-goal Assertion of goal fill_result_from'vc.
+Prover result is: Valid (0.01s, 27 steps).
+
+File "repaired.mlw", line 261, characters 35-44:
+Sub-goal Index in array bounds of goal fill_result_from'vc.
+Prover result is: Valid (0.01s, 29 steps).
+
+File "repaired.mlw", line 261, characters 6-58:
+Sub-goal Variant decrease of goal fill_result_from'vc.
+Prover result is: Valid (0.01s, 29 steps).
+
+File "repaired.mlw", line 261, characters 6-58:
+Sub-goal Precondition of goal fill_result_from'vc.
+Prover result is: Valid (0.01s, 29 steps).
+
+File "repaired.mlw", line 261, characters 6-58:
+Sub-goal Precondition of goal fill_result_from'vc.
+Prover result is: Valid (0.01s, 29 steps).
+
+File "repaired.mlw", line 261, characters 6-58:
+Sub-goal Precondition of goal fill_result_from'vc.
+Prover result is: Valid (0.01s, 29 steps).
+
+File "repaired.mlw", line 261, characters 6-58:
+Sub-goal Precondition of goal fill_result_from'vc.
+Prover result is: Valid (0.01s, 29 steps).
+
+File "repaired.mlw", line 261, characters 6-58:
+Sub-goal Precondition of goal fill_result_from'vc.
+Prover result is: Timeout (10.00s, 49066 steps).
+---- stage2 | prover: CVC4,1.8 | theory: LargestDivisibleSubset_Array_Spec | goal: fill_result_from'vc ----
+Transforms: split_vc
+File "repaired.mlw", line 254, characters 15-39:
+Sub-goal Assertion of goal fill_result_from'vc.
+Prover result is: Valid (0.01s, 1601 steps).
+
+File "repaired.mlw", line 255, characters 15-37:
+Sub-goal Assertion of goal fill_result_from'vc.
+Prover result is: Valid (0.01s, 1688 steps).
+
+File "repaired.mlw", line 256, characters 15-36:
+Sub-goal Assertion of goal fill_result_from'vc.
+Prover result is: Valid (0.01s, 1656 steps).
+
+File "repaired.mlw", line 257, characters 18-29:
+Sub-goal Index in array bounds of goal fill_result_from'vc.
+Prover result is: Valid (0.01s, 1661 steps).
+
+File "repaired.mlw", line 257, characters 6-29:
+Sub-goal Index in array bounds of goal fill_result_from'vc.
+Prover result is: Valid (0.01s, 1661 steps).
+
+File "repaired.mlw", line 258, characters 15-36:
+Sub-goal Assertion of goal fill_result_from'vc.
+Prover result is: Valid (0.01s, 2682 steps).
+
+File "repaired.mlw", line 259, characters 15-62:
+Sub-goal Assertion of goal fill_result_from'vc.
+Prover result is: Valid (0.01s, 2359 steps).
+
+File "repaired.mlw", line 260, characters 15-41:
+Sub-goal Assertion of goal fill_result_from'vc.
+Prover result is: Valid (0.01s, 2440 steps).
+
+File "repaired.mlw", line 261, characters 35-44:
+Sub-goal Index in array bounds of goal fill_result_from'vc.
+Prover result is: Valid (0.01s, 2303 steps).
+
+File "repaired.mlw", line 261, characters 6-58:
+Sub-goal Variant decrease of goal fill_result_from'vc.
+Prover result is: Valid (0.01s, 2503 steps).
+
+File "repaired.mlw", line 261, characters 6-58:
+Sub-goal Precondition of goal fill_result_from'vc.
+Prover result is: Valid (0.01s, 2300 steps).
+
+File "repaired.mlw", line 261, characters 6-58:
+Sub-goal Precondition of goal fill_result_from'vc.
+Prover result is: Valid (0.01s, 2303 steps).
+
+File "repaired.mlw", line 261, characters 6-58:
+Sub-goal Precondition of goal fill_result_from'vc.
+Prover result is: Valid (0.01s, 2309 steps).
+
+File "repaired.mlw", line 261, characters 6-58:
+Sub-goal Precondition of goal fill_result_from'vc.
+Prover result is: Valid (0.01s, 2312 steps).
+
+File "repaired.mlw", line 261, characters 6-58:
+Sub-goal Precondition of goal fill_result_from'vc.
+Prover result is: Timeout (10.00s, 1652582 steps).
+== Stage 2: split_vc on unproved goal ==
+Target theory: LargestDivisibleSubset_Array_Spec
+Target goal  : largest_divisible_subset_array'vc
+---- stage2 | prover: Z3,4.8.6 | theory: LargestDivisibleSubset_Array_Spec | goal: largest_divisible_subset_array'vc ----
+Transforms: split_vc
+File "repaired.mlw", line 269, characters 13-19:
+Sub-goal Assertion of goal largest_divisible_subset_array'vc.
+Prover result is: Valid (0.01s, 9556 steps).
+
+File "repaired.mlw", line 271, characters 15-20:
+Sub-goal Assertion of goal largest_divisible_subset_array'vc.
+Prover result is: Valid (0.01s, 965 steps).
+
+File "repaired.mlw", line 272, characters 6-14:
+Sub-goal Array creation size of goal largest_divisible_subset_array'vc.
+Prover result is: Valid (0.01s, 351 steps).
+
+File "repaired.mlw", line 266, characters 15-62:
+Sub-goal Postcondition of goal largest_divisible_subset_array'vc.
+Prover result is: Valid (0.01s, 691 steps).
+
+File "repaired.mlw", line 275, characters 15-23:
+Sub-goal Array creation size of goal largest_divisible_subset_array'vc.
+Prover result is: Valid (0.01s, 10854 steps).
+
+File "repaired.mlw", line 276, characters 17-28:
+Sub-goal Array creation size of goal largest_divisible_subset_array'vc.
+Prover result is: Valid (0.01s, 11477 steps).
+
+File "repaired.mlw", line 277, characters 15-32:
+Sub-goal Assertion of goal largest_divisible_subset_array'vc.
+Prover result is: Valid (0.01s, 914 steps).
+
+File "repaired.mlw", line 278, characters 15-40:
+Sub-goal Assertion of goal largest_divisible_subset_array'vc.
+Prover result is: Valid (0.01s, 13869 steps).
+
+File "repaired.mlw", line 279, characters 15-42:
+Sub-goal Assertion of goal largest_divisible_subset_array'vc.
+Prover result is: Valid (0.01s, 13996 steps).
+
+File "repaired.mlw", line 280, characters 15-29:
+Sub-goal Assertion of goal largest_divisible_subset_array'vc.
+Prover result is: Valid (0.01s, 15863 steps).
+
+File "repaired.mlw", line 281, characters 15-35:
+Sub-goal Assertion of goal largest_divisible_subset_array'vc.
+Prover result is: Valid (0.01s, 15982 steps).
+
+File "repaired.mlw", line 282, characters 15-37:
+Sub-goal Assertion of goal largest_divisible_subset_array'vc.
+Prover result is: Valid (0.01s, 1532 steps).
+
+File "repaired.mlw", line 283, characters 54-71:
+Sub-goal Assertion of goal largest_divisible_subset_array'vc.
+Prover result is: Valid (0.01s, 16918 steps).
+
+File "repaired.mlw", line 284, characters 15-36:
+Sub-goal Assertion of goal largest_divisible_subset_array'vc.
+Prover result is: Valid (0.01s, 23290 steps).
+
+File "repaired.mlw", line 285, characters 6-23:
+Sub-goal Precondition of goal largest_divisible_subset_array'vc.
+Prover result is: Valid (0.01s, 1138 steps).
+
+File "repaired.mlw", line 286, characters 15-37:
+Sub-goal Assertion of goal largest_divisible_subset_array'vc.
+Prover result is: Valid (0.01s, 1154 steps).
+
+File "repaired.mlw", line 287, characters 6-35:
+Sub-goal Precondition of goal largest_divisible_subset_array'vc.
+Prover result is: Valid (0.01s, 20079 steps).
+
+File "repaired.mlw", line 287, characters 6-35:
+Sub-goal Precondition of goal largest_divisible_subset_array'vc.
+Prover result is: Valid (0.01s, 20216 steps).
+
+File "repaired.mlw", line 287, characters 6-35:
+Sub-goal Precondition of goal largest_divisible_subset_array'vc.
+Prover result is: Valid (0.01s, 1171 steps).
+
+File "repaired.mlw", line 287, characters 6-35:
+Sub-goal Precondition of goal largest_divisible_subset_array'vc.
+Prover result is: Valid (0.01s, 1176 steps).
+
+File "repaired.mlw", line 287, characters 6-35:
+Sub-goal Precondition of goal largest_divisible_subset_array'vc.
+Prover result is: Valid (0.01s, 1181 steps).
+
+File "repaired.mlw", line 287, characters 6-35:
+Sub-goal Precondition of goal largest_divisible_subset_array'vc.
+Prover result is: Valid (0.01s, 16606 steps).
+
+File "repaired.mlw", line 288, characters 15-29:
+Sub-goal Assertion of goal largest_divisible_subset_array'vc.
+Prover result is: Valid (0.01s, 1187 steps).
+
+File "repaired.mlw", line 289, characters 15-28:
+Sub-goal Assertion of goal largest_divisible_subset_array'vc.
+Prover result is: Valid (0.01s, 16828 steps).
+
+File "repaired.mlw", line 290, characters 21-47:
+Sub-goal Precondition of goal largest_divisible_subset_array'vc.
+Prover result is: Valid (0.01s, 1207 steps).
+
+File "repaired.mlw", line 290, characters 21-47:
+Sub-goal Precondition of goal largest_divisible_subset_array'vc.
+Prover result is: Valid (0.01s, 16858 steps).
+
+File "repaired.mlw", line 290, characters 21-47:
+Sub-goal Precondition of goal largest_divisible_subset_array'vc.
+Prover result is: Valid (0.01s, 1231 steps).
+
+File "repaired.mlw", line 291, characters 15-40:
+Sub-goal Assertion of goal largest_divisible_subset_array'vc.
+Prover result is: Valid (0.01s, 1847 steps).
+
+File "repaired.mlw", line 292, characters 15-32:
+Sub-goal Assertion of goal largest_divisible_subset_array'vc.
+Prover result is: Valid (0.01s, 22719 steps).
+
+File "repaired.mlw", line 293, characters 24-36:
+Sub-goal Index in array bounds of goal largest_divisible_subset_array'vc.
+Prover result is: Valid (0.01s, 1871 steps).
+
+File "repaired.mlw", line 293, characters 19-38:
+Sub-goal Array creation size of goal largest_divisible_subset_array'vc.
+Prover result is: Valid (0.01s, 17210 steps).
+
+File "repaired.mlw", line 294, characters 15-43:
+Sub-goal Assertion of goal largest_divisible_subset_array'vc.
+Prover result is: Valid (0.01s, 1301 steps).
+
+File "repaired.mlw", line 295, characters 15-38:
+Sub-goal Assertion of goal largest_divisible_subset_array'vc.
+Prover result is: Valid (0.01s, 18002 steps).
+
+File "repaired.mlw", line 296, characters 15-60:
+Sub-goal Assertion of goal largest_divisible_subset_array'vc.
+Prover result is: Valid (0.01s, 18182 steps).
+
+File "repaired.mlw", line 297, characters 15-36:
+Sub-goal Assertion of goal largest_divisible_subset_array'vc.
+Prover result is: Valid (0.01s, 1350 steps).
+
+File "repaired.mlw", line 298, characters 6-52:
+Sub-goal Precondition of goal largest_divisible_subset_array'vc.
+Prover result is: Valid (0.01s, 24218 steps).
+
+File "repaired.mlw", line 298, characters 6-52:
+Sub-goal Precondition of goal largest_divisible_subset_array'vc.
+Prover result is: Valid (0.01s, 1362 steps).
+
+File "repaired.mlw", line 298, characters 6-52:
+Sub-goal Precondition of goal largest_divisible_subset_array'vc.
+Prover result is: Valid (0.01s, 1375 steps).
+
+File "repaired.mlw", line 298, characters 6-52:
+Sub-goal Precondition of goal largest_divisible_subset_array'vc.
+Prover result is: Valid (0.01s, 2082 steps).
+
+File "repaired.mlw", line 298, characters 6-52:
+Sub-goal Precondition of goal largest_divisible_subset_array'vc.
+Prover result is: Valid (0.01s, 18408 steps).
+
+File "repaired.mlw", line 299, characters 15-43:
+Sub-goal Assertion of goal largest_divisible_subset_array'vc.
+Prover result is: Unknown (unknown) (0.08s, 782808 steps).
+
+File "repaired.mlw", line 300, characters 15-35:
+Sub-goal Assertion of goal largest_divisible_subset_array'vc.
+Prover result is: Unknown (unknown) (0.06s, 510428 steps).
+
+File "repaired.mlw", line 301, characters 15-41:
+Sub-goal Assertion of goal largest_divisible_subset_array'vc.
+Prover result is: Unknown (unknown) (0.04s, 384985 steps).
+
+File "repaired.mlw", line 302, characters 15-40:
+Sub-goal Assertion of goal largest_divisible_subset_array'vc.
+Prover result is: Timeout (10.00s, 60952144 steps).
+
+File "repaired.mlw", line 303, characters 15-43:
+Sub-goal Assertion of goal largest_divisible_subset_array'vc.
+Prover result is: Valid (0.01s, 36705 steps).
+
+File "repaired.mlw", line 306, characters 45-78:
+Sub-goal Assertion of goal largest_divisible_subset_array'vc.
+Prover result is: Unknown (unknown) (0.19s, 2594240 steps).
+
+File "repaired.mlw", line 266, characters 15-62:
+Sub-goal Postcondition of goal largest_divisible_subset_array'vc.
+Prover result is: Valid (0.01s, 40391 steps).
+---- stage2 | prover: Alt-Ergo,2.4.0 | theory: LargestDivisibleSubset_Array_Spec | goal: largest_divisible_subset_array'vc ----
+Transforms: split_vc
+File "repaired.mlw", line 269, characters 13-19:
+Sub-goal Assertion of goal largest_divisible_subset_array'vc.
+Prover result is: Valid (0.01s, 4 steps).
+
+File "repaired.mlw", line 271, characters 15-20:
+Sub-goal Assertion of goal largest_divisible_subset_array'vc.
+Prover result is: Valid (0.01s, 4 steps).
+
+File "repaired.mlw", line 272, characters 6-14:
+Sub-goal Array creation size of goal largest_divisible_subset_array'vc.
+Prover result is: Valid (0.00s, 4 steps).
+
+File "repaired.mlw", line 266, characters 15-62:
+Sub-goal Postcondition of goal largest_divisible_subset_array'vc.
+Prover result is: Valid (0.01s, 4 steps).
+
+File "repaired.mlw", line 275, characters 15-23:
+Sub-goal Array creation size of goal largest_divisible_subset_array'vc.
+Prover result is: Valid (0.01s, 9 steps).
+
+File "repaired.mlw", line 276, characters 17-28:
+Sub-goal Array creation size of goal largest_divisible_subset_array'vc.
+Prover result is: Valid (0.01s, 11 steps).
+
+File "repaired.mlw", line 277, characters 15-32:
+Sub-goal Assertion of goal largest_divisible_subset_array'vc.
+Prover result is: Valid (0.01s, 15 steps).
+
+File "repaired.mlw", line 278, characters 15-40:
+Sub-goal Assertion of goal largest_divisible_subset_array'vc.
+Prover result is: Valid (0.01s, 15 steps).
+
+File "repaired.mlw", line 279, characters 15-42:
+Sub-goal Assertion of goal largest_divisible_subset_array'vc.
+Prover result is: Valid (0.01s, 15 steps).
+
+File "repaired.mlw", line 280, characters 15-29:
+Sub-goal Assertion of goal largest_divisible_subset_array'vc.
+Prover result is: Valid (0.01s, 51 steps).
+
+File "repaired.mlw", line 281, characters 15-35:
+Sub-goal Assertion of goal largest_divisible_subset_array'vc.
+Prover result is: Valid (0.01s, 19 steps).
+
+File "repaired.mlw", line 282, characters 15-37:
+Sub-goal Assertion of goal largest_divisible_subset_array'vc.
+Prover result is: Valid (0.01s, 20 steps).
+
+File "repaired.mlw", line 283, characters 54-71:
+Sub-goal Assertion of goal largest_divisible_subset_array'vc.
+Prover result is: Valid (0.01s, 36 steps).
+
+File "repaired.mlw", line 284, characters 15-36:
+Sub-goal Assertion of goal largest_divisible_subset_array'vc.
+Prover result is: Valid (0.01s, 43 steps).
+
+File "repaired.mlw", line 285, characters 6-23:
+Sub-goal Precondition of goal largest_divisible_subset_array'vc.
+Prover result is: Valid (0.01s, 22 steps).
+
+File "repaired.mlw", line 286, characters 15-37:
+Sub-goal Assertion of goal largest_divisible_subset_array'vc.
+Prover result is: Valid (0.01s, 26 steps).
+
+File "repaired.mlw", line 287, characters 6-35:
+Sub-goal Precondition of goal largest_divisible_subset_array'vc.
+Prover result is: Valid (0.01s, 26 steps).
+
+File "repaired.mlw", line 287, characters 6-35:
+Sub-goal Precondition of goal largest_divisible_subset_array'vc.
+Prover result is: Valid (0.01s, 27 steps).
+
+File "repaired.mlw", line 287, characters 6-35:
+Sub-goal Precondition of goal largest_divisible_subset_array'vc.
+Prover result is: Valid (0.01s, 28 steps).
+
+File "repaired.mlw", line 287, characters 6-35:
+Sub-goal Precondition of goal largest_divisible_subset_array'vc.
+Prover result is: Valid (0.01s, 28 steps).
+
+File "repaired.mlw", line 287, characters 6-35:
+Sub-goal Precondition of goal largest_divisible_subset_array'vc.
+Prover result is: Valid (0.01s, 28 steps).
+
+File "repaired.mlw", line 287, characters 6-35:
+Sub-goal Precondition of goal largest_divisible_subset_array'vc.
+Prover result is: Valid (0.01s, 28 steps).
+
+File "repaired.mlw", line 288, characters 15-29:
+Sub-goal Assertion of goal largest_divisible_subset_array'vc.
+Prover result is: Valid (0.01s, 34 steps).
+
+File "repaired.mlw", line 289, characters 15-28:
+Sub-goal Assertion of goal largest_divisible_subset_array'vc.
+Prover result is: Valid (0.01s, 34 steps).
+
+File "repaired.mlw", line 290, characters 21-47:
+Sub-goal Precondition of goal largest_divisible_subset_array'vc.
+Prover result is: Valid (0.01s, 35 steps).
+
+File "repaired.mlw", line 290, characters 21-47:
+Sub-goal Precondition of goal largest_divisible_subset_array'vc.
+Prover result is: Valid (0.01s, 35 steps).
+
+File "repaired.mlw", line 290, characters 21-47:
+Sub-goal Precondition of goal largest_divisible_subset_array'vc.
+Prover result is: Valid (0.01s, 37 steps).
+
+File "repaired.mlw", line 291, characters 15-40:
+Sub-goal Assertion of goal largest_divisible_subset_array'vc.
+Prover result is: Valid (0.01s, 39 steps).
+
+File "repaired.mlw", line 292, characters 15-32:
+Sub-goal Assertion of goal largest_divisible_subset_array'vc.
+Prover result is: Valid (0.01s, 68 steps).
+
+File "repaired.mlw", line 293, characters 24-36:
+Sub-goal Index in array bounds of goal largest_divisible_subset_array'vc.
+Prover result is: Valid (0.01s, 41 steps).
+
+File "repaired.mlw", line 293, characters 19-38:
+Sub-goal Array creation size of goal largest_divisible_subset_array'vc.
+Prover result is: Valid (0.01s, 41 steps).
+
+File "repaired.mlw", line 294, characters 15-43:
+Sub-goal Assertion of goal largest_divisible_subset_array'vc.
+Prover result is: Valid (0.01s, 43 steps).
+
+File "repaired.mlw", line 295, characters 15-38:
+Sub-goal Assertion of goal largest_divisible_subset_array'vc.
+Prover result is: Valid (0.01s, 43 steps).
+
+File "repaired.mlw", line 296, characters 15-60:
+Sub-goal Assertion of goal largest_divisible_subset_array'vc.
+Prover result is: Valid (0.01s, 45 steps).
+
+File "repaired.mlw", line 297, characters 15-36:
+Sub-goal Assertion of goal largest_divisible_subset_array'vc.
+Prover result is: Valid (0.01s, 46 steps).
+
+File "repaired.mlw", line 298, characters 6-52:
+Sub-goal Precondition of goal largest_divisible_subset_array'vc.
+Prover result is: Valid (0.01s, 46 steps).
+
+File "repaired.mlw", line 298, characters 6-52:
+Sub-goal Precondition of goal largest_divisible_subset_array'vc.
+Prover result is: Valid (0.01s, 47 steps).
+
+File "repaired.mlw", line 298, characters 6-52:
+Sub-goal Precondition of goal largest_divisible_subset_array'vc.
+Prover result is: Valid (0.01s, 47 steps).
+
+File "repaired.mlw", line 298, characters 6-52:
+Sub-goal Precondition of goal largest_divisible_subset_array'vc.
+Prover result is: Valid (0.01s, 47 steps).
+
+File "repaired.mlw", line 298, characters 6-52:
+Sub-goal Precondition of goal largest_divisible_subset_array'vc.
+Prover result is: Valid (0.01s, 47 steps).
+
+File "repaired.mlw", line 299, characters 15-43:
+Sub-goal Assertion of goal largest_divisible_subset_array'vc.
+Prover result is: Timeout (10.00s, 121963 steps).
+
+File "repaired.mlw", line 300, characters 15-35:
+Sub-goal Assertion of goal largest_divisible_subset_array'vc.
+Prover result is: Timeout (10.00s, 137366 steps).
+Infrastructure issue in stage 2 with prover Alt-Ergo,2.4.0; aborting rest of stage 2.
+== Goals still unproved after stage 2 (split_vc) ==
+LargestDivisibleSubset_Array_Spec	copy_array_from'vc
+LargestDivisibleSubset_Array_Spec	fill_result_from'vc
+LargestDivisibleSubset_Array_Spec	largest_divisible_subset_array'vc
+== Stage 3: split_vc + inline_all on still-unproved goal ==
+Target theory: LargestDivisibleSubset_Array_Spec
+Target goal  : copy_array_from'vc
+---- stage3 | prover: Z3,4.8.6 | theory: LargestDivisibleSubset_Array_Spec | goal: copy_array_from'vc ----
+Transforms: split_vc inline_all
+File "repaired.mlw", line 64, characters 53-58:
+Sub-goal Assertion of goal copy_array_from'vc.
+Prover result is: Valid (0.01s, 8408 steps).
+
+File "repaired.mlw", line 60, characters 53-68:
+Sub-goal Postcondition of goal copy_array_from'vc.
+Prover result is: Valid (0.01s, 8029 steps).
+
+File "repaired.mlw", line 66, characters 15-34:
+Sub-goal Assertion of goal copy_array_from'vc.
+Prover result is: Valid (0.01s, 2492 steps).
+
+File "repaired.mlw", line 67, characters 15-34:
+Sub-goal Assertion of goal copy_array_from'vc.
+Prover result is: Valid (0.01s, 8142 steps).
+
+File "repaired.mlw", line 68, characters 16-22:
+Sub-goal Index in array bounds of goal copy_array_from'vc.
+Prover result is: Valid (0.01s, 1013 steps).
+
+File "repaired.mlw", line 68, characters 6-22:
+Sub-goal Index in array bounds of goal copy_array_from'vc.
+Prover result is: Valid (0.01s, 1021 steps).
+
+File "repaired.mlw", line 69, characters 15-39:
+Sub-goal Assertion of goal copy_array_from'vc.
+Prover result is: Valid (0.01s, 12124 steps).
+
+File "repaired.mlw", line 70, characters 6-37:
+Sub-goal Variant decrease of goal copy_array_from'vc.
+Prover result is: Valid (0.01s, 4904 steps).
+
+File "repaired.mlw", line 70, characters 6-37:
+Sub-goal Precondition of goal copy_array_from'vc.
+Prover result is: Valid (0.01s, 12146 steps).
+
+File "repaired.mlw", line 70, characters 6-37:
+Sub-goal Precondition of goal copy_array_from'vc.
+Prover result is: Valid (0.01s, 1406 steps).
+
+File "repaired.mlw", line 71, characters 57-72:
+Sub-goal Assertion of goal copy_array_from'vc.
+Prover result is: Valid (0.01s, 14081 steps).
+
+File "repaired.mlw", line 72, characters 15-30:
+Sub-goal Assertion of goal copy_array_from'vc.
+Prover result is: Timeout (10.00s, 161391663 steps).
+
+File "repaired.mlw", line 73, characters 53-68:
+Sub-goal Assertion of goal copy_array_from'vc.
+Prover result is: Valid (0.01s, 15071 steps).
+
+File "repaired.mlw", line 60, characters 53-68:
+Sub-goal Postcondition of goal copy_array_from'vc.
+Prover result is: Valid (0.01s, 15354 steps).
+---- stage3 | prover: CVC4,1.8 | theory: LargestDivisibleSubset_Array_Spec | goal: copy_array_from'vc ----
+Transforms: split_vc inline_all
+File "repaired.mlw", line 64, characters 53-58:
+Sub-goal Assertion of goal copy_array_from'vc.
+Prover result is: Valid (0.01s, 2204 steps).
+
+File "repaired.mlw", line 60, characters 53-68:
+Sub-goal Postcondition of goal copy_array_from'vc.
+Prover result is: Valid (0.01s, 2323 steps).
+
+File "repaired.mlw", line 66, characters 15-34:
+Sub-goal Assertion of goal copy_array_from'vc.
+Prover result is: Valid (0.01s, 2047 steps).
+
+File "repaired.mlw", line 67, characters 15-34:
+Sub-goal Assertion of goal copy_array_from'vc.
+Prover result is: Valid (0.01s, 2164 steps).
+
+File "repaired.mlw", line 68, characters 16-22:
+Sub-goal Index in array bounds of goal copy_array_from'vc.
+Prover result is: Valid (0.01s, 2091 steps).
+
+File "repaired.mlw", line 68, characters 6-22:
+Sub-goal Index in array bounds of goal copy_array_from'vc.
+Prover result is: Valid (0.01s, 2091 steps).
+
+File "repaired.mlw", line 69, characters 15-39:
+Sub-goal Assertion of goal copy_array_from'vc.
+Prover result is: Valid (0.01s, 2841 steps).
+
+File "repaired.mlw", line 70, characters 6-37:
+Sub-goal Variant decrease of goal copy_array_from'vc.
+Prover result is: Valid (0.01s, 2713 steps).
+
+File "repaired.mlw", line 70, characters 6-37:
+Sub-goal Precondition of goal copy_array_from'vc.
+Prover result is: Valid (0.01s, 2825 steps).
+
+File "repaired.mlw", line 70, characters 6-37:
+Sub-goal Precondition of goal copy_array_from'vc.
+Prover result is: Valid (0.01s, 2663 steps).
+
+File "repaired.mlw", line 71, characters 57-72:
+Sub-goal Assertion of goal copy_array_from'vc.
+Prover result is: Valid (0.02s, 3617 steps).
+
+File "repaired.mlw", line 72, characters 15-30:
+Sub-goal Assertion of goal copy_array_from'vc.
+Prover result is: Unknown (unknown + incomplete) (0.02s, 3704 steps).
+
+File "repaired.mlw", line 73, characters 53-68:
+Sub-goal Assertion of goal copy_array_from'vc.
+Prover result is: Valid (0.02s, 3742 steps).
+
+File "repaired.mlw", line 60, characters 53-68:
+Sub-goal Postcondition of goal copy_array_from'vc.
+Prover result is: Valid (0.02s, 3894 steps).
+== Stage 3: split_vc + inline_all on still-unproved goal ==
+Target theory: LargestDivisibleSubset_Array_Spec
+Target goal  : fill_result_from'vc
+---- stage3 | prover: Z3,4.8.6 | theory: LargestDivisibleSubset_Array_Spec | goal: fill_result_from'vc ----
+Transforms: split_vc inline_all
+File "repaired.mlw", line 254, characters 15-39:
+Sub-goal Assertion of goal fill_result_from'vc.
+Prover result is: Valid (0.01s, 1094 steps).
+
+File "repaired.mlw", line 255, characters 15-37:
+Sub-goal Assertion of goal fill_result_from'vc.
+Prover result is: Valid (0.01s, 9147 steps).
+
+File "repaired.mlw", line 256, characters 15-36:
+Sub-goal Assertion of goal fill_result_from'vc.
+Prover result is: Valid (0.01s, 1194 steps).
+
+File "repaired.mlw", line 257, characters 18-29:
+Sub-goal Index in array bounds of goal fill_result_from'vc.
+Prover result is: Valid (0.01s, 1147 steps).
+
+File "repaired.mlw", line 257, characters 6-29:
+Sub-goal Index in array bounds of goal fill_result_from'vc.
+Prover result is: Valid (0.01s, 1183 steps).
+
+File "repaired.mlw", line 258, characters 15-36:
+Sub-goal Assertion of goal fill_result_from'vc.
+Prover result is: Valid (0.01s, 14211 steps).
+
+File "repaired.mlw", line 259, characters 15-62:
+Sub-goal Assertion of goal fill_result_from'vc.
+Prover result is: Valid (0.01s, 14724 steps).
+
+File "repaired.mlw", line 260, characters 15-41:
+Sub-goal Assertion of goal fill_result_from'vc.
+Prover result is: Valid (0.01s, 15735 steps).
+
+File "repaired.mlw", line 261, characters 35-44:
+Sub-goal Index in array bounds of goal fill_result_from'vc.
+Prover result is: Valid (0.01s, 1788 steps).
+
+File "repaired.mlw", line 261, characters 6-58:
+Sub-goal Variant decrease of goal fill_result_from'vc.
+Prover result is: Valid (0.01s, 9484 steps).
+
+File "repaired.mlw", line 261, characters 6-58:
+Sub-goal Precondition of goal fill_result_from'vc.
+Prover result is: Valid (0.01s, 1170 steps).
+
+File "repaired.mlw", line 261, characters 6-58:
+Sub-goal Precondition of goal fill_result_from'vc.
+Prover result is: Valid (0.01s, 16823 steps).
+
+File "repaired.mlw", line 261, characters 6-58:
+Sub-goal Precondition of goal fill_result_from'vc.
+Prover result is: Valid (0.01s, 1916 steps).
+
+File "repaired.mlw", line 261, characters 6-58:
+Sub-goal Precondition of goal fill_result_from'vc.
+Prover result is: Valid (0.01s, 1953 steps).
+
+File "repaired.mlw", line 261, characters 6-58:
+Sub-goal Precondition of goal fill_result_from'vc.
+Prover result is: Timeout (10.00s, 153266975 steps).
+---- stage3 | prover: CVC4,1.8 | theory: LargestDivisibleSubset_Array_Spec | goal: fill_result_from'vc ----
+Transforms: split_vc inline_all
+File "repaired.mlw", line 254, characters 15-39:
+Sub-goal Assertion of goal fill_result_from'vc.
+Prover result is: Valid (0.01s, 2119 steps).
+
+File "repaired.mlw", line 255, characters 15-37:
+Sub-goal Assertion of goal fill_result_from'vc.
+Prover result is: Valid (0.01s, 2247 steps).
+
+File "repaired.mlw", line 256, characters 15-36:
+Sub-goal Assertion of goal fill_result_from'vc.
+Prover result is: Valid (0.01s, 2170 steps).
+
+File "repaired.mlw", line 257, characters 18-29:
+Sub-goal Index in array bounds of goal fill_result_from'vc.
+Prover result is: Valid (0.01s, 2175 steps).
+
+File "repaired.mlw", line 257, characters 6-29:
+Sub-goal Index in array bounds of goal fill_result_from'vc.
+Prover result is: Valid (0.01s, 2175 steps).
+
+File "repaired.mlw", line 258, characters 15-36:
+Sub-goal Assertion of goal fill_result_from'vc.
+Prover result is: Valid (0.02s, 3332 steps).
+
+File "repaired.mlw", line 259, characters 15-62:
+Sub-goal Assertion of goal fill_result_from'vc.
+Prover result is: Valid (0.01s, 3214 steps).
+
+File "repaired.mlw", line 260, characters 15-41:
+Sub-goal Assertion of goal fill_result_from'vc.
+Prover result is: Valid (0.01s, 3418 steps).
+
+File "repaired.mlw", line 261, characters 35-44:
+Sub-goal Index in array bounds of goal fill_result_from'vc.
+Prover result is: Valid (0.01s, 3110 steps).
+
+File "repaired.mlw", line 261, characters 6-58:
+Sub-goal Variant decrease of goal fill_result_from'vc.
+Prover result is: Valid (0.01s, 3430 steps).
+
+File "repaired.mlw", line 261, characters 6-58:
+Sub-goal Precondition of goal fill_result_from'vc.
+Prover result is: Valid (0.01s, 3107 steps).
+
+File "repaired.mlw", line 261, characters 6-58:
+Sub-goal Precondition of goal fill_result_from'vc.
+Prover result is: Valid (0.02s, 3974 steps).
+
+File "repaired.mlw", line 261, characters 6-58:
+Sub-goal Precondition of goal fill_result_from'vc.
+Prover result is: Valid (0.01s, 3290 steps).
+
+File "repaired.mlw", line 261, characters 6-58:
+Sub-goal Precondition of goal fill_result_from'vc.
+Prover result is: Valid (0.01s, 3293 steps).
+
+File "repaired.mlw", line 261, characters 6-58:
+Sub-goal Precondition of goal fill_result_from'vc.
+Prover result is: Unknown (unknown + incomplete) (0.02s, 3964 steps).
+== Stage 3: split_vc + inline_all on still-unproved goal ==
+Target theory: LargestDivisibleSubset_Array_Spec
+Target goal  : largest_divisible_subset_array'vc
+---- stage3 | prover: Z3,4.8.6 | theory: LargestDivisibleSubset_Array_Spec | goal: largest_divisible_subset_array'vc ----
+Transforms: split_vc inline_all
+File "repaired.mlw", line 269, characters 13-19:
+Sub-goal Assertion of goal largest_divisible_subset_array'vc.
+Prover result is: Valid (0.01s, 1172 steps).
+
+File "repaired.mlw", line 271, characters 15-20:
+Sub-goal Assertion of goal largest_divisible_subset_array'vc.
+Prover result is: Valid (0.01s, 1170 steps).
+
+File "repaired.mlw", line 272, characters 6-14:
+Sub-goal Array creation size of goal largest_divisible_subset_array'vc.
+Prover result is: Valid (0.01s, 396 steps).
+
+File "repaired.mlw", line 266, characters 15-62:
+Sub-goal Postcondition of goal largest_divisible_subset_array'vc.
+Prover result is: Valid (0.01s, 509 steps).
+
+File "repaired.mlw", line 275, characters 15-23:
+Sub-goal Array creation size of goal largest_divisible_subset_array'vc.
+Prover result is: Valid (0.01s, 10555 steps).
+
+File "repaired.mlw", line 276, characters 17-28:
+Sub-goal Array creation size of goal largest_divisible_subset_array'vc.
+Prover result is: Valid (0.01s, 11401 steps).
+
+File "repaired.mlw", line 277, characters 15-32:
+Sub-goal Assertion of goal largest_divisible_subset_array'vc.
+Prover result is: Valid (0.01s, 1193 steps).
+
+File "repaired.mlw", line 278, characters 15-40:
+Sub-goal Assertion of goal largest_divisible_subset_array'vc.
+Prover result is: Valid (0.01s, 12326 steps).
+
+File "repaired.mlw", line 279, characters 15-42:
+Sub-goal Assertion of goal largest_divisible_subset_array'vc.
+Prover result is: Valid (0.01s, 12457 steps).
+
+File "repaired.mlw", line 280, characters 15-29:
+Sub-goal Assertion of goal largest_divisible_subset_array'vc.
+Prover result is: Valid (0.01s, 13167 steps).
+
+File "repaired.mlw", line 281, characters 15-35:
+Sub-goal Assertion of goal largest_divisible_subset_array'vc.
+Prover result is: Valid (0.01s, 14656 steps).
+
+File "repaired.mlw", line 282, characters 15-37:
+Sub-goal Assertion of goal largest_divisible_subset_array'vc.
+Prover result is: Valid (0.01s, 14707 steps).
+
+File "repaired.mlw", line 283, characters 54-71:
+Sub-goal Assertion of goal largest_divisible_subset_array'vc.
+Prover result is: Valid (0.01s, 14817 steps).
+
+File "repaired.mlw", line 284, characters 15-36:
+Sub-goal Assertion of goal largest_divisible_subset_array'vc.
+Prover result is: Valid (0.01s, 15719 steps).
+
+File "repaired.mlw", line 285, characters 6-23:
+Sub-goal Precondition of goal largest_divisible_subset_array'vc.
+Prover result is: Valid (0.01s, 15943 steps).
+
+File "repaired.mlw", line 286, characters 15-37:
+Sub-goal Assertion of goal largest_divisible_subset_array'vc.
+Prover result is: Valid (0.01s, 17199 steps).
+
+File "repaired.mlw", line 287, characters 6-35:
+Sub-goal Precondition of goal largest_divisible_subset_array'vc.
+Prover result is: Valid (0.01s, 16049 steps).
+
+File "repaired.mlw", line 287, characters 6-35:
+Sub-goal Precondition of goal largest_divisible_subset_array'vc.
+Prover result is: Valid (0.01s, 16186 steps).
+
+File "repaired.mlw", line 287, characters 6-35:
+Sub-goal Precondition of goal largest_divisible_subset_array'vc.
+Prover result is: Valid (0.01s, 17576 steps).
+
+File "repaired.mlw", line 287, characters 6-35:
+Sub-goal Precondition of goal largest_divisible_subset_array'vc.
+Prover result is: Valid (0.01s, 16801 steps).
+
+File "repaired.mlw", line 287, characters 6-35:
+Sub-goal Precondition of goal largest_divisible_subset_array'vc.
+Prover result is: Valid (0.01s, 17662 steps).
+
+File "repaired.mlw", line 287, characters 6-35:
+Sub-goal Precondition of goal largest_divisible_subset_array'vc.
+Prover result is: Valid (0.01s, 16605 steps).
+
+File "repaired.mlw", line 288, characters 15-29:
+Sub-goal Assertion of goal largest_divisible_subset_array'vc.
+Prover result is: Valid (0.01s, 18571 steps).
+
+File "repaired.mlw", line 289, characters 15-28:
+Sub-goal Assertion of goal largest_divisible_subset_array'vc.
+Prover result is: Valid (0.01s, 18023 steps).
+
+File "repaired.mlw", line 290, characters 21-47:
+Sub-goal Precondition of goal largest_divisible_subset_array'vc.
+Prover result is: Valid (0.01s, 2180 steps).
+
+File "repaired.mlw", line 290, characters 21-47:
+Sub-goal Precondition of goal largest_divisible_subset_array'vc.
+Prover result is: Valid (0.01s, 18066 steps).
+
+File "repaired.mlw", line 290, characters 21-47:
+Sub-goal Precondition of goal largest_divisible_subset_array'vc.
+Prover result is: Valid (0.01s, 2206 steps).
+
+File "repaired.mlw", line 291, characters 15-40:
+Sub-goal Assertion of goal largest_divisible_subset_array'vc.
+Prover result is: Valid (0.01s, 3435 steps).
+
+File "repaired.mlw", line 292, characters 15-32:
+Sub-goal Assertion of goal largest_divisible_subset_array'vc.
+Prover result is: Valid (0.01s, 19004 steps).
+
+File "repaired.mlw", line 293, characters 24-36:
+Sub-goal Index in array bounds of goal largest_divisible_subset_array'vc.
+Prover result is: Valid (0.01s, 3497 steps).
+
+File "repaired.mlw", line 293, characters 19-38:
+Sub-goal Array creation size of goal largest_divisible_subset_array'vc.
+Prover result is: Valid (0.01s, 19236 steps).
+
+File "repaired.mlw", line 294, characters 15-43:
+Sub-goal Assertion of goal largest_divisible_subset_array'vc.
+Prover result is: Valid (0.01s, 2340 steps).
+
+File "repaired.mlw", line 295, characters 15-38:
+Sub-goal Assertion of goal largest_divisible_subset_array'vc.
+Prover result is: Valid (0.01s, 20127 steps).
+
+File "repaired.mlw", line 296, characters 15-60:
+Sub-goal Assertion of goal largest_divisible_subset_array'vc.
+Prover result is: Valid (0.01s, 20163 steps).
+
+File "repaired.mlw", line 297, characters 15-36:
+Sub-goal Assertion of goal largest_divisible_subset_array'vc.
+Prover result is: Valid (0.01s, 21922 steps).
+
+File "repaired.mlw", line 298, characters 6-52:
+Sub-goal Precondition of goal largest_divisible_subset_array'vc.
+Prover result is: Valid (0.01s, 20760 steps).
+
+File "repaired.mlw", line 298, characters 6-52:
+Sub-goal Precondition of goal largest_divisible_subset_array'vc.
+Prover result is: Valid (0.01s, 22174 steps).
+
+File "repaired.mlw", line 298, characters 6-52:
+Sub-goal Precondition of goal largest_divisible_subset_array'vc.
+Prover result is: Valid (0.01s, 3971 steps).
+
+File "repaired.mlw", line 298, characters 6-52:
+Sub-goal Precondition of goal largest_divisible_subset_array'vc.
+Prover result is: Valid (0.01s, 3976 steps).
+
+File "repaired.mlw", line 298, characters 6-52:
+Sub-goal Precondition of goal largest_divisible_subset_array'vc.
+Prover result is: Valid (0.01s, 4040 steps).
+
+File "repaired.mlw", line 299, characters 15-43:
+Sub-goal Assertion of goal largest_divisible_subset_array'vc.
+Prover result is: Timeout (10.00s, 184829824 steps).
+
+File "repaired.mlw", line 300, characters 15-35:
+Sub-goal Assertion of goal largest_divisible_subset_array'vc.
+Prover result is: Timeout (10.00s, 203601841 steps).
+Infrastructure issue in stage 3 with prover Z3,4.8.6; aborting rest of stage 3.
+== Final summary ==
+Unproved root goals after first prover : 3
+Remaining failures after split_vc      : 3
+Remaining failures after stage 3       : 3
+Detailed logs stored in                : /Users/rubenm/Desktop/Diversify2Verify/codex-runs/repair2-split2/stage3a-rerepair/368_largest-divisible-subset/array-recursive/largest_divisible_subset_array_stage3_5fc77cde_stage3/repaired/generated/why3/.why3_sessions/repaired_logs
+Still unproved goals:
+LargestDivisibleSubset_Array_Spec	copy_array_from'vc
+LargestDivisibleSubset_Array_Spec	fill_result_from'vc
+LargestDivisibleSubset_Array_Spec	largest_divisible_subset_array'vc
+VERIFY_RESULT: FAILURE
+VERIFY_REASON: unproved_goals_remain
+VERIFY_STAGE: stage3
+VERIFY_ROOT_TOTAL: 10
+VERIFY_ROOT_PROVED: 7
+VERIFY_ROOT_REMAINING: 3

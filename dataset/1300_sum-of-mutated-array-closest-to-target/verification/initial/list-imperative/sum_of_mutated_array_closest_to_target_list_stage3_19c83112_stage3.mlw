@@ -1,0 +1,108 @@
+module SumOfMutatedArrayClosestToTarget_List_Stage3_Imperative
+
+  use int.Int
+  use int.Abs
+  use int.EuclideanDivision
+  use int.MinMax
+  use list.List
+  use list.Length
+  use ref.Ref
+
+  let rec predicate values_in_range (l: list int)
+    variant { l }
+  =
+    match l with
+    | Nil -> true
+    | Cons x xs -> 1 <= x && x <= 100000 && values_in_range xs
+    end
+
+  let rec function mutated_sum (l: list int) (v: int) : int
+    variant { l }
+  =
+    match l with
+    | Nil -> 0
+    | Cons x xs -> min x v + mutated_sum xs v
+    end
+
+  function distance_to_target (l: list int) (target: int) (v: int) : int =
+    abs (mutated_sum l v - target)
+
+  predicate best_mutation_value (l: list int) (target: int) (chosen: int) =
+    (forall v: int. distance_to_target l target chosen <= distance_to_target l target v) /\
+    (forall v: int.
+       distance_to_target l target chosen = distance_to_target l target v ->
+       chosen <= v)
+
+  let mutated_sum_with_cap (arr: list int) (cap: int) : int
+    ensures { result = mutated_sum arr cap }
+  =
+    let total = ref 0 in
+    let cur = ref arr in
+    while (match !cur with Nil -> false | Cons _ _ -> true end) do
+      invariant { !total + mutated_sum !cur cap = mutated_sum arr cap }
+      invariant { 0 <= length !cur }
+      variant { length !cur }
+      match !cur with
+      | Nil -> ()
+      | Cons x xs ->
+          assert { mutated_sum !cur cap = min x cap + mutated_sum xs cap };
+          total := !total + min x cap;
+          cur := xs
+      end
+    done;
+    assert { !cur = Nil };
+    assert { mutated_sum Nil cap = 0 };
+    !total
+
+  let max_value_in_list (arr: list int) : int
+    requires { values_in_range arr }
+    ensures  { 0 <= result }
+    ensures  { result <= 100000 }
+  =
+    let best = ref 0 in
+    let cur = ref arr in
+    while (match !cur with Nil -> false | Cons _ _ -> true end) do
+      invariant { 0 <= !best }
+      invariant { !best <= 100000 }
+      invariant { values_in_range !cur }
+      invariant { 0 <= length !cur }
+      variant { length !cur }
+      match !cur with
+      | Nil -> ()
+      | Cons x xs ->
+          assert { 1 <= x /\ x <= 100000 };
+          if x > !best then best := x;
+          cur := xs
+      end
+    done;
+    !best
+
+  let sum_of_mutated_array_closest_to_target_list (arr: list int) (target: int) : int
+    requires { arr <> Nil }
+    requires { values_in_range arr }
+    requires { 1 <= target /\ target <= 100000 }
+    ensures  { 0 <= result }
+    ensures  { best_mutation_value arr target result }
+  =
+    let upper = max_value_in_list arr in
+    let low = ref 0 in
+    let high = ref upper in
+    while !low < !high do
+      invariant { 0 <= !low }
+      invariant { !low <= !high }
+      invariant { !high <= upper }
+      variant { !high - !low }
+      let mid = !low + div (!high - !low) 2 in
+      let current_sum = mutated_sum_with_cap arr mid in
+      if current_sum < target then
+        low := mid + 1
+      else
+        high := mid
+    done;
+    let right = !low in
+    let left = if right = 0 then 0 else right - 1 in
+    let left_distance = abs (mutated_sum_with_cap arr left - target) in
+    let right_distance = abs (mutated_sum_with_cap arr right - target) in
+    if left_distance <= right_distance then left else right
+
+end

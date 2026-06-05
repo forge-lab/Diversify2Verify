@@ -1,0 +1,432 @@
+module EqualSumArraysWithMinimumNumberOfOperations_List_Stage3_Recursive
+
+  use int.Int
+  use list.List
+  use list.Length
+  use list.NumOcc
+  use list.Sum
+
+  let rec predicate dice_values (nums: list int)
+    variant { nums }
+  =
+    match nums with
+    | Nil -> true
+    | Cons x xs -> 1 <= x && x <= 6 && dice_values xs
+    end
+
+  function count_gain5_inc_first (nums1: list int) (nums2: list int) : int =
+    num_occ 1 nums1 + num_occ 6 nums2
+
+  function count_gain4_inc_first (nums1: list int) (nums2: list int) : int =
+    num_occ 2 nums1 + num_occ 5 nums2
+
+  function count_gain3_inc_first (nums1: list int) (nums2: list int) : int =
+    num_occ 3 nums1 + num_occ 4 nums2
+
+  function count_gain2_inc_first (nums1: list int) (nums2: list int) : int =
+    num_occ 4 nums1 + num_occ 3 nums2
+
+  function count_gain1_inc_first (nums1: list int) (nums2: list int) : int =
+    num_occ 5 nums1 + num_occ 2 nums2
+
+  function count_gain5_dec_first (nums1: list int) (nums2: list int) : int =
+    num_occ 6 nums1 + num_occ 1 nums2
+
+  function count_gain4_dec_first (nums1: list int) (nums2: list int) : int =
+    num_occ 5 nums1 + num_occ 2 nums2
+
+  function count_gain3_dec_first (nums1: list int) (nums2: list int) : int =
+    num_occ 4 nums1 + num_occ 3 nums2
+
+  function count_gain2_dec_first (nums1: list int) (nums2: list int) : int =
+    num_occ 3 nums1 + num_occ 4 nums2
+
+  function count_gain1_dec_first (nums1: list int) (nums2: list int) : int =
+    num_occ 2 nums1 + num_occ 5 nums2
+
+  function max_gain_with_ops (k: int) (c5: int) (c4: int) (c3: int) (c2: int) (c1: int) : int =
+    if k <= 0 then 0
+    else if k <= c5 then 5 * k
+    else if k <= c5 + c4 then 5 * c5 + 4 * (k - c5)
+    else if k <= c5 + c4 + c3 then
+      5 * c5 + 4 * c4 + 3 * (k - c5 - c4)
+    else if k <= c5 + c4 + c3 + c2 then
+      5 * c5 + 4 * c4 + 3 * c3 + 2 * (k - c5 - c4 - c3)
+    else if k <= c5 + c4 + c3 + c2 + c1 then
+      5 * c5 + 4 * c4 + 3 * c3 + 2 * c2 + (k - c5 - c4 - c3 - c2)
+    else
+      5 * c5 + 4 * c4 + 3 * c3 + 2 * c2 + c1
+
+  function best_gain_inc_first (nums1: list int) (nums2: list int) (k: int) : int =
+    max_gain_with_ops k
+      (count_gain5_inc_first nums1 nums2)
+      (count_gain4_inc_first nums1 nums2)
+      (count_gain3_inc_first nums1 nums2)
+      (count_gain2_inc_first nums1 nums2)
+      (count_gain1_inc_first nums1 nums2)
+
+  function best_gain_dec_first (nums1: list int) (nums2: list int) (k: int) : int =
+    max_gain_with_ops k
+      (count_gain5_dec_first nums1 nums2)
+      (count_gain4_dec_first nums1 nums2)
+      (count_gain3_dec_first nums1 nums2)
+      (count_gain2_dec_first nums1 nums2)
+      (count_gain1_dec_first nums1 nums2)
+
+  predicate feasible_ops
+    (remaining: int) (c5: int) (c4: int) (c3: int) (c2: int) (c1: int) =
+    remaining <= 0 \/
+    max_gain_with_ops (c5 + c4 + c3 + c2 + c1) c5 c4 c3 c2 c1 >= remaining
+
+  predicate achievable_in_ops (nums1: list int) (nums2: list int) (k: int) =
+    k >= 0 /\
+    if sum nums1 <= sum nums2 then
+      best_gain_inc_first nums1 nums2 k >= sum nums2 - sum nums1
+    else
+      best_gain_dec_first nums1 nums2 k >= sum nums1 - sum nums2
+
+  predicate impossible_to_equalize (nums1: list int) (nums2: list int) =
+    if sum nums1 <= sum nums2 then
+      best_gain_inc_first nums1 nums2 (length nums1 + length nums2) < sum nums2 - sum nums1
+    else
+      best_gain_dec_first nums1 nums2 (length nums1 + length nums2) < sum nums1 - sum nums2
+
+  predicate is_min_operations (nums1: list int) (nums2: list int) (r: int) =
+    if impossible_to_equalize nums1 nums2 then
+      r = -1
+    else
+      r >= 0 /\
+      achievable_in_ops nums1 nums2 r /\
+      (forall k: int. 0 <= k < r -> not (achievable_in_ops nums1 nums2 k))
+
+  let rec sum_list (nums: list int) : int
+    ensures { result = sum nums }
+    variant { nums }
+  =
+    match nums with
+    | Nil -> 0
+    | Cons x xs -> x + sum_list xs
+    end
+
+  let rec length_list (nums: list int) : int
+    ensures { result = length nums }
+    variant { nums }
+  =
+    match nums with
+    | Nil -> 0
+    | Cons _ xs -> 1 + length_list xs
+    end
+
+  let rec count_occurrence (value: int) (nums: list int) : int
+    ensures { result = num_occ value nums }
+    variant { nums }
+  =
+    match nums with
+    | Nil -> 0
+    | Cons x xs ->
+        (if x = value then 1 else 0) + count_occurrence value xs
+    end
+
+  let rec lemma length_nonnegative (nums: list int)
+    ensures { length nums >= 0 }
+    variant { nums }
+  =
+    match nums with
+    | Nil -> ()
+    | Cons _ xs -> length_nonnegative xs
+    end
+
+  let rec lemma num_occ_nonnegative (value: int) (nums: list int)
+    ensures { num_occ value nums >= 0 }
+    variant { nums }
+  =
+    match nums with
+    | Nil -> ()
+    | Cons _ xs -> num_occ_nonnegative value xs
+    end
+
+  let lemma max_gain_total_nonnegative
+    (c5: int) (c4: int) (c3: int) (c2: int) (c1: int)
+    requires { c5 >= 0 /\ c4 >= 0 /\ c3 >= 0 /\ c2 >= 0 /\ c1 >= 0 }
+    ensures  { max_gain_with_ops (c5 + c4 + c3 + c2 + c1) c5 c4 c3 c2 c1 >= 0 }
+  = ()
+
+  let count_gain5_inc_first_exec (nums1: list int) (nums2: list int) : int
+    ensures { result = count_gain5_inc_first nums1 nums2 }
+  =
+    count_occurrence 1 nums1 + count_occurrence 6 nums2
+
+  let count_gain4_inc_first_exec (nums1: list int) (nums2: list int) : int
+    ensures { result = count_gain4_inc_first nums1 nums2 }
+  =
+    count_occurrence 2 nums1 + count_occurrence 5 nums2
+
+  let count_gain3_inc_first_exec (nums1: list int) (nums2: list int) : int
+    ensures { result = count_gain3_inc_first nums1 nums2 }
+  =
+    count_occurrence 3 nums1 + count_occurrence 4 nums2
+
+  let count_gain2_inc_first_exec (nums1: list int) (nums2: list int) : int
+    ensures { result = count_gain2_inc_first nums1 nums2 }
+  =
+    count_occurrence 4 nums1 + count_occurrence 3 nums2
+
+  let count_gain1_inc_first_exec (nums1: list int) (nums2: list int) : int
+    ensures { result = count_gain1_inc_first nums1 nums2 }
+  =
+    count_occurrence 5 nums1 + count_occurrence 2 nums2
+
+  let count_gain5_dec_first_exec (nums1: list int) (nums2: list int) : int
+    ensures { result = count_gain5_dec_first nums1 nums2 }
+  =
+    count_occurrence 6 nums1 + count_occurrence 1 nums2
+
+  let count_gain4_dec_first_exec (nums1: list int) (nums2: list int) : int
+    ensures { result = count_gain4_dec_first nums1 nums2 }
+  =
+    count_occurrence 5 nums1 + count_occurrence 2 nums2
+
+  let count_gain3_dec_first_exec (nums1: list int) (nums2: list int) : int
+    ensures { result = count_gain3_dec_first nums1 nums2 }
+  =
+    count_occurrence 4 nums1 + count_occurrence 3 nums2
+
+  let count_gain2_dec_first_exec (nums1: list int) (nums2: list int) : int
+    ensures { result = count_gain2_dec_first nums1 nums2 }
+  =
+    count_occurrence 3 nums1 + count_occurrence 4 nums2
+
+  let count_gain1_dec_first_exec (nums1: list int) (nums2: list int) : int
+    ensures { result = count_gain1_dec_first nums1 nums2 }
+  =
+    count_occurrence 2 nums1 + count_occurrence 5 nums2
+
+  let max_gain_with_ops_exec (k: int) (c5: int) (c4: int) (c3: int) (c2: int) (c1: int) : int
+    ensures { result = max_gain_with_ops k c5 c4 c3 c2 c1 }
+  =
+    if k <= 0 then 0
+    else if k <= c5 then 5 * k
+    else if k <= c5 + c4 then 5 * c5 + 4 * (k - c5)
+    else if k <= c5 + c4 + c3 then
+      5 * c5 + 4 * c4 + 3 * (k - c5 - c4)
+    else if k <= c5 + c4 + c3 + c2 then
+      5 * c5 + 4 * c4 + 3 * c3 + 2 * (k - c5 - c4 - c3)
+    else if k <= c5 + c4 + c3 + c2 + c1 then
+      5 * c5 + 4 * c4 + 3 * c3 + 2 * c2 + (k - c5 - c4 - c3 - c2)
+    else
+      5 * c5 + 4 * c4 + 3 * c3 + 2 * c2 + c1
+
+  predicate min_ops_certificate
+    (remaining: int) (c5: int) (c4: int) (c3: int) (c2: int) (c1: int) (r: int) =
+    r >= 0 /\
+    if remaining <= 0 then
+      r = 0
+    else
+      max_gain_with_ops r c5 c4 c3 c2 c1 >= remaining /\
+      (forall k: int. 0 <= k < r -> max_gain_with_ops k c5 c4 c3 c2 c1 < remaining)
+
+  let rec min_ops_for_diff
+    (remaining: int) (c5: int) (c4: int) (c3: int) (c2: int) (c1: int) : int
+    requires { c5 >= 0 }
+    requires { c4 >= 0 }
+    requires { c3 >= 0 }
+    requires { c2 >= 0 }
+    requires { c1 >= 0 }
+    requires { feasible_ops remaining c5 c4 c3 c2 c1 }
+    ensures  { min_ops_certificate remaining c5 c4 c3 c2 c1 result }
+    variant { if remaining > 0 then remaining else 0 }
+  =
+    if remaining <= 0 then 0
+    else if c5 > 0 then begin
+      assert { max_gain_with_ops (c5 + c4 + c3 + c2 + c1) c5 c4 c3 c2 c1 =
+        5 + max_gain_with_ops ((c5 - 1) + c4 + c3 + c2 + c1) (c5 - 1) c4 c3 c2 c1 };
+      assert { feasible_ops (remaining - 5) (c5 - 1) c4 c3 c2 c1 };
+      let r = min_ops_for_diff (remaining - 5) (c5 - 1) c4 c3 c2 c1 in
+      assert { min_ops_certificate (remaining - 5) (c5 - 1) c4 c3 c2 c1 r };
+      assert { forall k: int. 1 <= k ->
+        max_gain_with_ops k c5 c4 c3 c2 c1 =
+        5 + max_gain_with_ops (k - 1) (c5 - 1) c4 c3 c2 c1 };
+      assert { max_gain_with_ops (1 + r) c5 c4 c3 c2 c1 >= remaining };
+      assert { forall k: int. 0 <= k < 1 + r ->
+        max_gain_with_ops k c5 c4 c3 c2 c1 < remaining };
+      1 + r
+    end else if c4 > 0 then begin
+      assert { c5 = 0 };
+      assert { max_gain_with_ops (c5 + c4 + c3 + c2 + c1) c5 c4 c3 c2 c1 =
+        4 + max_gain_with_ops (c5 + (c4 - 1) + c3 + c2 + c1) c5 (c4 - 1) c3 c2 c1 };
+      assert { feasible_ops (remaining - 4) c5 (c4 - 1) c3 c2 c1 };
+      let r = min_ops_for_diff (remaining - 4) c5 (c4 - 1) c3 c2 c1 in
+      assert { c5 = 0 };
+      assert { min_ops_certificate (remaining - 4) c5 (c4 - 1) c3 c2 c1 r };
+      assert { forall k: int. 1 <= k ->
+        max_gain_with_ops k c5 c4 c3 c2 c1 =
+        4 + max_gain_with_ops (k - 1) c5 (c4 - 1) c3 c2 c1 };
+      assert { max_gain_with_ops (1 + r) c5 c4 c3 c2 c1 >= remaining };
+      assert { forall k: int. 0 <= k < 1 + r ->
+        max_gain_with_ops k c5 c4 c3 c2 c1 < remaining };
+      1 + r
+    end else if c3 > 0 then begin
+      assert { c5 = 0 /\ c4 = 0 };
+      assert { max_gain_with_ops (c5 + c4 + c3 + c2 + c1) c5 c4 c3 c2 c1 =
+        3 + max_gain_with_ops (c5 + c4 + (c3 - 1) + c2 + c1) c5 c4 (c3 - 1) c2 c1 };
+      assert { feasible_ops (remaining - 3) c5 c4 (c3 - 1) c2 c1 };
+      let r = min_ops_for_diff (remaining - 3) c5 c4 (c3 - 1) c2 c1 in
+      assert { c5 = 0 /\ c4 = 0 };
+      assert { min_ops_certificate (remaining - 3) c5 c4 (c3 - 1) c2 c1 r };
+      assert { forall k: int. 1 <= k ->
+        max_gain_with_ops k c5 c4 c3 c2 c1 =
+        3 + max_gain_with_ops (k - 1) c5 c4 (c3 - 1) c2 c1 };
+      assert { max_gain_with_ops (1 + r) c5 c4 c3 c2 c1 >= remaining };
+      assert { forall k: int. 0 <= k < 1 + r ->
+        max_gain_with_ops k c5 c4 c3 c2 c1 < remaining };
+      1 + r
+    end else if c2 > 0 then begin
+      assert { c5 = 0 /\ c4 = 0 /\ c3 = 0 };
+      assert { max_gain_with_ops (c5 + c4 + c3 + c2 + c1) c5 c4 c3 c2 c1 =
+        2 + max_gain_with_ops (c5 + c4 + c3 + (c2 - 1) + c1) c5 c4 c3 (c2 - 1) c1 };
+      assert { feasible_ops (remaining - 2) c5 c4 c3 (c2 - 1) c1 };
+      let r = min_ops_for_diff (remaining - 2) c5 c4 c3 (c2 - 1) c1 in
+      assert { c5 = 0 /\ c4 = 0 /\ c3 = 0 };
+      assert { min_ops_certificate (remaining - 2) c5 c4 c3 (c2 - 1) c1 r };
+      assert { forall k: int. 1 <= k ->
+        max_gain_with_ops k c5 c4 c3 c2 c1 =
+        2 + max_gain_with_ops (k - 1) c5 c4 c3 (c2 - 1) c1 };
+      assert { max_gain_with_ops (1 + r) c5 c4 c3 c2 c1 >= remaining };
+      assert { forall k: int. 0 <= k < 1 + r ->
+        max_gain_with_ops k c5 c4 c3 c2 c1 < remaining };
+      1 + r
+    end else if c1 > 0 then begin
+      assert { c5 = 0 /\ c4 = 0 /\ c3 = 0 /\ c2 = 0 };
+      assert { max_gain_with_ops (c5 + c4 + c3 + c2 + c1) c5 c4 c3 c2 c1 =
+        1 + max_gain_with_ops (c5 + c4 + c3 + c2 + (c1 - 1)) c5 c4 c3 c2 (c1 - 1) };
+      assert { feasible_ops (remaining - 1) c5 c4 c3 c2 (c1 - 1) };
+      let r = min_ops_for_diff (remaining - 1) c5 c4 c3 c2 (c1 - 1) in
+      assert { c5 = 0 /\ c4 = 0 /\ c3 = 0 /\ c2 = 0 };
+      assert { min_ops_certificate (remaining - 1) c5 c4 c3 c2 (c1 - 1) r };
+      assert { forall k: int. 1 <= k ->
+        max_gain_with_ops k c5 c4 c3 c2 c1 =
+        1 + max_gain_with_ops (k - 1) c5 c4 c3 c2 (c1 - 1) };
+      assert { max_gain_with_ops (1 + r) c5 c4 c3 c2 c1 >= remaining };
+      assert { forall k: int. 0 <= k < 1 + r ->
+        max_gain_with_ops k c5 c4 c3 c2 c1 < remaining };
+      1 + r
+    end else begin
+      assert { c5 = 0 /\ c4 = 0 /\ c3 = 0 /\ c2 = 0 /\ c1 = 0 };
+      assert { max_gain_with_ops (c5 + c4 + c3 + c2 + c1) c5 c4 c3 c2 c1 = 0 };
+      assert { false };
+      1000000
+    end
+
+  let equal_sum_arrays_with_minimum_number_of_operations_list
+    (nums1: list int) (nums2: list int) : int
+    requires { length nums1 >= 1 }
+    requires { length nums2 >= 1 }
+    requires { dice_values nums1 }
+    requires { dice_values nums2 }
+    ensures  { is_min_operations nums1 nums2 result }
+  =
+    let sum1 = sum_list nums1 in
+    let sum2 = sum_list nums2 in
+    assert { sum1 = sum nums1 };
+    assert { sum2 = sum nums2 };
+    if sum1 = sum2 then begin
+      assert { sum nums1 = sum nums2 };
+      length_nonnegative nums1;
+      length_nonnegative nums2;
+      num_occ_nonnegative 1 nums1;
+      num_occ_nonnegative 2 nums1;
+      num_occ_nonnegative 3 nums1;
+      num_occ_nonnegative 4 nums1;
+      num_occ_nonnegative 5 nums1;
+      num_occ_nonnegative 2 nums2;
+      num_occ_nonnegative 3 nums2;
+      num_occ_nonnegative 4 nums2;
+      num_occ_nonnegative 5 nums2;
+      num_occ_nonnegative 6 nums2;
+      max_gain_total_nonnegative
+        (count_gain5_inc_first nums1 nums2)
+        (count_gain4_inc_first nums1 nums2)
+        (count_gain3_inc_first nums1 nums2)
+        (count_gain2_inc_first nums1 nums2)
+        (count_gain1_inc_first nums1 nums2);
+      assert { best_gain_inc_first nums1 nums2 (length nums1 + length nums2) >= 0 };
+      assert { achievable_in_ops nums1 nums2 0 };
+      assert { forall k: int. 0 <= k < 0 -> not (achievable_in_ops nums1 nums2 k) };
+      assert { not (impossible_to_equalize nums1 nums2) };
+      assert { is_min_operations nums1 nums2 0 };
+      0
+    end else if sum1 < sum2 then begin
+      let diff = sum2 - sum1 in
+      let c5 = count_gain5_inc_first_exec nums1 nums2 in
+      let c4 = count_gain4_inc_first_exec nums1 nums2 in
+      let c3 = count_gain3_inc_first_exec nums1 nums2 in
+      let c2 = count_gain2_inc_first_exec nums1 nums2 in
+      let c1 = count_gain1_inc_first_exec nums1 nums2 in
+      let total_ops = length_list nums1 + length_list nums2 in
+      assert { c5 = count_gain5_inc_first nums1 nums2 };
+      assert { c4 = count_gain4_inc_first nums1 nums2 };
+      assert { c3 = count_gain3_inc_first nums1 nums2 };
+      assert { c2 = count_gain2_inc_first nums1 nums2 };
+      assert { c1 = count_gain1_inc_first nums1 nums2 };
+      assert { c5 >= 0 /\ c4 >= 0 /\ c3 >= 0 /\ c2 >= 0 /\ c1 >= 0 };
+      assert { total_ops = length nums1 + length nums2 };
+      assert { sum nums1 < sum nums2 };
+      let available_gain = max_gain_with_ops_exec total_ops c5 c4 c3 c2 c1 in
+      assert { available_gain = best_gain_inc_first nums1 nums2 total_ops };
+      if available_gain < diff then begin
+        assert { impossible_to_equalize nums1 nums2 };
+        assert { is_min_operations nums1 nums2 (-1) };
+        -1
+      end else begin
+        assert { max_gain_with_ops (c5 + c4 + c3 + c2 + c1) c5 c4 c3 c2 c1 =
+          available_gain };
+        assert { not (max_gain_with_ops (c5 + c4 + c3 + c2 + c1) c5 c4 c3 c2 c1 < diff) };
+        assert { feasible_ops diff c5 c4 c3 c2 c1 };
+        let ops = min_ops_for_diff diff c5 c4 c3 c2 c1 in
+        assert { max_gain_with_ops ops c5 c4 c3 c2 c1 >= diff };
+        assert { forall k: int. 0 <= k < ops ->
+          max_gain_with_ops k c5 c4 c3 c2 c1 < diff };
+        assert { achievable_in_ops nums1 nums2 ops };
+        assert { forall k: int. 0 <= k < ops -> not (achievable_in_ops nums1 nums2 k) };
+        assert { is_min_operations nums1 nums2 ops };
+        ops
+      end
+    end else begin
+      let diff = sum1 - sum2 in
+      let c5 = count_gain5_dec_first_exec nums1 nums2 in
+      let c4 = count_gain4_dec_first_exec nums1 nums2 in
+      let c3 = count_gain3_dec_first_exec nums1 nums2 in
+      let c2 = count_gain2_dec_first_exec nums1 nums2 in
+      let c1 = count_gain1_dec_first_exec nums1 nums2 in
+      let total_ops = length_list nums1 + length_list nums2 in
+      assert { c5 = count_gain5_dec_first nums1 nums2 };
+      assert { c4 = count_gain4_dec_first nums1 nums2 };
+      assert { c3 = count_gain3_dec_first nums1 nums2 };
+      assert { c2 = count_gain2_dec_first nums1 nums2 };
+      assert { c1 = count_gain1_dec_first nums1 nums2 };
+      assert { c5 >= 0 /\ c4 >= 0 /\ c3 >= 0 /\ c2 >= 0 /\ c1 >= 0 };
+      assert { total_ops = length nums1 + length nums2 };
+      assert { sum nums2 < sum nums1 };
+      let available_gain = max_gain_with_ops_exec total_ops c5 c4 c3 c2 c1 in
+      assert { available_gain = best_gain_dec_first nums1 nums2 total_ops };
+      if available_gain < diff then begin
+        assert { impossible_to_equalize nums1 nums2 };
+        assert { is_min_operations nums1 nums2 (-1) };
+        -1
+      end else begin
+        assert { max_gain_with_ops (c5 + c4 + c3 + c2 + c1) c5 c4 c3 c2 c1 =
+          available_gain };
+        assert { not (max_gain_with_ops (c5 + c4 + c3 + c2 + c1) c5 c4 c3 c2 c1 < diff) };
+        assert { feasible_ops diff c5 c4 c3 c2 c1 };
+        let ops = min_ops_for_diff diff c5 c4 c3 c2 c1 in
+        assert { max_gain_with_ops ops c5 c4 c3 c2 c1 >= diff };
+        assert { forall k: int. 0 <= k < ops ->
+          max_gain_with_ops k c5 c4 c3 c2 c1 < diff };
+        assert { achievable_in_ops nums1 nums2 ops };
+        assert { forall k: int. 0 <= k < ops -> not (achievable_in_ops nums1 nums2 k) };
+        assert { is_min_operations nums1 nums2 ops };
+        ops
+      end
+    end
+
+end

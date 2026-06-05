@@ -1,0 +1,193 @@
+module TwoSumLessThanK_Array_Imperative
+
+  use int.Int
+  use array.Array
+  use array.Init
+  use ref.Ref
+
+  predicate valid_input (nums: array int) (k: int) =
+    1 <= length nums <= 100 /\
+    1 <= k <= 2000 /\
+    forall i: int. 0 <= i < length nums -> 1 <= nums[i] <= 1000
+
+  predicate valid_pair (nums: array int) (i: int) (j: int) =
+    0 <= i < j < length nums
+
+  predicate pair_sum_below (nums: array int) (k: int) (sum: int) =
+    exists i j: int.
+      valid_pair nums i j /\
+      sum = nums[i] + nums[j] /\
+      sum < k
+
+  predicate no_pair_sum_below (nums: array int) (k: int) =
+    forall i j: int.
+      valid_pair nums i j -> not (nums[i] + nums[j] < k)
+
+  predicate pair_sum_upper_bound (nums: array int) (k: int) (res: int) =
+    forall i j: int.
+      valid_pair nums i j /\ nums[i] + nums[j] < k ->
+      nums[i] + nums[j] <= res
+
+  predicate two_sum_less_than_k_array_spec
+    (nums: array int) (k: int) (res: int) =
+    (res = -1 /\ no_pair_sum_below nums k) \/
+    (pair_sum_below nums k res /\ pair_sum_upper_bound nums k res)
+
+  let two_sum_less_than_k_array (nums: array int) (k: int) : int =
+    if length nums < 2 then
+      -1
+    else
+      let best = ref (-1) in
+      for i = 0 to length nums - 2 do
+        for j = i + 1 to length nums - 1 do
+          let sum = nums[i] + nums[j] in
+          if sum < k && sum > !best then
+            best := sum
+        done
+      done;
+      !best
+
+  let test_000 () : bool =
+    let nums = init 4 [|500; 500; 500; 500|] in
+    let r = two_sum_less_than_k_array nums 1000 in
+    r = (-1)
+
+  let test_001 () : bool =
+    let nums = init 4 [|5; 15; 25; 35|] in
+    let r = two_sum_less_than_k_array nums 50 in
+    r = 40
+
+  let test_002 () : bool =
+    let nums = init 5 [|1; 2; 3; 4; 5|] in
+    let r = two_sum_less_than_k_array nums 8 in
+    r = 7
+
+  let test_003 () : bool =
+    let nums = init 4 [|999; 998; 997; 996|] in
+    let r = two_sum_less_than_k_array nums 1995 in
+    r = 1994
+
+  let test_004 () : bool =
+    let nums = init 5 [|5; 15; 25; 35; 45|] in
+    let r = two_sum_less_than_k_array nums 50 in
+    r = 40
+
+  let test_005 () : bool =
+    let nums = init 4 [|5; 5; 5; 5|] in
+    let r = two_sum_less_than_k_array nums 10 in
+    r = (-1)
+
+  let test_006 () : bool =
+    let nums = init 4 [|999; 998; 997; 996|] in
+    let r = two_sum_less_than_k_array nums 2000 in
+    r = 1997
+
+  let test_007 () : bool =
+    let nums = init 1 [|1|] in
+    let r = two_sum_less_than_k_array nums 2 in
+    r = (-1)
+
+  let test_008 () : bool =
+    let nums = init 5 [|999; 998; 997; 996; 995|] in
+    let r = two_sum_less_than_k_array nums 1995 in
+    r = 1994
+
+  let test_009 () : bool =
+    let nums = init 5 [|1; 2; 3; 4; 5|] in
+    let r = two_sum_less_than_k_array nums 10 in
+    r = 9
+
+  let test_010 () : bool =
+    let nums = init 3 [|10; 20; 30|] in
+    let r = two_sum_less_than_k_array nums 15 in
+    r = (-1)
+
+  let test_011 () : bool =
+    let nums = init 4 [|100; 200; 300; 400|] in
+    let r = two_sum_less_than_k_array nums 1000 in
+    r = 700
+
+  let test_012 () : bool =
+    let nums = init 8 [|34; 23; 1; 24; 75; 33; 54; 8|] in
+    let r = two_sum_less_than_k_array nums 60 in
+    r = 58
+
+  let test_013 () : bool =
+    let nums = init 4 [|1; 1; 1; 1|] in
+    let r = two_sum_less_than_k_array nums 3 in
+    r = 2
+
+  let test_014 () : bool =
+    let nums = init 5 [|100; 200; 300; 400; 500|] in
+    let r = two_sum_less_than_k_array nums 1000 in
+    r = 900
+
+  let test_015 () : bool =
+    let nums = init 10 [|100; 90; 80; 70; 60; 50; 40; 30; 20; 10|] in
+    let r = two_sum_less_than_k_array nums 150 in
+    r = 140
+
+  let test_016 () : bool =
+    let nums = init 10 [|50; 100; 150; 200; 250; 300; 350; 400; 450; 500|] in
+    let r = two_sum_less_than_k_array nums 850 in
+    r = 800
+
+  let test_017 () : bool =
+    let nums = init 10 [|999; 999; 999; 999; 999; 999; 999; 999; 999; 999|] in
+    let r = two_sum_less_than_k_array nums 1998 in
+    r = (-1)
+
+  let test_018 () : bool =
+    let nums = init 5 [|500; 400; 300; 200; 100|] in
+    let r = two_sum_less_than_k_array nums 800 in
+    r = 700
+
+  let test_019 () : bool =
+    let nums = init 20 [|1; 1; 2; 2; 3; 3; 4; 4; 5; 5; 6; 6; 7; 7; 8; 8; 9; 9; 10; 10|] in
+    let r = two_sum_less_than_k_array nums 18 in
+    r = 17
+
+  let run_tests () : bool =
+    if test_000 () then
+    if test_001 () then
+    if test_002 () then
+    if test_003 () then
+    if test_004 () then
+    if test_005 () then
+    if test_006 () then
+    if test_007 () then
+    if test_008 () then
+    if test_009 () then
+    if test_010 () then
+    if test_011 () then
+    if test_012 () then
+    if test_013 () then
+    if test_014 () then
+    if test_015 () then
+    if test_016 () then
+    if test_017 () then
+    if test_018 () then
+    if test_019 () then
+      true
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+
+end

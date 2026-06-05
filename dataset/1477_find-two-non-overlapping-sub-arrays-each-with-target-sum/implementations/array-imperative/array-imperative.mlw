@@ -1,0 +1,172 @@
+module FindTwoNonOverlappingSubArraysEachWithTargetSum_Array_Imperative
+
+  use int.Int
+  use array.Array
+  use array.Init
+  use ref.Ref
+
+  let find_two_non_overlapping_sub_arrays_each_with_target_sum_array
+    (arr: array int) (target: int) : int =
+    let n = length arr in
+    let best = ref 0 in
+    let found = ref false in
+    for l1 = 0 to n - 1 do
+      let sum1 = ref 0 in
+      for u1 = l1 + 1 to n do
+        sum1 := !sum1 + arr[u1 - 1];
+        if !sum1 = target then
+          begin
+            for l2 = u1 to n - 1 do
+              let sum2 = ref 0 in
+              for u2 = l2 + 1 to n do
+                sum2 := !sum2 + arr[u2 - 1];
+                if !sum2 = target then
+                  begin
+                    let candidate = (u1 - l1) + (u2 - l2) in
+                    if !found then
+                      begin
+                        if candidate < !best then best := candidate else ()
+                      end
+                    else
+                      begin
+                        best := candidate;
+                        found := true
+                      end
+                  end
+                else ()
+              done
+            done
+          end
+        else ()
+      done
+    done;
+    if !found then !best else (-1)
+
+  let check_case (arr: array int) (target: int) (expected: int) : bool =
+    let r = find_two_non_overlapping_sub_arrays_each_with_target_sum_array arr target in
+    r = expected
+
+  let test_000 () : bool =
+    let arr = init 5 [|5; 5; 5; 5; 5|] in
+    check_case arr 10 4
+
+  let test_001 () : bool =
+    let arr = init 10 [|1; 2; 3; 4; 5; 6; 7; 8; 9; 10|] in
+    check_case arr 15 5
+
+  let test_002 () : bool =
+    let arr = init 10 [|2; 2; 2; 2; 2; 2; 2; 2; 2; 2|] in
+    check_case arr 6 6
+
+  let test_003 () : bool =
+    let arr = init 9 [|1; 1; 1; 2; 2; 2; 3; 3; 3|] in
+    check_case arr 6 5
+
+  let test_004 () : bool =
+    let arr = init 5 [|1; 2; 3; 4; 5|] in
+    check_case arr 9 (-1)
+
+  let test_005 () : bool =
+    let arr = init 5 [|3; 2; 2; 4; 3|] in
+    check_case arr 3 2
+
+  let test_006 () : bool =
+    let arr = init 5 [|5; 5; 4; 4; 5|] in
+    check_case arr 9 4
+
+  let test_007 () : bool =
+    let arr = init 10 [|2; 2; 2; 2; 2; 2; 2; 2; 2; 2|] in
+    check_case arr 4 4
+
+  let test_008 () : bool =
+    let arr = init 3 [|1000; 1000; 1000|] in
+    check_case arr 2000 (-1)
+
+  let test_009 () : bool =
+    let arr = init 4 [|7; 3; 4; 7|] in
+    check_case arr 7 2
+
+  let test_010 () : bool =
+    let arr = init 5 [|1000; 1000; 1000; 1000; 1000|] in
+    check_case arr 2000 4
+
+  let test_011 () : bool =
+    let arr = init 9 [|1; 1; 1; 2; 2; 2; 3; 3; 3|] in
+    check_case arr 3 2
+
+  let test_012 () : bool =
+    let arr = init 10 [|1; 2; 1; 2; 1; 2; 1; 2; 1; 2|] in
+    check_case arr 3 4
+
+  let test_013 () : bool =
+    let arr = init 5 [|1000; 1000; 1000; 1000; 1000|] in
+    check_case arr 5000 (-1)
+
+  let test_014 () : bool =
+    let arr = init 8 [|1; 1; 1; 1; 1; 1; 1; 1|] in
+    check_case arr 2 4
+
+  let test_015 () : bool =
+    let arr = init 9 [|5; 5; 5; 5; 5; 5; 5; 5; 5|] in
+    check_case arr 15 6
+
+  let test_016 () : bool =
+    let arr = init 5 [|1; 2; 3; 4; 5|] in
+    check_case arr 10 (-1)
+
+  let test_017 () : bool =
+    let arr = init 5 [|10; 20; 30; 40; 50|] in
+    check_case arr 60 (-1)
+
+  let test_018 () : bool =
+    let arr = init 10 [|1; 4; 4; 4; 4; 4; 4; 4; 4; 1|] in
+    check_case arr 8 4
+
+  let test_019 () : bool =
+    let arr = init 10 [|5; 5; 5; 5; 5; 5; 5; 5; 5; 5|] in
+    check_case arr 15 6
+
+  let run_tests () : bool =
+    if test_000 () then
+    if test_001 () then
+    if test_002 () then
+    if test_003 () then
+    if test_004 () then
+    if test_005 () then
+    if test_006 () then
+    if test_007 () then
+    if test_008 () then
+    if test_009 () then
+    if test_010 () then
+    if test_011 () then
+    if test_012 () then
+    if test_013 () then
+    if test_014 () then
+    if test_015 () then
+    if test_016 () then
+    if test_017 () then
+    if test_018 () then
+    if test_019 () then
+      true
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+
+end

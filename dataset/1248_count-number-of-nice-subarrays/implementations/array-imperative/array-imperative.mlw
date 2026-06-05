@@ -1,0 +1,172 @@
+module CountNumberOfNiceSubarrays_Array_Imperative
+
+  use int.Int
+  use int.EuclideanDivision
+  use array.Array
+  use array.Init
+  use ref.Ref
+
+  predicate valid_input (nums: array int) (k: int) =
+    1 <= length nums <= 50000 /\
+    1 <= k <= length nums /\
+    forall i: int. 0 <= i < length nums -> 1 <= nums[i] <= 100000
+
+  let count_number_of_nice_subarrays_array (nums: array int) (k: int) : int
+    requires { valid_input nums k }
+  =
+    let total = ref 0 in
+    for l = 0 to length nums - 1 do
+      let odds = ref 0 in
+      for r = l to length nums - 1 do
+        if mod nums[r] 2 = 1 then
+          odds := !odds + 1;
+        if !odds = k then
+          total := !total + 1
+      done
+    done;
+    !total
+
+  let test_000 () : bool =
+    let nums = init 5 [|1; 2; 3; 4; 5|] in
+    let r = count_number_of_nice_subarrays_array nums 3 in
+    r = 1
+
+  let test_001 () : bool =
+    let nums = init 10 [|1; 2; 3; 4; 5; 6; 7; 8; 9; 10|] in
+    let r = count_number_of_nice_subarrays_array nums 5 in
+    r = 2
+
+  let test_002 () : bool =
+    let nums = init 1 [|2|] in
+    let r = count_number_of_nice_subarrays_array nums 1 in
+    r = 0
+
+  let test_003 () : bool =
+    let nums = init 3 [|2; 4; 6|] in
+    let r = count_number_of_nice_subarrays_array nums 1 in
+    r = 0
+
+  let test_004 () : bool =
+    let nums = init 10 [|1; 2; 3; 4; 5; 6; 7; 8; 9; 10|] in
+    let r = count_number_of_nice_subarrays_array nums 3 in
+    r = 10
+
+  let test_005 () : bool =
+    let nums = init 1 [|1|] in
+    let r = count_number_of_nice_subarrays_array nums 1 in
+    r = 1
+
+  let test_006 () : bool =
+    let nums = init 5 [|1; 3; 5; 7; 9|] in
+    let r = count_number_of_nice_subarrays_array nums 5 in
+    r = 1
+
+  let test_007 () : bool =
+    let nums = init 5 [|2; 2; 2; 2; 2|] in
+    let r = count_number_of_nice_subarrays_array nums 1 in
+    r = 0
+
+  let test_008 () : bool =
+    let nums = init 10 [|2; 2; 2; 1; 2; 2; 1; 2; 2; 2|] in
+    let r = count_number_of_nice_subarrays_array nums 2 in
+    r = 16
+
+  let test_009 () : bool =
+    let nums = init 5 [|1; 3; 5; 7; 9|] in
+    let r = count_number_of_nice_subarrays_array nums 2 in
+    r = 4
+
+  let test_010 () : bool =
+    let nums = init 5 [|1; 1; 2; 1; 1|] in
+    let r = count_number_of_nice_subarrays_array nums 3 in
+    r = 2
+
+  let test_012 () : bool =
+    let nums = init 5 [|10; 15; 20; 25; 30|] in
+    let r = count_number_of_nice_subarrays_array nums 1 in
+    r = 8
+
+  let test_014 () : bool =
+    let nums = init 31 [|2; 1; 2; 1; 2; 1; 2; 1; 2; 1; 2; 1; 2; 1; 2; 1; 2; 1; 2; 1; 2; 1; 2; 1; 2; 1; 2; 1; 2; 1; 2|] in
+    let r = count_number_of_nice_subarrays_array nums 5 in
+    r = 44
+
+  let test_015 () : bool =
+    let nums = init 30 [|1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 2; 2; 2; 2; 2; 2; 2; 2; 2; 2|] in
+    let r = count_number_of_nice_subarrays_array nums 15 in
+    r = 16
+
+  let test_016 () : bool =
+    let nums = init 15 [|2; 4; 6; 8; 10; 12; 14; 16; 18; 20; 22; 24; 26; 28; 30|] in
+    let r = count_number_of_nice_subarrays_array nums 1 in
+    r = 0
+
+  let test_018 () : bool =
+    let nums = init 47 [|3; 1; 4; 1; 5; 9; 2; 6; 5; 3; 5; 9; 7; 9; 3; 2; 3; 8; 4; 6; 2; 6; 4; 3; 3; 8; 3; 2; 7; 9; 5; 0; 2; 8; 8; 4; 1; 9; 7; 1; 6; 9; 3; 9; 9; 3; 7|] in
+    let r = count_number_of_nice_subarrays_array nums 10 in
+    r = 61
+
+  let test_019 () : bool =
+    let nums = init 20 [|1; 3; 5; 2; 4; 6; 8; 10; 12; 14; 16; 18; 20; 22; 24; 26; 28; 30; 32; 34|] in
+    let r = count_number_of_nice_subarrays_array nums 5 in
+    r = 0
+
+  let test_020 () : bool =
+    let nums = init 17 [|2; 2; 2; 2; 2; 2; 2; 2; 1; 2; 2; 2; 2; 2; 2; 2; 2|] in
+    let r = count_number_of_nice_subarrays_array nums 1 in
+    r = 81
+
+  let test_021 () : bool =
+    let nums = init 17 [|2; 4; 6; 8; 10; 1; 3; 5; 7; 9; 11; 13; 15; 17; 19; 21; 23|] in
+    let r = count_number_of_nice_subarrays_array nums 5 in
+    r = 13
+
+  let test_022 () : bool =
+    let nums = init 19 [|2; 2; 2; 1; 2; 2; 2; 1; 2; 2; 2; 1; 2; 2; 2; 1; 2; 2; 2|] in
+    let r = count_number_of_nice_subarrays_array nums 4 in
+    r = 16
+
+  let run_tests () : bool =
+    if test_000 () then
+    if test_001 () then
+    if test_002 () then
+    if test_003 () then
+    if test_004 () then
+    if test_005 () then
+    if test_006 () then
+    if test_007 () then
+    if test_008 () then
+    if test_009 () then
+    if test_010 () then
+    if test_012 () then
+    if test_014 () then
+    if test_015 () then
+    if test_016 () then
+    if test_018 () then
+    if test_019 () then
+    if test_020 () then
+    if test_021 () then
+    if test_022 () then
+      true
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+
+end

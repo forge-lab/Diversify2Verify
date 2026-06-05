@@ -1,0 +1,156 @@
+module MinimizeMaximumOfArray_List_Stage3_Imperative
+
+  use int.Int
+  use int.EuclideanDivision
+  use list.List
+  use list.Length
+  use list.Prefix
+  use list.Sum
+  use list.Append
+  use ref.Ref
+
+  let rec predicate nonnegative_list (nums: list int)
+    variant { nums }
+  =
+    match nums with
+    | Nil -> true
+    | Cons x xs -> 0 <= x && nonnegative_list xs
+    end
+
+  predicate prefix_capacity_bound (nums: list int) (m: int) =
+    forall k: int. 1 <= k <= length nums ->
+      sum (prefix k nums) <= m * k
+
+  predicate optimal_minimized_maximum (nums: list int) (m: int) =
+    0 <= m /\
+    prefix_capacity_bound nums m /\
+    (forall smaller: int. 0 <= smaller < m ->
+      not (prefix_capacity_bound nums smaller))
+
+  let rec lemma sum_append (a b: list int)
+    ensures { sum (a ++ b) = sum a + sum b }
+    variant { a }
+  =
+    match a with
+    | Nil -> ()
+    | Cons _ t -> sum_append t b
+    end
+
+  let rec lemma prefix_append_snoc (a: list int) (x: int) (b: list int)
+    ensures { prefix (length a + 1) (a ++ Cons x b) = a ++ Cons x Nil }
+    variant { a }
+  =
+    match a with
+    | Nil -> ()
+    | Cons _ t -> prefix_append_snoc t x b
+    end
+
+  let lemma accumulated_bounds_are_optimal (nums: list int) (m: int)
+    requires { 0 <= m }
+    requires {
+      forall k: int. 1 <= k <= length nums ->
+        sum (prefix k nums) <= m * k
+    }
+    requires {
+      forall smaller: int. 0 <= smaller < m ->
+        exists k: int. 1 <= k <= length nums /\
+          not (sum (prefix k nums) <= smaller * k)
+    }
+    ensures { optimal_minimized_maximum nums m }
+  =
+    assert { prefix_capacity_bound nums m };
+    assert {
+      forall smaller: int. 0 <= smaller < m ->
+        not (prefix_capacity_bound nums smaller)
+    }
+
+  let minimize_maximum_of_array_list (nums: list int) : int
+    requires { 2 <= length nums }
+    requires { nonnegative_list nums }
+    ensures  { optimal_minimized_maximum nums result }
+  =
+    let prefix_sum = ref 0 in
+    let prefix_len = ref 0 in
+    let best = ref 0 in
+    let cur = ref nums in
+    let ghost processed = ref Nil in
+    while (match !cur with Nil -> false | Cons _ _ -> true end) do
+      invariant { 0 <= !prefix_len <= length nums }
+      invariant { 0 <= !prefix_sum }
+      invariant { 0 <= !best }
+      invariant { length !processed = !prefix_len }
+      invariant { !processed ++ !cur = nums }
+      invariant { !prefix_sum = sum !processed }
+      invariant { nonnegative_list !cur }
+      invariant { !prefix_len + length !cur = length nums }
+      invariant {
+        forall k: int. 1 <= k <= !prefix_len ->
+          sum (prefix k nums) <= !best * k
+      }
+      invariant {
+        forall smaller: int. 0 <= smaller < !best ->
+          exists k: int. 1 <= k <= !prefix_len /\
+            not (sum (prefix k nums) <= smaller * k)
+      }
+      variant { length !cur }
+
+      match !cur with
+      | Nil -> ()
+      | Cons x xs ->
+          assert { 0 <= x };
+          assert { nonnegative_list xs };
+          assert { nums = !processed ++ Cons x xs };
+          prefix_sum := !prefix_sum + x;
+          prefix_len := !prefix_len + 1;
+          assert { 1 <= !prefix_len };
+          prefix_append_snoc !processed x xs;
+          sum_append !processed (Cons x Nil);
+          assert { prefix !prefix_len nums = !processed ++ Cons x Nil };
+          assert { !prefix_sum = sum (prefix !prefix_len nums) };
+          let candidate = div (!prefix_sum + !prefix_len - 1) !prefix_len in
+          let old_best = !best in
+          assert { candidate * !prefix_len <= !prefix_sum + !prefix_len - 1 };
+          assert { !prefix_sum + !prefix_len - 1 < (candidate + 1) * !prefix_len };
+          assert { !prefix_sum <= candidate * !prefix_len };
+          if candidate > !best then begin
+            assert {
+              forall k: int. 1 <= k < !prefix_len ->
+                sum (prefix k nums) <= old_best * k
+            };
+            assert {
+              forall smaller: int. old_best <= smaller < candidate ->
+                not (sum (prefix !prefix_len nums) <= smaller * !prefix_len)
+            };
+            best := candidate
+          end else begin
+            assert { candidate <= !best };
+            assert { sum (prefix !prefix_len nums) <= !best * !prefix_len }
+          end;
+          assert {
+            forall k: int. 1 <= k <= !prefix_len ->
+              sum (prefix k nums) <= !best * k
+          };
+          assert {
+            forall smaller: int. 0 <= smaller < !best ->
+              exists k: int. 1 <= k <= !prefix_len /\
+                not (sum (prefix k nums) <= smaller * k)
+          };
+          processed := !processed ++ Cons x Nil;
+          cur := xs
+      end
+    done;
+    assert { !cur = Nil };
+    assert { !prefix_len = length nums };
+    assert {
+      forall k: int. 1 <= k <= length nums ->
+        sum (prefix k nums) <= !best * k
+    };
+    assert {
+      forall smaller: int. 0 <= smaller < !best ->
+        exists k: int. 1 <= k <= length nums /\
+          not (sum (prefix k nums) <= smaller * k)
+    };
+    accumulated_bounds_are_optimal nums !best;
+    !best
+
+end

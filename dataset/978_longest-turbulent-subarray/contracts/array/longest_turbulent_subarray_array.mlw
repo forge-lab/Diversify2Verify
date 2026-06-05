@@ -1,0 +1,182 @@
+module LongestTurbulentSubarray_Array_Spec
+
+  use int.Int
+  use array.Array
+  use array.Init
+
+  predicate valid_input (arr: array int) =
+    1 <= length arr <= 40000 /\
+    forall i: int. 0 <= i < length arr -> 0 <= arr[i] <= 1000000000
+
+  predicate turbulent_subarray (arr: array int) (l: int) (r: int) =
+    0 <= l < r <= length arr /\
+    (forall k: int. l <= k < r - 1 ->
+       not (arr[k] = arr[k + 1])) /\
+    (forall k: int. l <= k < r - 2 ->
+       (arr[k] < arr[k + 1] /\ arr[k + 1] > arr[k + 2]) \/
+       (arr[k] > arr[k + 1] /\ arr[k + 1] < arr[k + 2]))
+
+  predicate has_turbulent_length (arr: array int) (n: int) =
+    exists l r: int. turbulent_subarray arr l r /\ n = r - l
+
+  predicate no_turbulent_longer_than (arr: array int) (n: int) =
+    forall l r: int. turbulent_subarray arr l r -> r - l <= n
+
+  predicate max_turbulent_length (arr: array int) (n: int) =
+    1 <= n <= length arr /\
+    has_turbulent_length arr n /\
+    no_turbulent_longer_than arr n
+
+  val longest_turbulent_subarray_array (arr: array int) : int
+    requires { valid_input arr }
+    ensures  { max_turbulent_length arr result }
+
+  let lemma test_000_equal_pair () =
+    let a = init 2 [|9; 9|] in
+    assert { length a = 2 };
+    assert { a[0] = 9 };
+    assert { a[1] = 9 };
+    assert { turbulent_subarray a 0 1 };
+    assert { turbulent_subarray a 1 2 };
+    assert { has_turbulent_length a 1 };
+    assert {
+      forall i: int. 0 <= i < length a ->
+        i = 0 \/ i = 1
+    };
+    assert { no_turbulent_longer_than a 1 };
+    assert { max_turbulent_length a 1 }
+
+  let lemma test_001_canonical_example () =
+    let a = init 9 [|9; 4; 2; 10; 7; 8; 8; 1; 9|] in
+    assert { length a = 9 };
+    assert { a[0] = 9 };
+    assert { a[1] = 4 };
+    assert { a[2] = 2 };
+    assert { a[3] = 10 };
+    assert { a[4] = 7 };
+    assert { a[5] = 8 };
+    assert { a[6] = 8 };
+    assert { a[7] = 1 };
+    assert { a[8] = 9 };
+    assert { turbulent_subarray a 1 6 };
+    assert { has_turbulent_length a 5 };
+    assert {
+      forall i: int. 0 <= i < length a ->
+        i = 0 \/ i = 1 \/ i = 2 \/ i = 3 \/ i = 4 \/
+        i = 5 \/ i = 6 \/ i = 7 \/ i = 8
+    };
+    assert { no_turbulent_longer_than a 5 };
+    assert { max_turbulent_length a 5 }
+
+  let lemma test_004_full_alternation () =
+    let a = init 9 [|1; 2; 1; 2; 1; 2; 1; 2; 1|] in
+    assert { length a = 9 };
+    assert { a[0] = 1 };
+    assert { a[1] = 2 };
+    assert { a[2] = 1 };
+    assert { a[3] = 2 };
+    assert { a[4] = 1 };
+    assert { a[5] = 2 };
+    assert { a[6] = 1 };
+    assert { a[7] = 2 };
+    assert { a[8] = 1 };
+    assert { turbulent_subarray a 0 9 };
+    assert { has_turbulent_length a 9 };
+    assert {
+      forall i: int. 0 <= i < length a ->
+        i = 0 \/ i = 1 \/ i = 2 \/ i = 3 \/ i = 4 \/
+        i = 5 \/ i = 6 \/ i = 7 \/ i = 8
+    };
+    assert { no_turbulent_longer_than a 9 };
+    assert { max_turbulent_length a 9 }
+
+  let lemma test_006_mixed_segment () =
+    let a = init 9 [|10; 9; 4; 5; 4; 8; 9; 3; 5|] in
+    assert { length a = 9 };
+    assert { a[0] = 10 };
+    assert { a[1] = 9 };
+    assert { a[2] = 4 };
+    assert { a[3] = 5 };
+    assert { a[4] = 4 };
+    assert { a[5] = 8 };
+    assert { a[6] = 9 };
+    assert { a[7] = 3 };
+    assert { a[8] = 5 };
+    assert { turbulent_subarray a 1 6 };
+    assert { has_turbulent_length a 5 };
+    assert {
+      forall i: int. 0 <= i < length a ->
+        i = 0 \/ i = 1 \/ i = 2 \/ i = 3 \/ i = 4 \/
+        i = 5 \/ i = 6 \/ i = 7 \/ i = 8
+    };
+    assert { no_turbulent_longer_than a 5 };
+    assert { max_turbulent_length a 5 }
+
+  let lemma test_007_decreasing () =
+    let a = init 10 [|10; 9; 8; 7; 6; 5; 4; 3; 2; 1|] in
+    assert { length a = 10 };
+    assert { a[0] = 10 };
+    assert { a[1] = 9 };
+    assert { a[2] = 8 };
+    assert { a[3] = 7 };
+    assert { a[4] = 6 };
+    assert { a[5] = 5 };
+    assert { a[6] = 4 };
+    assert { a[7] = 3 };
+    assert { a[8] = 2 };
+    assert { a[9] = 1 };
+    assert { turbulent_subarray a 0 2 };
+    assert { has_turbulent_length a 2 };
+    assert {
+      forall i: int. 0 <= i < length a ->
+        i = 0 \/ i = 1 \/ i = 2 \/ i = 3 \/ i = 4 \/
+        i = 5 \/ i = 6 \/ i = 7 \/ i = 8 \/ i = 9
+    };
+    assert { no_turbulent_longer_than a 2 };
+    assert { max_turbulent_length a 2 }
+
+  let lemma test_009_all_equal () =
+    let a = init 9 [|0; 0; 0; 0; 0; 0; 0; 0; 0|] in
+    assert { length a = 9 };
+    assert { a[0] = 0 };
+    assert { a[1] = 0 };
+    assert { a[2] = 0 };
+    assert { a[3] = 0 };
+    assert { a[4] = 0 };
+    assert { a[5] = 0 };
+    assert { a[6] = 0 };
+    assert { a[7] = 0 };
+    assert { a[8] = 0 };
+    assert { turbulent_subarray a 0 1 };
+    assert { has_turbulent_length a 1 };
+    assert {
+      forall i: int. 0 <= i < length a ->
+        i = 0 \/ i = 1 \/ i = 2 \/ i = 3 \/ i = 4 \/
+        i = 5 \/ i = 6 \/ i = 7 \/ i = 8
+    };
+    assert { no_turbulent_longer_than a 1 };
+    assert { max_turbulent_length a 1 }
+
+  let lemma test_010_plateau_interruptions () =
+    let a = init 9 [|1; 2; 2; 1; 2; 2; 1; 2; 2|] in
+    assert { length a = 9 };
+    assert { a[0] = 1 };
+    assert { a[1] = 2 };
+    assert { a[2] = 2 };
+    assert { a[3] = 1 };
+    assert { a[4] = 2 };
+    assert { a[5] = 2 };
+    assert { a[6] = 1 };
+    assert { a[7] = 2 };
+    assert { a[8] = 2 };
+    assert { turbulent_subarray a 2 5 };
+    assert { has_turbulent_length a 3 };
+    assert {
+      forall i: int. 0 <= i < length a ->
+        i = 0 \/ i = 1 \/ i = 2 \/ i = 3 \/ i = 4 \/
+        i = 5 \/ i = 6 \/ i = 7 \/ i = 8
+    };
+    assert { no_turbulent_longer_than a 3 };
+    assert { max_turbulent_length a 3 }
+
+end

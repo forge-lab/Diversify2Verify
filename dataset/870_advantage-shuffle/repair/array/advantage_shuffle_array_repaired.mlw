@@ -1,0 +1,174 @@
+module AdvantageShuffle_Array_Spec
+
+  use int.Int
+  use array.Array
+  use array.Init
+  use array.ArrayPermut
+  use array.NumOf
+
+  predicate input_values_in_range (nums1: array int) (nums2: array int) =
+    length nums2 = length nums1 /\
+    forall i: int.
+      0 <= i < length nums1 ->
+        0 <= nums1[i] <= 1000000000 /\ 0 <= nums2[i] <= 1000000000
+
+  predicate beats_at (candidate: array int) (nums2: array int) (i: int) =
+    0 <= i < length candidate /\ 0 <= i < length nums2 /\ candidate[i] > nums2[i]
+
+  function advantage_count (candidate: array int) (nums2: array int) : int =
+    numof (fun i v -> 0 <= i < length nums2 /\ v > nums2[i]) candidate 0 (length candidate)
+
+  predicate valid_permutation_result (nums1: array int) (result: array int) =
+    length result = length nums1 /\ permut_all result nums1
+
+  predicate optimal_advantage_result (nums1: array int) (nums2: array int) (result: array int) =
+    length nums2 = length nums1 /\
+    valid_permutation_result nums1 result /\
+    (forall candidate: array int.
+       valid_permutation_result nums1 candidate ->
+         advantage_count candidate nums2 <= advantage_count result nums2)
+
+  val advantage_shuffle_array (nums1: array int) (nums2: array int) : array int
+    requires { 1 <= length nums1 }
+    requires { length nums2 = length nums1 }
+    requires { input_values_in_range nums1 nums2 }
+    ensures  { optimal_advantage_result nums1 nums2 result }
+
+  let lemma test_000 () =
+    let nums1 = init 5 [|10; 20; 30; 40; 50|] in
+    let nums2 = init 5 [|5; 15; 25; 35; 45|] in
+    let expected = init 5 [|10; 20; 30; 40; 50|] in
+    assert { length nums1 = 5 };
+    assert { length nums2 = 5 };
+    assert { length expected = 5 };
+    assert { nums1[0] = 10 /\ nums1[1] = 20 /\ nums1[2] = 30 /\ nums1[3] = 40 /\ nums1[4] = 50 };
+    assert { nums2[0] = 5 /\ nums2[1] = 15 /\ nums2[2] = 25 /\ nums2[3] = 35 /\ nums2[4] = 45 };
+    assert { expected[0] = 10 /\ expected[1] = 20 /\ expected[2] = 30 /\ expected[3] = 40 /\ expected[4] = 50 };
+    assert { beats_at expected nums2 0 };
+    assert { beats_at expected nums2 1 };
+    assert { beats_at expected nums2 2 };
+    assert { beats_at expected nums2 3 };
+    assert { beats_at expected nums2 4 };
+    assert { advantage_count expected nums2 = 5 };
+    assert { length expected = length nums1 };
+    assert { expected[0] = nums1[0] /\ expected[1] = nums1[1] /\ expected[2] = nums1[2] /\
+             expected[3] = nums1[3] /\ expected[4] = nums1[4] }
+
+  let lemma test_001 () =
+    let nums1 = init 4 [|5; 15; 25; 35|] in
+    let nums2 = init 4 [|10; 20; 30; 40|] in
+    let expected = init 4 [|15; 25; 35; 5|] in
+    assert { length nums1 = 4 };
+    assert { length nums2 = 4 };
+    assert { length expected = 4 };
+    assert { nums1[0] = 5 /\ nums1[1] = 15 /\ nums1[2] = 25 /\ nums1[3] = 35 };
+    assert { nums2[0] = 10 /\ nums2[1] = 20 /\ nums2[2] = 30 /\ nums2[3] = 40 };
+    assert { expected[0] = 15 /\ expected[1] = 25 /\ expected[2] = 35 /\ expected[3] = 5 };
+    assert { beats_at expected nums2 0 };
+    assert { beats_at expected nums2 1 };
+    assert { beats_at expected nums2 2 };
+    assert { not (beats_at expected nums2 3) };
+    assert { advantage_count expected nums2 = 3 };
+    assert { length expected = length nums1 };
+    assert { expected[0] = nums1[1] /\ expected[1] = nums1[2] /\ expected[2] = nums1[3] /\
+             expected[3] = nums1[0] }
+
+  let lemma test_002 () =
+    let nums1 = init 4 [|2; 7; 11; 15|] in
+    let nums2 = init 4 [|1; 10; 4; 11|] in
+    let expected = init 4 [|2; 11; 7; 15|] in
+    assert { length nums1 = 4 };
+    assert { length nums2 = 4 };
+    assert { length expected = 4 };
+    assert { nums1[0] = 2 /\ nums1[1] = 7 /\ nums1[2] = 11 /\ nums1[3] = 15 };
+    assert { nums2[0] = 1 /\ nums2[1] = 10 /\ nums2[2] = 4 /\ nums2[3] = 11 };
+    assert { expected[0] = 2 /\ expected[1] = 11 /\ expected[2] = 7 /\ expected[3] = 15 };
+    assert { beats_at expected nums2 0 };
+    assert { beats_at expected nums2 1 };
+    assert { beats_at expected nums2 2 };
+    assert { beats_at expected nums2 3 };
+    assert { advantage_count expected nums2 = 4 };
+    assert { length expected = length nums1 };
+    assert { expected[0] = nums1[0] /\ expected[1] = nums1[2] /\ expected[2] = nums1[1] /\
+             expected[3] = nums1[3] }
+
+  let lemma test_003 () =
+    let nums1 = init 5 [|100; 90; 80; 70; 60|] in
+    let nums2 = init 5 [|60; 70; 80; 90; 100|] in
+    let expected = init 5 [|70; 80; 90; 100; 60|] in
+    assert { length nums1 = 5 };
+    assert { length nums2 = 5 };
+    assert { length expected = 5 };
+    assert { nums1[0] = 100 /\ nums1[1] = 90 /\ nums1[2] = 80 /\ nums1[3] = 70 /\ nums1[4] = 60 };
+    assert { nums2[0] = 60 /\ nums2[1] = 70 /\ nums2[2] = 80 /\ nums2[3] = 90 /\ nums2[4] = 100 };
+    assert { expected[0] = 70 /\ expected[1] = 80 /\ expected[2] = 90 /\ expected[3] = 100 /\ expected[4] = 60 };
+    assert { beats_at expected nums2 0 };
+    assert { beats_at expected nums2 1 };
+    assert { beats_at expected nums2 2 };
+    assert { beats_at expected nums2 3 };
+    assert { not (beats_at expected nums2 4) };
+    assert { advantage_count expected nums2 = 4 };
+    assert { length expected = length nums1 };
+    assert { expected[0] = nums1[3] /\ expected[1] = nums1[2] /\ expected[2] = nums1[1] /\
+             expected[3] = nums1[0] /\ expected[4] = nums1[4] }
+
+  let lemma test_004 () =
+    let nums1 = init 5 [|9; 12; 24; 22; 15|] in
+    let nums2 = init 5 [|14; 13; 25; 17; 22|] in
+    let expected = init 5 [|22; 15; 9; 24; 12|] in
+    assert { length nums1 = 5 };
+    assert { length nums2 = 5 };
+    assert { length expected = 5 };
+    assert { nums1[0] = 9 /\ nums1[1] = 12 /\ nums1[2] = 24 /\ nums1[3] = 22 /\ nums1[4] = 15 };
+    assert { nums2[0] = 14 /\ nums2[1] = 13 /\ nums2[2] = 25 /\ nums2[3] = 17 /\ nums2[4] = 22 };
+    assert { expected[0] = 22 /\ expected[1] = 15 /\ expected[2] = 9 /\ expected[3] = 24 /\ expected[4] = 12 };
+    assert { beats_at expected nums2 0 };
+    assert { beats_at expected nums2 1 };
+    assert { not (beats_at expected nums2 2) };
+    assert { beats_at expected nums2 3 };
+    assert { not (beats_at expected nums2 4) };
+    assert { advantage_count expected nums2 = 3 };
+    assert { length expected = length nums1 };
+    assert { expected[0] = nums1[3] /\ expected[1] = nums1[4] /\ expected[2] = nums1[0] /\
+             expected[3] = nums1[2] /\ expected[4] = nums1[1] }
+
+  let lemma test_005 () =
+    let nums1 = init 5 [|5; 6; 7; 8; 9|] in
+    let nums2 = init 5 [|1; 2; 3; 4; 5|] in
+    let expected = init 5 [|5; 6; 7; 8; 9|] in
+    assert { length nums1 = 5 };
+    assert { length nums2 = 5 };
+    assert { length expected = 5 };
+    assert { nums1[0] = 5 /\ nums1[1] = 6 /\ nums1[2] = 7 /\ nums1[3] = 8 /\ nums1[4] = 9 };
+    assert { nums2[0] = 1 /\ nums2[1] = 2 /\ nums2[2] = 3 /\ nums2[3] = 4 /\ nums2[4] = 5 };
+    assert { expected[0] = 5 /\ expected[1] = 6 /\ expected[2] = 7 /\ expected[3] = 8 /\ expected[4] = 9 };
+    assert { beats_at expected nums2 0 };
+    assert { beats_at expected nums2 1 };
+    assert { beats_at expected nums2 2 };
+    assert { beats_at expected nums2 3 };
+    assert { beats_at expected nums2 4 };
+    assert { advantage_count expected nums2 = 5 };
+    assert { length expected = length nums1 };
+    assert { expected[0] = nums1[0] /\ expected[1] = nums1[1] /\ expected[2] = nums1[2] /\
+             expected[3] = nums1[3] /\ expected[4] = nums1[4] }
+
+  let lemma test_006 () =
+    let nums1 = init 4 [|5; 6; 7; 8|] in
+    let nums2 = init 4 [|4; 5; 6; 7|] in
+    let expected = init 4 [|5; 6; 7; 8|] in
+    assert { length nums1 = 4 };
+    assert { length nums2 = 4 };
+    assert { length expected = 4 };
+    assert { nums1[0] = 5 /\ nums1[1] = 6 /\ nums1[2] = 7 /\ nums1[3] = 8 };
+    assert { nums2[0] = 4 /\ nums2[1] = 5 /\ nums2[2] = 6 /\ nums2[3] = 7 };
+    assert { expected[0] = 5 /\ expected[1] = 6 /\ expected[2] = 7 /\ expected[3] = 8 };
+    assert { beats_at expected nums2 0 };
+    assert { beats_at expected nums2 1 };
+    assert { beats_at expected nums2 2 };
+    assert { beats_at expected nums2 3 };
+    assert { advantage_count expected nums2 = 4 };
+    assert { length expected = length nums1 };
+    assert { expected[0] = nums1[0] /\ expected[1] = nums1[1] /\ expected[2] = nums1[2] /\
+             expected[3] = nums1[3] }
+
+end

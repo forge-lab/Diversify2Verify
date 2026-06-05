@@ -1,0 +1,232 @@
+module FindAllKDistantIndicesInAnArray_Array_Spec
+
+  use int.Int
+  use int.Abs
+  use array.Array
+  use array.Init
+
+  predicate valid_input (nums: array int) (key: int) (k: int) =
+    1 <= length nums <= 1000 /\
+    (forall i: int. 0 <= i < length nums -> 1 <= nums[i] <= 1000) /\
+    (exists j: int. 0 <= j < length nums /\ nums[j] = key) /\
+    1 <= k <= length nums
+
+  predicate k_distant_index (nums: array int) (key: int) (k: int) (i: int) =
+    0 <= i < length nums /\
+    exists j: int.
+      0 <= j < length nums /\
+      nums[j] = key /\
+      abs (i - j) <= k
+
+  predicate strictly_sorted (a: array int) =
+    forall p q: int. 0 <= p < q < length a -> a[p] < a[q]
+
+  predicate output_spec (nums: array int) (key: int) (k: int) (result: array int) =
+    strictly_sorted result /\
+    (forall p: int. 0 <= p < length result ->
+      k_distant_index nums key k result[p]) /\
+    (forall i: int. k_distant_index nums key k i ->
+      exists p: int. 0 <= p < length result /\ result[p] = i)
+
+  val find_all_k_distant_indices_in_an_array_array (nums: array int) (key: int) (k: int) : array int
+    requires { valid_input nums key k }
+    ensures  { output_spec nums key k result }
+
+  let lemma test_000_python_assertions () =
+    let nums = init 5 [|5; 1; 4; 1; 5|] in
+    let expected = init 5 [|0; 1; 2; 3; 4|] in
+    assert { length nums = 5 };
+    assert { nums[0] = 5 };
+    assert { nums[1] = 1 };
+    assert { nums[2] = 4 };
+    assert { nums[3] = 1 };
+    assert { nums[4] = 5 };
+    assert { valid_input nums 5 2 };
+    assert { length expected = 5 };
+    assert { expected[0] = 0 };
+    assert { expected[1] = 1 };
+    assert { expected[2] = 2 };
+    assert { expected[3] = 3 };
+    assert { expected[4] = 4 };
+    assert { k_distant_index nums 5 2 0 };
+    assert { k_distant_index nums 5 2 1 };
+    assert { k_distant_index nums 5 2 2 };
+    assert { k_distant_index nums 5 2 3 };
+    assert { k_distant_index nums 5 2 4 };
+    assert { strictly_sorted expected };
+    assert { output_spec nums 5 2 expected }
+
+  let lemma test_008_python_assertions () =
+    let nums = init 5 [|1; 2; 3; 4; 5|] in
+    let expected = init 3 [|0; 1; 2|] in
+    assert { length nums = 5 };
+    assert { nums[0] = 1 };
+    assert { nums[1] = 2 };
+    assert { nums[2] = 3 };
+    assert { nums[3] = 4 };
+    assert { nums[4] = 5 };
+    assert { valid_input nums 1 2 };
+    assert { length expected = 3 };
+    assert { expected[0] = 0 };
+    assert { expected[1] = 1 };
+    assert { expected[2] = 2 };
+    assert { k_distant_index nums 1 2 0 };
+    assert { k_distant_index nums 1 2 1 };
+    assert { k_distant_index nums 1 2 2 };
+    assert { not (k_distant_index nums 1 2 3) };
+    assert { not (k_distant_index nums 1 2 4) };
+    assert { strictly_sorted expected };
+    assert { output_spec nums 1 2 expected }
+
+  let lemma test_010_python_assertions () =
+    let nums = init 5 [|1; 2; 3; 4; 5|] in
+    let expected = init 3 [|2; 3; 4|] in
+    assert { length nums = 5 };
+    assert { nums[0] = 1 };
+    assert { nums[1] = 2 };
+    assert { nums[2] = 3 };
+    assert { nums[3] = 4 };
+    assert { nums[4] = 5 };
+    assert { valid_input nums 5 2 };
+    assert { length expected = 3 };
+    assert { expected[0] = 2 };
+    assert { expected[1] = 3 };
+    assert { expected[2] = 4 };
+    assert { not (k_distant_index nums 5 2 0) };
+    assert { not (k_distant_index nums 5 2 1) };
+    assert { k_distant_index nums 5 2 2 };
+    assert { k_distant_index nums 5 2 3 };
+    assert { k_distant_index nums 5 2 4 };
+    assert { strictly_sorted expected };
+    assert { output_spec nums 5 2 expected }
+
+  let lemma test_013_python_assertions () =
+    let nums = init 7 [|3; 4; 9; 1; 3; 9; 5|] in
+    let expected = init 6 [|1; 2; 3; 4; 5; 6|] in
+    assert { length nums = 7 };
+    assert { nums[0] = 3 };
+    assert { nums[1] = 4 };
+    assert { nums[2] = 9 };
+    assert { nums[3] = 1 };
+    assert { nums[4] = 3 };
+    assert { nums[5] = 9 };
+    assert { nums[6] = 5 };
+    assert { valid_input nums 9 1 };
+    assert { length expected = 6 };
+    assert { expected[0] = 1 };
+    assert { expected[1] = 2 };
+    assert { expected[2] = 3 };
+    assert { expected[3] = 4 };
+    assert { expected[4] = 5 };
+    assert { expected[5] = 6 };
+    assert { not (k_distant_index nums 9 1 0) };
+    assert { k_distant_index nums 9 1 1 };
+    assert { k_distant_index nums 9 1 2 };
+    assert { k_distant_index nums 9 1 3 };
+    assert { k_distant_index nums 9 1 4 };
+    assert { k_distant_index nums 9 1 5 };
+    assert { k_distant_index nums 9 1 6 };
+    assert { strictly_sorted expected };
+    assert { output_spec nums 9 1 expected }
+
+  let lemma test_014_python_assertions () =
+    let nums = init 5 [|5; 4; 3; 2; 1|] in
+    let expected = init 2 [|3; 4|] in
+    assert { length nums = 5 };
+    assert { nums[0] = 5 };
+    assert { nums[1] = 4 };
+    assert { nums[2] = 3 };
+    assert { nums[3] = 2 };
+    assert { nums[4] = 1 };
+    assert { valid_input nums 1 1 };
+    assert { length expected = 2 };
+    assert { expected[0] = 3 };
+    assert { expected[1] = 4 };
+    assert { not (k_distant_index nums 1 1 0) };
+    assert { not (k_distant_index nums 1 1 1) };
+    assert { not (k_distant_index nums 1 1 2) };
+    assert { k_distant_index nums 1 1 3 };
+    assert { k_distant_index nums 1 1 4 };
+    assert { strictly_sorted expected };
+    assert { output_spec nums 1 1 expected }
+
+  let lemma test_040_python_assertions () =
+    let nums = init 9 [|10; 20; 30; 40; 50; 40; 30; 20; 10|] in
+    let expected = init 6 [|1; 2; 3; 5; 6; 7|] in
+    assert { length nums = 9 };
+    assert { nums[0] = 10 };
+    assert { nums[1] = 20 };
+    assert { nums[2] = 30 };
+    assert { nums[3] = 40 };
+    assert { nums[4] = 50 };
+    assert { nums[5] = 40 };
+    assert { nums[6] = 30 };
+    assert { nums[7] = 20 };
+    assert { nums[8] = 10 };
+    assert { valid_input nums 30 1 };
+    assert { length expected = 6 };
+    assert { expected[0] = 1 };
+    assert { expected[1] = 2 };
+    assert { expected[2] = 3 };
+    assert { expected[3] = 5 };
+    assert { expected[4] = 6 };
+    assert { expected[5] = 7 };
+    assert { not (k_distant_index nums 30 1 0) };
+    assert { k_distant_index nums 30 1 1 };
+    assert { k_distant_index nums 30 1 2 };
+    assert { k_distant_index nums 30 1 3 };
+    assert { not (k_distant_index nums 30 1 4) };
+    assert { k_distant_index nums 30 1 5 };
+    assert { k_distant_index nums 30 1 6 };
+    assert { k_distant_index nums 30 1 7 };
+    assert { not (k_distant_index nums 30 1 8) };
+    assert { strictly_sorted expected };
+    assert { output_spec nums 30 1 expected }
+
+  let lemma test_050_python_assertions () =
+    let nums = init 13 [|7; 1; 5; 3; 6; 2; 4; 8; 9; 7; 5; 3; 1|] in
+    let expected = init 11 [|0; 1; 2; 3; 6; 7; 8; 9; 10; 11; 12|] in
+    assert { length nums = 13 };
+    assert { nums[0] = 7 };
+    assert { nums[1] = 1 };
+    assert { nums[2] = 5 };
+    assert { nums[3] = 3 };
+    assert { nums[4] = 6 };
+    assert { nums[5] = 2 };
+    assert { nums[6] = 4 };
+    assert { nums[7] = 8 };
+    assert { nums[8] = 9 };
+    assert { nums[9] = 7 };
+    assert { nums[10] = 5 };
+    assert { nums[11] = 3 };
+    assert { nums[12] = 1 };
+    assert { valid_input nums 7 3 };
+    assert { length expected = 11 };
+    assert { expected[0] = 0 };
+    assert { expected[1] = 1 };
+    assert { expected[2] = 2 };
+    assert { expected[3] = 3 };
+    assert { expected[4] = 6 };
+    assert { expected[5] = 7 };
+    assert { expected[6] = 8 };
+    assert { expected[7] = 9 };
+    assert { expected[8] = 10 };
+    assert { expected[9] = 11 };
+    assert { expected[10] = 12 };
+    assert { k_distant_index nums 7 3 0 };
+    assert { k_distant_index nums 7 3 1 };
+    assert { k_distant_index nums 7 3 2 };
+    assert { k_distant_index nums 7 3 3 };
+    assert { not (k_distant_index nums 7 3 4) };
+    assert { not (k_distant_index nums 7 3 5) };
+    assert { k_distant_index nums 7 3 6 };
+    assert { k_distant_index nums 7 3 7 };
+    assert { k_distant_index nums 7 3 8 };
+    assert { k_distant_index nums 7 3 9 };
+    assert { k_distant_index nums 7 3 10 };
+    assert { k_distant_index nums 7 3 11 };
+    assert { k_distant_index nums 7 3 12 };
+    assert { strictly_sorted expected };
+    assert { output_spec nums 7 3 expected }
+
+end

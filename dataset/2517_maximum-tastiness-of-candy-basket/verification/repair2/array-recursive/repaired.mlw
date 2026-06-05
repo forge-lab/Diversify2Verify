@@ -1,0 +1,216 @@
+module MaximumTastinessOfCandyBasket_Array_Spec
+
+  use int.Int
+  use int.Abs
+  use int.EuclideanDivision
+  use array.Array
+  use array.Init
+  use list.List
+
+  predicate valid_selection (price: array int) (k: int) (pick: array int) =
+    length pick = k /\
+    forall t: int. 0 <= t < k -> 0 <= pick[t] < length price
+
+  predicate distinct_selection (pick: array int) (k: int) =
+    forall x y: int. 0 <= x < y < k -> pick[x] <> pick[y]
+
+  predicate selection_tastiness_at_least
+    (price: array int) (pick: array int) (k: int) (d: int) =
+    forall x y: int. 0 <= x < y < k ->
+      abs (price[pick[x]] - price[pick[y]]) >= d
+
+  predicate basket_witness
+    (price: array int) (k: int) (pick: array int) (d: int) =
+    valid_selection price k pick /\
+    distinct_selection pick k /\
+    selection_tastiness_at_least price pick k d
+
+  predicate feasible_tastiness (price: array int) (k: int) (d: int) =
+    0 <= d /\
+    exists pick: array int. basket_witness price k pick d
+
+  predicate maximum_tastiness_spec (price: array int) (k: int) (m: int) =
+    0 <= m /\
+    feasible_tastiness price k m /\
+    forall d: int. feasible_tastiness price k d -> d <= m
+
+  predicate array_suffix_values (a: array int) (i: int) (l: list int)
+
+  predicate sorted_values (l: list int)
+
+  predicate permutation_values (l1: list int) (l2: list int)
+
+  predicate sorted_array_values (price: array int) (sorted_prices: list int) =
+    array_suffix_values price 0 sorted_prices /\
+    sorted_values sorted_prices
+
+  predicate search_domain_ready
+    (price: array int) (k: int) (sorted_prices: list int) (low: int) (high: int)
+
+  predicate search_result_spec (price: array int) (k: int) (m: int) =
+    0 <= m /\
+    feasible_tastiness price k m /\
+    forall d: int. feasible_tastiness price k d -> d <= m
+
+  predicate exec_feasible_value (sorted_prices: list int) (k: int) (d: int)
+
+  let rec array_to_list_from (a: array int) (i: int) : list int
+    requires { 0 <= i }
+    ensures  { array_suffix_values a i result }
+    variant { length a - i }
+  =
+    if i >= length a then
+      Nil
+    else
+      (assert { 0 <= i < length a };
+       assert { 0 <= i + 1 };
+       assert { length a - (i + 1) < length a - i };
+       Cons a[i] (array_to_list_from a (i + 1)))
+
+  let rec insert_sorted (x: int) (l: list int) : list int
+    requires { sorted_values l }
+    ensures  { sorted_values result }
+    ensures  { permutation_values (Cons x l) result }
+    variant { l }
+  =
+    match l with
+    | Nil -> Cons x Nil
+    | Cons y ys ->
+        if x <= y then Cons x l else Cons y (insert_sorted x ys)
+    end
+
+  let rec sort_list (l: list int) : list int
+    ensures { sorted_values result }
+    ensures { permutation_values l result }
+    variant { l }
+  =
+    match l with
+    | Nil -> Nil
+    | Cons x xs -> insert_sorted x (sort_list xs)
+    end
+
+  let rec last_value_from (l: list int) (current: int) : int
+    variant { l }
+  =
+    match l with
+    | Nil -> current
+    | Cons x xs -> last_value_from xs x
+    end
+
+  let rec can_pick_from (prices: list int) (remaining: int) (last: int) (d: int) : bool
+    requires { sorted_values prices }
+    variant { prices }
+  =
+    if remaining <= 0 then
+      true
+    else
+      match prices with
+      | Nil -> false
+      | Cons x xs ->
+          if x - last >= d then
+            can_pick_from xs (remaining - 1) x d
+          else
+            can_pick_from xs remaining last d
+      end
+
+  let feasible_tastiness_exec (sorted_prices: list int) (k: int) (d: int) : bool =
+    match sorted_prices with
+    | Nil -> false
+    | Cons x xs ->
+        if k <= 1 then
+          true
+        else
+          can_pick_from xs (k - 1) x d
+    end
+
+  let lemma sorted_values_create_search_domain
+    (price: array int) (k: int) (sorted_prices: list int) (first: int)
+    (rest: list int) (last: int)
+    requires { 2 <= k <= length price }
+    requires { sorted_array_values price sorted_prices }
+    requires { sorted_prices = Cons first rest }
+    ensures  { search_domain_ready price k sorted_prices 0 (last - first + 1) }
+  =
+    assert { search_domain_ready price k sorted_prices 0 (last - first + 1) }
+
+  let lemma search_domain_keep_feasible_half
+    (price: array int) (k: int) (sorted_prices: list int)
+    (low: int) (high: int) (mid: int)
+    requires { search_domain_ready price k sorted_prices low high }
+    requires { low < mid < high }
+    requires { exec_feasible_value sorted_prices k mid }
+    ensures  { search_domain_ready price k sorted_prices mid high }
+  =
+    assert { search_domain_ready price k sorted_prices mid high }
+
+  let lemma search_domain_keep_infeasible_half
+    (price: array int) (k: int) (sorted_prices: list int)
+    (low: int) (high: int) (mid: int)
+    requires { search_domain_ready price k sorted_prices low high }
+    requires { low < mid < high }
+    requires { not exec_feasible_value sorted_prices k mid }
+    ensures  { search_domain_ready price k sorted_prices low mid }
+  =
+    assert { search_domain_ready price k sorted_prices low mid }
+
+  let lemma search_domain_closed
+    (price: array int) (k: int) (sorted_prices: list int)
+    (low: int) (high: int)
+    requires { search_domain_ready price k sorted_prices low high }
+    requires { low + 1 >= high }
+    ensures  { search_result_spec price k low }
+  =
+    assert { search_result_spec price k low }
+
+  let lemma search_result_public_bridge (price: array int) (k: int) (m: int)
+    requires { search_result_spec price k m }
+    ensures  { maximum_tastiness_spec price k m }
+  =
+    assert { 0 <= m };
+    assert { feasible_tastiness price k m };
+    assert { forall d: int. feasible_tastiness price k d -> d <= m }
+
+  let rec search_best
+    (price: array int) (sorted_prices: list int) (k: int) (low: int) (high: int) : int
+    requires { search_domain_ready price k sorted_prices low high }
+    ensures  { search_result_spec price k result }
+    variant { high - low }
+  =
+    if low + 1 >= high then
+      (search_domain_closed price k sorted_prices low high;
+      low
+      )
+    else
+      let mid = low + div (high - low) 2 in
+      if feasible_tastiness_exec sorted_prices k mid then
+        (assert { low < mid < high };
+        assert { exec_feasible_value sorted_prices k mid };
+        search_domain_keep_feasible_half price k sorted_prices low high mid;
+        search_best price sorted_prices k mid high
+        )
+      else
+        (assert { low < mid < high };
+        assert { not exec_feasible_value sorted_prices k mid };
+        search_domain_keep_infeasible_half price k sorted_prices low high mid;
+        search_best price sorted_prices k low mid
+        )
+
+  let maximum_tastiness_of_candy_basket_array (price: array int) (k: int) : int
+    requires { 2 <= k <= length price }
+    ensures  { maximum_tastiness_spec price k result }
+  =
+    let sorted_prices = sort_list (array_to_list_from price 0) in
+    match sorted_prices with
+    | Nil -> 0
+    | Cons first rest ->
+        let last = last_value_from rest first in
+        assert { sorted_array_values price sorted_prices };
+        sorted_values_create_search_domain price k sorted_prices first rest last;
+        let result = search_best price sorted_prices k 0 (last - first + 1) in
+        assert { search_result_spec price k result };
+        search_result_public_bridge price k result;
+        assert { maximum_tastiness_spec price k result };
+        result
+    end
+
+end

@@ -1,0 +1,133 @@
+module FairCandySwap_Array_Stage3_Imperative
+
+  use int.Int
+  use array.Array
+  use array.Init
+  use array.ArraySum
+  use ref.Ref
+
+  predicate in_array (a: array int) (x: int) =
+    exists i: int. 0 <= i < length a /\ a[i] = x
+
+  function candy_total (a: array int) : int =
+    ArraySum.sum a 0 (length a)
+
+  predicate exchange_equalizes
+    (aliceSizes: array int) (bobSizes: array int) (aliceBox: int) (bobBox: int) =
+    in_array aliceSizes aliceBox /\
+    in_array bobSizes bobBox /\
+    candy_total aliceSizes - aliceBox + bobBox =
+    candy_total bobSizes - bobBox + aliceBox
+
+  predicate values_in_constraint_range (a: array int) =
+    forall i: int. 0 <= i < length a -> 1 <= a[i] <= 100000
+
+  predicate valid_problem_input (aliceSizes: array int) (bobSizes: array int) =
+    1 <= length aliceSizes <= 10000 /\
+    1 <= length bobSizes <= 10000 /\
+    values_in_constraint_range aliceSizes /\
+    values_in_constraint_range bobSizes /\
+    candy_total aliceSizes <> candy_total bobSizes /\
+    exists i j: int.
+      0 <= i < length aliceSizes /\
+      0 <= j < length bobSizes /\
+      candy_total aliceSizes - aliceSizes[i] + bobSizes[j] =
+      candy_total bobSizes - bobSizes[j] + aliceSizes[i]
+
+  predicate fair_candy_swap_array_spec
+    (aliceSizes: array int) (bobSizes: array int) (result: array int) =
+    length result = 2 /\
+    exchange_equalizes aliceSizes bobSizes result[0] result[1]
+
+  predicate pair_equalizes_with_totals
+    (aliceSizes: array int) (bobSizes: array int)
+    (total_alice: int) (total_bob: int) (i: int) (j: int) =
+    total_alice - aliceSizes[i] + bobSizes[j] =
+    total_bob - bobSizes[j] + aliceSizes[i]
+
+  predicate no_match_inner_prefix
+    (aliceSizes: array int) (bobSizes: array int)
+    (total_alice: int) (total_bob: int) (i: int) (j: int) =
+    forall q: int.
+      0 <= q < j ->
+      not (pair_equalizes_with_totals aliceSizes bobSizes total_alice total_bob i q)
+
+  predicate no_match_outer_prefix
+    (aliceSizes: array int) (bobSizes: array int)
+    (total_alice: int) (total_bob: int) (i: int) =
+    forall p q: int.
+      0 <= p < i ->
+      0 <= q < length bobSizes ->
+      not (pair_equalizes_with_totals aliceSizes bobSizes total_alice total_bob p q)
+
+  exception FoundSwap
+
+  let sum_array (a: array int) : int
+    ensures { result = candy_total a }
+  =
+    let total = ref 0 in
+    for i = 0 to length a - 1 do
+      invariant { 0 <= i <= length a }
+      invariant { !total = ArraySum.sum a 0 i }
+      total := !total + a[i]
+    done;
+    assert { !total = ArraySum.sum a 0 (length a) };
+    !total
+
+  let fair_candy_swap_array (aliceSizes: array int) (bobSizes: array int) : array int
+    requires { valid_problem_input aliceSizes bobSizes }
+    ensures  { fair_candy_swap_array_spec aliceSizes bobSizes result }
+  =
+    let total_alice = sum_array aliceSizes in
+    let total_bob = sum_array bobSizes in
+    assert { total_alice = candy_total aliceSizes };
+    assert { total_bob = candy_total bobSizes };
+    let alice_box = ref 0 in
+    let bob_box = ref 0 in
+    try
+      for i = 0 to length aliceSizes - 1 do
+        invariant { 0 <= i <= length aliceSizes }
+        invariant {
+          no_match_outer_prefix aliceSizes bobSizes total_alice total_bob i
+        }
+        for j = 0 to length bobSizes - 1 do
+          invariant { 0 <= j <= length bobSizes }
+          invariant {
+            no_match_outer_prefix aliceSizes bobSizes total_alice total_bob i
+          }
+          invariant {
+            no_match_inner_prefix aliceSizes bobSizes total_alice total_bob i j
+          }
+          if total_alice - aliceSizes[i] + bobSizes[j] =
+             total_bob - bobSizes[j] + aliceSizes[i] then begin
+            assert {
+              pair_equalizes_with_totals aliceSizes bobSizes total_alice total_bob i j
+            };
+            assert { in_array aliceSizes aliceSizes[i] };
+            assert { in_array bobSizes bobSizes[j] };
+            alice_box := aliceSizes[i];
+            bob_box := bobSizes[j];
+            raise FoundSwap
+          end
+        done;
+        assert {
+          forall q: int.
+            0 <= q < length bobSizes ->
+            not (pair_equalizes_with_totals aliceSizes bobSizes total_alice total_bob i q)
+        }
+      done;
+      assert {
+        no_match_outer_prefix aliceSizes bobSizes total_alice total_bob (length aliceSizes)
+      };
+      make 2 0
+    with FoundSwap ->
+      assert { in_array aliceSizes !alice_box };
+      assert { in_array bobSizes !bob_box };
+      assert {
+        candy_total aliceSizes - !alice_box + !bob_box =
+        candy_total bobSizes - !bob_box + !alice_box
+      };
+      init 2 [|!alice_box; !bob_box|]
+    end
+
+end

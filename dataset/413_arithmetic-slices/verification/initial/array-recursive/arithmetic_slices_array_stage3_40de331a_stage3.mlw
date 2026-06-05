@@ -1,0 +1,138 @@
+module ArithmeticSlices_Array_Stage3_Recursive
+
+  use int.Int
+  use array.Array
+  use array.Init
+
+  let rec function is_arithmetic_run (nums: array int) (lo: int) (hi: int) : bool
+    requires { 0 <= lo <= hi < length nums }
+    variant  { hi - lo }
+  =
+    if hi <= lo + 1 then true
+    else if nums[hi] - nums[hi - 1] = nums[lo + 1] - nums[lo] then
+      is_arithmetic_run nums lo (hi - 1)
+    else false
+
+  predicate arithmetic_slice (nums: array int) (lo: int) (hi: int) =
+    0 <= lo /\ lo + 2 <= hi < length nums /\
+    is_arithmetic_run nums lo hi = true /\
+    (forall k: int.
+       lo <= k < hi -> nums[k + 1] - nums[k] = nums[lo + 1] - nums[lo])
+
+  let rec function count_ends_from (nums: array int) (lo: int) (hi: int) : int
+    requires { 0 <= lo }
+    requires { lo + 2 <= hi <= length nums }
+    variant  { length nums - hi }
+  =
+    if hi = length nums then 0
+    else
+      (if is_arithmetic_run nums lo hi then 1 else 0) +
+      count_ends_from nums lo (hi + 1)
+
+  let rec function count_starts_from (nums: array int) (lo: int) : int
+    requires { 0 <= lo <= length nums }
+    variant  { length nums - lo }
+  =
+    if lo + 2 >= length nums then 0
+    else count_ends_from nums lo (lo + 2) + count_starts_from nums (lo + 1)
+
+  function arithmetic_slice_count (nums: array int) : int =
+    count_starts_from nums 0
+
+  let rec function count_starts_for_end_from (nums: array int) (lo: int) (hi: int) : int
+    requires { 0 <= lo <= hi - 2 }
+    requires { hi < length nums }
+    variant  { hi - lo }
+  =
+    if lo = hi - 2 then
+      if is_arithmetic_run nums lo hi then 1 else 0
+    else
+      (if is_arithmetic_run nums lo hi then 1 else 0) +
+      count_starts_for_end_from nums (lo + 1) hi
+
+  let function count_slices_ending_at (nums: array int) (hi: int) : int =
+    if 2 <= hi then
+      if hi < length nums then count_starts_for_end_from nums 0 hi else 0
+    else 0
+
+  let rec function count_endings_from (nums: array int) (i: int) : int
+    requires { 0 <= i }
+    variant  { length nums - i }
+  =
+    if i >= length nums then 0
+    else count_slices_ending_at nums i + count_endings_from nums (i + 1)
+
+  lemma count_starts_for_end_from_nonnegative:
+    forall nums: array int, lo hi: int.
+      0 <= lo <= hi - 2 -> hi < length nums ->
+      count_starts_for_end_from nums lo hi >= 0
+
+  lemma count_slices_ending_at_nonnegative:
+    forall nums: array int, hi: int.
+      count_slices_ending_at nums hi >= 0
+
+  lemma count_endings_from_nonnegative:
+    forall nums: array int, i: int.
+      0 <= i -> count_endings_from nums i >= 0
+
+  lemma count_slices_ending_at_step:
+    forall nums: array int, i: int.
+      2 <= i < length nums ->
+      count_slices_ending_at nums i =
+        (if nums[i] - nums[i - 1] = nums[i - 1] - nums[i - 2] then
+           count_slices_ending_at nums (i - 1) + 1
+         else
+           0)
+
+  lemma arithmetic_slice_count_by_endings:
+    forall nums: array int.
+      arithmetic_slice_count nums = count_endings_from nums 2
+
+  let rec arithmetic_slices_from (nums: array int) (i: int) (prev: int) (total: int) : int
+    requires { 1 <= length nums <= 5000 }
+    requires { forall j: int. 0 <= j < length nums -> -1000 <= nums[j] <= 1000 }
+    requires { 2 <= i <= length nums }
+    requires { prev = count_slices_ending_at nums (i - 1) }
+    requires { total >= 0 }
+    ensures  { result = total + count_endings_from nums i }
+    ensures  { result >= total }
+    variant  { length nums - i }
+  =
+    if i >= length nums then
+      begin
+        assert { count_endings_from nums i = 0 };
+        total
+      end
+    else
+      let current =
+        if nums[i] - nums[i - 1] = nums[i - 1] - nums[i - 2] then
+          prev + 1
+        else
+          0
+      in
+      assert { current = count_slices_ending_at nums i };
+      assert { count_endings_from nums i =
+               count_slices_ending_at nums i + count_endings_from nums (i + 1) };
+      assert { total + count_endings_from nums i =
+               total + current + count_endings_from nums (i + 1) };
+      arithmetic_slices_from nums (i + 1) current (total + current)
+
+  let arithmetic_slices_array (nums: array int) : int
+    requires { 1 <= length nums <= 5000 }
+    requires { forall i: int. 0 <= i < length nums -> -1000 <= nums[i] <= 1000 }
+    ensures  { result = arithmetic_slice_count nums }
+    ensures  { result >= 0 }
+  =
+    if length nums < 3 then
+      begin
+        assert { arithmetic_slice_count nums = 0 };
+        0
+      end
+    else
+      begin
+        assert { count_slices_ending_at nums 1 = 0 };
+        assert { arithmetic_slice_count nums = count_endings_from nums 2 };
+        arithmetic_slices_from nums 2 0 0
+      end
+
+end

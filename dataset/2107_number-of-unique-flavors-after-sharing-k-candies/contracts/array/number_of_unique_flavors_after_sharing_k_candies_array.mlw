@@ -1,0 +1,165 @@
+module NumberOfUniqueFlavorsAfterSharingKCandies_Array_Spec
+
+  use int.Int
+  use int.NumOf as IntNumOf
+  use array.Array
+  use array.Init
+
+  predicate valid_input (candies: array int) (k: int) =
+    0 <= length candies <= 100000 /\
+    0 <= k <= length candies /\
+    forall i: int. 0 <= i < length candies -> 1 <= candies[i] <= 100000
+
+  predicate kept_flavor_after_sharing
+    (candies: array int) (k: int) (start: int) (flavor: int) =
+    0 <= start <= length candies - k /\
+    1 <= flavor <= 100000 /\
+    exists i: int.
+      0 <= i < length candies /\
+      (i < start \/ start + k <= i) /\
+      candies[i] = flavor
+
+  function unique_flavors_kept
+    (candies: array int) (k: int) (start: int) : int =
+    IntNumOf.numof
+      (fun flavor -> kept_flavor_after_sharing candies k start flavor)
+      1 100001
+
+  predicate optimal_kept_flavor_count
+    (candies: array int) (k: int) (answer: int) =
+    valid_input candies k /\
+    0 <= answer <= length candies /\
+    (exists start: int.
+       0 <= start <= length candies - k /\
+       answer = unique_flavors_kept candies k start) /\
+    (forall start: int.
+       0 <= start <= length candies - k ->
+       unique_flavors_kept candies k start <= answer)
+
+  val number_of_unique_flavors_after_sharing_k_candies_array
+    (candies: array int) (k: int) : int
+    requires { valid_input candies k }
+    ensures  { optimal_kept_flavor_count candies k result }
+
+  let lemma test_000_empty_k_zero () =
+    let candies = init 0 (fun _ -> 1) in
+    assert { length candies = 0 };
+    assert { valid_input candies 0 };
+    assert {
+      forall flavor: int.
+        1 <= flavor <= 100000 ->
+        not (kept_flavor_after_sharing candies 0 0 flavor)
+    };
+    assert { unique_flavors_kept candies 0 0 = 0 };
+    assert { optimal_kept_flavor_count candies 0 0 }
+
+  let lemma test_001_all_same_upper_flavor () =
+    let candies = init 4 [|100000; 100000; 100000; 100000|] in
+    assert { length candies = 4 };
+    assert { candies[0] = 100000 };
+    assert { candies[1] = 100000 };
+    assert { candies[2] = 100000 };
+    assert { candies[3] = 100000 };
+    assert { valid_input candies 2 };
+    assert { kept_flavor_after_sharing candies 2 0 100000 };
+    assert { kept_flavor_after_sharing candies 2 1 100000 };
+    assert { kept_flavor_after_sharing candies 2 2 100000 };
+    assert { unique_flavors_kept candies 2 0 = 1 };
+    assert { unique_flavors_kept candies 2 1 = 1 };
+    assert { unique_flavors_kept candies 2 2 = 1 };
+    assert { optimal_kept_flavor_count candies 2 1 }
+
+  let lemma test_003_share_all_candies () =
+    let candies = init 3 [|1; 2; 3|] in
+    assert { length candies = 3 };
+    assert { candies[0] = 1 };
+    assert { candies[1] = 2 };
+    assert { candies[2] = 3 };
+    assert { valid_input candies 3 };
+    assert {
+      forall flavor: int.
+        1 <= flavor <= 100000 ->
+        not (kept_flavor_after_sharing candies 3 0 flavor)
+    };
+    assert { unique_flavors_kept candies 3 0 = 0 };
+    assert { optimal_kept_flavor_count candies 3 0 }
+
+  let lemma test_004_duplicate_heavy_two_flavors () =
+    let candies = init 6 [|2; 2; 2; 2; 3; 3|] in
+    assert { length candies = 6 };
+    assert { candies[0] = 2 };
+    assert { candies[1] = 2 };
+    assert { candies[2] = 2 };
+    assert { candies[3] = 2 };
+    assert { candies[4] = 3 };
+    assert { candies[5] = 3 };
+    assert { valid_input candies 2 };
+    assert { kept_flavor_after_sharing candies 2 3 2 };
+    assert { kept_flavor_after_sharing candies 2 3 3 };
+    assert { unique_flavors_kept candies 2 3 = 2 };
+    assert {
+      forall start: int.
+        0 <= start <= length candies - 2 ->
+        unique_flavors_kept candies 2 start <= 2
+    };
+    assert { optimal_kept_flavor_count candies 2 2 }
+
+  let lemma test_005_statement_example () =
+    let candies = init 6 [|1; 2; 2; 3; 4; 3|] in
+    assert { length candies = 6 };
+    assert { candies[0] = 1 };
+    assert { candies[1] = 2 };
+    assert { candies[2] = 2 };
+    assert { candies[3] = 3 };
+    assert { candies[4] = 4 };
+    assert { candies[5] = 3 };
+    assert { valid_input candies 3 };
+    assert { kept_flavor_after_sharing candies 3 1 1 };
+    assert { kept_flavor_after_sharing candies 3 1 4 };
+    assert { kept_flavor_after_sharing candies 3 1 3 };
+    assert { not (kept_flavor_after_sharing candies 3 1 2) };
+    assert { unique_flavors_kept candies 3 1 = 3 };
+    assert { optimal_kept_flavor_count candies 3 3 }
+
+  let lemma test_007_k_zero_all_distinct () =
+    let candies = init 5 [|10; 20; 30; 40; 50|] in
+    assert { length candies = 5 };
+    assert { candies[0] = 10 };
+    assert { candies[1] = 20 };
+    assert { candies[2] = 30 };
+    assert { candies[3] = 40 };
+    assert { candies[4] = 50 };
+    assert { valid_input candies 0 };
+    assert { kept_flavor_after_sharing candies 0 0 10 };
+    assert { kept_flavor_after_sharing candies 0 0 20 };
+    assert { kept_flavor_after_sharing candies 0 0 30 };
+    assert { kept_flavor_after_sharing candies 0 0 40 };
+    assert { kept_flavor_after_sharing candies 0 0 50 };
+    assert { unique_flavors_kept candies 0 0 = 5 };
+    assert { optimal_kept_flavor_count candies 0 5 }
+
+  let lemma test_009_share_full_distinct_array () =
+    let candies =
+      init 10 [|1; 2; 3; 4; 5; 6; 7; 8; 9; 10|]
+    in
+    assert { length candies = 10 };
+    assert { candies[0] = 1 };
+    assert { candies[1] = 2 };
+    assert { candies[2] = 3 };
+    assert { candies[3] = 4 };
+    assert { candies[4] = 5 };
+    assert { candies[5] = 6 };
+    assert { candies[6] = 7 };
+    assert { candies[7] = 8 };
+    assert { candies[8] = 9 };
+    assert { candies[9] = 10 };
+    assert { valid_input candies 10 };
+    assert {
+      forall flavor: int.
+        1 <= flavor <= 100000 ->
+        not (kept_flavor_after_sharing candies 10 0 flavor)
+    };
+    assert { unique_flavors_kept candies 10 0 = 0 };
+    assert { optimal_kept_flavor_count candies 10 0 }
+
+end

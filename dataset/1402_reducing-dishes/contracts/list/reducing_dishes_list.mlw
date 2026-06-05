@@ -1,0 +1,122 @@
+module ReducingDishes_List_Spec
+
+  use int.Int
+  use list.List
+  use list.NumOcc
+
+  let rec function like_time_from (time: int) (cooked: list int) : int
+    variant { cooked }
+  =
+    match cooked with
+    | Nil -> 0
+    | Cons x xs -> time * x + like_time_from (time + 1) xs
+    end
+
+  function like_time (cooked: list int) : int =
+    like_time_from 1 cooked
+
+  predicate sub_multiset (chosen: list int) (available: list int) =
+    forall x: int. num_occ x chosen <= num_occ x available
+
+  predicate max_like_time (satisfaction: list int) (best: int) =
+    (exists cooked: list int.
+       sub_multiset cooked satisfaction /\
+       best = like_time cooked) /\
+    (forall other: list int.
+       sub_multiset other satisfaction -> like_time other <= best)
+
+  val reducing_dishes_list (satisfaction: list int) : int
+    ensures { max_like_time satisfaction result }
+
+  let lemma check_test_001 () =
+    let satisfaction = Cons 0 Nil in
+    let cooked: list int = Nil in
+    assert { like_time_from 1 cooked = 0 };
+    assert { like_time cooked = 0 };
+    assert { num_occ 0 cooked = 0 };
+    assert { num_occ 0 satisfaction = 1 };
+    assert { sub_multiset cooked satisfaction };
+    assert { max_like_time satisfaction 0 }
+
+  let lemma check_test_002 () =
+    let satisfaction = Cons (-1) Nil in
+    let cooked: list int = Nil in
+    assert { like_time_from 1 cooked = 0 };
+    assert { like_time cooked = 0 };
+    assert { num_occ (-1) cooked = 0 };
+    assert { num_occ (-1) satisfaction = 1 };
+    assert { sub_multiset cooked satisfaction };
+    assert { max_like_time satisfaction 0 }
+
+  let lemma check_test_005 () =
+    let satisfaction = Cons (-1000) (Cons 1000 (Cons (-500) (Cons 500 Nil))) in
+    let cooked = Cons (-500) (Cons 500 (Cons 1000 Nil)) in
+    assert { like_time_from 3 (Cons 1000 Nil) = 3000 };
+    assert { like_time_from 2 (Cons 500 (Cons 1000 Nil)) = 4000 };
+    assert { like_time_from 1 cooked = 3500 };
+    assert { like_time cooked = 3500 };
+    assert { num_occ (-500) cooked = 1 };
+    assert { num_occ (-500) satisfaction = 1 };
+    assert { num_occ 500 cooked = 1 };
+    assert { num_occ 500 satisfaction = 1 };
+    assert { num_occ 1000 cooked = 1 };
+    assert { num_occ 1000 satisfaction = 1 };
+    assert { sub_multiset cooked satisfaction };
+    assert { max_like_time satisfaction 3500 }
+
+  let lemma check_test_007 () =
+    let satisfaction =
+      Cons 1000 (Cons (-1000) (Cons 1000 (Cons (-1000) (Cons 1000 Nil)))) in
+    let optimal_order =
+      Cons (-1000) (Cons (-1000) (Cons 1000 (Cons 1000 (Cons 1000 Nil)))) in
+    assert { like_time_from 5 (Cons 1000 Nil) = 5000 };
+    assert { like_time_from 4 (Cons 1000 (Cons 1000 Nil)) = 9000 };
+    assert { like_time_from 3 (Cons 1000 (Cons 1000 (Cons 1000 Nil))) = 12000 };
+    assert { like_time_from 2 (Cons (-1000) (Cons 1000 (Cons 1000 (Cons 1000 Nil)))) = 10000 };
+    assert { like_time optimal_order = 9000 };
+    assert { num_occ (-1000) optimal_order = 2 };
+    assert { num_occ (-1000) satisfaction = 2 };
+    assert { num_occ 1000 optimal_order = 3 };
+    assert { num_occ 1000 satisfaction = 3 };
+    assert { sub_multiset optimal_order satisfaction };
+    assert { max_like_time satisfaction 9000 }
+
+  let lemma check_test_008 () =
+    let satisfaction = Cons (-1) (Cons (-8) (Cons 0 (Cons 5 (Cons (-9) Nil)))) in
+    let cooked = Cons (-1) (Cons 0 (Cons 5 Nil)) in
+    assert { like_time_from 3 (Cons 5 Nil) = 15 };
+    assert { like_time_from 2 (Cons 0 (Cons 5 Nil)) = 15 };
+    assert { like_time_from 1 cooked = 14 };
+    assert { like_time cooked = 14 };
+    assert { num_occ (-1) cooked = 1 };
+    assert { num_occ (-1) satisfaction = 1 };
+    assert { num_occ 0 cooked = 1 };
+    assert { num_occ 0 satisfaction = 1 };
+    assert { num_occ 5 cooked = 1 };
+    assert { num_occ 5 satisfaction = 1 };
+    assert { sub_multiset cooked satisfaction };
+    assert { max_like_time satisfaction 14 }
+
+  let lemma check_test_010 () =
+    let satisfaction = Cons 1 (Cons 2 (Cons 3 (Cons 4 (Cons 5 Nil)))) in
+    let cooked = satisfaction in
+    assert { like_time_from 5 (Cons 5 Nil) = 25 };
+    assert { like_time_from 4 (Cons 4 (Cons 5 Nil)) = 41 };
+    assert { like_time_from 3 (Cons 3 (Cons 4 (Cons 5 Nil))) = 50 };
+    assert { like_time_from 2 (Cons 2 (Cons 3 (Cons 4 (Cons 5 Nil)))) = 54 };
+    assert { like_time_from 1 cooked = 55 };
+    assert { like_time cooked = 55 };
+    assert { sub_multiset cooked satisfaction };
+    assert { max_like_time satisfaction 55 }
+
+  let lemma check_test_012 () =
+    let satisfaction = Cons (-10) (Cons (-20) (Cons (-30) (Cons (-40) (Cons (-50) Nil)))) in
+    let cooked: list int = Nil in
+    assert { like_time_from 1 cooked = 0 };
+    assert { like_time cooked = 0 };
+    assert { num_occ (-10) cooked = 0 };
+    assert { num_occ (-10) satisfaction = 1 };
+    assert { sub_multiset cooked satisfaction };
+    assert { max_like_time satisfaction 0 }
+
+end

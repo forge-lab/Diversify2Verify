@@ -1,0 +1,463 @@
+== Stage 1: first prover on whole file ==
+Running in /Users/rubenm/Desktop/Diversify2Verify/codex-runs/dataset-merge-verification/stage3a-repair/1855_maximum-distance-between-a-pair-of-values/list-recursive/maximum_distance_between_a_pair_of_values_list_stage3_e24c1324_stage3/generated/why3: why3 session create -o /Users/rubenm/Desktop/Diversify2Verify/codex-runs/dataset-merge-verification/stage3a-repair/1855_maximum-distance-between-a-pair-of-values/list-recursive/maximum_distance_between_a_pair_of_values_list_stage3_e24c1324_stage3/generated/why3/.why3_sessions/repaired_stage1 -P Z3,4.8.6 -t 10 -m 8192 repaired.mlw
+Session created successfully
+Running in /Users/rubenm/Desktop/Diversify2Verify/codex-runs/dataset-merge-verification/stage3a-repair/1855_maximum-distance-between-a-pair-of-values/list-recursive/maximum_distance_between_a_pair_of_values_list_stage3_e24c1324_stage3/generated/why3: why3 bench /Users/rubenm/Desktop/Diversify2Verify/codex-runs/dataset-merge-verification/stage3a-repair/1855_maximum-distance-between-a-pair-of-values/list-recursive/maximum_distance_between_a_pair_of_values_list_stage3_e24c1324_stage3/generated/why3/.why3_sessions/repaired_stage1
+Progress: 6/1/0                       Progress: 5/2/0                       Progress: 4/3/0                       Progress: 3/4/0                       Progress: 2/5/0                       Progress: 1/6/0                       Progress: 1/1/2                       Progress: 0/2/2                       Progress: 0/0/1                       
+Replay completed, saving session... done
+== Stage 1 stats ==
+= Statistics for session /Users/rubenm/Desktop/Diversify2Verify/codex-runs/dataset-merge-verification/stage3a-repair/1855_maximum-distance-between-a-pair-of-values/list-recursive/maximum_distance_between_a_pair_of_values_list_stage3_e24c1324_stage3/generated/why3/.why3_sessions/repaired_stage1
+
+== Number of root goals ==
+  total: 7  proved: 5
+
+== Number of sub goals ==
+  total: 0  proved: 0
+
+== Goals not proved ==
+  +-- file [../../repaired.mlw]
+    +-- theory MaximumDistanceBetweenAPairOfValues_List_Stage3_Recursive
+      +-- goal count_valid_prefix'vc
+      +-- goal combine_suffix_max_distance'vc
+  
+== Goals proved by only one prover ==
+  +-- file [../../repaired.mlw]
+    +-- theory MaximumDistanceBetweenAPairOfValues_List_Stage3_Recursive
+      +-- goal non_increasing'vc: Z3 4.8.6
+      +-- goal drop'vc: Z3 4.8.6
+      +-- goal prefix_valid_for'vc: Z3 4.8.6
+      +-- goal max_distance_from_suffixes'vc: Z3 4.8.6
+      +-- goal maximum_distance_between_a_pair_of_values_list'vc: Z3 4.8.6
+  
+1 session(s) read, with a total of 7 proof goals.
+== Unproved root goals after first prover ==
+MaximumDistanceBetweenAPairOfValues_List_Stage3_Recursive	count_valid_prefix'vc
+MaximumDistanceBetweenAPairOfValues_List_Stage3_Recursive	combine_suffix_max_distance'vc
+== Stage 1: trying remaining goals with prover Alt-Ergo,2.4.0 ==
+---- stage1 | prover: Alt-Ergo,2.4.0 | theory: MaximumDistanceBetweenAPairOfValues_List_Stage3_Recursive | goal: count_valid_prefix'vc ----
+File repaired.mlw:
+Goal count_valid_prefix'vc.
+Prover result is: Timeout (10.00s, 254682 steps).
+---- stage1 | prover: Alt-Ergo,2.4.0 | theory: MaximumDistanceBetweenAPairOfValues_List_Stage3_Recursive | goal: combine_suffix_max_distance'vc ----
+File repaired.mlw:
+Goal combine_suffix_max_distance'vc.
+Prover result is: Timeout (10.00s, 34551 steps).
+Remaining after prover Alt-Ergo,2.4.0: 2
+== Stage 1: trying remaining goals with prover CVC4,1.8 ==
+---- stage1 | prover: CVC4,1.8 | theory: MaximumDistanceBetweenAPairOfValues_List_Stage3_Recursive | goal: count_valid_prefix'vc ----
+File repaired.mlw:
+Goal count_valid_prefix'vc.
+Prover result is: Timeout (10.00s, 321240 steps).
+---- stage1 | prover: CVC4,1.8 | theory: MaximumDistanceBetweenAPairOfValues_List_Stage3_Recursive | goal: combine_suffix_max_distance'vc ----
+File repaired.mlw:
+Goal combine_suffix_max_distance'vc.
+Prover result is: Timeout (10.00s, 420175 steps).
+Remaining after prover CVC4,1.8: 2
+== Goals still unproved after stage 1 ==
+MaximumDistanceBetweenAPairOfValues_List_Stage3_Recursive	count_valid_prefix'vc
+MaximumDistanceBetweenAPairOfValues_List_Stage3_Recursive	combine_suffix_max_distance'vc
+== Stage 2: split_vc on unproved goal ==
+Target theory: MaximumDistanceBetweenAPairOfValues_List_Stage3_Recursive
+Target goal  : count_valid_prefix'vc
+---- stage2 | prover: Z3,4.8.6 | theory: MaximumDistanceBetweenAPairOfValues_List_Stage3_Recursive | goal: count_valid_prefix'vc ----
+Transforms: split_vc
+File "repaired.mlw", line 106, characters 19-38:
+Sub-goal Assertion of goal count_valid_prefix'vc.
+Prover result is: Valid (0.01s, 14512 steps).
+
+File "repaired.mlw", line 107, characters 14-39:
+Sub-goal Variant decrease of goal count_valid_prefix'vc.
+Prover result is: Valid (0.01s, 15590 steps).
+
+File "repaired.mlw", line 107, characters 14-39:
+Sub-goal Precondition of goal count_valid_prefix'vc.
+Prover result is: Valid (0.01s, 995 steps).
+
+File "repaired.mlw", line 89, characters 14-25:
+Sub-goal Postcondition of goal count_valid_prefix'vc.
+Prover result is: Valid (0.01s, 41830 steps).
+
+File "repaired.mlw", line 90, characters 14-33:
+Sub-goal Postcondition of goal count_valid_prefix'vc.
+Prover result is: Valid (0.01s, 43093 steps).
+
+File "repaired.mlw", line 91, characters 14-42:
+Sub-goal Postcondition of goal count_valid_prefix'vc.
+Prover result is: Valid (0.01s, 42949 steps).
+
+File "repaired.mlw", line 92, characters 28-52:
+Sub-goal Postcondition of goal count_valid_prefix'vc.
+Prover result is: Valid (0.02s, 51824 steps).
+
+File "repaired.mlw", line 93, characters 73-83:
+Sub-goal Postcondition of goal count_valid_prefix'vc.
+Prover result is: Timeout (10.00s, 157682766 steps).
+
+File "repaired.mlw", line 94, characters 14-80:
+Sub-goal Postcondition of goal count_valid_prefix'vc.
+Prover result is: Valid (0.01s, 21998 steps).
+
+File "repaired.mlw", line 96, character 6 to line 99, character 9:
+Sub-goal Postcondition of goal count_valid_prefix'vc.
+Prover result is: Valid (0.02s, 103105 steps).
+---- stage2 | prover: Alt-Ergo,2.4.0 | theory: MaximumDistanceBetweenAPairOfValues_List_Stage3_Recursive | goal: count_valid_prefix'vc ----
+Transforms: split_vc
+File "repaired.mlw", line 106, characters 19-38:
+Sub-goal Assertion of goal count_valid_prefix'vc.
+Prover result is: Valid (0.01s, 156 steps).
+
+File "repaired.mlw", line 107, characters 14-39:
+Sub-goal Variant decrease of goal count_valid_prefix'vc.
+Prover result is: Valid (0.01s, 46 steps).
+
+File "repaired.mlw", line 107, characters 14-39:
+Sub-goal Precondition of goal count_valid_prefix'vc.
+Prover result is: Valid (0.01s, 10 steps).
+
+File "repaired.mlw", line 89, characters 14-25:
+Sub-goal Postcondition of goal count_valid_prefix'vc.
+Prover result is: Valid (0.02s, 378 steps).
+
+File "repaired.mlw", line 90, characters 14-33:
+Sub-goal Postcondition of goal count_valid_prefix'vc.
+Prover result is: Valid (0.02s, 382 steps).
+
+File "repaired.mlw", line 91, characters 14-42:
+Sub-goal Postcondition of goal count_valid_prefix'vc.
+Prover result is: Valid (0.02s, 433 steps).
+
+File "repaired.mlw", line 92, characters 28-52:
+Sub-goal Postcondition of goal count_valid_prefix'vc.
+Prover result is: Valid (0.02s, 625 steps).
+
+File "repaired.mlw", line 93, characters 73-83:
+Sub-goal Postcondition of goal count_valid_prefix'vc.
+Prover result is: Timeout (10.00s, 275741 steps).
+
+File "repaired.mlw", line 94, characters 14-80:
+Sub-goal Postcondition of goal count_valid_prefix'vc.
+Prover result is: Valid (0.01s, 57 steps).
+
+File "repaired.mlw", line 96, character 6 to line 99, character 9:
+Sub-goal Postcondition of goal count_valid_prefix'vc.
+Prover result is: Valid (0.14s, 2976 steps).
+---- stage2 | prover: CVC4,1.8 | theory: MaximumDistanceBetweenAPairOfValues_List_Stage3_Recursive | goal: count_valid_prefix'vc ----
+Transforms: split_vc
+File "repaired.mlw", line 106, characters 19-38:
+Sub-goal Assertion of goal count_valid_prefix'vc.
+Prover result is: Valid (0.02s, 3621 steps).
+
+File "repaired.mlw", line 107, characters 14-39:
+Sub-goal Variant decrease of goal count_valid_prefix'vc.
+Prover result is: Valid (0.02s, 3198 steps).
+
+File "repaired.mlw", line 107, characters 14-39:
+Sub-goal Precondition of goal count_valid_prefix'vc.
+Prover result is: Valid (0.01s, 2503 steps).
+
+File "repaired.mlw", line 89, characters 14-25:
+Sub-goal Postcondition of goal count_valid_prefix'vc.
+Prover result is: Unknown (unknown + incomplete) (0.02s, 5151 steps).
+
+File "repaired.mlw", line 90, characters 14-33:
+Sub-goal Postcondition of goal count_valid_prefix'vc.
+Prover result is: Unknown (unknown + incomplete) (0.02s, 5292 steps).
+
+File "repaired.mlw", line 91, characters 14-42:
+Sub-goal Postcondition of goal count_valid_prefix'vc.
+Prover result is: Unknown (unknown + incomplete) (0.02s, 5296 steps).
+
+File "repaired.mlw", line 92, characters 28-52:
+Sub-goal Postcondition of goal count_valid_prefix'vc.
+Prover result is: Unknown (unknown + incomplete) (0.02s, 5361 steps).
+
+File "repaired.mlw", line 93, characters 73-83:
+Sub-goal Postcondition of goal count_valid_prefix'vc.
+Prover result is: Unknown (unknown + incomplete) (0.02s, 5524 steps).
+
+File "repaired.mlw", line 94, characters 14-80:
+Sub-goal Postcondition of goal count_valid_prefix'vc.
+Prover result is: Valid (0.02s, 6205 steps).
+
+File "repaired.mlw", line 96, character 6 to line 99, character 9:
+Sub-goal Postcondition of goal count_valid_prefix'vc.
+Prover result is: Unknown (unknown + incomplete) (0.02s, 6144 steps).
+== Stage 2: split_vc on unproved goal ==
+Target theory: MaximumDistanceBetweenAPairOfValues_List_Stage3_Recursive
+Target goal  : combine_suffix_max_distance'vc
+---- stage2 | prover: Z3,4.8.6 | theory: MaximumDistanceBetweenAPairOfValues_List_Stage3_Recursive | goal: combine_suffix_max_distance'vc ----
+Transforms: split_vc
+File "repaired.mlw", line 121, characters 13-22:
+Sub-goal Assertion of goal combine_suffix_max_distance'vc.
+Prover result is: Valid (0.01s, 19107 steps).
+
+File "repaired.mlw", line 122, characters 13-22:
+Sub-goal Assertion of goal combine_suffix_max_distance'vc.
+Prover result is: Valid (0.01s, 19187 steps).
+
+File "repaired.mlw", line 123, characters 13-19:
+Sub-goal Assertion of goal combine_suffix_max_distance'vc.
+Prover result is: Valid (0.01s, 20100 steps).
+
+File "repaired.mlw", line 124, characters 13-60:
+Sub-goal Assertion of goal combine_suffix_max_distance'vc.
+Prover result is: Timeout (10.00s, 344394445 steps).
+
+File "repaired.mlw", line 126, characters 48-58:
+Sub-goal Assertion of goal combine_suffix_max_distance'vc.
+Prover result is: Timeout (10.00s, 481110430 steps).
+
+File "repaired.mlw", line 119, characters 15-57:
+Sub-goal Postcondition of goal combine_suffix_max_distance'vc.
+Prover result is: Valid (0.01s, 24534 steps).
+---- stage2 | prover: Alt-Ergo,2.4.0 | theory: MaximumDistanceBetweenAPairOfValues_List_Stage3_Recursive | goal: combine_suffix_max_distance'vc ----
+Transforms: split_vc
+File "repaired.mlw", line 121, characters 13-22:
+Sub-goal Assertion of goal combine_suffix_max_distance'vc.
+Prover result is: Valid (0.01s, 15 steps).
+
+File "repaired.mlw", line 122, characters 13-22:
+Sub-goal Assertion of goal combine_suffix_max_distance'vc.
+Prover result is: Valid (0.01s, 16 steps).
+
+File "repaired.mlw", line 123, characters 13-19:
+Sub-goal Assertion of goal combine_suffix_max_distance'vc.
+Prover result is: Valid (0.01s, 12 steps).
+
+File "repaired.mlw", line 124, characters 13-60:
+Sub-goal Assertion of goal combine_suffix_max_distance'vc.
+Prover result is: Timeout (10.00s, 41920 steps).
+
+File "repaired.mlw", line 126, characters 48-58:
+Sub-goal Assertion of goal combine_suffix_max_distance'vc.
+Prover result is: Timeout (10.00s, 36488 steps).
+
+File "repaired.mlw", line 119, characters 15-57:
+Sub-goal Postcondition of goal combine_suffix_max_distance'vc.
+Prover result is: Valid (0.01s, 109 steps).
+---- stage2 | prover: CVC4,1.8 | theory: MaximumDistanceBetweenAPairOfValues_List_Stage3_Recursive | goal: combine_suffix_max_distance'vc ----
+Transforms: split_vc
+File "repaired.mlw", line 121, characters 13-22:
+Sub-goal Assertion of goal combine_suffix_max_distance'vc.
+Prover result is: Valid (0.02s, 3792 steps).
+
+File "repaired.mlw", line 122, characters 13-22:
+Sub-goal Assertion of goal combine_suffix_max_distance'vc.
+Prover result is: Valid (0.02s, 3805 steps).
+
+File "repaired.mlw", line 123, characters 13-19:
+Sub-goal Assertion of goal combine_suffix_max_distance'vc.
+Prover result is: Valid (0.02s, 3320 steps).
+
+File "repaired.mlw", line 124, characters 13-60:
+Sub-goal Assertion of goal combine_suffix_max_distance'vc.
+Prover result is: Timeout (10.00s, 411612 steps).
+
+File "repaired.mlw", line 126, characters 48-58:
+Sub-goal Assertion of goal combine_suffix_max_distance'vc.
+Prover result is: Timeout (10.00s, 393211 steps).
+
+File "repaired.mlw", line 119, characters 15-57:
+Sub-goal Postcondition of goal combine_suffix_max_distance'vc.
+Prover result is: Valid (0.02s, 4465 steps).
+== Goals still unproved after stage 2 (split_vc) ==
+MaximumDistanceBetweenAPairOfValues_List_Stage3_Recursive	count_valid_prefix'vc
+MaximumDistanceBetweenAPairOfValues_List_Stage3_Recursive	combine_suffix_max_distance'vc
+== Stage 3: split_vc + inline_all on still-unproved goal ==
+Target theory: MaximumDistanceBetweenAPairOfValues_List_Stage3_Recursive
+Target goal  : count_valid_prefix'vc
+---- stage3 | prover: Z3,4.8.6 | theory: MaximumDistanceBetweenAPairOfValues_List_Stage3_Recursive | goal: count_valid_prefix'vc ----
+Transforms: split_vc inline_all
+File "repaired.mlw", line 106, characters 19-38:
+Sub-goal Assertion of goal count_valid_prefix'vc.
+Prover result is: Valid (0.01s, 14074 steps).
+
+File "repaired.mlw", line 107, characters 14-39:
+Sub-goal Variant decrease of goal count_valid_prefix'vc.
+Prover result is: Valid (0.01s, 15158 steps).
+
+File "repaired.mlw", line 107, characters 14-39:
+Sub-goal Precondition of goal count_valid_prefix'vc.
+Prover result is: Valid (0.01s, 1035 steps).
+
+File "repaired.mlw", line 89, characters 14-25:
+Sub-goal Postcondition of goal count_valid_prefix'vc.
+Prover result is: Valid (0.01s, 46703 steps).
+
+File "repaired.mlw", line 90, characters 14-33:
+Sub-goal Postcondition of goal count_valid_prefix'vc.
+Prover result is: Valid (0.01s, 49882 steps).
+
+File "repaired.mlw", line 91, characters 14-42:
+Sub-goal Postcondition of goal count_valid_prefix'vc.
+Prover result is: Valid (0.01s, 48669 steps).
+
+File "repaired.mlw", line 92, characters 28-52:
+Sub-goal Postcondition of goal count_valid_prefix'vc.
+Prover result is: Valid (0.02s, 78189 steps).
+
+File "repaired.mlw", line 93, characters 73-83:
+Sub-goal Postcondition of goal count_valid_prefix'vc.
+Prover result is: Timeout (10.00s, 146986528 steps).
+
+File "repaired.mlw", line 94, characters 14-80:
+Sub-goal Postcondition of goal count_valid_prefix'vc.
+Prover result is: Valid (0.01s, 26858 steps).
+
+File "repaired.mlw", line 96, character 6 to line 99, character 9:
+Sub-goal Postcondition of goal count_valid_prefix'vc.
+Prover result is: Valid (0.02s, 124276 steps).
+---- stage3 | prover: Alt-Ergo,2.4.0 | theory: MaximumDistanceBetweenAPairOfValues_List_Stage3_Recursive | goal: count_valid_prefix'vc ----
+Transforms: split_vc inline_all
+File "repaired.mlw", line 106, characters 19-38:
+Sub-goal Assertion of goal count_valid_prefix'vc.
+Prover result is: Valid (0.01s, 169 steps).
+
+File "repaired.mlw", line 107, characters 14-39:
+Sub-goal Variant decrease of goal count_valid_prefix'vc.
+Prover result is: Valid (0.01s, 46 steps).
+
+File "repaired.mlw", line 107, characters 14-39:
+Sub-goal Precondition of goal count_valid_prefix'vc.
+Prover result is: Valid (0.01s, 8 steps).
+
+File "repaired.mlw", line 89, characters 14-25:
+Sub-goal Postcondition of goal count_valid_prefix'vc.
+Prover result is: Valid (0.02s, 363 steps).
+
+File "repaired.mlw", line 90, characters 14-33:
+Sub-goal Postcondition of goal count_valid_prefix'vc.
+Prover result is: Valid (0.03s, 961 steps).
+
+File "repaired.mlw", line 91, characters 14-42:
+Sub-goal Postcondition of goal count_valid_prefix'vc.
+Prover result is: Valid (0.01s, 184 steps).
+
+File "repaired.mlw", line 92, characters 28-52:
+Sub-goal Postcondition of goal count_valid_prefix'vc.
+Prover result is: Valid (0.08s, 2690 steps).
+
+File "repaired.mlw", line 93, characters 73-83:
+Sub-goal Postcondition of goal count_valid_prefix'vc.
+Prover result is: Timeout (10.00s, 466186 steps).
+
+File "repaired.mlw", line 94, characters 14-80:
+Sub-goal Postcondition of goal count_valid_prefix'vc.
+Prover result is: Valid (0.01s, 100 steps).
+
+File "repaired.mlw", line 96, character 6 to line 99, character 9:
+Sub-goal Postcondition of goal count_valid_prefix'vc.
+Prover result is: Valid (0.28s, 6500 steps).
+---- stage3 | prover: CVC4,1.8 | theory: MaximumDistanceBetweenAPairOfValues_List_Stage3_Recursive | goal: count_valid_prefix'vc ----
+Transforms: split_vc inline_all
+File "repaired.mlw", line 106, characters 19-38:
+Sub-goal Assertion of goal count_valid_prefix'vc.
+Prover result is: Valid (0.02s, 3760 steps).
+
+File "repaired.mlw", line 107, characters 14-39:
+Sub-goal Variant decrease of goal count_valid_prefix'vc.
+Prover result is: Valid (0.02s, 3324 steps).
+
+File "repaired.mlw", line 107, characters 14-39:
+Sub-goal Precondition of goal count_valid_prefix'vc.
+Prover result is: Valid (0.01s, 2597 steps).
+
+File "repaired.mlw", line 89, characters 14-25:
+Sub-goal Postcondition of goal count_valid_prefix'vc.
+Prover result is: Unknown (unknown + incomplete) (0.02s, 6056 steps).
+
+File "repaired.mlw", line 90, characters 14-33:
+Sub-goal Postcondition of goal count_valid_prefix'vc.
+Prover result is: Unknown (unknown + incomplete) (0.02s, 6204 steps).
+
+File "repaired.mlw", line 91, characters 14-42:
+Sub-goal Postcondition of goal count_valid_prefix'vc.
+Prover result is: Unknown (unknown + incomplete) (0.02s, 6220 steps).
+
+File "repaired.mlw", line 92, characters 28-52:
+Sub-goal Postcondition of goal count_valid_prefix'vc.
+Prover result is: Unknown (unknown + incomplete) (0.02s, 6298 steps).
+
+File "repaired.mlw", line 93, characters 73-83:
+Sub-goal Postcondition of goal count_valid_prefix'vc.
+Prover result is: Unknown (unknown + incomplete) (0.02s, 6563 steps).
+
+File "repaired.mlw", line 94, characters 14-80:
+Sub-goal Postcondition of goal count_valid_prefix'vc.
+Prover result is: Valid (0.03s, 8089 steps).
+
+File "repaired.mlw", line 96, character 6 to line 99, character 9:
+Sub-goal Postcondition of goal count_valid_prefix'vc.
+Prover result is: Unknown (unknown + incomplete) (0.02s, 7510 steps).
+== Stage 3: split_vc + inline_all on still-unproved goal ==
+Target theory: MaximumDistanceBetweenAPairOfValues_List_Stage3_Recursive
+Target goal  : combine_suffix_max_distance'vc
+---- stage3 | prover: Z3,4.8.6 | theory: MaximumDistanceBetweenAPairOfValues_List_Stage3_Recursive | goal: combine_suffix_max_distance'vc ----
+Transforms: split_vc inline_all
+File "repaired.mlw", line 121, characters 13-22:
+Sub-goal Assertion of goal combine_suffix_max_distance'vc.
+Prover result is: Valid (0.01s, 2369 steps).
+
+File "repaired.mlw", line 122, characters 13-22:
+Sub-goal Assertion of goal combine_suffix_max_distance'vc.
+Prover result is: Valid (0.01s, 2310 steps).
+
+File "repaired.mlw", line 123, characters 13-19:
+Sub-goal Assertion of goal combine_suffix_max_distance'vc.
+Prover result is: Valid (0.01s, 19436 steps).
+
+File "repaired.mlw", line 124, characters 13-60:
+Sub-goal Assertion of goal combine_suffix_max_distance'vc.
+Prover result is: Timeout (10.00s, 166433924 steps).
+
+File "repaired.mlw", line 126, characters 48-58:
+Sub-goal Assertion of goal combine_suffix_max_distance'vc.
+Prover result is: Valid (0.01s, 32885 steps).
+
+File "repaired.mlw", line 119, characters 15-57:
+Sub-goal Postcondition of goal combine_suffix_max_distance'vc.
+Prover result is: Valid (0.01s, 3376 steps).
+---- stage3 | prover: Alt-Ergo,2.4.0 | theory: MaximumDistanceBetweenAPairOfValues_List_Stage3_Recursive | goal: combine_suffix_max_distance'vc ----
+Transforms: split_vc inline_all
+File "repaired.mlw", line 121, characters 13-22:
+Sub-goal Assertion of goal combine_suffix_max_distance'vc.
+Prover result is: Valid (0.01s, 10 steps).
+
+File "repaired.mlw", line 122, characters 13-22:
+Sub-goal Assertion of goal combine_suffix_max_distance'vc.
+Prover result is: Valid (0.01s, 10 steps).
+
+File "repaired.mlw", line 123, characters 13-19:
+Sub-goal Assertion of goal combine_suffix_max_distance'vc.
+Prover result is: Valid (0.01s, 28 steps).
+
+File "repaired.mlw", line 124, characters 13-60:
+Sub-goal Assertion of goal combine_suffix_max_distance'vc.
+Prover result is: Timeout (10.00s, 168035 steps).
+
+File "repaired.mlw", line 126, characters 48-58:
+Sub-goal Assertion of goal combine_suffix_max_distance'vc.
+Prover result is: High failure (signaled)
+  (7.47s)HighFailure (signaled),
+  Prover exit status: killed by signal 24
+  prover output:
+  
+  .
+
+File "repaired.mlw", line 119, characters 15-57:
+Sub-goal Postcondition of goal combine_suffix_max_distance'vc.
+Prover result is: Valid (0.02s, 170 steps).
+Infrastructure issue in stage 3 with prover Alt-Ergo,2.4.0; aborting rest of stage 3.
+== Final summary ==
+Unproved root goals after first prover : 2
+Remaining failures after split_vc      : 2
+Remaining failures after stage 3       : 2
+Detailed logs stored in                : /Users/rubenm/Desktop/Diversify2Verify/codex-runs/dataset-merge-verification/stage3a-repair/1855_maximum-distance-between-a-pair-of-values/list-recursive/maximum_distance_between_a_pair_of_values_list_stage3_e24c1324_stage3/generated/why3/.why3_sessions/repaired_logs
+Still unproved goals:
+MaximumDistanceBetweenAPairOfValues_List_Stage3_Recursive	count_valid_prefix'vc
+MaximumDistanceBetweenAPairOfValues_List_Stage3_Recursive	combine_suffix_max_distance'vc
+VERIFY_RESULT: FAILURE
+VERIFY_REASON: unproved_goals_remain
+VERIFY_STAGE: stage3
+VERIFY_ROOT_TOTAL: 7
+VERIFY_ROOT_PROVED: 5
+VERIFY_ROOT_REMAINING: 2

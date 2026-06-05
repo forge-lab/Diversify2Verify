@@ -1,0 +1,173 @@
+module MinimumCommonValue_List_Spec
+
+  use int.Int
+  use list.List
+  use list.Mem
+
+  let rec predicate le_all (x: int) (l: list int)
+    variant { l }
+  =
+    match l with
+    | Nil -> true
+    | Cons y ys -> x <= y && le_all x ys
+    end
+
+  let rec predicate sorted_list (l: list int)
+    variant { l }
+  =
+    match l with
+    | Nil -> true
+    | Cons x xs -> le_all x xs && sorted_list xs
+    end
+
+  let rec predicate all_positive (l: list int)
+    variant { l }
+  =
+    match l with
+    | Nil -> true
+    | Cons x xs -> 1 <= x && all_positive xs
+    end
+
+  predicate common_value (nums1: list int) (nums2: list int) (x: int) =
+    mem x nums1 /\ mem x nums2
+
+  predicate no_common_value (nums1: list int) (nums2: list int) =
+    forall x: int. not (common_value nums1 nums2 x)
+
+  predicate is_minimum_common_result
+    (nums1: list int) (nums2: list int) (r: int) =
+    (r = (-1) /\ no_common_value nums1 nums2) \/
+    (common_value nums1 nums2 r /\
+      (forall x: int. common_value nums1 nums2 x -> r <= x))
+
+  val minimum_common_value_list (nums1: list int) (nums2: list int) : int
+    requires { nums1 <> Nil }
+    requires { nums2 <> Nil }
+    requires { sorted_list nums1 }
+    requires { sorted_list nums2 }
+    requires { all_positive nums1 }
+    requires { all_positive nums2 }
+    ensures  { is_minimum_common_result nums1 nums2 result }
+
+  let lemma check_test_000 () =
+    let nums1 = Cons 1 (Cons 2 (Cons 2 (Cons 3 Nil))) in
+    let nums2 = Cons 2 (Cons 2 Nil) in
+    assert { sorted_list nums1 };
+    assert { sorted_list nums2 };
+    assert { all_positive nums1 };
+    assert { all_positive nums2 };
+    assert { mem 2 nums1 };
+    assert { mem 2 nums2 };
+    assert { common_value nums1 nums2 2 };
+    assert {
+      forall x: int. common_value nums1 nums2 x ->
+        x = 2
+    };
+    assert { is_minimum_common_result nums1 nums2 2 }
+
+  let lemma check_test_001 () =
+    let nums1 = Cons 10 (Cons 20 (Cons 30 Nil)) in
+    let nums2 = Cons 5 (Cons 15 (Cons 25 (Cons 35 Nil))) in
+    assert { sorted_list nums1 };
+    assert { sorted_list nums2 };
+    assert { all_positive nums1 };
+    assert { all_positive nums2 };
+    assert {
+      forall x: int. mem x nums1 ->
+        x = 10 \/ x = 20 \/ x = 30
+    };
+    assert {
+      forall x: int. mem x nums2 ->
+        x = 5 \/ x = 15 \/ x = 25 \/ x = 35
+    };
+    assert { no_common_value nums1 nums2 };
+    assert { is_minimum_common_result nums1 nums2 (-1) }
+
+  let lemma check_test_002 () =
+    let nums1 = Cons 1 (Cons 1 (Cons 1 (Cons 1 Nil))) in
+    let nums2 = Cons 1 (Cons 1 (Cons 1 (Cons 1 Nil))) in
+    assert { sorted_list nums1 };
+    assert { sorted_list nums2 };
+    assert { all_positive nums1 };
+    assert { all_positive nums2 };
+    assert { mem 1 nums1 };
+    assert { mem 1 nums2 };
+    assert { common_value nums1 nums2 1 };
+    assert {
+      forall x: int. common_value nums1 nums2 x ->
+        x = 1
+    };
+    assert { is_minimum_common_result nums1 nums2 1 }
+
+  let lemma check_test_008 () =
+    let nums1 = Cons 1 (Cons 2 (Cons 3 Nil)) in
+    let nums2 = Cons 2 (Cons 4 Nil) in
+    assert { sorted_list nums1 };
+    assert { sorted_list nums2 };
+    assert { all_positive nums1 };
+    assert { all_positive nums2 };
+    assert { mem 2 nums1 };
+    assert { mem 2 nums2 };
+    assert { common_value nums1 nums2 2 };
+    assert {
+      forall x: int. common_value nums1 nums2 x ->
+        x = 2
+    };
+    assert { is_minimum_common_result nums1 nums2 2 }
+
+  let lemma check_test_010 () =
+    let nums1 = Cons 1000000000 Nil in
+    let nums2 = Cons 1000000000 Nil in
+    assert { sorted_list nums1 };
+    assert { sorted_list nums2 };
+    assert { all_positive nums1 };
+    assert { all_positive nums2 };
+    assert { mem 1000000000 nums1 };
+    assert { mem 1000000000 nums2 };
+    assert { common_value nums1 nums2 1000000000 };
+    assert {
+      forall x: int. common_value nums1 nums2 x ->
+        x = 1000000000
+    };
+    assert { is_minimum_common_result nums1 nums2 1000000000 }
+
+  let lemma check_test_011 () =
+    let nums1 = Cons 1 (Cons 5 (Cons 9 Nil)) in
+    let nums2 = Cons 3 (Cons 6 (Cons 9 Nil)) in
+    assert { sorted_list nums1 };
+    assert { sorted_list nums2 };
+    assert { all_positive nums1 };
+    assert { all_positive nums2 };
+    assert { mem 9 nums1 };
+    assert { mem 9 nums2 };
+    assert { common_value nums1 nums2 9 };
+    assert {
+      forall x: int. common_value nums1 nums2 x ->
+        x = 9
+    };
+    assert { is_minimum_common_result nums1 nums2 9 }
+
+  let lemma check_test_102 () =
+    let nums1 =
+      Cons 50 (Cons 100 (Cons 150 (Cons 200 (Cons 250
+        (Cons 300 (Cons 350 (Cons 400 (Cons 450 (Cons 500 Nil))))))))) in
+    let nums2 =
+      Cons 25 (Cons 50 (Cons 75 (Cons 100 (Cons 125
+        (Cons 150 (Cons 175 (Cons 200 (Cons 225 (Cons 250 Nil))))))))) in
+    assert { sorted_list nums1 };
+    assert { sorted_list nums2 };
+    assert { all_positive nums1 };
+    assert { all_positive nums2 };
+    assert { mem 50 nums1 };
+    assert { mem 50 nums2 };
+    assert { common_value nums1 nums2 50 };
+    assert {
+      forall x: int. common_value nums1 nums2 x ->
+        x = 50 \/ x = 100 \/ x = 150 \/ x = 200 \/ x = 250
+    };
+    assert {
+      forall x: int. common_value nums1 nums2 x -> 50 <= x
+    };
+    assert { is_minimum_common_result nums1 nums2 50 }
+
+end

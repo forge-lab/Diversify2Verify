@@ -1,0 +1,128 @@
+module SpecialArrayWithXElementsGreaterThanOrEqualX_Array_Spec
+
+  use int.Int
+  use array.Array
+  use array.Init
+  use array.NumOf
+
+  function count_ge (nums: array int) (x: int) : int =
+    NumOf.numof (fun _ v -> v >= x) nums 0 (length nums)
+
+  predicate special_candidate (nums: array int) (x: int) =
+    0 <= x <= length nums /\ count_ge nums x = x
+
+  predicate special_array_result (nums: array int) (result: int) =
+    (result = -1 /\
+      forall x: int. 0 <= x <= length nums -> not (special_candidate nums x)) \/
+    (special_candidate nums result /\
+      forall x: int. special_candidate nums x -> x = result)
+
+  val special_array_with_x_elements_greater_than_or_equal_x_array (nums: array int) : int
+    ensures { special_array_result nums result }
+
+  let lemma test_017_basic_positive () =
+    let nums = Init.init 2 [|3; 5|] in
+    assert { length nums = 2 };
+    assert { nums[0] = 3 };
+    assert { nums[1] = 5 };
+    assert { count_ge nums 2 = 2 };
+    assert { special_candidate nums 2 };
+    assert { forall x: int. special_candidate nums x -> x = 2 };
+    assert { special_array_result nums 2 }
+
+  let lemma test_005_two_zeroes_negative () =
+    let nums = Init.init 2 [|0; 0|] in
+    assert { length nums = 2 };
+    assert { nums[0] = 0 };
+    assert { nums[1] = 0 };
+    assert { count_ge nums 0 = 2 };
+    assert { count_ge nums 1 = 0 };
+    assert { count_ge nums 2 = 0 };
+    assert { not (special_candidate nums 0) };
+    assert { not (special_candidate nums 1) };
+    assert { not (special_candidate nums 2) };
+    assert {
+      forall x: int. 0 <= x <= length nums ->
+        x = 0 \/ x = 1 \/ x = 2
+    };
+    assert { forall x: int. 0 <= x <= length nums -> not (special_candidate nums x) };
+    assert { special_array_result nums (-1) }
+
+  let lemma test_016_mixed_positive () =
+    let nums = Init.init 5 [|0; 4; 3; 0; 4|] in
+    assert { length nums = 5 };
+    assert { nums[0] = 0 };
+    assert { nums[1] = 4 };
+    assert { nums[2] = 3 };
+    assert { nums[3] = 0 };
+    assert { nums[4] = 4 };
+    assert { count_ge nums 3 = 3 };
+    assert { special_candidate nums 3 };
+    assert { forall x: int. special_candidate nums x -> x = 3 };
+    assert { special_array_result nums 3 }
+
+  let lemma test_006_single_one_positive () =
+    let nums = Init.init 1 [|1|] in
+    assert { length nums = 1 };
+    assert { nums[0] = 1 };
+    assert { count_ge nums 1 = 1 };
+    assert { special_candidate nums 1 };
+    assert { forall x: int. special_candidate nums x -> x = 1 };
+    assert { special_array_result nums 1 }
+
+  let lemma test_014_single_zero_negative () =
+    let nums = Init.init 1 [|0|] in
+    assert { length nums = 1 };
+    assert { nums[0] = 0 };
+    assert { count_ge nums 0 = 1 };
+    assert { count_ge nums 1 = 0 };
+    assert { not (special_candidate nums 0) };
+    assert { not (special_candidate nums 1) };
+    assert {
+      forall x: int. 0 <= x <= length nums ->
+        x = 0 \/ x = 1
+    };
+    assert { forall x: int. 0 <= x <= length nums -> not (special_candidate nums x) };
+    assert { special_array_result nums (-1) }
+
+  let lemma test_011_increasing_positive () =
+    let nums = Init.init 5 [|1; 2; 3; 4; 5|] in
+    assert { length nums = 5 };
+    assert { nums[0] = 1 };
+    assert { nums[1] = 2 };
+    assert { nums[2] = 3 };
+    assert { nums[3] = 4 };
+    assert { nums[4] = 5 };
+    assert { count_ge nums 3 = 3 };
+    assert { special_candidate nums 3 };
+    assert { forall x: int. special_candidate nums x -> x = 3 };
+    assert { special_array_result nums 3 }
+
+  let lemma test_010_all_zeroes_negative () =
+    let nums = Init.init 5 [|0; 0; 0; 0; 0|] in
+    assert { length nums = 5 };
+    assert { nums[0] = 0 };
+    assert { nums[1] = 0 };
+    assert { nums[2] = 0 };
+    assert { nums[3] = 0 };
+    assert { nums[4] = 0 };
+    assert { count_ge nums 0 = 5 };
+    assert { count_ge nums 1 = 0 };
+    assert { count_ge nums 2 = 0 };
+    assert { count_ge nums 3 = 0 };
+    assert { count_ge nums 4 = 0 };
+    assert { count_ge nums 5 = 0 };
+    assert { not (special_candidate nums 0) };
+    assert { not (special_candidate nums 1) };
+    assert { not (special_candidate nums 2) };
+    assert { not (special_candidate nums 3) };
+    assert { not (special_candidate nums 4) };
+    assert { not (special_candidate nums 5) };
+    assert {
+      forall x: int. 0 <= x <= length nums ->
+        x = 0 \/ x = 1 \/ x = 2 \/ x = 3 \/ x = 4 \/ x = 5
+    };
+    assert { forall x: int. 0 <= x <= length nums -> not (special_candidate nums x) };
+    assert { special_array_result nums (-1) }
+
+end

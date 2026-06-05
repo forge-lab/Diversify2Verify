@@ -1,0 +1,155 @@
+module SmallestRangeIi_List_Spec
+
+  use int.Int
+  use list.List
+  use list.Length
+  use list.Mem
+
+  let rec predicate choice_transform (nums: list int) (k: int) (changed: list int)
+    variant { nums }
+  =
+    match nums with
+    | Nil ->
+        match changed with
+        | Nil -> true
+        | Cons _ _ -> false
+        end
+    | Cons x xs ->
+        match changed with
+        | Nil -> false
+        | Cons y ys ->
+            (y = x + k || y = x - k) && choice_transform xs k ys
+        end
+    end
+
+  predicate is_min_value (l: list int) (lo: int) =
+    mem lo l /\
+    (forall x: int. mem x l -> lo <= x)
+
+  predicate is_max_value (l: list int) (hi: int) =
+    mem hi l /\
+    (forall x: int. mem x l -> x <= hi)
+
+  predicate range_score (l: list int) (score: int) =
+    exists lo hi: int.
+      is_min_value l lo /\ is_max_value l hi /\ score = hi - lo
+
+  predicate possible_score (nums: list int) (k: int) (score: int) =
+    exists changed: list int.
+      choice_transform nums k changed /\ range_score changed score
+
+  predicate optimal_score (nums: list int) (k: int) (best: int) =
+    possible_score nums k best /\
+    (forall score: int. possible_score nums k score -> best <= score)
+
+  let function min2 (a: int) (b: int) : int =
+    if a <= b then a else b
+
+  let function max2 (a: int) (b: int) : int =
+    if a >= b then a else b
+
+  let rec function insert_sorted (x: int) (l: list int) : list int
+    variant { l }
+  =
+    match l with
+    | Nil -> Cons x Nil
+    | Cons y ys ->
+        if x <= y then Cons x l else Cons y (insert_sorted x ys)
+    end
+
+  let rec function sort_list (l: list int) : list int
+    variant { l }
+  =
+    match l with
+    | Nil -> Nil
+    | Cons x xs -> insert_sorted x (sort_list xs)
+    end
+
+  let rec function last_value_with_current (current: int) (xs: list int) : int
+    variant { xs }
+  =
+    match xs with
+    | Nil -> current
+    | Cons y ys -> last_value_with_current y ys
+    end
+
+  let rec function best_split
+    (first: int) (last: int) (k: int) (prev: int) (rest: list int) (best: int) : int
+    variant { rest }
+  =
+    match rest with
+    | Nil -> best
+    | Cons current tail ->
+        let high = max2 (prev + k) (last - k) in
+        let low = min2 (first + k) (current - k) in
+        let candidate = high - low in
+        let next_best = min2 best candidate in
+        best_split first last k current tail next_best
+    end
+
+  let lemma smallest_range_ii_possible_result (nums: list int) (k: int) (candidate_result: int)
+    requires { nums <> Nil }
+    requires { 0 <= k <= 10000 }
+    requires { length nums <= 10000 }
+    requires { forall x: int. mem x nums -> 0 <= x <= 10000 }
+    requires {
+      candidate_result =
+        match sort_list nums with
+        | Nil -> 0
+        | Cons first rest ->
+            let last = last_value_with_current first rest in
+            let initial = last - first in
+            best_split first last k first rest initial
+        end
+    }
+    ensures  { possible_score nums k candidate_result }
+  = ()
+
+  let lemma smallest_range_ii_lower_bound (nums: list int) (k: int) (candidate_result: int)
+    requires { nums <> Nil }
+    requires { 0 <= k <= 10000 }
+    requires { length nums <= 10000 }
+    requires { forall x: int. mem x nums -> 0 <= x <= 10000 }
+    requires {
+      candidate_result =
+        match sort_list nums with
+        | Nil -> 0
+        | Cons first rest ->
+            let last = last_value_with_current first rest in
+            let initial = last - first in
+            best_split first last k first rest initial
+        end
+    }
+    ensures  { forall score: int. possible_score nums k score -> candidate_result <= score }
+  = ()
+
+  let smallest_range_ii_list (nums: list int) (k: int) : int
+    requires { nums <> Nil }
+    requires { 0 <= k <= 10000 }
+    requires { length nums <= 10000 }
+    requires { forall x: int. mem x nums -> 0 <= x <= 10000 }
+    ensures  { possible_score nums k result }
+    ensures  { forall score: int. possible_score nums k score -> result <= score }
+    ensures  { optimal_score nums k result }
+    ensures  { 0 <= result }
+  =
+    match sort_list nums with
+    | Nil ->
+        let result = 0 in
+        smallest_range_ii_possible_result nums k result;
+        smallest_range_ii_lower_bound nums k result;
+        assert { possible_score nums k result };
+        assert { forall score: int. possible_score nums k score -> result <= score };
+        result
+    | Cons first rest ->
+        let last = last_value_with_current first rest in
+        let initial = last - first in
+        let result = best_split first last k first rest initial in
+        smallest_range_ii_possible_result nums k result;
+        smallest_range_ii_lower_bound nums k result;
+        assert { possible_score nums k result };
+        assert { forall score: int. possible_score nums k score -> result <= score };
+        result
+    end
+
+end

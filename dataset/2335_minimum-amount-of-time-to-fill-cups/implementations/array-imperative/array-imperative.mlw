@@ -1,0 +1,163 @@
+module MinimumAmountOfTimeToFillCups_Array_Imperative
+
+  use int.Int
+  use int.MinMax
+  use int.EuclideanDivision
+  use array.Array
+  use array.Init
+  use ref.Ref
+
+  let minimum_amount_of_time_to_fill_cups_array (amount: array int) : int =
+    let total = ref 0 in
+    let largest = ref 0 in
+    for i = 0 to length amount - 1 do
+      total := !total + amount[i];
+      if amount[i] > !largest then
+        largest := amount[i]
+    done;
+    max !largest (div (!total + 1) 2)
+
+  let test_000 () : bool =
+    let amount = init 3 [|33; 33; 34|] in
+    let r = minimum_amount_of_time_to_fill_cups_array amount in
+    r = 50
+
+  let test_001 () : bool =
+    let amount = init 3 [|0; 0; 0|] in
+    let r = minimum_amount_of_time_to_fill_cups_array amount in
+    r = 0
+
+  let test_002 () : bool =
+    let amount = init 3 [|99; 1; 1|] in
+    let r = minimum_amount_of_time_to_fill_cups_array amount in
+    r = 99
+
+  let test_003 () : bool =
+    let amount = init 3 [|7; 7; 7|] in
+    let r = minimum_amount_of_time_to_fill_cups_array amount in
+    r = 11
+
+  let test_004 () : bool =
+    let amount = init 3 [|10; 10; 10|] in
+    let r = minimum_amount_of_time_to_fill_cups_array amount in
+    r = 15
+
+  let test_005 () : bool =
+    let amount = init 3 [|1; 2; 3|] in
+    let r = minimum_amount_of_time_to_fill_cups_array amount in
+    r = 3
+
+  let test_006 () : bool =
+    let amount = init 3 [|100; 0; 0|] in
+    let r = minimum_amount_of_time_to_fill_cups_array amount in
+    r = 100
+
+  let test_007 () : bool =
+    let amount = init 3 [|100; 100; 100|] in
+    let r = minimum_amount_of_time_to_fill_cups_array amount in
+    r = 150
+
+  let test_008 () : bool =
+    let amount = init 3 [|0; 1; 2|] in
+    let r = minimum_amount_of_time_to_fill_cups_array amount in
+    r = 2
+
+  let test_009 () : bool =
+    let amount = init 3 [|1; 4; 2|] in
+    let r = minimum_amount_of_time_to_fill_cups_array amount in
+    r = 4
+
+  let test_010 () : bool =
+    let amount = init 3 [|5; 0; 0|] in
+    let r = minimum_amount_of_time_to_fill_cups_array amount in
+    r = 5
+
+  let test_011 () : bool =
+    let amount = init 3 [|99; 99; 1|] in
+    let r = minimum_amount_of_time_to_fill_cups_array amount in
+    r = 100
+
+  let test_012 () : bool =
+    let amount = init 3 [|0; 50; 50|] in
+    let r = minimum_amount_of_time_to_fill_cups_array amount in
+    r = 50
+
+  let test_013 () : bool =
+    let amount = init 3 [|5; 4; 4|] in
+    let r = minimum_amount_of_time_to_fill_cups_array amount in
+    r = 7
+
+  let test_014 () : bool =
+    let amount = init 3 [|98; 1; 1|] in
+    let r = minimum_amount_of_time_to_fill_cups_array amount in
+    r = 98
+
+  let test_015 () : bool =
+    let amount = init 3 [|25; 0; 75|] in
+    let r = minimum_amount_of_time_to_fill_cups_array amount in
+    r = 75
+
+  let test_016 () : bool =
+    let amount = init 3 [|42; 42; 41|] in
+    let r = minimum_amount_of_time_to_fill_cups_array amount in
+    r = 63
+
+  let test_017 () : bool =
+    let amount = init 3 [|60; 20; 20|] in
+    let r = minimum_amount_of_time_to_fill_cups_array amount in
+    r = 60
+
+  let test_018 () : bool =
+    let amount = init 3 [|10; 50; 25|] in
+    let r = minimum_amount_of_time_to_fill_cups_array amount in
+    r = 50
+
+  let test_019 () : bool =
+    let amount = init 3 [|49; 49; 49|] in
+    let r = minimum_amount_of_time_to_fill_cups_array amount in
+    r = 74
+
+  let run_tests () : bool =
+    if test_000 () then
+    if test_001 () then
+    if test_002 () then
+    if test_003 () then
+    if test_004 () then
+    if test_005 () then
+    if test_006 () then
+    if test_007 () then
+    if test_008 () then
+    if test_009 () then
+    if test_010 () then
+    if test_011 () then
+    if test_012 () then
+    if test_013 () then
+    if test_014 () then
+    if test_015 () then
+    if test_016 () then
+    if test_017 () then
+    if test_018 () then
+    if test_019 () then
+      true
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+
+end

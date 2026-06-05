@@ -1,0 +1,149 @@
+module SmallestMissingIntegerGreaterThanSequentialPrefixSum_List_Stage3_Recursive
+
+  use int.Int
+  use list.List
+  use list.Length
+  use list.Mem
+
+  predicate valid_input (nums: list int) =
+    1 <= length nums <= 50 /\
+    (forall x: int. mem x nums -> 1 <= x <= 50)
+
+  let rec function sequential_prefix_sum_from
+    (prev: int) (rest: list int) (acc: int) : int
+    variant { rest }
+  =
+    match rest with
+    | Nil -> acc
+    | Cons y ys ->
+        if y = prev + 1 then sequential_prefix_sum_from y ys (acc + y)
+        else acc
+    end
+
+  function sequential_prefix_sum (nums: list int) : int =
+    match nums with
+    | Nil -> 0
+    | Cons x xs -> sequential_prefix_sum_from x xs x
+    end
+
+  predicate smallest_missing_at_or_above (nums: list int) (s: int) (r: int) =
+    s <= r /\
+    not (mem r nums) /\
+    (forall y: int. s <= y < r -> mem y nums)
+
+  let lemma valid_input_non_empty (nums: list int)
+    requires { valid_input nums }
+    ensures  { nums <> Nil }
+  = ()
+
+  let lemma valid_input_excludes_above_50 (nums: list int) (x: int)
+    requires { valid_input nums }
+    requires { x > 50 }
+    ensures  { not (mem x nums) }
+  = ()
+
+  let rec sequential_prefix_sum_from_exec
+    (prev: int) (rest: list int) (acc: int) : int
+    ensures { result = sequential_prefix_sum_from prev rest acc }
+    variant { rest }
+  =
+    match rest with
+    | Nil ->
+        acc
+    | Cons y ys ->
+        if y = prev + 1 then
+          sequential_prefix_sum_from_exec y ys (acc + y)
+        else
+          acc
+    end
+
+  let sequential_prefix_sum_exec (nums: list int) : int
+    ensures { result = sequential_prefix_sum nums }
+  =
+    match nums with
+    | Nil -> 0
+    | Cons x xs -> sequential_prefix_sum_from_exec x xs x
+    end
+
+  let rec contains (nums: list int) (target: int) : bool
+    ensures { result <-> mem target nums }
+    variant { nums }
+  =
+    match nums with
+    | Nil ->
+        assert { not (mem target Nil) };
+        false
+    | Cons x xs ->
+        if x = target then begin
+          assert { mem target (Cons x xs) };
+          true
+        end else begin
+          let r = contains xs target in
+          if r then begin
+            assert { mem target xs };
+            assert { mem target (Cons x xs) };
+            true
+          end else begin
+            assert { not (mem target xs) };
+            assert { not (mem target (Cons x xs)) };
+            false
+          end
+        end
+    end
+
+  let rec list_length (nums: list int) : int
+    ensures { result = length nums }
+    ensures { result >= 0 }
+    variant { nums }
+  =
+    match nums with
+    | Nil -> 0
+    | Cons _ xs ->
+        let n = list_length xs in
+        assert { n = length xs };
+        1 + n
+    end
+
+  let rec find_missing_from (nums: list int) (candidate: int) (fuel: int) : int
+    requires { 0 <= fuel }
+    ensures  { candidate <= result <= candidate + fuel }
+    ensures  { forall y: int. candidate <= y < result -> mem y nums }
+    ensures  { result < candidate + fuel -> not (mem result nums) }
+    variant { fuel }
+  =
+    if fuel = 0 then begin
+      candidate
+    end else if contains nums candidate then begin
+      assert { mem candidate nums };
+      let r = find_missing_from nums (candidate + 1) (fuel - 1) in
+      assert { candidate + 1 <= r <= candidate + fuel };
+      assert { forall y: int. candidate + 1 <= y < r -> mem y nums };
+      assert { forall y: int. candidate <= y < r -> mem y nums };
+      r
+    end else begin
+      assert { not (mem candidate nums) };
+      candidate
+    end
+
+  let smallest_missing_integer_greater_than_sequential_prefix_sum_list
+    (nums: list int) : int
+    requires { valid_input nums }
+    ensures  { smallest_missing_at_or_above nums (sequential_prefix_sum nums) result }
+  =
+    valid_input_non_empty nums;
+    let start = sequential_prefix_sum_exec nums in
+    assert { start = sequential_prefix_sum nums };
+    let fuel = list_length nums + 1 in
+    assert { fuel = length nums + 1 };
+    assert { 0 <= fuel };
+    let r = find_missing_from nums start fuel in
+    assert { start <= r };
+    assert { forall y: int. start <= y < r -> mem y nums };
+    if r < start + fuel then begin
+      assert { not (mem r nums) }
+    end else begin
+      assert { r = start + fuel }
+    end;
+    r
+
+end

@@ -1,0 +1,803 @@
+== Stage 1: first prover on whole file ==
+Running in /Users/rubenm/Desktop/Diversify2Verify/codex-runs/testing4/2195_append-k-integers-with-minimal-sum/stage3a/array-imperative/append_k_integers_with_minimal_sum_array_stage3_cdad616d/generated/why3/array: why3 session create -o /Users/rubenm/Desktop/Diversify2Verify/codex-runs/testing4/2195_append-k-integers-with-minimal-sum/stage3a/array-imperative/append_k_integers_with_minimal_sum_array_stage3_cdad616d/generated/why3/array/.why3_sessions/append_k_integers_with_minimal_sum_array_stage3_cdad616d_stage3_stage1 -P Z3,4.8.6 -t 10 -m 8192 append_k_integers_with_minimal_sum_array_stage3_cdad616d_stage3.mlw
+Session created successfully
+Running in /Users/rubenm/Desktop/Diversify2Verify/codex-runs/testing4/2195_append-k-integers-with-minimal-sum/stage3a/array-imperative/append_k_integers_with_minimal_sum_array_stage3_cdad616d/generated/why3/array: why3 bench /Users/rubenm/Desktop/Diversify2Verify/codex-runs/testing4/2195_append-k-integers-with-minimal-sum/stage3a/array-imperative/append_k_integers_with_minimal_sum_array_stage3_cdad616d/generated/why3/array/.why3_sessions/append_k_integers_with_minimal_sum_array_stage3_cdad616d_stage3_stage1
+Progress: 3/1/0                       Progress: 2/2/0                       Progress: 1/3/0                       Progress: 0/4/0                       Progress: 0/0/1                       
+Replay completed, saving session... done
+== Stage 1 stats ==
+= Statistics for session /Users/rubenm/Desktop/Diversify2Verify/codex-runs/testing4/2195_append-k-integers-with-minimal-sum/stage3a/array-imperative/append_k_integers_with_minimal_sum_array_stage3_cdad616d/generated/why3/array/.why3_sessions/append_k_integers_with_minimal_sum_array_stage3_cdad616d_stage3_stage1
+
+== Number of root goals ==
+  total: 4  proved: 1
+
+== Number of sub goals ==
+  total: 0  proved: 0
+
+== Goals not proved ==
+  +-- file [../../append_k_integers_with_minimal_sum_array_stage3_cdad616d_stage3.mlw]
+    +-- theory AppendKIntegersWithMinimalSum_Array_Spec
+      +-- goal copy_array'vc
+      +-- goal insertion_sort'vc
+      +-- goal append_k_integers_with_minimal_sum_array'vc
+  
+== Goals proved by only one prover ==
+  +-- file [../../append_k_integers_with_minimal_sum_array_stage3_cdad616d_stage3.mlw]
+    +-- theory AppendKIntegersWithMinimalSum_Array_Spec
+      +-- goal arithmetic_sum'vc: Z3 4.8.6
+  
+1 session(s) read, with a total of 4 proof goals.
+== Unproved root goals after first prover ==
+AppendKIntegersWithMinimalSum_Array_Spec	copy_array'vc
+AppendKIntegersWithMinimalSum_Array_Spec	insertion_sort'vc
+AppendKIntegersWithMinimalSum_Array_Spec	append_k_integers_with_minimal_sum_array'vc
+== Stage 1: trying remaining goals with prover Alt-Ergo,2.4.0 ==
+---- stage1 | prover: Alt-Ergo,2.4.0 | theory: AppendKIntegersWithMinimalSum_Array_Spec | goal: copy_array'vc ----
+File append_k_integers_with_minimal_sum_array_stage3_cdad616d_stage3.mlw:
+Goal copy_array'vc.
+Prover result is: Timeout (10.00s, 22906 steps).
+---- stage1 | prover: Alt-Ergo,2.4.0 | theory: AppendKIntegersWithMinimalSum_Array_Spec | goal: insertion_sort'vc ----
+File append_k_integers_with_minimal_sum_array_stage3_cdad616d_stage3.mlw:
+Goal insertion_sort'vc.
+Prover result is: Unknown () (0.01s, 53 steps).
+---- stage1 | prover: Alt-Ergo,2.4.0 | theory: AppendKIntegersWithMinimalSum_Array_Spec | goal: append_k_integers_with_minimal_sum_array'vc ----
+File append_k_integers_with_minimal_sum_array_stage3_cdad616d_stage3.mlw:
+Goal append_k_integers_with_minimal_sum_array'vc.
+Prover result is: Timeout (10.00s, 182181 steps).
+Remaining after prover Alt-Ergo,2.4.0: 3
+== Stage 1: trying remaining goals with prover CVC4,1.8 ==
+---- stage1 | prover: CVC4,1.8 | theory: AppendKIntegersWithMinimalSum_Array_Spec | goal: copy_array'vc ----
+File append_k_integers_with_minimal_sum_array_stage3_cdad616d_stage3.mlw:
+Goal copy_array'vc.
+Prover result is: Unknown (unknown + incomplete) (0.02s, 5866 steps).
+---- stage1 | prover: CVC4,1.8 | theory: AppendKIntegersWithMinimalSum_Array_Spec | goal: insertion_sort'vc ----
+File append_k_integers_with_minimal_sum_array_stage3_cdad616d_stage3.mlw:
+Goal insertion_sort'vc.
+Prover result is: Timeout (10.00s, 3755489 steps).
+---- stage1 | prover: CVC4,1.8 | theory: AppendKIntegersWithMinimalSum_Array_Spec | goal: append_k_integers_with_minimal_sum_array'vc ----
+File append_k_integers_with_minimal_sum_array_stage3_cdad616d_stage3.mlw:
+Goal append_k_integers_with_minimal_sum_array'vc.
+Prover result is: Timeout (10.00s, 1399489 steps).
+Remaining after prover CVC4,1.8: 3
+== Goals still unproved after stage 1 ==
+AppendKIntegersWithMinimalSum_Array_Spec	copy_array'vc
+AppendKIntegersWithMinimalSum_Array_Spec	insertion_sort'vc
+AppendKIntegersWithMinimalSum_Array_Spec	append_k_integers_with_minimal_sum_array'vc
+== Stage 2: split_vc on unproved goal ==
+Target theory: AppendKIntegersWithMinimalSum_Array_Spec
+Target goal  : copy_array'vc
+---- stage2 | prover: Z3,4.8.6 | theory: AppendKIntegersWithMinimalSum_Array_Spec | goal: copy_array'vc ----
+Transforms: split_vc
+File "append_k_integers_with_minimal_sum_array_stage3_cdad616d_stage3.mlw", line 43, characters 17-25:
+Sub-goal Array creation size of goal copy_array'vc.
+Prover result is: Valid (0.01s, 14399 steps).
+
+File "append_k_integers_with_minimal_sum_array_stage3_cdad616d_stage3.mlw", line 45, characters 19-26:
+Sub-goal Index in array bounds of goal copy_array'vc.
+Prover result is: Valid (0.01s, 15950 steps).
+
+File "append_k_integers_with_minimal_sum_array_stage3_cdad616d_stage3.mlw", line 45, characters 6-26:
+Sub-goal Index in array bounds of goal copy_array'vc.
+Prover result is: Valid (0.01s, 16056 steps).
+
+File "append_k_integers_with_minimal_sum_array_stage3_cdad616d_stage3.mlw", line 39, characters 14-41:
+Sub-goal Postcondition of goal copy_array'vc.
+Prover result is: Valid (0.01s, 15929 steps).
+
+File "append_k_integers_with_minimal_sum_array_stage3_cdad616d_stage3.mlw", line 40, characters 53-72:
+Sub-goal Postcondition of goal copy_array'vc.
+Prover result is: Unknown (unknown) (0.01s, 44916 steps).
+
+File append_k_integers_with_minimal_sum_array_stage3_cdad616d_stage3.mlw:
+Sub-goal Out of loop bounds of goal copy_array'vc.
+Prover result is: Valid (0.01s, 14998 steps).
+---- stage2 | prover: Alt-Ergo,2.4.0 | theory: AppendKIntegersWithMinimalSum_Array_Spec | goal: copy_array'vc ----
+Transforms: split_vc
+File "append_k_integers_with_minimal_sum_array_stage3_cdad616d_stage3.mlw", line 43, characters 17-25:
+Sub-goal Array creation size of goal copy_array'vc.
+Prover result is: Valid (0.01s, 2 steps).
+
+File "append_k_integers_with_minimal_sum_array_stage3_cdad616d_stage3.mlw", line 45, characters 19-26:
+Sub-goal Index in array bounds of goal copy_array'vc.
+Prover result is: Valid (0.01s, 10 steps).
+
+File "append_k_integers_with_minimal_sum_array_stage3_cdad616d_stage3.mlw", line 45, characters 6-26:
+Sub-goal Index in array bounds of goal copy_array'vc.
+Prover result is: Valid (0.01s, 10 steps).
+
+File "append_k_integers_with_minimal_sum_array_stage3_cdad616d_stage3.mlw", line 39, characters 14-41:
+Sub-goal Postcondition of goal copy_array'vc.
+Prover result is: Valid (0.01s, 8 steps).
+
+File "append_k_integers_with_minimal_sum_array_stage3_cdad616d_stage3.mlw", line 40, characters 53-72:
+Sub-goal Postcondition of goal copy_array'vc.
+Prover result is: Timeout (10.00s, 202881 steps).
+
+File append_k_integers_with_minimal_sum_array_stage3_cdad616d_stage3.mlw:
+Sub-goal Out of loop bounds of goal copy_array'vc.
+Prover result is: Valid (0.01s, 7 steps).
+---- stage2 | prover: CVC4,1.8 | theory: AppendKIntegersWithMinimalSum_Array_Spec | goal: copy_array'vc ----
+Transforms: split_vc
+File "append_k_integers_with_minimal_sum_array_stage3_cdad616d_stage3.mlw", line 43, characters 17-25:
+Sub-goal Array creation size of goal copy_array'vc.
+Prover result is: Valid (0.01s, 3372 steps).
+
+File "append_k_integers_with_minimal_sum_array_stage3_cdad616d_stage3.mlw", line 45, characters 19-26:
+Sub-goal Index in array bounds of goal copy_array'vc.
+Prover result is: Valid (0.01s, 3413 steps).
+
+File "append_k_integers_with_minimal_sum_array_stage3_cdad616d_stage3.mlw", line 45, characters 6-26:
+Sub-goal Index in array bounds of goal copy_array'vc.
+Prover result is: Valid (0.01s, 3482 steps).
+
+File "append_k_integers_with_minimal_sum_array_stage3_cdad616d_stage3.mlw", line 39, characters 14-41:
+Sub-goal Postcondition of goal copy_array'vc.
+Prover result is: Valid (0.01s, 3401 steps).
+
+File "append_k_integers_with_minimal_sum_array_stage3_cdad616d_stage3.mlw", line 40, characters 53-72:
+Sub-goal Postcondition of goal copy_array'vc.
+Prover result is: Unknown (unknown + incomplete) (0.02s, 4279 steps).
+
+File append_k_integers_with_minimal_sum_array_stage3_cdad616d_stage3.mlw:
+Sub-goal Out of loop bounds of goal copy_array'vc.
+Prover result is: Valid (0.01s, 3571 steps).
+== Stage 2: split_vc on unproved goal ==
+Target theory: AppendKIntegersWithMinimalSum_Array_Spec
+Target goal  : insertion_sort'vc
+---- stage2 | prover: Z3,4.8.6 | theory: AppendKIntegersWithMinimalSum_Array_Spec | goal: insertion_sort'vc ----
+Transforms: split_vc
+File "append_k_integers_with_minimal_sum_array_stage3_cdad616d_stage3.mlw", line 54, characters 16-23:
+Sub-goal Index in array bounds of goal insertion_sort'vc.
+Prover result is: Valid (0.01s, 15101 steps).
+
+File "append_k_integers_with_minimal_sum_array_stage3_cdad616d_stage3.mlw", line 58, characters 20-32:
+Sub-goal Loop invariant init of goal insertion_sort'vc.
+Prover result is: Valid (0.01s, 14864 steps).
+
+File "append_k_integers_with_minimal_sum_array_stage3_cdad616d_stage3.mlw", line 59, characters 20-35:
+Sub-goal Loop invariant init of goal insertion_sort'vc.
+Prover result is: Valid (0.01s, 1173 steps).
+
+File "append_k_integers_with_minimal_sum_array_stage3_cdad616d_stage3.mlw", line 62, characters 13-21:
+Sub-goal Index in array bounds of goal insertion_sort'vc.
+Prover result is: Valid (0.01s, 17367 steps).
+
+File "append_k_integers_with_minimal_sum_array_stage3_cdad616d_stage3.mlw", line 63, characters 28-36:
+Sub-goal Index in array bounds of goal insertion_sort'vc.
+Prover result is: Valid (0.01s, 18180 steps).
+
+File "append_k_integers_with_minimal_sum_array_stage3_cdad616d_stage3.mlw", line 63, characters 12-36:
+Sub-goal Index in array bounds of goal insertion_sort'vc.
+Prover result is: Valid (0.01s, 18221 steps).
+
+File "append_k_integers_with_minimal_sum_array_stage3_cdad616d_stage3.mlw", line 60, characters 20-26:
+Sub-goal Loop variant decrease of goal insertion_sort'vc.
+Prover result is: Valid (0.01s, 4497 steps).
+
+File "append_k_integers_with_minimal_sum_array_stage3_cdad616d_stage3.mlw", line 58, characters 20-32:
+Sub-goal Loop invariant preservation of goal insertion_sort'vc.
+Prover result is: Valid (0.01s, 18957 steps).
+
+File "append_k_integers_with_minimal_sum_array_stage3_cdad616d_stage3.mlw", line 59, characters 20-35:
+Sub-goal Loop invariant preservation of goal insertion_sort'vc.
+Prover result is: Valid (0.01s, 18701 steps).
+
+File "append_k_integers_with_minimal_sum_array_stage3_cdad616d_stage3.mlw", line 60, characters 20-26:
+Sub-goal Loop variant decrease of goal insertion_sort'vc.
+Prover result is: Unknown (unknown) (0.01s, 54885 steps).
+
+File "append_k_integers_with_minimal_sum_array_stage3_cdad616d_stage3.mlw", line 58, characters 20-32:
+Sub-goal Loop invariant preservation of goal insertion_sort'vc.
+Prover result is: Valid (0.01s, 1855 steps).
+
+File "append_k_integers_with_minimal_sum_array_stage3_cdad616d_stage3.mlw", line 59, characters 20-35:
+Sub-goal Loop invariant preservation of goal insertion_sort'vc.
+Prover result is: Valid (0.01s, 1264 steps).
+
+File "append_k_integers_with_minimal_sum_array_stage3_cdad616d_stage3.mlw", line 60, characters 20-26:
+Sub-goal Loop variant decrease of goal insertion_sort'vc.
+Prover result is: Unknown (unknown) (1.13s, 62523403 steps).
+
+File "append_k_integers_with_minimal_sum_array_stage3_cdad616d_stage3.mlw", line 58, characters 20-32:
+Sub-goal Loop invariant preservation of goal insertion_sort'vc.
+Prover result is: Valid (0.01s, 1777 steps).
+
+File "append_k_integers_with_minimal_sum_array_stage3_cdad616d_stage3.mlw", line 59, characters 20-35:
+Sub-goal Loop invariant preservation of goal insertion_sort'vc.
+Prover result is: Valid (0.01s, 1210 steps).
+
+File "append_k_integers_with_minimal_sum_array_stage3_cdad616d_stage3.mlw", line 70, characters 6-25:
+Sub-goal Index in array bounds of goal insertion_sort'vc.
+Prover result is: Valid (0.01s, 17337 steps).
+
+File "append_k_integers_with_minimal_sum_array_stage3_cdad616d_stage3.mlw", line 50, characters 14-45:
+Sub-goal Postcondition of goal insertion_sort'vc.
+Prover result is: Valid (0.01s, 1128 steps).
+
+File "append_k_integers_with_minimal_sum_array_stage3_cdad616d_stage3.mlw", line 50, characters 14-45:
+Sub-goal Postcondition of goal insertion_sort'vc.
+Prover result is: Valid (0.01s, 1119 steps).
+---- stage2 | prover: Alt-Ergo,2.4.0 | theory: AppendKIntegersWithMinimalSum_Array_Spec | goal: insertion_sort'vc ----
+Transforms: split_vc
+File "append_k_integers_with_minimal_sum_array_stage3_cdad616d_stage3.mlw", line 54, characters 16-23:
+Sub-goal Index in array bounds of goal insertion_sort'vc.
+Prover result is: Valid (0.01s, 8 steps).
+
+File "append_k_integers_with_minimal_sum_array_stage3_cdad616d_stage3.mlw", line 58, characters 20-32:
+Sub-goal Loop invariant init of goal insertion_sort'vc.
+Prover result is: Valid (0.01s, 8 steps).
+
+File "append_k_integers_with_minimal_sum_array_stage3_cdad616d_stage3.mlw", line 59, characters 20-35:
+Sub-goal Loop invariant init of goal insertion_sort'vc.
+Prover result is: Valid (0.01s, 10 steps).
+
+File "append_k_integers_with_minimal_sum_array_stage3_cdad616d_stage3.mlw", line 62, characters 13-21:
+Sub-goal Index in array bounds of goal insertion_sort'vc.
+Prover result is: Valid (0.01s, 19 steps).
+
+File "append_k_integers_with_minimal_sum_array_stage3_cdad616d_stage3.mlw", line 63, characters 28-36:
+Sub-goal Index in array bounds of goal insertion_sort'vc.
+Prover result is: Valid (0.01s, 21 steps).
+
+File "append_k_integers_with_minimal_sum_array_stage3_cdad616d_stage3.mlw", line 63, characters 12-36:
+Sub-goal Index in array bounds of goal insertion_sort'vc.
+Prover result is: Valid (0.01s, 21 steps).
+
+File "append_k_integers_with_minimal_sum_array_stage3_cdad616d_stage3.mlw", line 60, characters 20-26:
+Sub-goal Loop variant decrease of goal insertion_sort'vc.
+Prover result is: Valid (0.01s, 29 steps).
+
+File "append_k_integers_with_minimal_sum_array_stage3_cdad616d_stage3.mlw", line 58, characters 20-32:
+Sub-goal Loop invariant preservation of goal insertion_sort'vc.
+Prover result is: Valid (0.01s, 29 steps).
+
+File "append_k_integers_with_minimal_sum_array_stage3_cdad616d_stage3.mlw", line 59, characters 20-35:
+Sub-goal Loop invariant preservation of goal insertion_sort'vc.
+Prover result is: Valid (0.01s, 31 steps).
+
+File "append_k_integers_with_minimal_sum_array_stage3_cdad616d_stage3.mlw", line 60, characters 20-26:
+Sub-goal Loop variant decrease of goal insertion_sort'vc.
+Prover result is: Unknown () (0.01s, 31 steps).
+
+File "append_k_integers_with_minimal_sum_array_stage3_cdad616d_stage3.mlw", line 58, characters 20-32:
+Sub-goal Loop invariant preservation of goal insertion_sort'vc.
+Prover result is: Valid (0.01s, 23 steps).
+
+File "append_k_integers_with_minimal_sum_array_stage3_cdad616d_stage3.mlw", line 59, characters 20-35:
+Sub-goal Loop invariant preservation of goal insertion_sort'vc.
+Prover result is: Valid (0.01s, 23 steps).
+
+File "append_k_integers_with_minimal_sum_array_stage3_cdad616d_stage3.mlw", line 60, characters 20-26:
+Sub-goal Loop variant decrease of goal insertion_sort'vc.
+Prover result is: Unknown () (0.01s, 25 steps).
+
+File "append_k_integers_with_minimal_sum_array_stage3_cdad616d_stage3.mlw", line 58, characters 20-32:
+Sub-goal Loop invariant preservation of goal insertion_sort'vc.
+Prover result is: Valid (0.01s, 21 steps).
+
+File "append_k_integers_with_minimal_sum_array_stage3_cdad616d_stage3.mlw", line 59, characters 20-35:
+Sub-goal Loop invariant preservation of goal insertion_sort'vc.
+Prover result is: Valid (0.01s, 21 steps).
+
+File "append_k_integers_with_minimal_sum_array_stage3_cdad616d_stage3.mlw", line 70, characters 6-25:
+Sub-goal Index in array bounds of goal insertion_sort'vc.
+Prover result is: Valid (0.01s, 17 steps).
+
+File "append_k_integers_with_minimal_sum_array_stage3_cdad616d_stage3.mlw", line 50, characters 14-45:
+Sub-goal Postcondition of goal insertion_sort'vc.
+Prover result is: Valid (0.01s, 4 steps).
+
+File "append_k_integers_with_minimal_sum_array_stage3_cdad616d_stage3.mlw", line 50, characters 14-45:
+Sub-goal Postcondition of goal insertion_sort'vc.
+Prover result is: Valid (0.01s, 2 steps).
+---- stage2 | prover: CVC4,1.8 | theory: AppendKIntegersWithMinimalSum_Array_Spec | goal: insertion_sort'vc ----
+Transforms: split_vc
+File "append_k_integers_with_minimal_sum_array_stage3_cdad616d_stage3.mlw", line 54, characters 16-23:
+Sub-goal Index in array bounds of goal insertion_sort'vc.
+Prover result is: Valid (0.02s, 3324 steps).
+
+File "append_k_integers_with_minimal_sum_array_stage3_cdad616d_stage3.mlw", line 58, characters 20-32:
+Sub-goal Loop invariant init of goal insertion_sort'vc.
+Prover result is: Valid (0.01s, 3305 steps).
+
+File "append_k_integers_with_minimal_sum_array_stage3_cdad616d_stage3.mlw", line 59, characters 20-35:
+Sub-goal Loop invariant init of goal insertion_sort'vc.
+Prover result is: Valid (0.02s, 3270 steps).
+
+File "append_k_integers_with_minimal_sum_array_stage3_cdad616d_stage3.mlw", line 62, characters 13-21:
+Sub-goal Index in array bounds of goal insertion_sort'vc.
+Prover result is: Valid (0.02s, 3433 steps).
+
+File "append_k_integers_with_minimal_sum_array_stage3_cdad616d_stage3.mlw", line 63, characters 28-36:
+Sub-goal Index in array bounds of goal insertion_sort'vc.
+Prover result is: Valid (0.02s, 3552 steps).
+
+File "append_k_integers_with_minimal_sum_array_stage3_cdad616d_stage3.mlw", line 63, characters 12-36:
+Sub-goal Index in array bounds of goal insertion_sort'vc.
+Prover result is: Valid (0.01s, 3566 steps).
+
+File "append_k_integers_with_minimal_sum_array_stage3_cdad616d_stage3.mlw", line 60, characters 20-26:
+Sub-goal Loop variant decrease of goal insertion_sort'vc.
+Prover result is: Valid (0.01s, 3646 steps).
+
+File "append_k_integers_with_minimal_sum_array_stage3_cdad616d_stage3.mlw", line 58, characters 20-32:
+Sub-goal Loop invariant preservation of goal insertion_sort'vc.
+Prover result is: Valid (0.01s, 3792 steps).
+
+File "append_k_integers_with_minimal_sum_array_stage3_cdad616d_stage3.mlw", line 59, characters 20-35:
+Sub-goal Loop invariant preservation of goal insertion_sort'vc.
+Prover result is: Valid (0.01s, 3828 steps).
+
+File "append_k_integers_with_minimal_sum_array_stage3_cdad616d_stage3.mlw", line 60, characters 20-26:
+Sub-goal Loop variant decrease of goal insertion_sort'vc.
+Prover result is: Unknown (unknown + incomplete) (0.02s, 4297 steps).
+
+File "append_k_integers_with_minimal_sum_array_stage3_cdad616d_stage3.mlw", line 58, characters 20-32:
+Sub-goal Loop invariant preservation of goal insertion_sort'vc.
+Prover result is: Valid (0.01s, 3459 steps).
+
+File "append_k_integers_with_minimal_sum_array_stage3_cdad616d_stage3.mlw", line 59, characters 20-35:
+Sub-goal Loop invariant preservation of goal insertion_sort'vc.
+Prover result is: Valid (0.01s, 3464 steps).
+
+File "append_k_integers_with_minimal_sum_array_stage3_cdad616d_stage3.mlw", line 60, characters 20-26:
+Sub-goal Loop variant decrease of goal insertion_sort'vc.
+Prover result is: Unknown (unknown + incomplete) (0.02s, 3665 steps).
+
+File "append_k_integers_with_minimal_sum_array_stage3_cdad616d_stage3.mlw", line 58, characters 20-32:
+Sub-goal Loop invariant preservation of goal insertion_sort'vc.
+Prover result is: Valid (0.01s, 3367 steps).
+
+File "append_k_integers_with_minimal_sum_array_stage3_cdad616d_stage3.mlw", line 59, characters 20-35:
+Sub-goal Loop invariant preservation of goal insertion_sort'vc.
+Prover result is: Valid (0.01s, 3372 steps).
+
+File "append_k_integers_with_minimal_sum_array_stage3_cdad616d_stage3.mlw", line 70, characters 6-25:
+Sub-goal Index in array bounds of goal insertion_sort'vc.
+Prover result is: Valid (0.01s, 3431 steps).
+
+File "append_k_integers_with_minimal_sum_array_stage3_cdad616d_stage3.mlw", line 50, characters 14-45:
+Sub-goal Postcondition of goal insertion_sort'vc.
+Prover result is: Valid (0.01s, 3185 steps).
+
+File "append_k_integers_with_minimal_sum_array_stage3_cdad616d_stage3.mlw", line 50, characters 14-45:
+Sub-goal Postcondition of goal insertion_sort'vc.
+Prover result is: Valid (0.01s, 3163 steps).
+== Stage 2: split_vc on unproved goal ==
+Target theory: AppendKIntegersWithMinimalSum_Array_Spec
+Target goal  : append_k_integers_with_minimal_sum_array'vc
+---- stage2 | prover: Z3,4.8.6 | theory: AppendKIntegersWithMinimalSum_Array_Spec | goal: append_k_integers_with_minimal_sum_array'vc ----
+Transforms: split_vc
+File "append_k_integers_with_minimal_sum_array_stage3_cdad616d_stage3.mlw", line 92, characters 20-29:
+Sub-goal Index in array bounds of goal
+append_k_integers_with_minimal_sum_array'vc.
+Prover result is: Valid (0.01s, 17082 steps).
+
+File "append_k_integers_with_minimal_sum_array_stage3_cdad616d_stage3.mlw", line 83, characters 15-49:
+Sub-goal Postcondition of goal append_k_integers_with_minimal_sum_array'vc.
+Prover result is: Unknown (unknown) (6.13s, 128254130 steps).
+
+File "append_k_integers_with_minimal_sum_array_stage3_cdad616d_stage3.mlw", line 83, characters 15-49:
+Sub-goal Postcondition of goal append_k_integers_with_minimal_sum_array'vc.
+Prover result is: Timeout (10.00s, 232742030 steps).
+
+File append_k_integers_with_minimal_sum_array_stage3_cdad616d_stage3.mlw:
+Sub-goal Out of loop bounds of goal
+append_k_integers_with_minimal_sum_array'vc.
+Prover result is: Valid (0.01s, 25003 steps).
+---- stage2 | prover: Alt-Ergo,2.4.0 | theory: AppendKIntegersWithMinimalSum_Array_Spec | goal: append_k_integers_with_minimal_sum_array'vc ----
+Transforms: split_vc
+File "append_k_integers_with_minimal_sum_array_stage3_cdad616d_stage3.mlw", line 92, characters 20-29:
+Sub-goal Index in array bounds of goal
+append_k_integers_with_minimal_sum_array'vc.
+Prover result is: Valid (0.01s, 20 steps).
+
+File "append_k_integers_with_minimal_sum_array_stage3_cdad616d_stage3.mlw", line 83, characters 15-49:
+Sub-goal Postcondition of goal append_k_integers_with_minimal_sum_array'vc.
+Prover result is: Timeout (10.00s, 177987 steps).
+
+File "append_k_integers_with_minimal_sum_array_stage3_cdad616d_stage3.mlw", line 83, characters 15-49:
+Sub-goal Postcondition of goal append_k_integers_with_minimal_sum_array'vc.
+Prover result is: Timeout (10.00s, 181750 steps).
+
+File append_k_integers_with_minimal_sum_array_stage3_cdad616d_stage3.mlw:
+Sub-goal Out of loop bounds of goal
+append_k_integers_with_minimal_sum_array'vc.
+Prover result is: Valid (0.01s, 15 steps).
+---- stage2 | prover: CVC4,1.8 | theory: AppendKIntegersWithMinimalSum_Array_Spec | goal: append_k_integers_with_minimal_sum_array'vc ----
+Transforms: split_vc
+File "append_k_integers_with_minimal_sum_array_stage3_cdad616d_stage3.mlw", line 92, characters 20-29:
+Sub-goal Index in array bounds of goal
+append_k_integers_with_minimal_sum_array'vc.
+Prover result is: Valid (0.02s, 3704 steps).
+
+File "append_k_integers_with_minimal_sum_array_stage3_cdad616d_stage3.mlw", line 83, characters 15-49:
+Sub-goal Postcondition of goal append_k_integers_with_minimal_sum_array'vc.
+Prover result is: Timeout (10.00s, 1427536 steps).
+
+File "append_k_integers_with_minimal_sum_array_stage3_cdad616d_stage3.mlw", line 83, characters 15-49:
+Sub-goal Postcondition of goal append_k_integers_with_minimal_sum_array'vc.
+Prover result is: Timeout (10.00s, 1424691 steps).
+
+File append_k_integers_with_minimal_sum_array_stage3_cdad616d_stage3.mlw:
+Sub-goal Out of loop bounds of goal
+append_k_integers_with_minimal_sum_array'vc.
+Prover result is: Valid (0.02s, 4729 steps).
+== Goals still unproved after stage 2 (split_vc) ==
+AppendKIntegersWithMinimalSum_Array_Spec	copy_array'vc
+AppendKIntegersWithMinimalSum_Array_Spec	insertion_sort'vc
+AppendKIntegersWithMinimalSum_Array_Spec	append_k_integers_with_minimal_sum_array'vc
+== Stage 3: split_vc + inline_all on still-unproved goal ==
+Target theory: AppendKIntegersWithMinimalSum_Array_Spec
+Target goal  : copy_array'vc
+---- stage3 | prover: Z3,4.8.6 | theory: AppendKIntegersWithMinimalSum_Array_Spec | goal: copy_array'vc ----
+Transforms: split_vc inline_all
+File "append_k_integers_with_minimal_sum_array_stage3_cdad616d_stage3.mlw", line 43, characters 17-25:
+Sub-goal Array creation size of goal copy_array'vc.
+Prover result is: Valid (0.01s, 16662 steps).
+
+File "append_k_integers_with_minimal_sum_array_stage3_cdad616d_stage3.mlw", line 45, characters 19-26:
+Sub-goal Index in array bounds of goal copy_array'vc.
+Prover result is: Valid (0.01s, 16335 steps).
+
+File "append_k_integers_with_minimal_sum_array_stage3_cdad616d_stage3.mlw", line 45, characters 6-26:
+Sub-goal Index in array bounds of goal copy_array'vc.
+Prover result is: Valid (0.01s, 16470 steps).
+
+File "append_k_integers_with_minimal_sum_array_stage3_cdad616d_stage3.mlw", line 39, characters 14-41:
+Sub-goal Postcondition of goal copy_array'vc.
+Prover result is: Valid (0.01s, 15878 steps).
+
+File "append_k_integers_with_minimal_sum_array_stage3_cdad616d_stage3.mlw", line 40, characters 53-72:
+Sub-goal Postcondition of goal copy_array'vc.
+Prover result is: Unknown (unknown) (0.15s, 1371249 steps).
+
+File append_k_integers_with_minimal_sum_array_stage3_cdad616d_stage3.mlw:
+Sub-goal Out of loop bounds of goal copy_array'vc.
+Prover result is: Valid (0.01s, 15123 steps).
+---- stage3 | prover: Alt-Ergo,2.4.0 | theory: AppendKIntegersWithMinimalSum_Array_Spec | goal: copy_array'vc ----
+Transforms: split_vc inline_all
+File "append_k_integers_with_minimal_sum_array_stage3_cdad616d_stage3.mlw", line 43, characters 17-25:
+Sub-goal Array creation size of goal copy_array'vc.
+Prover result is: Valid (0.01s, 4 steps).
+
+File "append_k_integers_with_minimal_sum_array_stage3_cdad616d_stage3.mlw", line 45, characters 19-26:
+Sub-goal Index in array bounds of goal copy_array'vc.
+Prover result is: Valid (0.01s, 12 steps).
+
+File "append_k_integers_with_minimal_sum_array_stage3_cdad616d_stage3.mlw", line 45, characters 6-26:
+Sub-goal Index in array bounds of goal copy_array'vc.
+Prover result is: Valid (0.01s, 12 steps).
+
+File "append_k_integers_with_minimal_sum_array_stage3_cdad616d_stage3.mlw", line 39, characters 14-41:
+Sub-goal Postcondition of goal copy_array'vc.
+Prover result is: Valid (0.01s, 7 steps).
+
+File "append_k_integers_with_minimal_sum_array_stage3_cdad616d_stage3.mlw", line 40, characters 53-72:
+Sub-goal Postcondition of goal copy_array'vc.
+Prover result is: Timeout (10.00s, 30930 steps).
+
+File append_k_integers_with_minimal_sum_array_stage3_cdad616d_stage3.mlw:
+Sub-goal Out of loop bounds of goal copy_array'vc.
+Prover result is: Valid (0.01s, 10 steps).
+---- stage3 | prover: CVC4,1.8 | theory: AppendKIntegersWithMinimalSum_Array_Spec | goal: copy_array'vc ----
+Transforms: split_vc inline_all
+File "append_k_integers_with_minimal_sum_array_stage3_cdad616d_stage3.mlw", line 43, characters 17-25:
+Sub-goal Array creation size of goal copy_array'vc.
+Prover result is: Valid (0.02s, 4154 steps).
+
+File "append_k_integers_with_minimal_sum_array_stage3_cdad616d_stage3.mlw", line 45, characters 19-26:
+Sub-goal Index in array bounds of goal copy_array'vc.
+Prover result is: Valid (0.01s, 3866 steps).
+
+File "append_k_integers_with_minimal_sum_array_stage3_cdad616d_stage3.mlw", line 45, characters 6-26:
+Sub-goal Index in array bounds of goal copy_array'vc.
+Prover result is: Valid (0.01s, 3918 steps).
+
+File "append_k_integers_with_minimal_sum_array_stage3_cdad616d_stage3.mlw", line 39, characters 14-41:
+Sub-goal Postcondition of goal copy_array'vc.
+Prover result is: Valid (0.01s, 3722 steps).
+
+File "append_k_integers_with_minimal_sum_array_stage3_cdad616d_stage3.mlw", line 40, characters 53-72:
+Sub-goal Postcondition of goal copy_array'vc.
+Prover result is: Unknown (unknown + incomplete) (0.02s, 4270 steps).
+
+File append_k_integers_with_minimal_sum_array_stage3_cdad616d_stage3.mlw:
+Sub-goal Out of loop bounds of goal copy_array'vc.
+Prover result is: Valid (0.01s, 3928 steps).
+== Stage 3: split_vc + inline_all on still-unproved goal ==
+Target theory: AppendKIntegersWithMinimalSum_Array_Spec
+Target goal  : insertion_sort'vc
+---- stage3 | prover: Z3,4.8.6 | theory: AppendKIntegersWithMinimalSum_Array_Spec | goal: insertion_sort'vc ----
+Transforms: split_vc inline_all
+File "append_k_integers_with_minimal_sum_array_stage3_cdad616d_stage3.mlw", line 54, characters 16-23:
+Sub-goal Index in array bounds of goal insertion_sort'vc.
+Prover result is: Valid (0.01s, 18006 steps).
+
+File "append_k_integers_with_minimal_sum_array_stage3_cdad616d_stage3.mlw", line 58, characters 20-32:
+Sub-goal Loop invariant init of goal insertion_sort'vc.
+Prover result is: Valid (0.01s, 17656 steps).
+
+File "append_k_integers_with_minimal_sum_array_stage3_cdad616d_stage3.mlw", line 59, characters 20-35:
+Sub-goal Loop invariant init of goal insertion_sort'vc.
+Prover result is: Valid (0.01s, 1473 steps).
+
+File "append_k_integers_with_minimal_sum_array_stage3_cdad616d_stage3.mlw", line 62, characters 13-21:
+Sub-goal Index in array bounds of goal insertion_sort'vc.
+Prover result is: Valid (0.01s, 20846 steps).
+
+File "append_k_integers_with_minimal_sum_array_stage3_cdad616d_stage3.mlw", line 63, characters 28-36:
+Sub-goal Index in array bounds of goal insertion_sort'vc.
+Prover result is: Valid (0.01s, 18891 steps).
+
+File "append_k_integers_with_minimal_sum_array_stage3_cdad616d_stage3.mlw", line 63, characters 12-36:
+Sub-goal Index in array bounds of goal insertion_sort'vc.
+Prover result is: Valid (0.01s, 18947 steps).
+
+File "append_k_integers_with_minimal_sum_array_stage3_cdad616d_stage3.mlw", line 60, characters 20-26:
+Sub-goal Loop variant decrease of goal insertion_sort'vc.
+Prover result is: Valid (0.01s, 5679 steps).
+
+File "append_k_integers_with_minimal_sum_array_stage3_cdad616d_stage3.mlw", line 58, characters 20-32:
+Sub-goal Loop invariant preservation of goal insertion_sort'vc.
+Prover result is: Valid (0.01s, 23217 steps).
+
+File "append_k_integers_with_minimal_sum_array_stage3_cdad616d_stage3.mlw", line 59, characters 20-35:
+Sub-goal Loop invariant preservation of goal insertion_sort'vc.
+Prover result is: Valid (0.01s, 22853 steps).
+
+File "append_k_integers_with_minimal_sum_array_stage3_cdad616d_stage3.mlw", line 60, characters 20-26:
+Sub-goal Loop variant decrease of goal insertion_sort'vc.
+Prover result is: Timeout (10.00s, 64829203 steps).
+
+File "append_k_integers_with_minimal_sum_array_stage3_cdad616d_stage3.mlw", line 58, characters 20-32:
+Sub-goal Loop invariant preservation of goal insertion_sort'vc.
+Prover result is: Valid (0.01s, 2025 steps).
+
+File "append_k_integers_with_minimal_sum_array_stage3_cdad616d_stage3.mlw", line 59, characters 20-35:
+Sub-goal Loop invariant preservation of goal insertion_sort'vc.
+Prover result is: Valid (0.01s, 1394 steps).
+
+File "append_k_integers_with_minimal_sum_array_stage3_cdad616d_stage3.mlw", line 60, characters 20-26:
+Sub-goal Loop variant decrease of goal insertion_sort'vc.
+Prover result is: Unknown (unknown) (0.01s, 39657 steps).
+
+File "append_k_integers_with_minimal_sum_array_stage3_cdad616d_stage3.mlw", line 58, characters 20-32:
+Sub-goal Loop invariant preservation of goal insertion_sort'vc.
+Prover result is: Valid (0.01s, 2226 steps).
+
+File "append_k_integers_with_minimal_sum_array_stage3_cdad616d_stage3.mlw", line 59, characters 20-35:
+Sub-goal Loop invariant preservation of goal insertion_sort'vc.
+Prover result is: Valid (0.01s, 1537 steps).
+
+File "append_k_integers_with_minimal_sum_array_stage3_cdad616d_stage3.mlw", line 70, characters 6-25:
+Sub-goal Index in array bounds of goal insertion_sort'vc.
+Prover result is: Valid (0.01s, 20639 steps).
+
+File "append_k_integers_with_minimal_sum_array_stage3_cdad616d_stage3.mlw", line 50, characters 14-45:
+Sub-goal Postcondition of goal insertion_sort'vc.
+Prover result is: Valid (0.01s, 1390 steps).
+
+File "append_k_integers_with_minimal_sum_array_stage3_cdad616d_stage3.mlw", line 50, characters 14-45:
+Sub-goal Postcondition of goal insertion_sort'vc.
+Prover result is: Valid (0.01s, 1363 steps).
+---- stage3 | prover: Alt-Ergo,2.4.0 | theory: AppendKIntegersWithMinimalSum_Array_Spec | goal: insertion_sort'vc ----
+Transforms: split_vc inline_all
+File "append_k_integers_with_minimal_sum_array_stage3_cdad616d_stage3.mlw", line 54, characters 16-23:
+Sub-goal Index in array bounds of goal insertion_sort'vc.
+Prover result is: Valid (0.01s, 19 steps).
+
+File "append_k_integers_with_minimal_sum_array_stage3_cdad616d_stage3.mlw", line 58, characters 20-32:
+Sub-goal Loop invariant init of goal insertion_sort'vc.
+Prover result is: Valid (0.01s, 14 steps).
+
+File "append_k_integers_with_minimal_sum_array_stage3_cdad616d_stage3.mlw", line 59, characters 20-35:
+Sub-goal Loop invariant init of goal insertion_sort'vc.
+Prover result is: Valid (0.01s, 8 steps).
+
+File "append_k_integers_with_minimal_sum_array_stage3_cdad616d_stage3.mlw", line 62, characters 13-21:
+Sub-goal Index in array bounds of goal insertion_sort'vc.
+Prover result is: Valid (0.01s, 18 steps).
+
+File "append_k_integers_with_minimal_sum_array_stage3_cdad616d_stage3.mlw", line 63, characters 28-36:
+Sub-goal Index in array bounds of goal insertion_sort'vc.
+Prover result is: Valid (0.01s, 19 steps).
+
+File "append_k_integers_with_minimal_sum_array_stage3_cdad616d_stage3.mlw", line 63, characters 12-36:
+Sub-goal Index in array bounds of goal insertion_sort'vc.
+Prover result is: Valid (0.01s, 27 steps).
+
+File "append_k_integers_with_minimal_sum_array_stage3_cdad616d_stage3.mlw", line 60, characters 20-26:
+Sub-goal Loop variant decrease of goal insertion_sort'vc.
+Prover result is: Valid (0.01s, 28 steps).
+
+File "append_k_integers_with_minimal_sum_array_stage3_cdad616d_stage3.mlw", line 58, characters 20-32:
+Sub-goal Loop invariant preservation of goal insertion_sort'vc.
+Prover result is: Valid (0.01s, 26 steps).
+
+File "append_k_integers_with_minimal_sum_array_stage3_cdad616d_stage3.mlw", line 59, characters 20-35:
+Sub-goal Loop invariant preservation of goal insertion_sort'vc.
+Prover result is: Valid (0.01s, 23 steps).
+
+File "append_k_integers_with_minimal_sum_array_stage3_cdad616d_stage3.mlw", line 60, characters 20-26:
+Sub-goal Loop variant decrease of goal insertion_sort'vc.
+Prover result is: Unknown () (0.01s, 29 steps).
+
+File "append_k_integers_with_minimal_sum_array_stage3_cdad616d_stage3.mlw", line 58, characters 20-32:
+Sub-goal Loop invariant preservation of goal insertion_sort'vc.
+Prover result is: Valid (0.01s, 16 steps).
+
+File "append_k_integers_with_minimal_sum_array_stage3_cdad616d_stage3.mlw", line 59, characters 20-35:
+Sub-goal Loop invariant preservation of goal insertion_sort'vc.
+Prover result is: Valid (0.01s, 16 steps).
+
+File "append_k_integers_with_minimal_sum_array_stage3_cdad616d_stage3.mlw", line 60, characters 20-26:
+Sub-goal Loop variant decrease of goal insertion_sort'vc.
+Prover result is: Unknown () (0.01s, 32 steps).
+
+File "append_k_integers_with_minimal_sum_array_stage3_cdad616d_stage3.mlw", line 58, characters 20-32:
+Sub-goal Loop invariant preservation of goal insertion_sort'vc.
+Prover result is: Valid (0.01s, 16 steps).
+
+File "append_k_integers_with_minimal_sum_array_stage3_cdad616d_stage3.mlw", line 59, characters 20-35:
+Sub-goal Loop invariant preservation of goal insertion_sort'vc.
+Prover result is: Valid (0.01s, 16 steps).
+
+File "append_k_integers_with_minimal_sum_array_stage3_cdad616d_stage3.mlw", line 70, characters 6-25:
+Sub-goal Index in array bounds of goal insertion_sort'vc.
+Prover result is: Valid (0.01s, 20 steps).
+
+File "append_k_integers_with_minimal_sum_array_stage3_cdad616d_stage3.mlw", line 50, characters 14-45:
+Sub-goal Postcondition of goal insertion_sort'vc.
+Prover result is: Valid (0.01s, 5 steps).
+
+File "append_k_integers_with_minimal_sum_array_stage3_cdad616d_stage3.mlw", line 50, characters 14-45:
+Sub-goal Postcondition of goal insertion_sort'vc.
+Prover result is: Valid (0.01s, 2 steps).
+---- stage3 | prover: CVC4,1.8 | theory: AppendKIntegersWithMinimalSum_Array_Spec | goal: insertion_sort'vc ----
+Transforms: split_vc inline_all
+File "append_k_integers_with_minimal_sum_array_stage3_cdad616d_stage3.mlw", line 54, characters 16-23:
+Sub-goal Index in array bounds of goal insertion_sort'vc.
+Prover result is: Valid (0.02s, 4210 steps).
+
+File "append_k_integers_with_minimal_sum_array_stage3_cdad616d_stage3.mlw", line 58, characters 20-32:
+Sub-goal Loop invariant init of goal insertion_sort'vc.
+Prover result is: Valid (0.02s, 4179 steps).
+
+File "append_k_integers_with_minimal_sum_array_stage3_cdad616d_stage3.mlw", line 59, characters 20-35:
+Sub-goal Loop invariant init of goal insertion_sort'vc.
+Prover result is: Valid (0.01s, 4100 steps).
+
+File "append_k_integers_with_minimal_sum_array_stage3_cdad616d_stage3.mlw", line 62, characters 13-21:
+Sub-goal Index in array bounds of goal insertion_sort'vc.
+Prover result is: Valid (0.02s, 4389 steps).
+
+File "append_k_integers_with_minimal_sum_array_stage3_cdad616d_stage3.mlw", line 63, characters 28-36:
+Sub-goal Index in array bounds of goal insertion_sort'vc.
+Prover result is: Valid (0.02s, 4058 steps).
+
+File "append_k_integers_with_minimal_sum_array_stage3_cdad616d_stage3.mlw", line 63, characters 12-36:
+Sub-goal Index in array bounds of goal insertion_sort'vc.
+Prover result is: Valid (0.02s, 4088 steps).
+
+File "append_k_integers_with_minimal_sum_array_stage3_cdad616d_stage3.mlw", line 60, characters 20-26:
+Sub-goal Loop variant decrease of goal insertion_sort'vc.
+Prover result is: Valid (0.01s, 4630 steps).
+
+File "append_k_integers_with_minimal_sum_array_stage3_cdad616d_stage3.mlw", line 58, characters 20-32:
+Sub-goal Loop invariant preservation of goal insertion_sort'vc.
+Prover result is: Valid (0.02s, 4885 steps).
+
+File "append_k_integers_with_minimal_sum_array_stage3_cdad616d_stage3.mlw", line 59, characters 20-35:
+Sub-goal Loop invariant preservation of goal insertion_sort'vc.
+Prover result is: Valid (0.02s, 4928 steps).
+
+File "append_k_integers_with_minimal_sum_array_stage3_cdad616d_stage3.mlw", line 60, characters 20-26:
+Sub-goal Loop variant decrease of goal insertion_sort'vc.
+Prover result is: Unknown (unknown + incomplete) (0.02s, 4308 steps).
+
+File "append_k_integers_with_minimal_sum_array_stage3_cdad616d_stage3.mlw", line 58, characters 20-32:
+Sub-goal Loop invariant preservation of goal insertion_sort'vc.
+Prover result is: Valid (0.01s, 3867 steps).
+
+File "append_k_integers_with_minimal_sum_array_stage3_cdad616d_stage3.mlw", line 59, characters 20-35:
+Sub-goal Loop invariant preservation of goal insertion_sort'vc.
+Prover result is: Valid (0.01s, 3872 steps).
+
+File "append_k_integers_with_minimal_sum_array_stage3_cdad616d_stage3.mlw", line 60, characters 20-26:
+Sub-goal Loop variant decrease of goal insertion_sort'vc.
+Prover result is: Unknown (unknown + incomplete) (0.02s, 4629 steps).
+
+File "append_k_integers_with_minimal_sum_array_stage3_cdad616d_stage3.mlw", line 58, characters 20-32:
+Sub-goal Loop invariant preservation of goal insertion_sort'vc.
+Prover result is: Valid (0.01s, 4221 steps).
+
+File "append_k_integers_with_minimal_sum_array_stage3_cdad616d_stage3.mlw", line 59, characters 20-35:
+Sub-goal Loop invariant preservation of goal insertion_sort'vc.
+Prover result is: Valid (0.01s, 4226 steps).
+
+File "append_k_integers_with_minimal_sum_array_stage3_cdad616d_stage3.mlw", line 70, characters 6-25:
+Sub-goal Index in array bounds of goal insertion_sort'vc.
+Prover result is: Valid (0.02s, 4361 steps).
+
+File "append_k_integers_with_minimal_sum_array_stage3_cdad616d_stage3.mlw", line 50, characters 14-45:
+Sub-goal Postcondition of goal insertion_sort'vc.
+Prover result is: Valid (0.01s, 3931 steps).
+
+File "append_k_integers_with_minimal_sum_array_stage3_cdad616d_stage3.mlw", line 50, characters 14-45:
+Sub-goal Postcondition of goal insertion_sort'vc.
+Prover result is: Valid (0.01s, 3882 steps).
+== Stage 3: split_vc + inline_all on still-unproved goal ==
+Target theory: AppendKIntegersWithMinimalSum_Array_Spec
+Target goal  : append_k_integers_with_minimal_sum_array'vc
+---- stage3 | prover: Z3,4.8.6 | theory: AppendKIntegersWithMinimalSum_Array_Spec | goal: append_k_integers_with_minimal_sum_array'vc ----
+Transforms: split_vc inline_all
+File "append_k_integers_with_minimal_sum_array_stage3_cdad616d_stage3.mlw", line 92, characters 20-29:
+Sub-goal Index in array bounds of goal
+append_k_integers_with_minimal_sum_array'vc.
+Prover result is: Valid (0.01s, 18617 steps).
+
+File "append_k_integers_with_minimal_sum_array_stage3_cdad616d_stage3.mlw", line 83, characters 15-49:
+Sub-goal Postcondition of goal append_k_integers_with_minimal_sum_array'vc.
+Prover result is: Unknown (unknown) (3.32s, 28741838 steps).
+
+File "append_k_integers_with_minimal_sum_array_stage3_cdad616d_stage3.mlw", line 83, characters 15-49:
+Sub-goal Postcondition of goal append_k_integers_with_minimal_sum_array'vc.
+Prover result is: Unknown (unknown) (6.55s, 55083227 steps).
+
+File append_k_integers_with_minimal_sum_array_stage3_cdad616d_stage3.mlw:
+Sub-goal Out of loop bounds of goal
+append_k_integers_with_minimal_sum_array'vc.
+Prover result is: Valid (0.01s, 32940 steps).
+---- stage3 | prover: Alt-Ergo,2.4.0 | theory: AppendKIntegersWithMinimalSum_Array_Spec | goal: append_k_integers_with_minimal_sum_array'vc ----
+Transforms: split_vc inline_all
+File "append_k_integers_with_minimal_sum_array_stage3_cdad616d_stage3.mlw", line 92, characters 20-29:
+Sub-goal Index in array bounds of goal
+append_k_integers_with_minimal_sum_array'vc.
+Prover result is: Valid (0.01s, 16 steps).
+
+File "append_k_integers_with_minimal_sum_array_stage3_cdad616d_stage3.mlw", line 83, characters 15-49:
+Sub-goal Postcondition of goal append_k_integers_with_minimal_sum_array'vc.
+Prover result is: Timeout (10.00s, 157564 steps).
+
+File "append_k_integers_with_minimal_sum_array_stage3_cdad616d_stage3.mlw", line 83, characters 15-49:
+Sub-goal Postcondition of goal append_k_integers_with_minimal_sum_array'vc.
+Prover result is: Timeout (10.00s, 135357 steps).
+
+File append_k_integers_with_minimal_sum_array_stage3_cdad616d_stage3.mlw:
+Sub-goal Out of loop bounds of goal
+append_k_integers_with_minimal_sum_array'vc.
+Prover result is: Valid (0.01s, 21 steps).
+---- stage3 | prover: CVC4,1.8 | theory: AppendKIntegersWithMinimalSum_Array_Spec | goal: append_k_integers_with_minimal_sum_array'vc ----
+Transforms: split_vc inline_all
+File "append_k_integers_with_minimal_sum_array_stage3_cdad616d_stage3.mlw", line 92, characters 20-29:
+Sub-goal Index in array bounds of goal
+append_k_integers_with_minimal_sum_array'vc.
+Prover result is: Valid (0.02s, 4359 steps).
+
+File "append_k_integers_with_minimal_sum_array_stage3_cdad616d_stage3.mlw", line 83, characters 15-49:
+Sub-goal Postcondition of goal append_k_integers_with_minimal_sum_array'vc.
+Prover result is: Timeout (10.00s, 1360500 steps).
+
+File "append_k_integers_with_minimal_sum_array_stage3_cdad616d_stage3.mlw", line 83, characters 15-49:
+Sub-goal Postcondition of goal append_k_integers_with_minimal_sum_array'vc.
+Prover result is: Timeout (10.00s, 1427329 steps).
+
+File append_k_integers_with_minimal_sum_array_stage3_cdad616d_stage3.mlw:
+Sub-goal Out of loop bounds of goal
+append_k_integers_with_minimal_sum_array'vc.
+Prover result is: Valid (0.02s, 6804 steps).
+== Final summary ==
+Unproved root goals after first prover : 3
+Remaining failures after split_vc      : 3
+Remaining failures after stage 3       : 3
+Detailed logs stored in                : /Users/rubenm/Desktop/Diversify2Verify/codex-runs/testing4/2195_append-k-integers-with-minimal-sum/stage3a/array-imperative/append_k_integers_with_minimal_sum_array_stage3_cdad616d/generated/why3/array/.why3_sessions/append_k_integers_with_minimal_sum_array_stage3_cdad616d_stage3_logs
+Still unproved goals:
+AppendKIntegersWithMinimalSum_Array_Spec	copy_array'vc
+AppendKIntegersWithMinimalSum_Array_Spec	insertion_sort'vc
+AppendKIntegersWithMinimalSum_Array_Spec	append_k_integers_with_minimal_sum_array'vc
+VERIFY_RESULT: FAILURE
+VERIFY_REASON: unproved_goals_remain
+VERIFY_STAGE: stage3
+VERIFY_ROOT_TOTAL: 4
+VERIFY_ROOT_PROVED: 1
+VERIFY_ROOT_REMAINING: 3

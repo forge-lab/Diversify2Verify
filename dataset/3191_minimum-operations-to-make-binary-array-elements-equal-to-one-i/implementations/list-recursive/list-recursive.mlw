@@ -1,0 +1,174 @@
+module MinimumOperationsToMakeBinaryArrayElementsEqualToOneI_List_Recursive_Implementation
+
+  use int.Int
+  use list.List
+
+  let effective_bit (x: int) (prev2: int) (prev1: int) : int =
+    if prev2 = prev1 then x else 1 - x
+
+  let rec min_ops_from (prev2: int) (prev1: int) (nums: list int) : int
+    variant { nums }
+  =
+    match nums with
+    | Nil -> 0
+    | Cons x Nil ->
+        if effective_bit x prev2 prev1 = 1 then 0 else -1
+    | Cons x (Cons y Nil) ->
+        if effective_bit x prev2 prev1 = 1 then
+          if effective_bit y prev1 0 = 1 then 0 else -1
+        else -1
+    | Cons x (Cons y (Cons z zs)) ->
+        if effective_bit x prev2 prev1 = 1 then
+          min_ops_from prev1 0 (Cons y (Cons z zs))
+        else
+          let rest = min_ops_from prev1 1 (Cons y (Cons z zs)) in
+          if rest = -1 then -1 else 1 + rest
+    end
+
+  let minimum_operations_to_make_binary_array_elements_equal_to_one_i_list (nums: list int) : int =
+    min_ops_from 0 0 nums
+
+  let test_test_000 () : bool =
+    let nums = Cons 0 (Cons 1 (Cons 0 (Cons 1 (Cons 0 (Cons 1 Nil))))) in
+    let r = minimum_operations_to_make_binary_array_elements_equal_to_one_i_list nums in
+    r = 3
+
+  let test_test_001 () : bool =
+    let nums = Cons 0 (Cons 0 (Cons 1 (Cons 1 (Cons 1 (Cons 0 (Cons 0 Nil)))))) in
+    let r = minimum_operations_to_make_binary_array_elements_equal_to_one_i_list nums in
+    r = -1
+
+  let test_test_002 () : bool =
+    let nums = Cons 0 (Cons 0 (Cons 1 (Cons 0 (Cons 0 (Cons 1 (Cons 0 (Cons 1 (Cons 1 (Cons 0 Nil))))))))) in
+    let r = minimum_operations_to_make_binary_array_elements_equal_to_one_i_list nums in
+    r = 4
+
+  let test_test_003 () : bool =
+    let nums = Cons 1 (Cons 0 (Cons 1 (Cons 0 (Cons 1 (Cons 0 (Cons 1 (Cons 0 (Cons 1 Nil)))))))) in
+    let r = minimum_operations_to_make_binary_array_elements_equal_to_one_i_list nums in
+    r = -1
+
+  let test_test_004 () : bool =
+    let nums = Cons 0 (Cons 0 (Cons 0 (Cons 1 (Cons 1 (Cons 1 (Cons 0 (Cons 0 (Cons 0 Nil)))))))) in
+    let r = minimum_operations_to_make_binary_array_elements_equal_to_one_i_list nums in
+    r = 2
+
+  let test_test_005 () : bool =
+    let nums = Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 Nil)))))) in
+    let r = minimum_operations_to_make_binary_array_elements_equal_to_one_i_list nums in
+    r = 0
+
+  let test_test_006 () : bool =
+    let nums = Cons 1 (Cons 0 (Cons 0 (Cons 1 (Cons 0 (Cons 0 Nil))))) in
+    let r = minimum_operations_to_make_binary_array_elements_equal_to_one_i_list nums in
+    r = 2
+
+  let test_test_007 () : bool =
+    let nums = Cons 0 (Cons 1 (Cons 1 (Cons 1 Nil))) in
+    let r = minimum_operations_to_make_binary_array_elements_equal_to_one_i_list nums in
+    r = -1
+
+  let test_test_008 () : bool =
+    let nums = Cons 0 (Cons 0 (Cons 0 Nil)) in
+    let r = minimum_operations_to_make_binary_array_elements_equal_to_one_i_list nums in
+    r = 1
+
+  let test_test_009 () : bool =
+    let nums = Cons 1 (Cons 0 (Cons 1 (Cons 0 (Cons 1 (Cons 0 Nil))))) in
+    let r = minimum_operations_to_make_binary_array_elements_equal_to_one_i_list nums in
+    r = 3
+
+  let test_test_010 () : bool =
+    let nums = Cons 1 (Cons 0 (Cons 0 (Cons 1 (Cons 0 (Cons 0 (Cons 1 (Cons 1 (Cons 1 Nil)))))))) in
+    let r = minimum_operations_to_make_binary_array_elements_equal_to_one_i_list nums in
+    r = 2
+
+  let test_test_011 () : bool =
+    let nums = Cons 0 (Cons 0 (Cons 0 (Cons 0 (Cons 0 (Cons 0 (Cons 0 Nil)))))) in
+    let r = minimum_operations_to_make_binary_array_elements_equal_to_one_i_list nums in
+    r = -1
+
+  let test_test_012 () : bool =
+    let nums = Cons 0 (Cons 1 (Cons 1 (Cons 1 (Cons 0 (Cons 0 Nil))))) in
+    let r = minimum_operations_to_make_binary_array_elements_equal_to_one_i_list nums in
+    r = 3
+
+  let test_test_013 () : bool =
+    let nums = Cons 0 (Cons 0 (Cons 0 (Cons 0 (Cons 0 (Cons 0 Nil))))) in
+    let r = minimum_operations_to_make_binary_array_elements_equal_to_one_i_list nums in
+    r = 2
+
+  let test_test_014 () : bool =
+    let nums = Cons 1 (Cons 1 (Cons 0 (Cons 0 (Cons 0 (Cons 1 (Cons 1 Nil)))))) in
+    let r = minimum_operations_to_make_binary_array_elements_equal_to_one_i_list nums in
+    r = 1
+
+  let test_test_015 () : bool =
+    let nums = Cons 1 (Cons 1 (Cons 0 (Cons 0 (Cons 1 (Cons 1 (Cons 0 (Cons 0 (Cons 1 (Cons 1 Nil))))))))) in
+    let r = minimum_operations_to_make_binary_array_elements_equal_to_one_i_list nums in
+    r = -1
+
+  let test_test_016 () : bool =
+    let nums = Cons 1 (Cons 1 (Cons 1 (Cons 0 (Cons 0 (Cons 0 Nil))))) in
+    let r = minimum_operations_to_make_binary_array_elements_equal_to_one_i_list nums in
+    r = 1
+
+  let test_test_017 () : bool =
+    let nums = Cons 1 (Cons 0 (Cons 1 (Cons 0 (Cons 1 (Cons 0 (Cons 1 Nil)))))) in
+    let r = minimum_operations_to_make_binary_array_elements_equal_to_one_i_list nums in
+    r = 3
+
+  let test_test_018 () : bool =
+    let nums = Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 Nil))))) in
+    let r = minimum_operations_to_make_binary_array_elements_equal_to_one_i_list nums in
+    r = 0
+
+  let test_test_019 () : bool =
+    let nums = Cons 0 (Cons 1 (Cons 0 (Cons 1 (Cons 0 (Cons 1 (Cons 0 (Cons 1 (Cons 0 Nil)))))))) in
+    let r = minimum_operations_to_make_binary_array_elements_equal_to_one_i_list nums in
+    r = -1
+
+  let run_tests () : bool =
+    if test_test_000 () then
+    if test_test_001 () then
+    if test_test_002 () then
+    if test_test_003 () then
+    if test_test_004 () then
+    if test_test_005 () then
+    if test_test_006 () then
+    if test_test_007 () then
+    if test_test_008 () then
+    if test_test_009 () then
+    if test_test_010 () then
+    if test_test_011 () then
+    if test_test_012 () then
+    if test_test_013 () then
+    if test_test_014 () then
+    if test_test_015 () then
+    if test_test_016 () then
+    if test_test_017 () then
+    if test_test_018 () then
+    if test_test_019 () then
+      true
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+
+end

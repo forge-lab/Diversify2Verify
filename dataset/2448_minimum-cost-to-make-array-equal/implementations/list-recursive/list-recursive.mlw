@@ -1,0 +1,185 @@
+module MinimumCostToMakeArrayEqual_List_Recursive_Implementation
+
+  use int.Int
+  use int.Abs
+  use list.List
+
+  let rec weighted_cost_to (nums: list int) (cost: list int) (target: int) : int
+    variant { nums }
+  =
+    match nums, cost with
+    | Nil, Nil -> 0
+    | Cons n ns, Cons c cs ->
+        c * abs (n - target) + weighted_cost_to ns cs target
+    | _, _ -> 0
+    end
+
+  let rec minimum_cost_from_targets
+    (nums: list int) (cost: list int) (targets: list int) (current_best: int) : int
+    variant { targets }
+  =
+    match targets with
+    | Nil -> current_best
+    | Cons target rest ->
+        let candidate = weighted_cost_to nums cost target in
+        if candidate < current_best then
+          minimum_cost_from_targets nums cost rest candidate
+        else
+          minimum_cost_from_targets nums cost rest current_best
+    end
+
+  let minimum_cost_to_make_array_equal_list (nums: list int) (cost: list int) : int =
+    match nums with
+    | Nil -> 0
+    | Cons target rest ->
+        minimum_cost_from_targets nums cost rest (weighted_cost_to nums cost target)
+    end
+
+  let check_case (nums: list int) (cost: list int) (expected: int) : bool =
+    let r = minimum_cost_to_make_array_equal_list nums cost in
+    r = expected
+
+  let test_test_000 () : bool =
+    let nums = Cons 6 (Cons 1 (Cons 3 (Cons 9 (Cons 3 Nil)))) in
+    let cost = Cons 2 (Cons 1 (Cons 2 (Cons 1 (Cons 2 Nil)))) in
+    check_case nums cost 14
+
+  let test_test_001 () : bool =
+    let nums = Cons 1 (Cons 3 (Cons 5 (Cons 2 Nil))) in
+    let cost = Cons 2 (Cons 3 (Cons 1 (Cons 14 Nil))) in
+    check_case nums cost 8
+
+  let test_test_002 () : bool =
+    let nums = Cons 2 (Cons 2 (Cons 2 (Cons 2 (Cons 2 Nil)))) in
+    let cost = Cons 4 (Cons 2 (Cons 8 (Cons 1 (Cons 3 Nil)))) in
+    check_case nums cost 0
+
+  let test_test_003 () : bool =
+    let nums = Cons 6 (Cons 1 (Cons 9 Nil)) in
+    let cost = Cons 2 (Cons 5 (Cons 7 Nil)) in
+    check_case nums cost 46
+
+  let test_test_004 () : bool =
+    let nums = Cons 1 (Cons 2 (Cons 3 Nil)) in
+    let cost = Cons 1 (Cons 2 (Cons 3 Nil)) in
+    check_case nums cost 4
+
+  let test_test_005 () : bool =
+    let nums = Cons 10 (Cons 1 (Cons 10 Nil)) in
+    let cost = Cons 1 (Cons 100 (Cons 1 Nil)) in
+    check_case nums cost 18
+
+  let test_test_006 () : bool =
+    let nums = Cons 6 (Cons 1 (Cons 9 (Cons 8 (Cons 2 Nil)))) in
+    let cost = Cons 4 (Cons 2 (Cons 8 (Cons 1 (Cons 3 Nil)))) in
+    check_case nums cost 48
+
+  let test_test_007 () : bool =
+    let nums = Cons 100000 (Cons 100000 Nil) in
+    let cost = Cons 1000000 (Cons 1000000 Nil) in
+    check_case nums cost 0
+
+  let test_test_008 () : bool =
+    let nums = Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Nil)))))))))) in
+    let cost = Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Nil)))))))))) in
+    check_case nums cost 0
+
+  let test_test_009 () : bool =
+    let nums = Cons 5 (Cons 5 (Cons 5 (Cons 5 (Cons 5 Nil)))) in
+    let cost = Cons 10 (Cons 10 (Cons 10 (Cons 10 (Cons 10 Nil)))) in
+    check_case nums cost 0
+
+  let test_test_010 () : bool =
+    let nums = Cons 1 (Cons 2 (Cons 3 Nil)) in
+    let cost = Cons 1 (Cons 1 (Cons 1 Nil)) in
+    check_case nums cost 2
+
+  let test_test_011 () : bool =
+    let nums = Cons 10 (Cons 5 (Cons 15 Nil)) in
+    let cost = Cons 1 (Cons 10 (Cons 1 Nil)) in
+    check_case nums cost 15
+
+  let test_test_012 () : bool =
+    let nums = Cons 1 (Cons 2 (Cons 3 Nil)) in
+    let cost = Cons 9 (Cons 3 (Cons 5 Nil)) in
+    check_case nums cost 13
+
+  let test_test_013 () : bool =
+    let nums = Cons 100000 (Cons 1000000 Nil) in
+    let cost = Cons 100 (Cons 1 Nil) in
+    check_case nums cost 900000
+
+  let test_test_014 () : bool =
+    let nums = Cons 1000000 (Cons 1000000 (Cons 1000000 (Cons 1000000 Nil))) in
+    let cost = Cons 1000000 (Cons 1000000 (Cons 1000000 (Cons 1000000 Nil))) in
+    check_case nums cost 0
+
+  let test_test_015 () : bool =
+    let nums = Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Nil)))))))))) in
+    let cost = Cons 1 (Cons 2 (Cons 3 (Cons 4 (Cons 5 (Cons 6 (Cons 7 (Cons 8 (Cons 9 (Cons 10 (Nil)))))))))) in
+    check_case nums cost 0
+
+  let test_test_016 () : bool =
+    let nums = Cons 100 (Cons 200 (Cons 300 (Cons 400 (Cons 500 (Nil))))) in
+    let cost = Cons 5 (Cons 4 (Cons 3 (Cons 2 (Cons 1 (Nil))))) in
+    check_case nums cost 1500
+
+  let test_test_017 () : bool =
+    let nums = Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Nil)))))))))))))))))))) in
+    let cost = Cons 1 (Cons 2 (Cons 3 (Cons 4 (Cons 5 (Cons 6 (Cons 7 (Cons 8 (Cons 9 (Cons 10 (Cons 11 (Cons 12 (Cons 13 (Cons 14 (Cons 15 (Cons 16 (Cons 17 (Cons 18 (Cons 19 (Cons 20 (Nil)))))))))))))))))))) in
+    check_case nums cost 0
+
+  let test_test_018 () : bool =
+    let nums = Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Nil)))))))))))))))))))) in
+    let cost = Cons 1000 (Cons 2000 (Cons 3000 (Cons 4000 (Cons 5000 (Cons 6000 (Cons 7000 (Cons 8000 (Cons 9000 (Cons 10000 (Cons 11000 (Cons 12000 (Cons 13000 (Cons 14000 (Cons 15000 (Cons 16000 (Cons 17000 (Cons 18000 (Cons 19000 (Cons 20000 (Nil)))))))))))))))))))) in
+    check_case nums cost 0
+
+  let test_test_019 () : bool =
+    let nums = Cons 10 (Cons 10 (Cons 10 (Cons 10 (Cons 10 (Cons 10 (Cons 10 (Cons 10 (Cons 10 (Cons 10 (Cons 10 (Cons 10 (Cons 10 (Cons 10 (Cons 10 (Nil))))))))))))))) in
+    let cost = Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Nil))))))))))))))) in
+    check_case nums cost 0
+
+  let run_tests () : bool =
+    if test_test_000 () then
+    if test_test_001 () then
+    if test_test_002 () then
+    if test_test_003 () then
+    if test_test_004 () then
+    if test_test_005 () then
+    if test_test_006 () then
+    if test_test_007 () then
+    if test_test_008 () then
+    if test_test_009 () then
+    if test_test_010 () then
+    if test_test_011 () then
+    if test_test_012 () then
+    if test_test_013 () then
+    if test_test_014 () then
+    if test_test_015 () then
+    if test_test_016 () then
+    if test_test_017 () then
+    if test_test_018 () then
+    if test_test_019 () then
+      true
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+
+end

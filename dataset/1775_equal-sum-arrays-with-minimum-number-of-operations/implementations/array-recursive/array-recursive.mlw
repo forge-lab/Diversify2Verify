@@ -1,0 +1,246 @@
+module EqualSumArraysWithMinimumNumberOfOperations_Array_Recursive_Implementation
+
+  use int.Int
+  use array.Array
+  use array.Init
+
+  predicate valid_dice_array (a: array int) =
+    1 <= length a <= 100000 /\
+    forall i: int. 0 <= i < length a -> 1 <= a[i] <= 6
+
+  let rec sum_from (a: array int) (i: int) : int
+    variant { length a - i }
+  =
+    if i >= length a then
+      0
+    else
+      a[i] + sum_from a (i + 1)
+
+  let sum_array (a: array int) : int =
+    sum_from a 0
+
+  let rec fill_decrease_counts (a: array int) (counts: array int) (i: int) : unit
+    variant { length a - i }
+  =
+    if i >= length a then
+      ()
+    else
+      let gain = a[i] - 1 in
+      if gain > 0 then counts[gain] <- counts[gain] + 1 else ();
+      fill_decrease_counts a counts (i + 1)
+
+  let rec fill_increase_counts (a: array int) (counts: array int) (i: int) : unit
+    variant { length a - i }
+  =
+    if i >= length a then
+      ()
+    else
+      let gain = 6 - a[i] in
+      if gain > 0 then counts[gain] <- counts[gain] + 1 else ();
+      fill_increase_counts a counts (i + 1)
+
+  let rec consume_gains (remaining: int) (counts: array int) (gain: int) : int
+    variant { remaining + gain }
+  =
+    if remaining <= 0 then
+      0
+    else if gain <= 0 then
+      -1
+    else if counts[gain] = 0 then
+      consume_gains remaining counts (gain - 1)
+    else if remaining <= gain then
+      1
+    else
+      (counts[gain] <- counts[gain] - 1;
+       let tail = consume_gains (remaining - gain) counts gain in
+       if tail < 0 then -1 else 1 + tail)
+
+  let equal_sum_arrays_with_minimum_number_of_operations_array
+    (nums1: array int) (nums2: array int) : int
+    requires { valid_dice_array nums1 }
+    requires { valid_dice_array nums2 }
+  =
+    if 6 * length nums1 < length nums2 then
+      -1
+    else if 6 * length nums2 < length nums1 then
+      -1
+    else
+      let sum1 = sum_array nums1 in
+      let sum2 = sum_array nums2 in
+      if sum1 = sum2 then
+        0
+      else
+        let counts = make 6 0 in
+        if sum1 > sum2 then
+          (fill_decrease_counts nums1 counts 0;
+           fill_increase_counts nums2 counts 0;
+           consume_gains (sum1 - sum2) counts 5)
+        else
+          (fill_decrease_counts nums2 counts 0;
+           fill_increase_counts nums1 counts 0;
+           consume_gains (sum2 - sum1) counts 5)
+
+  let test_000 () : bool =
+    let nums1 = init 6 [|6; 5; 4; 3; 2; 1|] in
+    let nums2 = init 6 [|1; 2; 3; 4; 5; 6|] in
+    let r = equal_sum_arrays_with_minimum_number_of_operations_array nums1 nums2 in
+    r = 0
+
+  let test_001 () : bool =
+    let nums1 = init 4 [|3; 3; 3; 3|] in
+    let nums2 = init 4 [|2; 2; 2; 2|] in
+    let r = equal_sum_arrays_with_minimum_number_of_operations_array nums1 nums2 in
+    r = 1
+
+  let test_002 () : bool =
+    let nums1 = init 2 [|1; 1|] in
+    let nums2 = init 2 [|6; 6|] in
+    let r = equal_sum_arrays_with_minimum_number_of_operations_array nums1 nums2 in
+    r = 2
+
+  let test_003 () : bool =
+    let nums1 = init 3 [|6; 6; 6|] in
+    let nums2 = init 2 [|1; 1|] in
+    let r = equal_sum_arrays_with_minimum_number_of_operations_array nums1 nums2 in
+    r = 4
+
+  let test_004 () : bool =
+    let nums1 = init 3 [|1; 1; 2|] in
+    let nums2 = init 3 [|6; 6; 6|] in
+    let r = equal_sum_arrays_with_minimum_number_of_operations_array nums1 nums2 in
+    r = 3
+
+  let test_005 () : bool =
+    let nums1 = init 2 [|1; 1|] in
+    let nums2 = init 3 [|6; 6; 6|] in
+    let r = equal_sum_arrays_with_minimum_number_of_operations_array nums1 nums2 in
+    r = 4
+
+  let test_006 () : bool =
+    let nums1 = init 4 [|5; 5; 5; 5|] in
+    let nums2 = init 7 [|1; 1; 1; 1; 1; 1; 1|] in
+    let r = equal_sum_arrays_with_minimum_number_of_operations_array nums1 nums2 in
+    r = 3
+
+  let test_007 () : bool =
+    let nums1 = init 2 [|1; 2|] in
+    let nums2 = init 2 [|5; 6|] in
+    let r = equal_sum_arrays_with_minimum_number_of_operations_array nums1 nums2 in
+    r = 2
+
+  let test_008 () : bool =
+    let nums1 = init 3 [|6; 6; 6|] in
+    let nums2 = init 3 [|1; 1; 1|] in
+    let r = equal_sum_arrays_with_minimum_number_of_operations_array nums1 nums2 in
+    r = 3
+
+  let test_009 () : bool =
+    let nums1 = init 3 [|3; 3; 3|] in
+    let nums2 = init 3 [|3; 3; 3|] in
+    let r = equal_sum_arrays_with_minimum_number_of_operations_array nums1 nums2 in
+    r = 0
+
+  let test_010 () : bool =
+    let nums1 = init 3 [|2; 3; 4|] in
+    let nums2 = init 3 [|5; 5; 5|] in
+    let r = equal_sum_arrays_with_minimum_number_of_operations_array nums1 nums2 in
+    r = 2
+
+  let test_011 () : bool =
+    let nums1 = init 7 [|1; 1; 1; 1; 1; 1; 1|] in
+    let nums2 = init 1 [|6|] in
+    let r = equal_sum_arrays_with_minimum_number_of_operations_array nums1 nums2 in
+    r = (-1)
+
+  let test_012 () : bool =
+    let nums1 = init 1 [|6|] in
+    let nums2 = init 1 [|1|] in
+    let r = equal_sum_arrays_with_minimum_number_of_operations_array nums1 nums2 in
+    r = 1
+
+  let test_013 () : bool =
+    let nums1 = init 6 [|1; 2; 3; 4; 5; 6|] in
+    let nums2 = init 6 [|1; 1; 2; 2; 2; 2|] in
+    let r = equal_sum_arrays_with_minimum_number_of_operations_array nums1 nums2 in
+    r = 3
+
+  let test_014 () : bool =
+    let nums1 = init 3 [|3; 3; 3|] in
+    let nums2 = init 3 [|2; 2; 2|] in
+    let r = equal_sum_arrays_with_minimum_number_of_operations_array nums1 nums2 in
+    r = 1
+
+  let test_015 () : bool =
+    let nums1 = init 2 [|6; 6|] in
+    let nums2 = init 1 [|1|] in
+    let r = equal_sum_arrays_with_minimum_number_of_operations_array nums1 nums2 in
+    r = 3
+
+  let test_016 () : bool =
+    let nums1 = init 3 [|2; 2; 2|] in
+    let nums2 = init 3 [|5; 5; 5|] in
+    let r = equal_sum_arrays_with_minimum_number_of_operations_array nums1 nums2 in
+    r = 3
+
+  let test_017 () : bool =
+    let nums1 = init 3 [|3; 3; 3|] in
+    let nums2 = init 4 [|2; 2; 2; 2|] in
+    let r = equal_sum_arrays_with_minimum_number_of_operations_array nums1 nums2 in
+    r = 1
+
+  let test_018 () : bool =
+    let nums1 = init 1 [|1|] in
+    let nums2 = init 1 [|6|] in
+    let r = equal_sum_arrays_with_minimum_number_of_operations_array nums1 nums2 in
+    r = 1
+
+  let test_019 () : bool =
+    let nums1 = init 3 [|1; 1; 1|] in
+    let nums2 = init 3 [|6; 6; 6|] in
+    let r = equal_sum_arrays_with_minimum_number_of_operations_array nums1 nums2 in
+    r = 3
+
+  let run_tests () : bool =
+    if test_000 () then
+    if test_001 () then
+    if test_002 () then
+    if test_003 () then
+    if test_004 () then
+    if test_005 () then
+    if test_006 () then
+    if test_007 () then
+    if test_008 () then
+    if test_009 () then
+    if test_010 () then
+    if test_011 () then
+    if test_012 () then
+    if test_013 () then
+    if test_014 () then
+    if test_015 () then
+    if test_016 () then
+    if test_017 () then
+    if test_018 () then
+    if test_019 () then
+      true
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+
+end

@@ -1,0 +1,178 @@
+module DividePlayersIntoTeamsOfEqualSkill_List_Spec
+
+  use int.Int
+  use list.List
+  use list.Length
+  use list.Mem
+  use list.NumOcc
+
+  type team = { player_a: int; player_b: int }
+
+  let rec function team_player_count (x: int) (teams: list team) : int
+    variant { teams }
+  =
+    match teams with
+    | Nil -> 0
+    | Cons t rest ->
+        (if t.player_a = x then 1 else 0) +
+        (if t.player_b = x then 1 else 0) +
+        team_player_count x rest
+    end
+
+  let rec function chemistry_sum (teams: list team) : int
+    variant { teams }
+  =
+    match teams with
+    | Nil -> 0
+    | Cons t rest -> t.player_a * t.player_b + chemistry_sum rest
+    end
+
+  let rec predicate all_team_sums (target_sum: int) (teams: list team)
+    variant { teams }
+  =
+    match teams with
+    | Nil -> true
+    | Cons t rest ->
+        t.player_a + t.player_b = target_sum &&
+        all_team_sums target_sum rest
+    end
+
+  predicate same_player_multiset (skill: list int) (teams: list team) =
+    forall x: int. num_occ x skill = team_player_count x teams
+
+  predicate valid_division (skill: list int) (teams: list team) (target_sum: int) =
+    length skill = 2 * length teams &&
+    all_team_sums target_sum teams &&
+    same_player_multiset skill teams
+
+  predicate has_valid_division (skill: list int) =
+    exists teams: list team, target_sum: int.
+      valid_division skill teams target_sum
+
+  predicate valid_skill_values (skill: list int) =
+    forall x: int. mem x skill -> 1 <= x <= 1000
+
+  predicate even_list_length (skill: list int) =
+    exists k: int. 0 <= k && length skill = 2 * k
+
+  predicate result_spec (skill: list int) (r: int) =
+    (r = (-1) && not (has_valid_division skill)) \/
+    (r <> (-1) &&
+      exists teams: list team, target_sum: int.
+        valid_division skill teams target_sum &&
+        r = chemistry_sum teams)
+
+  val divide_players_into_teams_of_equal_skill_list (skill: list int) : int
+    requires { 2 <= length skill }
+    requires { length skill <= 100000 }
+    requires { even_list_length skill }
+    requires { valid_skill_values skill }
+    ensures  { result_spec skill result }
+
+  let lemma check_test_000 () =
+    let skill =
+      Cons 1 (Cons 1000 (Cons 1 (Cons 1000
+        (Cons 1 (Cons 1000 (Cons 1 (Cons 1000 Nil))))))) in
+    let teams =
+      Cons { player_a = 1; player_b = 1000 }
+        (Cons { player_a = 1; player_b = 1000 }
+          (Cons { player_a = 1; player_b = 1000 }
+            (Cons { player_a = 1; player_b = 1000 } Nil))) in
+    assert { chemistry_sum Nil = 0 };
+    assert { chemistry_sum (Cons { player_a = 1; player_b = 1000 } Nil) = 1000 };
+    assert { chemistry_sum teams = 4000 };
+    assert { all_team_sums 1001 teams };
+    assert { num_occ 1 skill = 4 };
+    assert { num_occ 1000 skill = 4 };
+    assert { team_player_count 1 teams = 4 };
+    assert { team_player_count 1000 teams = 4 };
+    assert { same_player_multiset skill teams };
+    assert { valid_division skill teams 1001 };
+    assert { result_spec skill 4000 }
+
+  let lemma check_test_002 () =
+    let skill = Cons 1 (Cons 1 (Cons 2 (Cons 3 Nil))) in
+    assert { length skill = 4 };
+    assert { num_occ 1 skill = 2 };
+    assert { num_occ 2 skill = 1 };
+    assert { num_occ 3 skill = 1 };
+    assert { not (has_valid_division skill) };
+    assert { result_spec skill (-1) }
+
+  let lemma check_test_003 () =
+    let skill =
+      Cons 1 (Cons 2 (Cons 3 (Cons 4
+        (Cons 5 (Cons 6 (Cons 7 (Cons 8 Nil))))))) in
+    let teams =
+      Cons { player_a = 1; player_b = 8 }
+        (Cons { player_a = 2; player_b = 7 }
+          (Cons { player_a = 3; player_b = 6 }
+            (Cons { player_a = 4; player_b = 5 } Nil))) in
+    assert { chemistry_sum (Cons { player_a = 4; player_b = 5 } Nil) = 20 };
+    assert { chemistry_sum teams = 60 };
+    assert { all_team_sums 9 teams };
+    assert { num_occ 1 skill = 1 };
+    assert { num_occ 8 skill = 1 };
+    assert { team_player_count 1 teams = 1 };
+    assert { team_player_count 8 teams = 1 };
+    assert { same_player_multiset skill teams };
+    assert { valid_division skill teams 9 };
+    assert { result_spec skill 60 }
+
+  let lemma check_test_004 () =
+    let skill = Cons 5 (Cons 5 (Cons 5 (Cons 5 (Cons 5 (Cons 5 Nil))))) in
+    let teams =
+      Cons { player_a = 5; player_b = 5 }
+        (Cons { player_a = 5; player_b = 5 }
+          (Cons { player_a = 5; player_b = 5 } Nil)) in
+    assert { chemistry_sum Nil = 0 };
+    assert { chemistry_sum (Cons { player_a = 5; player_b = 5 } Nil) = 25 };
+    assert { chemistry_sum teams = 75 };
+    assert { all_team_sums 10 teams };
+    assert { num_occ 5 skill = 6 };
+    assert { team_player_count 5 teams = 6 };
+    assert { same_player_multiset skill teams };
+    assert { valid_division skill teams 10 };
+    assert { result_spec skill 75 }
+
+  let lemma check_test_006 () =
+    let skill = Cons 3 (Cons 4 Nil) in
+    let teams = Cons { player_a = 3; player_b = 4 } Nil in
+    assert { chemistry_sum Nil = 0 };
+    assert { chemistry_sum teams = 12 };
+    assert { all_team_sums 7 teams };
+    assert { num_occ 3 skill = 1 };
+    assert { num_occ 4 skill = 1 };
+    assert { team_player_count 3 teams = 1 };
+    assert { team_player_count 4 teams = 1 };
+    assert { same_player_multiset skill teams };
+    assert { valid_division skill teams 7 };
+    assert { result_spec skill 12 }
+
+  let lemma check_test_009 () =
+    let skill = Cons 3 (Cons 2 (Cons 5 (Cons 1 (Cons 3 (Cons 4 Nil))))) in
+    let teams =
+      Cons { player_a = 1; player_b = 5 }
+        (Cons { player_a = 2; player_b = 4 }
+          (Cons { player_a = 3; player_b = 3 } Nil)) in
+    assert { chemistry_sum (Cons { player_a = 3; player_b = 3 } Nil) = 9 };
+    assert { chemistry_sum teams = 22 };
+    assert { all_team_sums 6 teams };
+    assert { num_occ 3 skill = 2 };
+    assert { team_player_count 3 teams = 2 };
+    assert { num_occ 1 skill = 1 };
+    assert { team_player_count 1 teams = 1 };
+    assert { same_player_multiset skill teams };
+    assert { valid_division skill teams 6 };
+    assert { result_spec skill 22 }
+
+  let lemma check_test_011 () =
+    let skill = Cons 1000 (Cons 1000 (Cons 1 (Cons 1 (Cons 2 (Cons 2 Nil))))) in
+    assert { length skill = 6 };
+    assert { num_occ 1000 skill = 2 };
+    assert { num_occ 1 skill = 2 };
+    assert { num_occ 2 skill = 2 };
+    assert { not (has_valid_division skill) };
+    assert { result_spec skill (-1) }
+
+end

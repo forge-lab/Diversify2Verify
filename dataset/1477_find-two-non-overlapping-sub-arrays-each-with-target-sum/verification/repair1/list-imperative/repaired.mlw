@@ -1,0 +1,156 @@
+module FindTwoNonOverlappingSubArraysEachWithTargetSum_List_Spec
+
+  use int.Int
+  use list.List
+  use list.Length
+  use list.Append
+  use list.Sum
+  use ref.Ref
+
+  let rec predicate all_between (l: list int) (lo: int) (hi: int)
+    variant { l }
+  =
+    match l with
+    | Nil -> true
+    | Cons x xs -> lo <= x && x <= hi && all_between xs lo hi
+    end
+
+  let lemma all_between_cons_bounds (x: int) (xs: list int) (lo: int) (hi: int)
+    requires { all_between (Cons x xs) lo hi }
+    ensures  { lo <= x /\ x <= hi /\ all_between xs lo hi }
+  =
+    assert { all_between (Cons x xs) lo hi }
+
+  predicate target_sum_segment (target: int) (segment: list int) =
+    segment <> Nil /\ sum segment = target
+
+  predicate ordered_target_segments
+    (arr: list int) (target: int) (first: list int) (second: list int)
+  =
+    exists prefix middle suffix: list int.
+      arr = prefix ++ (first ++ (middle ++ (second ++ suffix))) /\
+      target_sum_segment target first /\
+      target_sum_segment target second
+
+  predicate target_segment_pair_total
+    (arr: list int) (target: int) (total: int)
+  =
+    exists first second: list int.
+      ordered_target_segments arr target first second /\
+      total = length first + length second
+
+  predicate no_target_segment_pair (arr: list int) (target: int) =
+    forall first second: list int.
+      not (ordered_target_segments arr target first second)
+
+  predicate minimum_target_segment_pair_result
+    (arr: list int) (target: int) (r: int)
+  =
+    (r = -1 /\ no_target_segment_pair arr target) \/
+    (r > 0 /\
+     target_segment_pair_total arr target r /\
+     (forall total: int.
+        target_segment_pair_total arr target total -> r <= total))
+
+  let has_cons (l: list int) : bool =
+    match l with
+    | Nil -> false
+    | Cons _ _ -> true
+    end
+
+  let find_two_non_overlapping_sub_arrays_each_with_target_sum_list
+    (arr: list int) (target: int) : int
+    requires { 1 <= length arr <= 100000 }
+    requires { all_between arr 1 1000 }
+    requires { 1 <= target <= 100000000 }
+    ensures  { minimum_target_segment_pair_result arr target result }
+  =
+    let best = ref 0 in
+    let found = ref false in
+    let start_cur = ref arr in
+    while has_cons !start_cur do
+      invariant { 0 <= length !start_cur }
+      invariant { all_between !start_cur 1 1000 }
+      variant { length !start_cur }
+      let first_sum = ref 0 in
+      let first_len = ref 0 in
+      let end_cur = ref !start_cur in
+      while has_cons !end_cur do
+        invariant { 0 <= length !end_cur }
+        invariant { all_between !end_cur 1 1000 }
+        invariant { 0 <= !first_sum }
+        invariant { 0 <= !first_len }
+        variant { length !end_cur }
+        match !end_cur with
+        | Nil -> ()
+        | Cons x xs ->
+            all_between_cons_bounds x xs 1 1000;
+            assert { 1 <= x };
+            assert { all_between xs 1 1000 };
+            let old_first_sum = !first_sum in
+            assert { 0 <= old_first_sum };
+            first_sum := old_first_sum + x;
+            assert { 0 <= !first_sum };
+            first_len := !first_len + 1;
+            if !first_sum = target then
+              begin
+                let second_start = ref xs in
+                while has_cons !second_start do
+                  invariant { 0 <= length !second_start }
+                  invariant { all_between !second_start 1 1000 }
+                  variant { length !second_start }
+                  let second_sum = ref 0 in
+                  let second_len = ref 0 in
+                  let second_end = ref !second_start in
+                  while has_cons !second_end do
+                    invariant { 0 <= length !second_end }
+                    invariant { all_between !second_end 1 1000 }
+                    invariant { 0 <= !second_sum }
+                    invariant { 0 <= !second_len }
+                    variant { length !second_end }
+                    match !second_end with
+                    | Nil -> ()
+                    | Cons y ys ->
+                        all_between_cons_bounds y ys 1 1000;
+                        assert { 1 <= y };
+                        assert { all_between ys 1 1000 };
+                        let old_second_sum = !second_sum in
+                        assert { 0 <= old_second_sum };
+                        second_sum := old_second_sum + y;
+                        assert { 0 <= !second_sum };
+                        second_len := !second_len + 1;
+                        if !second_sum = target then
+                          begin
+                            let candidate = !first_len + !second_len in
+                            if !found then
+                              begin
+                                if candidate < !best then best := candidate else ()
+                              end
+                            else
+                              begin
+                                best := candidate;
+                                found := true
+                              end
+                          end
+                        else ();
+                        second_end := ys
+                    end
+                  done;
+                  match !second_start with
+                  | Nil -> ()
+                  | Cons _ rest -> second_start := rest
+                  end
+                done
+              end
+            else ();
+            end_cur := xs
+        end
+      done;
+      match !start_cur with
+      | Nil -> ()
+      | Cons _ rest -> start_cur := rest
+      end
+    done;
+    if !found then !best else (-1)
+
+end

@@ -1,0 +1,236 @@
+module MaximumGoodSubarraySum_List_Stage3_Recursive
+
+  use int.Int
+  use int.Abs
+  use list.List
+  use list.Length
+  use list.Append
+  use list.Sum
+
+  predicate first_value (l: list int) (x: int) =
+    match l with
+    | Nil -> false
+    | Cons y _ -> x = y
+    end
+
+  let rec predicate last_value (l: list int) (x: int)
+    variant { l }
+  =
+    match l with
+    | Nil -> false
+    | Cons y Nil -> x = y
+    | Cons _ ys -> last_value ys x
+    end
+
+  predicate good_segment (seg: list int) (k: int) =
+    exists first last: int.
+      first_value seg first /\
+      last_value seg last /\
+      abs (first - last) = k
+
+  predicate contiguous_segment (seg: list int) (nums: list int) =
+    exists left right: list int. nums = left ++ (seg ++ right)
+
+  predicate good_subarray_sum (nums: list int) (k: int) (s: int) =
+    exists seg: list int.
+      contiguous_segment seg nums /\
+      good_segment seg k /\
+      s = sum seg
+
+  predicate has_good_subarray_sum (nums: list int) (k: int) =
+    exists s: int. good_subarray_sum nums k s
+
+  predicate maximum_good_subarray_sum_spec (nums: list int) (k: int) (r: int) =
+    (has_good_subarray_sum nums k ->
+       good_subarray_sum nums k r /\
+       (forall s: int. good_subarray_sum nums k s -> s <= r)) /\
+    ((not (has_good_subarray_sum nums k)) -> r = 0)
+
+  type maybe_int =
+    | NoResult
+    | Result int
+
+  predicate maybe_maximum_good_subarray_sum_spec
+      (nums: list int) (k: int) (m: maybe_int) =
+    match m with
+    | NoResult -> not (has_good_subarray_sum nums k)
+    | Result r ->
+        good_subarray_sum nums k r /\
+        (forall s: int. good_subarray_sum nums k s -> s <= r)
+    end
+
+  let function better_model (a: maybe_int) (b: maybe_int) : maybe_int =
+    match a with
+    | NoResult -> b
+    | Result x ->
+        match b with
+        | NoResult -> a
+        | Result y -> if x >= y then a else b
+        end
+    end
+
+  let rec function best_with_first_model
+      (first: int) (acc: int) (rest: list int) (k: int) : maybe_int
+    variant { rest }
+  =
+    match rest with
+    | Nil -> NoResult
+    | Cons x xs ->
+        let next_sum = acc + x in
+        let current =
+          if abs (first - x) = k then Result next_sum else NoResult
+        in
+        better_model current (best_with_first_model first next_sum xs k)
+    end
+
+  let rec function best_over_starts_model (nums: list int) (k: int) : maybe_int
+    variant { nums }
+  =
+    match nums with
+    | Nil -> NoResult
+    | Cons _ Nil -> NoResult
+    | Cons x xs ->
+        better_model (best_with_first_model x x xs k)
+          (best_over_starts_model xs k)
+    end
+
+  let rec predicate good_with_first_acc
+      (first: int) (acc: int) (rest: list int) (k: int) (s: int)
+    variant { rest }
+  =
+    match rest with
+    | Nil -> false
+    | Cons x xs ->
+        ((abs (first - x) = k) && (s = acc + x)) ||
+        good_with_first_acc first (acc + x) xs k s
+    end
+
+  predicate maybe_best_with_first_acc_spec
+      (first: int) (acc: int) (rest: list int) (k: int) (m: maybe_int) =
+    match m with
+    | NoResult ->
+        forall s: int. not (good_with_first_acc first acc rest k s)
+    | Result r ->
+        good_with_first_acc first acc rest k r /\
+        (forall s: int. good_with_first_acc first acc rest k s -> s <= r)
+    end
+
+  let lemma no_good_subarray_nil (k: int)
+    ensures { not (has_good_subarray_sum Nil k) }
+  = ()
+
+  let lemma no_good_subarray_singleton (x: int) (k: int)
+    ensures { not (has_good_subarray_sum (Cons x Nil) k) }
+  = ()
+
+  let lemma good_subarray_sum_cons_split (x: int) (xs: list int) (k: int) (s: int)
+    ensures { good_subarray_sum (Cons x xs) k s <->
+              good_with_first_acc x x xs k s \/ good_subarray_sum xs k s }
+  = ()
+
+  let lemma maybe_better_model_with_first_acc
+      (first: int) (acc: int) (x: int) (xs: list int) (k: int) (tail: maybe_int)
+    requires { maybe_best_with_first_acc_spec first (acc + x) xs k tail }
+    ensures  { maybe_best_with_first_acc_spec first acc (Cons x xs) k
+                 (better_model
+                    (if abs (first - x) = k then Result (acc + x) else NoResult)
+                    tail) }
+  = ()
+
+  let rec lemma best_with_first_model_correct
+      (first: int) (acc: int) (rest: list int) (k: int)
+    ensures { maybe_best_with_first_acc_spec first acc rest k
+                (best_with_first_model first acc rest k) }
+    variant { rest }
+  =
+    match rest with
+    | Nil -> ()
+    | Cons x xs ->
+        best_with_first_model_correct first (acc + x) xs k;
+        maybe_better_model_with_first_acc first acc x xs k
+          (best_with_first_model first (acc + x) xs k)
+    end
+
+  let lemma better_model_maximum_good_subarray_sum_bridge
+      (x: int) (xs: list int) (k: int) (a: maybe_int) (b: maybe_int)
+    requires { maybe_best_with_first_acc_spec x x xs k a }
+    requires { maybe_maximum_good_subarray_sum_spec xs k b }
+    ensures  { maybe_maximum_good_subarray_sum_spec (Cons x xs) k
+                 (better_model a b) }
+  = ()
+
+  let better (a: maybe_int) (b: maybe_int) : maybe_int
+    ensures { result = better_model a b }
+  =
+    match a with
+    | NoResult -> b
+    | Result x ->
+        match b with
+        | NoResult -> a
+        | Result y -> if x >= y then a else b
+        end
+    end
+
+  let rec best_with_first (first: int) (acc: int) (rest: list int) (k: int) : maybe_int
+    ensures { result = best_with_first_model first acc rest k }
+    variant { rest }
+  =
+    match rest with
+    | Nil -> NoResult
+    | Cons x xs ->
+        let next_sum = acc + x in
+        let current =
+          if abs (first - x) = k then Result next_sum else NoResult
+        in
+        better current (best_with_first first next_sum xs k)
+    end
+
+  let rec best_over_starts (nums: list int) (k: int) : maybe_int
+    ensures { result = best_over_starts_model nums k }
+    variant { nums }
+  =
+    match nums with
+    | Nil -> NoResult
+    | Cons _ Nil -> NoResult
+    | Cons x xs ->
+        better (best_with_first x x xs k) (best_over_starts xs k)
+    end
+
+  let rec lemma best_over_starts_model_correct (nums: list int) (k: int)
+    requires { k > 0 }
+    ensures  { maybe_maximum_good_subarray_sum_spec nums k
+                 (best_over_starts_model nums k) }
+    variant  { nums }
+  =
+    match nums with
+    | Nil ->
+        no_good_subarray_nil k
+    | Cons x Nil ->
+        no_good_subarray_singleton x k
+    | Cons x xs ->
+        best_with_first_model_correct x x xs k;
+        best_over_starts_model_correct xs k;
+        better_model_maximum_good_subarray_sum_bridge x xs k
+          (best_with_first_model x x xs k)
+          (best_over_starts_model xs k)
+    end
+
+  let maximum_good_subarray_sum_list (nums: list int) (k: int) : int
+    requires { length nums >= 2 }
+    requires { k > 0 }
+    ensures  { maximum_good_subarray_sum_spec nums k result }
+  =
+    let best_result = best_over_starts nums k in
+    best_over_starts_model_correct nums k;
+    assert { maybe_maximum_good_subarray_sum_spec nums k best_result };
+    match best_result with
+    | NoResult ->
+        assert { not (has_good_subarray_sum nums k) };
+        0
+    | Result best ->
+        assert { good_subarray_sum nums k best };
+        assert { forall s: int. good_subarray_sum nums k s -> s <= best };
+        best
+    end
+
+end

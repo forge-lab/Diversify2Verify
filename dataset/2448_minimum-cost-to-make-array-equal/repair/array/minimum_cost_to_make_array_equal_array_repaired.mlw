@@ -1,0 +1,219 @@
+module MinimumCostToMakeArrayEqual_Array_Spec
+
+  use int.Int
+  use int.Abs
+  use array.Array
+  use array.Init
+
+  predicate valid_inputs (nums: array int) (cost: array int) =
+    length nums = length cost /\
+    length nums > 0 /\
+    (forall i: int. 0 <= i < length nums -> nums[i] >= 1 /\ cost[i] >= 1)
+
+  let rec function weighted_equalization_cost_from
+      (nums: array int) (cost: array int) (target: int) (i: int) : int
+    requires { valid_inputs nums cost }
+    requires { 0 <= i <= length nums }
+    variant  { length nums - i }
+  =
+    if i = length nums then 0
+    else cost[i] * abs (nums[i] - target) +
+         weighted_equalization_cost_from nums cost target (i + 1)
+
+  function weighted_equalization_cost
+      (nums: array int) (cost: array int) (target: int) : int =
+    weighted_equalization_cost_from nums cost target 0
+
+  predicate minimum_weighted_equalization_cost
+      (nums: array int) (cost: array int) (best: int) =
+    valid_inputs nums cost /\
+    best >= 0 /\
+    (exists target: int.
+       best = weighted_equalization_cost nums cost target /\
+       (forall other: int.
+          weighted_equalization_cost nums cost target <=
+          weighted_equalization_cost nums cost other))
+
+  val minimum_cost_to_make_array_equal_array
+      (nums: array int) (cost: array int) : int
+    requires { valid_inputs nums cost }
+    ensures  { minimum_weighted_equalization_cost nums cost result }
+
+  let lemma test_000_python_assertions () =
+    let nums = init 5 [|6; 1; 3; 9; 3|] in
+    let cost = init 5 [|2; 1; 2; 1; 2|] in
+    assert { length nums = 5 };
+    assert { length cost = 5 };
+    assert { nums[0] = 6 };
+    assert { nums[1] = 1 };
+    assert { nums[2] = 3 };
+    assert { nums[3] = 9 };
+    assert { nums[4] = 3 };
+    assert { cost[0] = 2 };
+    assert { cost[1] = 1 };
+    assert { cost[2] = 2 };
+    assert { cost[3] = 1 };
+    assert { cost[4] = 2 };
+    assert { valid_inputs nums cost };
+    assert { weighted_equalization_cost nums cost 3 =
+      2 * abs (6 - 3) + 1 * abs (1 - 3) + 2 * abs (3 - 3) +
+      1 * abs (9 - 3) + 2 * abs (3 - 3) };
+    assert { weighted_equalization_cost nums cost 3 = 14 };
+    assert { exists target: int. target = 3 /\
+      14 = weighted_equalization_cost nums cost target /\
+      (forall other: int.
+        weighted_equalization_cost nums cost target <=
+        weighted_equalization_cost nums cost other) };
+    assert { minimum_weighted_equalization_cost nums cost 14 }
+
+  let lemma test_001_python_assertions () =
+    let nums = init 4 [|1; 3; 5; 2|] in
+    let cost = init 4 [|2; 3; 1; 14|] in
+    assert { length nums = 4 };
+    assert { length cost = 4 };
+    assert { nums[0] = 1 };
+    assert { nums[1] = 3 };
+    assert { nums[2] = 5 };
+    assert { nums[3] = 2 };
+    assert { cost[0] = 2 };
+    assert { cost[1] = 3 };
+    assert { cost[2] = 1 };
+    assert { cost[3] = 14 };
+    assert { valid_inputs nums cost };
+    assert { weighted_equalization_cost nums cost 2 =
+      2 * abs (1 - 2) + 3 * abs (3 - 2) + 1 * abs (5 - 2) +
+      14 * abs (2 - 2) };
+    assert { weighted_equalization_cost nums cost 2 = 8 };
+    assert { exists target: int. target = 2 /\
+      8 = weighted_equalization_cost nums cost target /\
+      (forall other: int.
+        weighted_equalization_cost nums cost target <=
+        weighted_equalization_cost nums cost other) };
+    assert { minimum_weighted_equalization_cost nums cost 8 }
+
+  let lemma test_002_python_assertions () =
+    let nums = init 5 [|2; 2; 2; 2; 2|] in
+    let cost = init 5 [|4; 2; 8; 1; 3|] in
+    assert { length nums = 5 };
+    assert { length cost = 5 };
+    assert { nums[0] = 2 };
+    assert { nums[1] = 2 };
+    assert { nums[2] = 2 };
+    assert { nums[3] = 2 };
+    assert { nums[4] = 2 };
+    assert { cost[0] = 4 };
+    assert { cost[1] = 2 };
+    assert { cost[2] = 8 };
+    assert { cost[3] = 1 };
+    assert { cost[4] = 3 };
+    assert { valid_inputs nums cost };
+    assert { weighted_equalization_cost nums cost 2 = 0 };
+    assert { exists target: int. target = 2 /\
+      0 = weighted_equalization_cost nums cost target /\
+      (forall other: int.
+        weighted_equalization_cost nums cost target <=
+        weighted_equalization_cost nums cost other) };
+    assert { minimum_weighted_equalization_cost nums cost 0 }
+
+  let lemma test_004_python_assertions () =
+    let nums = init 3 [|1; 2; 3|] in
+    let cost = init 3 [|1; 2; 3|] in
+    assert { length nums = 3 };
+    assert { length cost = 3 };
+    assert { nums[0] = 1 };
+    assert { nums[1] = 2 };
+    assert { nums[2] = 3 };
+    assert { cost[0] = 1 };
+    assert { cost[1] = 2 };
+    assert { cost[2] = 3 };
+    assert { valid_inputs nums cost };
+    assert { weighted_equalization_cost nums cost 2 =
+      1 * abs (1 - 2) + 2 * abs (2 - 2) + 3 * abs (3 - 2) };
+    assert { weighted_equalization_cost nums cost 2 = 4 };
+    assert { exists target: int. target = 2 /\
+      4 = weighted_equalization_cost nums cost target /\
+      (forall other: int.
+        weighted_equalization_cost nums cost target <=
+        weighted_equalization_cost nums cost other) };
+    assert { minimum_weighted_equalization_cost nums cost 4 }
+
+  let lemma test_005_python_assertions () =
+    let nums = init 3 [|10; 1; 10|] in
+    let cost = init 3 [|1; 100; 1|] in
+    assert { length nums = 3 };
+    assert { length cost = 3 };
+    assert { nums[0] = 10 };
+    assert { nums[1] = 1 };
+    assert { nums[2] = 10 };
+    assert { cost[0] = 1 };
+    assert { cost[1] = 100 };
+    assert { cost[2] = 1 };
+    assert { valid_inputs nums cost };
+    assert { weighted_equalization_cost nums cost 1 =
+      1 * abs (10 - 1) + 100 * abs (1 - 1) + 1 * abs (10 - 1) };
+    assert { weighted_equalization_cost nums cost 1 = 18 };
+    assert { exists target: int. target = 1 /\
+      18 = weighted_equalization_cost nums cost target /\
+      (forall other: int.
+        weighted_equalization_cost nums cost target <=
+        weighted_equalization_cost nums cost other) };
+    assert { minimum_weighted_equalization_cost nums cost 18 }
+
+  let lemma test_020_python_assertions () =
+    let nums = init 6 [|5; 3; 8; 6; 2; 7|] in
+    let cost = init 6 [|100; 200; 300; 400; 500; 600|] in
+    assert { length nums = 6 };
+    assert { length cost = 6 };
+    assert { nums[0] = 5 };
+    assert { nums[1] = 3 };
+    assert { nums[2] = 8 };
+    assert { nums[3] = 6 };
+    assert { nums[4] = 2 };
+    assert { nums[5] = 7 };
+    assert { cost[0] = 100 };
+    assert { cost[1] = 200 };
+    assert { cost[2] = 300 };
+    assert { cost[3] = 400 };
+    assert { cost[4] = 500 };
+    assert { cost[5] = 600 };
+    assert { valid_inputs nums cost };
+    assert { weighted_equalization_cost nums cost 6 =
+      100 * abs (5 - 6) + 200 * abs (3 - 6) + 300 * abs (8 - 6) +
+      400 * abs (6 - 6) + 500 * abs (2 - 6) + 600 * abs (7 - 6) };
+    assert { weighted_equalization_cost nums cost 6 = 3900 };
+    assert { exists target: int. target = 6 /\
+      3900 = weighted_equalization_cost nums cost target /\
+      (forall other: int.
+        weighted_equalization_cost nums cost target <=
+        weighted_equalization_cost nums cost other) };
+    assert { minimum_weighted_equalization_cost nums cost 3900 }
+
+  let lemma test_108_python_assertions () =
+    let nums = init 5 [|1; 10; 100; 1000; 10000|] in
+    let cost = init 5 [|10000; 1000; 100; 10; 1|] in
+    assert { length nums = 5 };
+    assert { length cost = 5 };
+    assert { nums[0] = 1 };
+    assert { nums[1] = 10 };
+    assert { nums[2] = 100 };
+    assert { nums[3] = 1000 };
+    assert { nums[4] = 10000 };
+    assert { cost[0] = 10000 };
+    assert { cost[1] = 1000 };
+    assert { cost[2] = 100 };
+    assert { cost[3] = 10 };
+    assert { cost[4] = 1 };
+    assert { valid_inputs nums cost };
+    assert { weighted_equalization_cost nums cost 1 =
+      10000 * abs (1 - 1) + 1000 * abs (10 - 1) +
+      100 * abs (100 - 1) + 10 * abs (1000 - 1) +
+      1 * abs (10000 - 1) };
+    assert { weighted_equalization_cost nums cost 1 = 38889 };
+    assert { exists target: int. target = 1 /\
+      38889 = weighted_equalization_cost nums cost target /\
+      (forall other: int.
+        weighted_equalization_cost nums cost target <=
+        weighted_equalization_cost nums cost other) };
+    assert { minimum_weighted_equalization_cost nums cost 38889 }
+
+end

@@ -1,0 +1,207 @@
+module ConstrainedSubsequenceSum_Array_Spec
+
+  use int.Int
+  use array.Array
+  use array.Init
+  use ref.Ref
+
+  predicate input_valid (nums: array int) (k: int) =
+    1 <= k <= length nums <= 100000 /\
+    forall i: int. 0 <= i < length nums -> (-10000) <= nums[i] <= 10000
+
+  predicate valid_selection (nums: array int) (k: int) (pick: array int) =
+    length pick > 0 /\
+    (forall t: int. 0 <= t < length pick -> 0 <= pick[t] < length nums) /\
+    (forall t: int. 0 <= t < length pick - 1 ->
+      pick[t] < pick[t + 1] /\ pick[t + 1] - pick[t] <= k)
+
+  let rec function selected_sum_from
+    (nums: array int) (pick: array int) (pos: int) : int
+    requires { 0 <= pos <= length pick }
+    requires { forall t: int. pos <= t < length pick -> 0 <= pick[t] < length nums }
+    variant  { length pick - pos }
+  =
+    if pos = length pick then 0
+    else nums[pick[pos]] + selected_sum_from nums pick (pos + 1)
+
+  let function selected_sum (nums: array int) (pick: array int) : int
+    requires { forall t: int. 0 <= t < length pick -> 0 <= pick[t] < length nums }
+  =
+    selected_sum_from nums pick 0
+
+  predicate constrained_subsequence_sum_spec
+    (nums: array int) (k: int) (best: int) =
+    (exists pick: array int.
+      valid_selection nums k pick /\ selected_sum nums pick = best) /\
+    (forall pick: array int.
+      valid_selection nums k pick -> selected_sum nums pick <= best)
+
+  predicate selection_ends_at
+    (nums: array int) (k: int) (pick: array int) (idx: int) =
+    valid_selection nums k pick /\
+    pick[length pick - 1] = idx
+
+  predicate optimal_at
+    (nums: array int) (k: int) (dp: array int) (idx: int) =
+    (exists pick: array int.
+      selection_ends_at nums k pick idx /\ selected_sum nums pick = dp[idx]) /\
+    (forall pick: array int.
+      selection_ends_at nums k pick idx -> selected_sum nums pick <= dp[idx])
+
+  predicate optimal_prefix
+    (nums: array int) (k: int) (dp: array int) (upto: int) =
+    forall idx: int. 0 <= idx < upto -> optimal_at nums k dp idx
+
+  predicate best_prefix
+    (nums: array int) (dp: array int) (upto: int) (best: int) =
+    ((upto = 0 /\ best = nums[0]) \/
+     (exists idx: int. 0 <= idx < upto /\ dp[idx] = best)) /\
+    (forall idx: int. 0 <= idx < upto -> dp[idx] <= best)
+
+  predicate window_start (k: int) (i: int) (start: int) =
+    0 <= start <= i /\
+    i - start <= k /\
+    (forall p: int. 0 <= p < i /\ i - p <= k -> start <= p)
+
+  predicate window_max
+    (dp: array int) (start: int) (i: int) (m: int) =
+    0 <= m /\
+    (m = 0 \/ (exists p: int. start <= p < i /\ dp[p] = m)) /\
+    (forall p: int. start <= p < i -> dp[p] <= m)
+
+  predicate extends_by_last (pick: array int) (extended: array int) (idx: int) =
+    length extended = length pick + 1 /\
+    (forall t: int. 0 <= t < length pick -> extended[t] = pick[t]) /\
+    extended[length pick] = idx
+
+  lemma singleton_selection_exists:
+    forall nums: array int, k: int, idx: int.
+      input_valid nums k ->
+      0 <= idx < length nums ->
+      exists pick: array int.
+        selection_ends_at nums k pick idx /\
+        selected_sum nums pick = nums[idx]
+
+  lemma extend_selection_exists:
+    forall nums: array int, k: int, pick: array int, idx: int, next: int.
+      selection_ends_at nums k pick idx ->
+      0 <= next < length nums ->
+      idx < next ->
+      next - idx <= k ->
+      exists extended: array int.
+        extends_by_last pick extended next /\
+        selection_ends_at nums k extended next /\
+        selected_sum nums extended = selected_sum nums pick + nums[next]
+
+  lemma ending_selection_decomposes:
+    forall nums: array int, k: int, pick: array int, idx: int.
+      selection_ends_at nums k pick idx ->
+      (length pick = 1 /\ selected_sum nums pick = nums[idx]) \/
+      (exists prev_pick: array int, prev_idx: int.
+        selection_ends_at nums k prev_pick prev_idx /\
+        0 <= prev_idx < idx /\
+        idx - prev_idx <= k /\
+        selected_sum nums pick = selected_sum nums prev_pick + nums[idx])
+
+  lemma valid_selection_has_endpoint:
+    forall nums: array int, k: int, pick: array int.
+      valid_selection nums k pick ->
+      selection_ends_at nums k pick pick[length pick - 1]
+
+  let lemma optimal_at_from_window
+    (nums: array int) (k: int) (dp: array int)
+    (i: int) (start: int) (m: int)
+    requires { input_valid nums k }
+    requires { length dp = length nums }
+    requires { 0 <= i < length nums }
+    requires { window_start k i start }
+    requires { window_max dp start i m }
+    requires { optimal_prefix nums k dp i }
+    requires { dp[i] = nums[i] + m }
+    ensures  { optimal_at nums k dp i }
+  =
+    assert { exists pick: array int.
+      selection_ends_at nums k pick i /\ selected_sum nums pick = nums[i] };
+    assert { m = 0 \/
+      (exists p: int. start <= p < i /\ dp[p] = m) };
+    assert { exists pick: array int.
+      selection_ends_at nums k pick i /\ selected_sum nums pick = dp[i] };
+    assert { forall pick: array int.
+      selection_ends_at nums k pick i ->
+      selected_sum nums pick <= dp[i] };
+    ()
+
+  let lemma optimal_prefix_implies_spec
+    (nums: array int) (k: int) (dp: array int) (best: int)
+    requires { input_valid nums k }
+    requires { length dp = length nums }
+    requires { optimal_prefix nums k dp (length nums) }
+    requires { best_prefix nums dp (length nums) best }
+    ensures  { constrained_subsequence_sum_spec nums k best }
+  =
+    assert { exists idx: int.
+      0 <= idx < length nums /\ dp[idx] = best };
+    assert { exists pick: array int.
+      valid_selection nums k pick /\ selected_sum nums pick = best };
+    assert { forall pick: array int.
+      valid_selection nums k pick -> selected_sum nums pick <= best };
+    ()
+
+  let constrained_subsequence_sum_array (nums: array int) (k: int) : int
+    requires { input_valid nums k }
+    ensures  { constrained_subsequence_sum_spec nums k result }
+  =
+    let n = length nums in
+    let dp = make n 0 in
+    let best = ref nums[0] in
+    for i = 0 to n - 1 do
+      invariant { n = length nums }
+      invariant { length dp = n }
+      invariant { 0 <= i <= n }
+      invariant { 1 <= n }
+      invariant { forall t: int. 0 <= t < i -> nums[t] <= dp[t] }
+      invariant { forall t: int. 0 <= t < i -> dp[t] <= !best }
+      invariant { nums[0] <= !best }
+      invariant { optimal_prefix nums k dp i }
+      invariant { best_prefix nums dp i !best }
+      let max_prev = ref 0 in
+      let start = if i - k > 0 then i - k else 0 in
+      assert { 0 <= start <= i };
+      assert { i - start <= k };
+      assert { forall p: int. 0 <= p < i /\ i - p <= k -> start <= p };
+      assert { window_start k i start };
+      for j = start to i - 1 do
+        invariant { n = length nums }
+        invariant { length dp = n }
+        invariant { 0 <= start <= i < n }
+        invariant { start <= j <= i }
+        invariant { 0 <= !max_prev }
+        invariant { !max_prev = 0 \/
+          (exists p: int. start <= p < j /\ dp[p] = !max_prev) }
+        invariant { forall t: int. start <= t < j -> dp[t] <= !max_prev }
+        invariant { window_start k i start }
+        if dp[j] > !max_prev then
+          max_prev := dp[j]
+      done;
+      assert { 0 <= !max_prev };
+      assert { !max_prev = 0 \/
+        (exists p: int. start <= p < i /\ dp[p] = !max_prev) };
+      assert { forall t: int. start <= t < i -> dp[t] <= !max_prev };
+      assert { window_max dp start i !max_prev };
+      dp[i] <- nums[i] + !max_prev;
+      assert { dp[i] = nums[i] + !max_prev };
+      assert { nums[i] <= dp[i] };
+      assert { optimal_at nums k dp i };
+      if dp[i] > !best then
+        best := dp[i];
+      assert { dp[i] <= !best };
+      assert { optimal_prefix nums k dp (i + 1) };
+      assert { best_prefix nums dp (i + 1) !best }
+    done;
+    assert { optimal_prefix nums k dp n };
+    assert { forall t: int. 0 <= t < n -> dp[t] <= !best };
+    assert { best_prefix nums dp n !best };
+    assert { constrained_subsequence_sum_spec nums k !best };
+    !best
+
+end

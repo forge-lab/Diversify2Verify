@@ -1,0 +1,350 @@
+== Stage 1: first prover on whole file ==
+Running in /Users/rubenm/Desktop/Diversify2Verify/codex-runs/dataset-merge-verification/stage3a-repair/1300_sum-of-mutated-array-closest-to-target/array-imperative/sum_of_mutated_array_closest_to_target_array_stage3_6c14523c_stage3/generated/why3: why3 session create -o /Users/rubenm/Desktop/Diversify2Verify/codex-runs/dataset-merge-verification/stage3a-repair/1300_sum-of-mutated-array-closest-to-target/array-imperative/sum_of_mutated_array_closest_to_target_array_stage3_6c14523c_stage3/generated/why3/.why3_sessions/repaired_stage1 -P Z3,4.8.6 -t 10 -m 8192 repaired.mlw
+Session created successfully
+Running in /Users/rubenm/Desktop/Diversify2Verify/codex-runs/dataset-merge-verification/stage3a-repair/1300_sum-of-mutated-array-closest-to-target/array-imperative/sum_of_mutated_array_closest_to_target_array_stage3_6c14523c_stage3/generated/why3: why3 bench /Users/rubenm/Desktop/Diversify2Verify/codex-runs/dataset-merge-verification/stage3a-repair/1300_sum-of-mutated-array-closest-to-target/array-imperative/sum_of_mutated_array_closest_to_target_array_stage3_6c14523c_stage3/generated/why3/.why3_sessions/repaired_stage1
+Progress: 8/1/0                       Progress: 7/2/0                       Progress: 6/3/0                       Progress: 5/4/0                       Progress: 4/5/0                       Progress: 3/6/0                       Progress: 3/0/1                       Progress: 2/1/1                       Progress: 1/2/1                       Progress: 0/3/1                       Progress: 0/2/2                       Progress: 0/0/2                       Progress: 0/0/1                       
+Replay completed, saving session... done
+== Stage 1 stats ==
+= Statistics for session /Users/rubenm/Desktop/Diversify2Verify/codex-runs/dataset-merge-verification/stage3a-repair/1300_sum-of-mutated-array-closest-to-target/array-imperative/sum_of_mutated_array_closest_to_target_array_stage3_6c14523c_stage3/generated/why3/.why3_sessions/repaired_stage1
+
+== Number of root goals ==
+  total: 9  proved: 7
+
+== Number of sub goals ==
+  total: 0  proved: 0
+
+== Goals not proved ==
+  +-- file [../../repaired.mlw]
+    +-- theory SumOfMutatedArrayClosestToTarget_Array_Stage3_Imperative
+      +-- goal mutated_sum_strict_below_max
+      +-- goal sum_of_mutated_array_closest_to_target_array'vc
+  
+== Goals proved by only one prover ==
+  +-- file [../../repaired.mlw]
+    +-- theory SumOfMutatedArrayClosestToTarget_Array_Stage3_Imperative
+      +-- goal min_monotone_right: Z3 4.8.6
+      +-- goal min_at_upper_bound: Z3 4.8.6
+      +-- goal mutated_sum_monotone: Z3 4.8.6
+      +-- goal mutated_sum_saturated_above_max: Z3 4.8.6
+      +-- goal mutated_sum_zero_nonnegative: Z3 4.8.6
+      +-- goal mutated_sum_exec'vc: Z3 4.8.6
+      +-- goal max_array_value'vc: Z3 4.8.6
+  
+1 session(s) read, with a total of 9 proof goals.
+== Unproved root goals after first prover ==
+SumOfMutatedArrayClosestToTarget_Array_Stage3_Imperative	mutated_sum_strict_below_max
+SumOfMutatedArrayClosestToTarget_Array_Stage3_Imperative	sum_of_mutated_array_closest_to_target_array'vc
+== Stage 1: trying remaining goals with prover Alt-Ergo,2.4.0 ==
+---- stage1 | prover: Alt-Ergo,2.4.0 | theory: SumOfMutatedArrayClosestToTarget_Array_Stage3_Imperative | goal: mutated_sum_strict_below_max ----
+File "repaired.mlw", line 55, character 4 to line 58, character 43:
+Goal mutated_sum_strict_below_max.
+Prover result is: Timeout (10.00s, 153939 steps).
+---- stage1 | prover: Alt-Ergo,2.4.0 | theory: SumOfMutatedArrayClosestToTarget_Array_Stage3_Imperative | goal: sum_of_mutated_array_closest_to_target_array'vc ----
+File repaired.mlw:
+Goal sum_of_mutated_array_closest_to_target_array'vc.
+Prover result is: Timeout (10.00s, 206511 steps).
+Remaining after prover Alt-Ergo,2.4.0: 2
+== Stage 1: trying remaining goals with prover CVC4,1.8 ==
+---- stage1 | prover: CVC4,1.8 | theory: SumOfMutatedArrayClosestToTarget_Array_Stage3_Imperative | goal: mutated_sum_strict_below_max ----
+File "repaired.mlw", line 55, character 4 to line 58, character 43:
+Goal mutated_sum_strict_below_max.
+Prover result is: Timeout (10.00s, 1251509 steps).
+---- stage1 | prover: CVC4,1.8 | theory: SumOfMutatedArrayClosestToTarget_Array_Stage3_Imperative | goal: sum_of_mutated_array_closest_to_target_array'vc ----
+File repaired.mlw:
+Goal sum_of_mutated_array_closest_to_target_array'vc.
+Prover result is: Timeout (10.00s, 840847 steps).
+Remaining after prover CVC4,1.8: 2
+== Goals still unproved after stage 1 ==
+SumOfMutatedArrayClosestToTarget_Array_Stage3_Imperative	mutated_sum_strict_below_max
+SumOfMutatedArrayClosestToTarget_Array_Stage3_Imperative	sum_of_mutated_array_closest_to_target_array'vc
+== Stage 2: split_vc on unproved goal ==
+Target theory: SumOfMutatedArrayClosestToTarget_Array_Stage3_Imperative
+Target goal  : mutated_sum_strict_below_max
+---- stage2 | prover: Z3,4.8.6 | theory: SumOfMutatedArrayClosestToTarget_Array_Stage3_Imperative | goal: mutated_sum_strict_below_max ----
+Transforms: split_vc
+File "repaired.mlw", line 58, characters 6-43:
+Goal mutated_sum_strict_below_max.
+Prover result is: Timeout (10.00s, 302870749 steps).
+---- stage2 | prover: Alt-Ergo,2.4.0 | theory: SumOfMutatedArrayClosestToTarget_Array_Stage3_Imperative | goal: mutated_sum_strict_below_max ----
+Transforms: split_vc
+File "repaired.mlw", line 58, characters 6-43:
+Goal mutated_sum_strict_below_max.
+Prover result is: Timeout (10.00s, 155656 steps).
+---- stage2 | prover: CVC4,1.8 | theory: SumOfMutatedArrayClosestToTarget_Array_Stage3_Imperative | goal: mutated_sum_strict_below_max ----
+Transforms: split_vc
+File "repaired.mlw", line 58, characters 6-43:
+Goal mutated_sum_strict_below_max.
+Prover result is: Timeout (10.00s, 1269528 steps).
+== Stage 2: split_vc on unproved goal ==
+Target theory: SumOfMutatedArrayClosestToTarget_Array_Stage3_Imperative
+Target goal  : sum_of_mutated_array_closest_to_target_array'vc
+---- stage2 | prover: Z3,4.8.6 | theory: SumOfMutatedArrayClosestToTarget_Array_Stage3_Imperative | goal: sum_of_mutated_array_closest_to_target_array'vc ----
+Transforms: split_vc
+File "repaired.mlw", line 94, characters 20-39:
+Sub-goal Precondition of goal
+sum_of_mutated_array_closest_to_target_array'vc.
+Prover result is: Valid (0.01s, 1598 steps).
+
+File "repaired.mlw", line 95, characters 13-36:
+Sub-goal Assertion of goal sum_of_mutated_array_closest_to_target_array'vc.
+Prover result is: Valid (0.01s, 1603 steps).
+
+File "repaired.mlw", line 96, characters 13-27:
+Sub-goal Assertion of goal sum_of_mutated_array_closest_to_target_array'vc.
+Prover result is: Valid (0.01s, 21546 steps).
+
+File "repaired.mlw", line 98, characters 13-46:
+Sub-goal Assertion of goal sum_of_mutated_array_closest_to_target_array'vc.
+Prover result is: Valid (0.01s, 1609 steps).
+
+File "repaired.mlw", line 100, characters 15-29:
+Sub-goal Assertion of goal sum_of_mutated_array_closest_to_target_array'vc.
+Prover result is: Valid (0.01s, 21244 steps).
+
+File "repaired.mlw", line 92, characters 15-49:
+Sub-goal Postcondition of goal
+sum_of_mutated_array_closest_to_target_array'vc.
+Prover result is: Valid (5.37s, 52382665 steps).
+
+File "repaired.mlw", line 106, characters 20-48:
+Sub-goal Loop invariant init of goal
+sum_of_mutated_array_closest_to_target_array'vc.
+Prover result is: Valid (0.01s, 21302 steps).
+
+File "repaired.mlw", line 107, characters 51-77:
+Sub-goal Loop invariant init of goal
+sum_of_mutated_array_closest_to_target_array'vc.
+Prover result is: Valid (0.01s, 1675 steps).
+
+File "repaired.mlw", line 108, characters 60-87:
+Sub-goal Loop invariant init of goal
+sum_of_mutated_array_closest_to_target_array'vc.
+Prover result is: Valid (0.01s, 22610 steps).
+
+File "repaired.mlw", line 110, characters 24-41:
+Sub-goal Precondition of goal
+sum_of_mutated_array_closest_to_target_array'vc.
+Prover result is: Valid (0.01s, 1734 steps).
+
+File "repaired.mlw", line 111, characters 17-33:
+Sub-goal Assertion of goal sum_of_mutated_array_closest_to_target_array'vc.
+Prover result is: Valid (0.01s, 36340 steps).
+
+File "repaired.mlw", line 113, characters 17-46:
+Sub-goal Assertion of goal sum_of_mutated_array_closest_to_target_array'vc.
+Prover result is: Valid (0.01s, 2099 steps).
+
+File "repaired.mlw", line 115, characters 53-93:
+Sub-goal Assertion of goal sum_of_mutated_array_closest_to_target_array'vc.
+Prover result is: Valid (0.01s, 29019 steps).
+
+File "repaired.mlw", line 116, characters 54-80:
+Sub-goal Assertion of goal sum_of_mutated_array_closest_to_target_array'vc.
+Prover result is: Valid (0.01s, 29928 steps).
+
+File "repaired.mlw", line 109, characters 18-27:
+Sub-goal Loop variant decrease of goal
+sum_of_mutated_array_closest_to_target_array'vc.
+Prover result is: Valid (0.01s, 32965 steps).
+
+File "repaired.mlw", line 106, characters 20-48:
+Sub-goal Loop invariant preservation of goal
+sum_of_mutated_array_closest_to_target_array'vc.
+Prover result is: Valid (0.01s, 33242 steps).
+
+File "repaired.mlw", line 107, characters 51-77:
+Sub-goal Loop invariant preservation of goal
+sum_of_mutated_array_closest_to_target_array'vc.
+Prover result is: Valid (0.01s, 34097 steps).
+
+File "repaired.mlw", line 108, characters 60-87:
+Sub-goal Loop invariant preservation of goal
+sum_of_mutated_array_closest_to_target_array'vc.
+Prover result is: Valid (0.01s, 34377 steps).
+
+File "repaired.mlw", line 119, characters 59-99:
+Sub-goal Assertion of goal sum_of_mutated_array_closest_to_target_array'vc.
+Prover result is: Valid (0.01s, 28999 steps).
+
+File "repaired.mlw", line 120, characters 59-86:
+Sub-goal Assertion of goal sum_of_mutated_array_closest_to_target_array'vc.
+Prover result is: Valid (0.01s, 29900 steps).
+
+File "repaired.mlw", line 109, characters 18-27:
+Sub-goal Loop variant decrease of goal
+sum_of_mutated_array_closest_to_target_array'vc.
+Prover result is: Valid (0.01s, 16642 steps).
+
+File "repaired.mlw", line 106, characters 20-48:
+Sub-goal Loop invariant preservation of goal
+sum_of_mutated_array_closest_to_target_array'vc.
+Prover result is: Valid (0.01s, 33246 steps).
+
+File "repaired.mlw", line 107, characters 51-77:
+Sub-goal Loop invariant preservation of goal
+sum_of_mutated_array_closest_to_target_array'vc.
+Prover result is: Valid (0.01s, 34250 steps).
+
+File "repaired.mlw", line 108, characters 60-87:
+Sub-goal Loop invariant preservation of goal
+sum_of_mutated_array_closest_to_target_array'vc.
+Prover result is: Valid (0.01s, 34190 steps).
+
+File "repaired.mlw", line 124, characters 15-24:
+Sub-goal Assertion of goal sum_of_mutated_array_closest_to_target_array'vc.
+Prover result is: Valid (0.01s, 22548 steps).
+
+File "repaired.mlw", line 125, characters 15-36:
+Sub-goal Assertion of goal sum_of_mutated_array_closest_to_target_array'vc.
+Prover result is: Valid (0.01s, 8771 steps).
+
+File "repaired.mlw", line 127, characters 52-78:
+Sub-goal Assertion of goal sum_of_mutated_array_closest_to_target_array'vc.
+Prover result is: Valid (0.01s, 26538 steps).
+
+File "repaired.mlw", line 128, characters 61-88:
+Sub-goal Assertion of goal sum_of_mutated_array_closest_to_target_array'vc.
+Prover result is: Valid (0.01s, 26565 steps).
+
+File "repaired.mlw", line 129, characters 48-93:
+Sub-goal Assertion of goal sum_of_mutated_array_closest_to_target_array'vc.
+Prover result is: Valid (0.01s, 26649 steps).
+
+File "repaired.mlw", line 130, characters 48-75:
+Sub-goal Assertion of goal sum_of_mutated_array_closest_to_target_array'vc.
+Prover result is: Valid (0.01s, 27226 steps).
+
+File "repaired.mlw", line 132, characters 17-31:
+Sub-goal Assertion of goal sum_of_mutated_array_closest_to_target_array'vc.
+Prover result is: Valid (0.01s, 1873 steps).
+
+File "repaired.mlw", line 133, characters 17-44:
+Sub-goal Assertion of goal sum_of_mutated_array_closest_to_target_array'vc.
+Prover result is: Valid (0.01s, 28270 steps).
+
+File "repaired.mlw", line 134, characters 17-38:
+Sub-goal Assertion of goal sum_of_mutated_array_closest_to_target_array'vc.
+Prover result is: Valid (0.01s, 30384 steps).
+
+File "repaired.mlw", line 135, characters 17-22:
+Sub-goal Assertion of goal sum_of_mutated_array_closest_to_target_array'vc.
+Prover result is: Valid (0.01s, 27293 steps).
+
+File "repaired.mlw", line 139, characters 17-38:
+Sub-goal Assertion of goal sum_of_mutated_array_closest_to_target_array'vc.
+Prover result is: Valid (0.01s, 26478 steps).
+
+File "repaired.mlw", line 140, characters 17-46:
+Sub-goal Assertion of goal sum_of_mutated_array_closest_to_target_array'vc.
+Prover result is: Valid (0.01s, 27715 steps).
+
+File "repaired.mlw", line 141, characters 17-52:
+Sub-goal Assertion of goal sum_of_mutated_array_closest_to_target_array'vc.
+Prover result is: Valid (0.01s, 28515 steps).
+
+File "repaired.mlw", line 144, characters 17-58:
+Sub-goal Assertion of goal sum_of_mutated_array_closest_to_target_array'vc.
+Prover result is: Valid (0.01s, 1932 steps).
+
+File "repaired.mlw", line 145, characters 17-48:
+Sub-goal Assertion of goal sum_of_mutated_array_closest_to_target_array'vc.
+Prover result is: Valid (0.01s, 1934 steps).
+
+File "repaired.mlw", line 148, characters 17-72:
+Sub-goal Assertion of goal sum_of_mutated_array_closest_to_target_array'vc.
+Prover result is: Valid (0.01s, 30562 steps).
+
+File "repaired.mlw", line 149, characters 17-62:
+Sub-goal Assertion of goal sum_of_mutated_array_closest_to_target_array'vc.
+Prover result is: Valid (0.01s, 30926 steps).
+
+File "repaired.mlw", line 151, characters 19-28:
+Sub-goal Assertion of goal sum_of_mutated_array_closest_to_target_array'vc.
+Prover result is: Valid (0.01s, 2127 steps).
+
+File "repaired.mlw", line 152, characters 51-117:
+Sub-goal Assertion of goal sum_of_mutated_array_closest_to_target_array'vc.
+Prover result is: Valid (0.01s, 36628 steps).
+
+File "repaired.mlw", line 153, characters 59-126:
+Sub-goal Assertion of goal sum_of_mutated_array_closest_to_target_array'vc.
+Prover result is: Valid (0.09s, 1263627 steps).
+
+File "repaired.mlw", line 154, characters 52-119:
+Sub-goal Assertion of goal sum_of_mutated_array_closest_to_target_array'vc.
+Prover result is: Valid (0.32s, 3769513 steps).
+
+File "repaired.mlw", line 155, characters 44-111:
+Sub-goal Assertion of goal sum_of_mutated_array_closest_to_target_array'vc.
+Prover result is: Valid (0.01s, 33399 steps).
+
+File "repaired.mlw", line 156, characters 114-123:
+Sub-goal Assertion of goal sum_of_mutated_array_closest_to_target_array'vc.
+Prover result is: Valid (0.01s, 34080 steps).
+
+File "repaired.mlw", line 157, characters 19-51:
+Sub-goal Assertion of goal sum_of_mutated_array_closest_to_target_array'vc.
+Prover result is: Valid (0.98s, 11845036 steps).
+
+File "repaired.mlw", line 160, characters 19-33:
+Sub-goal Assertion of goal sum_of_mutated_array_closest_to_target_array'vc.
+Prover result is: Valid (0.01s, 2129 steps).
+
+File "repaired.mlw", line 161, characters 56-127:
+Sub-goal Assertion of goal sum_of_mutated_array_closest_to_target_array'vc.
+Prover result is: Valid (0.01s, 37352 steps).
+
+File "repaired.mlw", line 162, characters 52-124:
+Sub-goal Assertion of goal sum_of_mutated_array_closest_to_target_array'vc.
+Prover result is: Valid (0.01s, 46105 steps).
+
+File "repaired.mlw", line 163, characters 44-116:
+Sub-goal Assertion of goal sum_of_mutated_array_closest_to_target_array'vc.
+Prover result is: Valid (0.01s, 32669 steps).
+
+File "repaired.mlw", line 164, characters 119-133:
+Sub-goal Assertion of goal sum_of_mutated_array_closest_to_target_array'vc.
+Prover result is: Valid (0.01s, 33244 steps).
+
+File "repaired.mlw", line 165, characters 19-56:
+Sub-goal Assertion of goal sum_of_mutated_array_closest_to_target_array'vc.
+Prover result is: Valid (4.19s, 49748077 steps).
+
+File "repaired.mlw", line 92, characters 15-49:
+Sub-goal Postcondition of goal
+sum_of_mutated_array_closest_to_target_array'vc.
+Prover result is: Valid (0.02s, 92556 steps).
+Solved with split_vc using prover: Z3,4.8.6
+== Goals still unproved after stage 2 (split_vc) ==
+SumOfMutatedArrayClosestToTarget_Array_Stage3_Imperative	mutated_sum_strict_below_max
+== Stage 3: split_vc + inline_all on still-unproved goal ==
+Target theory: SumOfMutatedArrayClosestToTarget_Array_Stage3_Imperative
+Target goal  : mutated_sum_strict_below_max
+---- stage3 | prover: Z3,4.8.6 | theory: SumOfMutatedArrayClosestToTarget_Array_Stage3_Imperative | goal: mutated_sum_strict_below_max ----
+Transforms: split_vc inline_all
+File "repaired.mlw", line 58, characters 6-43:
+Goal mutated_sum_strict_below_max.
+Prover result is: Timeout (10.00s, 244955267 steps).
+---- stage3 | prover: Alt-Ergo,2.4.0 | theory: SumOfMutatedArrayClosestToTarget_Array_Stage3_Imperative | goal: mutated_sum_strict_below_max ----
+Transforms: split_vc inline_all
+File "repaired.mlw", line 58, characters 6-43:
+Goal mutated_sum_strict_below_max.
+Prover result is: Timeout (10.00s, 161385 steps).
+---- stage3 | prover: CVC4,1.8 | theory: SumOfMutatedArrayClosestToTarget_Array_Stage3_Imperative | goal: mutated_sum_strict_below_max ----
+Transforms: split_vc inline_all
+File "repaired.mlw", line 58, characters 6-43:
+Goal mutated_sum_strict_below_max.
+Prover result is: Timeout (10.00s, 1709343 steps).
+== Final summary ==
+Unproved root goals after first prover : 2
+Remaining failures after split_vc      : 1
+Remaining failures after stage 3       : 1
+Detailed logs stored in                : /Users/rubenm/Desktop/Diversify2Verify/codex-runs/dataset-merge-verification/stage3a-repair/1300_sum-of-mutated-array-closest-to-target/array-imperative/sum_of_mutated_array_closest_to_target_array_stage3_6c14523c_stage3/generated/why3/.why3_sessions/repaired_logs
+Still unproved goals:
+SumOfMutatedArrayClosestToTarget_Array_Stage3_Imperative	mutated_sum_strict_below_max
+VERIFY_RESULT: FAILURE
+VERIFY_REASON: unproved_goals_remain
+VERIFY_STAGE: stage3
+VERIFY_ROOT_TOTAL: 9
+VERIFY_ROOT_PROVED: 8
+VERIFY_ROOT_REMAINING: 1

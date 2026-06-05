@@ -1,0 +1,359 @@
+module AdvantageShuffle_List_Recursive_Implementation
+
+  use int.Int
+  use list.List
+
+  type target_entry = Target int int
+  type placed_entry = Placed int int
+
+  let target_value (entry: target_entry) : int =
+    match entry with
+    | Target value _ -> value
+    end
+
+  let target_index (entry: target_entry) : int =
+    match entry with
+    | Target _ index -> index
+    end
+
+  let placed_index (entry: placed_entry) : int =
+    match entry with
+    | Placed index _ -> index
+    end
+
+  let placed_value (entry: placed_entry) : int =
+    match entry with
+    | Placed _ value -> value
+    end
+
+  let rec insert_int_sorted (x: int) (xs: list int) : list int
+    variant { xs }
+  =
+    match xs with
+    | Nil -> Cons x Nil
+    | Cons y ys ->
+        if x < y then Cons x xs else Cons y (insert_int_sorted x ys)
+    end
+
+  let rec sort_ints (xs: list int) : list int
+    variant { xs }
+  =
+    match xs with
+    | Nil -> Nil
+    | Cons x rest -> insert_int_sorted x (sort_ints rest)
+    end
+
+  let rec insert_target_sorted (entry: target_entry) (xs: list target_entry) : list target_entry
+    variant { xs }
+  =
+    match xs with
+    | Nil -> Cons entry Nil
+    | Cons y ys ->
+        if target_value entry < target_value y then
+          Cons entry xs
+        else
+          Cons y (insert_target_sorted entry ys)
+    end
+
+  let rec sort_targets (xs: list target_entry) : list target_entry
+    variant { xs }
+  =
+    match xs with
+    | Nil -> Nil
+    | Cons x rest -> insert_target_sorted x (sort_targets rest)
+    end
+
+  let rec insert_placed_sorted (entry: placed_entry) (xs: list placed_entry) : list placed_entry
+    variant { xs }
+  =
+    match xs with
+    | Nil -> Cons entry Nil
+    | Cons y ys ->
+        if placed_index entry < placed_index y then
+          Cons entry xs
+        else
+          Cons y (insert_placed_sorted entry ys)
+    end
+
+  let rec sort_placed (xs: list placed_entry) : list placed_entry
+    variant { xs }
+  =
+    match xs with
+    | Nil -> Nil
+    | Cons x rest -> insert_placed_sorted x (sort_placed rest)
+    end
+
+  let rec index_targets (nums2: list int) (i: int) : list target_entry
+    variant { nums2 }
+  =
+    match nums2 with
+    | Nil -> Nil
+    | Cons x xs -> Cons (Target x i) (index_targets xs (i + 1))
+    end
+
+  let rec last_int (xs: list int) : int
+    variant { xs }
+  =
+    match xs with
+    | Nil -> 0
+    | Cons x Nil -> x
+    | Cons _ ys -> last_int ys
+    end
+
+  let rec drop_last_int (xs: list int) : list int
+    variant { xs }
+  =
+    match xs with
+    | Nil -> Nil
+    | Cons _ Nil -> Nil
+    | Cons x ys -> Cons x (drop_last_int ys)
+    end
+
+  let rec last_target (xs: list target_entry) : target_entry
+    variant { xs }
+  =
+    match xs with
+    | Nil -> Target 0 0
+    | Cons x Nil -> x
+    | Cons _ ys -> last_target ys
+    end
+
+  let rec drop_last_target (xs: list target_entry) : list target_entry
+    variant { xs }
+  =
+    match xs with
+    | Nil -> Nil
+    | Cons _ Nil -> Nil
+    | Cons x ys -> Cons x (drop_last_target ys)
+    end
+
+  let rec assign_advantage (available: list int) (targets: list target_entry) : list placed_entry
+    variant { targets }
+  =
+    match targets with
+    | Nil -> Nil
+    | _ ->
+        let current_target = last_target targets in
+        let remaining_targets = drop_last_target targets in
+        match available with
+        | Nil -> Nil
+        | Cons smallest rest ->
+            let largest = last_int available in
+            if largest > target_value current_target then
+              let remaining_available = drop_last_int available in
+              Cons (Placed (target_index current_target) largest)
+                (assign_advantage remaining_available remaining_targets)
+            else
+              Cons (Placed (target_index current_target) smallest)
+                (assign_advantage rest remaining_targets)
+        end
+    end
+
+  let rec extract_values (xs: list placed_entry) : list int
+    variant { xs }
+  =
+    match xs with
+    | Nil -> Nil
+    | Cons x rest -> Cons (placed_value x) (extract_values rest)
+    end
+
+  let rec equal_int_lists (xs: list int) (ys: list int) : bool
+    variant { xs }
+  =
+    match xs, ys with
+    | Nil, Nil -> true
+    | Cons x xs1, Cons y ys1 ->
+        if x = y then equal_int_lists xs1 ys1 else false
+    | _, _ -> false
+    end
+
+  let advantage_shuffle_list (nums1: list int) (nums2: list int) : list int =
+    let sorted_nums1 = sort_ints nums1 in
+    let indexed_targets = sort_targets (index_targets nums2 0) in
+    let placements = assign_advantage sorted_nums1 indexed_targets in
+    extract_values (sort_placed placements)
+
+  let test_000 () : bool =
+    let nums1 = Cons 10 (Cons 20 (Cons 30 (Cons 40 (Cons 50 Nil)))) in
+    let nums2 = Cons 5 (Cons 15 (Cons 25 (Cons 35 (Cons 45 Nil)))) in
+    let expected = Cons 10 (Cons 20 (Cons 30 (Cons 40 (Cons 50 Nil)))) in
+    let r = advantage_shuffle_list nums1 nums2 in
+    equal_int_lists r expected
+
+  let test_001 () : bool =
+    let nums1 = Cons 5 (Cons 15 (Cons 25 (Cons 35 Nil))) in
+    let nums2 = Cons 10 (Cons 20 (Cons 30 (Cons 40 Nil))) in
+    let expected = Cons 15 (Cons 25 (Cons 35 (Cons 5 Nil))) in
+    let r = advantage_shuffle_list nums1 nums2 in
+    equal_int_lists r expected
+
+  let test_002 () : bool =
+    let nums1 = Cons 2 (Cons 7 (Cons 11 (Cons 15 Nil))) in
+    let nums2 = Cons 1 (Cons 10 (Cons 4 (Cons 11 Nil))) in
+    let expected = Cons 2 (Cons 11 (Cons 7 (Cons 15 Nil))) in
+    let r = advantage_shuffle_list nums1 nums2 in
+    equal_int_lists r expected
+
+  let test_003 () : bool =
+    let nums1 = Cons 100 (Cons 90 (Cons 80 (Cons 70 (Cons 60 Nil)))) in
+    let nums2 = Cons 60 (Cons 70 (Cons 80 (Cons 90 (Cons 100 Nil)))) in
+    let expected = Cons 70 (Cons 80 (Cons 90 (Cons 100 (Cons 60 Nil)))) in
+    let r = advantage_shuffle_list nums1 nums2 in
+    equal_int_lists r expected
+
+  let test_004 () : bool =
+    let nums1 = Cons 10 (Cons 20 (Cons 30 (Cons 40 (Cons 50 (Cons 60 (Cons 70 (Cons 80 (Cons 90 (Cons 100 Nil))))))))) in
+    let nums2 = Cons 5 (Cons 15 (Cons 25 (Cons 35 (Cons 45 (Cons 55 (Cons 65 (Cons 75 (Cons 85 (Cons 95 Nil))))))))) in
+    let expected = Cons 10 (Cons 20 (Cons 30 (Cons 40 (Cons 50 (Cons 60 (Cons 70 (Cons 80 (Cons 90 (Cons 100 Nil))))))))) in
+    let r = advantage_shuffle_list nums1 nums2 in
+    equal_int_lists r expected
+
+  let test_005 () : bool =
+    let nums1 = Cons 5 (Cons 6 (Cons 7 (Cons 8 (Cons 9 Nil)))) in
+    let nums2 = Cons 1 (Cons 2 (Cons 3 (Cons 4 (Cons 5 Nil)))) in
+    let expected = Cons 5 (Cons 6 (Cons 7 (Cons 8 (Cons 9 Nil)))) in
+    let r = advantage_shuffle_list nums1 nums2 in
+    equal_int_lists r expected
+
+  let test_006 () : bool =
+    let nums1 = Cons 5 (Cons 6 (Cons 7 (Cons 8 Nil))) in
+    let nums2 = Cons 4 (Cons 5 (Cons 6 (Cons 7 Nil))) in
+    let expected = Cons 5 (Cons 6 (Cons 7 (Cons 8 Nil))) in
+    let r = advantage_shuffle_list nums1 nums2 in
+    equal_int_lists r expected
+
+  let test_007 () : bool =
+    let nums1 = Cons 100 (Cons 200 (Cons 300 (Cons 400 Nil))) in
+    let nums2 = Cons 50 (Cons 150 (Cons 250 (Cons 350 Nil))) in
+    let expected = Cons 100 (Cons 200 (Cons 300 (Cons 400 Nil))) in
+    let r = advantage_shuffle_list nums1 nums2 in
+    equal_int_lists r expected
+
+  let test_008 () : bool =
+    let nums1 = Cons 12 (Cons 24 (Cons 8 (Cons 32 Nil))) in
+    let nums2 = Cons 13 (Cons 25 (Cons 32 (Cons 11 Nil))) in
+    let expected = Cons 24 (Cons 32 (Cons 8 (Cons 12 Nil))) in
+    let r = advantage_shuffle_list nums1 nums2 in
+    equal_int_lists r expected
+
+  let test_009 () : bool =
+    let nums1 = Cons 10 (Cons 10 (Cons 10 (Cons 10 Nil))) in
+    let nums2 = Cons 1 (Cons 1 (Cons 1 (Cons 1 Nil))) in
+    let expected = Cons 10 (Cons 10 (Cons 10 (Cons 10 Nil))) in
+    let r = advantage_shuffle_list nums1 nums2 in
+    equal_int_lists r expected
+
+  let test_010 () : bool =
+    let nums1 = Cons 1 (Cons 2 (Cons 3 (Cons 4 Nil))) in
+    let nums2 = Cons 1 (Cons 2 (Cons 3 (Cons 4 Nil))) in
+    let expected = Cons 2 (Cons 3 (Cons 4 (Cons 1 Nil))) in
+    let r = advantage_shuffle_list nums1 nums2 in
+    equal_int_lists r expected
+
+  let test_011 () : bool =
+    let nums1 = Cons 100 (Cons 90 (Cons 80 (Cons 70 Nil))) in
+    let nums2 = Cons 60 (Cons 70 (Cons 80 (Cons 90 Nil))) in
+    let expected = Cons 70 (Cons 80 (Cons 90 (Cons 100 Nil))) in
+    let r = advantage_shuffle_list nums1 nums2 in
+    equal_int_lists r expected
+
+  let test_012 () : bool =
+    let nums1 = Cons 1 (Cons 2 (Cons 3 (Cons 4 (Cons 5 Nil)))) in
+    let nums2 = Cons 5 (Cons 4 (Cons 3 (Cons 2 (Cons 1 Nil)))) in
+    let expected = Cons 1 (Cons 5 (Cons 4 (Cons 3 (Cons 2 Nil)))) in
+    let r = advantage_shuffle_list nums1 nums2 in
+    equal_int_lists r expected
+
+  let test_013 () : bool =
+    let nums1 = Cons 1 (Cons 2 (Cons 3 (Cons 4 Nil))) in
+    let nums2 = Cons 4 (Cons 3 (Cons 2 (Cons 1 Nil))) in
+    let expected = Cons 1 (Cons 4 (Cons 3 (Cons 2 Nil))) in
+    let r = advantage_shuffle_list nums1 nums2 in
+    equal_int_lists r expected
+
+  let test_014 () : bool =
+    let nums1 = Cons 1 (Cons 2 (Cons 3 (Cons 4 (Cons 5 Nil)))) in
+    let nums2 = Cons 9 (Cons 8 (Cons 7 (Cons 6 (Cons 5 Nil)))) in
+    let expected = Cons 1 (Cons 2 (Cons 3 (Cons 4 (Cons 5 Nil)))) in
+    let r = advantage_shuffle_list nums1 nums2 in
+    equal_int_lists r expected
+
+  let test_015 () : bool =
+    let nums1 = Cons 5 (Cons 6 (Cons 7 (Cons 8 Nil))) in
+    let nums2 = Cons 1 (Cons 2 (Cons 3 (Cons 4 Nil))) in
+    let expected = Cons 5 (Cons 6 (Cons 7 (Cons 8 Nil))) in
+    let r = advantage_shuffle_list nums1 nums2 in
+    equal_int_lists r expected
+
+  let test_016 () : bool =
+    let nums1 = Cons 1 (Cons 2 (Cons 3 (Cons 4 Nil))) in
+    let nums2 = Cons 5 (Cons 6 (Cons 7 (Cons 8 Nil))) in
+    let expected = Cons 4 (Cons 3 (Cons 2 (Cons 1 Nil))) in
+    let r = advantage_shuffle_list nums1 nums2 in
+    equal_int_lists r expected
+
+  let test_017 () : bool =
+    let nums1 = Cons 8 (Cons 24 (Cons 15 (Cons 3 (Cons 17 (Cons 22 Nil))))) in
+    let nums2 = Cons 25 (Cons 18 (Cons 9 (Cons 13 (Cons 22 (Cons 6 Nil))))) in
+    let expected = Cons 3 (Cons 22 (Cons 15 (Cons 17 (Cons 24 (Cons 8 Nil))))) in
+    let r = advantage_shuffle_list nums1 nums2 in
+    equal_int_lists r expected
+
+  let test_018 () : bool =
+    let nums1 = Cons 100 (Cons 200 (Cons 300 (Cons 400 (Cons 500 Nil)))) in
+    let nums2 = Cons 450 (Cons 350 (Cons 250 (Cons 150 (Cons 50 Nil)))) in
+    let expected = Cons 500 (Cons 400 (Cons 300 (Cons 200 (Cons 100 Nil)))) in
+    let r = advantage_shuffle_list nums1 nums2 in
+    equal_int_lists r expected
+
+  let test_019 () : bool =
+    let nums1 = Cons 8 (Cons 6 (Cons 4 (Cons 2 (Cons 0 (Cons 1 (Cons 3 (Cons 5 (Cons 7 (Cons 9 Nil))))))))) in
+    let nums2 = Cons 9 (Cons 7 (Cons 5 (Cons 3 (Cons 1 (Cons 0 (Cons 2 (Cons 4 (Cons 6 (Cons 8 Nil))))))))) in
+    let expected = Cons 0 (Cons 8 (Cons 6 (Cons 4 (Cons 2 (Cons 1 (Cons 3 (Cons 5 (Cons 7 (Cons 9 Nil))))))))) in
+    let r = advantage_shuffle_list nums1 nums2 in
+    equal_int_lists r expected
+
+  let run_tests () : bool =
+    if test_000 () then
+    if test_001 () then
+    if test_002 () then
+    if test_003 () then
+    if test_004 () then
+    if test_005 () then
+    if test_006 () then
+    if test_007 () then
+    if test_008 () then
+    if test_009 () then
+    if test_010 () then
+    if test_011 () then
+    if test_012 () then
+    if test_013 () then
+    if test_014 () then
+    if test_015 () then
+    if test_016 () then
+    if test_017 () then
+    if test_018 () then
+    if test_019 () then
+      true
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+
+end

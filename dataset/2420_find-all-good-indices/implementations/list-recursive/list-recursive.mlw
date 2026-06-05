@@ -1,0 +1,249 @@
+module FindAllGoodIndices_List_Recursive_Implementation
+
+  use int.Int
+  use list.List
+
+  let rec list_length (l: list int) : int
+    variant { l }
+  =
+    match l with
+    | Nil -> 0
+    | Cons _ xs -> 1 + list_length xs
+    end
+
+  let rec drop (l: list int) (n: int) : list int
+    variant { l }
+  =
+    if n <= 0 then l else
+    match l with
+    | Nil -> Nil
+    | Cons _ xs -> drop xs (n - 1)
+    end
+
+  let rec take (l: list int) (n: int) : list int
+    variant { l }
+  =
+    if n <= 0 then Nil else
+    match l with
+    | Nil -> Nil
+    | Cons x xs -> Cons x (take xs (n - 1))
+    end
+
+  let rec is_nonincreasing (l: list int) : bool
+    variant { l }
+  =
+    match l with
+    | Nil -> true
+    | Cons _ Nil -> true
+    | Cons x (Cons y ys) ->
+        if x >= y then is_nonincreasing (Cons y ys) else false
+    end
+
+  let rec is_nondecreasing (l: list int) : bool
+    variant { l }
+  =
+    match l with
+    | Nil -> true
+    | Cons _ Nil -> true
+    | Cons x (Cons y ys) ->
+        if x <= y then is_nondecreasing (Cons y ys) else false
+    end
+
+  let rec list_eq (xs: list int) (ys: list int) : bool
+    variant { xs }
+  =
+    match xs with
+    | Nil ->
+        match ys with
+        | Nil -> true
+        | Cons _ _ -> false
+        end
+    | Cons x xt ->
+        match ys with
+        | Nil -> false
+        | Cons y yt ->
+            if x = y then list_eq xt yt else false
+        end
+    end
+
+  let good_index_at (nums: list int) (k: int) (i: int) : bool =
+    let left = take (drop nums (i - k)) k in
+    let right = take (drop nums (i + 1)) k in
+    if is_nonincreasing left then is_nondecreasing right else false
+
+  let rec collect_good_indices (nums: list int) (k: int) (i: int) (limit: int) : list int
+    variant { limit - i }
+  =
+    if i >= limit then Nil else
+    let tail = collect_good_indices nums k (i + 1) limit in
+    if good_index_at nums k i then Cons i tail else tail
+
+  let find_all_good_indices_list (nums: list int) (k: int) : list int =
+    let n = list_length nums in
+    let limit = n - k in
+    collect_good_indices nums k k limit
+
+  let test_000 () : bool =
+    let nums = Cons 9 (Cons 8 (Cons 7 (Cons 6 (Cons 5 (Cons 4 (Cons 3 (Cons 2 (Cons 1 (Cons 2 (Cons 3 (Cons 4 (Cons 5 Nil)))))))))))) in
+    let expected = Cons 7 (Cons 8 (Cons 9 Nil)) in
+    let r = find_all_good_indices_list nums 3 in
+    list_eq r expected
+
+  let test_001 () : bool =
+    let nums = Cons 1 (Cons 2 (Cons 3 (Cons 4 (Cons 3 (Cons 2 (Cons 1 Nil)))))) in
+    let expected = Nil in
+    let r = find_all_good_indices_list nums 2 in
+    list_eq r expected
+
+  let test_002 () : bool =
+    let nums = Cons 1 (Cons 2 (Cons 2 (Cons 3 (Cons 4 (Cons 5 (Cons 5 (Cons 4 (Cons 3 (Cons 2 (Cons 1 Nil)))))))))) in
+    let expected = Nil in
+    let r = find_all_good_indices_list nums 3 in
+    list_eq r expected
+
+  let test_003 () : bool =
+    let nums = Cons 10 (Cons 9 (Cons 8 (Cons 7 (Cons 6 (Cons 5 (Cons 4 (Cons 3 (Cons 2 (Cons 1 Nil))))))))) in
+    let expected = Nil in
+    let r = find_all_good_indices_list nums 4 in
+    list_eq r expected
+
+  let test_004 () : bool =
+    let nums = Cons 1000000 (Cons 999999 (Cons 999998 (Cons 999997 (Cons 999996 (Cons 999995 (Cons 999994 (Cons 999993 (Cons 999992 Nil)))))))) in
+    let expected = Nil in
+    let r = find_all_good_indices_list nums 3 in
+    list_eq r expected
+
+  let test_005 () : bool =
+    let nums = Cons 5 (Cons 4 (Cons 3 (Cons 2 (Cons 1 (Cons 2 (Cons 3 (Cons 4 (Cons 5 Nil)))))))) in
+    let expected = Cons 3 (Cons 4 (Cons 5 Nil)) in
+    let r = find_all_good_indices_list nums 2 in
+    list_eq r expected
+
+  let test_006 () : bool =
+    let nums = Cons 5 (Cons 4 (Cons 5 (Cons 3 (Cons 4 (Cons 5 (Cons 6 (Cons 7 (Cons 8 Nil)))))))) in
+    let expected = Cons 2 (Cons 4 Nil) in
+    let r = find_all_good_indices_list nums 2 in
+    list_eq r expected
+
+  let test_007 () : bool =
+    let nums = Cons 2 (Cons 1 (Cons 1 (Cons 2 Nil))) in
+    let expected = Nil in
+    let r = find_all_good_indices_list nums 2 in
+    list_eq r expected
+
+  let test_008 () : bool =
+    let nums = Cons 1000000 (Cons 999999 (Cons 999998 (Cons 999997 (Cons 999996 (Cons 999995 (Cons 999994 (Cons 999993 (Cons 999992 (Cons 999991 Nil))))))))) in
+    let expected = Nil in
+    let r = find_all_good_indices_list nums 3 in
+    list_eq r expected
+
+  let test_009 () : bool =
+    let nums = Cons 1 (Cons 2 (Cons 3 (Cons 4 (Cons 5 (Cons 4 (Cons 3 (Cons 2 (Cons 1 Nil)))))))) in
+    let expected = Nil in
+    let r = find_all_good_indices_list nums 2 in
+    list_eq r expected
+
+  let test_010 () : bool =
+    let nums = Cons 9 (Cons 8 (Cons 7 (Cons 6 (Cons 5 (Cons 4 (Cons 3 (Cons 2 (Cons 1 (Cons 2 (Cons 3 (Cons 4 (Cons 5 (Cons 6 (Cons 7 (Cons 8 (Cons 9 Nil)))))))))))))))) in
+    let expected = Cons 7 (Cons 8 (Cons 9 Nil)) in
+    let r = find_all_good_indices_list nums 3 in
+    list_eq r expected
+
+  let test_011 () : bool =
+    let nums = Cons 5 (Cons 4 (Cons 3 (Cons 4 (Cons 5 Nil)))) in
+    let expected = Cons 1 (Cons 2 (Cons 3 Nil)) in
+    let r = find_all_good_indices_list nums 1 in
+    list_eq r expected
+
+  let test_012 () : bool =
+    let nums = Cons 2 (Cons 1 (Cons 1 (Cons 1 (Cons 3 (Cons 4 (Cons 1 Nil)))))) in
+    let expected = Cons 2 (Cons 3 Nil) in
+    let r = find_all_good_indices_list nums 2 in
+    list_eq r expected
+
+  let test_013 () : bool =
+    let nums = Cons 1 (Cons 2 (Cons 2 (Cons 2 (Cons 3 (Cons 3 (Cons 3 (Cons 4 (Cons 4 (Cons 4 (Cons 5 (Cons 5 (Cons 5 (Cons 4 (Cons 4 (Cons 4 (Cons 3 (Cons 3 (Cons 3 (Cons 2 (Cons 2 (Cons 2 (Cons 1 (Cons 1 Nil))))))))))))))))))))))) in
+    let expected = Cons 4 (Cons 7 (Cons 15 (Cons 18 Nil))) in
+    let r = find_all_good_indices_list nums 3 in
+    list_eq r expected
+
+  let test_014 () : bool =
+    let nums = Cons 8 (Cons 8 (Cons 8 (Cons 8 (Cons 8 (Cons 8 (Cons 8 (Cons 8 (Cons 8 (Cons 8 (Cons 8 (Cons 8 (Cons 8 Nil)))))))))))) in
+    let expected = Cons 3 (Cons 4 (Cons 5 (Cons 6 (Cons 7 (Cons 8 (Cons 9 Nil)))))) in
+    let r = find_all_good_indices_list nums 3 in
+    list_eq r expected
+
+  let test_015 () : bool =
+    let nums = Cons 9 (Cons 8 (Cons 7 (Cons 6 (Cons 5 (Cons 4 (Cons 3 (Cons 2 (Cons 1 (Cons 2 (Cons 3 (Cons 4 (Cons 5 (Cons 6 (Cons 7 (Cons 8 (Cons 9 Nil)))))))))))))))) in
+    let expected = Cons 7 (Cons 8 (Cons 9 Nil)) in
+    let r = find_all_good_indices_list nums 4 in
+    list_eq r expected
+
+  let test_016 () : bool =
+    let nums = Cons 1 (Cons 3 (Cons 2 (Cons 1 (Cons 3 (Cons 2 (Cons 1 (Cons 3 (Cons 2 (Cons 1 (Cons 3 (Cons 2 (Cons 1 (Cons 3 (Cons 2 (Cons 1 (Cons 3 (Cons 2 (Cons 1 Nil)))))))))))))))))) in
+    let expected = Nil in
+    let r = find_all_good_indices_list nums 2 in
+    list_eq r expected
+
+  let test_017 () : bool =
+    let nums = Cons 100 (Cons 99 (Cons 98 (Cons 97 (Cons 96 (Cons 97 (Cons 98 (Cons 99 (Cons 100 (Cons 101 (Cons 102 (Cons 103 (Cons 104 (Cons 103 (Cons 102 (Cons 101 (Cons 100 Nil)))))))))))))))) in
+    let expected = Cons 4 (Cons 5 Nil) in
+    let r = find_all_good_indices_list nums 4 in
+    list_eq r expected
+
+  let test_018 () : bool =
+    let nums = Cons 1 (Cons 2 (Cons 3 (Cons 4 (Cons 5 (Cons 4 (Cons 3 (Cons 4 (Cons 5 (Cons 4 (Cons 3 (Cons 4 (Cons 5 (Cons 4 (Cons 3 (Cons 4 (Cons 5 (Cons 4 (Cons 3 Nil)))))))))))))))))) in
+    let expected = Cons 6 (Cons 10 (Cons 14 Nil)) in
+    let r = find_all_good_indices_list nums 2 in
+    list_eq r expected
+
+  let test_019 () : bool =
+    let nums = Cons 10 (Cons 9 (Cons 8 (Cons 7 (Cons 6 (Cons 5 (Cons 6 (Cons 7 (Cons 8 (Cons 9 (Cons 10 (Cons 9 (Cons 8 (Cons 7 (Cons 6 (Cons 5 Nil))))))))))))))) in
+    let expected = Cons 5 Nil in
+    let r = find_all_good_indices_list nums 5 in
+    list_eq r expected
+
+  let run_tests () : bool =
+    if test_000 () then
+    if test_001 () then
+    if test_002 () then
+    if test_003 () then
+    if test_004 () then
+    if test_005 () then
+    if test_006 () then
+    if test_007 () then
+    if test_008 () then
+    if test_009 () then
+    if test_010 () then
+    if test_011 () then
+    if test_012 () then
+    if test_013 () then
+    if test_014 () then
+    if test_015 () then
+    if test_016 () then
+    if test_017 () then
+    if test_018 () then
+    if test_019 () then
+      true
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+
+end

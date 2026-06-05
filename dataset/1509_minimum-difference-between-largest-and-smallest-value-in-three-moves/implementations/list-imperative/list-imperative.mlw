@@ -1,0 +1,198 @@
+module MinimumDifferenceBetweenLargestAndSmallestValueInThreeMoves_List_Imperative
+
+  use int.Int
+  use list.List
+  use ref.Ref
+
+  let min2 (a: int) (b: int) : int =
+    if a <= b then a else b
+
+  let min4 (a: int) (b: int) (c: int) (d: int) : int =
+    min2 (min2 a b) (min2 c d)
+
+  let minimum_difference_between_largest_and_smallest_value_in_three_moves_list (nums: list int) : int =
+    match nums with
+    | Nil -> 0
+    | _ ->
+        let seen = ref 0 in
+        let smallest_1 = ref 1000000001 in
+        let smallest_2 = ref 1000000001 in
+        let smallest_3 = ref 1000000001 in
+        let smallest_4 = ref 1000000001 in
+        let largest_1 = ref (-1000000001) in
+        let largest_2 = ref (-1000000001) in
+        let largest_3 = ref (-1000000001) in
+        let largest_4 = ref (-1000000001) in
+        let cur = ref nums in
+        while (match !cur with Nil -> false | Cons _ _ -> true end) do
+          match !cur with
+          | Nil -> ()
+          | Cons x xs ->
+              seen := !seen + 1;
+              if x <= !smallest_1 then (
+                smallest_4 := !smallest_3;
+                smallest_3 := !smallest_2;
+                smallest_2 := !smallest_1;
+                smallest_1 := x
+              ) else if x <= !smallest_2 then (
+                smallest_4 := !smallest_3;
+                smallest_3 := !smallest_2;
+                smallest_2 := x
+              ) else if x <= !smallest_3 then (
+                smallest_4 := !smallest_3;
+                smallest_3 := x
+              ) else if x < !smallest_4 then
+                smallest_4 := x;
+              if x >= !largest_1 then (
+                largest_4 := !largest_3;
+                largest_3 := !largest_2;
+                largest_2 := !largest_1;
+                largest_1 := x
+              ) else if x >= !largest_2 then (
+                largest_4 := !largest_3;
+                largest_3 := !largest_2;
+                largest_2 := x
+              ) else if x >= !largest_3 then (
+                largest_4 := !largest_3;
+                largest_3 := x
+              ) else if x > !largest_4 then
+                largest_4 := x;
+              cur := xs
+          end
+        done;
+        if !seen <= 4 then 0 else
+        let diff_remove_three_largest = !largest_4 - !smallest_1 in
+        let diff_remove_two_largest = !largest_3 - !smallest_2 in
+        let diff_remove_one_largest = !largest_2 - !smallest_3 in
+        let diff_remove_three_smallest = !largest_1 - !smallest_4 in
+        min4 diff_remove_three_largest diff_remove_two_largest diff_remove_one_largest diff_remove_three_smallest
+    end
+
+  let check_case (nums: list int) (expected: int) : bool =
+    let r = minimum_difference_between_largest_and_smallest_value_in_three_moves_list nums in
+    r = expected
+
+  let test_000 () : bool =
+    let nums = Cons 3 (Cons 100 (Cons 20 (Nil))) in
+    check_case nums 0
+
+  let test_001 () : bool =
+    let nums = Cons 1 (Nil) in
+    check_case nums 0
+
+  let test_002 () : bool =
+    let nums = Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Nil)))))))))) in
+    check_case nums 0
+
+  let test_003 () : bool =
+    let nums = Cons (-1) (Cons (-2) (Cons (-3) (Cons (-4) (Cons (-5) (Cons (-6) (Cons (-7) (Cons (-8) (Cons (-9) (Cons (-10) (Nil)))))))))) in
+    check_case nums 6
+
+  let test_004 () : bool =
+    let nums = Cons 1 (Cons 1000000000 (Cons (-1000000000) (Cons 0 (Nil)))) in
+    check_case nums 0
+
+  let test_005 () : bool =
+    let nums = Cons 1 (Cons 2 (Nil)) in
+    check_case nums 0
+
+  let test_006 () : bool =
+    let nums = Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Nil))))) in
+    check_case nums 0
+
+  let test_007 () : bool =
+    let nums = Cons 1000000000 (Cons (-1000000000) (Cons 1000000000 (Cons (-1000000000) (Cons 0 (Nil))))) in
+    check_case nums 0
+
+  let test_008 () : bool =
+    let nums = Cons 6 (Cons 6 (Cons 0 (Cons 1 (Cons 1 (Cons 4 (Cons 6 (Nil))))))) in
+    check_case nums 2
+
+  let test_009 () : bool =
+    let nums = Cons 1 (Cons 2 (Cons 3 (Nil))) in
+    check_case nums 0
+
+  let test_010 () : bool =
+    let nums = Cons 1 (Cons 2 (Cons 3 (Cons 4 (Cons 5 (Cons 6 (Cons 7 (Cons 8 (Cons 9 (Cons 10 (Cons 11 (Cons 12 (Cons 13 (Cons 14 (Cons 15 (Nil))))))))))))))) in
+    check_case nums 11
+
+  let test_011 () : bool =
+    let nums = Cons 1 (Cons 5 (Cons 0 (Cons 10 (Cons 14 (Nil))))) in
+    check_case nums 1
+
+  let test_012 () : bool =
+    let nums = Cons 5 (Cons 3 (Cons 2 (Cons 4 (Nil)))) in
+    check_case nums 0
+
+  let test_013 () : bool =
+    let nums = Cons 1 (Cons 2 (Cons 3 (Cons 4 (Cons 5 (Nil))))) in
+    check_case nums 1
+
+  let test_014 () : bool =
+    let nums = Cons 1 (Cons 2 (Cons 3 (Cons 4 (Cons 5 (Cons 6 (Cons 7 (Cons 8 (Cons 9 (Cons 10 (Nil)))))))))) in
+    check_case nums 6
+
+  let test_015 () : bool =
+    let nums = Cons 1 (Cons 2 (Cons 3 (Cons 4 (Cons 5 (Cons 6 (Cons 7 (Cons 8 (Cons 9 (Cons 10 (Cons 11 (Cons 12 (Cons 13 (Cons 14 (Cons 15 (Cons 16 (Cons 17 (Cons 18 (Cons 19 (Cons 20 (Cons 21 (Cons 22 (Cons 23 (Cons 24 (Cons 25 (Cons 26 (Cons 27 (Cons 28 (Cons 29 (Cons 30 (Cons 31 (Cons 32 (Cons 33 (Cons 34 (Cons 35 (Cons 36 (Cons 37 (Cons 38 (Cons 39 (Cons 40 (Cons 41 (Cons 42 (Cons 43 (Cons 44 (Cons 45 (Cons 46 (Cons 47 (Cons 48 (Cons 49 (Cons 50 (Nil)))))))))))))))))))))))))))))))))))))))))))))))))) in
+    check_case nums 46
+
+  let test_016 () : bool =
+    let nums = Cons 1 (Cons 2 (Cons 3 (Cons 1000000 (Cons 1000001 (Cons 1000002 (Cons 1000003 (Cons 1000004 (Cons 1000005 (Cons 1000006 (Nil)))))))))) in
+    check_case nums 6
+
+  let test_017 () : bool =
+    let nums = Cons 100 (Cons 200 (Cons 300 (Cons 400 (Cons 500 (Cons 600 (Cons 700 (Cons 800 (Cons 900 (Cons 1000 (Cons 1100 (Cons 1200 (Cons 1300 (Cons 1400 (Cons 1500 (Nil))))))))))))))) in
+    check_case nums 1100
+
+  let test_018 () : bool =
+    let nums = Cons 1 (Cons 5 (Cons 9 (Cons 13 (Cons 17 (Cons 21 (Cons 25 (Cons 29 (Cons 33 (Cons 37 (Cons 41 (Cons 45 (Cons 49 (Cons 53 (Cons 57 (Cons 61 (Cons 65 (Cons 69 (Cons 73 (Cons 77 (Cons 81 (Cons 85 (Cons 89 (Cons 93 (Cons 97 (Cons 101 (Nil)))))))))))))))))))))))))) in
+    check_case nums 88
+
+  let test_019 () : bool =
+    let nums = Cons (-1000000) (Cons (-900000) (Cons (-800000) (Cons (-700000) (Cons (-600000) (Cons (-500000) (Cons (-400000) (Cons (-300000) (Cons (-200000) (Cons (-100000) (Nil)))))))))) in
+    check_case nums 600000
+
+  let run_tests () : bool =
+    if test_000 () then
+    if test_001 () then
+    if test_002 () then
+    if test_003 () then
+    if test_004 () then
+    if test_005 () then
+    if test_006 () then
+    if test_007 () then
+    if test_008 () then
+    if test_009 () then
+    if test_010 () then
+    if test_011 () then
+    if test_012 () then
+    if test_013 () then
+    if test_014 () then
+    if test_015 () then
+    if test_016 () then
+    if test_017 () then
+    if test_018 () then
+    if test_019 () then
+      true
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+
+end

@@ -1,0 +1,180 @@
+module MinimumOperationsToMakeBinaryArrayElementsEqualToOneI_Array_Imperative_Implementation
+
+  use int.Int
+  use int.EuclideanDivision
+  use array.Array
+  use array.Init
+  use ref.Ref
+
+  let minimum_operations_to_make_binary_array_elements_equal_to_one_i_array
+      (nums: array int) : int =
+    let n = length nums in
+    if n < 3 then
+      let all_one = ref true in
+      for i = 0 to n - 1 do
+        if nums[i] <> 1 then all_one := false
+      done;
+      if !all_one then 0 else -1
+    else
+      let prev2 = ref 0 in
+      let prev1 = ref 0 in
+      let count = ref 0 in
+      for i = 0 to n - 3 do
+        let current = mod (nums[i] + !prev2 + !prev1) 2 in
+        if current = 0 then begin
+          count := !count + 1;
+          prev2 := !prev1;
+          prev1 := 1
+        end else begin
+          prev2 := !prev1;
+          prev1 := 0
+        end
+      done;
+      let second_last = mod (nums[n - 2] + !prev2 + !prev1) 2 in
+      let last = mod (nums[n - 1] + !prev1) 2 in
+      if second_last = 1 && last = 1 then !count else -1
+
+  let test_000 () : bool =
+    let nums = init 6 [|0; 1; 0; 1; 0; 1|] in
+    let r = minimum_operations_to_make_binary_array_elements_equal_to_one_i_array nums in
+    r = 3
+
+  let test_001 () : bool =
+    let nums = init 7 [|0; 0; 1; 1; 1; 0; 0|] in
+    let r = minimum_operations_to_make_binary_array_elements_equal_to_one_i_array nums in
+    r = (-1)
+
+  let test_002 () : bool =
+    let nums = init 10 [|0; 0; 1; 0; 0; 1; 0; 1; 1; 0|] in
+    let r = minimum_operations_to_make_binary_array_elements_equal_to_one_i_array nums in
+    r = 4
+
+  let test_003 () : bool =
+    let nums = init 9 [|1; 0; 1; 0; 1; 0; 1; 0; 1|] in
+    let r = minimum_operations_to_make_binary_array_elements_equal_to_one_i_array nums in
+    r = (-1)
+
+  let test_004 () : bool =
+    let nums = init 9 [|0; 0; 0; 1; 1; 1; 0; 0; 0|] in
+    let r = minimum_operations_to_make_binary_array_elements_equal_to_one_i_array nums in
+    r = 2
+
+  let test_005 () : bool =
+    let nums = init 7 [|1; 1; 1; 1; 1; 1; 1|] in
+    let r = minimum_operations_to_make_binary_array_elements_equal_to_one_i_array nums in
+    r = 0
+
+  let test_006 () : bool =
+    let nums = init 6 [|1; 0; 0; 1; 0; 0|] in
+    let r = minimum_operations_to_make_binary_array_elements_equal_to_one_i_array nums in
+    r = 2
+
+  let test_007 () : bool =
+    let nums = init 4 [|0; 1; 1; 1|] in
+    let r = minimum_operations_to_make_binary_array_elements_equal_to_one_i_array nums in
+    r = (-1)
+
+  let test_008 () : bool =
+    let nums = init 3 [|0; 0; 0|] in
+    let r = minimum_operations_to_make_binary_array_elements_equal_to_one_i_array nums in
+    r = 1
+
+  let test_009 () : bool =
+    let nums = init 6 [|1; 0; 1; 0; 1; 0|] in
+    let r = minimum_operations_to_make_binary_array_elements_equal_to_one_i_array nums in
+    r = 3
+
+  let test_010 () : bool =
+    let nums = init 9 [|1; 0; 0; 1; 0; 0; 1; 1; 1|] in
+    let r = minimum_operations_to_make_binary_array_elements_equal_to_one_i_array nums in
+    r = 2
+
+  let test_011 () : bool =
+    let nums = init 7 [|0; 0; 0; 0; 0; 0; 0|] in
+    let r = minimum_operations_to_make_binary_array_elements_equal_to_one_i_array nums in
+    r = (-1)
+
+  let test_012 () : bool =
+    let nums = init 6 [|0; 1; 1; 1; 0; 0|] in
+    let r = minimum_operations_to_make_binary_array_elements_equal_to_one_i_array nums in
+    r = 3
+
+  let test_013 () : bool =
+    let nums = init 6 [|0; 0; 0; 0; 0; 0|] in
+    let r = minimum_operations_to_make_binary_array_elements_equal_to_one_i_array nums in
+    r = 2
+
+  let test_014 () : bool =
+    let nums = init 7 [|1; 1; 0; 0; 0; 1; 1|] in
+    let r = minimum_operations_to_make_binary_array_elements_equal_to_one_i_array nums in
+    r = 1
+
+  let test_015 () : bool =
+    let nums = init 10 [|1; 1; 0; 0; 1; 1; 0; 0; 1; 1|] in
+    let r = minimum_operations_to_make_binary_array_elements_equal_to_one_i_array nums in
+    r = (-1)
+
+  let test_016 () : bool =
+    let nums = init 6 [|1; 1; 1; 0; 0; 0|] in
+    let r = minimum_operations_to_make_binary_array_elements_equal_to_one_i_array nums in
+    r = 1
+
+  let test_017 () : bool =
+    let nums = init 7 [|1; 0; 1; 0; 1; 0; 1|] in
+    let r = minimum_operations_to_make_binary_array_elements_equal_to_one_i_array nums in
+    r = 3
+
+  let test_018 () : bool =
+    let nums = init 6 [|1; 1; 1; 1; 1; 1|] in
+    let r = minimum_operations_to_make_binary_array_elements_equal_to_one_i_array nums in
+    r = 0
+
+  let test_019 () : bool =
+    let nums = init 9 [|0; 1; 0; 1; 0; 1; 0; 1; 0|] in
+    let r = minimum_operations_to_make_binary_array_elements_equal_to_one_i_array nums in
+    r = (-1)
+
+  let run_tests () : bool =
+    if test_000 () then
+    if test_001 () then
+    if test_002 () then
+    if test_003 () then
+    if test_004 () then
+    if test_005 () then
+    if test_006 () then
+    if test_007 () then
+    if test_008 () then
+    if test_009 () then
+    if test_010 () then
+    if test_011 () then
+    if test_012 () then
+    if test_013 () then
+    if test_014 () then
+    if test_015 () then
+    if test_016 () then
+    if test_017 () then
+    if test_018 () then
+    if test_019 () then
+      true
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+
+end

@@ -1,0 +1,795 @@
+== Stage 1: first prover on whole file ==
+Running in /Users/rubenm/Desktop/Diversify2Verify/codex-runs/dataset-merge-verification/stage3a-repair/1425_constrained-subsequence-sum/array-imperative/constrained_subsequence_sum_array_stage3_1f10d285_stage3/generated/why3: why3 session create -o /Users/rubenm/Desktop/Diversify2Verify/codex-runs/dataset-merge-verification/stage3a-repair/1425_constrained-subsequence-sum/array-imperative/constrained_subsequence_sum_array_stage3_1f10d285_stage3/generated/why3/.why3_sessions/repaired_stage1 -P Z3,4.8.6 -t 10 -m 8192 repaired.mlw
+Session created successfully
+Running in /Users/rubenm/Desktop/Diversify2Verify/codex-runs/dataset-merge-verification/stage3a-repair/1425_constrained-subsequence-sum/array-imperative/constrained_subsequence_sum_array_stage3_1f10d285_stage3/generated/why3: why3 bench /Users/rubenm/Desktop/Diversify2Verify/codex-runs/dataset-merge-verification/stage3a-repair/1425_constrained-subsequence-sum/array-imperative/constrained_subsequence_sum_array_stage3_1f10d285_stage3/generated/why3/.why3_sessions/repaired_stage1
+Progress: 4/1/0                       Progress: 3/2/0                       Progress: 2/3/0                       Progress: 1/4/0                       Progress: 0/5/0                       Progress: 0/0/2                       Progress: 0/0/1                       
+Replay completed, saving session... done
+== Stage 1 stats ==
+= Statistics for session /Users/rubenm/Desktop/Diversify2Verify/codex-runs/dataset-merge-verification/stage3a-repair/1425_constrained-subsequence-sum/array-imperative/constrained_subsequence_sum_array_stage3_1f10d285_stage3/generated/why3/.why3_sessions/repaired_stage1
+
+== Number of root goals ==
+  total: 5  proved: 2
+
+== Number of sub goals ==
+  total: 0  proved: 0
+
+== Goals not proved ==
+  +-- file [../../repaired.mlw]
+    +-- theory ConstrainedSubsequenceSum_Array_Spec
+      +-- goal optimal_at_from_window'vc
+      +-- goal optimal_prefix_implies_spec'vc
+      +-- goal constrained_subsequence_sum_array'vc
+  
+== Goals proved by only one prover ==
+  +-- file [../../repaired.mlw]
+    +-- theory ConstrainedSubsequenceSum_Array_Spec
+      +-- goal selected_sum_from'vc: Z3 4.8.6
+      +-- goal selected_sum'vc: Z3 4.8.6
+  
+1 session(s) read, with a total of 5 proof goals.
+== Unproved root goals after first prover ==
+ConstrainedSubsequenceSum_Array_Spec	optimal_at_from_window'vc
+ConstrainedSubsequenceSum_Array_Spec	optimal_prefix_implies_spec'vc
+ConstrainedSubsequenceSum_Array_Spec	constrained_subsequence_sum_array'vc
+== Stage 1: trying remaining goals with prover Alt-Ergo,2.4.0 ==
+---- stage1 | prover: Alt-Ergo,2.4.0 | theory: ConstrainedSubsequenceSum_Array_Spec | goal: optimal_at_from_window'vc ----
+File repaired.mlw:
+Goal optimal_at_from_window'vc.
+Prover result is: Timeout (10.00s, 144550 steps).
+---- stage1 | prover: Alt-Ergo,2.4.0 | theory: ConstrainedSubsequenceSum_Array_Spec | goal: optimal_prefix_implies_spec'vc ----
+File repaired.mlw:
+Goal optimal_prefix_implies_spec'vc.
+Prover result is: Timeout (10.00s, 164831 steps).
+---- stage1 | prover: Alt-Ergo,2.4.0 | theory: ConstrainedSubsequenceSum_Array_Spec | goal: constrained_subsequence_sum_array'vc ----
+File repaired.mlw:
+Goal constrained_subsequence_sum_array'vc.
+Prover result is: Timeout (10.00s, 184469 steps).
+Remaining after prover Alt-Ergo,2.4.0: 3
+== Stage 1: trying remaining goals with prover CVC4,1.8 ==
+---- stage1 | prover: CVC4,1.8 | theory: ConstrainedSubsequenceSum_Array_Spec | goal: optimal_at_from_window'vc ----
+File repaired.mlw:
+Goal optimal_at_from_window'vc.
+Prover result is: Unknown (unknown + incomplete) (0.02s, 5959 steps).
+---- stage1 | prover: CVC4,1.8 | theory: ConstrainedSubsequenceSum_Array_Spec | goal: optimal_prefix_implies_spec'vc ----
+File repaired.mlw:
+Goal optimal_prefix_implies_spec'vc.
+Prover result is: Unknown (unknown + incomplete) (0.02s, 5985 steps).
+---- stage1 | prover: CVC4,1.8 | theory: ConstrainedSubsequenceSum_Array_Spec | goal: constrained_subsequence_sum_array'vc ----
+File repaired.mlw:
+Goal constrained_subsequence_sum_array'vc.
+Prover result is: Timeout (10.00s, 1516183 steps).
+Remaining after prover CVC4,1.8: 3
+== Goals still unproved after stage 1 ==
+ConstrainedSubsequenceSum_Array_Spec	optimal_at_from_window'vc
+ConstrainedSubsequenceSum_Array_Spec	optimal_prefix_implies_spec'vc
+ConstrainedSubsequenceSum_Array_Spec	constrained_subsequence_sum_array'vc
+== Stage 2: split_vc on unproved goal ==
+Target theory: ConstrainedSubsequenceSum_Array_Spec
+Target goal  : optimal_at_from_window'vc
+---- stage2 | prover: Z3,4.8.6 | theory: ConstrainedSubsequenceSum_Array_Spec | goal: optimal_at_from_window'vc ----
+Transforms: split_vc
+File "repaired.mlw", line 82, characters 15-37:
+Sub-goal Postcondition of goal optimal_at_from_window'vc.
+Prover result is: Unknown (unknown) (0.09s, 938736 steps).
+---- stage2 | prover: Alt-Ergo,2.4.0 | theory: ConstrainedSubsequenceSum_Array_Spec | goal: optimal_at_from_window'vc ----
+Transforms: split_vc
+File "repaired.mlw", line 82, characters 15-37:
+Sub-goal Postcondition of goal optimal_at_from_window'vc.
+Prover result is: Timeout (10.00s, 146073 steps).
+---- stage2 | prover: CVC4,1.8 | theory: ConstrainedSubsequenceSum_Array_Spec | goal: optimal_at_from_window'vc ----
+Transforms: split_vc
+File "repaired.mlw", line 82, characters 15-37:
+Sub-goal Postcondition of goal optimal_at_from_window'vc.
+Prover result is: Unknown (unknown + incomplete) (0.02s, 5716 steps).
+== Stage 2: split_vc on unproved goal ==
+Target theory: ConstrainedSubsequenceSum_Array_Spec
+Target goal  : optimal_prefix_implies_spec'vc
+---- stage2 | prover: Z3,4.8.6 | theory: ConstrainedSubsequenceSum_Array_Spec | goal: optimal_prefix_implies_spec'vc ----
+Transforms: split_vc
+File "repaired.mlw", line 92, characters 15-59:
+Sub-goal Postcondition of goal optimal_prefix_implies_spec'vc.
+Prover result is: Timeout (10.00s, 164765487 steps).
+---- stage2 | prover: Alt-Ergo,2.4.0 | theory: ConstrainedSubsequenceSum_Array_Spec | goal: optimal_prefix_implies_spec'vc ----
+Transforms: split_vc
+File "repaired.mlw", line 92, characters 15-59:
+Sub-goal Postcondition of goal optimal_prefix_implies_spec'vc.
+Prover result is: Timeout (10.00s, 218742 steps).
+---- stage2 | prover: CVC4,1.8 | theory: ConstrainedSubsequenceSum_Array_Spec | goal: optimal_prefix_implies_spec'vc ----
+Transforms: split_vc
+File "repaired.mlw", line 92, characters 15-59:
+Sub-goal Postcondition of goal optimal_prefix_implies_spec'vc.
+Prover result is: Unknown (unknown + incomplete) (0.02s, 5871 steps).
+== Stage 2: split_vc on unproved goal ==
+Target theory: ConstrainedSubsequenceSum_Array_Spec
+Target goal  : constrained_subsequence_sum_array'vc
+---- stage2 | prover: Z3,4.8.6 | theory: ConstrainedSubsequenceSum_Array_Spec | goal: constrained_subsequence_sum_array'vc ----
+Transforms: split_vc
+File "repaired.mlw", line 101, characters 13-21:
+Sub-goal Array creation size of goal constrained_subsequence_sum_array'vc.
+Prover result is: Valid (0.01s, 30398 steps).
+
+File "repaired.mlw", line 102, characters 19-26:
+Sub-goal Index in array bounds of goal constrained_subsequence_sum_array'vc.
+Prover result is: Valid (0.01s, 30363 steps).
+
+File "repaired.mlw", line 104, characters 18-33:
+Sub-goal Loop invariant init of goal constrained_subsequence_sum_array'vc.
+Prover result is: Valid (0.01s, 1778 steps).
+
+File "repaired.mlw", line 105, characters 18-31:
+Sub-goal Loop invariant init of goal constrained_subsequence_sum_array'vc.
+Prover result is: Valid (0.01s, 1788 steps).
+
+File "repaired.mlw", line 106, characters 18-29:
+Sub-goal Loop invariant init of goal constrained_subsequence_sum_array'vc.
+Prover result is: Valid (0.01s, 1801 steps).
+
+File "repaired.mlw", line 107, characters 18-24:
+Sub-goal Loop invariant init of goal constrained_subsequence_sum_array'vc.
+Prover result is: Valid (0.01s, 30498 steps).
+
+File "repaired.mlw", line 108, characters 47-63:
+Sub-goal Loop invariant init of goal constrained_subsequence_sum_array'vc.
+Prover result is: Valid (0.01s, 1835 steps).
+
+File "repaired.mlw", line 109, characters 47-61:
+Sub-goal Loop invariant init of goal constrained_subsequence_sum_array'vc.
+Prover result is: Valid (0.01s, 1872 steps).
+
+File "repaired.mlw", line 110, characters 18-34:
+Sub-goal Loop invariant init of goal constrained_subsequence_sum_array'vc.
+Prover result is: Valid (0.01s, 1887 steps).
+
+File "repaired.mlw", line 111, characters 18-44:
+Sub-goal Loop invariant init of goal constrained_subsequence_sum_array'vc.
+Prover result is: Valid (0.01s, 29096 steps).
+
+File "repaired.mlw", line 112, characters 18-45:
+Sub-goal Loop invariant init of goal constrained_subsequence_sum_array'vc.
+Prover result is: Valid (0.01s, 29542 steps).
+
+File "repaired.mlw", line 115, characters 15-30:
+Sub-goal Assertion of goal constrained_subsequence_sum_array'vc.
+Prover result is: Valid (0.01s, 35281 steps).
+
+File "repaired.mlw", line 116, characters 15-29:
+Sub-goal Assertion of goal constrained_subsequence_sum_array'vc.
+Prover result is: Valid (0.01s, 35082 steps).
+
+File "repaired.mlw", line 117, characters 58-68:
+Sub-goal Assertion of goal constrained_subsequence_sum_array'vc.
+Prover result is: Valid (0.01s, 35915 steps).
+
+File "repaired.mlw", line 118, characters 15-37:
+Sub-goal Assertion of goal constrained_subsequence_sum_array'vc.
+Prover result is: Valid (0.01s, 37047 steps).
+
+File "repaired.mlw", line 120, characters 20-35:
+Sub-goal Loop invariant init of goal constrained_subsequence_sum_array'vc.
+Prover result is: Valid (0.01s, 2064 steps).
+
+File "repaired.mlw", line 121, characters 20-33:
+Sub-goal Loop invariant init of goal constrained_subsequence_sum_array'vc.
+Prover result is: Valid (0.01s, 2070 steps).
+
+File "repaired.mlw", line 122, characters 20-39:
+Sub-goal Loop invariant init of goal constrained_subsequence_sum_array'vc.
+Prover result is: Valid (0.01s, 34775 steps).
+
+File "repaired.mlw", line 123, characters 20-35:
+Sub-goal Loop invariant init of goal constrained_subsequence_sum_array'vc.
+Prover result is: Valid (0.01s, 2106 steps).
+
+File "repaired.mlw", line 124, characters 20-34:
+Sub-goal Loop invariant init of goal constrained_subsequence_sum_array'vc.
+Prover result is: Valid (0.01s, 2109 steps).
+
+File "repaired.mlw", line 125, character 20 to line 126, character 62:
+Sub-goal Loop invariant init of goal constrained_subsequence_sum_array'vc.
+Prover result is: Valid (0.01s, 2110 steps).
+
+File "repaired.mlw", line 127, characters 53-71:
+Sub-goal Loop invariant init of goal constrained_subsequence_sum_array'vc.
+Prover result is: Valid (0.01s, 2138 steps).
+
+File "repaired.mlw", line 128, characters 20-42:
+Sub-goal Loop invariant init of goal constrained_subsequence_sum_array'vc.
+Prover result is: Valid (0.01s, 2149 steps).
+
+File "repaired.mlw", line 129, characters 11-16:
+Sub-goal Index in array bounds of goal constrained_subsequence_sum_array'vc.
+Prover result is: Valid (0.01s, 38284 steps).
+
+File "repaired.mlw", line 130, characters 22-27:
+Sub-goal Index in array bounds of goal constrained_subsequence_sum_array'vc.
+Prover result is: Valid (0.01s, 38661 steps).
+
+File "repaired.mlw", line 120, characters 20-35:
+Sub-goal Loop invariant preservation of goal
+constrained_subsequence_sum_array'vc.
+Prover result is: Valid (0.01s, 2232 steps).
+
+File "repaired.mlw", line 121, characters 20-33:
+Sub-goal Loop invariant preservation of goal
+constrained_subsequence_sum_array'vc.
+Prover result is: Valid (0.01s, 2238 steps).
+
+File "repaired.mlw", line 122, characters 20-39:
+Sub-goal Loop invariant preservation of goal
+constrained_subsequence_sum_array'vc.
+Prover result is: Valid (0.01s, 3337 steps).
+
+File "repaired.mlw", line 123, characters 20-35:
+Sub-goal Loop invariant preservation of goal
+constrained_subsequence_sum_array'vc.
+Prover result is: Valid (0.01s, 37106 steps).
+
+File "repaired.mlw", line 124, characters 20-34:
+Sub-goal Loop invariant preservation of goal
+constrained_subsequence_sum_array'vc.
+Prover result is: Valid (0.01s, 37418 steps).
+
+File "repaired.mlw", line 125, character 20 to line 126, character 62:
+Sub-goal Loop invariant preservation of goal
+constrained_subsequence_sum_array'vc.
+Prover result is: Valid (0.01s, 39466 steps).
+
+File "repaired.mlw", line 127, characters 53-71:
+Sub-goal Loop invariant preservation of goal
+constrained_subsequence_sum_array'vc.
+Prover result is: Valid (0.01s, 50037 steps).
+
+File "repaired.mlw", line 128, characters 20-42:
+Sub-goal Loop invariant preservation of goal
+constrained_subsequence_sum_array'vc.
+Prover result is: Valid (0.01s, 2370 steps).
+
+File "repaired.mlw", line 120, characters 20-35:
+Sub-goal Loop invariant preservation of goal
+constrained_subsequence_sum_array'vc.
+Prover result is: Valid (0.01s, 2229 steps).
+
+File "repaired.mlw", line 121, characters 20-33:
+Sub-goal Loop invariant preservation of goal
+constrained_subsequence_sum_array'vc.
+Prover result is: Valid (0.01s, 2235 steps).
+
+File "repaired.mlw", line 122, characters 20-39:
+Sub-goal Loop invariant preservation of goal
+constrained_subsequence_sum_array'vc.
+Prover result is: Valid (0.01s, 3326 steps).
+
+File "repaired.mlw", line 123, characters 20-35:
+Sub-goal Loop invariant preservation of goal
+constrained_subsequence_sum_array'vc.
+Prover result is: Valid (0.01s, 37029 steps).
+
+File "repaired.mlw", line 124, characters 20-34:
+Sub-goal Loop invariant preservation of goal
+constrained_subsequence_sum_array'vc.
+Prover result is: Valid (0.01s, 2272 steps).
+
+File "repaired.mlw", line 125, character 20 to line 126, character 62:
+Sub-goal Loop invariant preservation of goal
+constrained_subsequence_sum_array'vc.
+Prover result is: Valid (0.01s, 40501 steps).
+
+File "repaired.mlw", line 127, characters 53-71:
+Sub-goal Loop invariant preservation of goal
+constrained_subsequence_sum_array'vc.
+Prover result is: Valid (0.01s, 49787 steps).
+
+File "repaired.mlw", line 128, characters 20-42:
+Sub-goal Loop invariant preservation of goal
+constrained_subsequence_sum_array'vc.
+Prover result is: Valid (0.01s, 2365 steps).
+
+File "repaired.mlw", line 132, characters 15-29:
+Sub-goal Assertion of goal constrained_subsequence_sum_array'vc.
+Prover result is: Valid (0.01s, 2240 steps).
+
+File "repaired.mlw", line 133, character 15 to line 134, character 60:
+Sub-goal Assertion of goal constrained_subsequence_sum_array'vc.
+Prover result is: Valid (0.01s, 3281 steps).
+
+File "repaired.mlw", line 135, characters 48-66:
+Sub-goal Assertion of goal constrained_subsequence_sum_array'vc.
+Prover result is: Valid (0.01s, 38288 steps).
+
+File "repaired.mlw", line 136, characters 15-46:
+Sub-goal Assertion of goal constrained_subsequence_sum_array'vc.
+Prover result is: Valid (0.01s, 40215 steps).
+
+File "repaired.mlw", line 137, characters 15-22:
+Sub-goal Index in array bounds of goal constrained_subsequence_sum_array'vc.
+Prover result is: Valid (0.01s, 3458 steps).
+
+File "repaired.mlw", line 137, characters 6-34:
+Sub-goal Index in array bounds of goal constrained_subsequence_sum_array'vc.
+Prover result is: Valid (0.01s, 36965 steps).
+
+File "repaired.mlw", line 138, characters 15-42:
+Sub-goal Assertion of goal constrained_subsequence_sum_array'vc.
+Prover result is: Valid (0.01s, 40091 steps).
+
+File "repaired.mlw", line 139, characters 15-31:
+Sub-goal Assertion of goal constrained_subsequence_sum_array'vc.
+Prover result is: Valid (0.01s, 16870 steps).
+
+File "repaired.mlw", line 140, characters 15-37:
+Sub-goal Assertion of goal constrained_subsequence_sum_array'vc.
+Prover result is: Timeout (10.00s, 317020116 steps).
+
+File "repaired.mlw", line 141, characters 9-14:
+Sub-goal Index in array bounds of goal constrained_subsequence_sum_array'vc.
+Prover result is: Valid (0.01s, 40406 steps).
+
+File "repaired.mlw", line 142, characters 16-21:
+Sub-goal Index in array bounds of goal constrained_subsequence_sum_array'vc.
+Prover result is: Valid (0.01s, 40603 steps).
+
+File "repaired.mlw", line 143, characters 15-29:
+Sub-goal Assertion of goal constrained_subsequence_sum_array'vc.
+Prover result is: Valid (0.01s, 8268 steps).
+
+File "repaired.mlw", line 144, characters 15-47:
+Sub-goal Assertion of goal constrained_subsequence_sum_array'vc.
+Prover result is: Timeout (10.00s, 598925792 steps).
+
+File "repaired.mlw", line 145, characters 15-48:
+Sub-goal Assertion of goal constrained_subsequence_sum_array'vc.
+Prover result is: Valid (0.01s, 53424 steps).
+
+File "repaired.mlw", line 104, characters 18-33:
+Sub-goal Loop invariant preservation of goal
+constrained_subsequence_sum_array'vc.
+Prover result is: Valid (0.01s, 2512 steps).
+
+File "repaired.mlw", line 105, characters 18-31:
+Sub-goal Loop invariant preservation of goal
+constrained_subsequence_sum_array'vc.
+Prover result is: Valid (0.01s, 42688 steps).
+
+File "repaired.mlw", line 106, characters 18-29:
+Sub-goal Loop invariant preservation of goal
+constrained_subsequence_sum_array'vc.
+Prover result is: Valid (0.01s, 40711 steps).
+
+File "repaired.mlw", line 107, characters 18-24:
+Sub-goal Loop invariant preservation of goal
+constrained_subsequence_sum_array'vc.
+Prover result is: Valid (0.01s, 2536 steps).
+
+File "repaired.mlw", line 108, characters 47-63:
+Sub-goal Loop invariant preservation of goal
+constrained_subsequence_sum_array'vc.
+Prover result is: Valid (0.01s, 53124 steps).
+
+File "repaired.mlw", line 109, characters 47-61:
+Sub-goal Loop invariant preservation of goal
+constrained_subsequence_sum_array'vc.
+Prover result is: Valid (0.01s, 44843 steps).
+
+File "repaired.mlw", line 110, characters 18-34:
+Sub-goal Loop invariant preservation of goal
+constrained_subsequence_sum_array'vc.
+Prover result is: Valid (0.01s, 41993 steps).
+
+File "repaired.mlw", line 111, characters 18-44:
+Sub-goal Loop invariant preservation of goal
+constrained_subsequence_sum_array'vc.
+Prover result is: Valid (0.01s, 2634 steps).
+
+File "repaired.mlw", line 112, characters 18-45:
+Sub-goal Loop invariant preservation of goal
+constrained_subsequence_sum_array'vc.
+Prover result is: Valid (0.01s, 2639 steps).
+
+File "repaired.mlw", line 143, characters 15-29:
+Sub-goal Assertion of goal constrained_subsequence_sum_array'vc.
+Prover result is: Valid (0.01s, 2494 steps).
+Infrastructure issue in stage 2 with prover Z3,4.8.6; aborting rest of stage 2.
+== Goals still unproved after stage 2 (split_vc) ==
+ConstrainedSubsequenceSum_Array_Spec	optimal_at_from_window'vc
+ConstrainedSubsequenceSum_Array_Spec	optimal_prefix_implies_spec'vc
+ConstrainedSubsequenceSum_Array_Spec	constrained_subsequence_sum_array'vc
+== Stage 3: split_vc + inline_all on still-unproved goal ==
+Target theory: ConstrainedSubsequenceSum_Array_Spec
+Target goal  : optimal_at_from_window'vc
+---- stage3 | prover: Alt-Ergo,2.4.0 | theory: ConstrainedSubsequenceSum_Array_Spec | goal: optimal_at_from_window'vc ----
+Transforms: split_vc inline_all
+File "repaired.mlw", line 82, characters 15-37:
+Sub-goal Postcondition of goal optimal_at_from_window'vc.
+Prover result is: Timeout (10.00s, 182440 steps).
+---- stage3 | prover: CVC4,1.8 | theory: ConstrainedSubsequenceSum_Array_Spec | goal: optimal_at_from_window'vc ----
+Transforms: split_vc inline_all
+File "repaired.mlw", line 82, characters 15-37:
+Sub-goal Postcondition of goal optimal_at_from_window'vc.
+Prover result is: Timeout (10.00s, 1398471 steps).
+== Stage 3: split_vc + inline_all on still-unproved goal ==
+Target theory: ConstrainedSubsequenceSum_Array_Spec
+Target goal  : optimal_prefix_implies_spec'vc
+---- stage3 | prover: Alt-Ergo,2.4.0 | theory: ConstrainedSubsequenceSum_Array_Spec | goal: optimal_prefix_implies_spec'vc ----
+Transforms: split_vc inline_all
+File "repaired.mlw", line 92, characters 15-59:
+Sub-goal Postcondition of goal optimal_prefix_implies_spec'vc.
+Prover result is: Timeout (10.00s, 222951 steps).
+---- stage3 | prover: CVC4,1.8 | theory: ConstrainedSubsequenceSum_Array_Spec | goal: optimal_prefix_implies_spec'vc ----
+Transforms: split_vc inline_all
+File "repaired.mlw", line 92, characters 15-59:
+Sub-goal Postcondition of goal optimal_prefix_implies_spec'vc.
+Prover result is: Timeout (10.00s, 1283920 steps).
+== Stage 3: split_vc + inline_all on still-unproved goal ==
+Target theory: ConstrainedSubsequenceSum_Array_Spec
+Target goal  : constrained_subsequence_sum_array'vc
+---- stage3 | prover: Alt-Ergo,2.4.0 | theory: ConstrainedSubsequenceSum_Array_Spec | goal: constrained_subsequence_sum_array'vc ----
+Transforms: split_vc inline_all
+File "repaired.mlw", line 101, characters 13-21:
+Sub-goal Array creation size of goal constrained_subsequence_sum_array'vc.
+Prover result is: Valid (0.01s, 17 steps).
+
+File "repaired.mlw", line 102, characters 19-26:
+Sub-goal Index in array bounds of goal constrained_subsequence_sum_array'vc.
+Prover result is: Valid (0.01s, 16 steps).
+
+File "repaired.mlw", line 104, characters 18-33:
+Sub-goal Loop invariant init of goal constrained_subsequence_sum_array'vc.
+Prover result is: Valid (0.01s, 7 steps).
+
+File "repaired.mlw", line 105, characters 18-31:
+Sub-goal Loop invariant init of goal constrained_subsequence_sum_array'vc.
+Prover result is: Valid (0.01s, 7 steps).
+
+File "repaired.mlw", line 106, characters 18-29:
+Sub-goal Loop invariant init of goal constrained_subsequence_sum_array'vc.
+Prover result is: Valid (0.01s, 12 steps).
+
+File "repaired.mlw", line 107, characters 18-24:
+Sub-goal Loop invariant init of goal constrained_subsequence_sum_array'vc.
+Prover result is: Valid (0.01s, 23 steps).
+
+File "repaired.mlw", line 108, characters 47-63:
+Sub-goal Loop invariant init of goal constrained_subsequence_sum_array'vc.
+Prover result is: Valid (0.01s, 16 steps).
+
+File "repaired.mlw", line 109, characters 47-61:
+Sub-goal Loop invariant init of goal constrained_subsequence_sum_array'vc.
+Prover result is: Valid (0.01s, 16 steps).
+
+File "repaired.mlw", line 110, characters 18-34:
+Sub-goal Loop invariant init of goal constrained_subsequence_sum_array'vc.
+Prover result is: Valid (0.01s, 9 steps).
+
+File "repaired.mlw", line 111, characters 18-44:
+Sub-goal Loop invariant init of goal constrained_subsequence_sum_array'vc.
+Prover result is: Valid (0.01s, 14 steps).
+
+File "repaired.mlw", line 112, characters 18-45:
+Sub-goal Loop invariant init of goal constrained_subsequence_sum_array'vc.
+Prover result is: Valid (0.01s, 17 steps).
+
+File "repaired.mlw", line 115, characters 15-30:
+Sub-goal Assertion of goal constrained_subsequence_sum_array'vc.
+Prover result is: Valid (0.01s, 43 steps).
+
+File "repaired.mlw", line 116, characters 15-29:
+Sub-goal Assertion of goal constrained_subsequence_sum_array'vc.
+Prover result is: Valid (0.01s, 29 steps).
+
+File "repaired.mlw", line 117, characters 58-68:
+Sub-goal Assertion of goal constrained_subsequence_sum_array'vc.
+Prover result is: Valid (0.01s, 45 steps).
+
+File "repaired.mlw", line 118, characters 15-37:
+Sub-goal Assertion of goal constrained_subsequence_sum_array'vc.
+Prover result is: Valid (0.01s, 49 steps).
+
+File "repaired.mlw", line 120, characters 20-35:
+Sub-goal Loop invariant init of goal constrained_subsequence_sum_array'vc.
+Prover result is: Valid (0.01s, 22 steps).
+
+File "repaired.mlw", line 121, characters 20-33:
+Sub-goal Loop invariant init of goal constrained_subsequence_sum_array'vc.
+Prover result is: Valid (0.01s, 22 steps).
+
+File "repaired.mlw", line 122, characters 20-39:
+Sub-goal Loop invariant init of goal constrained_subsequence_sum_array'vc.
+Prover result is: Valid (0.01s, 39 steps).
+
+File "repaired.mlw", line 123, characters 20-35:
+Sub-goal Loop invariant init of goal constrained_subsequence_sum_array'vc.
+Prover result is: Valid (0.01s, 23 steps).
+
+File "repaired.mlw", line 124, characters 20-34:
+Sub-goal Loop invariant init of goal constrained_subsequence_sum_array'vc.
+Prover result is: Valid (0.01s, 23 steps).
+
+File "repaired.mlw", line 125, character 20 to line 126, character 62:
+Sub-goal Loop invariant init of goal constrained_subsequence_sum_array'vc.
+Prover result is: Valid (0.01s, 23 steps).
+
+File "repaired.mlw", line 127, characters 53-71:
+Sub-goal Loop invariant init of goal constrained_subsequence_sum_array'vc.
+Prover result is: Valid (0.01s, 29 steps).
+
+File "repaired.mlw", line 128, characters 20-42:
+Sub-goal Loop invariant init of goal constrained_subsequence_sum_array'vc.
+Prover result is: Valid (0.01s, 51 steps).
+
+File "repaired.mlw", line 129, characters 11-16:
+Sub-goal Index in array bounds of goal constrained_subsequence_sum_array'vc.
+Prover result is: Valid (0.01s, 61 steps).
+
+File "repaired.mlw", line 130, characters 22-27:
+Sub-goal Index in array bounds of goal constrained_subsequence_sum_array'vc.
+Prover result is: Valid (0.01s, 62 steps).
+
+File "repaired.mlw", line 120, characters 20-35:
+Sub-goal Loop invariant preservation of goal
+constrained_subsequence_sum_array'vc.
+Prover result is: Valid (0.01s, 32 steps).
+
+File "repaired.mlw", line 121, characters 20-33:
+Sub-goal Loop invariant preservation of goal
+constrained_subsequence_sum_array'vc.
+Prover result is: Valid (0.01s, 32 steps).
+
+File "repaired.mlw", line 122, characters 20-39:
+Sub-goal Loop invariant preservation of goal
+constrained_subsequence_sum_array'vc.
+Prover result is: Valid (0.01s, 32 steps).
+
+File "repaired.mlw", line 123, characters 20-35:
+Sub-goal Loop invariant preservation of goal
+constrained_subsequence_sum_array'vc.
+Prover result is: Valid (0.01s, 54 steps).
+
+File "repaired.mlw", line 124, characters 20-34:
+Sub-goal Loop invariant preservation of goal
+constrained_subsequence_sum_array'vc.
+Prover result is: Valid (0.01s, 43 steps).
+
+File "repaired.mlw", line 125, character 20 to line 126, character 62:
+Sub-goal Loop invariant preservation of goal
+constrained_subsequence_sum_array'vc.
+Prover result is: Valid (0.01s, 92 steps).
+
+File "repaired.mlw", line 127, characters 53-71:
+Sub-goal Loop invariant preservation of goal
+constrained_subsequence_sum_array'vc.
+Prover result is: Valid (0.02s, 222 steps).
+
+File "repaired.mlw", line 128, characters 20-42:
+Sub-goal Loop invariant preservation of goal
+constrained_subsequence_sum_array'vc.
+Prover result is: Valid (0.01s, 73 steps).
+
+File "repaired.mlw", line 120, characters 20-35:
+Sub-goal Loop invariant preservation of goal
+constrained_subsequence_sum_array'vc.
+Prover result is: Valid (0.01s, 29 steps).
+
+File "repaired.mlw", line 121, characters 20-33:
+Sub-goal Loop invariant preservation of goal
+constrained_subsequence_sum_array'vc.
+Prover result is: Valid (0.01s, 29 steps).
+
+File "repaired.mlw", line 122, characters 20-39:
+Sub-goal Loop invariant preservation of goal
+constrained_subsequence_sum_array'vc.
+Prover result is: Valid (0.01s, 29 steps).
+
+File "repaired.mlw", line 123, characters 20-35:
+Sub-goal Loop invariant preservation of goal
+constrained_subsequence_sum_array'vc.
+Prover result is: Valid (0.01s, 52 steps).
+
+File "repaired.mlw", line 124, characters 20-34:
+Sub-goal Loop invariant preservation of goal
+constrained_subsequence_sum_array'vc.
+Prover result is: Valid (0.01s, 31 steps).
+
+File "repaired.mlw", line 125, character 20 to line 126, character 62:
+Sub-goal Loop invariant preservation of goal
+constrained_subsequence_sum_array'vc.
+Prover result is: Valid (0.02s, 155 steps).
+
+File "repaired.mlw", line 127, characters 53-71:
+Sub-goal Loop invariant preservation of goal
+constrained_subsequence_sum_array'vc.
+Prover result is: Valid (0.01s, 102 steps).
+
+File "repaired.mlw", line 128, characters 20-42:
+Sub-goal Loop invariant preservation of goal
+constrained_subsequence_sum_array'vc.
+Prover result is: Valid (0.01s, 68 steps).
+
+File "repaired.mlw", line 132, characters 15-29:
+Sub-goal Assertion of goal constrained_subsequence_sum_array'vc.
+Prover result is: Valid (0.01s, 25 steps).
+
+File "repaired.mlw", line 133, character 15 to line 134, character 60:
+Sub-goal Assertion of goal constrained_subsequence_sum_array'vc.
+Prover result is: Valid (0.01s, 117 steps).
+
+File "repaired.mlw", line 135, characters 48-66:
+Sub-goal Assertion of goal constrained_subsequence_sum_array'vc.
+Prover result is: Valid (0.01s, 82 steps).
+
+File "repaired.mlw", line 136, characters 15-46:
+Sub-goal Assertion of goal constrained_subsequence_sum_array'vc.
+Prover result is: Valid (0.02s, 240 steps).
+
+File "repaired.mlw", line 137, characters 15-22:
+Sub-goal Index in array bounds of goal constrained_subsequence_sum_array'vc.
+Prover result is: Valid (0.01s, 25 steps).
+
+File "repaired.mlw", line 137, characters 6-34:
+Sub-goal Index in array bounds of goal constrained_subsequence_sum_array'vc.
+Prover result is: Valid (0.01s, 25 steps).
+
+File "repaired.mlw", line 138, characters 15-42:
+Sub-goal Assertion of goal constrained_subsequence_sum_array'vc.
+Prover result is: Valid (0.01s, 89 steps).
+
+File "repaired.mlw", line 139, characters 15-31:
+Sub-goal Assertion of goal constrained_subsequence_sum_array'vc.
+Prover result is: Valid (0.01s, 38 steps).
+
+File "repaired.mlw", line 140, characters 15-37:
+Sub-goal Assertion of goal constrained_subsequence_sum_array'vc.
+Prover result is: Timeout (10.00s, 196756 steps).
+
+File "repaired.mlw", line 141, characters 9-14:
+Sub-goal Index in array bounds of goal constrained_subsequence_sum_array'vc.
+Prover result is: Valid (0.01s, 44 steps).
+
+File "repaired.mlw", line 142, characters 16-21:
+Sub-goal Index in array bounds of goal constrained_subsequence_sum_array'vc.
+Prover result is: Valid (0.01s, 45 steps).
+
+File "repaired.mlw", line 143, characters 15-29:
+Sub-goal Assertion of goal constrained_subsequence_sum_array'vc.
+Prover result is: Valid (0.01s, 50 steps).
+
+File "repaired.mlw", line 144, characters 15-47:
+Sub-goal Assertion of goal constrained_subsequence_sum_array'vc.
+Prover result is: Valid (2.41s, 58806 steps).
+
+File "repaired.mlw", line 145, characters 15-48:
+Sub-goal Assertion of goal constrained_subsequence_sum_array'vc.
+Prover result is: Valid (0.92s, 25107 steps).
+
+File "repaired.mlw", line 104, characters 18-33:
+Sub-goal Loop invariant preservation of goal
+constrained_subsequence_sum_array'vc.
+Prover result is: Valid (0.01s, 51 steps).
+
+File "repaired.mlw", line 105, characters 18-31:
+Sub-goal Loop invariant preservation of goal
+constrained_subsequence_sum_array'vc.
+Prover result is: Valid (0.01s, 51 steps).
+
+File "repaired.mlw", line 106, characters 18-29:
+Sub-goal Loop invariant preservation of goal
+constrained_subsequence_sum_array'vc.
+Prover result is: Valid (0.01s, 79 steps).
+
+File "repaired.mlw", line 107, characters 18-24:
+Sub-goal Loop invariant preservation of goal
+constrained_subsequence_sum_array'vc.
+Prover result is: Valid (0.01s, 53 steps).
+
+File "repaired.mlw", line 108, characters 47-63:
+Sub-goal Loop invariant preservation of goal
+constrained_subsequence_sum_array'vc.
+Prover result is: Valid (0.04s, 722 steps).
+
+File "repaired.mlw", line 109, characters 47-61:
+Sub-goal Loop invariant preservation of goal
+constrained_subsequence_sum_array'vc.
+Prover result is: Valid (0.02s, 161 steps).
+
+File "repaired.mlw", line 110, characters 18-34:
+Sub-goal Loop invariant preservation of goal
+constrained_subsequence_sum_array'vc.
+Prover result is: Valid (0.01s, 101 steps).
+
+File "repaired.mlw", line 111, characters 18-44:
+Sub-goal Loop invariant preservation of goal
+constrained_subsequence_sum_array'vc.
+Prover result is: Valid (2.20s, 52626 steps).
+
+File "repaired.mlw", line 112, characters 18-45:
+Sub-goal Loop invariant preservation of goal
+constrained_subsequence_sum_array'vc.
+Prover result is: Valid (0.04s, 621 steps).
+
+File "repaired.mlw", line 143, characters 15-29:
+Sub-goal Assertion of goal constrained_subsequence_sum_array'vc.
+Prover result is: Valid (0.01s, 46 steps).
+
+File "repaired.mlw", line 144, characters 15-47:
+Sub-goal Assertion of goal constrained_subsequence_sum_array'vc.
+Prover result is: Valid (2.68s, 68787 steps).
+
+File "repaired.mlw", line 145, characters 15-48:
+Sub-goal Assertion of goal constrained_subsequence_sum_array'vc.
+Prover result is: Valid (0.50s, 14453 steps).
+
+File "repaired.mlw", line 104, characters 18-33:
+Sub-goal Loop invariant preservation of goal
+constrained_subsequence_sum_array'vc.
+Prover result is: Valid (0.01s, 47 steps).
+
+File "repaired.mlw", line 105, characters 18-31:
+Sub-goal Loop invariant preservation of goal
+constrained_subsequence_sum_array'vc.
+Prover result is: Valid (0.01s, 47 steps).
+
+File "repaired.mlw", line 106, characters 18-29:
+Sub-goal Loop invariant preservation of goal
+constrained_subsequence_sum_array'vc.
+Prover result is: Valid (0.01s, 76 steps).
+
+File "repaired.mlw", line 107, characters 18-24:
+Sub-goal Loop invariant preservation of goal
+constrained_subsequence_sum_array'vc.
+Prover result is: Valid (0.01s, 48 steps).
+
+File "repaired.mlw", line 108, characters 47-63:
+Sub-goal Loop invariant preservation of goal
+constrained_subsequence_sum_array'vc.
+Prover result is: Valid (0.04s, 908 steps).
+
+File "repaired.mlw", line 109, characters 47-61:
+Sub-goal Loop invariant preservation of goal
+constrained_subsequence_sum_array'vc.
+Prover result is: Valid (0.02s, 159 steps).
+
+File "repaired.mlw", line 110, characters 18-34:
+Sub-goal Loop invariant preservation of goal
+constrained_subsequence_sum_array'vc.
+Prover result is: Valid (0.01s, 48 steps).
+
+File "repaired.mlw", line 111, characters 18-44:
+Sub-goal Loop invariant preservation of goal
+constrained_subsequence_sum_array'vc.
+Prover result is: Valid (2.22s, 55077 steps).
+
+File "repaired.mlw", line 112, characters 18-45:
+Sub-goal Loop invariant preservation of goal
+constrained_subsequence_sum_array'vc.
+Prover result is: Valid (0.04s, 749 steps).
+
+File repaired.mlw:
+Sub-goal Out of loop bounds of goal constrained_subsequence_sum_array'vc.
+Prover result is: Valid (0.01s, 51 steps).
+
+File "repaired.mlw", line 147, characters 13-39:
+Sub-goal Assertion of goal constrained_subsequence_sum_array'vc.
+Prover result is: Valid (0.12s, 2923 steps).
+
+File "repaired.mlw", line 148, characters 42-56:
+Sub-goal Assertion of goal constrained_subsequence_sum_array'vc.
+Prover result is: Valid (0.01s, 41 steps).
+
+File "repaired.mlw", line 149, characters 13-40:
+Sub-goal Assertion of goal constrained_subsequence_sum_array'vc.
+Prover result is: Valid (0.02s, 228 steps).
+Infrastructure issue in stage 3 with prover Alt-Ergo,2.4.0; aborting rest of stage 3.
+== Final summary ==
+Unproved root goals after first prover : 3
+Remaining failures after split_vc      : 3
+Remaining failures after stage 3       : 3
+Detailed logs stored in                : /Users/rubenm/Desktop/Diversify2Verify/codex-runs/dataset-merge-verification/stage3a-repair/1425_constrained-subsequence-sum/array-imperative/constrained_subsequence_sum_array_stage3_1f10d285_stage3/generated/why3/.why3_sessions/repaired_logs
+Still unproved goals:
+ConstrainedSubsequenceSum_Array_Spec	optimal_at_from_window'vc
+ConstrainedSubsequenceSum_Array_Spec	optimal_prefix_implies_spec'vc
+ConstrainedSubsequenceSum_Array_Spec	constrained_subsequence_sum_array'vc
+VERIFY_RESULT: FAILURE
+VERIFY_REASON: unproved_goals_remain
+VERIFY_STAGE: stage3
+VERIFY_ROOT_TOTAL: 5
+VERIFY_ROOT_PROVED: 2
+VERIFY_ROOT_REMAINING: 3

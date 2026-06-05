@@ -1,0 +1,229 @@
+module MinimumOperationsToMakeMedianOfArrayEqualToK_List_Spec
+
+  use int.Int
+  use int.Abs
+  use int.EuclideanDivision
+  use list.List
+  use list.Length
+
+  let rec predicate all_nonnegative (nums: list int)
+    variant { nums }
+  =
+    match nums with
+    | Nil -> true
+    | Cons x xs -> 0 <= x && all_nonnegative xs
+    end
+
+  let rec function count_lt (nums: list int) (k: int) : int
+    variant { nums }
+  =
+    match nums with
+    | Nil -> 0
+    | Cons x xs -> (if x < k then 1 else 0) + count_lt xs k
+    end
+
+  let rec function count_gt (nums: list int) (k: int) : int
+    variant { nums }
+  =
+    match nums with
+    | Nil -> 0
+    | Cons x xs -> (if x > k then 1 else 0) + count_gt xs k
+    end
+
+  predicate upper_median_is (nums: list int) (k: int) =
+    nums <> Nil /\
+    count_lt nums k <= div (length nums) 2 /\
+    count_gt nums k <= length nums - div (length nums) 2 - 1
+
+  let rec function transform_cost (nums: list int) (final: list int) : int
+    variant { nums }
+  =
+    match nums, final with
+    | Nil, Nil -> 0
+    | Cons x xs, Cons y ys -> abs (x - y) + transform_cost xs ys
+    | _, _ -> 0
+    end
+
+  predicate minimum_operations_result (nums: list int) (k: int) (ops: int) =
+    0 <= ops /\
+    exists final: list int.
+      length final = length nums /\
+      upper_median_is final k /\
+      transform_cost nums final = ops /\
+      (forall other: list int.
+        length other = length nums /\ upper_median_is other k ->
+        ops <= transform_cost nums other)
+
+  val minimum_operations_to_make_median_of_array_equal_to_k_list
+    (nums: list int) (k: int) : int
+    requires { nums <> Nil }
+    requires { k >= 0 }
+    requires { all_nonnegative nums }
+    ensures  { minimum_operations_result nums k result }
+
+  let lemma check_test_002 () =
+    let nums =
+      Cons 1 (Cons 1000000000 (Cons 2 (Cons 999999999 (Cons 3 Nil)))) in
+    let final =
+      Cons 1 (Cons 1000000000 (Cons 2 (Cons 999999999 (Cons 500000000 Nil)))) in
+    assert { all_nonnegative nums };
+    assert { count_lt Nil 500000000 = 0 };
+    assert { count_lt (Cons 500000000 Nil) 500000000 = 0 };
+    assert { count_lt (Cons 999999999 (Cons 500000000 Nil)) 500000000 = 0 };
+    assert { count_lt (Cons 2 (Cons 999999999 (Cons 500000000 Nil))) 500000000 = 1 };
+    assert { count_lt final 500000000 = 2 };
+    assert { count_gt Nil 500000000 = 0 };
+    assert { count_gt (Cons 500000000 Nil) 500000000 = 0 };
+    assert { count_gt (Cons 999999999 (Cons 500000000 Nil)) 500000000 = 1 };
+    assert { count_gt final 500000000 = 2 };
+    assert { upper_median_is final 500000000 };
+    assert { transform_cost Nil Nil = 0 };
+    assert { transform_cost (Cons 3 Nil) (Cons 500000000 Nil) = 499999997 };
+    assert { transform_cost nums final = 499999997 };
+    assert {
+      forall other: list int.
+        length other = length nums /\ upper_median_is other 500000000 ->
+        499999997 <= transform_cost nums other
+    };
+    assert { minimum_operations_result nums 500000000 499999997 }
+
+  let lemma check_test_003 () =
+    let nums = Cons 2 (Cons 5 (Cons 6 (Cons 8 (Cons 5 Nil)))) in
+    let final = Cons 2 (Cons 7 (Cons 7 (Cons 8 (Cons 5 Nil)))) in
+    assert { all_nonnegative nums };
+    assert { count_lt Nil 7 = 0 };
+    assert { count_lt (Cons 5 Nil) 7 = 1 };
+    assert { count_lt (Cons 8 (Cons 5 Nil)) 7 = 1 };
+    assert { count_lt final 7 = 2 };
+    assert { count_gt Nil 7 = 0 };
+    assert { count_gt (Cons 5 Nil) 7 = 0 };
+    assert { count_gt (Cons 8 (Cons 5 Nil)) 7 = 1 };
+    assert { count_gt final 7 = 1 };
+    assert { upper_median_is final 7 };
+    assert { transform_cost (Cons 5 Nil) (Cons 5 Nil) = 0 };
+    assert { transform_cost (Cons 6 (Cons 8 (Cons 5 Nil))) (Cons 7 (Cons 8 (Cons 5 Nil))) = 1 };
+    assert { transform_cost nums final = 3 };
+    assert {
+      forall other: list int.
+        length other = length nums /\ upper_median_is other 7 ->
+        3 <= transform_cost nums other
+    };
+    assert { minimum_operations_result nums 7 3 }
+
+  let lemma check_test_004 () =
+    let nums = Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 Nil)))) in
+    let final = Cons 3 (Cons 3 (Cons 3 (Cons 1 (Cons 1 Nil)))) in
+    assert { all_nonnegative nums };
+    assert { count_lt Nil 3 = 0 };
+    assert { count_lt (Cons 1 Nil) 3 = 1 };
+    assert { count_lt (Cons 1 (Cons 1 Nil)) 3 = 2 };
+    assert { count_lt final 3 = 2 };
+    assert { count_gt Nil 3 = 0 };
+    assert { count_gt (Cons 1 Nil) 3 = 0 };
+    assert { count_gt final 3 = 0 };
+    assert { upper_median_is final 3 };
+    assert { transform_cost Nil Nil = 0 };
+    assert { transform_cost (Cons 1 Nil) (Cons 1 Nil) = 0 };
+    assert { transform_cost (Cons 1 (Cons 1 Nil)) (Cons 1 (Cons 1 Nil)) = 0 };
+    assert { transform_cost (Cons 1 (Cons 1 (Cons 1 Nil))) (Cons 3 (Cons 1 (Cons 1 Nil))) = 2 };
+    assert { transform_cost nums final = 6 };
+    assert {
+      forall other: list int.
+        length other = length nums /\ upper_median_is other 3 ->
+        6 <= transform_cost nums other
+    };
+    assert { minimum_operations_result nums 3 6 }
+
+  let lemma check_test_005 () =
+    let nums = Cons 1 (Cons 2 (Cons 3 (Cons 4 (Cons 5 (Cons 6 Nil))))) in
+    let final = nums in
+    assert { all_nonnegative nums };
+    assert { count_lt Nil 4 = 0 };
+    assert { count_lt (Cons 6 Nil) 4 = 0 };
+    assert { count_lt (Cons 5 (Cons 6 Nil)) 4 = 0 };
+    assert { count_lt (Cons 4 (Cons 5 (Cons 6 Nil))) 4 = 0 };
+    assert { count_lt nums 4 = 3 };
+    assert { count_gt Nil 4 = 0 };
+    assert { count_gt (Cons 6 Nil) 4 = 1 };
+    assert { count_gt (Cons 5 (Cons 6 Nil)) 4 = 2 };
+    assert { count_gt nums 4 = 2 };
+    assert { upper_median_is final 4 };
+    assert { transform_cost nums final = 0 };
+    assert {
+      forall other: list int.
+        length other = length nums /\ upper_median_is other 4 ->
+        0 <= transform_cost nums other
+    };
+    assert { minimum_operations_result nums 4 0 }
+
+  let lemma check_test_006 () =
+    let nums = Cons 2 (Cons 5 (Cons 6 (Cons 8 (Cons 5 Nil)))) in
+    let final = Cons 2 (Cons 4 (Cons 6 (Cons 8 (Cons 4 Nil)))) in
+    assert { all_nonnegative nums };
+    assert { count_lt Nil 4 = 0 };
+    assert { count_lt (Cons 4 Nil) 4 = 0 };
+    assert { count_lt (Cons 8 (Cons 4 Nil)) 4 = 0 };
+    assert { count_lt final 4 = 1 };
+    assert { count_gt Nil 4 = 0 };
+    assert { count_gt (Cons 4 Nil) 4 = 0 };
+    assert { count_gt (Cons 8 (Cons 4 Nil)) 4 = 1 };
+    assert { count_gt final 4 = 2 };
+    assert { upper_median_is final 4 };
+    assert { transform_cost (Cons 5 Nil) (Cons 4 Nil) = 1 };
+    assert { transform_cost nums final = 2 };
+    assert {
+      forall other: list int.
+        length other = length nums /\ upper_median_is other 4 ->
+        2 <= transform_cost nums other
+    };
+    assert { minimum_operations_result nums 4 2 }
+
+  let lemma check_test_072 () =
+    let nums =
+      Cons 5 (Cons 5 (Cons 5 (Cons 5 (Cons 5 (Cons 5 (Cons 5 (Cons 5 Nil))))))) in
+    let final =
+      Cons 6 (Cons 6 (Cons 6 (Cons 6 (Cons 5 (Cons 5 (Cons 5 (Cons 5 Nil))))))) in
+    assert { all_nonnegative nums };
+    assert { count_lt Nil 6 = 0 };
+    assert { count_lt (Cons 5 Nil) 6 = 1 };
+    assert { count_lt (Cons 5 (Cons 5 Nil)) 6 = 2 };
+    assert { count_lt final 6 = 4 };
+    assert { count_gt Nil 6 = 0 };
+    assert { count_gt (Cons 5 Nil) 6 = 0 };
+    assert { count_gt final 6 = 0 };
+    assert { upper_median_is final 6 };
+    assert { transform_cost Nil Nil = 0 };
+    assert { transform_cost (Cons 5 Nil) (Cons 5 Nil) = 0 };
+    assert { transform_cost nums final = 4 };
+    assert {
+      forall other: list int.
+        length other = length nums /\ upper_median_is other 6 ->
+        4 <= transform_cost nums other
+    };
+    assert { minimum_operations_result nums 6 4 }
+
+  let lemma check_test_083 () =
+    let nums =
+      Cons 1 (Cons 2 (Cons 3 (Cons 4 (Cons 5 (Cons 6 (Cons 7 (Cons 8 (Cons 9 (Cons 10 Nil))))))))) in
+    let final =
+      Cons 1 (Cons 2 (Cons 3 (Cons 4 (Cons 5 (Cons 5 (Cons 7 (Cons 8 (Cons 9 (Cons 10 Nil))))))))) in
+    assert { all_nonnegative nums };
+    assert { count_lt Nil 5 = 0 };
+    assert { count_lt (Cons 10 Nil) 5 = 0 };
+    assert { count_lt (Cons 9 (Cons 10 Nil)) 5 = 0 };
+    assert { count_lt final 5 = 4 };
+    assert { count_gt Nil 5 = 0 };
+    assert { count_gt (Cons 10 Nil) 5 = 1 };
+    assert { count_gt (Cons 9 (Cons 10 Nil)) 5 = 2 };
+    assert { count_gt final 5 = 4 };
+    assert { upper_median_is final 5 };
+    assert { transform_cost (Cons 6 Nil) (Cons 5 Nil) = 1 };
+    assert { transform_cost nums final = 1 };
+    assert {
+      forall other: list int.
+        length other = length nums /\ upper_median_is other 5 ->
+        1 <= transform_cost nums other
+    };
+    assert { minimum_operations_result nums 5 1 }
+
+end

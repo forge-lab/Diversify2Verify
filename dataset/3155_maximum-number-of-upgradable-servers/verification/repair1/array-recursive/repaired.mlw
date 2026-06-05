@@ -1,0 +1,136 @@
+module MaximumNumberOfUpgradableServers_Array_Spec
+
+  use int.Int
+  use int.EuclideanDivision
+  use array.Array
+  use array.Init
+
+  predicate valid_inputs (count: array int) (upgrade: array int)
+      (sell: array int) (money: array int) =
+    1 <= length count /\
+    length upgrade = length count /\
+    length sell = length count /\
+    length money = length count /\
+    (forall i: int. 0 <= i < length count ->
+      1 <= count[i] /\ 1 <= upgrade[i] /\ 1 <= sell[i] /\ 1 <= money[i])
+
+  predicate feasible_upgrade_count (count: array int) (upgrade: array int)
+      (sell: array int) (money: array int) (i: int) (k: int) =
+    0 <= i < length count /\
+    0 <= k <= count[i] /\
+    k * upgrade[i] <= money[i] + (count[i] - k) * sell[i]
+
+  predicate optimal_upgrade_count (count: array int) (upgrade: array int)
+      (sell: array int) (money: array int) (i: int) (k: int) =
+    feasible_upgrade_count count upgrade sell money i k /\
+    (forall candidate: int.
+      feasible_upgrade_count count upgrade sell money i candidate ->
+      candidate <= k)
+
+  predicate answer_spec (count: array int) (upgrade: array int)
+      (sell: array int) (money: array int) (answer: array int) =
+    length answer = length count /\
+    (forall i: int. 0 <= i < length count ->
+      optimal_upgrade_count count upgrade sell money i answer[i])
+
+  let lemma lift_center_optimal_to_array
+    (count: array int) (upgrade: array int) (sell: array int)
+    (money: array int) (i: int) (best: int)
+    requires { valid_inputs count upgrade sell money }
+    requires { 0 <= i < length count }
+    requires { 0 <= best <= count[i] }
+    requires { best * upgrade[i] <= money[i] + (count[i] - best) * sell[i] }
+    requires { forall candidate: int.
+      0 <= candidate <= count[i] /\
+      candidate * upgrade[i] <= money[i] + (count[i] - candidate) * sell[i] ->
+      candidate <= best }
+    ensures  { optimal_upgrade_count count upgrade sell money i best }
+  =
+    assert { feasible_upgrade_count count upgrade sell money i best };
+    assert { forall candidate: int.
+      feasible_upgrade_count count upgrade sell money i candidate ->
+      0 <= candidate <= count[i] };
+    assert { forall candidate: int.
+      feasible_upgrade_count count upgrade sell money i candidate ->
+      candidate * upgrade[i] <= money[i] + (count[i] - candidate) * sell[i] };
+    assert { forall candidate: int.
+      feasible_upgrade_count count upgrade sell money i candidate ->
+      candidate <= best }
+
+  let max_upgradable_for_center
+    (count_i: int) (upgrade_i: int) (sell_i: int) (money_i: int) : int
+    requires { 1 <= count_i }
+    requires { 1 <= upgrade_i }
+    requires { 1 <= sell_i }
+    requires { 1 <= money_i }
+    ensures  { 0 <= result <= count_i }
+    ensures  { result * upgrade_i <= money_i + (count_i - result) * sell_i }
+    ensures  { forall candidate: int.
+      0 <= candidate <= count_i /\
+      candidate * upgrade_i <= money_i + (count_i - candidate) * sell_i ->
+      candidate <= result }
+  =
+    let affordable = div (money_i + count_i * sell_i) (upgrade_i + sell_i) in
+    if affordable < 0 then
+      0
+    else if affordable <= count_i then
+      affordable
+    else
+      count_i
+
+  let rec fill_answer
+    (count: array int) (upgrade: array int) (sell: array int)
+    (money: array int) (answer: array int) (i: int) : unit
+    requires { valid_inputs count upgrade sell money }
+    requires { length answer = length count }
+    requires { 0 <= i <= length count }
+    ensures  { length answer = length count }
+    ensures  { forall j: int. 0 <= j < i -> answer[j] = (old answer)[j] }
+    ensures  { forall j: int. i <= j < length count ->
+      optimal_upgrade_count count upgrade sell money j answer[j] }
+    variant { length count - i }
+  =
+    if i >= length count then
+      ()
+    else begin
+      assert { 0 <= i < length count };
+      assert { 1 <= count[i] };
+      assert { 1 <= upgrade[i] };
+      assert { 1 <= sell[i] };
+      assert { 1 <= money[i] };
+      let best = max_upgradable_for_center count[i] upgrade[i] sell[i] money[i] in
+      assert { 0 <= best <= count[i] };
+      assert { best * upgrade[i] <= money[i] + (count[i] - best) * sell[i] };
+      assert { forall candidate: int.
+        0 <= candidate <= count[i] /\
+        candidate * upgrade[i] <= money[i] + (count[i] - candidate) * sell[i] ->
+        candidate <= best };
+      lift_center_optimal_to_array count upgrade sell money i best;
+      answer[i] <- best;
+      assert { answer[i] = best };
+      assert { optimal_upgrade_count count upgrade sell money i answer[i] };
+      fill_answer count upgrade sell money answer (i + 1);
+      assert { answer[i] = best };
+      assert { optimal_upgrade_count count upgrade sell money i answer[i] };
+      assert { forall j: int. i + 1 <= j < length count ->
+        optimal_upgrade_count count upgrade sell money j answer[j] };
+      assert { forall j: int. i <= j < length count ->
+        j = i \/ i + 1 <= j };
+      assert { forall j: int. i <= j < length count ->
+        optimal_upgrade_count count upgrade sell money j answer[j] }
+    end
+
+  let maximum_number_of_upgradable_servers_array
+    (count: array int) (upgrade: array int) (sell: array int) (money: array int)
+    : array int
+    requires { valid_inputs count upgrade sell money }
+    ensures  { answer_spec count upgrade sell money result }
+  =
+    let answer = make (length count) 0 in
+    fill_answer count upgrade sell money answer 0;
+    assert { length answer = length count };
+    assert { forall i: int. 0 <= i < length count ->
+      optimal_upgrade_count count upgrade sell money i answer[i] };
+    answer
+
+end

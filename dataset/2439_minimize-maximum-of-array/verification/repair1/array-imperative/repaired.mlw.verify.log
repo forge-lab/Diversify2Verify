@@ -1,0 +1,201 @@
+== Stage 1: first prover on whole file ==
+Running in /Users/rubenm/Desktop/Diversify2Verify/codex-runs/dataset-merge-verification/stage3a-repair/2439_minimize-maximum-of-array/array-imperative/minimize_maximum_of_array_array_stage3_a6c09b06_stage3/generated/why3: why3 session create -o /Users/rubenm/Desktop/Diversify2Verify/codex-runs/dataset-merge-verification/stage3a-repair/2439_minimize-maximum-of-array/array-imperative/minimize_maximum_of_array_array_stage3_a6c09b06_stage3/generated/why3/.why3_sessions/repaired_stage1 -P Z3,4.8.6 -t 10 -m 8192 repaired.mlw
+Session created successfully
+Running in /Users/rubenm/Desktop/Diversify2Verify/codex-runs/dataset-merge-verification/stage3a-repair/2439_minimize-maximum-of-array/array-imperative/minimize_maximum_of_array_array_stage3_a6c09b06_stage3/generated/why3: why3 bench /Users/rubenm/Desktop/Diversify2Verify/codex-runs/dataset-merge-verification/stage3a-repair/2439_minimize-maximum-of-array/array-imperative/minimize_maximum_of_array_array_stage3_a6c09b06_stage3/generated/why3/.why3_sessions/repaired_stage1
+Progress: 8/1/0                       Progress: 7/2/0                       Progress: 6/3/0                       Progress: 5/4/0                       Progress: 4/5/0                       Progress: 3/6/0                       Progress: 3/1/2                       Progress: 2/2/2                       Progress: 1/3/2                       Progress: 0/4/2                       Progress: 0/2/2                       Progress: 0/1/2                       Progress: 0/0/2                       Progress: 0/0/1                       
+Replay completed, saving session... done
+== Stage 1 stats ==
+= Statistics for session /Users/rubenm/Desktop/Diversify2Verify/codex-runs/dataset-merge-verification/stage3a-repair/2439_minimize-maximum-of-array/array-imperative/minimize_maximum_of_array_array_stage3_a6c09b06_stage3/generated/why3/.why3_sessions/repaired_stage1
+
+== Number of root goals ==
+  total: 9  proved: 5
+
+== Number of sub goals ==
+  total: 0  proved: 0
+
+== Goals not proved ==
+  +-- file [../../repaired.mlw]
+    +-- theory MinimizeMaximumOfArray_Array_Stage3_Imperative
+      +-- goal prefix_ceiling_bounds_prefix'vc
+      +-- goal prefix_ceiling_le_of_bound'vc
+      +-- goal best_prefix_ceiling_to_minimum'vc
+      +-- goal processed_prefix_ceiling_max_keep'vc
+  
+== Goals proved by only one prover ==
+  +-- file [../../repaired.mlw]
+    +-- theory MinimizeMaximumOfArray_Array_Stage3_Imperative
+      +-- goal prefix_sum_extend'vc: Z3 4.8.6
+      +-- goal prefix_sum_nonnegative'vc: Z3 4.8.6
+      +-- goal prefix_bounded_candidate_nonnegative'vc: Z3 4.8.6
+      +-- goal processed_prefix_ceiling_max_raise'vc: Z3 4.8.6
+      +-- goal minimize_maximum_of_array_array'vc: Z3 4.8.6
+  
+1 session(s) read, with a total of 9 proof goals.
+== Unproved root goals after first prover ==
+MinimizeMaximumOfArray_Array_Stage3_Imperative	prefix_ceiling_bounds_prefix'vc
+MinimizeMaximumOfArray_Array_Stage3_Imperative	prefix_ceiling_le_of_bound'vc
+MinimizeMaximumOfArray_Array_Stage3_Imperative	best_prefix_ceiling_to_minimum'vc
+MinimizeMaximumOfArray_Array_Stage3_Imperative	processed_prefix_ceiling_max_keep'vc
+== Stage 1: trying remaining goals with prover Alt-Ergo,2.4.0 ==
+---- stage1 | prover: Alt-Ergo,2.4.0 | theory: MinimizeMaximumOfArray_Array_Stage3_Imperative | goal: prefix_ceiling_bounds_prefix'vc ----
+File repaired.mlw:
+Goal prefix_ceiling_bounds_prefix'vc.
+Prover result is: Valid (0.11s, 3327 steps).
+Solved in stage 1 using prover: Alt-Ergo,2.4.0
+---- stage1 | prover: Alt-Ergo,2.4.0 | theory: MinimizeMaximumOfArray_Array_Stage3_Imperative | goal: prefix_ceiling_le_of_bound'vc ----
+File repaired.mlw:
+Goal prefix_ceiling_le_of_bound'vc.
+Prover result is: Valid (0.03s, 638 steps).
+Solved in stage 1 using prover: Alt-Ergo,2.4.0
+---- stage1 | prover: Alt-Ergo,2.4.0 | theory: MinimizeMaximumOfArray_Array_Stage3_Imperative | goal: best_prefix_ceiling_to_minimum'vc ----
+File repaired.mlw:
+Goal best_prefix_ceiling_to_minimum'vc.
+Prover result is: Valid (0.35s, 10911 steps).
+Solved in stage 1 using prover: Alt-Ergo,2.4.0
+---- stage1 | prover: Alt-Ergo,2.4.0 | theory: MinimizeMaximumOfArray_Array_Stage3_Imperative | goal: processed_prefix_ceiling_max_keep'vc ----
+File repaired.mlw:
+Goal processed_prefix_ceiling_max_keep'vc.
+Prover result is: Timeout (10.00s, 207573 steps).
+Remaining after prover Alt-Ergo,2.4.0: 1
+== Stage 1: trying remaining goals with prover CVC4,1.8 ==
+---- stage1 | prover: CVC4,1.8 | theory: MinimizeMaximumOfArray_Array_Stage3_Imperative | goal: processed_prefix_ceiling_max_keep'vc ----
+File repaired.mlw:
+Goal processed_prefix_ceiling_max_keep'vc.
+Prover result is: Timeout (10.00s, 1418666 steps).
+Remaining after prover CVC4,1.8: 1
+== Goals still unproved after stage 1 ==
+MinimizeMaximumOfArray_Array_Stage3_Imperative	processed_prefix_ceiling_max_keep'vc
+== Stage 2: split_vc on unproved goal ==
+Target theory: MinimizeMaximumOfArray_Array_Stage3_Imperative
+Target goal  : processed_prefix_ceiling_max_keep'vc
+---- stage2 | prover: Z3,4.8.6 | theory: MinimizeMaximumOfArray_Array_Stage3_Imperative | goal: processed_prefix_ceiling_max_keep'vc ----
+Transforms: split_vc
+File "repaired.mlw", line 126, characters 8-37:
+Sub-goal Assertion of goal processed_prefix_ceiling_max_keep'vc.
+Prover result is: Valid (0.01s, 44744 steps).
+
+File "repaired.mlw", line 128, characters 13-51:
+Sub-goal Assertion of goal processed_prefix_ceiling_max_keep'vc.
+Prover result is: Valid (0.01s, 10909 steps).
+
+File "repaired.mlw", line 131, characters 8-33:
+Sub-goal Assertion of goal processed_prefix_ceiling_max_keep'vc.
+Prover result is: Valid (0.01s, 33332 steps).
+
+File "repaired.mlw", line 135, characters 8-37:
+Sub-goal Assertion of goal processed_prefix_ceiling_max_keep'vc.
+Prover result is: Valid (0.63s, 4956165 steps).
+
+File "repaired.mlw", line 141, characters 42-72:
+Sub-goal Assertion of goal processed_prefix_ceiling_max_keep'vc.
+Prover result is: Valid (0.01s, 36306 steps).
+
+File "repaired.mlw", line 147, characters 8-21:
+Sub-goal Assertion of goal processed_prefix_ceiling_max_keep'vc.
+Prover result is: Timeout (10.00s, 254080409 steps).
+
+File "repaired.mlw", line 122, characters 15-64:
+Sub-goal Postcondition of goal processed_prefix_ceiling_max_keep'vc.
+Prover result is: Timeout (10.00s, 311541978 steps).
+---- stage2 | prover: Alt-Ergo,2.4.0 | theory: MinimizeMaximumOfArray_Array_Stage3_Imperative | goal: processed_prefix_ceiling_max_keep'vc ----
+Transforms: split_vc
+File "repaired.mlw", line 126, characters 8-37:
+Sub-goal Assertion of goal processed_prefix_ceiling_max_keep'vc.
+Prover result is: Valid (0.01s, 63 steps).
+
+File "repaired.mlw", line 128, characters 13-51:
+Sub-goal Assertion of goal processed_prefix_ceiling_max_keep'vc.
+Prover result is: Valid (0.01s, 10 steps).
+
+File "repaired.mlw", line 131, characters 8-33:
+Sub-goal Assertion of goal processed_prefix_ceiling_max_keep'vc.
+Prover result is: Valid (0.01s, 15 steps).
+
+File "repaired.mlw", line 135, characters 8-37:
+Sub-goal Assertion of goal processed_prefix_ceiling_max_keep'vc.
+Prover result is: Valid (0.01s, 35 steps).
+
+File "repaired.mlw", line 141, characters 42-72:
+Sub-goal Assertion of goal processed_prefix_ceiling_max_keep'vc.
+Prover result is: Valid (0.01s, 20 steps).
+
+File "repaired.mlw", line 147, characters 8-21:
+Sub-goal Assertion of goal processed_prefix_ceiling_max_keep'vc.
+Prover result is: Timeout (10.00s, 355409 steps).
+
+File "repaired.mlw", line 122, characters 15-64:
+Sub-goal Postcondition of goal processed_prefix_ceiling_max_keep'vc.
+Prover result is: Timeout (10.00s).
+---- stage2 | prover: CVC4,1.8 | theory: MinimizeMaximumOfArray_Array_Stage3_Imperative | goal: processed_prefix_ceiling_max_keep'vc ----
+Transforms: split_vc
+File "repaired.mlw", line 126, characters 8-37:
+Sub-goal Assertion of goal processed_prefix_ceiling_max_keep'vc.
+Prover result is: Valid (0.03s, 11628 steps).
+
+File "repaired.mlw", line 128, characters 13-51:
+Sub-goal Assertion of goal processed_prefix_ceiling_max_keep'vc.
+Prover result is: Valid (0.02s, 8726 steps).
+
+File "repaired.mlw", line 131, characters 8-33:
+Sub-goal Assertion of goal processed_prefix_ceiling_max_keep'vc.
+Prover result is: Valid (0.02s, 8855 steps).
+
+File "repaired.mlw", line 135, characters 8-37:
+Sub-goal Assertion of goal processed_prefix_ceiling_max_keep'vc.
+Prover result is: Valid (0.03s, 10732 steps).
+
+File "repaired.mlw", line 141, characters 42-72:
+Sub-goal Assertion of goal processed_prefix_ceiling_max_keep'vc.
+Prover result is: Valid (0.03s, 11563 steps).
+
+File "repaired.mlw", line 147, characters 8-21:
+Sub-goal Assertion of goal processed_prefix_ceiling_max_keep'vc.
+Prover result is: Timeout (10.00s, 1806411 steps).
+
+File "repaired.mlw", line 122, characters 15-64:
+Sub-goal Postcondition of goal processed_prefix_ceiling_max_keep'vc.
+Prover result is: Timeout (10.00s, 1603804 steps).
+== Goals still unproved after stage 2 (split_vc) ==
+MinimizeMaximumOfArray_Array_Stage3_Imperative	processed_prefix_ceiling_max_keep'vc
+== Stage 3: split_vc + inline_all on still-unproved goal ==
+Target theory: MinimizeMaximumOfArray_Array_Stage3_Imperative
+Target goal  : processed_prefix_ceiling_max_keep'vc
+---- stage3 | prover: Z3,4.8.6 | theory: MinimizeMaximumOfArray_Array_Stage3_Imperative | goal: processed_prefix_ceiling_max_keep'vc ----
+Transforms: split_vc inline_all
+File "repaired.mlw", line 126, characters 8-37:
+Sub-goal Assertion of goal processed_prefix_ceiling_max_keep'vc.
+Prover result is: Valid (0.01s, 58822 steps).
+
+File "repaired.mlw", line 128, characters 13-51:
+Sub-goal Assertion of goal processed_prefix_ceiling_max_keep'vc.
+Prover result is: Valid (0.01s, 28193 steps).
+
+File "repaired.mlw", line 131, characters 8-33:
+Sub-goal Assertion of goal processed_prefix_ceiling_max_keep'vc.
+Prover result is: Valid (0.01s, 54563 steps).
+
+File "repaired.mlw", line 135, characters 8-37:
+Sub-goal Assertion of goal processed_prefix_ceiling_max_keep'vc.
+Prover result is: Timeout (10.00s, 132235392 steps).
+
+File "repaired.mlw", line 141, characters 42-72:
+Sub-goal Assertion of goal processed_prefix_ceiling_max_keep'vc.
+Prover result is: Valid (0.01s, 62699 steps).
+
+File "repaired.mlw", line 147, characters 8-21:
+Sub-goal Assertion of goal processed_prefix_ceiling_max_keep'vc.
+Prover result is: Timeout (10.00s, 91456999 steps).
+Infrastructure issue in stage 3 with prover Z3,4.8.6; aborting rest of stage 3.
+== Final summary ==
+Unproved root goals after first prover : 1
+Remaining failures after split_vc      : 1
+Remaining failures after stage 3       : 1
+Detailed logs stored in                : /Users/rubenm/Desktop/Diversify2Verify/codex-runs/dataset-merge-verification/stage3a-repair/2439_minimize-maximum-of-array/array-imperative/minimize_maximum_of_array_array_stage3_a6c09b06_stage3/generated/why3/.why3_sessions/repaired_logs
+Still unproved goals:
+MinimizeMaximumOfArray_Array_Stage3_Imperative	processed_prefix_ceiling_max_keep'vc
+VERIFY_RESULT: FAILURE
+VERIFY_REASON: unproved_goals_remain
+VERIFY_STAGE: stage3
+VERIFY_ROOT_TOTAL: 9
+VERIFY_ROOT_PROVED: 8
+VERIFY_ROOT_REMAINING: 1

@@ -1,0 +1,136 @@
+module IntervalsBetweenIdenticalElements_List_Spec
+
+  use int.Int
+  use int.Abs
+  use list.List
+
+  let rec function distance_sum_from (l: list int) (x: int) (i: int) (j: int) : int
+    variant { l }
+  =
+    match l with
+    | Nil -> 0
+    | Cons y ys ->
+        (if y = x then abs (i - j) else 0) + distance_sum_from ys x i (j + 1)
+    end
+
+  let rec predicate intervals_from (arr: list int) (remaining: list int) (i: int) (out: list int)
+    variant { remaining }
+  =
+    match remaining with
+    | Nil ->
+        match out with
+        | Nil -> true
+        | Cons _ _ -> false
+        end
+    | Cons x xs ->
+        match out with
+        | Nil -> false
+        | Cons r rs ->
+            r = distance_sum_from arr x i 0 &&
+            intervals_from arr xs (i + 1) rs
+        end
+    end
+
+  val intervals_between_identical_elements_list (arr: list int) : list int
+    ensures { intervals_from arr arr 0 result }
+
+  let lemma check_test_001 () =
+    let arr =
+      Cons 5 (Cons 4 (Cons 3 (Cons 2 (Cons 1 Nil)))) in
+    let expected =
+      Cons 0 (Cons 0 (Cons 0 (Cons 0 (Cons 0 Nil)))) in
+    assert { distance_sum_from arr 5 0 0 = 0 };
+    assert { distance_sum_from arr 4 1 0 = 0 };
+    assert { distance_sum_from arr 3 2 0 = 0 };
+    assert { distance_sum_from arr 2 3 0 = 0 };
+    assert { distance_sum_from arr 1 4 0 = 0 };
+    assert { intervals_from arr arr 0 expected }
+
+  let lemma check_test_003 () =
+    let arr =
+      Cons 1 (Cons 2 (Cons 3 (Cons 4 (Cons 5
+        (Cons 1 (Cons 2 (Cons 3 (Cons 4 (Cons 5 Nil))))))))) in
+    let expected =
+      Cons 5 (Cons 5 (Cons 5 (Cons 5 (Cons 5
+        (Cons 5 (Cons 5 (Cons 5 (Cons 5 (Cons 5 Nil))))))))) in
+    assert { distance_sum_from arr 1 0 0 = 5 };
+    assert { distance_sum_from arr 2 1 0 = 5 };
+    assert { distance_sum_from arr 3 2 0 = 5 };
+    assert { distance_sum_from arr 4 3 0 = 5 };
+    assert { distance_sum_from arr 5 4 0 = 5 };
+    assert { intervals_from arr arr 0 expected }
+
+  let lemma check_test_006 () =
+    let arr =
+      Cons 10 (Cons 5 (Cons 10 (Cons 10 Nil))) in
+    let expected =
+      Cons 5 (Cons 0 (Cons 3 (Cons 4 Nil))) in
+    assert { distance_sum_from arr 10 0 0 = 5 };
+    assert { distance_sum_from arr 5 1 0 = 0 };
+    assert { distance_sum_from arr 10 2 0 = 3 };
+    assert { distance_sum_from arr 10 3 0 = 4 };
+    assert { intervals_from arr arr 0 expected }
+
+  let lemma check_test_007 () =
+    let arr =
+      Cons 5 (Cons 5 (Cons 5 (Cons 5 (Cons 5 Nil)))) in
+    let expected =
+      Cons 10 (Cons 7 (Cons 6 (Cons 7 (Cons 10 Nil)))) in
+    assert { distance_sum_from arr 5 0 0 = 10 };
+    assert { distance_sum_from arr 5 1 0 = 7 };
+    assert { distance_sum_from arr 5 2 0 = 6 };
+    assert { distance_sum_from arr 5 3 0 = 7 };
+    assert { distance_sum_from arr 5 4 0 = 10 };
+    assert { intervals_from arr arr 0 expected }
+
+  let lemma check_test_009 () =
+    let arr =
+      Cons 1 (Cons 1 (Cons 2 (Cons 2 (Cons 3 (Cons 3 (Cons 4 (Cons 4 Nil))))))) in
+    let expected =
+      Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 Nil))))))) in
+    assert { distance_sum_from arr 1 0 0 = 1 };
+    assert { distance_sum_from arr 1 1 0 = 1 };
+    assert { distance_sum_from arr 2 2 0 = 1 };
+    assert { distance_sum_from arr 2 3 0 = 1 };
+    assert { distance_sum_from arr 3 4 0 = 1 };
+    assert { distance_sum_from arr 3 5 0 = 1 };
+    assert { distance_sum_from arr 4 6 0 = 1 };
+    assert { distance_sum_from arr 4 7 0 = 1 };
+    assert { intervals_from arr arr 0 expected }
+
+  let lemma check_test_010 () =
+    let arr =
+      Cons 2 (Cons 1 (Cons 3 (Cons 1 (Cons 2 (Cons 3 (Cons 3 Nil)))))) in
+    let expected =
+      Cons 4 (Cons 2 (Cons 7 (Cons 2 (Cons 4 (Cons 4 (Cons 5 Nil)))))) in
+    assert { distance_sum_from arr 2 0 0 = 4 };
+    assert { distance_sum_from arr 1 1 0 = 2 };
+    assert { distance_sum_from arr 3 2 0 = 7 };
+    assert { distance_sum_from arr 1 3 0 = 2 };
+    assert { distance_sum_from arr 2 4 0 = 4 };
+    assert { distance_sum_from arr 3 5 0 = 4 };
+    assert { distance_sum_from arr 3 6 0 = 5 };
+    assert { intervals_from arr arr 0 expected }
+
+  let lemma check_test_022 () =
+    let arr =
+      Cons 5 (Cons 3 (Cons 2 (Cons 5 (Cons 3 (Cons 5
+        (Cons 2 (Cons 5 (Cons 2 (Cons 5 (Cons 2 (Cons 3 Nil))))))))))) in
+    let expected =
+      Cons 24 (Cons 13 (Cons 18 (Cons 15 (Cons 10 (Cons 13
+        (Cons 10 (Cons 15 (Cons 10 (Cons 21 (Cons 14 (Cons 17 Nil))))))))))) in
+    assert { distance_sum_from arr 5 0 0 = 24 };
+    assert { distance_sum_from arr 3 1 0 = 13 };
+    assert { distance_sum_from arr 2 2 0 = 18 };
+    assert { distance_sum_from arr 5 3 0 = 15 };
+    assert { distance_sum_from arr 3 4 0 = 10 };
+    assert { distance_sum_from arr 5 5 0 = 13 };
+    assert { distance_sum_from arr 2 6 0 = 10 };
+    assert { distance_sum_from arr 5 7 0 = 15 };
+    assert { distance_sum_from arr 2 8 0 = 10 };
+    assert { distance_sum_from arr 5 9 0 = 21 };
+    assert { distance_sum_from arr 2 10 0 = 14 };
+    assert { distance_sum_from arr 3 11 0 = 17 };
+    assert { intervals_from arr arr 0 expected }
+
+end

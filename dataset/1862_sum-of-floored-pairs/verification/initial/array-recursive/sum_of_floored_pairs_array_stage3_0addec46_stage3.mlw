@@ -1,0 +1,51 @@
+module SumOfFlooredPairs_Array_Stage3_Recursive
+
+  use int.Int
+  use int.EuclideanDivision
+  use array.Array
+
+  function result_modulus : int = 1000000007
+
+  predicate valid_problem_values (nums: array int) =
+    forall i: int. 0 <= i < length nums -> 1 <= nums[i] <= 100000
+
+  predicate valid_problem_input (nums: array int) =
+    1 <= length nums <= 100000 /\
+    valid_problem_values nums
+
+  let rec function pair_row_sum_from (nums: array int) (i: int) (j: int) : int
+    requires { valid_problem_values nums }
+    requires { 0 <= i < length nums }
+    requires { 0 <= j <= length nums }
+    variant  { length nums - j }
+  =
+    if j = length nums then
+      0
+    else
+      div nums[i] nums[j] + pair_row_sum_from nums i (j + 1)
+
+  let rec function floored_pair_sum_from (nums: array int) (i: int) : int
+    requires { valid_problem_values nums }
+    requires { 0 <= i <= length nums }
+    variant  { length nums - i }
+  =
+    if i = length nums then
+      0
+    else
+      pair_row_sum_from nums i 0 + floored_pair_sum_from nums (i + 1)
+
+  predicate sum_of_floored_pairs_array_spec (nums: array int) (res: int) =
+    res = mod (floored_pair_sum_from nums 0) result_modulus
+
+  let sum_of_floored_pairs_array (nums: array int) : int
+    requires { valid_problem_input nums }
+    ensures  { sum_of_floored_pairs_array_spec nums result }
+    ensures  { 0 <= result < result_modulus }
+  =
+    let r = mod (floored_pair_sum_from nums 0) 1000000007 in
+    assert { 0 < result_modulus };
+    assert { sum_of_floored_pairs_array_spec nums r };
+    assert { 0 <= r < result_modulus };
+    r
+
+end

@@ -1,0 +1,197 @@
+module MinimumCostsUsingTheTrainLine_Array_Spec
+
+  use int.Int
+  use int.MinMax
+  use array.Array
+  use array.Init
+  use array.ArrayEq
+
+  predicate valid_input (regular: array int) (express: array int) (expressCost: int) =
+    1 <= length regular <= 100000 /\
+    length express = length regular /\
+    1 <= expressCost <= 100000 /\
+    (forall i: int. 0 <= i < length regular -> 1 <= regular[i] <= 100000) /\
+    (forall i: int. 0 <= i < length express -> 1 <= express[i] <= 100000)
+
+  let rec function route_cost
+      (regular: array int) (express: array int) (expressCost: int) (k: int) (route: int) : int
+    requires { length regular = length express }
+    requires { 0 <= k <= length regular }
+    requires { route = 0 \/ route = 1 }
+    variant  { k }
+  =
+    if k = 0 then
+      if route = 0 then 0 else expressCost
+    else if route = 0 then
+      min (route_cost regular express expressCost (k - 1) 0)
+          (route_cost regular express expressCost (k - 1) 1) + regular[k - 1]
+    else
+      min (route_cost regular express expressCost (k - 1) 1)
+          (route_cost regular express expressCost (k - 1) 0 + expressCost) + express[k - 1]
+
+  let function min_stop_cost (regular: array int) (express: array int) (expressCost: int) (k: int) : int
+    requires { length regular = length express }
+    requires { 1 <= k <= length regular }
+  =
+    min (route_cost regular express expressCost k 0)
+        (route_cost regular express expressCost k 1)
+
+  predicate valid_costs_output
+      (regular: array int) (express: array int) (expressCost: int) (costs: array int) =
+    valid_input regular express expressCost /\
+    length costs = length regular /\
+    forall i: int. 0 <= i < length costs ->
+      costs[i] = min_stop_cost regular express expressCost (i + 1)
+
+  val minimum_costs_using_the_train_line_array
+      (regular: array int) (express: array int) (expressCost: int) : array int
+    requires { valid_input regular express expressCost }
+    ensures  { valid_costs_output regular express expressCost result }
+
+  let lemma test_000_equal_costs_regular_path () =
+    let regular = init 4 [|1; 1; 1; 1|] in
+    let express = init 4 [|1; 1; 1; 1|] in
+    let expected = init 4 [|1; 2; 3; 4|] in
+    assert { length regular = 4 };
+    assert { length express = 4 };
+    assert { length expected = 4 };
+    assert { regular[0] = 1 /\ regular[1] = 1 /\ regular[2] = 1 /\ regular[3] = 1 };
+    assert { express[0] = 1 /\ express[1] = 1 /\ express[2] = 1 /\ express[3] = 1 };
+    assert { expected[0] = 1 /\ expected[1] = 2 /\ expected[2] = 3 /\ expected[3] = 4 };
+    assert { route_cost regular express 1 0 0 = 0 };
+    assert { route_cost regular express 1 0 1 = 1 };
+    assert { min_stop_cost regular express 1 1 = 1 };
+    assert { min_stop_cost regular express 1 2 = 2 };
+    assert { min_stop_cost regular express 1 3 = 3 };
+    assert { min_stop_cost regular express 1 4 = 4 };
+    assert {
+      forall i: int. 0 <= i < length expected ->
+        i = 0 \/ i = 1 \/ i = 2 \/ i = 3
+    };
+    assert { valid_costs_output regular express 1 expected };
+    assert { array_eq expected expected }
+
+  let lemma test_001_immediate_express_benefit () =
+    let regular = init 3 [|10; 20; 30|] in
+    let express = init 3 [|5; 15; 25|] in
+    let expected = init 3 [|7; 22; 47|] in
+    assert { length regular = 3 };
+    assert { length express = 3 };
+    assert { length expected = 3 };
+    assert { regular[0] = 10 /\ regular[1] = 20 /\ regular[2] = 30 };
+    assert { express[0] = 5 /\ express[1] = 15 /\ express[2] = 25 };
+    assert { expected[0] = 7 /\ expected[1] = 22 /\ expected[2] = 47 };
+    assert { route_cost regular express 2 1 0 = 10 };
+    assert { route_cost regular express 2 1 1 = 7 };
+    assert { min_stop_cost regular express 2 1 = 7 };
+    assert { min_stop_cost regular express 2 2 = 22 };
+    assert { min_stop_cost regular express 2 3 = 47 };
+    assert {
+      forall i: int. 0 <= i < length expected ->
+        i = 0 \/ i = 1 \/ i = 2
+    };
+    assert { valid_costs_output regular express 2 expected };
+    assert { array_eq expected expected }
+
+  let lemma test_005_single_segment () =
+    let regular = init 1 [|5|] in
+    let express = init 1 [|10|] in
+    let expected = init 1 [|5|] in
+    assert { length regular = 1 };
+    assert { length express = 1 };
+    assert { length expected = 1 };
+    assert { regular[0] = 5 };
+    assert { express[0] = 10 };
+    assert { expected[0] = 5 };
+    assert { route_cost regular express 7 1 0 = 5 };
+    assert { route_cost regular express 7 1 1 = 17 };
+    assert { min_stop_cost regular express 7 1 = 5 };
+    assert {
+      forall i: int. 0 <= i < length expected ->
+        i = 0
+    };
+    assert { valid_costs_output regular express 7 expected };
+    assert { array_eq expected expected }
+
+  let lemma test_009_statement_example_one () =
+    let regular = init 4 [|1; 6; 9; 5|] in
+    let express = init 4 [|5; 2; 3; 10|] in
+    let expected = init 4 [|1; 7; 14; 19|] in
+    assert { length regular = 4 };
+    assert { length express = 4 };
+    assert { length expected = 4 };
+    assert { regular[0] = 1 /\ regular[1] = 6 /\ regular[2] = 9 /\ regular[3] = 5 };
+    assert { express[0] = 5 /\ express[1] = 2 /\ express[2] = 3 /\ express[3] = 10 };
+    assert { expected[0] = 1 /\ expected[1] = 7 /\ expected[2] = 14 /\ expected[3] = 19 };
+    assert { min_stop_cost regular express 8 1 = 1 };
+    assert { min_stop_cost regular express 8 2 = 7 };
+    assert { min_stop_cost regular express 8 3 = 14 };
+    assert { min_stop_cost regular express 8 4 = 19 };
+    assert {
+      forall i: int. 0 <= i < length expected ->
+        i = 0 \/ i = 1 \/ i = 2 \/ i = 3
+    };
+    assert { valid_costs_output regular express 8 expected };
+    assert { array_eq expected expected }
+
+  let lemma test_010_mixed_three_segments () =
+    let regular = init 3 [|5; 10; 15|] in
+    let express = init 3 [|3; 6; 9|] in
+    let expected = init 3 [|5; 14; 23|] in
+    assert { length regular = 3 };
+    assert { length express = 3 };
+    assert { length expected = 3 };
+    assert { regular[0] = 5 /\ regular[1] = 10 /\ regular[2] = 15 };
+    assert { express[0] = 3 /\ express[1] = 6 /\ express[2] = 9 };
+    assert { expected[0] = 5 /\ expected[1] = 14 /\ expected[2] = 23 };
+    assert { min_stop_cost regular express 5 1 = 5 };
+    assert { min_stop_cost regular express 5 2 = 14 };
+    assert { min_stop_cost regular express 5 3 = 23 };
+    assert {
+      forall i: int. 0 <= i < length expected ->
+        i = 0 \/ i = 1 \/ i = 2
+    };
+    assert { valid_costs_output regular express 5 expected };
+    assert { array_eq expected expected }
+
+  let lemma test_011_express_amortized () =
+    let regular = init 3 [|3; 3; 3|] in
+    let express = init 3 [|1; 1; 1|] in
+    let expected = init 3 [|3; 6; 8|] in
+    assert { length regular = 3 };
+    assert { length express = 3 };
+    assert { length expected = 3 };
+    assert { regular[0] = 3 /\ regular[1] = 3 /\ regular[2] = 3 };
+    assert { express[0] = 1 /\ express[1] = 1 /\ express[2] = 1 };
+    assert { expected[0] = 3 /\ expected[1] = 6 /\ expected[2] = 8 };
+    assert { min_stop_cost regular express 5 1 = 3 };
+    assert { min_stop_cost regular express 5 2 = 6 };
+    assert { min_stop_cost regular express 5 3 = 8 };
+    assert {
+      forall i: int. 0 <= i < length expected ->
+        i = 0 \/ i = 1 \/ i = 2
+    };
+    assert { valid_costs_output regular express 5 expected };
+    assert { array_eq expected expected }
+
+  let lemma test_014_statement_example_two () =
+    let regular = init 3 [|11; 5; 13|] in
+    let express = init 3 [|7; 10; 6|] in
+    let expected = init 3 [|10; 15; 24|] in
+    assert { length regular = 3 };
+    assert { length express = 3 };
+    assert { length expected = 3 };
+    assert { regular[0] = 11 /\ regular[1] = 5 /\ regular[2] = 13 };
+    assert { express[0] = 7 /\ express[1] = 10 /\ express[2] = 6 };
+    assert { expected[0] = 10 /\ expected[1] = 15 /\ expected[2] = 24 };
+    assert { min_stop_cost regular express 3 1 = 10 };
+    assert { min_stop_cost regular express 3 2 = 15 };
+    assert { min_stop_cost regular express 3 3 = 24 };
+    assert {
+      forall i: int. 0 <= i < length expected ->
+        i = 0 \/ i = 1 \/ i = 2
+    };
+    assert { valid_costs_output regular express 3 expected };
+    assert { array_eq expected expected }
+
+end

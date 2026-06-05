@@ -1,0 +1,175 @@
+module KeepMultiplyingFoundValuesByTwo_List_Imperative
+
+  use int.Int
+  use list.List
+  use ref.Ref
+
+  exception Found
+
+  let mem_int_imp (nums: list int) (target: int) : bool =
+    try
+      let cur = ref nums in
+      while (match !cur with Nil -> false | Cons _ _ -> true end) do
+        match !cur with
+        | Nil -> ()
+        | Cons x xs ->
+            if x = target then raise Found;
+            cur := xs
+        end
+      done;
+      false
+    with Found ->
+      true
+    end
+
+  let keep_multiplying_found_values_by_two_list (nums: list int) (original: int) : int =
+    let current = ref original in
+    while mem_int_imp nums !current do
+      current := !current * 2
+    done;
+    !current
+
+  let test_000 () : bool =
+    let nums = Cons 10 (Cons 20 (Cons 30 (Cons 40 (Cons 50 Nil)))) in
+    let r = keep_multiplying_found_values_by_two_list nums 5 in
+    r = 5
+
+  let test_001 () : bool =
+    let nums = Cons 1000 (Cons 500 (Cons 250 (Cons 125 (Cons 625 Nil)))) in
+    let r = keep_multiplying_found_values_by_two_list nums 5 in
+    r = 5
+
+  let test_002 () : bool =
+    let nums = Cons 3 (Cons 6 (Cons 9 (Cons 12 (Cons 15 Nil)))) in
+    let r = keep_multiplying_found_values_by_two_list nums 3 in
+    r = 24
+
+  let test_003 () : bool =
+    let nums = Cons 1 (Cons 2 (Cons 4 (Cons 8 Nil))) in
+    let r = keep_multiplying_found_values_by_two_list nums 1 in
+    r = 16
+
+  let test_004 () : bool =
+    let nums = Cons 8 (Cons 16 (Cons 32 (Cons 64 (Cons 128 Nil)))) in
+    let r = keep_multiplying_found_values_by_two_list nums 8 in
+    r = 256
+
+  let test_005 () : bool =
+    let nums = Cons 2 (Cons 7 (Cons 9 Nil)) in
+    let r = keep_multiplying_found_values_by_two_list nums 4 in
+    r = 4
+
+  let test_006 () : bool =
+    let nums = Cons 1000 (Cons 1000 (Cons 1000 (Cons 1000 (Cons 1000 Nil)))) in
+    let r = keep_multiplying_found_values_by_two_list nums 1000 in
+    r = 2000
+
+  let test_007 () : bool =
+    let nums = Cons 1 (Cons 3 (Cons 5 (Cons 7 (Cons 9 Nil)))) in
+    let r = keep_multiplying_found_values_by_two_list nums 2 in
+    r = 2
+
+  let test_008 () : bool =
+    let nums = Cons 10 (Cons 20 (Cons 30 (Cons 40 (Cons 50 Nil)))) in
+    let r = keep_multiplying_found_values_by_two_list nums 10 in
+    r = 80
+
+  let test_009 () : bool =
+    let nums = Cons 2 (Cons 2 (Cons 2 (Cons 2 (Cons 2 Nil)))) in
+    let r = keep_multiplying_found_values_by_two_list nums 2 in
+    r = 4
+
+  let test_010 () : bool =
+    let nums = Cons 8 (Cons 16 (Cons 32 (Cons 64 (Cons 128 (Cons 256 (Cons 512 Nil)))))) in
+    let r = keep_multiplying_found_values_by_two_list nums 4 in
+    r = 4
+
+  let test_011 () : bool =
+    let nums = Cons 1000 (Cons 500 (Cons 250 (Cons 125 (Cons 62 (Cons 31 Nil))))) in
+    let r = keep_multiplying_found_values_by_two_list nums 1 in
+    r = 1
+
+  let test_012 () : bool =
+    let nums = Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 Nil)))) in
+    let r = keep_multiplying_found_values_by_two_list nums 1 in
+    r = 2
+
+  let test_013 () : bool =
+    let nums = Cons 1 (Cons 2 (Cons 4 (Cons 8 (Cons 16 Nil)))) in
+    let r = keep_multiplying_found_values_by_two_list nums 1 in
+    r = 32
+
+  let test_014 () : bool =
+    let nums = Cons 4 (Cons 8 (Cons 16 (Cons 32 (Cons 64 Nil)))) in
+    let r = keep_multiplying_found_values_by_two_list nums 2 in
+    r = 2
+
+  let test_015 () : bool =
+    let nums = Cons 5 (Cons 3 (Cons 6 (Cons 1 (Cons 12 Nil)))) in
+    let r = keep_multiplying_found_values_by_two_list nums 3 in
+    r = 24
+
+  let test_016 () : bool =
+    let nums = Cons 1000 (Cons 500 (Cons 250 (Cons 125 Nil))) in
+    let r = keep_multiplying_found_values_by_two_list nums 125 in
+    r = 2000
+
+  let test_017 () : bool =
+    let nums = Cons 10 (Cons 20 (Cons 40 (Cons 80 (Cons 160 Nil)))) in
+    let r = keep_multiplying_found_values_by_two_list nums 10 in
+    r = 320
+
+  let test_018 () : bool =
+    let nums = Cons 7 (Cons 14 (Cons 28 (Cons 56 (Cons 112 Nil)))) in
+    let r = keep_multiplying_found_values_by_two_list nums 7 in
+    r = 224
+
+  let test_019 () : bool =
+    let nums = Cons 1 (Cons 3 (Cons 5 (Cons 7 (Cons 9 Nil)))) in
+    let r = keep_multiplying_found_values_by_two_list nums 1 in
+    r = 2
+
+  let run_tests () : bool =
+    if test_000 () then
+    if test_001 () then
+    if test_002 () then
+    if test_003 () then
+    if test_004 () then
+    if test_005 () then
+    if test_006 () then
+    if test_007 () then
+    if test_008 () then
+    if test_009 () then
+    if test_010 () then
+    if test_011 () then
+    if test_012 () then
+    if test_013 () then
+    if test_014 () then
+    if test_015 () then
+    if test_016 () then
+    if test_017 () then
+    if test_018 () then
+    if test_019 () then
+      true
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+
+end

@@ -1,0 +1,130 @@
+module SmallestMissingIntegerGreaterThanSequentialPrefixSum_Array_Spec
+
+  use int.Int
+  use array.Array
+  use array.Init
+  use array.ArraySum
+  use ref.Ref
+
+  predicate valid_input (nums: array int) =
+    1 <= length nums <= 50 /\
+    forall i: int. 0 <= i < length nums -> 1 <= nums[i] <= 50
+
+  predicate present (nums: array int) (x: int) =
+    exists i: int. 0 <= i < length nums /\ nums[i] = x
+
+  predicate missing (nums: array int) (x: int) =
+    not (present nums x)
+
+  predicate sequential_prefix (nums: array int) (len: int) =
+    1 <= len <= length nums /\
+    forall j: int. 1 <= j < len -> nums[j] = nums[j - 1] + 1
+
+  predicate longest_sequential_prefix (nums: array int) (len: int) =
+    sequential_prefix nums len /\
+    forall k: int. len < k <= length nums -> not (sequential_prefix nums k)
+
+  function prefix_sum (nums: array int) (len: int) : int =
+    sum nums 0 len
+
+  predicate valid_answer_for_prefix (nums: array int) (len: int) (x: int) =
+    longest_sequential_prefix nums len /\
+    prefix_sum nums len <= x /\
+    missing nums x /\
+    forall y: int. prefix_sum nums len <= y < x -> present nums y
+
+  predicate result_spec (nums: array int) (x: int) =
+    exists len: int. valid_answer_for_prefix nums len x
+
+  let contains (nums: array int) (x: int) : bool
+    ensures { (result = true) <-> present nums x }
+    ensures { (result = false) <-> missing nums x }
+  =
+    let found = ref false in
+    for i = 0 to length nums - 1 do
+      invariant { 0 <= i <= length nums }
+      invariant { !found = true ->
+        exists j: int. 0 <= j < i /\ nums[j] = x }
+      invariant { !found = false ->
+        forall j: int. 0 <= j < i -> nums[j] <> x }
+      if nums[i] = x then
+        found := true
+    done;
+    assert { !found = true -> present nums x };
+    assert { !found = false -> missing nums x };
+    !found
+
+  let longest_sequential_prefix_length (nums: array int) : int
+    requires { 1 <= length nums }
+    ensures  { 1 <= result <= length nums }
+    ensures  { longest_sequential_prefix nums result }
+  =
+    let prefix_len = ref 1 in
+    let stopped = ref false in
+    for i = 1 to length nums - 1 do
+      invariant { 1 <= i <= length nums }
+      invariant { 1 <= !prefix_len <= i }
+      invariant { sequential_prefix nums !prefix_len }
+      invariant { !stopped = false -> !prefix_len = i }
+      invariant { !stopped = true -> !prefix_len < i }
+      invariant { forall k: int. !prefix_len < k <= i ->
+        not (sequential_prefix nums k) }
+      if not !stopped then
+        if nums[i] = nums[i - 1] + 1 then
+          prefix_len := i + 1
+        else
+          stopped := true
+    done;
+    assert { 1 <= !prefix_len <= length nums };
+    assert { longest_sequential_prefix nums !prefix_len };
+    !prefix_len
+
+  let prefix_sum_first (nums: array int) (len: int) : int
+    requires { 0 <= len <= length nums }
+    ensures  { result = prefix_sum nums len }
+  =
+    let total = ref 0 in
+    for i = 0 to len - 1 do
+      invariant { 0 <= i <= len }
+      invariant { !total = sum nums 0 i }
+      total := !total + nums[i]
+    done;
+    assert { !total = sum nums 0 len };
+    assert { !total = prefix_sum nums len };
+    !total
+
+  let smallest_missing_integer_greater_than_sequential_prefix_sum_array (nums: array int) : int
+    requires { valid_input nums }
+    ensures  { result_spec nums result }
+  =
+    let prefix_len = longest_sequential_prefix_length nums in
+    assert { longest_sequential_prefix nums prefix_len };
+    let start = prefix_sum_first nums prefix_len in
+    assert { start = prefix_sum nums prefix_len };
+    let answer = ref (start + length nums) in
+    let found_missing = ref false in
+    for delta = 0 to length nums do
+      invariant { 0 <= delta <= length nums + 1 }
+      invariant { longest_sequential_prefix nums prefix_len }
+      invariant { start = prefix_sum nums prefix_len }
+      invariant { start <= !answer <= start + length nums }
+      invariant { !found_missing = true ->
+        start <= !answer < start + delta /\
+        missing nums !answer /\
+        forall y: int. start <= y < !answer -> present nums y }
+      invariant { !found_missing = false ->
+        forall y: int. start <= y < start + delta -> present nums y }
+      if not !found_missing then
+        let candidate = start + delta in
+        if not (contains nums candidate) then begin
+          assert { missing nums candidate };
+          assert { forall y: int. start <= y < candidate -> present nums y };
+          answer := candidate;
+          found_missing := true
+        end
+    done;
+    assert { valid_answer_for_prefix nums prefix_len !answer };
+    assert { result_spec nums !answer };
+    !answer
+
+end

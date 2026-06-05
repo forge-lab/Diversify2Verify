@@ -1,0 +1,429 @@
+module MinimumOperationsToMakeTheArrayAlternating_Array_Spec
+
+  use int.Int
+  use int.EuclideanDivision
+  use array.Array
+  use array.Init
+  use array.NumOf as ArrayNumOf
+
+  predicate valid_input (nums: array int) =
+    1 <= length nums <= 100000 /\
+    forall i: int. 0 <= i < length nums -> 1 <= nums[i] <= 100000
+
+  predicate valid_assignment (even_value: int) (odd_value: int) =
+    even_value > 0 /\ odd_value > 0 /\ even_value <> odd_value
+
+  predicate wrong_for_assignment
+    (i: int) (v: int) (even_value: int) (odd_value: int) =
+    (mod i 2 = 0 /\ v <> even_value) \/
+    (mod i 2 = 1 /\ v <> odd_value)
+
+  function changes_for_assignment
+    (nums: array int) (even_value: int) (odd_value: int) : int =
+    ArrayNumOf.numof
+      (fun i v -> wrong_for_assignment i v even_value odd_value)
+      nums 0 (length nums)
+
+  predicate optimal_alternating_operations (nums: array int) (res: int) =
+    res >= 0 /\
+    exists even_value odd_value: int.
+      valid_assignment even_value odd_value /\
+      res = changes_for_assignment nums even_value odd_value /\
+      forall other_even other_odd: int.
+        valid_assignment other_even other_odd ->
+        res <= changes_for_assignment nums other_even other_odd
+
+  function candidate_at (nums: array int) (k: int) : int =
+    if k < length nums then nums[k] else 100001
+
+  predicate odd_candidate_from
+    (nums: array int) (odd_idx: int) (odd_value: int) =
+    exists k: int. odd_idx <= k <= length nums /\
+      odd_value = candidate_at nums k
+
+  predicate even_candidate_from
+    (nums: array int) (even_idx: int) (even_value: int) =
+    exists k: int. even_idx <= k <= length nums /\
+      even_value = candidate_at nums k
+
+  predicate best_odd_candidate_from
+    (nums: array int) (even_value: int) (odd_idx: int) (cost: int) =
+    cost >= 0 /\
+    cost <= length nums + 1 /\
+    (cost = length nums + 1 \/
+      exists odd_value: int.
+        odd_candidate_from nums odd_idx odd_value /\
+        valid_assignment even_value odd_value /\
+        cost = changes_for_assignment nums even_value odd_value) /\
+    forall odd_value: int.
+      odd_candidate_from nums odd_idx odd_value /\
+      valid_assignment even_value odd_value ->
+      cost <= changes_for_assignment nums even_value odd_value
+
+  predicate best_total_candidate_from
+    (nums: array int) (even_idx: int) (cost: int) =
+    cost >= 0 /\
+    cost <= length nums + 1 /\
+    (cost = length nums + 1 \/
+      exists even_value odd_value: int.
+        even_candidate_from nums even_idx even_value /\
+        odd_candidate_from nums 0 odd_value /\
+        valid_assignment even_value odd_value /\
+        cost = changes_for_assignment nums even_value odd_value) /\
+    forall even_value odd_value: int.
+      even_candidate_from nums even_idx even_value /\
+      odd_candidate_from nums 0 odd_value /\
+      valid_assignment even_value odd_value ->
+      cost <= changes_for_assignment nums even_value odd_value
+
+  let rec function changes_for_assignment_suffix
+    (nums: array int) (even_value: int) (odd_value: int) (i: int) : int
+    requires { 0 <= i <= length nums }
+    variant  { length nums - i }
+  =
+    if i >= length nums then
+      0
+    else
+      (if mod i 2 = 0 then
+         if nums[i] = even_value then 0 else 1
+       else
+         if nums[i] = odd_value then 0 else 1) +
+      changes_for_assignment_suffix nums even_value odd_value (i + 1)
+
+  predicate best_odd_for_even
+    (nums: array int) (even_value: int) (cost: int) =
+    cost >= 0 /\
+    exists odd_value: int.
+      valid_assignment even_value odd_value /\
+      cost = changes_for_assignment nums even_value odd_value /\
+      forall other_odd: int.
+        other_odd > 0 /\ other_odd <> even_value ->
+        cost <= changes_for_assignment nums even_value other_odd
+
+  let rec lemma changes_suffix_nonnegative
+    (nums: array int) (even_value: int) (odd_value: int) (i: int)
+    requires { 0 <= i <= length nums }
+    ensures  { changes_for_assignment_suffix nums even_value odd_value i >= 0 }
+    variant  { length nums - i }
+  =
+    if i < length nums then begin
+      changes_suffix_nonnegative nums even_value odd_value (i + 1);
+      assert { changes_for_assignment_suffix nums even_value odd_value i >= 0 }
+    end
+
+  let lemma changes_suffix_zero_matches_numof
+    (nums: array int) (even_value: int) (odd_value: int)
+    ensures { changes_for_assignment_suffix nums even_value odd_value 0 =
+              changes_for_assignment nums even_value odd_value }
+  =
+    assert { 0 <= length nums };
+    assert { changes_for_assignment_suffix nums even_value odd_value 0 =
+             changes_for_assignment nums even_value odd_value }
+
+  let rec lemma changes_suffix_bounded
+    (nums: array int) (even_value: int) (odd_value: int) (i: int)
+    requires { 0 <= i <= length nums }
+    ensures  { 0 <= changes_for_assignment_suffix nums even_value odd_value i }
+    ensures  { changes_for_assignment_suffix nums even_value odd_value i <= length nums - i }
+    variant  { length nums - i }
+  =
+    if i < length nums then begin
+      changes_suffix_bounded nums even_value odd_value (i + 1);
+      assert { changes_for_assignment_suffix nums even_value odd_value i <=
+               length nums - i }
+    end else
+      assert { changes_for_assignment_suffix nums even_value odd_value i = 0 }
+
+  let lemma changes_for_assignment_bounded
+    (nums: array int) (even_value: int) (odd_value: int)
+    ensures { 0 <= changes_for_assignment nums even_value odd_value }
+    ensures { changes_for_assignment nums even_value odd_value <= length nums }
+  =
+    changes_suffix_bounded nums even_value odd_value 0;
+    changes_suffix_zero_matches_numof nums even_value odd_value;
+    assert { 0 <= changes_for_assignment nums even_value odd_value <= length nums }
+
+  let lemma candidate_value_positive_or_sentinel
+    (nums: array int) (k: int)
+    requires { valid_input nums }
+    requires { 0 <= k <= length nums }
+    ensures  { candidate_at nums k > 0 }
+    ensures  { k < length nums -> candidate_at nums k = nums[k] }
+    ensures  { k = length nums -> candidate_at nums k = 100001 }
+  =
+    if k < length nums then begin
+      assert { 0 <= k < length nums };
+      assert { 1 <= nums[k] <= 100000 };
+      assert { candidate_at nums k = nums[k] }
+    end else begin
+      assert { k = length nums };
+      assert { candidate_at nums k = 100001 }
+    end
+
+  let lemma candidate_representative_for_assignment
+    (nums: array int) (even_value: int) (odd_value: int)
+    requires { valid_input nums }
+    requires { valid_assignment even_value odd_value }
+    ensures  { exists even_idx odd_idx: int.
+      0 <= even_idx <= length nums /\
+      0 <= odd_idx <= length nums /\
+      valid_assignment (candidate_at nums even_idx) (candidate_at nums odd_idx) /\
+      changes_for_assignment nums (candidate_at nums even_idx) (candidate_at nums odd_idx)
+        <= changes_for_assignment nums even_value odd_value }
+  =
+    assert { 1 <= length nums };
+    assert { 0 <= 0 < length nums };
+    candidate_value_positive_or_sentinel nums 0;
+    candidate_value_positive_or_sentinel nums (length nums);
+    if candidate_at nums 0 <> 100001 then
+      assert { valid_assignment (candidate_at nums 0) 100001 \/
+               valid_assignment 100001 (candidate_at nums 0) };
+    assert { exists even_idx odd_idx: int.
+      0 <= even_idx <= length nums /\
+      0 <= odd_idx <= length nums /\
+      valid_assignment (candidate_at nums even_idx) (candidate_at nums odd_idx) /\
+      changes_for_assignment nums (candidate_at nums even_idx) (candidate_at nums odd_idx)
+        <= changes_for_assignment nums even_value odd_value }
+
+  let lemma exists_valid_odd_candidate
+    (nums: array int) (even_value: int)
+    requires { valid_input nums }
+    requires { even_value > 0 }
+    ensures  { exists odd_value: int.
+      odd_candidate_from nums 0 odd_value /\
+      valid_assignment even_value odd_value }
+  =
+    assert { 1 <= length nums };
+    candidate_value_positive_or_sentinel nums 0;
+    candidate_value_positive_or_sentinel nums (length nums);
+    if even_value = candidate_at nums 0 then
+      assert { valid_assignment even_value (candidate_at nums (length nums)) }
+    else
+      assert { valid_assignment even_value (candidate_at nums 0) };
+    assert { exists odd_value: int.
+      odd_candidate_from nums 0 odd_value /\
+      valid_assignment even_value odd_value }
+
+  let lemma candidate_odd_representative_for_assignment
+    (nums: array int) (even_value: int) (odd_value: int)
+    requires { valid_input nums }
+    requires { valid_assignment even_value odd_value }
+    ensures  { exists candidate_odd: int.
+      odd_candidate_from nums 0 candidate_odd /\
+      valid_assignment even_value candidate_odd /\
+      changes_for_assignment nums even_value candidate_odd
+        <= changes_for_assignment nums even_value odd_value }
+  =
+    exists_valid_odd_candidate nums even_value;
+    assert { exists candidate_odd: int.
+      odd_candidate_from nums 0 candidate_odd /\
+      valid_assignment even_value candidate_odd /\
+      changes_for_assignment nums even_value candidate_odd
+        <= changes_for_assignment nums even_value odd_value }
+
+  let lemma best_odd_candidates_zero_is_public
+    (nums: array int) (even_value: int) (cost: int)
+    requires { valid_input nums }
+    requires { even_value > 0 }
+    requires { best_odd_candidate_from nums even_value 0 cost }
+    ensures  { best_odd_for_even nums even_value cost }
+  =
+    exists_valid_odd_candidate nums even_value;
+    assert { cost >= 0 };
+    assert { exists odd_value: int.
+      odd_candidate_from nums 0 odd_value /\
+      valid_assignment even_value odd_value };
+    assert { exists odd_value: int.
+      valid_assignment even_value odd_value /\
+      cost = changes_for_assignment nums even_value odd_value };
+    assert { forall other_odd: int.
+      other_odd > 0 /\ other_odd <> even_value ->
+      cost <= changes_for_assignment nums even_value other_odd };
+    assert { best_odd_for_even nums even_value cost }
+
+  let lemma candidate_pair_representative_for_assignment
+    (nums: array int) (even_value: int) (odd_value: int)
+    requires { valid_input nums }
+    requires { valid_assignment even_value odd_value }
+    ensures  { exists candidate_even candidate_odd: int.
+      even_candidate_from nums 0 candidate_even /\
+      odd_candidate_from nums 0 candidate_odd /\
+      valid_assignment candidate_even candidate_odd /\
+      changes_for_assignment nums candidate_even candidate_odd
+        <= changes_for_assignment nums even_value odd_value }
+  =
+    candidate_representative_for_assignment nums even_value odd_value;
+    assert { exists candidate_even candidate_odd: int.
+      even_candidate_from nums 0 candidate_even /\
+      odd_candidate_from nums 0 candidate_odd /\
+      valid_assignment candidate_even candidate_odd /\
+      changes_for_assignment nums candidate_even candidate_odd
+        <= changes_for_assignment nums even_value odd_value }
+
+  let lemma best_total_candidates_zero_is_public
+    (nums: array int) (cost: int)
+    requires { valid_input nums }
+    requires { best_total_candidate_from nums 0 cost }
+    ensures  { optimal_alternating_operations nums cost }
+  =
+    assert { cost >= 0 };
+    assert { exists even_value odd_value: int.
+      valid_assignment even_value odd_value /\
+      cost = changes_for_assignment nums even_value odd_value };
+    assert { forall other_even other_odd: int.
+      valid_assignment other_even other_odd ->
+      cost <= changes_for_assignment nums other_even other_odd };
+    assert { optimal_alternating_operations nums cost }
+
+  let candidate_value (nums: array int) (k: int) : int
+    requires { 0 <= k <= length nums }
+    ensures  { k < length nums -> result = nums[k] }
+    ensures  { k = length nums -> result = 100001 }
+    ensures  { result = candidate_at nums k }
+    ensures  { valid_input nums -> result > 0 }
+  =
+    if k < length nums then begin
+      assert { nums[k] = candidate_at nums k };
+      nums[k]
+    end else begin
+      assert { k = length nums };
+      assert { 100001 = candidate_at nums k };
+      100001
+    end
+
+  let rec changes_for_assignment_from
+    (nums: array int) (even_value: int) (odd_value: int) (i: int) : int
+    requires { 0 <= i <= length nums }
+    variant  { length nums - i }
+    ensures  { result >= 0 }
+    ensures  { result <= length nums - i }
+    ensures  { result = changes_for_assignment_suffix nums even_value odd_value i }
+    ensures  { i = 0 -> result = changes_for_assignment nums even_value odd_value }
+  =
+    if i >= length nums then
+      0
+    else
+      begin
+      assert { 0 <= i < length nums };
+      let wrong =
+        if mod i 2 = 0 then
+          if nums[i] = even_value then 0 else 1
+        else
+          if nums[i] = odd_value then 0 else 1
+      in
+      assert { wrong >= 0 };
+      if wrong = 0 then
+        assert { not wrong_for_assignment i nums[i] even_value odd_value }
+      else
+        assert { wrong_for_assignment i nums[i] even_value odd_value };
+      let rest = changes_for_assignment_from nums even_value odd_value (i + 1) in
+      changes_suffix_nonnegative nums even_value odd_value (i + 1);
+      changes_suffix_bounded nums even_value odd_value (i + 1);
+      if i = 0 then
+        changes_suffix_zero_matches_numof nums even_value odd_value;
+      assert { wrong + rest =
+               changes_for_assignment_suffix nums even_value odd_value i };
+      wrong + rest
+      end
+
+  let rec best_odd_cost_from (nums: array int) (even_value: int) (odd_idx: int) : int
+    requires { valid_input nums }
+    requires { 0 <= odd_idx <= length nums + 1 }
+    requires { even_value > 0 }
+    variant  { (length nums + 1) - odd_idx }
+    ensures  { result >= 0 }
+    ensures  { result <= length nums + 1 }
+    ensures  { best_odd_candidate_from nums even_value odd_idx result }
+    ensures  { odd_idx = 0 -> best_odd_for_even nums even_value result }
+  =
+    if odd_idx = length nums + 1 then
+      length nums + 1
+    else
+      begin
+      assert { 0 <= odd_idx <= length nums };
+      let rest = best_odd_cost_from nums even_value (odd_idx + 1) in
+      let odd_value = candidate_value nums odd_idx in
+      assert { odd_value = candidate_at nums odd_idx };
+      if even_value = odd_value then
+        begin
+        assert { forall other_odd: int.
+          odd_candidate_from nums odd_idx other_odd /\
+          valid_assignment even_value other_odd ->
+          odd_candidate_from nums (odd_idx + 1) other_odd };
+        rest
+        end
+      else
+        begin
+        assert { valid_assignment even_value odd_value };
+        let current = changes_for_assignment_from nums even_value odd_value 0 in
+        assert { current = changes_for_assignment nums even_value odd_value };
+        let best = if current < rest then current else rest in
+        assert { best >= 0 };
+        assert { best <= length nums + 1 };
+        assert { odd_candidate_from nums odd_idx odd_value };
+        assert { forall other_odd: int.
+          odd_candidate_from nums odd_idx other_odd /\
+          valid_assignment even_value other_odd ->
+          best <= changes_for_assignment nums even_value other_odd };
+        if odd_idx = 0 then begin
+          assert { best >= 0 };
+          assert { exists odd_value: int.
+            valid_assignment even_value odd_value /\
+            best = changes_for_assignment nums even_value odd_value };
+          best_odd_candidates_zero_is_public nums even_value best;
+          assert { best_odd_for_even nums even_value best }
+        end;
+        best
+        end
+      end
+
+  let rec best_total_cost_from (nums: array int) (even_idx: int) : int
+    requires { valid_input nums }
+    requires { 0 <= even_idx <= length nums + 1 }
+    variant  { (length nums + 1) - even_idx }
+    ensures  { result >= 0 }
+    ensures  { result <= length nums + 1 }
+    ensures  { best_total_candidate_from nums even_idx result }
+    ensures  { even_idx = 0 -> optimal_alternating_operations nums result }
+  =
+    if even_idx = length nums + 1 then
+      length nums + 1
+    else
+      begin
+      assert { 0 <= even_idx <= length nums };
+      let rest = best_total_cost_from nums (even_idx + 1) in
+      let even_value = candidate_value nums even_idx in
+      assert { even_value = candidate_at nums even_idx };
+      let current = best_odd_cost_from nums even_value 0 in
+      assert { best_odd_for_even nums even_value current };
+      let best = if current < rest then current else rest in
+      assert { best >= 0 };
+      assert { best <= length nums + 1 };
+      assert { even_candidate_from nums even_idx even_value };
+      assert { forall other_even other_odd: int.
+        even_candidate_from nums even_idx other_even /\
+        odd_candidate_from nums 0 other_odd /\
+        valid_assignment other_even other_odd ->
+        best <= changes_for_assignment nums other_even other_odd };
+      if even_idx = 0 then begin
+        candidate_representative_for_assignment nums even_value
+          (if even_value = 100001 then nums[0] else 100001);
+        assert { best >= 0 };
+        assert { exists even_value odd_value: int.
+          valid_assignment even_value odd_value /\
+          best = changes_for_assignment nums even_value odd_value };
+        best_total_candidates_zero_is_public nums best;
+        assert { optimal_alternating_operations nums best }
+      end;
+      best
+      end
+
+  let minimum_operations_to_make_the_array_alternating_array (nums: array int) : int
+    requires { valid_input nums }
+    ensures  { optimal_alternating_operations nums result }
+  =
+    let result = best_total_cost_from nums 0 in
+    assert { optimal_alternating_operations nums result };
+    result
+
+end

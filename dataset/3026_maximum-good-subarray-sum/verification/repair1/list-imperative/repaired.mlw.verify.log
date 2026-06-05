@@ -1,0 +1,475 @@
+== Stage 1: first prover on whole file ==
+Running in /Users/rubenm/Desktop/Diversify2Verify/codex-runs/dataset-merge-verification/stage3a-repair/3026_maximum-good-subarray-sum/list-imperative/maximum_good_subarray_sum_list_stage3_d415749a_stage3/generated/why3: why3 session create -o /Users/rubenm/Desktop/Diversify2Verify/codex-runs/dataset-merge-verification/stage3a-repair/3026_maximum-good-subarray-sum/list-imperative/maximum_good_subarray_sum_list_stage3_d415749a_stage3/generated/why3/.why3_sessions/repaired_stage1 -P Z3,4.8.6 -t 10 -m 8192 repaired.mlw
+Session created successfully
+Running in /Users/rubenm/Desktop/Diversify2Verify/codex-runs/dataset-merge-verification/stage3a-repair/3026_maximum-good-subarray-sum/list-imperative/maximum_good_subarray_sum_list_stage3_d415749a_stage3/generated/why3: why3 bench /Users/rubenm/Desktop/Diversify2Verify/codex-runs/dataset-merge-verification/stage3a-repair/3026_maximum-good-subarray-sum/list-imperative/maximum_good_subarray_sum_list_stage3_d415749a_stage3/generated/why3/.why3_sessions/repaired_stage1
+Progress: 6/1/0                       Progress: 5/2/0                       Progress: 4/3/0                       Progress: 3/4/0                       Progress: 2/5/0                       Progress: 1/6/0                       Progress: 1/0/2                       Progress: 0/1/2                       Progress: 0/0/1                       
+Replay completed, saving session... done
+== Stage 1 stats ==
+= Statistics for session /Users/rubenm/Desktop/Diversify2Verify/codex-runs/dataset-merge-verification/stage3a-repair/3026_maximum-good-subarray-sum/list-imperative/maximum_good_subarray_sum_list_stage3_d415749a_stage3/generated/why3/.why3_sessions/repaired_stage1
+
+== Number of root goals ==
+  total: 7  proved: 4
+
+== Number of sub goals ==
+  total: 0  proved: 0
+
+== Goals not proved ==
+  +-- file [../../repaired.mlw]
+    +-- theory MaximumGoodSubarraySum_List_Stage3_Imperative
+      +-- goal last_value'vc
+      +-- goal scan_starts_correct'vc
+      +-- goal maximum_good_subarray_sum_list'vc
+  
+== Goals proved by only one prover ==
+  +-- file [../../repaired.mlw]
+    +-- theory MaximumGoodSubarraySum_List_Stage3_Imperative
+      +-- goal scan_ends_found'vc: Z3 4.8.6
+      +-- goal scan_ends_best'vc: Z3 4.8.6
+      +-- goal scan_starts_found'vc: Z3 4.8.6
+      +-- goal scan_starts_best'vc: Z3 4.8.6
+  
+1 session(s) read, with a total of 7 proof goals.
+== Unproved root goals after first prover ==
+MaximumGoodSubarraySum_List_Stage3_Imperative	last_value'vc
+MaximumGoodSubarraySum_List_Stage3_Imperative	scan_starts_correct'vc
+MaximumGoodSubarraySum_List_Stage3_Imperative	maximum_good_subarray_sum_list'vc
+== Stage 1: trying remaining goals with prover Alt-Ergo,2.4.0 ==
+---- stage1 | prover: Alt-Ergo,2.4.0 | theory: MaximumGoodSubarraySum_List_Stage3_Imperative | goal: last_value'vc ----
+File repaired.mlw:
+Goal last_value'vc.
+Prover result is: Valid (0.01s, 55 steps).
+Solved in stage 1 using prover: Alt-Ergo,2.4.0
+---- stage1 | prover: Alt-Ergo,2.4.0 | theory: MaximumGoodSubarraySum_List_Stage3_Imperative | goal: scan_starts_correct'vc ----
+File repaired.mlw:
+Goal scan_starts_correct'vc.
+Prover result is: High failure (signaled)
+  (7.03s)HighFailure (signaled),
+  Prover exit status: killed by signal 24
+  prover output:
+  
+  .
+Infrastructure issue in stage 1 with prover Alt-Ergo,2.4.0; aborting rest of stage 1.
+Remaining after prover Alt-Ergo,2.4.0: 2
+== Goals still unproved after stage 1 ==
+MaximumGoodSubarraySum_List_Stage3_Imperative	scan_starts_correct'vc
+MaximumGoodSubarraySum_List_Stage3_Imperative	maximum_good_subarray_sum_list'vc
+== Stage 2: split_vc on unproved goal ==
+Target theory: MaximumGoodSubarraySum_List_Stage3_Imperative
+Target goal  : scan_starts_correct'vc
+---- stage2 | prover: Z3,4.8.6 | theory: MaximumGoodSubarraySum_List_Stage3_Imperative | goal: scan_starts_correct'vc ----
+Transforms: split_vc
+File "repaired.mlw", line 110, character 6 to line 113, character 16:
+Sub-goal Postcondition of goal scan_starts_correct'vc.
+Prover result is: Timeout (10.00s).
+---- stage2 | prover: CVC4,1.8 | theory: MaximumGoodSubarraySum_List_Stage3_Imperative | goal: scan_starts_correct'vc ----
+Transforms: split_vc
+File "repaired.mlw", line 110, character 6 to line 113, character 16:
+Sub-goal Postcondition of goal scan_starts_correct'vc.
+Prover result is: Timeout (10.00s, 643032 steps).
+== Stage 2: split_vc on unproved goal ==
+Target theory: MaximumGoodSubarraySum_List_Stage3_Imperative
+Target goal  : maximum_good_subarray_sum_list'vc
+---- stage2 | prover: Z3,4.8.6 | theory: MaximumGoodSubarraySum_List_Stage3_Imperative | goal: maximum_good_subarray_sum_list'vc ----
+Transforms: split_vc
+File "repaired.mlw", line 127, characters 18-37:
+Sub-goal Loop invariant init of goal maximum_good_subarray_sum_list'vc.
+Prover result is: Valid (0.01s, 27608 steps).
+
+File "repaired.mlw", line 128, character 18 to line 129, character 48:
+Sub-goal Loop invariant init of goal maximum_good_subarray_sum_list'vc.
+Prover result is: Valid (0.01s, 1890 steps).
+
+File "repaired.mlw", line 130, character 18 to line 131, character 49:
+Sub-goal Loop invariant init of goal maximum_good_subarray_sum_list'vc.
+Prover result is: Valid (0.01s, 1892 steps).
+
+File "repaired.mlw", line 132, characters 32-41:
+Sub-goal Loop invariant init of goal maximum_good_subarray_sum_list'vc.
+Prover result is: Valid (0.01s, 1894 steps).
+
+File "repaired.mlw", line 137, characters 19-24:
+Sub-goal Assertion of goal maximum_good_subarray_sum_list'vc.
+Prover result is: Valid (0.01s, 2119 steps).
+
+File "repaired.mlw", line 133, characters 16-30:
+Sub-goal Loop variant decrease of goal maximum_good_subarray_sum_list'vc.
+Prover result is: Valid (0.01s, 1099 steps).
+
+File "repaired.mlw", line 127, characters 18-37:
+Sub-goal Loop invariant preservation of goal
+maximum_good_subarray_sum_list'vc.
+Prover result is: Valid (0.01s, 1099 steps).
+
+File "repaired.mlw", line 128, character 18 to line 129, character 48:
+Sub-goal Loop invariant preservation of goal
+maximum_good_subarray_sum_list'vc.
+Prover result is: Valid (0.01s, 1100 steps).
+
+File "repaired.mlw", line 130, character 18 to line 131, character 49:
+Sub-goal Loop invariant preservation of goal
+maximum_good_subarray_sum_list'vc.
+Prover result is: Valid (0.01s, 1101 steps).
+
+File "repaired.mlw", line 132, characters 32-41:
+Sub-goal Loop invariant preservation of goal
+maximum_good_subarray_sum_list'vc.
+Prover result is: Valid (0.01s, 1103 steps).
+
+File "repaired.mlw", line 145, characters 24-40:
+Sub-goal Loop invariant init of goal maximum_good_subarray_sum_list'vc.
+Prover result is: Valid (0.01s, 34171 steps).
+
+File "repaired.mlw", line 146, character 24 to line 147, character 63:
+Sub-goal Loop invariant init of goal maximum_good_subarray_sum_list'vc.
+Prover result is: Valid (0.01s, 2171 steps).
+
+File "repaired.mlw", line 148, character 24 to line 149, character 73:
+Sub-goal Loop invariant init of goal maximum_good_subarray_sum_list'vc.
+Prover result is: Valid (0.01s, 2173 steps).
+
+File "repaired.mlw", line 150, characters 38-47:
+Sub-goal Loop invariant init of goal maximum_good_subarray_sum_list'vc.
+Prover result is: Valid (0.01s, 3196 steps).
+
+File "repaired.mlw", line 155, characters 25-30:
+Sub-goal Assertion of goal maximum_good_subarray_sum_list'vc.
+Prover result is: Valid (0.01s, 2230 steps).
+
+File "repaired.mlw", line 151, characters 22-33:
+Sub-goal Loop variant decrease of goal maximum_good_subarray_sum_list'vc.
+Prover result is: Valid (0.01s, 1162 steps).
+
+File "repaired.mlw", line 145, characters 24-40:
+Sub-goal Loop invariant preservation of goal
+maximum_good_subarray_sum_list'vc.
+Prover result is: Valid (0.01s, 1162 steps).
+
+File "repaired.mlw", line 146, character 24 to line 147, character 63:
+Sub-goal Loop invariant preservation of goal
+maximum_good_subarray_sum_list'vc.
+Prover result is: Valid (0.01s, 1163 steps).
+
+File "repaired.mlw", line 148, character 24 to line 149, character 73:
+Sub-goal Loop invariant preservation of goal
+maximum_good_subarray_sum_list'vc.
+Prover result is: Valid (0.01s, 1164 steps).
+
+File "repaired.mlw", line 150, characters 38-47:
+Sub-goal Loop invariant preservation of goal
+maximum_good_subarray_sum_list'vc.
+Prover result is: Valid (0.01s, 1166 steps).
+
+File "repaired.mlw", line 151, characters 22-33:
+Sub-goal Loop variant decrease of goal maximum_good_subarray_sum_list'vc.
+Prover result is: Valid (0.01s, 34542 steps).
+
+File "repaired.mlw", line 145, characters 24-40:
+Sub-goal Loop invariant preservation of goal
+maximum_good_subarray_sum_list'vc.
+Prover result is: Valid (0.01s, 34473 steps).
+
+File "repaired.mlw", line 146, character 24 to line 147, character 63:
+Sub-goal Loop invariant preservation of goal
+maximum_good_subarray_sum_list'vc.
+Prover result is: Timeout (10.00s, 44674420 steps).
+
+File "repaired.mlw", line 148, character 24 to line 149, character 73:
+Sub-goal Loop invariant preservation of goal
+maximum_good_subarray_sum_list'vc.
+Prover result is: Timeout (10.00s, 45828003 steps).
+
+File "repaired.mlw", line 150, characters 38-47:
+Sub-goal Loop invariant preservation of goal
+maximum_good_subarray_sum_list'vc.
+Prover result is: Valid (0.01s, 2329 steps).
+
+File "repaired.mlw", line 151, characters 22-33:
+Sub-goal Loop variant decrease of goal maximum_good_subarray_sum_list'vc.
+Prover result is: Valid (0.01s, 35723 steps).
+
+File "repaired.mlw", line 145, characters 24-40:
+Sub-goal Loop invariant preservation of goal
+maximum_good_subarray_sum_list'vc.
+Prover result is: Valid (0.01s, 35655 steps).
+Infrastructure issue in stage 2 with prover Z3,4.8.6; aborting rest of stage 2.
+== Goals still unproved after stage 2 (split_vc) ==
+MaximumGoodSubarraySum_List_Stage3_Imperative	scan_starts_correct'vc
+MaximumGoodSubarraySum_List_Stage3_Imperative	maximum_good_subarray_sum_list'vc
+== Stage 3: split_vc + inline_all on still-unproved goal ==
+Target theory: MaximumGoodSubarraySum_List_Stage3_Imperative
+Target goal  : scan_starts_correct'vc
+---- stage3 | prover: CVC4,1.8 | theory: MaximumGoodSubarraySum_List_Stage3_Imperative | goal: scan_starts_correct'vc ----
+Transforms: split_vc inline_all
+File "repaired.mlw", line 110, character 6 to line 113, character 16:
+Sub-goal Postcondition of goal scan_starts_correct'vc.
+Prover result is: Unknown (unknown + incomplete) (0.04s, 11617 steps).
+== Stage 3: split_vc + inline_all on still-unproved goal ==
+Target theory: MaximumGoodSubarraySum_List_Stage3_Imperative
+Target goal  : maximum_good_subarray_sum_list'vc
+---- stage3 | prover: CVC4,1.8 | theory: MaximumGoodSubarraySum_List_Stage3_Imperative | goal: maximum_good_subarray_sum_list'vc ----
+Transforms: split_vc inline_all
+File "repaired.mlw", line 127, characters 18-37:
+Sub-goal Loop invariant init of goal maximum_good_subarray_sum_list'vc.
+Prover result is: Valid (0.02s, 8005 steps).
+
+File "repaired.mlw", line 128, character 18 to line 129, character 48:
+Sub-goal Loop invariant init of goal maximum_good_subarray_sum_list'vc.
+Prover result is: Valid (0.02s, 7883 steps).
+
+File "repaired.mlw", line 130, character 18 to line 131, character 49:
+Sub-goal Loop invariant init of goal maximum_good_subarray_sum_list'vc.
+Prover result is: Valid (0.02s, 7884 steps).
+
+File "repaired.mlw", line 132, characters 32-41:
+Sub-goal Loop invariant init of goal maximum_good_subarray_sum_list'vc.
+Prover result is: Valid (0.02s, 7885 steps).
+
+File "repaired.mlw", line 137, characters 19-24:
+Sub-goal Assertion of goal maximum_good_subarray_sum_list'vc.
+Prover result is: Valid (0.02s, 8619 steps).
+
+File "repaired.mlw", line 133, characters 16-30:
+Sub-goal Loop variant decrease of goal maximum_good_subarray_sum_list'vc.
+Prover result is: Valid (0.02s, 8640 steps).
+
+File "repaired.mlw", line 127, characters 18-37:
+Sub-goal Loop invariant preservation of goal
+maximum_good_subarray_sum_list'vc.
+Prover result is: Valid (0.02s, 8627 steps).
+
+File "repaired.mlw", line 128, character 18 to line 129, character 48:
+Sub-goal Loop invariant preservation of goal
+maximum_good_subarray_sum_list'vc.
+Prover result is: Valid (0.02s, 8627 steps).
+
+File "repaired.mlw", line 130, character 18 to line 131, character 49:
+Sub-goal Loop invariant preservation of goal
+maximum_good_subarray_sum_list'vc.
+Prover result is: Valid (0.02s, 8630 steps).
+
+File "repaired.mlw", line 132, characters 32-41:
+Sub-goal Loop invariant preservation of goal
+maximum_good_subarray_sum_list'vc.
+Prover result is: Valid (0.02s, 8636 steps).
+
+File "repaired.mlw", line 145, characters 24-40:
+Sub-goal Loop invariant init of goal maximum_good_subarray_sum_list'vc.
+Prover result is: Valid (0.03s, 9807 steps).
+
+File "repaired.mlw", line 146, character 24 to line 147, character 63:
+Sub-goal Loop invariant init of goal maximum_good_subarray_sum_list'vc.
+Prover result is: Valid (0.02s, 8769 steps).
+
+File "repaired.mlw", line 148, character 24 to line 149, character 73:
+Sub-goal Loop invariant init of goal maximum_good_subarray_sum_list'vc.
+Prover result is: Valid (0.02s, 8770 steps).
+
+File "repaired.mlw", line 150, characters 38-47:
+Sub-goal Loop invariant init of goal maximum_good_subarray_sum_list'vc.
+Prover result is: Valid (0.02s, 8776 steps).
+
+File "repaired.mlw", line 155, characters 25-30:
+Sub-goal Assertion of goal maximum_good_subarray_sum_list'vc.
+Prover result is: Valid (0.02s, 8925 steps).
+
+File "repaired.mlw", line 151, characters 22-33:
+Sub-goal Loop variant decrease of goal maximum_good_subarray_sum_list'vc.
+Prover result is: Valid (0.02s, 8946 steps).
+
+File "repaired.mlw", line 145, characters 24-40:
+Sub-goal Loop invariant preservation of goal
+maximum_good_subarray_sum_list'vc.
+Prover result is: Valid (0.02s, 8933 steps).
+
+File "repaired.mlw", line 146, character 24 to line 147, character 63:
+Sub-goal Loop invariant preservation of goal
+maximum_good_subarray_sum_list'vc.
+Prover result is: Valid (0.02s, 8933 steps).
+
+File "repaired.mlw", line 148, character 24 to line 149, character 73:
+Sub-goal Loop invariant preservation of goal
+maximum_good_subarray_sum_list'vc.
+Prover result is: Valid (0.02s, 8936 steps).
+
+File "repaired.mlw", line 150, characters 38-47:
+Sub-goal Loop invariant preservation of goal
+maximum_good_subarray_sum_list'vc.
+Prover result is: Valid (0.02s, 8942 steps).
+
+File "repaired.mlw", line 151, characters 22-33:
+Sub-goal Loop variant decrease of goal maximum_good_subarray_sum_list'vc.
+Prover result is: Valid (0.03s, 10896 steps).
+
+File "repaired.mlw", line 145, characters 24-40:
+Sub-goal Loop invariant preservation of goal
+maximum_good_subarray_sum_list'vc.
+Prover result is: Valid (0.03s, 10850 steps).
+
+File "repaired.mlw", line 146, character 24 to line 147, character 63:
+Sub-goal Loop invariant preservation of goal
+maximum_good_subarray_sum_list'vc.
+Prover result is: Valid (0.03s, 11012 steps).
+
+File "repaired.mlw", line 148, character 24 to line 149, character 73:
+Sub-goal Loop invariant preservation of goal
+maximum_good_subarray_sum_list'vc.
+Prover result is: Valid (0.03s, 11106 steps).
+
+File "repaired.mlw", line 150, characters 38-47:
+Sub-goal Loop invariant preservation of goal
+maximum_good_subarray_sum_list'vc.
+Prover result is: Valid (0.02s, 9232 steps).
+
+File "repaired.mlw", line 151, characters 22-33:
+Sub-goal Loop variant decrease of goal maximum_good_subarray_sum_list'vc.
+Prover result is: Valid (0.03s, 10980 steps).
+
+File "repaired.mlw", line 145, characters 24-40:
+Sub-goal Loop invariant preservation of goal
+maximum_good_subarray_sum_list'vc.
+Prover result is: Valid (0.03s, 10927 steps).
+
+File "repaired.mlw", line 146, character 24 to line 147, character 63:
+Sub-goal Loop invariant preservation of goal
+maximum_good_subarray_sum_list'vc.
+Prover result is: Valid (0.03s, 11037 steps).
+
+File "repaired.mlw", line 148, character 24 to line 149, character 73:
+Sub-goal Loop invariant preservation of goal
+maximum_good_subarray_sum_list'vc.
+Prover result is: Valid (0.03s, 11208 steps).
+
+File "repaired.mlw", line 150, characters 38-47:
+Sub-goal Loop invariant preservation of goal
+maximum_good_subarray_sum_list'vc.
+Prover result is: Valid (0.02s, 9247 steps).
+
+File "repaired.mlw", line 151, characters 22-33:
+Sub-goal Loop variant decrease of goal maximum_good_subarray_sum_list'vc.
+Prover result is: Valid (0.03s, 10923 steps).
+
+File "repaired.mlw", line 145, characters 24-40:
+Sub-goal Loop invariant preservation of goal
+maximum_good_subarray_sum_list'vc.
+Prover result is: Valid (0.03s, 10877 steps).
+
+File "repaired.mlw", line 146, character 24 to line 147, character 63:
+Sub-goal Loop invariant preservation of goal
+maximum_good_subarray_sum_list'vc.
+Prover result is: Valid (0.03s, 10977 steps).
+
+File "repaired.mlw", line 148, character 24 to line 149, character 73:
+Sub-goal Loop invariant preservation of goal
+maximum_good_subarray_sum_list'vc.
+Prover result is: Valid (0.03s, 11037 steps).
+
+File "repaired.mlw", line 150, characters 38-47:
+Sub-goal Loop invariant preservation of goal
+maximum_good_subarray_sum_list'vc.
+Prover result is: Valid (0.02s, 9223 steps).
+
+File "repaired.mlw", line 151, characters 22-33:
+Sub-goal Loop variant decrease of goal maximum_good_subarray_sum_list'vc.
+Prover result is: Valid (0.03s, 10831 steps).
+
+File "repaired.mlw", line 145, characters 24-40:
+Sub-goal Loop invariant preservation of goal
+maximum_good_subarray_sum_list'vc.
+Prover result is: Valid (0.03s, 10767 steps).
+
+File "repaired.mlw", line 146, character 24 to line 147, character 63:
+Sub-goal Loop invariant preservation of goal
+maximum_good_subarray_sum_list'vc.
+Prover result is: Valid (0.03s, 10928 steps).
+
+File "repaired.mlw", line 148, character 24 to line 149, character 73:
+Sub-goal Loop invariant preservation of goal
+maximum_good_subarray_sum_list'vc.
+Prover result is: Valid (0.03s, 10974 steps).
+
+File "repaired.mlw", line 150, characters 38-47:
+Sub-goal Loop invariant preservation of goal
+maximum_good_subarray_sum_list'vc.
+Prover result is: Valid (0.02s, 9191 steps).
+
+File "repaired.mlw", line 170, characters 19-29:
+Sub-goal Assertion of goal maximum_good_subarray_sum_list'vc.
+Prover result is: Unknown (unknown + incomplete) (0.08s, 25009 steps).
+
+File "repaired.mlw", line 171, characters 19-67:
+Sub-goal Assertion of goal maximum_good_subarray_sum_list'vc.
+Prover result is: Valid (0.03s, 10056 steps).
+
+File "repaired.mlw", line 172, characters 19-76:
+Sub-goal Assertion of goal maximum_good_subarray_sum_list'vc.
+Prover result is: Valid (0.03s, 9957 steps).
+
+File "repaired.mlw", line 173, character 19 to line 174, character 47:
+Sub-goal Assertion of goal maximum_good_subarray_sum_list'vc.
+Prover result is: Valid (0.03s, 10068 steps).
+
+File "repaired.mlw", line 175, character 19 to line 176, character 52:
+Sub-goal Assertion of goal maximum_good_subarray_sum_list'vc.
+Prover result is: Valid (0.03s, 10169 steps).
+
+File "repaired.mlw", line 133, characters 16-30:
+Sub-goal Loop variant decrease of goal maximum_good_subarray_sum_list'vc.
+Prover result is: Valid (0.03s, 10753 steps).
+
+File "repaired.mlw", line 127, characters 18-37:
+Sub-goal Loop invariant preservation of goal
+maximum_good_subarray_sum_list'vc.
+Prover result is: Valid (0.03s, 10716 steps).
+
+File "repaired.mlw", line 128, character 18 to line 129, character 48:
+Sub-goal Loop invariant preservation of goal
+maximum_good_subarray_sum_list'vc.
+Prover result is: Valid (0.03s, 10025 steps).
+
+File "repaired.mlw", line 130, character 18 to line 131, character 49:
+Sub-goal Loop invariant preservation of goal
+maximum_good_subarray_sum_list'vc.
+Prover result is: Valid (0.03s, 10023 steps).
+
+File "repaired.mlw", line 132, characters 32-41:
+Sub-goal Loop invariant preservation of goal
+maximum_good_subarray_sum_list'vc.
+Prover result is: Valid (0.02s, 9179 steps).
+
+File "repaired.mlw", line 180, characters 13-26:
+Sub-goal Assertion of goal maximum_good_subarray_sum_list'vc.
+Prover result is: Unknown (unknown + incomplete) (0.03s, 9999 steps).
+
+File "repaired.mlw", line 181, characters 13-52:
+Sub-goal Assertion of goal maximum_good_subarray_sum_list'vc.
+Prover result is: Valid (0.03s, 9597 steps).
+
+File "repaired.mlw", line 182, characters 13-52:
+Sub-goal Assertion of goal maximum_good_subarray_sum_list'vc.
+Prover result is: Valid (0.03s, 9577 steps).
+
+File "repaired.mlw", line 183, characters 4-30:
+Sub-goal Precondition of goal maximum_good_subarray_sum_list'vc.
+Prover result is: Valid (0.02s, 8814 steps).
+
+File "repaired.mlw", line 183, characters 4-30:
+Sub-goal Precondition of goal maximum_good_subarray_sum_list'vc.
+Prover result is: Valid (0.02s, 8816 steps).
+
+File "repaired.mlw", line 121, characters 15-59:
+Sub-goal Postcondition of goal maximum_good_subarray_sum_list'vc.
+Prover result is: Unknown (unknown + incomplete) (0.05s, 21277 steps).
+== Final summary ==
+Unproved root goals after first prover : 2
+Remaining failures after split_vc      : 2
+Remaining failures after stage 3       : 2
+Detailed logs stored in                : /Users/rubenm/Desktop/Diversify2Verify/codex-runs/dataset-merge-verification/stage3a-repair/3026_maximum-good-subarray-sum/list-imperative/maximum_good_subarray_sum_list_stage3_d415749a_stage3/generated/why3/.why3_sessions/repaired_logs
+Still unproved goals:
+MaximumGoodSubarraySum_List_Stage3_Imperative	scan_starts_correct'vc
+MaximumGoodSubarraySum_List_Stage3_Imperative	maximum_good_subarray_sum_list'vc
+VERIFY_RESULT: FAILURE
+VERIFY_REASON: unproved_goals_remain
+VERIFY_STAGE: stage3
+VERIFY_ROOT_TOTAL: 7
+VERIFY_ROOT_PROVED: 5
+VERIFY_ROOT_REMAINING: 2

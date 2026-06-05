@@ -1,0 +1,273 @@
+module MinimumSumOfSquaredDifference_List_Imperative_Implementation
+
+  use int.Int
+  use int.Abs
+  use int.EuclideanDivision
+  use list.List
+  use ref.Ref
+
+  type diff_group = Group int int
+
+  let square (x: int) : int =
+    x * x
+
+  let rec function square_sum_groups (groups: list diff_group) : int
+    variant { groups }
+  =
+    match groups with
+    | Nil -> 0
+    | Cons (Group value count) rest ->
+        count * square value + square_sum_groups rest
+    end
+
+  let reduced_square_block (value: int) (count: int) (budget: int) : int =
+    let q = div budget count in
+    let r = mod budget count in
+    let high = value - q in
+    let low = high - 1 in
+    (count - r) * square high + r * square low
+
+  let rec function insert_group (d: int) (groups: list diff_group) : list diff_group
+    variant { groups }
+  =
+    match groups with
+    | Nil -> Cons (Group d 1) Nil
+    | Cons (Group value count) rest ->
+        if d = value then Cons (Group value (count + 1)) rest
+        else if d > value then Cons (Group d 1) (Cons (Group value count) rest)
+        else Cons (Group value count) (insert_group d rest)
+    end
+
+  let build_groups (nums1: list int) (nums2: list int) : list diff_group =
+    let groups = ref Nil in
+    let cur1 = ref nums1 in
+    let cur2 = ref nums2 in
+    while
+      (match !cur1 with
+       | Nil -> false
+       | Cons _ _ ->
+           match !cur2 with
+           | Nil -> false
+           | Cons _ _ -> true
+           end
+       end)
+    do
+      match !cur1 with
+      | Nil -> ()
+      | Cons x xs ->
+          match !cur2 with
+          | Nil -> ()
+          | Cons y ys ->
+              let d = abs (x - y) in
+              groups := insert_group d !groups;
+              cur1 := xs;
+              cur2 := ys
+          end
+      end
+    done;
+    !groups
+
+  let rec function minimum_square_from_groups (groups: list diff_group) (budget: int) : int
+    variant { groups }
+  =
+    match groups with
+    | Nil -> 0
+    | Cons (Group value count) rest ->
+        if value <= 0 then 0
+        else
+          match rest with
+          | Nil ->
+              if budget >= value * count then 0
+              else reduced_square_block value count budget
+          | Cons (Group next_value next_count) tail ->
+              let need = (value - next_value) * count in
+              if budget < need then
+                reduced_square_block value count budget + square_sum_groups rest
+              else
+                minimum_square_from_groups
+                  (Cons (Group next_value (count + next_count)) tail)
+                  (budget - need)
+          end
+    end
+
+  let minimum_sum_of_squared_difference_list
+      (nums1: list int) (nums2: list int) (k1: int) (k2: int) : int =
+    let budget = k1 + k2 in
+    minimum_square_from_groups (build_groups nums1 nums2) budget
+
+  let test_000 () : bool =
+    let nums1 = Cons 5 (Cons 5 (Cons 5 (Cons 5 Nil))) in
+    let nums2 = Cons 5 (Cons 5 (Cons 5 (Cons 5 Nil))) in
+    let r = minimum_sum_of_squared_difference_list nums1 nums2 100 100 in
+    r = 0
+
+  let test_001 () : bool =
+    let nums1 = Cons 10 (Cons 20 (Cons 30 (Cons 40 (Cons 50 Nil)))) in
+    let nums2 = Cons 5 (Cons 15 (Cons 25 (Cons 35 (Cons 45 Nil)))) in
+    let r = minimum_sum_of_squared_difference_list nums1 nums2 50 50 in
+    r = 0
+
+  let test_002 () : bool =
+    let nums1 = Cons 100000 (Cons 100000 Nil) in
+    let nums2 = Cons 0 (Cons 0 Nil) in
+    let r = minimum_sum_of_squared_difference_list nums1 nums2 100000 100000 in
+    r = 0
+
+  let test_003 () : bool =
+    let nums1 = Cons 1 (Cons 3 (Cons 5 (Cons 7 (Cons 9 Nil)))) in
+    let nums2 = Cons 2 (Cons 4 (Cons 6 (Cons 8 (Cons 10 Nil)))) in
+    let r = minimum_sum_of_squared_difference_list nums1 nums2 1 1 in
+    r = 3
+
+  let test_004 () : bool =
+    let nums1 = Cons 1 (Cons 2 (Cons 3 Nil)) in
+    let nums2 = Cons 3 (Cons 2 (Cons 1 Nil)) in
+    let r = minimum_sum_of_squared_difference_list nums1 nums2 3 3 in
+    r = 0
+
+  let test_005 () : bool =
+    let nums1 = Cons 0 (Cons 0 (Cons 0 (Cons 0 Nil))) in
+    let nums2 = Cons 100 (Cons 100 (Cons 100 (Cons 100 Nil))) in
+    let r = minimum_sum_of_squared_difference_list nums1 nums2 200 200 in
+    r = 0
+
+  let test_006 () : bool =
+    let nums1 = Cons 1 (Cons 2 (Cons 3 Nil)) in
+    let nums2 = Cons 3 (Cons 2 (Cons 1 Nil)) in
+    let r = minimum_sum_of_squared_difference_list nums1 nums2 10 10 in
+    r = 0
+
+  let test_007 () : bool =
+    let nums1 = Cons 1 (Cons 2 (Cons 3 (Cons 4 Nil))) in
+    let nums2 = Cons 2 (Cons 10 (Cons 20 (Cons 19 Nil))) in
+    let r = minimum_sum_of_squared_difference_list nums1 nums2 0 0 in
+    r = 579
+
+  let test_008 () : bool =
+    let nums1 = Cons 1 (Cons 2 (Cons 3 Nil)) in
+    let nums2 = Cons 3 (Cons 2 (Cons 1 Nil)) in
+    let r = minimum_sum_of_squared_difference_list nums1 nums2 2 2 in
+    r = 0
+
+  let test_009 () : bool =
+    let nums1 = Cons 5 (Cons 5 (Cons 5 (Cons 5 Nil))) in
+    let nums2 = Cons 1 (Cons 1 (Cons 1 (Cons 1 Nil))) in
+    let r = minimum_sum_of_squared_difference_list nums1 nums2 4 4 in
+    r = 16
+
+  let test_010 () : bool =
+    let nums1 = Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 Nil)))) in
+    let nums2 = Cons 5 (Cons 5 (Cons 5 (Cons 5 (Cons 5 Nil)))) in
+    let r = minimum_sum_of_squared_difference_list nums1 nums2 5 5 in
+    r = 20
+
+  let test_011 () : bool =
+    let nums1 = Cons 0 (Cons 0 (Cons 0 (Cons 0 Nil))) in
+    let nums2 = Cons 0 (Cons 0 (Cons 0 (Cons 0 Nil))) in
+    let r = minimum_sum_of_squared_difference_list nums1 nums2 5 5 in
+    r = 0
+
+  let test_012 () : bool =
+    let nums1 = Cons 1 (Cons 2 (Cons 3 (Cons 4 (Cons 5 Nil)))) in
+    let nums2 = Cons 5 (Cons 4 (Cons 3 (Cons 2 (Cons 1 Nil)))) in
+    let r = minimum_sum_of_squared_difference_list nums1 nums2 5 5 in
+    r = 2
+
+  let test_013 () : bool =
+    let nums1 =
+      Cons 1
+        (Cons 1
+           (Cons 1
+              (Cons 1
+                 (Cons 1
+                    (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 Nil))))))))) in
+    let nums2 =
+      Cons 9
+        (Cons 9
+           (Cons 9
+              (Cons 9
+                 (Cons 9
+                    (Cons 9 (Cons 9 (Cons 9 (Cons 9 (Cons 9 Nil))))))))) in
+    let r = minimum_sum_of_squared_difference_list nums1 nums2 50 50 in
+    r = 0
+
+  let test_014 () : bool =
+    let nums1 = Cons 0 (Cons 0 (Cons 0 (Cons 0 Nil))) in
+    let nums2 = Cons 10 (Cons 10 (Cons 10 (Cons 10 Nil))) in
+    let r = minimum_sum_of_squared_difference_list nums1 nums2 20 20 in
+    r = 0
+
+  let test_015 () : bool =
+    let nums1 = Cons 1 (Cons 2 (Cons 3 (Cons 4 (Cons 5 Nil)))) in
+    let nums2 = Cons 5 (Cons 4 (Cons 3 (Cons 2 (Cons 1 Nil)))) in
+    let r = minimum_sum_of_squared_difference_list nums1 nums2 3 3 in
+    r = 10
+
+  let test_016 () : bool =
+    let nums1 = Cons 0 (Cons 0 (Cons 0 Nil)) in
+    let nums2 = Cons 100 (Cons 100 (Cons 100 Nil)) in
+    let r = minimum_sum_of_squared_difference_list nums1 nums2 150 150 in
+    r = 0
+
+  let test_017 () : bool =
+    let nums1 = Cons 10 (Cons 20 (Cons 30 Nil)) in
+    let nums2 = Cons 1 (Cons 2 (Cons 3 Nil)) in
+    let r = minimum_sum_of_squared_difference_list nums1 nums2 25 25 in
+    r = 6
+
+  let test_018 () : bool =
+    let nums1 = Cons 1 (Cons 1 (Cons 1 (Cons 1 Nil))) in
+    let nums2 = Cons 1 (Cons 1 (Cons 1 (Cons 1 Nil))) in
+    let r = minimum_sum_of_squared_difference_list nums1 nums2 5 5 in
+    r = 0
+
+  let test_019 () : bool =
+    let nums1 = Cons 0 (Cons 0 (Cons 0 (Cons 0 Nil))) in
+    let nums2 = Cons 1 (Cons 1 (Cons 1 (Cons 1 Nil))) in
+    let r = minimum_sum_of_squared_difference_list nums1 nums2 2 2 in
+    r = 0
+
+  let run_tests () : bool =
+    if test_000 () then
+    if test_001 () then
+    if test_002 () then
+    if test_003 () then
+    if test_004 () then
+    if test_005 () then
+    if test_006 () then
+    if test_007 () then
+    if test_008 () then
+    if test_009 () then
+    if test_010 () then
+    if test_011 () then
+    if test_012 () then
+    if test_013 () then
+    if test_014 () then
+    if test_015 () then
+    if test_016 () then
+    if test_017 () then
+    if test_018 () then
+    if test_019 () then
+      true
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+
+end

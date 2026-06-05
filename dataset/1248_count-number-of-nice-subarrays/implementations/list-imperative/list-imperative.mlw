@@ -1,0 +1,384 @@
+module CountNumberOfNiceSubarrays_List_Imperative
+
+  use int.Int
+  use int.EuclideanDivision
+  use list.List
+  use ref.Ref
+
+  let has_elements (xs: list int) : bool =
+    match xs with
+    | Nil -> false
+    | Cons _ _ -> true
+    end
+
+  let odd_indicator (x: int) : int =
+    if mod x 2 = 1 then 1 else 0
+
+  let count_number_of_nice_subarrays_list (nums: list int) (k: int) : int =
+    let total = ref 0 in
+    let start = ref nums in
+    while has_elements !start do
+      let odd_count = ref 0 in
+      let suffix = ref !start in
+      while has_elements !suffix do
+        match !suffix with
+        | Nil -> ()
+        | Cons x xs ->
+            odd_count := !odd_count + odd_indicator x;
+            if !odd_count = k then total := !total + 1;
+            suffix := xs
+        end
+      done;
+      match !start with
+      | Nil -> ()
+      | Cons _ xs -> start := xs
+      end
+    done;
+    !total
+
+  let test_000 () : bool =
+    let nums = Cons 1 (Cons 2 (Cons 3 (Cons 4 (Cons 5 Nil)))) in
+    let r = count_number_of_nice_subarrays_list nums 3 in
+    r = 1
+
+  let test_001 () : bool =
+    let nums =
+      Cons 1 (Cons 2 (Cons 3 (Cons 4 (Cons 5 (Cons 6 (Cons 7 (Cons 8 (Cons 9 (Cons 10 Nil)))))))))
+    in
+    let r = count_number_of_nice_subarrays_list nums 5 in
+    r = 2
+
+  let test_002 () : bool =
+    let nums = Cons 2 Nil in
+    let r = count_number_of_nice_subarrays_list nums 1 in
+    r = 0
+
+  let test_003 () : bool =
+    let nums = Cons 2 (Cons 4 (Cons 6 Nil)) in
+    let r = count_number_of_nice_subarrays_list nums 1 in
+    r = 0
+
+  let test_004 () : bool =
+    let nums =
+      Cons 1 (Cons 2 (Cons 3 (Cons 4 (Cons 5 (Cons 6 (Cons 7 (Cons 8 (Cons 9 (Cons 10 Nil)))))))))
+    in
+    let r = count_number_of_nice_subarrays_list nums 3 in
+    r = 10
+
+  let test_005 () : bool =
+    let nums = Cons 1 Nil in
+    let r = count_number_of_nice_subarrays_list nums 1 in
+    r = 1
+
+  let test_006 () : bool =
+    let nums = Cons 1 (Cons 3 (Cons 5 (Cons 7 (Cons 9 Nil)))) in
+    let r = count_number_of_nice_subarrays_list nums 5 in
+    r = 1
+
+  let test_007 () : bool =
+    let nums = Cons 2 (Cons 2 (Cons 2 (Cons 2 (Cons 2 Nil)))) in
+    let r = count_number_of_nice_subarrays_list nums 1 in
+    r = 0
+
+  let test_008 () : bool =
+    let nums =
+      Cons 2 (Cons 2 (Cons 2 (Cons 1 (Cons 2 (Cons 2 (Cons 1 (Cons 2 (Cons 2 (Cons 2 Nil)))))))))
+    in
+    let r = count_number_of_nice_subarrays_list nums 2 in
+    r = 16
+
+  let test_009 () : bool =
+    let nums = Cons 1 (Cons 3 (Cons 5 (Cons 7 (Cons 9 Nil)))) in
+    let r = count_number_of_nice_subarrays_list nums 2 in
+    r = 4
+
+  let test_010 () : bool =
+    let nums = Cons 1 (Cons 1 (Cons 2 (Cons 1 (Cons 1 Nil)))) in
+    let r = count_number_of_nice_subarrays_list nums 3 in
+    r = 2
+
+  let test_012 () : bool =
+    let nums = Cons 10 (Cons 15 (Cons 20 (Cons 25 (Cons 30 Nil)))) in
+    let r = count_number_of_nice_subarrays_list nums 1 in
+    r = 8
+
+  let test_014 () : bool =
+    let t1 = Cons 2 Nil in
+    let t2 = Cons 1 t1 in
+    let t3 = Cons 2 t2 in
+    let t4 = Cons 1 t3 in
+    let t5 = Cons 2 t4 in
+    let t6 = Cons 1 t5 in
+    let t7 = Cons 2 t6 in
+    let t8 = Cons 1 t7 in
+    let t9 = Cons 2 t8 in
+    let t10 = Cons 1 t9 in
+    let t11 = Cons 2 t10 in
+    let t12 = Cons 1 t11 in
+    let t13 = Cons 2 t12 in
+    let t14 = Cons 1 t13 in
+    let t15 = Cons 2 t14 in
+    let t16 = Cons 1 t15 in
+    let t17 = Cons 2 t16 in
+    let t18 = Cons 1 t17 in
+    let t19 = Cons 2 t18 in
+    let t20 = Cons 1 t19 in
+    let t21 = Cons 2 t20 in
+    let t22 = Cons 1 t21 in
+    let t23 = Cons 2 t22 in
+    let t24 = Cons 1 t23 in
+    let t25 = Cons 2 t24 in
+    let t26 = Cons 1 t25 in
+    let t27 = Cons 2 t26 in
+    let t28 = Cons 1 t27 in
+    let t29 = Cons 2 t28 in
+    let t30 = Cons 1 t29 in
+    let t31 = Cons 2 t30 in
+    let nums = t31 in
+    let r = count_number_of_nice_subarrays_list nums 5 in
+    r = 44
+
+  let test_015 () : bool =
+    let t1 = Cons 2 Nil in
+    let t2 = Cons 2 t1 in
+    let t3 = Cons 2 t2 in
+    let t4 = Cons 2 t3 in
+    let t5 = Cons 2 t4 in
+    let t6 = Cons 2 t5 in
+    let t7 = Cons 2 t6 in
+    let t8 = Cons 2 t7 in
+    let t9 = Cons 2 t8 in
+    let t10 = Cons 2 t9 in
+    let t11 = Cons 1 t10 in
+    let t12 = Cons 1 t11 in
+    let t13 = Cons 1 t12 in
+    let t14 = Cons 1 t13 in
+    let t15 = Cons 1 t14 in
+    let t16 = Cons 1 t15 in
+    let t17 = Cons 1 t16 in
+    let t18 = Cons 1 t17 in
+    let t19 = Cons 1 t18 in
+    let t20 = Cons 1 t19 in
+    let t21 = Cons 1 t20 in
+    let t22 = Cons 1 t21 in
+    let t23 = Cons 1 t22 in
+    let t24 = Cons 1 t23 in
+    let t25 = Cons 1 t24 in
+    let t26 = Cons 1 t25 in
+    let t27 = Cons 1 t26 in
+    let t28 = Cons 1 t27 in
+    let t29 = Cons 1 t28 in
+    let t30 = Cons 1 t29 in
+    let nums = t30 in
+    let r = count_number_of_nice_subarrays_list nums 15 in
+    r = 16
+
+  let test_016 () : bool =
+    let t1 = Cons 30 Nil in
+    let t2 = Cons 28 t1 in
+    let t3 = Cons 26 t2 in
+    let t4 = Cons 24 t3 in
+    let t5 = Cons 22 t4 in
+    let t6 = Cons 20 t5 in
+    let t7 = Cons 18 t6 in
+    let t8 = Cons 16 t7 in
+    let t9 = Cons 14 t8 in
+    let t10 = Cons 12 t9 in
+    let t11 = Cons 10 t10 in
+    let t12 = Cons 8 t11 in
+    let t13 = Cons 6 t12 in
+    let t14 = Cons 4 t13 in
+    let t15 = Cons 2 t14 in
+    let nums = t15 in
+    let r = count_number_of_nice_subarrays_list nums 1 in
+    r = 0
+
+  let test_018 () : bool =
+    let t1 = Cons 7 Nil in
+    let t2 = Cons 3 t1 in
+    let t3 = Cons 9 t2 in
+    let t4 = Cons 9 t3 in
+    let t5 = Cons 3 t4 in
+    let t6 = Cons 9 t5 in
+    let t7 = Cons 6 t6 in
+    let t8 = Cons 1 t7 in
+    let t9 = Cons 7 t8 in
+    let t10 = Cons 9 t9 in
+    let t11 = Cons 1 t10 in
+    let t12 = Cons 4 t11 in
+    let t13 = Cons 8 t12 in
+    let t14 = Cons 8 t13 in
+    let t15 = Cons 2 t14 in
+    let t16 = Cons 0 t15 in
+    let t17 = Cons 5 t16 in
+    let t18 = Cons 9 t17 in
+    let t19 = Cons 7 t18 in
+    let t20 = Cons 2 t19 in
+    let t21 = Cons 3 t20 in
+    let t22 = Cons 8 t21 in
+    let t23 = Cons 3 t22 in
+    let t24 = Cons 3 t23 in
+    let t25 = Cons 4 t24 in
+    let t26 = Cons 6 t25 in
+    let t27 = Cons 2 t26 in
+    let t28 = Cons 6 t27 in
+    let t29 = Cons 4 t28 in
+    let t30 = Cons 8 t29 in
+    let t31 = Cons 3 t30 in
+    let t32 = Cons 2 t31 in
+    let t33 = Cons 3 t32 in
+    let t34 = Cons 9 t33 in
+    let t35 = Cons 7 t34 in
+    let t36 = Cons 9 t35 in
+    let t37 = Cons 5 t36 in
+    let t38 = Cons 3 t37 in
+    let t39 = Cons 5 t38 in
+    let t40 = Cons 6 t39 in
+    let t41 = Cons 2 t40 in
+    let t42 = Cons 9 t41 in
+    let t43 = Cons 5 t42 in
+    let t44 = Cons 1 t43 in
+    let t45 = Cons 4 t44 in
+    let t46 = Cons 1 t45 in
+    let t47 = Cons 3 t46 in
+    let nums = t47 in
+    let r = count_number_of_nice_subarrays_list nums 10 in
+    r = 61
+
+  let test_019 () : bool =
+    let t1 = Cons 34 Nil in
+    let t2 = Cons 32 t1 in
+    let t3 = Cons 30 t2 in
+    let t4 = Cons 28 t3 in
+    let t5 = Cons 26 t4 in
+    let t6 = Cons 24 t5 in
+    let t7 = Cons 22 t6 in
+    let t8 = Cons 20 t7 in
+    let t9 = Cons 18 t8 in
+    let t10 = Cons 16 t9 in
+    let t11 = Cons 14 t10 in
+    let t12 = Cons 12 t11 in
+    let t13 = Cons 10 t12 in
+    let t14 = Cons 8 t13 in
+    let t15 = Cons 6 t14 in
+    let t16 = Cons 4 t15 in
+    let t17 = Cons 2 t16 in
+    let t18 = Cons 5 t17 in
+    let t19 = Cons 3 t18 in
+    let t20 = Cons 1 t19 in
+    let nums = t20 in
+    let r = count_number_of_nice_subarrays_list nums 5 in
+    r = 0
+
+  let test_020 () : bool =
+    let t1 = Cons 2 Nil in
+    let t2 = Cons 2 t1 in
+    let t3 = Cons 2 t2 in
+    let t4 = Cons 2 t3 in
+    let t5 = Cons 2 t4 in
+    let t6 = Cons 2 t5 in
+    let t7 = Cons 2 t6 in
+    let t8 = Cons 2 t7 in
+    let t9 = Cons 1 t8 in
+    let t10 = Cons 2 t9 in
+    let t11 = Cons 2 t10 in
+    let t12 = Cons 2 t11 in
+    let t13 = Cons 2 t12 in
+    let t14 = Cons 2 t13 in
+    let t15 = Cons 2 t14 in
+    let t16 = Cons 2 t15 in
+    let t17 = Cons 2 t16 in
+    let nums = t17 in
+    let r = count_number_of_nice_subarrays_list nums 1 in
+    r = 81
+
+  let test_021 () : bool =
+    let t1 = Cons 23 Nil in
+    let t2 = Cons 21 t1 in
+    let t3 = Cons 19 t2 in
+    let t4 = Cons 17 t3 in
+    let t5 = Cons 15 t4 in
+    let t6 = Cons 13 t5 in
+    let t7 = Cons 11 t6 in
+    let t8 = Cons 9 t7 in
+    let t9 = Cons 7 t8 in
+    let t10 = Cons 5 t9 in
+    let t11 = Cons 3 t10 in
+    let t12 = Cons 1 t11 in
+    let t13 = Cons 10 t12 in
+    let t14 = Cons 8 t13 in
+    let t15 = Cons 6 t14 in
+    let t16 = Cons 4 t15 in
+    let t17 = Cons 2 t16 in
+    let nums = t17 in
+    let r = count_number_of_nice_subarrays_list nums 5 in
+    r = 13
+
+  let test_022 () : bool =
+    let t1 = Cons 2 Nil in
+    let t2 = Cons 2 t1 in
+    let t3 = Cons 2 t2 in
+    let t4 = Cons 1 t3 in
+    let t5 = Cons 2 t4 in
+    let t6 = Cons 2 t5 in
+    let t7 = Cons 2 t6 in
+    let t8 = Cons 1 t7 in
+    let t9 = Cons 2 t8 in
+    let t10 = Cons 2 t9 in
+    let t11 = Cons 2 t10 in
+    let t12 = Cons 1 t11 in
+    let t13 = Cons 2 t12 in
+    let t14 = Cons 2 t13 in
+    let t15 = Cons 2 t14 in
+    let t16 = Cons 1 t15 in
+    let t17 = Cons 2 t16 in
+    let t18 = Cons 2 t17 in
+    let t19 = Cons 2 t18 in
+    let nums = t19 in
+    let r = count_number_of_nice_subarrays_list nums 4 in
+    r = 16
+
+  let run_tests () : bool =
+    if test_000 () then
+    if test_001 () then
+    if test_002 () then
+    if test_003 () then
+    if test_004 () then
+    if test_005 () then
+    if test_006 () then
+    if test_007 () then
+    if test_008 () then
+    if test_009 () then
+    if test_010 () then
+    if test_012 () then
+    if test_014 () then
+    if test_015 () then
+    if test_016 () then
+    if test_018 () then
+    if test_019 () then
+    if test_020 () then
+    if test_021 () then
+    if test_022 () then
+      true
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+
+end

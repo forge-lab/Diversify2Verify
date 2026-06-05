@@ -1,0 +1,273 @@
+module CountOfInterestingSubarrays_Array_Spec
+
+  use int.Int
+  use int.EuclideanDivision
+  use array.Array
+  use array.Init
+
+  predicate valid_input (nums: array int) (modulo: int) (k: int) =
+    1 <= length nums <= 100000 /\
+    1 <= modulo <= 1000000000 /\
+    0 <= k < modulo /\
+    forall i: int. 0 <= i < length nums -> 1 <= nums[i] <= 1000000000
+
+  predicate matches_mod (nums: array int) (modulo: int) (k: int) (i: int) =
+    if 1 <= modulo /\ 0 <= i < length nums then
+      mod nums[i] modulo = k
+    else
+      false
+
+  let rec function matching_index_count
+    (nums: array int) (modulo: int) (k: int) (l: int) (r: int) : int
+    requires { 1 <= modulo }
+    requires { 0 <= l <= r + 1 <= length nums }
+    variant  { r + 1 - l }
+  =
+    if l = r + 1 then 0
+    else
+      (if mod nums[l] modulo = k then 1 else 0) +
+      matching_index_count nums modulo k (l + 1) r
+
+  predicate interesting_subarray
+    (nums: array int) (modulo: int) (k: int) (l: int) (r: int) =
+    if 1 <= modulo /\ 0 <= l <= r < length nums then
+      mod (matching_index_count nums modulo k l r) modulo = k
+    else
+      false
+
+  let rec function interesting_right_count_from
+    (nums: array int) (modulo: int) (k: int) (l: int) (r: int) : int
+    requires { 1 <= modulo }
+    requires { 0 <= l <= r <= length nums }
+    variant  { length nums - r }
+  =
+    if r = length nums then 0
+    else
+      (if mod (matching_index_count nums modulo k l r) modulo = k then 1 else 0) +
+      interesting_right_count_from nums modulo k l (r + 1)
+
+  let function interesting_right_count
+    (nums: array int) (modulo: int) (k: int) (l: int) : int
+    requires { 1 <= modulo }
+    requires { 0 <= l <= length nums }
+  =
+    interesting_right_count_from nums modulo k l l
+
+  let rec function interesting_subarray_total_from
+    (nums: array int) (modulo: int) (k: int) (l: int) : int
+    requires { 1 <= modulo }
+    requires { 0 <= l <= length nums }
+    variant  { length nums - l }
+  =
+    if l = length nums then 0
+    else
+      interesting_right_count nums modulo k l +
+      interesting_subarray_total_from nums modulo k (l + 1)
+
+  let function interesting_subarray_total
+    (nums: array int) (modulo: int) (k: int) : int
+    requires { 1 <= modulo }
+  =
+    interesting_subarray_total_from nums modulo k 0
+
+  val count_of_interesting_subarrays_array
+    (nums: array int) (modulo: int) (k: int) : int
+    requires { valid_input nums modulo k }
+    ensures  { result = interesting_subarray_total nums modulo k }
+
+  let lemma test_000 () =
+    let nums = init 3 [|3; 2; 4|] in
+    assert { length nums = 3 };
+    assert { nums[0] = 3 };
+    assert { nums[1] = 2 };
+    assert { nums[2] = 4 };
+    assert { valid_input nums 2 1 };
+    assert { matches_mod nums 2 1 0 };
+    assert { not (matches_mod nums 2 1 1) };
+    assert { not (matches_mod nums 2 1 2) };
+    assert { matching_index_count nums 2 1 0 0 = 1 };
+    assert { matching_index_count nums 2 1 0 1 = 1 };
+    assert { matching_index_count nums 2 1 0 2 = 1 };
+    assert { matching_index_count nums 2 1 1 1 = 0 };
+    assert { matching_index_count nums 2 1 1 2 = 0 };
+    assert { matching_index_count nums 2 1 2 2 = 0 };
+    assert { interesting_subarray nums 2 1 0 0 };
+    assert { interesting_subarray nums 2 1 0 1 };
+    assert { interesting_subarray nums 2 1 0 2 };
+    assert { not (interesting_subarray nums 2 1 1 1) };
+    assert { interesting_right_count nums 2 1 2 = 0 };
+    assert { interesting_right_count nums 2 1 1 = 0 };
+    assert { interesting_right_count nums 2 1 0 = 3 };
+    assert { interesting_subarray_total_from nums 2 1 2 = 0 };
+    assert { interesting_subarray_total_from nums 2 1 1 = 0 };
+    assert { interesting_subarray_total_from nums 2 1 0 = 3 };
+    assert { interesting_subarray_total nums 2 1 = 3 }
+
+  let lemma test_001 () =
+    let nums = init 5 [|8; 12; 16; 20; 24|] in
+    assert { length nums = 5 };
+    assert { nums[0] = 8 };
+    assert { nums[1] = 12 };
+    assert { nums[2] = 16 };
+    assert { nums[3] = 20 };
+    assert { nums[4] = 24 };
+    assert { valid_input nums 4 0 };
+    assert { matches_mod nums 4 0 0 };
+    assert { matches_mod nums 4 0 1 };
+    assert { matches_mod nums 4 0 2 };
+    assert { matches_mod nums 4 0 3 };
+    assert { matches_mod nums 4 0 4 };
+    assert { matching_index_count nums 4 0 0 3 = 4 };
+    assert { matching_index_count nums 4 0 1 4 = 4 };
+    assert { interesting_subarray nums 4 0 0 3 };
+    assert { interesting_subarray nums 4 0 1 4 };
+    assert { interesting_right_count nums 4 0 4 = 0 };
+    assert { interesting_right_count nums 4 0 3 = 0 };
+    assert { interesting_right_count nums 4 0 2 = 0 };
+    assert { interesting_right_count nums 4 0 1 = 1 };
+    assert { interesting_right_count nums 4 0 0 = 1 };
+    assert { interesting_subarray_total_from nums 4 0 4 = 0 };
+    assert { interesting_subarray_total_from nums 4 0 3 = 0 };
+    assert { interesting_subarray_total_from nums 4 0 2 = 0 };
+    assert { interesting_subarray_total_from nums 4 0 1 = 1 };
+    assert { interesting_subarray_total_from nums 4 0 0 = 2 };
+    assert { interesting_subarray_total nums 4 0 = 2 }
+
+  let lemma test_002 () =
+    let nums = init 7 [|7; 7; 7; 7; 7; 7; 7|] in
+    assert { length nums = 7 };
+    assert { nums[0] = 7 };
+    assert { nums[1] = 7 };
+    assert { nums[2] = 7 };
+    assert { nums[3] = 7 };
+    assert { nums[4] = 7 };
+    assert { nums[5] = 7 };
+    assert { nums[6] = 7 };
+    assert { valid_input nums 7 0 };
+    assert { matches_mod nums 7 0 0 };
+    assert { matches_mod nums 7 0 6 };
+    assert { matching_index_count nums 7 0 0 6 = 7 };
+    assert { interesting_subarray nums 7 0 0 6 };
+    assert { interesting_right_count nums 7 0 6 = 0 };
+    assert { interesting_right_count nums 7 0 5 = 0 };
+    assert { interesting_right_count nums 7 0 4 = 0 };
+    assert { interesting_right_count nums 7 0 3 = 0 };
+    assert { interesting_right_count nums 7 0 2 = 0 };
+    assert { interesting_right_count nums 7 0 1 = 0 };
+    assert { interesting_right_count nums 7 0 0 = 1 };
+    assert { interesting_subarray_total_from nums 7 0 6 = 0 };
+    assert { interesting_subarray_total_from nums 7 0 5 = 0 };
+    assert { interesting_subarray_total_from nums 7 0 4 = 0 };
+    assert { interesting_subarray_total_from nums 7 0 3 = 0 };
+    assert { interesting_subarray_total_from nums 7 0 2 = 0 };
+    assert { interesting_subarray_total_from nums 7 0 1 = 0 };
+    assert { interesting_subarray_total_from nums 7 0 0 = 1 };
+    assert { interesting_subarray_total nums 7 0 = 1 }
+
+  let lemma test_003 () =
+    let nums = init 4 [|3; 1; 9; 6|] in
+    assert { length nums = 4 };
+    assert { nums[0] = 3 };
+    assert { nums[1] = 1 };
+    assert { nums[2] = 9 };
+    assert { nums[3] = 6 };
+    assert { valid_input nums 3 0 };
+    assert { matches_mod nums 3 0 0 };
+    assert { not (matches_mod nums 3 0 1) };
+    assert { matches_mod nums 3 0 2 };
+    assert { matches_mod nums 3 0 3 };
+    assert { matching_index_count nums 3 0 0 3 = 3 };
+    assert { matching_index_count nums 3 0 1 1 = 0 };
+    assert { interesting_subarray nums 3 0 0 3 };
+    assert { interesting_subarray nums 3 0 1 1 };
+    assert { interesting_right_count nums 3 0 3 = 0 };
+    assert { interesting_right_count nums 3 0 2 = 0 };
+    assert { interesting_right_count nums 3 0 1 = 1 };
+    assert { interesting_right_count nums 3 0 0 = 1 };
+    assert { interesting_subarray_total_from nums 3 0 3 = 0 };
+    assert { interesting_subarray_total_from nums 3 0 2 = 0 };
+    assert { interesting_subarray_total_from nums 3 0 1 = 1 };
+    assert { interesting_subarray_total_from nums 3 0 0 = 2 };
+    assert { interesting_subarray_total nums 3 0 = 2 }
+
+  let lemma test_004 () =
+    let nums = init 4 [|5; 5; 5; 5|] in
+    assert { length nums = 4 };
+    assert { nums[0] = 5 };
+    assert { nums[1] = 5 };
+    assert { nums[2] = 5 };
+    assert { nums[3] = 5 };
+    assert { valid_input nums 5 0 };
+    assert { matches_mod nums 5 0 0 };
+    assert { matches_mod nums 5 0 3 };
+    assert { not (interesting_subarray nums 5 0 0 0) };
+    assert { interesting_right_count nums 5 0 3 = 0 };
+    assert { interesting_right_count nums 5 0 2 = 0 };
+    assert { interesting_right_count nums 5 0 1 = 0 };
+    assert { interesting_right_count nums 5 0 0 = 0 };
+    assert { interesting_subarray_total_from nums 5 0 3 = 0 };
+    assert { interesting_subarray_total_from nums 5 0 2 = 0 };
+    assert { interesting_subarray_total_from nums 5 0 1 = 0 };
+    assert { interesting_subarray_total_from nums 5 0 0 = 0 };
+    assert { interesting_subarray_total nums 5 0 = 0 }
+
+  let lemma test_005 () =
+    let nums = init 5 [|1; 3; 5; 7; 9|] in
+    assert { length nums = 5 };
+    assert { nums[0] = 1 };
+    assert { nums[1] = 3 };
+    assert { nums[2] = 5 };
+    assert { nums[3] = 7 };
+    assert { nums[4] = 9 };
+    assert { valid_input nums 2 1 };
+    assert { matches_mod nums 2 1 0 };
+    assert { matches_mod nums 2 1 4 };
+    assert { matching_index_count nums 2 1 0 0 = 1 };
+    assert { matching_index_count nums 2 1 0 2 = 3 };
+    assert { matching_index_count nums 2 1 2 4 = 3 };
+    assert { interesting_subarray nums 2 1 0 0 };
+    assert { interesting_subarray nums 2 1 0 2 };
+    assert { interesting_subarray nums 2 1 2 4 };
+    assert { interesting_right_count nums 2 1 4 = 1 };
+    assert { interesting_right_count nums 2 1 3 = 1 };
+    assert { interesting_right_count nums 2 1 2 = 2 };
+    assert { interesting_right_count nums 2 1 1 = 2 };
+    assert { interesting_right_count nums 2 1 0 = 3 };
+    assert { interesting_subarray_total_from nums 2 1 4 = 1 };
+    assert { interesting_subarray_total_from nums 2 1 3 = 2 };
+    assert { interesting_subarray_total_from nums 2 1 2 = 4 };
+    assert { interesting_subarray_total_from nums 2 1 1 = 6 };
+    assert { interesting_subarray_total_from nums 2 1 0 = 9 };
+    assert { interesting_subarray_total nums 2 1 = 9 }
+
+  let lemma test_006 () =
+    let nums = init 7 [|7; 7; 7; 7; 7; 7; 7|] in
+    assert { length nums = 7 };
+    assert { nums[0] = 7 };
+    assert { nums[1] = 7 };
+    assert { nums[2] = 7 };
+    assert { nums[3] = 7 };
+    assert { nums[4] = 7 };
+    assert { nums[5] = 7 };
+    assert { nums[6] = 7 };
+    assert { valid_input nums 7 3 };
+    assert { not (matches_mod nums 7 3 0) };
+    assert { not (matches_mod nums 7 3 6) };
+    assert { not (interesting_subarray nums 7 3 0 0) };
+    assert { interesting_right_count nums 7 3 6 = 0 };
+    assert { interesting_right_count nums 7 3 5 = 0 };
+    assert { interesting_right_count nums 7 3 4 = 0 };
+    assert { interesting_right_count nums 7 3 3 = 0 };
+    assert { interesting_right_count nums 7 3 2 = 0 };
+    assert { interesting_right_count nums 7 3 1 = 0 };
+    assert { interesting_right_count nums 7 3 0 = 0 };
+    assert { interesting_subarray_total_from nums 7 3 6 = 0 };
+    assert { interesting_subarray_total_from nums 7 3 5 = 0 };
+    assert { interesting_subarray_total_from nums 7 3 4 = 0 };
+    assert { interesting_subarray_total_from nums 7 3 3 = 0 };
+    assert { interesting_subarray_total_from nums 7 3 2 = 0 };
+    assert { interesting_subarray_total_from nums 7 3 1 = 0 };
+    assert { interesting_subarray_total_from nums 7 3 0 = 0 };
+    assert { interesting_subarray_total nums 7 3 = 0 }
+
+end

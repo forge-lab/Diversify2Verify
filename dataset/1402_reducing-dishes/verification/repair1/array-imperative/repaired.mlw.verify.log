@@ -1,0 +1,239 @@
+== Stage 1: first prover on whole file ==
+Running in /Users/rubenm/Desktop/Diversify2Verify/codex-runs/dataset-merge-verification/stage3a-repair/1402_reducing-dishes/array-imperative/reducing_dishes_array_stage3_c5d9b3e5_stage3/generated/why3: why3 session create -o /Users/rubenm/Desktop/Diversify2Verify/codex-runs/dataset-merge-verification/stage3a-repair/1402_reducing-dishes/array-imperative/reducing_dishes_array_stage3_c5d9b3e5_stage3/generated/why3/.why3_sessions/repaired_stage1 -P Z3,4.8.6 -t 10 -m 8192 repaired.mlw
+Session created successfully
+Running in /Users/rubenm/Desktop/Diversify2Verify/codex-runs/dataset-merge-verification/stage3a-repair/1402_reducing-dishes/array-imperative/reducing_dishes_array_stage3_c5d9b3e5_stage3/generated/why3: why3 bench /Users/rubenm/Desktop/Diversify2Verify/codex-runs/dataset-merge-verification/stage3a-repair/1402_reducing-dishes/array-imperative/reducing_dishes_array_stage3_c5d9b3e5_stage3/generated/why3/.why3_sessions/repaired_stage1
+Progress: 5/1/0                       Progress: 4/2/0                       Progress: 3/3/0                       Progress: 2/4/0                       Progress: 1/5/0                       Progress: 0/6/0                       Progress: 0/1/2                       Progress: 0/0/2                       Progress: 0/0/1                       
+Replay completed, saving session... done
+== Stage 1 stats ==
+= Statistics for session /Users/rubenm/Desktop/Diversify2Verify/codex-runs/dataset-merge-verification/stage3a-repair/1402_reducing-dishes/array-imperative/reducing_dishes_array_stage3_c5d9b3e5_stage3/generated/why3/.why3_sessions/repaired_stage1
+
+== Number of root goals ==
+  total: 6  proved: 4
+
+== Number of sub goals ==
+  total: 0  proved: 0
+
+== Goals not proved ==
+  +-- file [../../repaired.mlw]
+    +-- theory ReducingDishes_Array_Spec
+      +-- goal insertion_sort'vc
+      +-- goal reducing_dishes_array'vc
+  
+== Goals proved by only one prover ==
+  +-- file [../../repaired.mlw]
+    +-- theory ReducingDishes_Array_Spec
+      +-- goal score_from'vc: Z3 4.8.6
+      +-- goal sum_from'vc: Z3 4.8.6
+      +-- goal greedy_total_from'vc: Z3 4.8.6
+      +-- goal copy_array'vc: Z3 4.8.6
+  
+1 session(s) read, with a total of 6 proof goals.
+== Unproved root goals after first prover ==
+ReducingDishes_Array_Spec	insertion_sort'vc
+ReducingDishes_Array_Spec	reducing_dishes_array'vc
+== Stage 1: trying remaining goals with prover Alt-Ergo,2.4.0 ==
+---- stage1 | prover: Alt-Ergo,2.4.0 | theory: ReducingDishes_Array_Spec | goal: insertion_sort'vc ----
+File repaired.mlw:
+Goal insertion_sort'vc.
+Prover result is: Timeout (10.00s, 52773 steps).
+---- stage1 | prover: Alt-Ergo,2.4.0 | theory: ReducingDishes_Array_Spec | goal: reducing_dishes_array'vc ----
+File repaired.mlw:
+Goal reducing_dishes_array'vc.
+Prover result is: Timeout (10.00s, 150564 steps).
+Remaining after prover Alt-Ergo,2.4.0: 2
+== Stage 1: trying remaining goals with prover CVC4,1.8 ==
+---- stage1 | prover: CVC4,1.8 | theory: ReducingDishes_Array_Spec | goal: insertion_sort'vc ----
+File repaired.mlw:
+Goal insertion_sort'vc.
+Prover result is: Timeout (10.00s, 1321661 steps).
+---- stage1 | prover: CVC4,1.8 | theory: ReducingDishes_Array_Spec | goal: reducing_dishes_array'vc ----
+File repaired.mlw:
+Goal reducing_dishes_array'vc.
+Prover result is: Timeout (10.00s, 2063709 steps).
+Remaining after prover CVC4,1.8: 2
+== Goals still unproved after stage 1 ==
+ReducingDishes_Array_Spec	insertion_sort'vc
+ReducingDishes_Array_Spec	reducing_dishes_array'vc
+== Stage 2: split_vc on unproved goal ==
+Target theory: ReducingDishes_Array_Spec
+Target goal  : insertion_sort'vc
+---- stage2 | prover: Z3,4.8.6 | theory: ReducingDishes_Array_Spec | goal: insertion_sort'vc ----
+Transforms: split_vc
+File "repaired.mlw", line 95, characters 20-31:
+Sub-goal Loop invariant init of goal insertion_sort'vc.
+Prover result is: Valid (0.01s, 1519 steps).
+
+File "repaired.mlw", line 96, characters 20-32:
+Sub-goal Loop invariant init of goal insertion_sort'vc.
+Prover result is: Valid (0.01s, 1518 steps).
+
+File "repaired.mlw", line 97, characters 20-37:
+Sub-goal Loop invariant init of goal insertion_sort'vc.
+Prover result is: Valid (0.01s, 20056 steps).
+
+File "repaired.mlw", line 98, characters 20-43:
+Sub-goal Loop invariant init of goal insertion_sort'vc.
+Prover result is: Valid (0.01s, 22030 steps).
+
+File "repaired.mlw", line 99, characters 18-22:
+Sub-goal Index in array bounds of goal insertion_sort'vc.
+Prover result is: Valid (0.01s, 22780 steps).
+
+File "repaired.mlw", line 102, characters 22-34:
+Sub-goal Loop invariant init of goal insertion_sort'vc.
+Prover result is: Valid (0.01s, 22118 steps).
+
+File "repaired.mlw", line 103, characters 22-34:
+Sub-goal Loop invariant init of goal insertion_sort'vc.
+Prover result is: Valid (0.01s, 1834 steps).
+
+File "repaired.mlw", line 104, characters 57-67:
+Sub-goal Loop invariant init of goal insertion_sort'vc.
+Prover result is: Valid (0.01s, 23893 steps).
+
+File "repaired.mlw", line 105, characters 22-38:
+Sub-goal Loop invariant init of goal insertion_sort'vc.
+Prover result is: Valid (0.01s, 2033 steps).
+
+File "repaired.mlw", line 106, characters 22-60:
+Sub-goal Loop invariant init of goal insertion_sort'vc.
+Prover result is: Timeout (10.00s, 5277692 steps).
+
+File "repaired.mlw", line 101, characters 25-30:
+Sub-goal Index in array bounds of goal insertion_sort'vc.
+Prover result is: Valid (0.01s, 26977 steps).
+
+File "repaired.mlw", line 108, characters 19-57:
+Sub-goal Assertion of goal insertion_sort'vc.
+Prover result is: Valid (0.01s, 2253 steps).
+
+File "repaired.mlw", line 109, characters 23-28:
+Sub-goal Index in array bounds of goal insertion_sort'vc.
+Prover result is: Valid (0.01s, 30429 steps).
+
+File "repaired.mlw", line 109, characters 10-28:
+Sub-goal Index in array bounds of goal insertion_sort'vc.
+Prover result is: Valid (0.01s, 30477 steps).
+
+File "repaired.mlw", line 110, characters 19-53:
+Sub-goal Assertion of goal insertion_sort'vc.
+Prover result is: Timeout (10.00s, 8469332 steps).
+
+File "repaired.mlw", line 107, characters 20-26:
+Sub-goal Loop variant decrease of goal insertion_sort'vc.
+Prover result is: Valid (0.01s, 7644 steps).
+
+File "repaired.mlw", line 102, characters 22-34:
+Sub-goal Loop invariant preservation of goal insertion_sort'vc.
+Prover result is: Valid (0.01s, 31124 steps).
+
+File "repaired.mlw", line 103, characters 22-34:
+Sub-goal Loop invariant preservation of goal insertion_sort'vc.
+Prover result is: Valid (0.01s, 31124 steps).
+
+File "repaired.mlw", line 104, characters 57-67:
+Sub-goal Loop invariant preservation of goal insertion_sort'vc.
+Prover result is: Valid (0.01s, 32892 steps).
+
+File "repaired.mlw", line 105, characters 22-38:
+Sub-goal Loop invariant preservation of goal insertion_sort'vc.
+Prover result is: Valid (0.01s, 30925 steps).
+
+File "repaired.mlw", line 106, characters 22-60:
+Sub-goal Loop invariant preservation of goal insertion_sort'vc.
+Prover result is: Valid (0.01s, 11080 steps).
+
+File "repaired.mlw", line 113, characters 17-29:
+Sub-goal Assertion of goal insertion_sort'vc.
+Prover result is: Valid (0.01s, 3330 steps).
+
+File "repaired.mlw", line 114, characters 17-33:
+Sub-goal Assertion of goal insertion_sort'vc.
+Prover result is: Valid (0.01s, 3341 steps).
+
+File "repaired.mlw", line 115, characters 17-55:
+Sub-goal Assertion of goal insertion_sort'vc.
+Prover result is: Valid (0.01s, 2288 steps).
+
+File "repaired.mlw", line 116, characters 8-24:
+Sub-goal Index in array bounds of goal insertion_sort'vc.
+Prover result is: Valid (0.01s, 31746 steps).
+Infrastructure issue in stage 2 with prover Z3,4.8.6; aborting rest of stage 2.
+== Goals still unproved after stage 2 (split_vc) ==
+ReducingDishes_Array_Spec	insertion_sort'vc
+ReducingDishes_Array_Spec	reducing_dishes_array'vc
+== Stage 3: split_vc + inline_all on still-unproved goal ==
+Target theory: ReducingDishes_Array_Spec
+Target goal  : insertion_sort'vc
+---- stage3 | prover: Alt-Ergo,2.4.0 | theory: ReducingDishes_Array_Spec | goal: insertion_sort'vc ----
+Transforms: split_vc inline_all
+File "repaired.mlw", line 95, characters 20-31:
+Sub-goal Loop invariant init of goal insertion_sort'vc.
+Prover result is: Valid (0.01s, 6 steps).
+
+File "repaired.mlw", line 96, characters 20-32:
+Sub-goal Loop invariant init of goal insertion_sort'vc.
+Prover result is: Valid (0.01s, 4 steps).
+
+File "repaired.mlw", line 97, characters 20-37:
+Sub-goal Loop invariant init of goal insertion_sort'vc.
+Prover result is: Valid (0.01s, 15 steps).
+
+File "repaired.mlw", line 98, characters 20-43:
+Sub-goal Loop invariant init of goal insertion_sort'vc.
+Prover result is: Valid (0.01s, 5 steps).
+
+File "repaired.mlw", line 99, characters 18-22:
+Sub-goal Index in array bounds of goal insertion_sort'vc.
+Prover result is: Valid (0.01s, 16 steps).
+
+File "repaired.mlw", line 102, characters 22-34:
+Sub-goal Loop invariant init of goal insertion_sort'vc.
+Prover result is: Valid (0.01s, 17 steps).
+
+File "repaired.mlw", line 103, characters 22-34:
+Sub-goal Loop invariant init of goal insertion_sort'vc.
+Prover result is: Valid (0.01s, 12 steps).
+
+File "repaired.mlw", line 104, characters 57-67:
+Sub-goal Loop invariant init of goal insertion_sort'vc.
+Prover result is: Valid (0.01s, 24 steps).
+
+File "repaired.mlw", line 105, characters 22-38:
+Sub-goal Loop invariant init of goal insertion_sort'vc.
+Prover result is: Valid (0.01s, 17 steps).
+
+File "repaired.mlw", line 106, characters 22-60:
+Sub-goal Loop invariant init of goal insertion_sort'vc.
+Prover result is: Timeout (10.00s, 45071 steps).
+
+File "repaired.mlw", line 101, characters 25-30:
+Sub-goal Index in array bounds of goal insertion_sort'vc.
+Prover result is: Valid (0.01s, 32 steps).
+
+File "repaired.mlw", line 108, characters 19-57:
+Sub-goal Assertion of goal insertion_sort'vc.
+Prover result is: Timeout (10.00s, 41619 steps).
+
+File "repaired.mlw", line 109, characters 23-28:
+Sub-goal Index in array bounds of goal insertion_sort'vc.
+Prover result is: Valid (0.01s, 35 steps).
+
+File "repaired.mlw", line 109, characters 10-28:
+Sub-goal Index in array bounds of goal insertion_sort'vc.
+Prover result is: Valid (0.01s, 37 steps).
+Infrastructure issue in stage 3 with prover Alt-Ergo,2.4.0; aborting rest of stage 3.
+== Final summary ==
+Unproved root goals after first prover : 2
+Remaining failures after split_vc      : 2
+Remaining failures after stage 3       : 2
+Detailed logs stored in                : /Users/rubenm/Desktop/Diversify2Verify/codex-runs/dataset-merge-verification/stage3a-repair/1402_reducing-dishes/array-imperative/reducing_dishes_array_stage3_c5d9b3e5_stage3/generated/why3/.why3_sessions/repaired_logs
+Still unproved goals:
+ReducingDishes_Array_Spec	insertion_sort'vc
+ReducingDishes_Array_Spec	reducing_dishes_array'vc
+VERIFY_RESULT: FAILURE
+VERIFY_REASON: unproved_goals_remain
+VERIFY_STAGE: stage3
+VERIFY_ROOT_TOTAL: 6
+VERIFY_ROOT_PROVED: 4
+VERIFY_ROOT_REMAINING: 2

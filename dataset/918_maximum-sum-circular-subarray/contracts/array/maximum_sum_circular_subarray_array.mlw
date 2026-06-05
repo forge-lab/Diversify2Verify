@@ -1,0 +1,158 @@
+module MaximumSumCircularSubarray_Array_Spec
+
+  use int.Int
+  use int.EuclideanDivision
+  use int.Sum as IntSum
+  use array.Array
+  use array.Init
+
+  predicate leetcode_input (nums: array int) =
+    1 <= length nums <= 30000 /\
+    forall i: int. 0 <= i < length nums -> -30000 <= nums[i] <= 30000
+
+  predicate valid_circular_segment (nums: array int) (start: int) (len: int) =
+    0 <= start < length nums /\
+    1 <= len <= length nums
+
+  function circular_segment_sum
+      (nums: array int) (start: int) (len: int) : int =
+    IntSum.sum
+      (fun offset -> nums[mod (start + offset) (length nums)])
+      0 len
+
+  predicate maximum_circular_subarray_sum (nums: array int) (best: int) =
+    (exists start len: int.
+       valid_circular_segment nums start len /\
+       best = circular_segment_sum nums start len) /\
+    (forall start len: int.
+       valid_circular_segment nums start len ->
+       circular_segment_sum nums start len <= best)
+
+  val maximum_sum_circular_subarray_array (nums: array int) : int
+    requires { leetcode_input nums }
+    ensures  { maximum_circular_subarray_sum nums result }
+
+  let lemma test_000_python_assertions () =
+    let nums = init 4 [|1; -2; 3; -2|] in
+    assert { length nums = 4 };
+    assert { nums[0] = 1 };
+    assert { nums[1] = -2 };
+    assert { nums[2] = 3 };
+    assert { nums[3] = -2 };
+    assert { leetcode_input nums };
+    assert { valid_circular_segment nums 2 1 };
+    assert { circular_segment_sum nums 2 1 = 3 };
+    assert { exists start len: int.
+      valid_circular_segment nums start len /\
+      3 = circular_segment_sum nums start len };
+    assert { forall i: int. 0 <= i < length nums ->
+      i = 0 \/ i = 1 \/ i = 2 \/ i = 3 };
+    assert { maximum_circular_subarray_sum nums 3 }
+
+  let lemma test_003_python_assertions () =
+    let nums = init 3 [|5; -3; 5|] in
+    assert { length nums = 3 };
+    assert { nums[0] = 5 };
+    assert { nums[1] = -3 };
+    assert { nums[2] = 5 };
+    assert { leetcode_input nums };
+    assert { valid_circular_segment nums 2 2 };
+    assert { circular_segment_sum nums 2 2 = 10 };
+    assert { exists start len: int.
+      valid_circular_segment nums start len /\
+      10 = circular_segment_sum nums start len };
+    assert { forall i: int. 0 <= i < length nums ->
+      i = 0 \/ i = 1 \/ i = 2 };
+    assert { maximum_circular_subarray_sum nums 10 }
+
+  let lemma test_006_python_assertions () =
+    let nums = init 4 [|-1; -2; -3; 4|] in
+    assert { length nums = 4 };
+    assert { nums[0] = -1 };
+    assert { nums[1] = -2 };
+    assert { nums[2] = -3 };
+    assert { nums[3] = 4 };
+    assert { leetcode_input nums };
+    assert { valid_circular_segment nums 3 1 };
+    assert { circular_segment_sum nums 3 1 = 4 };
+    assert { exists start len: int.
+      valid_circular_segment nums start len /\
+      4 = circular_segment_sum nums start len };
+    assert { forall i: int. 0 <= i < length nums ->
+      i = 0 \/ i = 1 \/ i = 2 \/ i = 3 };
+    assert { maximum_circular_subarray_sum nums 4 }
+
+  let lemma test_008_python_assertions () =
+    let nums = init 7 [|10; 0; 3; 5; -10; 2; 4|] in
+    assert { length nums = 7 };
+    assert { nums[0] = 10 };
+    assert { nums[1] = 0 };
+    assert { nums[2] = 3 };
+    assert { nums[3] = 5 };
+    assert { nums[4] = -10 };
+    assert { nums[5] = 2 };
+    assert { nums[6] = 4 };
+    assert { leetcode_input nums };
+    assert { valid_circular_segment nums 5 6 };
+    assert { circular_segment_sum nums 5 6 = 24 };
+    assert { exists start len: int.
+      valid_circular_segment nums start len /\
+      24 = circular_segment_sum nums start len };
+    assert { forall i: int. 0 <= i < length nums ->
+      i = 0 \/ i = 1 \/ i = 2 \/ i = 3 \/
+      i = 4 \/ i = 5 \/ i = 6 };
+    assert { maximum_circular_subarray_sum nums 24 }
+
+  let lemma test_009_python_assertions () =
+    let nums = init 5 [|1; 2; 3; 4; 5|] in
+    assert { length nums = 5 };
+    assert { nums[0] = 1 };
+    assert { nums[1] = 2 };
+    assert { nums[2] = 3 };
+    assert { nums[3] = 4 };
+    assert { nums[4] = 5 };
+    assert { leetcode_input nums };
+    assert { valid_circular_segment nums 0 5 };
+    assert { circular_segment_sum nums 0 5 = 15 };
+    assert { exists start len: int.
+      valid_circular_segment nums start len /\
+      15 = circular_segment_sum nums start len };
+    assert { forall i: int. 0 <= i < length nums ->
+      i = 0 \/ i = 1 \/ i = 2 \/ i = 3 \/ i = 4 };
+    assert { maximum_circular_subarray_sum nums 15 }
+
+  let lemma test_010_python_assertions () =
+    let nums = init 4 [|-1; -2; -3; -4|] in
+    assert { length nums = 4 };
+    assert { nums[0] = -1 };
+    assert { nums[1] = -2 };
+    assert { nums[2] = -3 };
+    assert { nums[3] = -4 };
+    assert { leetcode_input nums };
+    assert { valid_circular_segment nums 0 1 };
+    assert { circular_segment_sum nums 0 1 = -1 };
+    assert { exists start len: int.
+      valid_circular_segment nums start len /\
+      (-1) = circular_segment_sum nums start len };
+    assert { forall i: int. 0 <= i < length nums ->
+      i = 0 \/ i = 1 \/ i = 2 \/ i = 3 };
+    assert { maximum_circular_subarray_sum nums (-1) }
+
+  let lemma test_011_python_assertions () =
+    let nums = init 4 [|1; -4; 7; 2|] in
+    assert { length nums = 4 };
+    assert { nums[0] = 1 };
+    assert { nums[1] = -4 };
+    assert { nums[2] = 7 };
+    assert { nums[3] = 2 };
+    assert { leetcode_input nums };
+    assert { valid_circular_segment nums 2 3 };
+    assert { circular_segment_sum nums 2 3 = 10 };
+    assert { exists start len: int.
+      valid_circular_segment nums start len /\
+      10 = circular_segment_sum nums start len };
+    assert { forall i: int. 0 <= i < length nums ->
+      i = 0 \/ i = 1 \/ i = 2 \/ i = 3 };
+    assert { maximum_circular_subarray_sum nums 10 }
+
+end

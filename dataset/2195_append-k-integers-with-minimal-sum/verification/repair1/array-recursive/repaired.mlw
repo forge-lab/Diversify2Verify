@@ -1,0 +1,127 @@
+module AppendKIntegersWithMinimalSum_Array_Stage3
+
+  use int.Int
+  use int.EuclideanDivision
+  use array.Array
+  use array.Init
+  use array.ArraySum
+  use list.List
+
+  predicate occurs_in_array (nums: array int) (x: int) =
+    exists i: int. 0 <= i < length nums /\ nums[i] = x
+
+  predicate absent_from_nums (nums: array int) (x: int) =
+    forall i: int. 0 <= i < length nums -> nums[i] <> x
+
+  predicate pairwise_distinct (a: array int) =
+    forall i j: int. 0 <= i < j < length a -> a[i] <> a[j]
+
+  function appended_sum (added: array int) : int =
+    sum added 0 (length added)
+
+  predicate valid_append_choice (nums: array int) (k: int) (added: array int) =
+    length added = k /\
+    pairwise_distinct added /\
+    (forall i: int.
+       0 <= i < length added ->
+       added[i] > 0 /\ absent_from_nums nums added[i])
+
+  predicate minimal_append_choice (nums: array int) (k: int) (added: array int) =
+    valid_append_choice nums k added /\
+    (forall other: array int.
+       valid_append_choice nums k other ->
+       appended_sum added <= appended_sum other)
+
+  predicate append_k_minimal_sum (nums: array int) (k: int) (result: int) =
+    exists added: array int.
+      minimal_append_choice nums k added /\ result = appended_sum added
+
+  let rec insert_sorted_unique (x: int) (xs: list int) : list int
+    variant { xs }
+  =
+    match xs with
+    | Nil -> Cons x Nil
+    | Cons y ys ->
+        if x = y then
+          xs
+        else if x < y then
+          Cons x xs
+        else
+          Cons y (insert_sorted_unique x ys)
+    end
+
+  let rec sorted_unique_list_of_array_from (nums: array int) (i: int) : list int
+    requires { 0 <= i <= length nums }
+    variant { length nums - i }
+  =
+    if i >= length nums then
+      Nil
+    else begin
+      assert { 0 <= i < length nums };
+      assert { 0 <= i + 1 <= length nums };
+      insert_sorted_unique nums[i] (sorted_unique_list_of_array_from nums (i + 1))
+    end
+
+  let arithmetic_sum (start: int) (count: int) : int
+    ensures { count <= 0 -> result = 0 }
+    ensures { count > 0 ->
+      result = div (count * (2 * start + count - 1)) 2 }
+  =
+    if count <= 0 then
+      0
+    else
+      div (count * (2 * start + count - 1)) 2
+
+  let rec consume_sorted
+      (sorted: list int) (next_value: int) (remaining: int) (acc: int) : int
+    requires { 1 <= next_value }
+    requires { 0 <= remaining }
+    ensures  { remaining <= 0 -> result = acc }
+    variant { sorted }
+  =
+    if remaining <= 0 then
+      acc
+    else
+      match sorted with
+      | Nil -> acc + arithmetic_sum next_value remaining
+      | Cons x xs ->
+          if x < next_value then begin
+            assert { 1 <= next_value };
+            assert { 0 <= remaining };
+            consume_sorted xs next_value remaining acc
+          end else if x = next_value then begin
+            assert { 1 <= next_value + 1 };
+            assert { 0 <= remaining };
+            consume_sorted xs (next_value + 1) remaining acc
+          end else begin
+            let gap = x - next_value in
+            assert { gap > 0 };
+            if remaining <= gap then
+              acc + arithmetic_sum next_value remaining
+            else begin
+              assert { 0 <= remaining - gap };
+              assert { 1 <= x + 1 };
+              consume_sorted xs (x + 1) (remaining - gap)
+                (acc + arithmetic_sum next_value gap)
+            end
+          end
+      end
+
+  let append_k_integers_with_minimal_sum_array (nums: array int) (k: int) : int
+    requires { 1 <= length nums <= 100000 }
+    requires { 1 <= k <= 100000000 }
+    requires { forall i: int. 0 <= i < length nums -> 1 <= nums[i] <= 1000000000 }
+    ensures  { append_k_minimal_sum nums k result }
+  =
+    if k <= 0 then
+      0
+    else begin
+      assert { 0 <= 0 <= length nums };
+      assert { 1 <= k };
+      let sorted = sorted_unique_list_of_array_from nums 0 in
+      let r = consume_sorted sorted 1 k 0 in
+      assert { append_k_minimal_sum nums k r };
+      r
+    end
+
+end

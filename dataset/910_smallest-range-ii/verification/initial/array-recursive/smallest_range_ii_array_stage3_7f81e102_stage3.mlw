@@ -1,0 +1,98 @@
+module SmallestRangeIi_Array_Stage3
+
+  use int.Int
+  use array.Array
+  use list.List
+
+  predicate valid_input (nums: array int) (k: int) =
+    1 <= length nums <= 10000 /\
+    0 <= k <= 10000 /\
+    (forall i: int. 0 <= i < length nums -> 0 <= nums[i] <= 10000)
+
+  predicate choice_in_interval (x: int) (k: int) (lo: int) (hi: int) =
+    (lo <= x + k <= hi) \/ (lo <= x - k <= hi)
+
+  predicate choice_at_fits (nums: array int) (k: int) (lo: int) (hi: int) (i: int) =
+    0 <= i < length nums -> choice_in_interval nums[i] k lo hi
+
+  predicate all_choices_fit (nums: array int) (k: int) (lo: int) (hi: int) =
+    forall i: int. 0 <= i < length nums -> choice_in_interval nums[i] k lo hi
+
+  predicate range_width_feasible (nums: array int) (k: int) (w: int) =
+    w >= 0 /\
+    (exists lo hi: int.
+       lo <= hi /\
+       hi - lo = w /\
+       all_choices_fit nums k lo hi)
+
+  predicate no_smaller_feasible (nums: array int) (k: int) (r: int) =
+    forall w: int. 0 <= w < r -> not (range_width_feasible nums k w)
+
+  predicate smallest_range_score (nums: array int) (k: int) (r: int) =
+    range_width_feasible nums k r /\
+    no_smaller_feasible nums k r
+
+  let min_int (x: int) (y: int) : int =
+    if x <= y then x else y
+
+  let max_int (x: int) (y: int) : int =
+    if x >= y then x else y
+
+  let rec insert_sorted (x: int) (xs: list int) : list int
+    variant { xs }
+  =
+    match xs with
+    | Nil -> Cons x Nil
+    | Cons y ys ->
+        if x <= y then
+          Cons x xs
+        else
+          Cons y (insert_sorted x ys)
+    end
+
+  let rec sorted_list_of_array_from (nums: array int) (i: int) : list int
+    variant { length nums - i }
+  =
+    if i >= length nums then
+      Nil
+    else
+      insert_sorted nums[i] (sorted_list_of_array_from nums (i + 1))
+
+  let rec last_of_nonempty (xs: list int) (current: int) : int
+    variant { xs }
+  =
+    match xs with
+    | Nil -> current
+    | Cons y ys -> last_of_nonempty ys y
+    end
+
+  let rec best_width_from
+    (prev: int) (xs: list int) (smallest: int) (largest: int) (k: int) (best: int) : int
+    variant { xs }
+  =
+    match xs with
+    | Nil -> best
+    | Cons next rest ->
+        let high = max_int (prev + k) largest in
+        let low = min_int smallest (next - k) in
+        let width = high - low in
+        let best_next = min_int best width in
+        best_width_from next rest smallest largest k best_next
+    end
+
+  let smallest_range_ii_array (nums: array int) (k: int) : int
+    requires { valid_input nums k }
+    ensures  { smallest_range_score nums k result }
+  =
+    let sorted = sorted_list_of_array_from nums 0 in
+    match sorted with
+    | Nil -> 0
+    | Cons first rest ->
+        let last = last_of_nonempty rest first in
+        let initial = last - first in
+        let smallest = first + k in
+        let largest = last - k in
+        best_width_from first rest smallest largest k initial
+    end
+
+end

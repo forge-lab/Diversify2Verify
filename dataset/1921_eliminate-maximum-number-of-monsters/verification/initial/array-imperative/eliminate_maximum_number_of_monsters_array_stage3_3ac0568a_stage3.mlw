@@ -1,0 +1,135 @@
+module EliminateMaximumNumberOfMonsters_Array_Stage3_Imperative
+
+  use int.Int
+  use int.EuclideanDivision
+  use array.Array
+  use array.Init
+  use ref.Ref
+
+  predicate input_constraints (dist: array int) (speed: array int) =
+    length dist = length speed /\
+    1 <= length dist /\ length dist <= 100000 /\
+    (forall i: int. 0 <= i < length dist ->
+      1 <= dist[i] /\ dist[i] <= 100000 /\
+      1 <= speed[i] /\ speed[i] <= 100000)
+
+  predicate killed_before (order: array int) (i: int) (t: int) =
+    exists p: int. 0 <= p < t /\ order[p] = i
+
+  predicate distinct_prefix (order: array int) (k: int) =
+    forall p q: int. 0 <= p < q < k -> order[p] <> order[q]
+
+  predicate all_uneliminated_safe_at
+    (dist: array int) (speed: array int) (order: array int) (t: int) =
+    forall i: int. 0 <= i < length dist ->
+      not (killed_before order i t) ->
+      dist[i] > speed[i] * t
+
+  predicate valid_elimination_order
+    (dist: array int) (speed: array int) (order: array int) (k: int) =
+    length dist = length speed /\
+    0 <= k <= length dist /\
+    length order = k /\
+    distinct_prefix order k /\
+    (forall t: int. 0 <= t < k ->
+      all_uneliminated_safe_at dist speed order t /\
+      0 <= order[t] < length dist /\
+      not (killed_before order order[t] t))
+
+  predicate can_eliminate_count (dist: array int) (speed: array int) (k: int) =
+    exists order: array int. valid_elimination_order dist speed order k
+
+  predicate optimal_elimination_count (dist: array int) (speed: array int) (r: int) =
+    0 <= r <= length dist /\
+    can_eliminate_count dist speed r /\
+    (forall k: int. 0 <= k <= length dist ->
+      can_eliminate_count dist speed k -> k <= r)
+
+  predicate deadline_value
+    (dist: array int) (speed: array int) (i: int) (d: int) =
+    0 <= i < length dist /\
+    d = div (dist[i] - 1) speed[i]
+
+  predicate deadlines_computed_prefix
+    (dist: array int) (speed: array int) (deadlines: array int) (upto: int) =
+    length deadlines = length dist /\
+    0 <= upto <= length dist /\
+    (forall i: int. 0 <= i < upto ->
+      deadline_value dist speed i deadlines[i])
+
+  predicate sorted_prefix (a: array int) (upto: int) =
+    0 <= upto <= length a /\
+    (forall i j: int. 0 <= i <= j < upto -> a[i] <= a[j])
+
+  predicate deadline_safe_prefix (deadlines: array int) (k: int) =
+    0 <= k <= length deadlines /\
+    (forall t: int. 0 <= t < k -> deadlines[t] >= t)
+
+  predicate greedy_deadline_result (deadlines: array int) (r: int) =
+    sorted_prefix deadlines (length deadlines) /\
+    deadline_safe_prefix deadlines r /\
+    (r < length deadlines -> deadlines[r] < r)
+
+  let sort_int_array (a: array int) : unit
+    ensures { length a = length (old a) }
+    ensures { sorted_prefix a (length a) }
+  =
+    let n = length a in
+    for i = 1 to n - 1 do
+      invariant { length a = n }
+      invariant { 1 <= i <= n }
+      invariant { sorted_prefix a i }
+      let key = a[i] in
+      let j = ref (i - 1) in
+      while !j >= 0 && a[!j] > key do
+        invariant { -1 <= !j < i }
+        invariant { length a = n }
+        variant { !j + 1 }
+        a[!j + 1] <- a[!j];
+        j := !j - 1
+      done;
+      a[!j + 1] <- key
+    done
+
+  let eliminate_maximum_number_of_monsters_array
+    (dist: array int) (speed: array int) : int
+    requires { input_constraints dist speed }
+    ensures  { optimal_elimination_count dist speed result }
+  =
+    let n = length dist in
+    assert { n = length speed };
+    assert { 1 <= n };
+    let deadlines = copy dist in
+    assert { length deadlines = n };
+    for i = 0 to n - 1 do
+      invariant { length deadlines = n }
+      invariant { length dist = n }
+      invariant { length speed = n }
+      invariant { 0 <= i <= n }
+      invariant { deadlines_computed_prefix dist speed deadlines i }
+      assert { 0 <= i < n };
+      assert { 1 <= speed[i] };
+      deadlines[i] <- div (dist[i] - 1) speed[i];
+      assert { deadline_value dist speed i deadlines[i] }
+    done;
+    assert { deadlines_computed_prefix dist speed deadlines n };
+    sort_int_array deadlines;
+    assert { sorted_prefix deadlines n };
+    let killed = ref 0 in
+    while !killed < n && deadlines[!killed] >= !killed do
+      invariant { length deadlines = n }
+      invariant { 0 <= !killed <= n }
+      invariant { sorted_prefix deadlines n }
+      invariant { deadline_safe_prefix deadlines !killed }
+      variant { n - !killed }
+      assert { 0 <= !killed < n };
+      assert { deadlines[!killed] >= !killed };
+      killed := !killed + 1
+    done;
+    assert { 0 <= !killed <= n };
+    assert { deadline_safe_prefix deadlines !killed };
+    assert { !killed < n -> deadlines[!killed] < !killed };
+    assert { greedy_deadline_result deadlines !killed };
+    !killed
+
+end

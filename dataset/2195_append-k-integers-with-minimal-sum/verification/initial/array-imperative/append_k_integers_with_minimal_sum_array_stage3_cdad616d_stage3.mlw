@@ -1,0 +1,109 @@
+module AppendKIntegersWithMinimalSum_Array_Spec
+
+  use int.Int
+  use int.EuclideanDivision
+  use array.Array
+  use array.ArraySum
+  use ref.Ref
+
+  predicate occurs_in_array (nums: array int) (x: int) =
+    exists i: int. 0 <= i < length nums /\ nums[i] = x
+
+  predicate absent_from_nums (nums: array int) (x: int) =
+    forall i: int. 0 <= i < length nums -> nums[i] <> x
+
+  predicate pairwise_distinct (a: array int) =
+    forall i j: int. 0 <= i < j < length a -> a[i] <> a[j]
+
+  function appended_sum (added: array int) : int =
+    sum added 0 (length added)
+
+  predicate valid_append_choice (nums: array int) (k: int) (added: array int) =
+    length added = k /\
+    pairwise_distinct added /\
+    (forall i: int.
+       0 <= i < length added ->
+       added[i] > 0 /\ absent_from_nums nums added[i])
+
+  predicate minimal_append_choice (nums: array int) (k: int) (added: array int) =
+    valid_append_choice nums k added /\
+    (forall other: array int.
+       valid_append_choice nums k other ->
+       appended_sum added <= appended_sum other)
+
+  predicate append_k_minimal_sum (nums: array int) (k: int) (result: int) =
+    exists added: array int.
+      minimal_append_choice nums k added /\ result = appended_sum added
+
+  let copy_array (nums: array int) : array int
+    ensures { length result = length nums }
+    ensures { forall i: int. 0 <= i < length nums -> result[i] = nums[i] }
+  =
+    let n = length nums in
+    let copied = make n 0 in
+    for i = 0 to n - 1 do
+      copied[i] <- nums[i]
+    done;
+    copied
+
+  let insertion_sort (nums: array int) : unit
+    ensures { length nums = old (length nums) }
+  =
+    let n = length nums in
+    for i = 1 to n - 1 do
+      let key = nums[i] in
+      let j = ref (i - 1) in
+      let searching = ref true in
+      while !searching do
+        invariant { -1 <= !j < i }
+        invariant { length nums = n }
+        variant   { !j + 1 }
+        if !j >= 0 then
+          if nums[!j] > key then begin
+            nums[!j + 1] <- nums[!j];
+            j := !j - 1
+          end else
+            searching := false
+        else
+          searching := false
+      done;
+      nums[!j + 1] <- key
+    done
+
+  let arithmetic_sum (start: int) (count: int) : int
+    ensures { count <= 0 -> result = 0 }
+  =
+    if count <= 0 then 0 else
+    div (count * (2 * start + count - 1)) 2
+
+  let append_k_integers_with_minimal_sum_array (nums: array int) (k: int) : int
+    requires { 1 <= length nums <= 100000 }
+    requires { 1 <= k <= 100000000 }
+    requires { forall i: int. 0 <= i < length nums -> 1 <= nums[i] <= 1000000000 }
+    ensures  { append_k_minimal_sum nums k result }
+  =
+    let n = length nums in
+    let sorted = copy_array nums in
+    insertion_sort sorted;
+    let remaining = ref k in
+    let next_value = ref 1 in
+    let total = ref 0 in
+    for i = 0 to n - 1 do
+      let current = sorted[i] in
+      if current >= !next_value then begin
+        let gap = current - !next_value in
+        if gap > 0 then begin
+          let take = if gap <= !remaining then gap else !remaining in
+          total := !total + arithmetic_sum !next_value take;
+          remaining := !remaining - take;
+          next_value := !next_value + take
+        end;
+        if current = !next_value then
+          next_value := !next_value + 1
+      end
+    done;
+    if !remaining > 0 then
+      total := !total + arithmetic_sum !next_value !remaining;
+    !total
+
+end

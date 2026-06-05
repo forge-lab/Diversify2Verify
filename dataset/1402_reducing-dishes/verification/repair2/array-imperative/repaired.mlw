@@ -1,0 +1,174 @@
+module ReducingDishes_Array_Spec
+
+  use int.Int
+  use array.Array
+  use array.Init
+  use array.NumOfEq
+  use ref.Ref
+
+  let rec function score_from (prep: array int) (i: int) : int
+    requires { 0 <= i <= length prep }
+    variant  { length prep - i }
+  =
+    if i = length prep then 0
+    else ((i + 1) * prep[i]) + score_from prep (i + 1)
+
+  function like_time_score (prep: array int) : int =
+    score_from prep 0
+
+  predicate valid_preparation (satisfaction: array int) (prep: array int) =
+    length prep <= length satisfaction /\
+    forall x: int.
+      numof prep x 0 (length prep) <= numof satisfaction x 0 (length satisfaction)
+
+  predicate feasible_score (satisfaction: array int) (score: int) =
+    exists prep: array int.
+      valid_preparation satisfaction prep /\ like_time_score prep = score
+
+  predicate optimal_like_time (satisfaction: array int) (result: int) =
+    result >= 0 /\
+    feasible_score satisfaction result /\
+    forall prep: array int.
+      valid_preparation satisfaction prep -> like_time_score prep <= result
+
+  predicate sorted_asc (a: array int) =
+    forall i j: int.
+      0 <= i <= j < length a -> a[i] <= a[j]
+
+  predicate sorted_prefix (a: array int) (hi: int) =
+    0 <= hi <= length a /\
+    forall i j: int.
+      0 <= i <= j < hi -> a[i] <= a[j]
+
+  predicate same_multiset (a: array int) (b: array int) =
+    length a = length b /\
+    forall x: int.
+      numof a x 0 (length a) = numof b x 0 (length b)
+
+  let rec function sum_from (a: array int) (i: int) : int
+    requires { 0 <= i <= length a }
+    variant  { length a - i }
+  =
+    if i = length a then 0 else a[i] + sum_from a (i + 1)
+
+  let rec function greedy_total_from (a: array int) (i: int) : int
+    requires { 0 <= i <= length a }
+    variant  { length a - i }
+  =
+    if i = length a then 0
+    else
+      let suffix = sum_from a i in
+      if suffix > 0 then suffix + greedy_total_from a (i + 1)
+      else greedy_total_from a (i + 1)
+
+  predicate optimal_sorted_greedy
+    (satisfaction: array int) (sorted: array int) (answer: int) =
+    sorted_asc sorted /\
+    same_multiset sorted satisfaction /\
+    answer = greedy_total_from sorted 0 /\
+    optimal_like_time satisfaction answer
+
+  let copy_array (a: array int) : array int
+    ensures { length result = length a }
+    ensures { forall i: int. 0 <= i < length a -> result[i] = a[i] }
+    ensures { same_multiset result a }
+  =
+    let n = length a in
+    let result = make n 0 in
+    for i = 0 to n - 1 do
+      invariant { 0 <= i <= n }
+      invariant { length result = n }
+      invariant { forall k: int. 0 <= k < i -> result[k] = a[k] }
+      result[i] <- a[i]
+    done;
+    assert { forall k: int. 0 <= k < n -> result[k] = a[k] };
+    assert { same_multiset result a };
+    result
+
+  let insertion_sort (a: array int) : unit
+    ensures { sorted_asc a }
+    ensures { same_multiset a (old a) }
+  =
+    let n = length a in
+    if n >= 2 then begin
+      for i = 1 to n - 1 do
+        invariant { 1 <= i <= n }
+        invariant { length a = n }
+        invariant { sorted_prefix a i }
+        invariant { same_multiset a (old a) }
+        let key = a[i] in
+        let j = ref (i - 1) in
+        assert { !j + 1 = i };
+        assert { a[!j + 1] = key };
+        assert { a[!j + 1 <- key] = a };
+        assert { same_multiset a[!j + 1 <- key] (old a) };
+        while !j >= 0 && a[!j] > key do
+          invariant { -1 <= !j < i }
+          invariant { length a = n }
+          invariant { forall k: int. !j + 2 <= k <= i -> key < a[k] }
+          invariant { 0 <= !j + 1 <= i }
+          invariant { same_multiset a[!j + 1 <- key] (old a) }
+          variant { !j + 1 }
+          a[!j + 1] <- a[!j];
+          assert { same_multiset a[!j <- key] (old a) };
+          j := !j - 1
+        done;
+        assert { -1 <= !j < i };
+        assert { 0 <= !j + 1 <= i };
+        assert { same_multiset a[!j + 1 <- key] (old a) };
+        a[!j + 1] <- key;
+        assert { sorted_prefix a (i + 1) };
+        assert { same_multiset a (old a) }
+      done;
+      assert { sorted_prefix a n };
+      assert { sorted_asc a }
+    end else begin
+      assert { sorted_asc a };
+      assert { same_multiset a (old a) }
+    end
+
+  let reducing_dishes_array (satisfaction: array int) : int
+    ensures { optimal_like_time satisfaction result }
+  =
+    let n = length satisfaction in
+    if n = 0 then begin
+      let prep = make 0 0 in
+      assert { length prep = 0 };
+      assert { valid_preparation satisfaction prep };
+      assert { like_time_score prep = 0 };
+      assert { feasible_score satisfaction 0 };
+      assert { optimal_like_time satisfaction 0 };
+      0
+    end else begin
+      let sorted = copy_array satisfaction in
+      assert { same_multiset sorted satisfaction };
+      insertion_sort sorted;
+      assert { sorted_asc sorted };
+      assert { same_multiset sorted satisfaction };
+
+      let suffix_sum = ref 0 in
+      let answer = ref 0 in
+      for i = n - 1 downto 0 do
+        invariant { 0 <= i < n }
+        invariant { length sorted = n }
+        invariant { sorted_asc sorted }
+        invariant { same_multiset sorted satisfaction }
+        invariant { !answer >= 0 }
+        invariant { !suffix_sum = sum_from sorted (i + 1) }
+        invariant { !answer = greedy_total_from sorted (i + 1) }
+        suffix_sum := !suffix_sum + sorted[i];
+        assert { !suffix_sum = sum_from sorted i };
+        if !suffix_sum > 0 then
+          answer := !answer + !suffix_sum
+        else
+          ();
+        assert { !answer = greedy_total_from sorted i }
+      done;
+      assert { !suffix_sum = sum_from sorted 0 };
+      assert { !answer = greedy_total_from sorted 0 };
+      assert { optimal_sorted_greedy satisfaction sorted !answer };
+      assert { optimal_like_time satisfaction !answer };
+      !answer
+    end
+
+end

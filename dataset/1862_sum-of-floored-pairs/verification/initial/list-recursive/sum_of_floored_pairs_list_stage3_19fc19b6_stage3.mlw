@@ -1,0 +1,58 @@
+module SumOfFlooredPairs_List_Stage3_Recursive
+
+  use int.Int
+  use int.EuclideanDivision
+  use list.List
+  use list.Length
+
+  function result_modulus : int = 1000000007
+
+  let rec predicate all_values_in_range (l: list int)
+    variant { l }
+  =
+    match l with
+    | Nil -> true
+    | Cons x xs -> 1 <= x && x <= 100000 && all_values_in_range xs
+    end
+
+  predicate valid_problem_input (nums: list int) =
+    nums <> Nil /\
+    length nums <= 100000 /\
+    all_values_in_range nums
+
+  let rec function row_floor_sum (x: int) (denoms: list int) : int
+    requires { all_values_in_range denoms }
+    variant { denoms }
+  =
+    match denoms with
+    | Nil -> 0
+    | Cons y ys -> div x y + row_floor_sum x ys
+    end
+
+  let rec function floored_pair_sum (nums: list int) (denoms: list int) : int
+    requires { all_values_in_range denoms }
+    variant { nums }
+  =
+    match nums with
+    | Nil -> 0
+    | Cons x xs -> row_floor_sum x denoms + floored_pair_sum xs denoms
+    end
+
+  predicate sum_of_floored_pairs_list_spec (nums: list int) (res: int) =
+    res = mod (floored_pair_sum nums nums) result_modulus
+
+  let sum_of_floored_pairs_list (nums: list int) : int
+    requires { valid_problem_input nums }
+    ensures  { sum_of_floored_pairs_list_spec nums result }
+    ensures  { 0 <= result < result_modulus }
+  =
+    assert { all_values_in_range nums };
+    let total = floored_pair_sum nums nums in
+    let answer = mod total 1000000007 in
+    assert { result_modulus = 1000000007 };
+    assert { total = floored_pair_sum nums nums };
+    assert { answer = mod (floored_pair_sum nums nums) result_modulus };
+    assert { 0 <= answer < result_modulus };
+    answer
+
+end

@@ -1,0 +1,84 @@
+module ApplyOperationsToAnArray_List_Stage3_Recursive
+
+  use int.Int
+  use list.List
+  use list.Length
+  use list.Append
+
+  let rec function operation_pass (nums: list int) : list int
+    variant { length nums }
+  =
+    match nums with
+    | Nil -> Nil
+    | Cons x Nil -> Cons x Nil
+    | Cons x (Cons y ys) ->
+        if x = y then
+          Cons (x + y) (operation_pass (Cons 0 ys))
+        else
+          Cons x (operation_pass (Cons y ys))
+    end
+
+  let rec function shift_zeros_to_end (nums: list int) : list int
+    variant { nums }
+  =
+    match nums with
+    | Nil -> Nil
+    | Cons x xs ->
+        if x = 0 then
+          shift_zeros_to_end xs ++ Cons 0 Nil
+        else
+          Cons x (shift_zeros_to_end xs)
+    end
+
+  function apply_operations_spec (nums: list int) : list int =
+    shift_zeros_to_end (operation_pass nums)
+
+  predicate valid_apply_operations_result (nums: list int) (result: list int) =
+    result = apply_operations_spec nums
+
+  let rec lemma operation_pass_length (nums: list int)
+    ensures { length (operation_pass nums) = length nums }
+    variant { length nums }
+  =
+    match nums with
+    | Nil -> ()
+    | Cons _ Nil -> ()
+    | Cons x (Cons y ys) ->
+        if x = y then begin
+          assert { length (Cons 0 ys) < length nums };
+          operation_pass_length (Cons 0 ys)
+        end else begin
+          assert { length (Cons y ys) < length nums };
+          operation_pass_length (Cons y ys)
+        end
+    end
+
+  let rec lemma shift_zeros_to_end_length (nums: list int)
+    ensures { length (shift_zeros_to_end nums) = length nums }
+    variant { nums }
+  =
+    match nums with
+    | Nil -> ()
+    | Cons x xs ->
+        shift_zeros_to_end_length xs;
+        if x = 0 then
+          assert { length (shift_zeros_to_end xs ++ Cons 0 Nil) =
+                   length (shift_zeros_to_end xs) + length (Cons 0 Nil) }
+        else
+          assert { length (Cons x (shift_zeros_to_end xs)) =
+                   1 + length (shift_zeros_to_end xs) }
+    end
+
+  let apply_operations_to_an_array_list (nums: list int) : list int
+    ensures { valid_apply_operations_result nums result }
+    ensures { length result = length nums }
+  =
+    let after_ops = operation_pass nums in
+    operation_pass_length nums;
+    assert { length after_ops = length nums };
+    shift_zeros_to_end_length after_ops;
+    let result = shift_zeros_to_end after_ops in
+    assert { result = apply_operations_spec nums };
+    result
+
+end

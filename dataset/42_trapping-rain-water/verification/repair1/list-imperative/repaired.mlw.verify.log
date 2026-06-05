@@ -1,0 +1,502 @@
+== Stage 1: first prover on whole file ==
+Running in /Users/rubenm/Desktop/Diversify2Verify/codex-runs/dataset-merge-verification/stage3a-repair/42_trapping-rain-water/list-imperative/trapping_rain_water_list_stage3_f65213d8_stage3/generated/why3: why3 session create -o /Users/rubenm/Desktop/Diversify2Verify/codex-runs/dataset-merge-verification/stage3a-repair/42_trapping-rain-water/list-imperative/trapping_rain_water_list_stage3_f65213d8_stage3/generated/why3/.why3_sessions/repaired_stage1 -P Z3,4.8.6 -t 10 -m 8192 repaired.mlw
+Session created successfully
+Running in /Users/rubenm/Desktop/Diversify2Verify/codex-runs/dataset-merge-verification/stage3a-repair/42_trapping-rain-water/list-imperative/trapping_rain_water_list_stage3_f65213d8_stage3/generated/why3: why3 bench /Users/rubenm/Desktop/Diversify2Verify/codex-runs/dataset-merge-verification/stage3a-repair/42_trapping-rain-water/list-imperative/trapping_rain_water_list_stage3_f65213d8_stage3/generated/why3/.why3_sessions/repaired_stage1
+Progress: 8/1/0                       Progress: 7/2/0                       Progress: 6/3/0                       Progress: 5/4/0                       Progress: 4/5/0                       Progress: 3/6/0                       Progress: 3/0/2                       Progress: 2/1/2                       Progress: 1/2/2                       Progress: 0/3/2                       Progress: 0/0/2                       
+Replay completed, saving session... done
+== Stage 1 stats ==
+= Statistics for session /Users/rubenm/Desktop/Diversify2Verify/codex-runs/dataset-merge-verification/stage3a-repair/42_trapping-rain-water/list-imperative/trapping_rain_water_list_stage3_f65213d8_stage3/generated/why3/.why3_sessions/repaired_stage1
+
+== Number of root goals ==
+  total: 9  proved: 5
+
+== Number of sub goals ==
+  total: 0  proved: 0
+
+== Goals not proved ==
+  +-- file [../../repaired.mlw]
+    +-- theory TrappingRainWater_List_Stage3_Imperative
+      +-- goal max_height_acc_upper'vc
+      +-- goal max_height_acc_spec'vc
+      +-- goal max_height_list'vc
+      +-- goal trapping_rain_water_list'vc
+  
+== Goals proved by only one prover ==
+  +-- file [../../repaired.mlw]
+    +-- theory TrappingRainWater_List_Stage3_Imperative
+      +-- goal all_nonnegative'vc: Z3 4.8.6
+      +-- goal max_height'vc: Z3 4.8.6
+      +-- goal trapped_from'vc: Z3 4.8.6
+      +-- goal max_height_acc'vc: Z3 4.8.6
+      +-- goal water_at_exec'vc: Z3 4.8.6
+  
+1 session(s) read, with a total of 9 proof goals.
+== Unproved root goals after first prover ==
+TrappingRainWater_List_Stage3_Imperative	max_height_acc_upper'vc
+TrappingRainWater_List_Stage3_Imperative	max_height_acc_spec'vc
+TrappingRainWater_List_Stage3_Imperative	max_height_list'vc
+TrappingRainWater_List_Stage3_Imperative	trapping_rain_water_list'vc
+== Stage 1: trying remaining goals with prover Alt-Ergo,2.4.0 ==
+---- stage1 | prover: Alt-Ergo,2.4.0 | theory: TrappingRainWater_List_Stage3_Imperative | goal: max_height_acc_upper'vc ----
+File repaired.mlw:
+Goal max_height_acc_upper'vc.
+Prover result is: Valid (0.01s, 76 steps).
+Solved in stage 1 using prover: Alt-Ergo,2.4.0
+---- stage1 | prover: Alt-Ergo,2.4.0 | theory: TrappingRainWater_List_Stage3_Imperative | goal: max_height_acc_spec'vc ----
+File repaired.mlw:
+Goal max_height_acc_spec'vc.
+Prover result is: Valid (0.34s, 13510 steps).
+Solved in stage 1 using prover: Alt-Ergo,2.4.0
+---- stage1 | prover: Alt-Ergo,2.4.0 | theory: TrappingRainWater_List_Stage3_Imperative | goal: max_height_list'vc ----
+File repaired.mlw:
+Goal max_height_list'vc.
+Prover result is: Timeout (10.00s, 182219 steps).
+---- stage1 | prover: Alt-Ergo,2.4.0 | theory: TrappingRainWater_List_Stage3_Imperative | goal: trapping_rain_water_list'vc ----
+File repaired.mlw:
+Goal trapping_rain_water_list'vc.
+Prover result is: Valid (0.03s, 1040 steps).
+Solved in stage 1 using prover: Alt-Ergo,2.4.0
+Remaining after prover Alt-Ergo,2.4.0: 1
+== Stage 1: trying remaining goals with prover CVC4,1.8 ==
+---- stage1 | prover: CVC4,1.8 | theory: TrappingRainWater_List_Stage3_Imperative | goal: max_height_list'vc ----
+File repaired.mlw:
+Goal max_height_list'vc.
+Prover result is: Timeout (10.00s, 956505 steps).
+Remaining after prover CVC4,1.8: 1
+== Goals still unproved after stage 1 ==
+TrappingRainWater_List_Stage3_Imperative	max_height_list'vc
+== Stage 2: split_vc on unproved goal ==
+Target theory: TrappingRainWater_List_Stage3_Imperative
+Target goal  : max_height_list'vc
+---- stage2 | prover: Z3,4.8.6 | theory: TrappingRainWater_List_Stage3_Imperative | goal: max_height_list'vc ----
+Transforms: split_vc
+File "repaired.mlw", line 93, characters 4-32:
+Sub-goal Precondition of goal max_height_list'vc.
+Prover result is: Valid (0.01s, 680 steps).
+
+File "repaired.mlw", line 97, characters 18-76:
+Sub-goal Loop invariant init of goal max_height_list'vc.
+Prover result is: Valid (0.01s, 693 steps).
+
+File "repaired.mlw", line 98, characters 18-35:
+Sub-goal Loop invariant init of goal max_height_list'vc.
+Prover result is: Valid (0.01s, 699 steps).
+
+File "repaired.mlw", line 99, characters 16-27:
+Sub-goal Loop variant decrease of goal max_height_list'vc.
+Prover result is: Valid (0.01s, 895 steps).
+
+File "repaired.mlw", line 97, characters 18-76:
+Sub-goal Loop invariant preservation of goal max_height_list'vc.
+Prover result is: Valid (0.01s, 866 steps).
+
+File "repaired.mlw", line 98, characters 18-35:
+Sub-goal Loop invariant preservation of goal max_height_list'vc.
+Prover result is: Valid (0.01s, 871 steps).
+
+File "repaired.mlw", line 99, characters 16-27:
+Sub-goal Loop variant decrease of goal max_height_list'vc.
+Prover result is: Valid (0.01s, 13850 steps).
+
+File "repaired.mlw", line 97, characters 18-76:
+Sub-goal Loop invariant preservation of goal max_height_list'vc.
+Prover result is: Valid (0.01s, 43731 steps).
+
+File "repaired.mlw", line 98, characters 18-35:
+Sub-goal Loop invariant preservation of goal max_height_list'vc.
+Prover result is: Valid (0.01s, 12907 steps).
+
+File "repaired.mlw", line 99, characters 16-27:
+Sub-goal Loop variant decrease of goal max_height_list'vc.
+Prover result is: Valid (0.01s, 13794 steps).
+
+File "repaired.mlw", line 97, characters 18-76:
+Sub-goal Loop invariant preservation of goal max_height_list'vc.
+Prover result is: Valid (0.01s, 27964 steps).
+
+File "repaired.mlw", line 98, characters 18-35:
+Sub-goal Loop invariant preservation of goal max_height_list'vc.
+Prover result is: Valid (0.01s, 978 steps).
+
+File "repaired.mlw", line 107, characters 13-23:
+Sub-goal Assertion of goal max_height_list'vc.
+Prover result is: Valid (0.01s, 14602 steps).
+
+File "repaired.mlw", line 108, characters 13-59:
+Sub-goal Assertion of goal max_height_list'vc.
+Prover result is: Valid (0.01s, 13458 steps).
+
+File "repaired.mlw", line 109, characters 13-56:
+Sub-goal Assertion of goal max_height_list'vc.
+Prover result is: Timeout (10.00s, 1987363 steps).
+
+File "repaired.mlw", line 90, characters 14-40:
+Sub-goal Postcondition of goal max_height_list'vc.
+Prover result is: Valid (0.22s, 355388 steps).
+
+File "repaired.mlw", line 91, characters 14-25:
+Sub-goal Postcondition of goal max_height_list'vc.
+Prover result is: Valid (0.01s, 1000 steps).
+---- stage2 | prover: Alt-Ergo,2.4.0 | theory: TrappingRainWater_List_Stage3_Imperative | goal: max_height_list'vc ----
+Transforms: split_vc
+File "repaired.mlw", line 93, characters 4-32:
+Sub-goal Precondition of goal max_height_list'vc.
+Prover result is: Valid (0.01s, 3 steps).
+
+File "repaired.mlw", line 97, characters 18-76:
+Sub-goal Loop invariant init of goal max_height_list'vc.
+Prover result is: Valid (0.01s, 5 steps).
+
+File "repaired.mlw", line 98, characters 18-35:
+Sub-goal Loop invariant init of goal max_height_list'vc.
+Prover result is: Valid (0.01s, 6 steps).
+
+File "repaired.mlw", line 99, characters 16-27:
+Sub-goal Loop variant decrease of goal max_height_list'vc.
+Prover result is: Valid (0.01s, 10 steps).
+
+File "repaired.mlw", line 97, characters 18-76:
+Sub-goal Loop invariant preservation of goal max_height_list'vc.
+Prover result is: Valid (0.01s, 10 steps).
+
+File "repaired.mlw", line 98, characters 18-35:
+Sub-goal Loop invariant preservation of goal max_height_list'vc.
+Prover result is: Valid (0.01s, 10 steps).
+
+File "repaired.mlw", line 99, characters 16-27:
+Sub-goal Loop variant decrease of goal max_height_list'vc.
+Prover result is: Valid (0.01s, 35 steps).
+
+File "repaired.mlw", line 97, characters 18-76:
+Sub-goal Loop invariant preservation of goal max_height_list'vc.
+Prover result is: Valid (0.01s, 142 steps).
+
+File "repaired.mlw", line 98, characters 18-35:
+Sub-goal Loop invariant preservation of goal max_height_list'vc.
+Prover result is: Valid (0.01s, 16 steps).
+
+File "repaired.mlw", line 99, characters 16-27:
+Sub-goal Loop variant decrease of goal max_height_list'vc.
+Prover result is: Valid (0.01s, 35 steps).
+
+File "repaired.mlw", line 97, characters 18-76:
+Sub-goal Loop invariant preservation of goal max_height_list'vc.
+Prover result is: Valid (0.01s, 151 steps).
+
+File "repaired.mlw", line 98, characters 18-35:
+Sub-goal Loop invariant preservation of goal max_height_list'vc.
+Prover result is: Valid (0.01s, 16 steps).
+
+File "repaired.mlw", line 107, characters 13-23:
+Sub-goal Assertion of goal max_height_list'vc.
+Prover result is: Timeout (10.00s, 125380 steps).
+
+File "repaired.mlw", line 108, characters 13-59:
+Sub-goal Assertion of goal max_height_list'vc.
+Prover result is: Valid (0.01s, 29 steps).
+
+File "repaired.mlw", line 109, characters 13-56:
+Sub-goal Assertion of goal max_height_list'vc.
+Prover result is: Timeout (10.00s, 446759 steps).
+
+File "repaired.mlw", line 90, characters 14-40:
+Sub-goal Postcondition of goal max_height_list'vc.
+Prover result is: Valid (0.01s, 21 steps).
+
+File "repaired.mlw", line 91, characters 14-25:
+Sub-goal Postcondition of goal max_height_list'vc.
+Prover result is: Valid (0.01s, 22 steps).
+---- stage2 | prover: CVC4,1.8 | theory: TrappingRainWater_List_Stage3_Imperative | goal: max_height_list'vc ----
+Transforms: split_vc
+File "repaired.mlw", line 93, characters 4-32:
+Sub-goal Precondition of goal max_height_list'vc.
+Prover result is: Valid (0.02s, 2170 steps).
+
+File "repaired.mlw", line 97, characters 18-76:
+Sub-goal Loop invariant init of goal max_height_list'vc.
+Prover result is: Valid (0.01s, 2189 steps).
+
+File "repaired.mlw", line 98, characters 18-35:
+Sub-goal Loop invariant init of goal max_height_list'vc.
+Prover result is: Valid (0.01s, 2200 steps).
+
+File "repaired.mlw", line 99, characters 16-27:
+Sub-goal Loop variant decrease of goal max_height_list'vc.
+Prover result is: Valid (0.01s, 2635 steps).
+
+File "repaired.mlw", line 97, characters 18-76:
+Sub-goal Loop invariant preservation of goal max_height_list'vc.
+Prover result is: Valid (0.01s, 2586 steps).
+
+File "repaired.mlw", line 98, characters 18-35:
+Sub-goal Loop invariant preservation of goal max_height_list'vc.
+Prover result is: Valid (0.01s, 2589 steps).
+
+File "repaired.mlw", line 99, characters 16-27:
+Sub-goal Loop variant decrease of goal max_height_list'vc.
+Prover result is: Valid (0.02s, 3757 steps).
+
+File "repaired.mlw", line 97, characters 18-76:
+Sub-goal Loop invariant preservation of goal max_height_list'vc.
+Prover result is: Valid (0.02s, 4868 steps).
+
+File "repaired.mlw", line 98, characters 18-35:
+Sub-goal Loop invariant preservation of goal max_height_list'vc.
+Prover result is: Valid (0.01s, 3022 steps).
+
+File "repaired.mlw", line 99, characters 16-27:
+Sub-goal Loop variant decrease of goal max_height_list'vc.
+Prover result is: Valid (0.02s, 3750 steps).
+
+File "repaired.mlw", line 97, characters 18-76:
+Sub-goal Loop invariant preservation of goal max_height_list'vc.
+Prover result is: Valid (0.02s, 4940 steps).
+
+File "repaired.mlw", line 98, characters 18-35:
+Sub-goal Loop invariant preservation of goal max_height_list'vc.
+Prover result is: Valid (0.01s, 2885 steps).
+
+File "repaired.mlw", line 107, characters 13-23:
+Sub-goal Assertion of goal max_height_list'vc.
+Prover result is: Valid (0.04s, 9243 steps).
+
+File "repaired.mlw", line 108, characters 13-59:
+Sub-goal Assertion of goal max_height_list'vc.
+Prover result is: Valid (0.01s, 3248 steps).
+
+File "repaired.mlw", line 109, characters 13-56:
+Sub-goal Assertion of goal max_height_list'vc.
+Prover result is: Timeout (10.00s, 1574408 steps).
+
+File "repaired.mlw", line 90, characters 14-40:
+Sub-goal Postcondition of goal max_height_list'vc.
+Prover result is: Valid (0.01s, 3170 steps).
+
+File "repaired.mlw", line 91, characters 14-25:
+Sub-goal Postcondition of goal max_height_list'vc.
+Prover result is: Valid (0.01s, 2942 steps).
+== Goals still unproved after stage 2 (split_vc) ==
+TrappingRainWater_List_Stage3_Imperative	max_height_list'vc
+== Stage 3: split_vc + inline_all on still-unproved goal ==
+Target theory: TrappingRainWater_List_Stage3_Imperative
+Target goal  : max_height_list'vc
+---- stage3 | prover: Z3,4.8.6 | theory: TrappingRainWater_List_Stage3_Imperative | goal: max_height_list'vc ----
+Transforms: split_vc inline_all
+File "repaired.mlw", line 93, characters 4-32:
+Sub-goal Precondition of goal max_height_list'vc.
+Prover result is: Valid (0.01s, 763 steps).
+
+File "repaired.mlw", line 97, characters 18-76:
+Sub-goal Loop invariant init of goal max_height_list'vc.
+Prover result is: Valid (0.01s, 800 steps).
+
+File "repaired.mlw", line 98, characters 18-35:
+Sub-goal Loop invariant init of goal max_height_list'vc.
+Prover result is: Valid (0.01s, 802 steps).
+
+File "repaired.mlw", line 99, characters 16-27:
+Sub-goal Loop variant decrease of goal max_height_list'vc.
+Prover result is: Valid (0.01s, 1050 steps).
+
+File "repaired.mlw", line 97, characters 18-76:
+Sub-goal Loop invariant preservation of goal max_height_list'vc.
+Prover result is: Valid (0.01s, 989 steps).
+
+File "repaired.mlw", line 98, characters 18-35:
+Sub-goal Loop invariant preservation of goal max_height_list'vc.
+Prover result is: Valid (0.01s, 998 steps).
+
+File "repaired.mlw", line 99, characters 16-27:
+Sub-goal Loop variant decrease of goal max_height_list'vc.
+Prover result is: Valid (0.01s, 15338 steps).
+
+File "repaired.mlw", line 97, characters 18-76:
+Sub-goal Loop invariant preservation of goal max_height_list'vc.
+Prover result is: Valid (0.01s, 17964 steps).
+
+File "repaired.mlw", line 98, characters 18-35:
+Sub-goal Loop invariant preservation of goal max_height_list'vc.
+Prover result is: Valid (0.01s, 14861 steps).
+
+File "repaired.mlw", line 99, characters 16-27:
+Sub-goal Loop variant decrease of goal max_height_list'vc.
+Prover result is: Valid (0.01s, 15290 steps).
+
+File "repaired.mlw", line 97, characters 18-76:
+Sub-goal Loop invariant preservation of goal max_height_list'vc.
+Prover result is: Valid (0.01s, 17350 steps).
+
+File "repaired.mlw", line 98, characters 18-35:
+Sub-goal Loop invariant preservation of goal max_height_list'vc.
+Prover result is: Valid (0.01s, 1613 steps).
+
+File "repaired.mlw", line 107, characters 13-23:
+Sub-goal Assertion of goal max_height_list'vc.
+Prover result is: Valid (0.01s, 30545 steps).
+
+File "repaired.mlw", line 108, characters 13-59:
+Sub-goal Assertion of goal max_height_list'vc.
+Prover result is: Valid (0.01s, 14945 steps).
+
+File "repaired.mlw", line 109, characters 13-56:
+Sub-goal Assertion of goal max_height_list'vc.
+Prover result is: Timeout (10.00s, 158002141 steps).
+
+File "repaired.mlw", line 90, characters 14-40:
+Sub-goal Postcondition of goal max_height_list'vc.
+Prover result is: Valid (0.01s, 15483 steps).
+
+File "repaired.mlw", line 91, characters 14-25:
+Sub-goal Postcondition of goal max_height_list'vc.
+Prover result is: Valid (0.01s, 1679 steps).
+---- stage3 | prover: Alt-Ergo,2.4.0 | theory: TrappingRainWater_List_Stage3_Imperative | goal: max_height_list'vc ----
+Transforms: split_vc inline_all
+File "repaired.mlw", line 93, characters 4-32:
+Sub-goal Precondition of goal max_height_list'vc.
+Prover result is: Valid (0.01s, 3 steps).
+
+File "repaired.mlw", line 97, characters 18-76:
+Sub-goal Loop invariant init of goal max_height_list'vc.
+Prover result is: Valid (0.01s, 8 steps).
+
+File "repaired.mlw", line 98, characters 18-35:
+Sub-goal Loop invariant init of goal max_height_list'vc.
+Prover result is: Valid (0.01s, 8 steps).
+
+File "repaired.mlw", line 99, characters 16-27:
+Sub-goal Loop variant decrease of goal max_height_list'vc.
+Prover result is: Valid (0.01s, 11 steps).
+
+File "repaired.mlw", line 97, characters 18-76:
+Sub-goal Loop invariant preservation of goal max_height_list'vc.
+Prover result is: Valid (0.01s, 11 steps).
+
+File "repaired.mlw", line 98, characters 18-35:
+Sub-goal Loop invariant preservation of goal max_height_list'vc.
+Prover result is: Valid (0.01s, 11 steps).
+
+File "repaired.mlw", line 99, characters 16-27:
+Sub-goal Loop variant decrease of goal max_height_list'vc.
+Prover result is: Valid (0.01s, 49 steps).
+
+File "repaired.mlw", line 97, characters 18-76:
+Sub-goal Loop invariant preservation of goal max_height_list'vc.
+Prover result is: Valid (0.01s, 49 steps).
+
+File "repaired.mlw", line 98, characters 18-35:
+Sub-goal Loop invariant preservation of goal max_height_list'vc.
+Prover result is: Valid (0.01s, 21 steps).
+
+File "repaired.mlw", line 99, characters 16-27:
+Sub-goal Loop variant decrease of goal max_height_list'vc.
+Prover result is: Valid (0.01s, 48 steps).
+
+File "repaired.mlw", line 97, characters 18-76:
+Sub-goal Loop invariant preservation of goal max_height_list'vc.
+Prover result is: Valid (0.01s, 91 steps).
+
+File "repaired.mlw", line 98, characters 18-35:
+Sub-goal Loop invariant preservation of goal max_height_list'vc.
+Prover result is: Valid (0.01s, 17 steps).
+
+File "repaired.mlw", line 107, characters 13-23:
+Sub-goal Assertion of goal max_height_list'vc.
+Prover result is: Timeout (10.00s, 154218 steps).
+
+File "repaired.mlw", line 108, characters 13-59:
+Sub-goal Assertion of goal max_height_list'vc.
+Prover result is: Valid (0.01s, 43 steps).
+
+File "repaired.mlw", line 109, characters 13-56:
+Sub-goal Assertion of goal max_height_list'vc.
+Prover result is: Timeout (10.00s, 126745 steps).
+
+File "repaired.mlw", line 90, characters 14-40:
+Sub-goal Postcondition of goal max_height_list'vc.
+Prover result is: Valid (0.01s, 22 steps).
+
+File "repaired.mlw", line 91, characters 14-25:
+Sub-goal Postcondition of goal max_height_list'vc.
+Prover result is: Valid (0.01s, 22 steps).
+---- stage3 | prover: CVC4,1.8 | theory: TrappingRainWater_List_Stage3_Imperative | goal: max_height_list'vc ----
+Transforms: split_vc inline_all
+File "repaired.mlw", line 93, characters 4-32:
+Sub-goal Precondition of goal max_height_list'vc.
+Prover result is: Valid (0.02s, 3667 steps).
+
+File "repaired.mlw", line 97, characters 18-76:
+Sub-goal Loop invariant init of goal max_height_list'vc.
+Prover result is: Valid (0.01s, 3748 steps).
+
+File "repaired.mlw", line 98, characters 18-35:
+Sub-goal Loop invariant init of goal max_height_list'vc.
+Prover result is: Valid (0.01s, 3749 steps).
+
+File "repaired.mlw", line 99, characters 16-27:
+Sub-goal Loop variant decrease of goal max_height_list'vc.
+Prover result is: Valid (0.01s, 4272 steps).
+
+File "repaired.mlw", line 97, characters 18-76:
+Sub-goal Loop invariant preservation of goal max_height_list'vc.
+Prover result is: Valid (0.01s, 4172 steps).
+
+File "repaired.mlw", line 98, characters 18-35:
+Sub-goal Loop invariant preservation of goal max_height_list'vc.
+Prover result is: Valid (0.01s, 4175 steps).
+
+File "repaired.mlw", line 99, characters 16-27:
+Sub-goal Loop variant decrease of goal max_height_list'vc.
+Prover result is: Valid (0.03s, 7862 steps).
+
+File "repaired.mlw", line 97, characters 18-76:
+Sub-goal Loop invariant preservation of goal max_height_list'vc.
+Prover result is: Valid (0.03s, 7674 steps).
+
+File "repaired.mlw", line 98, characters 18-35:
+Sub-goal Loop invariant preservation of goal max_height_list'vc.
+Prover result is: Valid (0.02s, 5546 steps).
+
+File "repaired.mlw", line 99, characters 16-27:
+Sub-goal Loop variant decrease of goal max_height_list'vc.
+Prover result is: Valid (0.03s, 7858 steps).
+
+File "repaired.mlw", line 97, characters 18-76:
+Sub-goal Loop invariant preservation of goal max_height_list'vc.
+Prover result is: Valid (0.03s, 7790 steps).
+
+File "repaired.mlw", line 98, characters 18-35:
+Sub-goal Loop invariant preservation of goal max_height_list'vc.
+Prover result is: Valid (0.01s, 4471 steps).
+
+File "repaired.mlw", line 107, characters 13-23:
+Sub-goal Assertion of goal max_height_list'vc.
+Prover result is: Unknown (unknown + incomplete) (0.03s, 7821 steps).
+
+File "repaired.mlw", line 108, characters 13-59:
+Sub-goal Assertion of goal max_height_list'vc.
+Prover result is: Valid (0.02s, 7013 steps).
+
+File "repaired.mlw", line 109, characters 13-56:
+Sub-goal Assertion of goal max_height_list'vc.
+Prover result is: Unknown (unknown + incomplete) (0.02s, 7336 steps).
+
+File "repaired.mlw", line 90, characters 14-40:
+Sub-goal Postcondition of goal max_height_list'vc.
+Prover result is: Valid (0.02s, 5629 steps).
+
+File "repaired.mlw", line 91, characters 14-25:
+Sub-goal Postcondition of goal max_height_list'vc.
+Prover result is: Valid (0.01s, 4528 steps).
+== Final summary ==
+Unproved root goals after first prover : 1
+Remaining failures after split_vc      : 1
+Remaining failures after stage 3       : 1
+Detailed logs stored in                : /Users/rubenm/Desktop/Diversify2Verify/codex-runs/dataset-merge-verification/stage3a-repair/42_trapping-rain-water/list-imperative/trapping_rain_water_list_stage3_f65213d8_stage3/generated/why3/.why3_sessions/repaired_logs
+Still unproved goals:
+TrappingRainWater_List_Stage3_Imperative	max_height_list'vc
+VERIFY_RESULT: FAILURE
+VERIFY_REASON: unproved_goals_remain
+VERIFY_STAGE: stage3
+VERIFY_ROOT_TOTAL: 9
+VERIFY_ROOT_PROVED: 8
+VERIFY_ROOT_REMAINING: 1

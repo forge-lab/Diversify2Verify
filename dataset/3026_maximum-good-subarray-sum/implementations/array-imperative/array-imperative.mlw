@@ -1,0 +1,170 @@
+module MaximumGoodSubarraySum_Array_Imperative
+
+  use int.Int
+  use int.Abs
+  use array.Array
+  use array.Init
+  use ref.Ref
+
+  let maximum_good_subarray_sum_array (nums: array int) (k: int) : int =
+    let best = ref 0 in
+    let found = ref false in
+    for i = 0 to length nums - 1 do
+      let running_sum = ref 0 in
+      for j = i to length nums - 1 do
+        running_sum := !running_sum + nums[j];
+        if abs (nums[i] - nums[j]) = k then begin
+          if not !found then begin
+            found := true;
+            best := !running_sum
+          end else if !running_sum > !best then
+            best := !running_sum
+        end
+      done
+    done;
+    if !found then !best else 0
+
+  let test_000 () : bool =
+    let nums = init 2 [|1000000000; -1000000000|] in
+    let r = maximum_good_subarray_sum_array nums 2000000000 in
+    r = 0
+
+  let test_001 () : bool =
+    let nums = init 5 [|-1; 3; 2; 4; 5|] in
+    let r = maximum_good_subarray_sum_array nums 3 in
+    r = 11
+
+  let test_002 () : bool =
+    let nums = init 5 [|10; 20; 30; 40; 50|] in
+    let r = maximum_good_subarray_sum_array nums 20 in
+    r = 120
+
+  let test_005 () : bool =
+    let nums = init 4 [|-1000000000; 1000000000; -1000000000; 1000000000|] in
+    let r = maximum_good_subarray_sum_array nums 2000000000 in
+    r = 0
+
+  let test_006 () : bool =
+    let nums = init 5 [|1; 3; 5; 7; 9|] in
+    let r = maximum_good_subarray_sum_array nums 8 in
+    r = 25
+
+  let test_007 () : bool =
+    let nums = init 10 [|1; 2; 3; 4; 5; 6; 7; 8; 9; 10|] in
+    let r = maximum_good_subarray_sum_array nums 9 in
+    r = 55
+
+  let test_008 () : bool =
+    let nums = init 5 [|10; 20; 30; 40; 50|] in
+    let r = maximum_good_subarray_sum_array nums 40 in
+    r = 150
+
+  let test_009 () : bool =
+    let nums = init 4 [|-1; -2; -3; -4|] in
+    let r = maximum_good_subarray_sum_array nums 2 in
+    r = -6
+
+  let test_010 () : bool =
+    let nums = init 5 [|1; -1; 1; -1; 1|] in
+    let r = maximum_good_subarray_sum_array nums 2 in
+    r = 0
+
+  let test_011 () : bool =
+    let nums = init 6 [|1; 2; 3; 4; 5; 6|] in
+    let r = maximum_good_subarray_sum_array nums 1 in
+    r = 11
+
+  let test_012 () : bool =
+    let nums = init 8 [|1; 3; 1; 5; 4; 1; 3; 5|] in
+    let r = maximum_good_subarray_sum_array nums 2 in
+    r = 22
+
+  let test_013 () : bool =
+    let nums = init 6 [|1; 3; 1; 5; 4; 1|] in
+    let r = maximum_good_subarray_sum_array nums 4 in
+    r = 10
+
+  let test_014 () : bool =
+    let nums = init 5 [|5; 4; 3; 2; 1|] in
+    let r = maximum_good_subarray_sum_array nums 4 in
+    r = 15
+
+  let test_015 () : bool =
+    let nums = init 10 [|10; 9; 8; 7; 6; 5; 4; 3; 2; 1|] in
+    let r = maximum_good_subarray_sum_array nums 9 in
+    r = 55
+
+  let test_016 () : bool =
+    let nums = init 5 [|10; 20; 30; 40; 50|] in
+    let r = maximum_good_subarray_sum_array nums 10 in
+    r = 90
+
+  let test_020 () : bool =
+    let nums = init 20 [|1; 2; 3; 4; 5; 6; 7; 8; 9; 10; 11; 12; 13; 14; 15; 16; 17; 18; 19; 20|] in
+    let r = maximum_good_subarray_sum_array nums 19 in
+    r = 210
+
+  let test_021 () : bool =
+    let nums = init 20 [|1; 2; 3; 4; 5; 6; 7; 8; 9; 10; 11; 12; 13; 14; 15; 1; 2; 3; 4; 5|] in
+    let r = maximum_good_subarray_sum_array nums 14 in
+    r = 120
+
+  let test_022 () : bool =
+    let nums = init 10 [|1; 3; 1; 5; 1; 7; 1; 9; 1; 11|] in
+    let r = maximum_good_subarray_sum_array nums 8 in
+    r = 39
+
+  let test_023 () : bool =
+    let nums = init 25 [|1; 2; 3; 4; 5; 6; 7; 8; 9; 10; 11; 12; 13; 14; 15; 16; 17; 18; 19; 20; 1; 2; 3; 4; 5|] in
+    let r = maximum_good_subarray_sum_array nums 19 in
+    r = 210
+
+  let test_024 () : bool =
+    let nums = init 11 [|-1; 0; 1; -2; 2; -3; 3; -4; 4; -5; 5|] in
+    let r = maximum_good_subarray_sum_array nums 5 in
+    r = 1
+
+  let run_tests () : bool =
+    if test_000 () then
+    if test_001 () then
+    if test_002 () then
+    if test_005 () then
+    if test_006 () then
+    if test_007 () then
+    if test_008 () then
+    if test_009 () then
+    if test_010 () then
+    if test_011 () then
+    if test_012 () then
+    if test_013 () then
+    if test_014 () then
+    if test_015 () then
+    if test_016 () then
+    if test_020 () then
+    if test_021 () then
+    if test_022 () then
+    if test_023 () then
+    if test_024 () then
+      true
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+
+end

@@ -1,0 +1,295 @@
+module MaximumNumberOfUpgradableServers_List_Imperative_Implementation
+
+  use int.Int
+  use int.MinMax
+  use int.EuclideanDivision
+  use list.List
+  use ref.Ref
+
+  let maximum_upgrades_amount (c: int) (u: int) (s: int) (m: int) : int =
+    if u + s <= 0 then 0 else min c (div (m + c * s) (u + s))
+
+  let reverse_list (xs: list int) : list int =
+    let cur = ref xs in
+    let acc = ref Nil in
+    while (match !cur with Nil -> false | Cons _ _ -> true end) do
+      match !cur with
+      | Nil -> ()
+      | Cons x xt ->
+          acc := Cons x !acc;
+          cur := xt
+      end
+    done;
+    !acc
+
+  let list_eq (xs: list int) (ys: list int) : bool =
+    let left = ref xs in
+    let right = ref ys in
+    let same = ref true in
+    while !same &&
+          (match !left, !right with
+           | Cons _ _, Cons _ _ -> true
+           | _, _ -> false
+           end) do
+      match !left, !right with
+      | Cons x xt, Cons y yt ->
+          if x <> y then same := false;
+          left := xt;
+          right := yt
+      | _, _ -> ()
+      end
+    done;
+    if not !same then false else
+    match !left, !right with
+    | Nil, Nil -> true
+    | _, _ -> false
+    end
+
+  let maximum_number_of_upgradable_servers_list (count: list int) (upgrade: list int)
+      (sell: list int) (money: list int) : list int =
+    let count_cur = ref count in
+    let upgrade_cur = ref upgrade in
+    let sell_cur = ref sell in
+    let money_cur = ref money in
+    let rev_answer = ref Nil in
+    while (match !count_cur, !upgrade_cur, !sell_cur, !money_cur with
+           | Cons _ _, Cons _ _, Cons _ _, Cons _ _ -> true
+           | _, _, _, _ -> false
+           end) do
+      match !count_cur, !upgrade_cur, !sell_cur, !money_cur with
+      | Cons c cs, Cons u us, Cons s ss, Cons m ms ->
+          let value = maximum_upgrades_amount c u s m in
+          rev_answer := Cons value !rev_answer;
+          count_cur := cs;
+          upgrade_cur := us;
+          sell_cur := ss;
+          money_cur := ms
+      | _, _, _, _ -> ()
+      end
+    done;
+    reverse_list !rev_answer
+
+  let test_000 () : bool =
+    let count = Cons 100000 Nil in
+    let upgrade = Cons 100000 Nil in
+    let sell = Cons 100000 Nil in
+    let money = Cons 1000000000 Nil in
+    let expected = Cons 55000 Nil in
+    let result = maximum_number_of_upgradable_servers_list count upgrade sell money in
+    list_eq result expected
+
+  let test_001 () : bool =
+    let count = Cons 10 (Cons 20 (Cons 30 Nil)) in
+    let upgrade = Cons 5 (Cons 4 (Cons 3 Nil)) in
+    let sell = Cons 1 (Cons 2 (Cons 3 Nil)) in
+    let money = Cons 50 (Cons 100 (Cons 150 Nil)) in
+    let expected = Cons 10 (Cons 20 (Cons 30 Nil)) in
+    let result = maximum_number_of_upgradable_servers_list count upgrade sell money in
+    list_eq result expected
+
+  let test_002 () : bool =
+    let count = Cons 10 (Cons 20 (Cons 30 Nil)) in
+    let upgrade = Cons 1 (Cons 2 (Cons 3 Nil)) in
+    let sell = Cons 4 (Cons 5 (Cons 6 Nil)) in
+    let money = Cons 100 (Cons 100 (Cons 100 Nil)) in
+    let expected = Cons 10 (Cons 20 (Cons 30 Nil)) in
+    let result = maximum_number_of_upgradable_servers_list count upgrade sell money in
+    list_eq result expected
+
+  let test_003 () : bool =
+    let count = Cons 4 (Cons 3 Nil) in
+    let upgrade = Cons 3 (Cons 5 Nil) in
+    let sell = Cons 4 (Cons 2 Nil) in
+    let money = Cons 8 (Cons 9 Nil) in
+    let expected = Cons 3 (Cons 2 Nil) in
+    let result = maximum_number_of_upgradable_servers_list count upgrade sell money in
+    list_eq result expected
+
+  let test_004 () : bool =
+    let count = Cons 5 (Cons 5 (Cons 5 Nil)) in
+    let upgrade = Cons 10 (Cons 20 (Cons 30 Nil)) in
+    let sell = Cons 5 (Cons 10 (Cons 15 Nil)) in
+    let money = Cons 100 (Cons 100 (Cons 100 Nil)) in
+    let expected = Cons 5 (Cons 5 (Cons 3 Nil)) in
+    let result = maximum_number_of_upgradable_servers_list count upgrade sell money in
+    list_eq result expected
+
+  let test_005 () : bool =
+    let count = Cons 1 Nil in
+    let upgrade = Cons 2 Nil in
+    let sell = Cons 1 Nil in
+    let money = Cons 1 Nil in
+    let expected = Cons 0 Nil in
+    let result = maximum_number_of_upgradable_servers_list count upgrade sell money in
+    list_eq result expected
+
+  let test_006 () : bool =
+    let count = Cons 10 (Cons 20 (Cons 30 Nil)) in
+    let upgrade = Cons 5 (Cons 10 (Cons 15 Nil)) in
+    let sell = Cons 1 (Cons 2 (Cons 3 Nil)) in
+    let money = Cons 100 (Cons 200 (Cons 300 Nil)) in
+    let expected = Cons 10 (Cons 20 (Cons 21 Nil)) in
+    let result = maximum_number_of_upgradable_servers_list count upgrade sell money in
+    list_eq result expected
+
+  let test_007 () : bool =
+    let count = Cons 10 (Cons 20 (Cons 30 Nil)) in
+    let upgrade = Cons 1 (Cons 2 (Cons 3 Nil)) in
+    let sell = Cons 4 (Cons 5 (Cons 6 Nil)) in
+    let money = Cons 50 (Cons 100 (Cons 150 Nil)) in
+    let expected = Cons 10 (Cons 20 (Cons 30 Nil)) in
+    let result = maximum_number_of_upgradable_servers_list count upgrade sell money in
+    list_eq result expected
+
+  let test_008 () : bool =
+    let count = Cons 5 (Cons 5 (Cons 5 Nil)) in
+    let upgrade = Cons 10 (Cons 20 (Cons 30 Nil)) in
+    let sell = Cons 5 (Cons 15 (Cons 25 Nil)) in
+    let money = Cons 100 (Cons 150 (Cons 200 Nil)) in
+    let expected = Cons 5 (Cons 5 (Cons 5 Nil)) in
+    let result = maximum_number_of_upgradable_servers_list count upgrade sell money in
+    list_eq result expected
+
+  let test_009 () : bool =
+    let count = Cons 5 (Cons 5 (Cons 5 Nil)) in
+    let upgrade = Cons 1 (Cons 2 (Cons 3 Nil)) in
+    let sell = Cons 3 (Cons 2 (Cons 1 Nil)) in
+    let money = Cons 10 (Cons 10 (Cons 10 Nil)) in
+    let expected = Cons 5 (Cons 5 (Cons 3 Nil)) in
+    let result = maximum_number_of_upgradable_servers_list count upgrade sell money in
+    list_eq result expected
+
+  let test_010 () : bool =
+    let count = Cons 100 (Cons 100 (Cons 100 Nil)) in
+    let upgrade = Cons 1000 (Cons 1000 (Cons 1000 Nil)) in
+    let sell = Cons 500 (Cons 500 (Cons 500 Nil)) in
+    let money = Cons 50000 (Cons 50000 (Cons 50000 Nil)) in
+    let expected = Cons 66 (Cons 66 (Cons 66 Nil)) in
+    let result = maximum_number_of_upgradable_servers_list count upgrade sell money in
+    list_eq result expected
+
+  let test_011 () : bool =
+    let count = Cons 100 Nil in
+    let upgrade = Cons 10 Nil in
+    let sell = Cons 5 Nil in
+    let money = Cons 500 Nil in
+    let expected = Cons 66 Nil in
+    let result = maximum_number_of_upgradable_servers_list count upgrade sell money in
+    list_eq result expected
+
+  let test_012 () : bool =
+    let count = Cons 10 (Cons 20 (Cons 30 Nil)) in
+    let upgrade = Cons 1 (Cons 2 (Cons 3 Nil)) in
+    let sell = Cons 3 (Cons 2 (Cons 1 Nil)) in
+    let money = Cons 100 (Cons 200 (Cons 300 Nil)) in
+    let expected = Cons 10 (Cons 20 (Cons 30 Nil)) in
+    let result = maximum_number_of_upgradable_servers_list count upgrade sell money in
+    list_eq result expected
+
+  let test_013 () : bool =
+    let count = Cons 5 (Cons 5 (Cons 5 Nil)) in
+    let upgrade = Cons 10 (Cons 10 (Cons 10 Nil)) in
+    let sell = Cons 5 (Cons 5 (Cons 5 Nil)) in
+    let money = Cons 50 (Cons 50 (Cons 50 Nil)) in
+    let expected = Cons 5 (Cons 5 (Cons 5 Nil)) in
+    let result = maximum_number_of_upgradable_servers_list count upgrade sell money in
+    list_eq result expected
+
+  let test_014 () : bool =
+    let count = Cons 5 (Cons 5 (Cons 5 Nil)) in
+    let upgrade = Cons 10 (Cons 10 (Cons 10 Nil)) in
+    let sell = Cons 5 (Cons 5 (Cons 5 Nil)) in
+    let money = Cons 20 (Cons 20 (Cons 20 Nil)) in
+    let expected = Cons 3 (Cons 3 (Cons 3 Nil)) in
+    let result = maximum_number_of_upgradable_servers_list count upgrade sell money in
+    list_eq result expected
+
+  let test_015 () : bool =
+    let count = Cons 2 (Cons 4 (Cons 6 Nil)) in
+    let upgrade = Cons 1 (Cons 2 (Cons 3 Nil)) in
+    let sell = Cons 2 (Cons 4 (Cons 6 Nil)) in
+    let money = Cons 10 (Cons 20 (Cons 30 Nil)) in
+    let expected = Cons 2 (Cons 4 (Cons 6 Nil)) in
+    let result = maximum_number_of_upgradable_servers_list count upgrade sell money in
+    list_eq result expected
+
+  let test_016 () : bool =
+    let count = Cons 100 (Cons 200 (Cons 300 (Cons 400 Nil))) in
+    let upgrade = Cons 5 (Cons 10 (Cons 15 (Cons 20 Nil))) in
+    let sell = Cons 20 (Cons 15 (Cons 10 (Cons 5 Nil))) in
+    let money = Cons 500 (Cons 1000 (Cons 1500 (Cons 2000 Nil))) in
+    let expected = Cons 100 (Cons 160 (Cons 180 (Cons 160 Nil))) in
+    let result = maximum_number_of_upgradable_servers_list count upgrade sell money in
+    list_eq result expected
+
+  let test_017 () : bool =
+    let count = Cons 100 (Cons 200 (Cons 300 (Cons 400 (Cons 500 Nil)))) in
+    let upgrade = Cons 5 (Cons 10 (Cons 15 (Cons 20 (Cons 25 Nil)))) in
+    let sell = Cons 20 (Cons 15 (Cons 10 (Cons 5 (Cons 1 Nil)))) in
+    let money = Cons 1000 (Cons 2000 (Cons 3000 (Cons 4000 (Cons 5000 Nil)))) in
+    let expected = Cons 100 (Cons 200 (Cons 240 (Cons 240 (Cons 211 Nil)))) in
+    let result = maximum_number_of_upgradable_servers_list count upgrade sell money in
+    list_eq result expected
+
+  let test_018 () : bool =
+    let count = Cons 1 (Cons 2 (Cons 3 (Cons 4 (Cons 5 Nil)))) in
+    let upgrade = Cons 10 (Cons 20 (Cons 30 (Cons 40 (Cons 50 Nil)))) in
+    let sell = Cons 50 (Cons 40 (Cons 30 (Cons 20 (Cons 10 Nil)))) in
+    let money = Cons 100 (Cons 200 (Cons 300 (Cons 400 (Cons 500 Nil)))) in
+    let expected = Cons 1 (Cons 2 (Cons 3 (Cons 4 (Cons 5 Nil)))) in
+    let result = maximum_number_of_upgradable_servers_list count upgrade sell money in
+    list_eq result expected
+
+  let test_019 () : bool =
+    let count = Cons 15 (Cons 25 (Cons 35 (Cons 45 Nil))) in
+    let upgrade = Cons 2 (Cons 3 (Cons 4 (Cons 5 Nil))) in
+    let sell = Cons 5 (Cons 4 (Cons 3 (Cons 2 Nil))) in
+    let money = Cons 150 (Cons 250 (Cons 350 (Cons 450 Nil))) in
+    let expected = Cons 15 (Cons 25 (Cons 35 (Cons 45 Nil))) in
+    let result = maximum_number_of_upgradable_servers_list count upgrade sell money in
+    list_eq result expected
+
+  let run_tests () : bool =
+    if test_000 () then
+    if test_001 () then
+    if test_002 () then
+    if test_003 () then
+    if test_004 () then
+    if test_005 () then
+    if test_006 () then
+    if test_007 () then
+    if test_008 () then
+    if test_009 () then
+    if test_010 () then
+    if test_011 () then
+    if test_012 () then
+    if test_013 () then
+    if test_014 () then
+    if test_015 () then
+    if test_016 () then
+    if test_017 () then
+    if test_018 () then
+    if test_019 () then
+      true
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+
+end

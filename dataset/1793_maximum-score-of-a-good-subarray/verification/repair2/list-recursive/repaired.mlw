@@ -1,0 +1,361 @@
+module MaximumScoreOfAGoodSubarray_List_Spec
+
+  use int.Int
+  use list.List
+  use list.Length
+  use list.NthNoOpt
+
+  predicate values_in_range (nums: list int) =
+    forall idx: int.
+      0 <= idx /\ idx < length nums ->
+      1 <= nth idx nums /\ nth idx nums <= 20000
+
+  predicate valid_input (nums: list int) (k: int) =
+    1 <= length nums /\ length nums <= 100000 /\
+    0 <= k /\ k < length nums /\
+    values_in_range nums
+
+  predicate valid_interval (nums: list int) (k: int) (i: int) (j: int) =
+    0 <= i /\ i <= k /\ k <= j /\ j < length nums
+
+  predicate is_min_on_interval (nums: list int) (i: int) (j: int) (m: int) =
+    (forall t: int. i <= t /\ t <= j -> m <= nth t nums) /\
+    (exists t: int. i <= t /\ t <= j /\ nth t nums = m)
+
+  predicate good_subarray_score
+      (nums: list int) (k: int) (i: int) (j: int) (score: int) =
+    valid_interval nums k i j /\
+    exists m: int.
+      is_min_on_interval nums i j m /\
+      score = m * (j - i + 1)
+
+  predicate interval_score_at_most (nums: list int) (k: int) (bound: int) =
+    forall i j score: int.
+      good_subarray_score nums k i j score -> score <= bound
+
+  predicate maximum_good_subarray_score
+      (nums: list int) (k: int) (best: int) =
+    (exists i j: int. good_subarray_score nums k i j best) /\
+    interval_score_at_most nums k best
+
+  predicate suffix_from_at (nums: list int) (pos: int) (suffix: list int) =
+    0 <= pos /\ pos <= length nums /\
+    length suffix = length nums - pos /\
+    forall p: int.
+      0 <= p /\ p < length suffix -> nth p suffix = nth (pos + p) nums
+
+  predicate reversed_prefix_before (nums: list int) (pos: int) (left_rev: list int) =
+    0 <= pos /\ pos <= length nums /\
+    length left_rev = pos /\
+    forall p: int.
+      0 <= p /\ p < length left_rev -> nth p left_rev = nth (pos - 1 - p) nums
+
+  predicate take_rev_acc_shape
+      (nums: list int) (pos: int) (acc: list int) (result: list int) =
+    0 <= pos /\ pos <= length nums /\
+    length result = pos + length acc /\
+    (forall p: int.
+      0 <= p /\ p < pos -> nth p result = nth (pos - 1 - p) nums) /\
+    (forall p: int.
+      pos <= p /\ p < length result -> nth p result = nth (p - pos) acc)
+
+  predicate right_state
+      (nums: list int) (k: int) (i: int) (j: int)
+      (current_min: int) (current_len: int) (right: list int) =
+    valid_interval nums k i j /\
+    current_len = j - i + 1 /\
+    is_min_on_interval nums i j current_min /\
+    suffix_from_at nums (j + 1) right
+
+  predicate best_right_from
+      (nums: list int) (k: int) (i: int) (start_j: int) (best: int) =
+    0 <= i /\ i <= k /\ k <= start_j /\ start_j < length nums /\
+    (exists j: int.
+      start_j <= j /\ j < length nums /\
+      good_subarray_score nums k i j best) /\
+    (forall j score: int.
+      start_j <= j /\ j < length nums /\
+      good_subarray_score nums k i j score -> score <= best)
+
+  predicate fixed_interval_score_at_most
+      (nums: list int) (k: int) (i: int) (j: int) (bound: int) =
+    forall score: int.
+      good_subarray_score nums k i j score -> score <= bound
+
+  predicate left_state
+      (nums: list int) (k: int) (i: int) (left_rev: list int)
+      (current_min: int) (current_len: int) (right: list int) =
+    0 <= i /\ i <= k /\ k < length nums /\
+    current_len = k - i + 1 /\
+    is_min_on_interval nums i k current_min /\
+    reversed_prefix_before nums i left_rev /\
+    suffix_from_at nums (k + 1) right
+
+  predicate best_left_from
+      (nums: list int) (k: int) (max_left: int) (best: int) =
+    0 <= max_left /\ max_left <= k /\ k < length nums /\
+    (exists i j: int.
+      0 <= i /\ i <= max_left /\ k <= j /\ j < length nums /\
+      good_subarray_score nums k i j best) /\
+    (forall i j score: int.
+      0 <= i /\ i <= max_left /\ k <= j /\ j < length nums /\
+      good_subarray_score nums k i j score -> score <= best)
+
+  let lemma take_rev_acc_shape_nil_bridge
+      (nums: list int) (pos: int) (res: list int)
+    requires { take_rev_acc_shape nums pos Nil res }
+    ensures  { reversed_prefix_before nums pos res }
+  =
+    assert { length (Nil: list int) = 0 };
+    assert { length res = pos }
+
+  let lemma min_on_interval_unique
+      (nums: list int) (i: int) (j: int) (m1: int) (m2: int)
+    requires { is_min_on_interval nums i j m1 }
+    requires { is_min_on_interval nums i j m2 }
+    ensures  { m1 = m2 }
+  =
+    assert { exists t1: int. i <= t1 /\ t1 <= j /\ nth t1 nums = m1 };
+    assert { exists t2: int. i <= t2 /\ t2 <= j /\ nth t2 nums = m2 };
+    assert { m1 <= m2 };
+    assert { m2 <= m1 }
+
+  let lemma fixed_interval_current_bound
+      (nums: list int) (k: int) (i: int) (j: int)
+      (current_min: int) (current_len: int)
+    requires { valid_interval nums k i j }
+    requires { current_len = j - i + 1 }
+    requires { is_min_on_interval nums i j current_min }
+    ensures  { fixed_interval_score_at_most nums k i j
+                (current_min * current_len) }
+  =
+    assert { forall m: int.
+      is_min_on_interval nums i j m -> m = current_min };
+    assert { forall score: int.
+      good_subarray_score nums k i j score ->
+      score = current_min * current_len }
+
+  let lemma best_right_nil_bridge
+      (nums: list int) (k: int) (i: int) (j: int)
+      (current_min: int) (current_len: int)
+    requires { right_state nums k i j current_min current_len Nil }
+    requires { fixed_interval_score_at_most nums k i j
+                (current_min * current_len) }
+    ensures  { best_right_from nums k i j (current_min * current_len) }
+  =
+    assert { good_subarray_score nums k i j (current_min * current_len) };
+    assert { suffix_from_at nums (j + 1) Nil };
+    assert { j = length nums - 1 };
+    assert { forall jj score: int.
+      j <= jj /\ jj < length nums /\
+      good_subarray_score nums k i jj score -> jj = j };
+    assert { forall jj score: int.
+      j <= jj /\ jj < length nums /\
+      good_subarray_score nums k i jj score ->
+      score <= current_min * current_len }
+
+  let lemma best_right_cons_bridge
+      (nums: list int) (k: int) (i: int) (j: int)
+      (current_score: int) (extended_best: int) (best: int)
+    requires { valid_interval nums k i j }
+    requires { good_subarray_score nums k i j current_score }
+    requires { fixed_interval_score_at_most nums k i j current_score }
+    requires { best_right_from nums k i (j + 1) extended_best }
+    requires { current_score <= best /\ extended_best <= best }
+    requires { best = current_score \/ best = extended_best }
+    ensures  { best_right_from nums k i j best }
+  =
+    assert { exists jj: int.
+      j <= jj /\ jj < length nums /\
+      good_subarray_score nums k i jj best };
+    assert { forall jj score: int.
+      j <= jj /\ jj < length nums /\
+      good_subarray_score nums k i jj score ->
+      score <= best }
+
+  let lemma best_left_nil_bridge
+      (nums: list int) (k: int) (i: int) (best_here: int)
+    requires { i = 0 }
+    requires { best_right_from nums k i k best_here }
+    ensures  { best_left_from nums k i best_here }
+  =
+    assert { forall ii jj score: int.
+      0 <= ii /\ ii <= i /\ k <= jj /\ jj < length nums /\
+      good_subarray_score nums k ii jj score -> ii = i };
+    assert { forall ii jj score: int.
+      0 <= ii /\ ii <= i /\ k <= jj /\ jj < length nums /\
+      good_subarray_score nums k ii jj score -> score <= best_here }
+
+  let lemma best_left_cons_bridge
+      (nums: list int) (k: int) (i: int)
+      (best_here: int) (extended_best: int) (best: int)
+    requires { 0 < i }
+    requires { best_right_from nums k i k best_here }
+    requires { best_left_from nums k (i - 1) extended_best }
+    requires { best_here <= best /\ extended_best <= best }
+    requires { best = best_here \/ best = extended_best }
+    ensures  { best_left_from nums k i best }
+  =
+    assert { exists ii jj: int.
+      0 <= ii /\ ii <= i /\ k <= jj /\ jj < length nums /\
+      good_subarray_score nums k ii jj best };
+    assert { forall ii jj score: int.
+      0 <= ii /\ ii <= i /\ k <= jj /\ jj < length nums /\
+      good_subarray_score nums k ii jj score ->
+      score <= best }
+
+  let min_int (x: int) (y: int) : int
+    ensures { result = x \/ result = y }
+    ensures { result <= x /\ result <= y }
+    ensures { result = x \/ x > y }
+    ensures { result = y \/ x <= y }
+  =
+    if x <= y then x else y
+
+  let max_int (x: int) (y: int) : int
+    ensures { result = x \/ result = y }
+    ensures { x <= result /\ y <= result }
+    ensures { result = x \/ x < y }
+    ensures { result = y \/ x >= y }
+  =
+    if x >= y then x else y
+
+  let rec drop (l: list int) (n: int) : list int
+    requires { 0 <= n /\ n <= length l }
+    ensures  { suffix_from_at l n result }
+    variant { l }
+  =
+    if n <= 0 then begin
+      assert { n = 0 };
+      assert { suffix_from_at l 0 l };
+      l
+    end else
+    match l with
+    | Nil ->
+        absurd
+    | Cons _ xs ->
+        let r = drop xs (n - 1) in
+        assert { suffix_from_at l n r };
+        r
+    end
+
+  let rec take_rev_acc (l: list int) (n: int) (acc: list int) : list int
+    requires { 0 <= n /\ n <= length l }
+    ensures  { take_rev_acc_shape l n acc result }
+    ensures  { acc = Nil -> reversed_prefix_before l n result }
+    variant { l }
+  =
+    if n <= 0 then begin
+      assert { n = 0 };
+      assert { take_rev_acc_shape l n acc acc };
+      assert { acc = Nil -> reversed_prefix_before l n acc };
+      acc
+    end else
+    match l with
+    | Nil ->
+        absurd
+    | Cons x xs ->
+        assert { 0 <= n - 1 /\ n - 1 <= length xs };
+        let r = take_rev_acc xs (n - 1) (Cons x acc) in
+        assert { take_rev_acc_shape xs (n - 1) (Cons x acc) r };
+        assert { length r = n + length acc };
+        assert { forall p: int.
+          0 <= p /\ p < n - 1 -> nth p r = nth (n - 1 - p) l };
+        assert { forall p: int.
+          p = n - 1 -> nth p r = nth (n - 1 - p) l };
+        assert { forall p: int.
+          0 <= p /\ p < n -> nth p r = nth (n - 1 - p) l };
+        assert { forall p: int.
+          n <= p /\ p < length r -> nth p r = nth (p - n) acc };
+        assert { take_rev_acc_shape l n acc r };
+        assert { acc = Nil -> reversed_prefix_before l n r };
+        r
+    end
+
+  let rec best_with_right
+      (nums: list int) (k: int) (i: int) (j: int)
+      (current_min: int) (current_len: int) (right: list int) : int
+    requires { right_state nums k i j current_min current_len right }
+    ensures  { best_right_from nums k i j result }
+    variant { right }
+  =
+    let current_score = current_min * current_len in
+    assert { good_subarray_score nums k i j current_score };
+    fixed_interval_current_bound nums k i j current_min current_len;
+    assert { fixed_interval_score_at_most nums k i j current_score };
+    match right with
+    | Nil ->
+        assert { j = length nums - 1 };
+        best_right_nil_bridge nums k i j current_min current_len;
+        assert { best_right_from nums k i j current_score };
+        current_score
+    | Cons x xs ->
+        assert { nth (j + 1) nums = x };
+        let next_min = min_int current_min x in
+        assert { is_min_on_interval nums i (j + 1) next_min };
+        assert { right_state nums k i (j + 1) next_min (current_len + 1) xs };
+        let extended_best =
+          best_with_right nums k i (j + 1) next_min (current_len + 1) xs in
+        let best = max_int current_score extended_best in
+        best_right_cons_bridge nums k i j current_score extended_best best;
+        assert { best_right_from nums k i j best };
+        best
+    end
+
+  let rec best_with_left
+      (nums: list int)
+      (k: int)
+      (i: int)
+      (left_rev: list int)
+      (current_min: int)
+      (current_len: int)
+      (right: list int) : int
+    requires { left_state nums k i left_rev current_min current_len right }
+    ensures  { best_left_from nums k i result }
+    variant { left_rev }
+  =
+    assert { right_state nums k i k current_min current_len right };
+    let best_here = best_with_right nums k i k current_min current_len right in
+    match left_rev with
+    | Nil ->
+        assert { i = 0 };
+        best_left_nil_bridge nums k i best_here;
+        assert { best_left_from nums k i best_here };
+        best_here
+    | Cons x xs ->
+        assert { i > 0 };
+        assert { nth (i - 1) nums = x };
+        let next_min = min_int current_min x in
+        assert { is_min_on_interval nums (i - 1) k next_min };
+        assert { left_state nums k (i - 1) xs next_min (current_len + 1) right };
+        let extended_best =
+          best_with_left nums k (i - 1) xs next_min (current_len + 1) right in
+        let best = max_int best_here extended_best in
+        best_left_cons_bridge nums k i best_here extended_best best;
+        assert { best_left_from nums k i best };
+        best
+    end
+
+  let maximum_score_of_a_good_subarray_list (nums: list int) (k: int) : int
+    requires { valid_input nums k }
+    ensures  { maximum_good_subarray_score nums k result }
+  =
+    let left_rev = take_rev_acc nums k Nil in
+    let suffix = drop nums k in
+    match suffix with
+    | Nil ->
+        absurd
+    | Cons pivot right ->
+        assert { suffix_from_at nums k suffix };
+        assert { pivot = nth k nums };
+        assert { suffix_from_at nums (k + 1) right };
+        assert { reversed_prefix_before nums k left_rev };
+        assert { is_min_on_interval nums k k pivot };
+        assert { left_state nums k k left_rev pivot 1 right };
+        let result = best_with_left nums k k left_rev pivot 1 right in
+        assert { best_left_from nums k k result };
+        assert { maximum_good_subarray_score nums k result };
+        result
+    end
+
+end

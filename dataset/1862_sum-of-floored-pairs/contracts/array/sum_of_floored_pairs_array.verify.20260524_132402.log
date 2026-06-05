@@ -1,0 +1,220 @@
+== Stage 1: first prover on whole file ==
+Running in /Users/rubenm/Desktop/Diversify2Verify/codex-runs2/stage1a-array/1862_sum-of-floored-pairs-20260524-004420/generated/why3/array: why3 session create -o /Users/rubenm/Desktop/Diversify2Verify/codex-runs2/stage1a-array/1862_sum-of-floored-pairs-20260524-004420/generated/why3/array/.why3_sessions/sum_of_floored_pairs_array_stage1 -P Z3,4.8.6 -t 10 -m 8192 sum_of_floored_pairs_array.mlw
+Session created successfully
+Running in /Users/rubenm/Desktop/Diversify2Verify/codex-runs2/stage1a-array/1862_sum-of-floored-pairs-20260524-004420/generated/why3/array: why3 bench /Users/rubenm/Desktop/Diversify2Verify/codex-runs2/stage1a-array/1862_sum-of-floored-pairs-20260524-004420/generated/why3/array/.why3_sessions/sum_of_floored_pairs_array_stage1
+Progress: 8/1/0                       Progress: 7/2/0                       Progress: 6/3/0                       Progress: 5/4/0                       Progress: 4/5/0                       Progress: 3/6/0                       Progress: 3/2/2                       Progress: 2/3/2                       Progress: 1/4/2                       Progress: 1/0/2                       Progress: 0/1/2                       Progress: 0/0/1                       
+Replay completed, saving session... done
+== Stage 1 stats ==
+= Statistics for session /Users/rubenm/Desktop/Diversify2Verify/codex-runs2/stage1a-array/1862_sum-of-floored-pairs-20260524-004420/generated/why3/array/.why3_sessions/sum_of_floored_pairs_array_stage1
+
+== Number of root goals ==
+  total: 9  proved: 8
+
+== Number of sub goals ==
+  total: 0  proved: 0
+
+== Goals not proved ==
+  +-- file [../../sum_of_floored_pairs_array.mlw]
+    +-- theory SumOfFlooredPairs_Array_Spec
+      +-- goal pair_row_sum_from'vc
+  
+== Goals proved by only one prover ==
+  +-- file [../../sum_of_floored_pairs_array.mlw]
+    +-- theory SumOfFlooredPairs_Array_Spec
+      +-- goal floored_pair_sum_from'vc: Z3 4.8.6
+      +-- goal test_000_python_assertions'vc: Z3 4.8.6
+      +-- goal test_001_python_assertions'vc: Z3 4.8.6
+      +-- goal test_002_python_assertions'vc: Z3 4.8.6
+      +-- goal test_003_python_assertions'vc: Z3 4.8.6
+      +-- goal test_004_python_assertions'vc: Z3 4.8.6
+      +-- goal test_006_python_assertions'vc: Z3 4.8.6
+      +-- goal test_008_python_assertions'vc: Z3 4.8.6
+  
+1 session(s) read, with a total of 9 proof goals.
+== Unproved root goals after first prover ==
+SumOfFlooredPairs_Array_Spec	pair_row_sum_from'vc
+== Stage 1: trying remaining goals with prover Alt-Ergo,2.4.0 ==
+---- stage1 | prover: Alt-Ergo,2.4.0 | theory: SumOfFlooredPairs_Array_Spec | goal: pair_row_sum_from'vc ----
+File sum_of_floored_pairs_array.mlw:
+Goal pair_row_sum_from'vc.
+Prover result is: Timeout (10.00s, 667683 steps).
+Remaining after prover Alt-Ergo,2.4.0: 1
+== Stage 1: trying remaining goals with prover CVC4,1.8 ==
+---- stage1 | prover: CVC4,1.8 | theory: SumOfFlooredPairs_Array_Spec | goal: pair_row_sum_from'vc ----
+File sum_of_floored_pairs_array.mlw:
+Goal pair_row_sum_from'vc.
+Prover result is: Unknown (unknown + incomplete) (0.02s, 8096 steps).
+Remaining after prover CVC4,1.8: 1
+== Goals still unproved after stage 1 ==
+SumOfFlooredPairs_Array_Spec	pair_row_sum_from'vc
+== Stage 2: split_vc on unproved goal ==
+Target theory: SumOfFlooredPairs_Array_Spec
+Target goal  : pair_row_sum_from'vc
+---- stage2 | prover: Z3,4.8.6 | theory: SumOfFlooredPairs_Array_Spec | goal: pair_row_sum_from'vc ----
+Transforms: split_vc
+File "sum_of_floored_pairs_array.mlw", line 20, characters 31-63:
+Sub-goal Variant decrease of goal pair_row_sum_from'vc.
+Prover result is: Valid (0.01s, 3335 steps).
+
+File "sum_of_floored_pairs_array.mlw", line 20, characters 31-63:
+Sub-goal Precondition of goal pair_row_sum_from'vc.
+Prover result is: Valid (0.01s, 738 steps).
+
+File "sum_of_floored_pairs_array.mlw", line 20, characters 31-63:
+Sub-goal Precondition of goal pair_row_sum_from'vc.
+Prover result is: Valid (0.01s, 6502 steps).
+
+File "sum_of_floored_pairs_array.mlw", line 20, characters 21-28:
+Sub-goal Index in array bounds of goal pair_row_sum_from'vc.
+Prover result is: Valid (0.01s, 6273 steps).
+
+File "sum_of_floored_pairs_array.mlw", line 20, characters 13-20:
+Sub-goal Index in array bounds of goal pair_row_sum_from'vc.
+Prover result is: Valid (0.01s, 738 steps).
+
+File "sum_of_floored_pairs_array.mlw", line 20, characters 9-28:
+Sub-goal Precondition of goal pair_row_sum_from'vc.
+Prover result is: Unknown (unknown) (0.01s, 16731 steps).
+---- stage2 | prover: Alt-Ergo,2.4.0 | theory: SumOfFlooredPairs_Array_Spec | goal: pair_row_sum_from'vc ----
+Transforms: split_vc
+File "sum_of_floored_pairs_array.mlw", line 20, characters 31-63:
+Sub-goal Variant decrease of goal pair_row_sum_from'vc.
+Prover result is: Valid (0.01s, 10 steps).
+
+File "sum_of_floored_pairs_array.mlw", line 20, characters 31-63:
+Sub-goal Precondition of goal pair_row_sum_from'vc.
+Prover result is: Valid (0.01s, 10 steps).
+
+File "sum_of_floored_pairs_array.mlw", line 20, characters 31-63:
+Sub-goal Precondition of goal pair_row_sum_from'vc.
+Prover result is: Valid (0.01s, 10 steps).
+
+File "sum_of_floored_pairs_array.mlw", line 20, characters 21-28:
+Sub-goal Index in array bounds of goal pair_row_sum_from'vc.
+Prover result is: Valid (0.01s, 10 steps).
+
+File "sum_of_floored_pairs_array.mlw", line 20, characters 13-20:
+Sub-goal Index in array bounds of goal pair_row_sum_from'vc.
+Prover result is: Valid (0.01s, 10 steps).
+
+File "sum_of_floored_pairs_array.mlw", line 20, characters 9-28:
+Sub-goal Precondition of goal pair_row_sum_from'vc.
+Prover result is: Unknown () (0.01s, 15 steps).
+---- stage2 | prover: CVC4,1.8 | theory: SumOfFlooredPairs_Array_Spec | goal: pair_row_sum_from'vc ----
+Transforms: split_vc
+File "sum_of_floored_pairs_array.mlw", line 20, characters 31-63:
+Sub-goal Variant decrease of goal pair_row_sum_from'vc.
+Prover result is: Valid (0.01s, 1386 steps).
+
+File "sum_of_floored_pairs_array.mlw", line 20, characters 31-63:
+Sub-goal Precondition of goal pair_row_sum_from'vc.
+Prover result is: Valid (0.01s, 1348 steps).
+
+File "sum_of_floored_pairs_array.mlw", line 20, characters 31-63:
+Sub-goal Precondition of goal pair_row_sum_from'vc.
+Prover result is: Valid (0.01s, 1462 steps).
+
+File "sum_of_floored_pairs_array.mlw", line 20, characters 21-28:
+Sub-goal Index in array bounds of goal pair_row_sum_from'vc.
+Prover result is: Valid (0.01s, 1416 steps).
+
+File "sum_of_floored_pairs_array.mlw", line 20, characters 13-20:
+Sub-goal Index in array bounds of goal pair_row_sum_from'vc.
+Prover result is: Valid (0.01s, 1349 steps).
+
+File "sum_of_floored_pairs_array.mlw", line 20, characters 9-28:
+Sub-goal Precondition of goal pair_row_sum_from'vc.
+Prover result is: Unknown (unknown + incomplete) (0.01s, 1853 steps).
+== Goals still unproved after stage 2 (split_vc) ==
+SumOfFlooredPairs_Array_Spec	pair_row_sum_from'vc
+== Stage 3: split_vc + inline_all on still-unproved goal ==
+Target theory: SumOfFlooredPairs_Array_Spec
+Target goal  : pair_row_sum_from'vc
+---- stage3 | prover: Z3,4.8.6 | theory: SumOfFlooredPairs_Array_Spec | goal: pair_row_sum_from'vc ----
+Transforms: split_vc inline_all
+File "sum_of_floored_pairs_array.mlw", line 20, characters 31-63:
+Sub-goal Variant decrease of goal pair_row_sum_from'vc.
+Prover result is: Valid (0.01s, 3257 steps).
+
+File "sum_of_floored_pairs_array.mlw", line 20, characters 31-63:
+Sub-goal Precondition of goal pair_row_sum_from'vc.
+Prover result is: Valid (0.01s, 989 steps).
+
+File "sum_of_floored_pairs_array.mlw", line 20, characters 31-63:
+Sub-goal Precondition of goal pair_row_sum_from'vc.
+Prover result is: Valid (0.01s, 8836 steps).
+
+File "sum_of_floored_pairs_array.mlw", line 20, characters 21-28:
+Sub-goal Index in array bounds of goal pair_row_sum_from'vc.
+Prover result is: Valid (0.01s, 981 steps).
+
+File "sum_of_floored_pairs_array.mlw", line 20, characters 13-20:
+Sub-goal Index in array bounds of goal pair_row_sum_from'vc.
+Prover result is: Valid (0.01s, 989 steps).
+
+File "sum_of_floored_pairs_array.mlw", line 20, characters 9-28:
+Sub-goal Precondition of goal pair_row_sum_from'vc.
+Prover result is: Timeout (10.00s, 171667841 steps).
+---- stage3 | prover: Alt-Ergo,2.4.0 | theory: SumOfFlooredPairs_Array_Spec | goal: pair_row_sum_from'vc ----
+Transforms: split_vc inline_all
+File "sum_of_floored_pairs_array.mlw", line 20, characters 31-63:
+Sub-goal Variant decrease of goal pair_row_sum_from'vc.
+Prover result is: Valid (0.01s, 8 steps).
+
+File "sum_of_floored_pairs_array.mlw", line 20, characters 31-63:
+Sub-goal Precondition of goal pair_row_sum_from'vc.
+Prover result is: Valid (0.01s, 7 steps).
+
+File "sum_of_floored_pairs_array.mlw", line 20, characters 31-63:
+Sub-goal Precondition of goal pair_row_sum_from'vc.
+Prover result is: Valid (0.01s, 16 steps).
+
+File "sum_of_floored_pairs_array.mlw", line 20, characters 21-28:
+Sub-goal Index in array bounds of goal pair_row_sum_from'vc.
+Prover result is: Valid (0.01s, 7 steps).
+
+File "sum_of_floored_pairs_array.mlw", line 20, characters 13-20:
+Sub-goal Index in array bounds of goal pair_row_sum_from'vc.
+Prover result is: Valid (0.01s, 7 steps).
+
+File "sum_of_floored_pairs_array.mlw", line 20, characters 9-28:
+Sub-goal Precondition of goal pair_row_sum_from'vc.
+Prover result is: Unknown () (0.01s, 12 steps).
+---- stage3 | prover: CVC4,1.8 | theory: SumOfFlooredPairs_Array_Spec | goal: pair_row_sum_from'vc ----
+Transforms: split_vc inline_all
+File "sum_of_floored_pairs_array.mlw", line 20, characters 31-63:
+Sub-goal Variant decrease of goal pair_row_sum_from'vc.
+Prover result is: Valid (0.02s, 2126 steps).
+
+File "sum_of_floored_pairs_array.mlw", line 20, characters 31-63:
+Sub-goal Precondition of goal pair_row_sum_from'vc.
+Prover result is: Valid (0.01s, 2065 steps).
+
+File "sum_of_floored_pairs_array.mlw", line 20, characters 31-63:
+Sub-goal Precondition of goal pair_row_sum_from'vc.
+Prover result is: Valid (0.01s, 2299 steps).
+
+File "sum_of_floored_pairs_array.mlw", line 20, characters 21-28:
+Sub-goal Index in array bounds of goal pair_row_sum_from'vc.
+Prover result is: Valid (0.01s, 2066 steps).
+
+File "sum_of_floored_pairs_array.mlw", line 20, characters 13-20:
+Sub-goal Index in array bounds of goal pair_row_sum_from'vc.
+Prover result is: Valid (0.01s, 2066 steps).
+
+File "sum_of_floored_pairs_array.mlw", line 20, characters 9-28:
+Sub-goal Precondition of goal pair_row_sum_from'vc.
+Prover result is: Unknown (unknown + incomplete) (0.01s, 2023 steps).
+== Final summary ==
+Unproved root goals after first prover : 1
+Remaining failures after split_vc      : 1
+Remaining failures after stage 3       : 1
+Detailed logs stored in                : /Users/rubenm/Desktop/Diversify2Verify/codex-runs2/stage1a-array/1862_sum-of-floored-pairs-20260524-004420/generated/why3/array/.why3_sessions/sum_of_floored_pairs_array_logs
+Still unproved goals:
+SumOfFlooredPairs_Array_Spec	pair_row_sum_from'vc
+VERIFY_RESULT: FAILURE
+VERIFY_REASON: unproved_goals_remain
+VERIFY_STAGE: stage3
+VERIFY_ROOT_TOTAL: 9
+VERIFY_ROOT_PROVED: 8
+VERIFY_ROOT_REMAINING: 1

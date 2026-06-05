@@ -1,0 +1,226 @@
+module SplitArrayLargestSum_List_Imperative_Implementation
+
+  use int.Int
+  use int.EuclideanDivision
+  use list.List
+  use ref.Ref
+
+  let sum_list (nums: list int) : int =
+    let total = ref 0 in
+    let cur = ref nums in
+    while (match !cur with Nil -> false | Cons _ _ -> true end) do
+      match !cur with
+      | Nil -> ()
+      | Cons x xs ->
+          total := !total + x;
+          cur := xs
+      end
+    done;
+    !total
+
+  let max_list (nums: list int) : int =
+    match nums with
+    | Nil -> 0
+    | Cons x xs ->
+        let current = ref x in
+        let cur = ref xs in
+        while (match !cur with Nil -> false | Cons _ _ -> true end) do
+          match !cur with
+          | Nil -> ()
+          | Cons y ys ->
+              if y > !current then current := y;
+              cur := ys
+          end
+        done;
+        !current
+    end
+
+  let segments_needed (nums: list int) (bound: int) : int =
+    match nums with
+    | Nil -> 0
+    | Cons x xs ->
+        let segments = ref 1 in
+        let current_sum = ref x in
+        let cur = ref xs in
+        while (match !cur with Nil -> false | Cons _ _ -> true end) do
+          match !cur with
+          | Nil -> ()
+          | Cons y ys ->
+              if !current_sum + y <= bound then
+                current_sum := !current_sum + y
+              else begin
+                segments := !segments + 1;
+                current_sum := y
+              end;
+              cur := ys
+          end
+        done;
+        !segments
+    end
+
+  let can_split_with_bound (nums: list int) (k: int) (bound: int) : bool =
+    max_list nums <= bound && segments_needed nums bound <= k
+
+  let split_array_largest_sum_list (nums: list int) (k: int) : int =
+    if k <= 0 then
+      0
+    else
+      match nums with
+      | Nil -> 0
+      | Cons _ _ ->
+          let low = ref (max_list nums) in
+          let high = ref (sum_list nums) in
+          while !low < !high do
+            let mid = !low + div (!high - !low) 2 in
+            if can_split_with_bound nums k mid then
+              high := mid
+            else
+              low := mid + 1
+          done;
+          !low
+      end
+
+  let test_000 () : bool =
+    let nums = Cons 7 (Cons 2 (Cons 5 (Cons 10 (Cons 8 (Nil))))) in
+    let r = split_array_largest_sum_list nums 2 in
+    r = 18
+
+  let test_001 () : bool =
+    let nums = Cons 5 (Cons 5 (Cons 5 (Cons 5 (Cons 5 (Nil))))) in
+    let r = split_array_largest_sum_list nums 5 in
+    r = 5
+
+  let test_002 () : bool =
+    let nums = Cons 10 (Cons 10 (Cons 10 (Cons 10 (Nil)))) in
+    let r = split_array_largest_sum_list nums 2 in
+    r = 20
+
+  let test_003 () : bool =
+    let nums = Cons 10 (Cons 5 (Cons 13 (Cons 4 (Cons 8 (Cons 4 (Cons 5 (Cons 11 (Cons 14 (Cons 9 (Cons 15 (Nil))))))))))) in
+    let r = split_array_largest_sum_list nums 6 in
+    r = 23
+
+  let test_004 () : bool =
+    let nums = Cons 1 (Cons 2 (Cons 3 (Cons 4 (Cons 5 (Cons 6 (Cons 7 (Cons 8 (Cons 9 (Cons 10 (Nil)))))))))) in
+    let r = split_array_largest_sum_list nums 5 in
+    r = 15
+
+  let test_005 () : bool =
+    let nums = Cons 5 (Cons 5 (Cons 5 (Cons 5 (Cons 5 (Cons 5 (Cons 5 (Cons 5 (Cons 5 (Cons 5 (Nil)))))))))) in
+    let r = split_array_largest_sum_list nums 10 in
+    r = 5
+
+  let test_006 () : bool =
+    let nums = Cons 10 (Cons 10 (Cons 10 (Cons 10 (Cons 10 (Nil))))) in
+    let r = split_array_largest_sum_list nums 5 in
+    r = 10
+
+  let test_007 () : bool =
+    let nums = Cons 1 (Cons 2 (Cons 3 (Cons 4 (Cons 5 (Nil))))) in
+    let r = split_array_largest_sum_list nums 2 in
+    r = 9
+
+  let test_008 () : bool =
+    let nums = Cons 1 (Cons 1000000 (Cons 1 (Nil))) in
+    let r = split_array_largest_sum_list nums 2 in
+    r = 1000001
+
+  let test_009 () : bool =
+    let nums = Cons 1 (Cons 4 (Cons 4 (Nil))) in
+    let r = split_array_largest_sum_list nums 3 in
+    r = 4
+
+  let test_010 () : bool =
+    let nums = Cons 1 (Cons 2 (Cons 3 (Cons 4 (Cons 5 (Cons 6 (Cons 7 (Cons 8 (Cons 9 (Nil))))))))) in
+    let r = split_array_largest_sum_list nums 3 in
+    r = 17
+
+  let test_011 () : bool =
+    let nums = Cons 10 (Cons 5 (Cons 13 (Cons 4 (Cons 8 (Cons 4 (Cons 5 (Cons 11 (Cons 14 (Cons 9 (Cons 15 (Nil))))))))))) in
+    let r = split_array_largest_sum_list nums 8 in
+    r = 15
+
+  let test_012 () : bool =
+    let nums = Cons 4 (Cons 2 (Cons 5 (Cons 1 (Cons 7 (Nil))))) in
+    let r = split_array_largest_sum_list nums 3 in
+    r = 7
+
+  let test_013 () : bool =
+    let nums = Cons 10 (Cons 5 (Cons 13 (Cons 4 (Cons 8 (Cons 4 (Cons 5 (Cons 11 (Cons 14 (Cons 9 (Cons 15 (Nil))))))))))) in
+    let r = split_array_largest_sum_list nums 3 in
+    r = 38
+
+  let test_014 () : bool =
+    let nums = Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Nil)))))))))) in
+    let r = split_array_largest_sum_list nums 10 in
+    r = 1
+
+  let test_015 () : bool =
+    let nums = Cons 0 (Cons 0 (Cons 0 (Cons 0 (Cons 0 (Cons 0 (Cons 0 (Cons 0 (Cons 0 (Cons 0 (Nil)))))))))) in
+    let r = split_array_largest_sum_list nums 5 in
+    r = 0
+
+  let test_016 () : bool =
+    let nums = Cons 1000000 (Nil) in
+    let r = split_array_largest_sum_list nums 1 in
+    r = 1000000
+
+  let test_017 () : bool =
+    let nums = Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Nil)))))))))))))))))))) in
+    let r = split_array_largest_sum_list nums 5 in
+    r = 4
+
+  let test_018 () : bool =
+    let nums = Cons 10 (Cons 20 (Cons 30 (Cons 40 (Cons 50 (Cons 60 (Cons 70 (Cons 80 (Cons 90 (Cons 100 (Nil)))))))))) in
+    let r = split_array_largest_sum_list nums 5 in
+    r = 150
+
+  let test_019 () : bool =
+    let nums = Cons 3 (Cons 2 (Cons 5 (Cons 7 (Cons 1 (Cons 10 (Cons 4 (Cons 2 (Cons 8 (Cons 6 (Cons 3 (Nil))))))))))) in
+    let r = split_array_largest_sum_list nums 4 in
+    r = 17
+
+  let run_tests () : bool =
+    if test_000 () then
+    if test_001 () then
+    if test_002 () then
+    if test_003 () then
+    if test_004 () then
+    if test_005 () then
+    if test_006 () then
+    if test_007 () then
+    if test_008 () then
+    if test_009 () then
+    if test_010 () then
+    if test_011 () then
+    if test_012 () then
+    if test_013 () then
+    if test_014 () then
+    if test_015 () then
+    if test_016 () then
+    if test_017 () then
+    if test_018 () then
+    if test_019 () then
+      true
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+
+end

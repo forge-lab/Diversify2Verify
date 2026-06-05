@@ -1,0 +1,189 @@
+module MaximumScoreOfAGoodSubarray_Array_Recursive_Implementation
+
+  use int.Int
+  use array.Array
+  use array.Init
+
+  let min2 (x: int) (y: int) : int =
+    if x <= y then x else y
+
+  let max2 (x: int) (y: int) : int =
+    if x >= y then x else y
+
+  let rec best_with_right
+    (nums: array int) (l: int) (r: int) (current_min: int) (best: int) : int
+    requires { 0 <= l <= r <= length nums }
+    variant { length nums - r }
+  =
+    if r >= length nums then
+      best
+    else
+      let next_min = min2 current_min nums[r] in
+      let score = next_min * (r - l + 1) in
+      let next_best = max2 best score in
+      best_with_right nums l (r + 1) next_min next_best
+
+  let rec best_from_left
+    (nums: array int) (k: int) (l: int) (left_min: int) (best: int) : int
+    requires { 0 <= k < length nums }
+    requires { -1 <= l <= k }
+    variant { l + 1 }
+  =
+    if l < 0 then
+      best
+    else
+      let next_left_min = min2 left_min nums[l] in
+      let best_for_l = best_with_right nums l k next_left_min best in
+      best_from_left nums k (l - 1) next_left_min best_for_l
+
+  let maximum_score_of_a_good_subarray_array (nums: array int) (k: int) : int
+    requires { 1 <= length nums }
+    requires { 0 <= k < length nums }
+    requires { forall i: int. 0 <= i < length nums -> 1 <= nums[i] <= 20000 }
+  =
+    best_from_left nums k k nums[k] 0
+
+  let test_000 () : bool =
+    let nums = init 8 [|5; 5; 4; 5; 4; 1; 1; 1|] in
+    let r = maximum_score_of_a_good_subarray_array nums 0 in
+    r = 20
+
+  let test_001 () : bool =
+    let nums = init 5 [|10; 10; 10; 10; 10|] in
+    let r = maximum_score_of_a_good_subarray_array nums 2 in
+    r = 50
+
+  let test_002 () : bool =
+    let nums = init 9 [|9; 8; 7; 6; 5; 4; 3; 2; 1|] in
+    let r = maximum_score_of_a_good_subarray_array nums 4 in
+    r = 25
+
+  let test_003 () : bool =
+    let nums = init 10 [|1; 100; 1; 100; 1; 100; 1; 100; 1; 100|] in
+    let r = maximum_score_of_a_good_subarray_array nums 4 in
+    r = 10
+
+  let test_004 () : bool =
+    let nums = init 5 [|9; 7; 5; 3; 1|] in
+    let r = maximum_score_of_a_good_subarray_array nums 2 in
+    r = 15
+
+  let test_005 () : bool =
+    let nums = init 10 [|2; 2; 2; 2; 2; 2; 2; 2; 2; 2|] in
+    let r = maximum_score_of_a_good_subarray_array nums 5 in
+    r = 20
+
+  let test_006 () : bool =
+    let nums = init 10 [|1; 2; 3; 4; 5; 6; 7; 8; 9; 10|] in
+    let r = maximum_score_of_a_good_subarray_array nums 5 in
+    r = 30
+
+  let test_007 () : bool =
+    let nums = init 5 [|1; 2; 3; 4; 5|] in
+    let r = maximum_score_of_a_good_subarray_array nums 2 in
+    r = 9
+
+  let test_008 () : bool =
+    let nums = init 9 [|2; 1; 3; 4; 5; 6; 7; 8; 9|] in
+    let r = maximum_score_of_a_good_subarray_array nums 2 in
+    r = 21
+
+  let test_009 () : bool =
+    let nums = init 6 [|1; 4; 3; 7; 4; 5|] in
+    let r = maximum_score_of_a_good_subarray_array nums 3 in
+    r = 15
+
+  let test_010 () : bool =
+    let nums = init 10 [|1; 1; 1; 1; 1; 1; 1; 1; 1; 1|] in
+    let r = maximum_score_of_a_good_subarray_array nums 5 in
+    r = 10
+
+  let test_011 () : bool =
+    let nums = init 9 [|1; 3; 5; 7; 9; 7; 5; 3; 1|] in
+    let r = maximum_score_of_a_good_subarray_array nums 4 in
+    r = 25
+
+  let test_012 () : bool =
+    let nums = init 9 [|100; 200; 300; 400; 500; 400; 300; 200; 100|] in
+    let r = maximum_score_of_a_good_subarray_array nums 4 in
+    r = 1500
+
+  let test_013 () : bool =
+    let nums = init 5 [|10; 20; 30; 40; 50|] in
+    let r = maximum_score_of_a_good_subarray_array nums 2 in
+    r = 90
+
+  let test_014 () : bool =
+    let nums = init 10 [|10; 9; 8; 7; 6; 5; 4; 3; 2; 1|] in
+    let r = maximum_score_of_a_good_subarray_array nums 5 in
+    r = 30
+
+  let test_015 () : bool =
+    let nums = init 10 [|1; 3; 5; 7; 9; 11; 13; 15; 17; 19|] in
+    let r = maximum_score_of_a_good_subarray_array nums 4 in
+    r = 54
+
+  let test_016 () : bool =
+    let nums = init 7 [|1; 1; 1; 1; 1; 1; 1|] in
+    let r = maximum_score_of_a_good_subarray_array nums 3 in
+    r = 7
+
+  let test_017 () : bool =
+    let nums = init 10 [|1; 2; 3; 4; 5; 6; 7; 8; 9; 10|] in
+    let r = maximum_score_of_a_good_subarray_array nums 4 in
+    r = 30
+
+  let test_018 () : bool =
+    let nums = init 9 [|2; 3; 4; 5; 6; 7; 8; 9; 10|] in
+    let r = maximum_score_of_a_good_subarray_array nums 4 in
+    r = 30
+
+  let test_019 () : bool =
+    let nums = init 15 [|5; 3; 8; 6; 2; 7; 4; 1; 9; 10; 1; 2; 3; 4; 5|] in
+    let r = maximum_score_of_a_good_subarray_array nums 9 in
+    r = 18
+
+  let run_tests () : bool =
+    if test_000 () then
+    if test_001 () then
+    if test_002 () then
+    if test_003 () then
+    if test_004 () then
+    if test_005 () then
+    if test_006 () then
+    if test_007 () then
+    if test_008 () then
+    if test_009 () then
+    if test_010 () then
+    if test_011 () then
+    if test_012 () then
+    if test_013 () then
+    if test_014 () then
+    if test_015 () then
+    if test_016 () then
+    if test_017 () then
+    if test_018 () then
+    if test_019 () then
+      true
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+
+end

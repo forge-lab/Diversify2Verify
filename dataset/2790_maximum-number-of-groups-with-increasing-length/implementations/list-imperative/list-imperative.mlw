@@ -1,0 +1,193 @@
+module MaximumNumberOfGroupsWithIncreasingLength_List_Imperative_Implementation
+
+  use int.Int
+  use int.MinMax
+  use list.List
+  use ref.Ref
+
+  let list_length (usageLimits: list int) : int =
+    let len = ref 0 in
+    let cur = ref usageLimits in
+    while (match !cur with Nil -> false | Cons _ _ -> true end) do
+      match !cur with
+      | Nil -> ()
+      | Cons _ rest ->
+          len := !len + 1;
+          cur := rest
+      end
+    done;
+    !len
+
+  let capped_sum_upto (usageLimits: list int) (groups: int) : int =
+    let total = ref 0 in
+    let cur = ref usageLimits in
+    while (match !cur with Nil -> false | Cons _ _ -> true end) do
+      match !cur with
+      | Nil -> ()
+      | Cons limit rest ->
+          total := !total + min limit groups;
+          cur := rest
+      end
+    done;
+    !total
+
+  let feasible_groups_impl (usageLimits: list int) (groups: int) : bool =
+    0 <= groups &&
+    groups <= list_length usageLimits &&
+    groups * (groups + 1) <= 2 * capped_sum_upto usageLimits groups
+
+  let maximum_number_of_groups_with_increasing_length_list
+      (usageLimits: list int) : int =
+    let n = list_length usageLimits in
+    let best = ref 0 in
+    let groups = ref 1 in
+    while !groups <= n do
+      if feasible_groups_impl usageLimits !groups then best := !groups;
+      groups := !groups + 1
+    done;
+    !best
+
+  let test_000 () : bool =
+    let usageLimits = Cons 10 (Cons 9 (Cons 8 (Cons 7 (Cons 6 (Cons 5 (Cons 4 (Cons 3 (Cons 2 (Cons 1 Nil))))))))) in
+    let r = maximum_number_of_groups_with_increasing_length_list usageLimits in
+    r = 10
+
+  let test_001 () : bool =
+    let usageLimits = Cons 1000000000 (Cons 1000000000 (Cons 1000000000 Nil)) in
+    let r = maximum_number_of_groups_with_increasing_length_list usageLimits in
+    r = 3
+
+  let test_002 () : bool =
+    let usageLimits = Cons 5 (Cons 5 (Cons 5 (Cons 5 (Cons 5 (Cons 5 (Cons 5 (Cons 5 (Cons 5 (Cons 5 Nil))))))))) in
+    let r = maximum_number_of_groups_with_increasing_length_list usageLimits in
+    r = 9
+
+  let test_003 () : bool =
+    let usageLimits = Cons 1 (Cons 2 (Cons 5 Nil)) in
+    let r = maximum_number_of_groups_with_increasing_length_list usageLimits in
+    r = 3
+
+  let test_004 () : bool =
+    let usageLimits = Cons 1 (Cons 2 (Cons 3 (Cons 4 (Cons 5 Nil)))) in
+    let r = maximum_number_of_groups_with_increasing_length_list usageLimits in
+    r = 5
+
+  let test_005 () : bool =
+    let usageLimits = Cons 3 (Cons 3 (Cons 3 Nil)) in
+    let r = maximum_number_of_groups_with_increasing_length_list usageLimits in
+    r = 3
+
+  let test_006 () : bool =
+    let usageLimits = Cons 1 (Cons 1 Nil) in
+    let r = maximum_number_of_groups_with_increasing_length_list usageLimits in
+    r = 1
+
+  let test_007 () : bool =
+    let usageLimits = Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 Nil))))))))) in
+    let r = maximum_number_of_groups_with_increasing_length_list usageLimits in
+    r = 4
+
+  let test_008 () : bool =
+    let usageLimits = Cons 1 Nil in
+    let r = maximum_number_of_groups_with_increasing_length_list usageLimits in
+    r = 1
+
+  let test_009 () : bool =
+    let usageLimits = Cons 1 (Cons 1000000000 (Cons 1 (Cons 1000000000 (Cons 1 Nil)))) in
+    let r = maximum_number_of_groups_with_increasing_length_list usageLimits in
+    r = 4
+
+  let test_010 () : bool =
+    let usageLimits = Cons 3 (Cons 3 (Cons 3 (Cons 3 Nil))) in
+    let r = maximum_number_of_groups_with_increasing_length_list usageLimits in
+    r = 4
+
+  let test_011 () : bool =
+    let usageLimits = Cons 1000000000 (Cons 1000000000 (Cons 1000000000 (Cons 1000000000 (Cons 1000000000 Nil)))) in
+    let r = maximum_number_of_groups_with_increasing_length_list usageLimits in
+    r = 5
+
+  let test_012 () : bool =
+    let usageLimits = Cons 2 (Cons 1 (Cons 2 Nil)) in
+    let r = maximum_number_of_groups_with_increasing_length_list usageLimits in
+    r = 2
+
+  let test_013 () : bool =
+    let usageLimits = Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1000000000 Nil)))))))))))))) in
+    let r = maximum_number_of_groups_with_increasing_length_list usageLimits in
+    r = 5
+
+  let test_014 () : bool =
+    let usageLimits = Cons 5 (Cons 5 (Cons 5 (Cons 5 (Cons 5 (Cons 5 (Cons 5 (Cons 5 (Cons 5 (Cons 5 (Cons 5 (Cons 5 (Cons 5 (Cons 5 (Cons 5 Nil)))))))))))))) in
+    let r = maximum_number_of_groups_with_increasing_length_list usageLimits in
+    r = 11
+
+  let test_015 () : bool =
+    let usageLimits = Cons 10 (Cons 10 (Cons 10 (Cons 10 (Cons 10 (Cons 10 (Cons 10 (Cons 10 (Cons 10 (Cons 10 (Cons 10 (Cons 10 (Cons 10 (Cons 10 (Cons 10 (Cons 10 (Cons 10 (Cons 10 (Cons 10 (Cons 10 Nil))))))))))))))))))) in
+    let r = maximum_number_of_groups_with_increasing_length_list usageLimits in
+    r = 19
+
+  let test_016 () : bool =
+    let usageLimits = Cons 1 (Cons 2 (Cons 3 (Cons 4 (Cons 5 (Cons 6 (Cons 7 (Cons 8 (Cons 9 (Cons 10 (Cons 11 (Cons 12 (Cons 13 (Cons 14 (Cons 15 Nil)))))))))))))) in
+    let r = maximum_number_of_groups_with_increasing_length_list usageLimits in
+    r = 15
+
+  let test_017 () : bool =
+    let usageLimits = Cons 1 (Cons 1 (Cons 2 (Cons 2 (Cons 3 (Cons 3 (Cons 4 (Cons 4 (Cons 5 (Cons 5 (Cons 6 (Cons 6 (Cons 7 (Cons 7 (Cons 8 (Cons 8 (Cons 9 (Cons 9 (Cons 10 (Cons 10 Nil))))))))))))))))))) in
+    let r = maximum_number_of_groups_with_increasing_length_list usageLimits in
+    r = 14
+
+  let test_018 () : bool =
+    let usageLimits = Cons 1 (Cons 3 (Cons 5 (Cons 7 (Cons 9 (Cons 11 (Cons 13 (Cons 15 (Cons 17 (Cons 19 Nil))))))))) in
+    let r = maximum_number_of_groups_with_increasing_length_list usageLimits in
+    r = 10
+
+  let test_019 () : bool =
+    let usageLimits = Cons 20 (Cons 1 (Cons 20 (Cons 2 (Cons 20 (Cons 3 (Cons 20 (Cons 4 (Cons 20 (Cons 5 (Cons 20 (Cons 6 (Cons 20 (Cons 7 (Cons 20 (Cons 8 (Cons 20 (Cons 9 (Cons 20 (Cons 10 Nil))))))))))))))))))) in
+    let r = maximum_number_of_groups_with_increasing_length_list usageLimits in
+    r = 20
+
+  let run_tests () : bool =
+    if test_000 () then
+    if test_001 () then
+    if test_002 () then
+    if test_003 () then
+    if test_004 () then
+    if test_005 () then
+    if test_006 () then
+    if test_007 () then
+    if test_008 () then
+    if test_009 () then
+    if test_010 () then
+    if test_011 () then
+    if test_012 () then
+    if test_013 () then
+    if test_014 () then
+    if test_015 () then
+    if test_016 () then
+    if test_017 () then
+    if test_018 () then
+    if test_019 () then
+      true
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+
+end

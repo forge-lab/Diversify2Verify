@@ -1,0 +1,400 @@
+module SumOfMutatedArrayClosestToTarget_List_Stage3_Imperative
+
+  use int.Int
+  use int.Abs
+  use int.EuclideanDivision
+  use int.MinMax
+  use list.List
+  use list.Length
+  use ref.Ref
+
+  let rec predicate values_in_range (l: list int)
+    variant { l }
+  =
+    match l with
+    | Nil -> true
+    | Cons x xs -> 1 <= x && x <= 100000 && values_in_range xs
+    end
+
+  let rec function mutated_sum (l: list int) (v: int) : int
+    variant { l }
+  =
+    match l with
+    | Nil -> 0
+    | Cons x xs -> min x v + mutated_sum xs v
+    end
+
+  function distance_to_target (l: list int) (target: int) (v: int) : int =
+    abs (mutated_sum l v - target)
+
+  predicate best_mutation_value (l: list int) (target: int) (chosen: int) =
+    (forall v: int. distance_to_target l target chosen <= distance_to_target l target v) /\
+    (forall v: int.
+       distance_to_target l target chosen = distance_to_target l target v ->
+       chosen <= v)
+
+  let rec predicate upper_bound_list (l: list int) (bound: int)
+    variant { l }
+  =
+    match l with
+    | Nil -> true
+    | Cons x xs -> x <= bound && upper_bound_list xs bound
+    end
+
+  let rec predicate list_eq (a b: list int)
+    variant { a }
+  =
+    match a with
+    | Nil ->
+        match b with
+        | Nil -> true
+        | Cons _ _ -> false
+        end
+    | Cons x xs ->
+        match b with
+        | Nil -> false
+        | Cons y ys -> x = y && list_eq xs ys
+        end
+    end
+
+  let rec predicate mem_value (x: int) (l: list int)
+    variant { l }
+  =
+    match l with
+    | Nil -> false
+    | Cons y ys -> (x = y) || mem_value x ys
+    end
+
+  let rec predicate suffix_of (orig cur: list int)
+    variant { orig }
+  =
+    list_eq orig cur ||
+    (match orig with
+    | Nil -> false
+    | Cons _ xs -> suffix_of xs cur
+    end)
+
+  let rec predicate prefix_bounded_until (orig cur: list int) (bound: int)
+    variant { orig }
+  =
+    list_eq orig cur ||
+    (match orig with
+    | Nil -> false
+    | Cons x xs -> x <= bound && prefix_bounded_until xs cur bound
+    end)
+
+  predicate strict_before_bound (l: list int) (bound: int) =
+    forall v: int. 0 <= v /\ v < bound -> mutated_sum l v < mutated_sum l (v + 1)
+
+  let rec lemma suffix_cons_mem (orig xs: list int) (x: int)
+    requires { suffix_of orig (Cons x xs) }
+    ensures  { mem_value x orig }
+    variant  { orig }
+  =
+    if list_eq orig (Cons x xs) then
+      ()
+    else
+      match orig with
+      | Nil -> absurd
+      | Cons _ ys ->
+          assert { suffix_of ys (Cons x xs) };
+          suffix_cons_mem ys xs x
+      end
+
+  let rec lemma suffix_advance (orig xs: list int) (x: int)
+    requires { suffix_of orig (Cons x xs) }
+    ensures  { suffix_of orig xs }
+    variant  { orig }
+  =
+    if list_eq orig (Cons x xs) then
+      ()
+    else
+      match orig with
+      | Nil -> absurd
+      | Cons _ ys ->
+          assert { suffix_of ys (Cons x xs) };
+          suffix_advance ys xs x
+      end
+
+  let rec lemma prefix_bounded_weaken (orig cur: list int) (old_bound new_bound: int)
+    requires { prefix_bounded_until orig cur old_bound }
+    requires { old_bound <= new_bound }
+    ensures  { prefix_bounded_until orig cur new_bound }
+    variant  { orig }
+  =
+    if list_eq orig cur then
+      ()
+    else
+      match orig with
+      | Nil -> absurd
+      | Cons x xs ->
+          assert { x <= old_bound };
+          assert { prefix_bounded_until xs cur old_bound };
+          prefix_bounded_weaken xs cur old_bound new_bound;
+          assert { x <= new_bound };
+          assert { prefix_bounded_until (Cons x xs) cur new_bound }
+      end
+
+  let rec lemma prefix_bounded_advance (orig xs: list int) (x old_bound new_bound: int)
+    requires { prefix_bounded_until orig (Cons x xs) old_bound }
+    requires { old_bound <= new_bound }
+    requires { x <= new_bound }
+    ensures  { prefix_bounded_until orig xs new_bound }
+    variant  { orig }
+  =
+    if list_eq orig (Cons x xs) then
+      assert { prefix_bounded_until (Cons x xs) xs new_bound }
+    else
+      match orig with
+      | Nil -> absurd
+      | Cons y ys ->
+          assert { y <= old_bound };
+          assert { prefix_bounded_until ys (Cons x xs) old_bound };
+          prefix_bounded_advance ys xs x old_bound new_bound;
+          assert { y <= new_bound };
+          assert { prefix_bounded_until (Cons y ys) xs new_bound }
+      end
+
+  let rec lemma prefix_nil_upper_bound (orig: list int) (bound: int)
+    requires { prefix_bounded_until orig Nil bound }
+    ensures  { upper_bound_list orig bound }
+    variant  { orig }
+  =
+    match orig with
+    | Nil -> ()
+    | Cons x xs ->
+        assert { x <= bound };
+        assert { prefix_bounded_until xs Nil bound };
+        prefix_nil_upper_bound xs bound
+    end
+
+  let rec lemma mutated_sum_monotone_cap (l: list int) (a b: int)
+    requires { a <= b }
+    ensures  { mutated_sum l a <= mutated_sum l b }
+    variant  { l }
+  =
+    match l with
+    | Nil -> ()
+    | Cons _ xs -> mutated_sum_monotone_cap xs a b
+    end
+
+  let rec lemma mutated_sum_nonnegative_cap (l: list int) (v: int)
+    requires { values_in_range l }
+    requires { 0 <= v }
+    ensures  { 0 <= mutated_sum l v }
+    variant  { l }
+  =
+    match l with
+    | Nil -> ()
+    | Cons _ xs -> mutated_sum_nonnegative_cap xs v
+    end
+
+  let rec lemma mutated_sum_zero_cap (l: list int)
+    requires { values_in_range l }
+    ensures  { mutated_sum l 0 = 0 }
+    variant  { l }
+  =
+    match l with
+    | Nil -> ()
+    | Cons _ xs -> mutated_sum_zero_cap xs
+    end
+
+  let rec lemma mutated_sum_saturates_above_bound (l: list int) (bound v: int)
+    requires { upper_bound_list l bound }
+    requires { bound <= v }
+    ensures  { mutated_sum l v = mutated_sum l bound }
+    variant  { l }
+  =
+    match l with
+    | Nil -> ()
+    | Cons _ xs -> mutated_sum_saturates_above_bound xs bound v
+    end
+
+  let rec lemma mutated_sum_step_increases_with_member (l: list int) (m v: int)
+    requires { mem_value m l }
+    requires { v < m }
+    ensures  { mutated_sum l v < mutated_sum l (v + 1) }
+    variant  { l }
+  =
+    match l with
+    | Nil -> absurd
+    | Cons x xs ->
+        mutated_sum_monotone_cap xs v (v + 1);
+        if x = m then begin
+          assert { min x v = v };
+          assert { min x (v + 1) = v + 1 }
+        end else begin
+          assert { mem_value m xs };
+          mutated_sum_step_increases_with_member xs m v
+        end
+    end
+
+  let lemma strict_before_bound_from_member (l: list int) (bound: int)
+    requires { mem_value bound l }
+    ensures  { strict_before_bound l bound }
+  =
+    assert { forall v: int. 0 <= v /\ v < bound -> mutated_sum l v < mutated_sum l (v + 1) }
+
+  let lemma distance_below_target_order (s_small s_big target: int)
+    requires { s_small <= s_big }
+    requires { s_big <= target }
+    ensures  { abs (s_big - target) <= abs (s_small - target) }
+  =
+    ()
+
+  let lemma distance_below_target_strict (s_small s_big target: int)
+    requires { s_small < s_big }
+    requires { s_big <= target }
+    ensures  { abs (s_big - target) < abs (s_small - target) }
+  =
+    ()
+
+  let lemma distance_above_target_order (s_small s_big target: int)
+    requires { target <= s_small }
+    requires { s_small <= s_big }
+    ensures  { abs (s_small - target) <= abs (s_big - target) }
+  =
+    ()
+
+  let lemma binary_search_choice_best (arr: list int) (target upper left right chosen: int)
+    requires { arr <> Nil }
+    requires { values_in_range arr }
+    requires { 1 <= target /\ target <= 100000 }
+    requires { 0 <= upper }
+    requires { upper_bound_list arr upper }
+    requires { strict_before_bound arr upper }
+    requires { 0 <= right /\ right <= upper }
+    requires { left = (if right = 0 then 0 else right - 1) }
+    requires { chosen = (if distance_to_target arr target left <= distance_to_target arr target right then left else right) }
+    requires { chosen = left \/ chosen = right }
+    requires { distance_to_target arr target chosen <= distance_to_target arr target left }
+    requires { distance_to_target arr target chosen <= distance_to_target arr target right }
+    requires { forall v: int. 0 <= v /\ v < right -> mutated_sum arr v < target }
+    requires { right = upper \/ target <= mutated_sum arr right }
+    ensures  { 0 <= chosen }
+    ensures  { best_mutation_value arr target chosen }
+  =
+    mutated_sum_zero_cap arr;
+    mutated_sum_nonnegative_cap arr chosen;
+    assert { 0 <= chosen };
+    assert { forall v: int. upper <= v -> mutated_sum arr v = mutated_sum arr upper };
+    assert { forall v: int. 0 <= v /\ v <= upper -> mutated_sum arr v <= mutated_sum arr upper };
+    assert { forall v: int. v < left -> distance_to_target arr target chosen < distance_to_target arr target v };
+    assert { forall v: int. right <= v -> distance_to_target arr target chosen <= distance_to_target arr target v };
+    assert { forall v: int.
+      distance_to_target arr target chosen = distance_to_target arr target v ->
+      chosen <= v };
+    assert { best_mutation_value arr target chosen }
+
+  let mutated_sum_with_cap (arr: list int) (cap: int) : int
+    ensures { result = mutated_sum arr cap }
+  =
+    let total = ref 0 in
+    let cur = ref arr in
+    while (match !cur with Nil -> false | Cons _ _ -> true end) do
+      invariant { !total + mutated_sum !cur cap = mutated_sum arr cap }
+      invariant { 0 <= length !cur }
+      variant { length !cur }
+      match !cur with
+      | Nil -> ()
+      | Cons x xs ->
+          assert { mutated_sum !cur cap = min x cap + mutated_sum xs cap };
+          total := !total + min x cap;
+          cur := xs
+      end
+    done;
+    assert { !cur = Nil };
+    assert { mutated_sum Nil cap = 0 };
+    !total
+
+  let max_value_in_list (arr: list int) : int
+    requires { arr <> Nil }
+    requires { values_in_range arr }
+    ensures  { 0 <= result }
+    ensures  { result <= 100000 }
+    ensures  { upper_bound_list arr result }
+    ensures  { mem_value result arr }
+    ensures  { strict_before_bound arr result }
+  =
+    match arr with
+    | Nil -> absurd
+    | Cons h t ->
+        let best = ref h in
+        let cur = ref t in
+        assert { 1 <= h /\ h <= 100000 };
+        while (match !cur with Nil -> false | Cons _ _ -> true end) do
+          invariant { 0 <= !best }
+          invariant { !best <= 100000 }
+          invariant { values_in_range !cur }
+          invariant { suffix_of arr !cur }
+          invariant { mem_value !best arr }
+          invariant { prefix_bounded_until arr !cur !best }
+          invariant { 0 <= length !cur }
+          variant { length !cur }
+          match !cur with
+          | Nil -> ()
+          | Cons x xs ->
+              let old_best = !best in
+              assert { 1 <= x /\ x <= 100000 };
+              suffix_cons_mem arr xs x;
+              if x > !best then best := x;
+              assert { old_best <= !best };
+              assert { x <= !best };
+              prefix_bounded_advance arr xs x old_best !best;
+              suffix_advance arr xs x;
+              cur := xs
+          end
+        done;
+        assert { !cur = Nil };
+        prefix_nil_upper_bound arr !best;
+        strict_before_bound_from_member arr !best;
+        !best
+    end
+
+  let sum_of_mutated_array_closest_to_target_list (arr: list int) (target: int) : int
+    requires { arr <> Nil }
+    requires { values_in_range arr }
+    requires { 1 <= target /\ target <= 100000 }
+    ensures  { 0 <= result }
+    ensures  { best_mutation_value arr target result }
+  =
+    let upper = max_value_in_list arr in
+    let low = ref 0 in
+    let high = ref upper in
+    while !low < !high do
+      invariant { 0 <= !low }
+      invariant { !low <= !high }
+      invariant { !high <= upper }
+      invariant { forall v: int. 0 <= v /\ v < !low -> mutated_sum arr v < target }
+      invariant { !high < upper -> target <= mutated_sum arr !high }
+      variant { !high - !low }
+      let mid = !low + div (!high - !low) 2 in
+      let current_sum = mutated_sum_with_cap arr mid in
+      assert { !low <= mid };
+      assert { mid < !high };
+      if current_sum < target then
+        begin
+        assert { forall v: int. 0 <= v /\ v <= mid -> mutated_sum arr v <= current_sum };
+        low := mid + 1
+        end
+      else
+        begin
+        assert { target <= mutated_sum arr mid };
+        high := mid
+        end
+    done;
+    assert { !low = !high };
+    let right = !low in
+    let left = if right = 0 then 0 else right - 1 in
+    let left_distance = abs (mutated_sum_with_cap arr left - target) in
+    let right_distance = abs (mutated_sum_with_cap arr right - target) in
+    let chosen = if left_distance <= right_distance then left else right in
+    assert { chosen = left \/ chosen = right };
+    assert { distance_to_target arr target chosen <= distance_to_target arr target left };
+    assert { distance_to_target arr target chosen <= distance_to_target arr target right };
+    assert { right = upper \/ target <= mutated_sum arr right };
+    assert { chosen = (if distance_to_target arr target left <= distance_to_target arr target right then left else right) };
+    binary_search_choice_best arr target upper left right chosen;
+    chosen
+
+end

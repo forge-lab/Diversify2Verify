@@ -1,0 +1,211 @@
+module MinimumDifferenceBetweenLargestAndSmallestValueInThreeMoves_Array_Recursive_Implementation
+
+  use int.Int
+  use array.Array
+  use array.Init
+  use list.List
+
+  let rec array_to_list_from (nums: array int) (i: int) : list int
+    variant { length nums - i }
+  =
+    if i >= length nums then
+      Nil
+    else
+      Cons nums[i] (array_to_list_from nums (i + 1))
+
+  let rec insert_sorted (x: int) (l: list int) : list int
+    variant { l }
+  =
+    match l with
+    | Nil -> Cons x Nil
+    | Cons y ys ->
+        if x <= y then Cons x l else Cons y (insert_sorted x ys)
+    end
+
+  let rec insertion_sort (l: list int) : list int
+    variant { l }
+  =
+    match l with
+    | Nil -> Nil
+    | Cons x xs -> insert_sorted x (insertion_sort xs)
+    end
+
+  let rec list_length (l: list int) : int
+    variant { l }
+  =
+    match l with
+    | Nil -> 0
+    | Cons _ xs -> 1 + list_length xs
+    end
+
+  let rec nth_default (l: list int) (i: int) (default: int) : int
+    variant { l }
+  =
+    match l with
+    | Nil -> default
+    | Cons x xs ->
+        if i <= 0 then x else nth_default xs (i - 1) default
+    end
+
+  let min2 (a: int) (b: int) : int =
+    if a <= b then a else b
+
+  let min4 (a: int) (b: int) (c: int) (d: int) : int =
+    min2 (min2 a b) (min2 c d)
+
+  let minimum_difference_between_largest_and_smallest_value_in_three_moves_array
+      (nums: array int) : int =
+    let nums_list = array_to_list_from nums 0 in
+    let n = list_length nums_list in
+    if n <= 4 then 0 else
+    let sorted = insertion_sort nums_list in
+    let d0 = nth_default sorted (n - 4) 0 - nth_default sorted 0 0 in
+    let d1 = nth_default sorted (n - 3) 0 - nth_default sorted 1 0 in
+    let d2 = nth_default sorted (n - 2) 0 - nth_default sorted 2 0 in
+    let d3 = nth_default sorted (n - 1) 0 - nth_default sorted 3 0 in
+    min4 d0 d1 d2 d3
+
+  let test_000 () : bool =
+    let nums = init 3 [|3; 100; 20|] in
+    let r = minimum_difference_between_largest_and_smallest_value_in_three_moves_array nums in
+    r = 0
+
+  let test_001 () : bool =
+    let nums = init 1 [|1|] in
+    let r = minimum_difference_between_largest_and_smallest_value_in_three_moves_array nums in
+    r = 0
+
+  let test_002 () : bool =
+    let nums = init 10 [|1; 1; 1; 1; 1; 1; 1; 1; 1; 1|] in
+    let r = minimum_difference_between_largest_and_smallest_value_in_three_moves_array nums in
+    r = 0
+
+  let test_003 () : bool =
+    let nums = init 10 [|(-1); (-2); (-3); (-4); (-5); (-6); (-7); (-8); (-9); (-10)|] in
+    let r = minimum_difference_between_largest_and_smallest_value_in_three_moves_array nums in
+    r = 6
+
+  let test_004 () : bool =
+    let nums = init 4 [|1; 1000000000; (-1000000000); 0|] in
+    let r = minimum_difference_between_largest_and_smallest_value_in_three_moves_array nums in
+    r = 0
+
+  let test_005 () : bool =
+    let nums = init 2 [|1; 2|] in
+    let r = minimum_difference_between_largest_and_smallest_value_in_three_moves_array nums in
+    r = 0
+
+  let test_006 () : bool =
+    let nums = init 5 [|1; 1; 1; 1; 1|] in
+    let r = minimum_difference_between_largest_and_smallest_value_in_three_moves_array nums in
+    r = 0
+
+  let test_007 () : bool =
+    let nums = init 5 [|1000000000; (-1000000000); 1000000000; (-1000000000); 0|] in
+    let r = minimum_difference_between_largest_and_smallest_value_in_three_moves_array nums in
+    r = 0
+
+  let test_008 () : bool =
+    let nums = init 7 [|6; 6; 0; 1; 1; 4; 6|] in
+    let r = minimum_difference_between_largest_and_smallest_value_in_three_moves_array nums in
+    r = 2
+
+  let test_009 () : bool =
+    let nums = init 3 [|1; 2; 3|] in
+    let r = minimum_difference_between_largest_and_smallest_value_in_three_moves_array nums in
+    r = 0
+
+  let test_010 () : bool =
+    let nums = init 15 [|1; 2; 3; 4; 5; 6; 7; 8; 9; 10; 11; 12; 13; 14; 15|] in
+    let r = minimum_difference_between_largest_and_smallest_value_in_three_moves_array nums in
+    r = 11
+
+  let test_011 () : bool =
+    let nums = init 5 [|1; 5; 0; 10; 14|] in
+    let r = minimum_difference_between_largest_and_smallest_value_in_three_moves_array nums in
+    r = 1
+
+  let test_012 () : bool =
+    let nums = init 4 [|5; 3; 2; 4|] in
+    let r = minimum_difference_between_largest_and_smallest_value_in_three_moves_array nums in
+    r = 0
+
+  let test_013 () : bool =
+    let nums = init 5 [|1; 2; 3; 4; 5|] in
+    let r = minimum_difference_between_largest_and_smallest_value_in_three_moves_array nums in
+    r = 1
+
+  let test_014 () : bool =
+    let nums = init 10 [|1; 2; 3; 4; 5; 6; 7; 8; 9; 10|] in
+    let r = minimum_difference_between_largest_and_smallest_value_in_three_moves_array nums in
+    r = 6
+
+  let test_015 () : bool =
+    let nums = init 50 [|1; 2; 3; 4; 5; 6; 7; 8; 9; 10; 11; 12; 13; 14; 15; 16; 17; 18; 19; 20; 21; 22; 23; 24; 25; 26; 27; 28; 29; 30; 31; 32; 33; 34; 35; 36; 37; 38; 39; 40; 41; 42; 43; 44; 45; 46; 47; 48; 49; 50|] in
+    let r = minimum_difference_between_largest_and_smallest_value_in_three_moves_array nums in
+    r = 46
+
+  let test_016 () : bool =
+    let nums = init 10 [|1; 2; 3; 1000000; 1000001; 1000002; 1000003; 1000004; 1000005; 1000006|] in
+    let r = minimum_difference_between_largest_and_smallest_value_in_three_moves_array nums in
+    r = 6
+
+  let test_017 () : bool =
+    let nums = init 15 [|100; 200; 300; 400; 500; 600; 700; 800; 900; 1000; 1100; 1200; 1300; 1400; 1500|] in
+    let r = minimum_difference_between_largest_and_smallest_value_in_three_moves_array nums in
+    r = 1100
+
+  let test_018 () : bool =
+    let nums = init 26 [|1; 5; 9; 13; 17; 21; 25; 29; 33; 37; 41; 45; 49; 53; 57; 61; 65; 69; 73; 77; 81; 85; 89; 93; 97; 101|] in
+    let r = minimum_difference_between_largest_and_smallest_value_in_three_moves_array nums in
+    r = 88
+
+  let test_019 () : bool =
+    let nums = init 10 [|(-1000000); (-900000); (-800000); (-700000); (-600000); (-500000); (-400000); (-300000); (-200000); (-100000)|] in
+    let r = minimum_difference_between_largest_and_smallest_value_in_three_moves_array nums in
+    r = 600000
+
+  let run_tests () : bool =
+    if test_000 () then
+    if test_001 () then
+    if test_002 () then
+    if test_003 () then
+    if test_004 () then
+    if test_005 () then
+    if test_006 () then
+    if test_007 () then
+    if test_008 () then
+    if test_009 () then
+    if test_010 () then
+    if test_011 () then
+    if test_012 () then
+    if test_013 () then
+    if test_014 () then
+    if test_015 () then
+    if test_016 () then
+    if test_017 () then
+    if test_018 () then
+    if test_019 () then
+      true
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+
+end

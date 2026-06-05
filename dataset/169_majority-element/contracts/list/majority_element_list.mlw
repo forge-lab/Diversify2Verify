@@ -1,0 +1,114 @@
+module MajorityElement_List_Spec
+
+  use int.Int
+  use list.List
+  use list.Length
+  use list.NumOcc
+
+  predicate is_majority (nums: list int) (x: int) =
+    2 * num_occ x nums > length nums
+
+  predicate has_majority (nums: list int) =
+    exists x: int. is_majority nums x
+
+  val majority_element_list (nums: list int) : int
+    requires { has_majority nums }
+    ensures  { is_majority nums result }
+
+  let lemma check_test_000 () =
+    let l = Cons 1 (Cons 1 (Cons 2 (Cons 2 (Cons 2 (Cons 2 (Cons 2 Nil)))))) in
+    assert { num_occ 2 Nil = 0 };
+    assert { num_occ 2 (Cons 2 Nil) = 1 };
+    assert { num_occ 2 (Cons 2 (Cons 2 Nil)) = 2 };
+    assert { num_occ 2 (Cons 2 (Cons 2 (Cons 2 Nil))) = 3 };
+    assert { num_occ 2 (Cons 2 (Cons 2 (Cons 2 (Cons 2 Nil)))) = 4 };
+    assert { num_occ 2 l = 5 };
+    assert { length l = 7 };
+    assert { is_majority l 2 };
+    assert { has_majority l }
+
+  let lemma check_test_001 () =
+    let l = Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 2 (Cons 2 (Cons 3 Nil)))))) in
+    assert { num_occ 1 Nil = 0 };
+    assert { num_occ 1 (Cons 1 Nil) = 1 };
+    assert { num_occ 1 (Cons 1 (Cons 1 Nil)) = 2 };
+    assert { num_occ 1 (Cons 1 (Cons 1 (Cons 1 Nil))) = 3 };
+    assert { num_occ 1 l = 4 };
+    assert { length l = 7 };
+    assert { is_majority l 1 };
+    assert { has_majority l }
+
+  let lemma check_test_002 () =
+    let l = Cons 2 (Cons 2 (Cons 1 (Cons 1 (Cons 1 (Cons 2 (Cons 2 Nil)))))) in
+    assert { num_occ 2 Nil = 0 };
+    assert { num_occ 2 (Cons 2 Nil) = 1 };
+    assert { num_occ 2 (Cons 2 (Cons 2 Nil)) = 2 };
+    assert { num_occ 2 (Cons 1 (Cons 2 (Cons 2 Nil))) = 2 };
+    assert { num_occ 2 (Cons 1 (Cons 1 (Cons 1 (Cons 2 (Cons 2 Nil))))) = 2 };
+    assert { num_occ 2 l = 4 };
+    assert { length l = 7 };
+    assert { is_majority l 2 };
+    assert { has_majority l }
+
+  let lemma check_test_003 () =
+    let l =
+      Cons (-1) (Cons 100 (Cons (-1) (Cons (-1) (Cons (-1) (Cons (-1)
+        (Cons 1 (Cons 1 (Cons 1 (Cons 1 Nil))))))))) in
+    assert { num_occ (-1) Nil = 0 };
+    assert { num_occ (-1) (Cons (-1) Nil) = 1 };
+    assert { num_occ (-1) (Cons (-1) (Cons (-1) Nil)) = 2 };
+    assert { num_occ (-1) (Cons (-1) (Cons (-1) (Cons (-1) Nil))) = 3 };
+    assert { num_occ (-1) (Cons (-1) (Cons (-1) (Cons (-1) (Cons (-1) Nil)))) = 4 };
+    assert { num_occ (-1) l = 5 };
+    assert { length l = 10 };
+    assert { is_majority l (-1) };
+    assert { has_majority l }
+
+  let lemma check_test_004 () =
+    let l = Cons 1 (Cons 2 (Cons 3 (Cons 4 (Cons 5 (Cons 4 (Cons 4 (Cons 4 (Cons 4 Nil)))))))) in
+    assert { num_occ 4 Nil = 0 };
+    assert { num_occ 4 (Cons 4 Nil) = 1 };
+    assert { num_occ 4 (Cons 4 (Cons 4 Nil)) = 2 };
+    assert { num_occ 4 (Cons 4 (Cons 4 (Cons 4 Nil))) = 3 };
+    assert { num_occ 4 (Cons 4 (Cons 4 (Cons 4 (Cons 4 Nil)))) = 4 };
+    assert { num_occ 4 l = 5 };
+    assert { length l = 9 };
+    assert { is_majority l 4 };
+    assert { has_majority l }
+
+  let lemma check_test_005 () =
+    let l = Cons 4 (Cons 4 (Cons 4 (Cons 4 (Cons 2 (Cons 2 (Cons 3 Nil)))))) in
+    assert { num_occ 4 Nil = 0 };
+    assert { num_occ 4 (Cons 4 Nil) = 1 };
+    assert { num_occ 4 (Cons 4 (Cons 4 Nil)) = 2 };
+    assert { num_occ 4 (Cons 4 (Cons 4 (Cons 4 Nil))) = 3 };
+    assert { num_occ 4 l = 4 };
+    assert { length l = 7 };
+    assert { is_majority l 4 };
+    assert { has_majority l }
+
+  let lemma check_test_006 () =
+    let b = 1000000000 in
+    let t1 = Cons 1 Nil in
+    let t2 = Cons 1 t1 in
+    let t3 = Cons 1 t2 in
+    let t4 = Cons 1 t3 in
+    let t5 = Cons 1 t4 in
+    let l1 = Cons b t5 in
+    let l2 = Cons b l1 in
+    let l3 = Cons b l2 in
+    let l4 = Cons b l3 in
+    let l5 = Cons b l4 in
+    let l = Cons b l5 in
+    assert { num_occ b Nil = 0 };
+    assert { num_occ b (Cons b Nil) = 1 };
+    assert { num_occ b (Cons b (Cons b Nil)) = 2 };
+    assert { num_occ b (Cons b (Cons b (Cons b Nil))) = 3 };
+    assert { num_occ b (Cons b (Cons b (Cons b (Cons b Nil)))) = 4 };
+    assert { num_occ b (Cons b (Cons b (Cons b (Cons b (Cons b Nil))))) = 5 };
+    assert { num_occ b l = 6 };
+    assert { length l = 11 };
+    assert { is_majority l b };
+    assert { has_majority l }
+
+end

@@ -1,0 +1,112 @@
+module TwoSumLessThanK_Array_Stage3_Imperative
+
+  use int.Int
+  use array.Array
+  use ref.Ref
+
+  predicate valid_input (nums: array int) (k: int) =
+    1 <= length nums <= 100 /\
+    1 <= k <= 2000 /\
+    forall i: int. 0 <= i < length nums -> 1 <= nums[i] <= 1000
+
+  predicate valid_pair (nums: array int) (i: int) (j: int) =
+    0 <= i < j < length nums
+
+  predicate pair_sum_below (nums: array int) (k: int) (sum: int) =
+    exists i j: int.
+      valid_pair nums i j /\
+      sum = nums[i] + nums[j] /\
+      sum < k
+
+  predicate no_pair_sum_below (nums: array int) (k: int) =
+    forall i j: int.
+      valid_pair nums i j -> not (nums[i] + nums[j] < k)
+
+  predicate pair_sum_upper_bound (nums: array int) (k: int) (res: int) =
+    forall i j: int.
+      valid_pair nums i j /\ nums[i] + nums[j] < k ->
+      nums[i] + nums[j] <= res
+
+  predicate two_sum_less_than_k_array_spec
+    (nums: array int) (k: int) (res: int) =
+    (res = -1 /\ no_pair_sum_below nums k) \/
+    (pair_sum_below nums k res /\ pair_sum_upper_bound nums k res)
+
+  predicate pair_bound_at
+    (nums: array int) (k: int) (res: int) (i: int) (j: int) =
+    valid_pair nums i j /\ nums[i] + nums[j] < k ->
+    nums[i] + nums[j] <= res
+
+  predicate outer_processed_bound
+    (nums: array int) (k: int) (best: int) (i: int) =
+    forall p q: int.
+      valid_pair nums p q /\ p < i /\ nums[p] + nums[q] < k ->
+      nums[p] + nums[q] <= best
+
+  predicate inner_processed_bound
+    (nums: array int) (k: int) (best: int) (i: int) (j: int) =
+    forall q: int.
+      i < q < j /\ j <= length nums /\ nums[i] + nums[q] < k ->
+      nums[i] + nums[q] <= best
+
+  predicate processed_has_no_pair
+    (nums: array int) (k: int) (i: int) =
+    forall p q: int.
+      valid_pair nums p q /\ p < i ->
+      not (nums[p] + nums[q] < k)
+
+  predicate current_inner_has_no_pair
+    (nums: array int) (k: int) (i: int) (j: int) =
+    forall q: int.
+      i < q < j /\ j <= length nums ->
+      not (nums[i] + nums[q] < k)
+
+  predicate best_witness_or_none
+    (nums: array int) (k: int) (best: int) =
+    best = -1 \/ pair_sum_below nums k best
+
+  let two_sum_less_than_k_array (nums: array int) (k: int) : int
+    requires { valid_input nums k }
+    ensures  { two_sum_less_than_k_array_spec nums k result }
+  =
+    if length nums < 2 then
+      -1
+    else
+      let best = ref (-1) in
+      for i = 0 to length nums - 2 do
+        invariant { 0 <= i <= length nums - 1 }
+        invariant { best_witness_or_none nums k !best }
+        invariant { outer_processed_bound nums k !best i }
+        invariant { !best = -1 -> processed_has_no_pair nums k i }
+        for j = i + 1 to length nums - 1 do
+          invariant { i + 1 <= j <= length nums }
+          invariant { best_witness_or_none nums k !best }
+          invariant { outer_processed_bound nums k !best i }
+          invariant { inner_processed_bound nums k !best i j }
+          invariant { !best = -1 -> processed_has_no_pair nums k i }
+          invariant { !best = -1 -> current_inner_has_no_pair nums k i j }
+          let sum = nums[i] + nums[j] in
+          assert { valid_pair nums i j };
+          if sum < k && sum > !best then begin
+            best := sum;
+            assert { pair_sum_below nums k !best }
+          end
+        done;
+        assert { outer_processed_bound nums k !best (i + 1) }
+      done;
+      assert { outer_processed_bound nums k !best (length nums - 1) };
+      assert {
+        forall p q: int.
+          valid_pair nums p q /\ nums[p] + nums[q] < k ->
+          nums[p] + nums[q] <= !best
+      };
+      if !best = -1 then begin
+        assert { no_pair_sum_below nums k };
+        !best
+      end else begin
+        assert { pair_sum_below nums k !best };
+        assert { pair_sum_upper_bound nums k !best };
+        !best
+      end
+
+end

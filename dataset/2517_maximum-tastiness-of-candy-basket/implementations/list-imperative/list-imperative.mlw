@@ -1,0 +1,254 @@
+module MaximumTastinessOfCandyBasket_List_Imperative_Implementation
+
+  use int.Int
+  use int.EuclideanDivision
+  use list.List
+  use ref.Ref
+
+  let rec insert_sorted (x: int) (l: list int) : list int
+    variant { l }
+  =
+    match l with
+    | Nil -> Cons x Nil
+    | Cons y ys ->
+        if x <= y then Cons x l else Cons y (insert_sorted x ys)
+    end
+
+  let sort_list (l: list int) : list int =
+    let sorted = ref (Nil : list int) in
+    let cur = ref l in
+    while (match !cur with Nil -> false | Cons _ _ -> true end) do
+      match !cur with
+      | Nil -> ()
+      | Cons x xs ->
+          sorted := insert_sorted x !sorted;
+          cur := xs
+      end
+    done;
+    !sorted
+
+  let last_value (l: list int) : int =
+    match l with
+    | Nil -> 0
+    | Cons x xs ->
+        let last = ref x in
+        let cur = ref xs in
+        while (match !cur with Nil -> false | Cons _ _ -> true end) do
+          match !cur with
+          | Nil -> ()
+          | Cons y ys ->
+              last := y;
+              cur := ys
+          end
+        done;
+        !last
+    end
+
+  let feasible_tastiness_exec (sorted_prices: list int) (k: int) (d: int) : bool =
+    match sorted_prices with
+    | Nil -> false
+    | Cons first rest ->
+        if k <= 1 then true else
+        let chosen = ref 1 in
+        let last = ref first in
+        let cur = ref rest in
+        while (match !cur with Nil -> false | Cons _ _ -> true end) do
+          match !cur with
+          | Nil -> ()
+          | Cons x xs ->
+              if !chosen < k && x - !last >= d then (
+                chosen := !chosen + 1;
+                last := x
+              );
+              cur := xs
+          end
+        done;
+        !chosen >= k
+    end
+
+  let maximum_tastiness_of_candy_basket_list (price: list int) (k: int) : int =
+    let sorted_prices = sort_list price in
+    match sorted_prices with
+    | Nil -> 0
+    | Cons first _ ->
+        let low = ref 0 in
+        let high = ref (last_value sorted_prices - first + 1) in
+        while !low + 1 < !high do
+          let mid = !low + div (!high - !low) 2 in
+          if feasible_tastiness_exec sorted_prices k mid then
+            low := mid
+          else
+            high := mid
+        done;
+        !low
+    end
+
+  let test_000 () : bool =
+    let price = Cons 1000000000 (Cons 1 (Cons 2 (Cons 3 (Cons 4 (Cons 5 Nil))))) in
+    let r = maximum_tastiness_of_candy_basket_list price 3 in
+    r = 4
+
+  let test_001 () : bool =
+    let price = Cons 1000000000 (Cons 1 (Cons 1000000000 (Cons 1 (Cons 1000000000 Nil)))) in
+    let r = maximum_tastiness_of_candy_basket_list price 3 in
+    r = 0
+
+  let test_002 () : bool =
+    let price = Cons 10 (Cons 20 (Cons 30 (Cons 40 (Cons 50 Nil)))) in
+    let r = maximum_tastiness_of_candy_basket_list price 3 in
+    r = 20
+
+  let test_003 () : bool =
+    let price = Cons 13 (Cons 5 (Cons 1 (Cons 8 (Cons 21 (Cons 2 Nil))))) in
+    let r = maximum_tastiness_of_candy_basket_list price 3 in
+    r = 8
+
+  let test_004 () : bool =
+    let price = Cons 1 (Cons 1000000000 (Cons 2 (Cons 999999999 Nil))) in
+    let r = maximum_tastiness_of_candy_basket_list price 2 in
+    r = 999999999
+
+  let test_005 () : bool =
+    let price = Cons 7 (Cons 7 (Cons 7 (Cons 7 Nil))) in
+    let r = maximum_tastiness_of_candy_basket_list price 2 in
+    r = 0
+
+  let test_006 () : bool =
+    let price = Cons 50 (Cons 50 (Cons 50 (Cons 50 (Cons 50 (Cons 50 Nil))))) in
+    let r = maximum_tastiness_of_candy_basket_list price 2 in
+    r = 0
+
+  let test_007 () : bool =
+    let price = Cons 1 (Cons 3 (Cons 1 Nil)) in
+    let r = maximum_tastiness_of_candy_basket_list price 2 in
+    r = 2
+
+  let test_008 () : bool =
+    let price = Cons 10 (Cons 20 (Cons 30 (Cons 40 (Cons 50 Nil)))) in
+    let r = maximum_tastiness_of_candy_basket_list price 4 in
+    r = 10
+
+  let test_009 () : bool =
+    let price =
+      Cons 1 (Cons 2 (Cons 3 (Cons 4 (Cons 5 (Cons 6 (Cons 7
+        (Cons 8 (Cons 9 (Cons 10 (Nil)))))))))) in
+    let r = maximum_tastiness_of_candy_basket_list price 5 in
+    r = 2
+
+  let test_010 () : bool =
+    let price =
+      Cons 100000000 (Cons 100000001 (Cons 100000002 (Cons 100000003
+        (Cons 100000004 (Cons 100000005 (Cons 100000006 (Cons 100000007
+        (Cons 100000008 (Cons 100000009 (Nil)))))))))) in
+    let r = maximum_tastiness_of_candy_basket_list price 5 in
+    r = 2
+
+  let test_011 () : bool =
+    let price =
+      Cons 1 (Cons 1000000000 (Cons 2 (Cons 999999999 (Cons 3
+        (Cons 999999998 (Cons 4 (Cons 999999997 (Nil)))))))) in
+    let r = maximum_tastiness_of_candy_basket_list price 5 in
+    r = 1
+
+  let test_012 () : bool =
+    let price =
+      Cons 500 (Cons 400 (Cons 300 (Cons 200 (Cons 100 (Cons 90
+        (Cons 80 (Cons 70 (Cons 60 (Cons 50 (Nil)))))))))) in
+    let r = maximum_tastiness_of_candy_basket_list price 3 in
+    r = 200
+
+  let test_013 () : bool =
+    let price =
+      Cons 100 (Cons 102 (Cons 105 (Cons 108 (Cons 110 (Cons 120
+        (Cons 130 (Cons 140 (Cons 150 (Nil))))))))) in
+    let r = maximum_tastiness_of_candy_basket_list price 4 in
+    r = 10
+
+  let test_014 () : bool =
+    let price =
+      Cons 1 (Cons 10 (Cons 20 (Cons 30 (Cons 40 (Cons 50 (Cons 60
+        (Cons 70 (Cons 80 (Cons 90 (Cons 100 (Cons 110 (Cons 120
+        (Cons 130 (Cons 140 (Cons 150 (Nil)))))))))))))))) in
+    let r = maximum_tastiness_of_candy_basket_list price 7 in
+    r = 20
+
+  let test_015 () : bool =
+    let price =
+      Cons 1 (Cons 3 (Cons 6 (Cons 9 (Cons 12 (Cons 15 (Cons 18
+        (Cons 21 (Cons 24 (Cons 27 (Cons 30 (Nil))))))))))) in
+    let r = maximum_tastiness_of_candy_basket_list price 5 in
+    r = 6
+
+  let test_016 () : bool =
+    let price =
+      Cons 100 (Cons 200 (Cons 300 (Cons 400 (Cons 500 (Cons 600
+        (Cons 700 (Cons 800 (Cons 900 (Cons 1000 (Nil)))))))))) in
+    let r = maximum_tastiness_of_candy_basket_list price 6 in
+    r = 100
+
+  let test_017 () : bool =
+    let price =
+      Cons 9 (Cons 18 (Cons 27 (Cons 36 (Cons 45 (Cons 54 (Cons 63
+        (Cons 72 (Cons 81 (Cons 90 (Cons 99 (Nil))))))))))) in
+    let r = maximum_tastiness_of_candy_basket_list price 6 in
+    r = 18
+
+  let test_018 () : bool =
+    let price =
+      Cons 2 (Cons 4 (Cons 6 (Cons 8 (Cons 10 (Cons 12 (Cons 14
+        (Cons 16 (Cons 18 (Cons 20 (Cons 22 (Cons 24 (Cons 26
+        (Cons 28 (Cons 30 (Nil))))))))))))))) in
+    let r = maximum_tastiness_of_candy_basket_list price 10 in
+    r = 2
+
+  let test_019 () : bool =
+    let price =
+      Cons 1 (Cons 1 (Cons 2 (Cons 2 (Cons 3 (Cons 3 (Cons 4
+        (Cons 4 (Cons 5 (Cons 5 (Nil)))))))))) in
+    let r = maximum_tastiness_of_candy_basket_list price 3 in
+    r = 2
+
+  let run_tests () : bool =
+    if test_000 () then
+    if test_001 () then
+    if test_002 () then
+    if test_003 () then
+    if test_004 () then
+    if test_005 () then
+    if test_006 () then
+    if test_007 () then
+    if test_008 () then
+    if test_009 () then
+    if test_010 () then
+    if test_011 () then
+    if test_012 () then
+    if test_013 () then
+    if test_014 () then
+    if test_015 () then
+    if test_016 () then
+    if test_017 () then
+    if test_018 () then
+    if test_019 () then
+      true
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+
+end

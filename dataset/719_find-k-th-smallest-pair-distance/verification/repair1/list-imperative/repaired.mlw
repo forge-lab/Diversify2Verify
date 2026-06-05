@@ -1,0 +1,196 @@
+module FindKThSmallestPairDistance_List_Stage3_Imperative
+
+  use int.Int
+  use int.Abs
+  use list.List
+  use list.Length
+  use list.Mem
+  use ref.Ref
+
+  let rec predicate bounded_values (nums: list int)
+    variant { nums }
+  =
+    match nums with
+    | Nil -> true
+    | Cons x xs -> (0 <= x && x <= 1000000) && bounded_values xs
+    end
+
+  let rec function count_head_pairs_le (x: int) (tail: list int) (d: int) : int
+    variant { tail }
+  =
+    match tail with
+    | Nil -> 0
+    | Cons y ys ->
+        (if abs (x - y) <= d then 1 else 0) + count_head_pairs_le x ys d
+    end
+
+  let rec function pair_count_le (nums: list int) (d: int) : int
+    variant { nums }
+  =
+    match nums with
+    | Nil -> 0
+    | Cons x xs -> count_head_pairs_le x xs d + pair_count_le xs d
+    end
+
+  predicate all_pair_distances_le (nums: list int) (d: int) =
+    forall x y: int. mem x nums /\ mem y nums -> abs (x - y) <= d
+
+  let rec lemma count_head_pairs_le_all (x: int) (tail: list int) (d: int)
+    requires { forall y: int. mem y tail -> abs (x - y) <= d }
+    ensures  { count_head_pairs_le x tail d = length tail }
+    variant  { tail }
+  =
+    match tail with
+    | Nil -> ()
+    | Cons y ys ->
+        assert { mem y tail };
+        assert { abs (x - y) <= d };
+        assert { forall z: int. mem z ys -> mem z tail };
+        count_head_pairs_le_all x ys d
+    end
+
+  let rec lemma pair_count_le_all (nums: list int) (d: int)
+    requires { all_pair_distances_le nums d }
+    ensures  { 2 * pair_count_le nums d = length nums * (length nums - 1) }
+    variant  { nums }
+  =
+    match nums with
+    | Nil -> ()
+    | Cons x xs ->
+        assert { forall y: int. mem y xs -> mem y nums };
+        assert { forall y: int. mem y xs -> abs (x - y) <= d };
+        count_head_pairs_le_all x xs d;
+        assert { forall a b: int. mem a xs /\ mem b xs -> abs (a - b) <= d };
+        pair_count_le_all xs d
+    end
+
+  let lemma bounded_interval_gives_pair_distances (nums: list int) (lo: int) (hi: int)
+    requires { lo <= hi }
+    requires { forall z: int. mem z nums -> lo <= z /\ z <= hi }
+    ensures  { all_pair_distances_le nums (hi - lo) }
+  =
+    assert { forall x y: int.
+      mem x nums /\ mem y nums ->
+      x - y <= hi - lo /\ y - x <= hi - lo };
+    assert { forall x y: int.
+      mem x nums /\ mem y nums ->
+      abs (x - y) <= hi - lo }
+
+  predicate kth_pair_distance (nums: list int) (k: int) (r: int) =
+    0 <= r /\
+    pair_count_le nums r >= k /\
+    (forall d: int. 0 <= d /\ d < r -> pair_count_le nums d < k)
+
+  let impl_count_head_pairs_le (x: int) (tail: list int) (d: int) : int
+    ensures { result = count_head_pairs_le x tail d }
+  =
+    let count = ref 0 in
+    let cur = ref tail in
+    while (match !cur with Nil -> false | Cons _ _ -> true end) do
+      invariant { !count + count_head_pairs_le x !cur d = count_head_pairs_le x tail d }
+      invariant { 0 <= length !cur }
+      variant { length !cur }
+      match !cur with
+      | Nil -> ()
+      | Cons y ys ->
+          if abs (x - y) <= d then begin
+            count := !count + 1
+          end;
+          cur := ys
+      end
+    done;
+    assert { !cur = Nil };
+    assert { count_head_pairs_le x Nil d = 0 };
+    !count
+
+  let impl_pair_count_le (nums: list int) (d: int) : int
+    ensures { result = pair_count_le nums d }
+  =
+    let total = ref 0 in
+    let cur = ref nums in
+    while (match !cur with Nil -> false | Cons _ _ -> true end) do
+      invariant { !total + pair_count_le !cur d = pair_count_le nums d }
+      invariant { 0 <= length !cur }
+      variant { length !cur }
+      match !cur with
+      | Nil -> ()
+      | Cons x xs ->
+          total := !total + impl_count_head_pairs_le x xs d;
+          cur := xs
+      end
+    done;
+    assert { !cur = Nil };
+    assert { pair_count_le Nil d = 0 };
+    !total
+
+  let max_distance_bound (nums: list int) : int
+    requires { bounded_values nums }
+    ensures  { 0 <= result }
+    ensures  { forall k: int.
+      length nums >= 2 /\ 1 <= k /\ 2 * k <= length nums * (length nums - 1) ->
+      pair_count_le nums result >= k }
+  =
+    match nums with
+    | Nil -> 0
+    | Cons x xs ->
+        let low = ref x in
+        let high = ref x in
+        let cur = ref xs in
+        while (match !cur with Nil -> false | Cons _ _ -> true end) do
+          invariant { !low <= !high }
+          invariant { 0 <= length !cur }
+          invariant { bounded_values !cur }
+          invariant { forall z: int.
+            mem z nums /\ not (mem z !cur) -> !low <= z /\ z <= !high }
+          variant { length !cur }
+          match !cur with
+          | Nil -> ()
+          | Cons y ys ->
+              if y < !low then begin
+                low := y
+              end;
+              if y > !high then begin
+                high := y
+              end;
+              cur := ys
+          end
+        done;
+        assert { !low <= !high };
+        assert { !cur = Nil };
+        assert { forall z: int. mem z nums -> !low <= z /\ z <= !high };
+        bounded_interval_gives_pair_distances nums !low !high;
+        pair_count_le_all nums (!high - !low);
+        !high - !low
+    end
+
+  let find_k_th_smallest_pair_distance_list (nums: list int) (k: int) : int
+    requires { length nums >= 2 }
+    requires { 1 <= k }
+    requires { 2 * k <= length nums * (length nums - 1) }
+    requires { bounded_values nums }
+    ensures  { kth_pair_distance nums k result }
+  =
+    match nums with
+    | Nil -> absurd
+    | Cons _ Nil -> absurd
+    | _ ->
+        let upper = max_distance_bound nums in
+        assert { 0 <= upper };
+        assert { pair_count_le nums upper >= k };
+        let d = ref 0 in
+        while !d < upper && impl_pair_count_le nums !d < k do
+          invariant { 0 <= !d }
+          invariant { !d <= upper }
+          invariant { forall q: int. 0 <= q /\ q < !d -> pair_count_le nums q < k }
+          variant { upper - !d }
+          assert { pair_count_le nums !d < k };
+          d := !d + 1
+        done;
+        assert { 0 <= !d };
+        assert { !d <= upper };
+        assert { pair_count_le nums !d >= k };
+        assert { forall q: int. 0 <= q /\ q < !d -> pair_count_le nums q < k };
+        !d
+    end
+
+end

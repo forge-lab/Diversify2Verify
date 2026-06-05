@@ -1,0 +1,256 @@
+module SumOfMutatedArrayClosestToTarget_Array_Stage3_Recursive
+
+  use int.Int
+  use int.Abs
+  use int.MinMax
+  use int.Sum
+  use int.EuclideanDivision
+  use array.Array
+
+  function mutated_sum (arr: array int) (value: int) : int =
+    sum (fun i -> min arr[i] value) 0 (length arr)
+
+  function mutation_distance (arr: array int) (target: int) (value: int) : int =
+    abs (mutated_sum arr value - target)
+
+  predicate value_is_optimal (arr: array int) (target: int) (value: int) =
+    value >= 0 /\
+    (forall candidate: int.
+       candidate >= 0 ->
+       mutation_distance arr target value <= mutation_distance arr target candidate) /\
+    (forall candidate: int.
+       candidate >= 0 ->
+       mutation_distance arr target candidate = mutation_distance arr target value ->
+       value <= candidate)
+
+  predicate is_array_upper_bound (arr: array int) (bound: int) =
+    0 <= bound /\
+    forall i: int. 0 <= i < length arr -> arr[i] <= bound
+
+  predicate is_array_maximum (arr: array int) (bound: int) =
+    is_array_upper_bound arr bound /\
+    exists i: int. 0 <= i < length arr /\ arr[i] = bound
+
+  predicate lower_bound_search_result
+      (arr: array int) (target: int) (lo: int) (hi: int) (result: int) =
+    lo <= result <= hi /\
+    (forall v: int. lo <= v < result -> mutated_sum arr v < target) /\
+    (result < hi -> target <= mutated_sum arr result)
+
+  predicate adjacent_candidates_are_globally_best
+      (arr: array int) (target: int) (maxv: int) (left: int) (right: int) =
+    is_array_maximum arr maxv /\
+    lower_bound_search_result arr target 0 maxv right /\
+    left = (if right = 0 then 0 else right - 1)
+
+  lemma min_monotone_in_cap:
+    forall x v1 v2: int. v1 <= v2 -> min x v1 <= min x v2
+
+  lemma mutated_sum_monotone:
+    forall arr: array int, v1 v2: int.
+      v1 <= v2 ->
+      mutated_sum arr v1 <= mutated_sum arr v2
+
+  lemma mutated_sum_at_or_above_upper_bound:
+    forall arr: array int, bound value: int.
+      is_array_upper_bound arr bound ->
+      bound <= value ->
+      mutated_sum arr value = mutated_sum arr bound
+
+  let lemma capped_sum_strict_at_index
+      (arr: array int) (v1 v2 lo hi witness: int)
+    requires { lo <= witness < hi }
+    requires { forall i: int. lo <= i < hi ->
+      min arr[i] v1 <= min arr[i] v2 }
+    requires { min arr[witness] v1 < min arr[witness] v2 }
+    ensures  { sum (fun i -> min arr[i] v1) lo hi <
+               sum (fun i -> min arr[i] v2) lo hi }
+  =
+    assert { sum (fun i -> min arr[i] v1) lo hi =
+             sum (fun i -> min arr[i] v1) lo witness +
+             sum (fun i -> min arr[i] v1) witness hi };
+    assert { sum (fun i -> min arr[i] v2) lo hi =
+             sum (fun i -> min arr[i] v2) lo witness +
+             sum (fun i -> min arr[i] v2) witness hi };
+    assert { sum (fun i -> min arr[i] v1) witness hi =
+             min arr[witness] v1 +
+             sum (fun i -> min arr[i] v1) (witness + 1) hi };
+    assert { sum (fun i -> min arr[i] v2) witness hi =
+             min arr[witness] v2 +
+             sum (fun i -> min arr[i] v2) (witness + 1) hi };
+    assert { sum (fun i -> min arr[i] v1) lo witness <=
+             sum (fun i -> min arr[i] v2) lo witness };
+    assert { sum (fun i -> min arr[i] v1) (witness + 1) hi <=
+             sum (fun i -> min arr[i] v2) (witness + 1) hi }
+
+  let lemma mutated_sum_strictly_increases_below_maximum
+      (arr: array int) (maxv v1 v2: int)
+    requires { is_array_maximum arr maxv }
+    requires { 0 <= v1 < v2 <= maxv }
+    ensures  { mutated_sum arr v1 < mutated_sum arr v2 }
+  =
+    let witness = any int
+      ensures { 0 <= result < length arr /\ arr[result] = maxv } in
+    assert { min arr[witness] v1 = v1 };
+    assert { min arr[witness] v2 = v2 };
+    assert { min arr[witness] v1 < min arr[witness] v2 };
+    assert { forall i: int.
+      0 <= i < length arr -> min arr[i] v1 <= min arr[i] v2 };
+    capped_sum_strict_at_index arr v1 v2 0 (length arr) witness
+
+  lemma distance_under_target_monotone:
+    forall low high target: int.
+      low <= high < target ->
+      abs (high - target) <= abs (low - target)
+
+  lemma distance_over_target_monotone:
+    forall low high target: int.
+      target <= low <= high ->
+      abs (low - target) <= abs (high - target)
+
+  lemma left_candidate_best_below_right:
+    forall arr: array int, target left right candidate: int.
+      0 <= candidate ->
+      left = (if right = 0 then 0 else right - 1) ->
+      (forall v: int. 0 <= v < right -> mutated_sum arr v < target) ->
+      candidate < right ->
+      mutation_distance arr target left <= mutation_distance arr target candidate
+
+  lemma right_candidate_best_at_or_above_right:
+    forall arr: array int, target maxv right candidate: int.
+      is_array_maximum arr maxv ->
+      lower_bound_search_result arr target 0 maxv right ->
+      right <= candidate ->
+      mutation_distance arr target right <= mutation_distance arr target candidate
+
+  lemma adjacent_left_choice_is_optimal:
+    forall arr: array int, target maxv left right: int.
+      adjacent_candidates_are_globally_best arr target maxv left right ->
+      mutation_distance arr target left <= mutation_distance arr target right ->
+      value_is_optimal arr target left
+
+  lemma adjacent_right_choice_is_optimal:
+    forall arr: array int, target maxv left right: int.
+      adjacent_candidates_are_globally_best arr target maxv left right ->
+      mutation_distance arr target right < mutation_distance arr target left ->
+      value_is_optimal arr target right
+
+  let abs_int (x: int) : int
+    ensures { result = abs x }
+    ensures { 0 <= result }
+  =
+    if x < 0 then -x else x
+
+  let rec capped_sum_from (arr: array int) (value: int) (i: int) : int
+    requires { 0 <= i <= length arr }
+    variant { length arr - i }
+    ensures { result = sum (fun j -> min arr[j] value) i (length arr) }
+  =
+    if i >= length arr then
+      0
+    else
+      (if arr[i] <= value then arr[i] else value) + capped_sum_from arr value (i + 1)
+
+  let capped_sum (arr: array int) (value: int) : int
+    ensures { result = mutated_sum arr value }
+  =
+    capped_sum_from arr value 0
+
+  let distance_for_value (arr: array int) (target: int) (value: int) : int
+    ensures { result = mutation_distance arr target value }
+  =
+    abs_int (capped_sum arr value - target)
+
+  let rec max_from (arr: array int) (i: int) (best: int) : int
+    requires { 0 <= i <= length arr }
+    requires { 0 <= best }
+    variant { length arr - i }
+    ensures { best <= result }
+    ensures { 0 <= result }
+    ensures { forall k: int. i <= k < length arr -> arr[k] <= result }
+    ensures { (forall k: int. 0 <= k < i -> arr[k] <= best) ->
+              forall k: int. 0 <= k < length arr -> arr[k] <= result }
+    ensures { (exists k: int. 0 <= k < i /\ best = arr[k]) ->
+              exists k: int. 0 <= k < length arr /\ result = arr[k] }
+  =
+    if i >= length arr then
+      best
+    else if arr[i] > best then
+      max_from arr (i + 1) arr[i]
+    else
+      max_from arr (i + 1) best
+
+  let max_value (arr: array int) : int
+    requires { 1 <= length arr }
+    requires { forall i: int. 0 <= i < length arr -> 1 <= arr[i] }
+    ensures { is_array_maximum arr result }
+  =
+    max_from arr 1 arr[0]
+
+  let rec lower_bound_value (arr: array int) (target: int) (lo: int) (hi: int) : int
+    requires { 0 <= lo <= hi }
+    variant { hi - lo }
+    ensures { lower_bound_search_result arr target lo hi result }
+  =
+    if lo >= hi then
+      lo
+    else
+      let mid = lo + div (hi - lo) 2 in
+      let s = capped_sum arr mid in
+      if s < target then
+        lower_bound_value arr target (mid + 1) hi
+      else
+        lower_bound_value arr target lo mid
+
+  let choose_better_value (arr: array int) (target: int)
+      (maxv: int) (left: int) (right: int) : int
+    requires { adjacent_candidates_are_globally_best arr target maxv left right }
+    ensures { value_is_optimal arr target result }
+  =
+    let left_distance = distance_for_value arr target left in
+    let right_distance = distance_for_value arr target right in
+    assert { 0 <= left };
+    assert { 0 <= right };
+    assert { left <= right };
+    if left_distance < right_distance then
+    begin
+      assert { left_distance = mutation_distance arr target left };
+      assert { right_distance = mutation_distance arr target right };
+      assert { value_is_optimal arr target left };
+      left
+    end
+    else if right_distance < left_distance then
+    begin
+      assert { left_distance = mutation_distance arr target left };
+      assert { right_distance = mutation_distance arr target right };
+      assert { value_is_optimal arr target right };
+      right
+    end
+    else if left <= right then
+    begin
+      assert { left_distance = mutation_distance arr target left };
+      assert { right_distance = mutation_distance arr target right };
+      assert { value_is_optimal arr target left };
+      left
+    end
+    else
+    begin
+      assert { false };
+      assert { left_distance = mutation_distance arr target left };
+      assert { right_distance = mutation_distance arr target right };
+      assert { value_is_optimal arr target right };
+      right
+    end
+
+  let sum_of_mutated_array_closest_to_target_array (arr: array int) (target: int) : int
+    requires { 1 <= length arr <= 10000 }
+    requires { 1 <= target <= 100000 }
+    requires { forall i: int. 0 <= i < length arr -> 1 <= arr[i] <= 100000 }
+    ensures  { value_is_optimal arr target result }
+  =
+    let hi = max_value arr in
+    let right = lower_bound_value arr target 0 hi in
+    let left = if right = 0 then 0 else right - 1 in
+    choose_better_value arr target hi left right
+
+end

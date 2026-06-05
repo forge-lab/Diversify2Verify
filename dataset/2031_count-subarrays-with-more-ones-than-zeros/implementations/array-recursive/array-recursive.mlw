@@ -1,0 +1,203 @@
+module CountSubarraysWithMoreOnesThanZeros_Array_Recursive_Implementation
+
+  use int.Int
+  use int.EuclideanDivision
+  use array.Array
+  use array.Init
+
+  constant modulo_value : int = 1000000007
+
+  predicate binary_array (nums: array int) =
+    forall i: int. 0 <= i < length nums -> nums[i] = 0 \/ nums[i] = 1
+
+  let rec subarray_balance_from (nums: array int) (i: int) (u: int) : int
+    variant { length nums - i }
+  =
+    if i >= u then
+      0
+    else if i >= length nums then
+      0
+    else
+      (2 * nums[i] - 1) + subarray_balance_from nums (i + 1) u
+
+  let subarray_balance (nums: array int) (l: int) (u: int) : int =
+    subarray_balance_from nums l u
+
+  let rec count_good_subarrays_until (nums: array int) (l: int) (u: int) : int
+    variant { length nums + 1 - u }
+  =
+    if l < 0 then
+      0
+    else if l >= length nums then
+      0
+    else if u > length nums then
+      0
+    else
+      (if subarray_balance nums l u > 0 then 1 else 0) +
+      count_good_subarrays_until nums l (u + 1)
+
+  let count_good_subarrays_from (nums: array int) (l: int) : int =
+    if l < 0 then 0 else if l >= length nums then 0 else count_good_subarrays_until nums l (l + 1)
+
+  let rec total_more_ones_subarrays_from (nums: array int) (l: int) : int
+    variant { length nums - l }
+  =
+    if l >= length nums then
+      0
+    else
+      count_good_subarrays_from nums l + total_more_ones_subarrays_from nums (l + 1)
+
+  let total_more_ones_subarrays (nums: array int) : int =
+    total_more_ones_subarrays_from nums 0
+
+  let count_subarrays_with_more_ones_than_zeros_array (nums: array int) : int
+    requires { 1 <= length nums <= 100000 }
+    requires { binary_array nums }
+  =
+    let total = total_more_ones_subarrays nums in
+    mod total 1000000007
+
+  let test_000 () : bool =
+    let a = init 6 [|1; 1; 1; 1; 1; 0|] in
+    let r = count_subarrays_with_more_ones_than_zeros_array a in
+    r = 19
+
+  let test_001 () : bool =
+    let a = init 5 [|1; 0; 1; 0; 1|] in
+    let r = count_subarrays_with_more_ones_than_zeros_array a in
+    r = 6
+
+  let test_002 () : bool =
+    let a = init 8 [|1; 0; 0; 1; 0; 1; 1; 0|] in
+    let r = count_subarrays_with_more_ones_than_zeros_array a in
+    r = 12
+
+  let test_003 () : bool =
+    let a = init 1 [|1|] in
+    let r = count_subarrays_with_more_ones_than_zeros_array a in
+    r = 1
+
+  let test_004 () : bool =
+    let a = init 8 [|1; 1; 0; 0; 1; 1; 0; 0|] in
+    let r = count_subarrays_with_more_ones_than_zeros_array a in
+    r = 13
+
+  let test_005 () : bool =
+    let a = init 6 [|0; 0; 0; 1; 1; 1|] in
+    let r = count_subarrays_with_more_ones_than_zeros_array a in
+    r = 9
+
+  let test_006 () : bool =
+    let a = init 10 [|1; 0; 1; 0; 1; 0; 1; 0; 1; 0|] in
+    let r = count_subarrays_with_more_ones_than_zeros_array a in
+    r = 15
+
+  let test_007 () : bool =
+    let a = init 5 [|0; 0; 0; 0; 0|] in
+    let r = count_subarrays_with_more_ones_than_zeros_array a in
+    r = 0
+
+  let test_008 () : bool =
+    let a = init 10 [|0; 1; 0; 1; 0; 1; 0; 1; 0; 1|] in
+    let r = count_subarrays_with_more_ones_than_zeros_array a in
+    r = 15
+
+  let test_009 () : bool =
+    let a = init 5 [|1; 1; 1; 1; 1|] in
+    let r = count_subarrays_with_more_ones_than_zeros_array a in
+    r = 15
+
+  let test_010 () : bool =
+    let a = init 1 [|0|] in
+    let r = count_subarrays_with_more_ones_than_zeros_array a in
+    r = 0
+
+  let test_011 () : bool =
+    let a = init 7 [|0; 1; 0; 1; 0; 1; 0|] in
+    let r = count_subarrays_with_more_ones_than_zeros_array a in
+    r = 6
+
+  let test_012 () : bool =
+    let a = init 8 [|0; 1; 0; 1; 0; 1; 0; 1|] in
+    let r = count_subarrays_with_more_ones_than_zeros_array a in
+    r = 10
+
+  let test_013 () : bool =
+    let a = init 6 [|0; 0; 0; 0; 0; 0|] in
+    let r = count_subarrays_with_more_ones_than_zeros_array a in
+    r = 0
+
+  let test_014 () : bool =
+    let a = init 8 [|0; 1; 1; 1; 1; 1; 0; 0|] in
+    let r = count_subarrays_with_more_ones_than_zeros_array a in
+    r = 28
+
+  let test_015 () : bool =
+    let a = init 8 [|1; 0; 0; 1; 1; 0; 0; 1|] in
+    let r = count_subarrays_with_more_ones_than_zeros_array a in
+    r = 9
+
+  let test_016 () : bool =
+    let a = init 10 [|1; 1; 0; 0; 1; 1; 0; 0; 1; 1|] in
+    let r = count_subarrays_with_more_ones_than_zeros_array a in
+    r = 24
+
+  let test_017 () : bool =
+    let a = init 5 [|0; 1; 1; 0; 1|] in
+    let r = count_subarrays_with_more_ones_than_zeros_array a in
+    r = 9
+
+  let test_018 () : bool =
+    let a = init 20 [|1; 0; 0; 0; 0; 0; 0; 0; 0; 0; 0; 0; 0; 0; 0; 0; 0; 0; 0; 0|] in
+    let r = count_subarrays_with_more_ones_than_zeros_array a in
+    r = 1
+
+  let test_019 () : bool =
+    let a = init 7 [|1; 0; 1; 0; 1; 0; 1|] in
+    let r = count_subarrays_with_more_ones_than_zeros_array a in
+    r = 10
+
+  let run_tests () : bool =
+    if test_000 () then
+    if test_001 () then
+    if test_002 () then
+    if test_003 () then
+    if test_004 () then
+    if test_005 () then
+    if test_006 () then
+    if test_007 () then
+    if test_008 () then
+    if test_009 () then
+    if test_010 () then
+    if test_011 () then
+    if test_012 () then
+    if test_013 () then
+    if test_014 () then
+    if test_015 () then
+    if test_016 () then
+    if test_017 () then
+    if test_018 () then
+    if test_019 () then
+      true
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+
+end

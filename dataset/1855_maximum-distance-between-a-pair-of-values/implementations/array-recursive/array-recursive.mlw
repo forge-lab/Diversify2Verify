@@ -1,0 +1,199 @@
+module MaximumDistanceBetweenAPairOfValues_Array_Recursive
+
+  use int.Int
+  use array.Array
+  use array.Init
+
+  let rec best_distance_for_i
+    (nums1: array int) (nums2: array int) (i: int) (j: int) : int
+    variant { j + 1 }
+  =
+    if j < i then
+      0
+    else if nums1[i] <= nums2[j] then
+      j - i
+    else
+      best_distance_for_i nums1 nums2 i (j - 1)
+
+  let rec maximum_distance_from
+    (nums1: array int) (nums2: array int) (i: int) : int
+    variant { length nums1 - i }
+  =
+    if i >= length nums1 then
+      0
+    else
+      let best_here =
+        if length nums2 = 0 then 0 else best_distance_for_i nums1 nums2 i (length nums2 - 1)
+      in
+      let best_rest = maximum_distance_from nums1 nums2 (i + 1) in
+      if best_here >= best_rest then best_here else best_rest
+
+  let maximum_distance_between_a_pair_of_values_array
+    (nums1: array int) (nums2: array int) : int
+  =
+    maximum_distance_from nums1 nums2 0
+
+  let test_000 () : bool =
+    let nums1 = init 1 [|100|] in
+    let nums2 = init 1 [|101|] in
+    let r = maximum_distance_between_a_pair_of_values_array nums1 nums2 in
+    r = 0
+
+  let test_001 () : bool =
+    let nums1 = init 4 [|30; 29; 19; 5|] in
+    let nums2 = init 5 [|25; 25; 25; 25; 25|] in
+    let r = maximum_distance_between_a_pair_of_values_array nums1 nums2 in
+    r = 2
+
+  let test_002 () : bool =
+    let nums1 = init 5 [|5; 4; 3; 2; 1|] in
+    let nums2 = init 5 [|5; 4; 3; 2; 1|] in
+    let r = maximum_distance_between_a_pair_of_values_array nums1 nums2 in
+    r = 0
+
+  let test_003 () : bool =
+    let nums1 = init 5 [|10; 9; 8; 7; 6|] in
+    let nums2 = init 5 [|10; 9; 8; 7; 6|] in
+    let r = maximum_distance_between_a_pair_of_values_array nums1 nums2 in
+    r = 0
+
+  let test_004 () : bool =
+    let nums1 = init 1 [|5|] in
+    let nums2 = init 1 [|10|] in
+    let r = maximum_distance_between_a_pair_of_values_array nums1 nums2 in
+    r = 0
+
+  let test_005 () : bool =
+    let nums1 = init 4 [|10; 9; 8; 7|] in
+    let nums2 = init 4 [|7; 7; 7; 7|] in
+    let r = maximum_distance_between_a_pair_of_values_array nums1 nums2 in
+    r = 0
+
+  let test_006 () : bool =
+    let nums1 = init 1 [|5|] in
+    let nums2 = init 1 [|5|] in
+    let r = maximum_distance_between_a_pair_of_values_array nums1 nums2 in
+    r = 0
+
+  let test_007 () : bool =
+    let nums1 = init 4 [|1; 1; 1; 1|] in
+    let nums2 = init 4 [|1; 1; 1; 1|] in
+    let r = maximum_distance_between_a_pair_of_values_array nums1 nums2 in
+    r = 3
+
+  let test_008 () : bool =
+    let nums1 = init 1 [|10|] in
+    let nums2 = init 1 [|5|] in
+    let r = maximum_distance_between_a_pair_of_values_array nums1 nums2 in
+    r = 0
+
+  let test_009 () : bool =
+    let nums1 = init 4 [|5; 5; 5; 5|] in
+    let nums2 = init 6 [|5; 5; 5; 5; 5; 5|] in
+    let r = maximum_distance_between_a_pair_of_values_array nums1 nums2 in
+    r = 5
+
+  let test_010 () : bool =
+    let nums1 = init 5 [|10; 9; 8; 7; 6|] in
+    let nums2 = init 6 [|6; 5; 4; 3; 2; 1|] in
+    let r = maximum_distance_between_a_pair_of_values_array nums1 nums2 in
+    r = 0
+
+  let test_011 () : bool =
+    let nums1 = init 5 [|1; 1; 1; 1; 1|] in
+    let nums2 = init 10 [|10; 9; 8; 7; 6; 5; 4; 3; 2; 1|] in
+    let r = maximum_distance_between_a_pair_of_values_array nums1 nums2 in
+    r = 9
+
+  let test_012 () : bool =
+    let nums1 = init 5 [|10; 9; 8; 7; 6|] in
+    let nums2 = init 5 [|5; 4; 3; 2; 1|] in
+    let r = maximum_distance_between_a_pair_of_values_array nums1 nums2 in
+    r = 0
+
+  let test_013 () : bool =
+    let nums1 = init 2 [|100; 90|] in
+    let nums2 = init 2 [|95; 85|] in
+    let r = maximum_distance_between_a_pair_of_values_array nums1 nums2 in
+    r = 0
+
+  let test_014 () : bool =
+    let nums1 = init 3 [|100; 90; 80|] in
+    let nums2 = init 5 [|100; 90; 80; 70; 60|] in
+    let r = maximum_distance_between_a_pair_of_values_array nums1 nums2 in
+    r = 0
+
+  let test_015 () : bool =
+    let nums1 = init 3 [|99999; 99998; 99997|] in
+    let nums2 = init 3 [|100000; 99999; 99998|] in
+    let r = maximum_distance_between_a_pair_of_values_array nums1 nums2 in
+    r = 1
+
+  let test_016 () : bool =
+    let nums1 = init 1 [|1|] in
+    let nums2 = init 1 [|2|] in
+    let r = maximum_distance_between_a_pair_of_values_array nums1 nums2 in
+    r = 0
+
+  let test_017 () : bool =
+    let nums1 = init 5 [|1; 1; 1; 1; 1|] in
+    let nums2 = init 5 [|5; 5; 5; 5; 5|] in
+    let r = maximum_distance_between_a_pair_of_values_array nums1 nums2 in
+    r = 4
+
+  let test_018 () : bool =
+    let nums1 = init 3 [|2; 2; 2|] in
+    let nums2 = init 3 [|10; 10; 1|] in
+    let r = maximum_distance_between_a_pair_of_values_array nums1 nums2 in
+    r = 1
+
+  let test_019 () : bool =
+    let nums1 = init 4 [|100; 50; 25; 10|] in
+    let nums2 = init 4 [|100; 100; 100; 100|] in
+    let r = maximum_distance_between_a_pair_of_values_array nums1 nums2 in
+    r = 3
+
+  let run_tests () : bool =
+    if test_000 () then
+    if test_001 () then
+    if test_002 () then
+    if test_003 () then
+    if test_004 () then
+    if test_005 () then
+    if test_006 () then
+    if test_007 () then
+    if test_008 () then
+    if test_009 () then
+    if test_010 () then
+    if test_011 () then
+    if test_012 () then
+    if test_013 () then
+    if test_014 () then
+    if test_015 () then
+    if test_016 () then
+    if test_017 () then
+    if test_018 () then
+    if test_019 () then
+      true
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+
+end

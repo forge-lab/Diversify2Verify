@@ -1,0 +1,123 @@
+module SumOfDistances_List_Spec
+
+  use int.Int
+  use int.Abs
+  use list.List
+  use list.Length
+  use list.Mem
+
+  predicate valid_input (nums: list int) =
+    length nums >= 1 /\
+    (forall x: int. mem x nums -> 0 <= x <= 1000000000)
+
+  let rec function distance_sum_from
+      (target: int) (target_index: int) (current_index: int) (nums: list int) : int
+    variant { nums }
+  =
+    match nums with
+    | Nil -> 0
+    | Cons x xs ->
+        (if x = target then
+           if current_index = target_index then 0
+           else abs (target_index - current_index)
+         else 0) + distance_sum_from target target_index (current_index + 1) xs
+    end
+
+  let rec function distances_for
+      (all_nums: list int) (current_index: int) (suffix: list int) : list int
+    variant { suffix }
+  =
+    match suffix with
+    | Nil -> Nil
+    | Cons x xs ->
+        Cons (distance_sum_from x current_index 0 all_nums)
+          (distances_for all_nums (current_index + 1) xs)
+    end
+
+  val sum_of_distances_list (nums: list int) : list int
+    requires { valid_input nums }
+    ensures  { result = distances_for nums 0 nums }
+    ensures  { length result = length nums }
+
+  let lemma check_sum_of_distances_test_000 () =
+    let nums = Cons 0 (Cons 5 (Cons 3 Nil)) in
+    let expected = Cons 0 (Cons 0 (Cons 0 Nil)) in
+    assert { distance_sum_from 0 0 0 nums = 0 };
+    assert { distance_sum_from 5 1 0 nums = 0 };
+    assert { distance_sum_from 3 2 0 nums = 0 };
+    assert { distances_for nums 0 nums = expected }
+
+  let lemma check_sum_of_distances_test_001 () =
+    let nums =
+      Cons 1 (Cons 2 (Cons 3 (Cons 4 (Cons 5
+        (Cons 1 (Cons 2 (Cons 3 (Cons 4 (Cons 5 Nil))))))))) in
+    let expected =
+      Cons 5 (Cons 5 (Cons 5 (Cons 5 (Cons 5
+        (Cons 5 (Cons 5 (Cons 5 (Cons 5 (Cons 5 Nil))))))))) in
+    assert { distance_sum_from 1 0 0 nums = 5 };
+    assert { distance_sum_from 2 1 0 nums = 5 };
+    assert { distance_sum_from 3 2 0 nums = 5 };
+    assert { distance_sum_from 4 3 0 nums = 5 };
+    assert { distance_sum_from 5 4 0 nums = 5 };
+    assert { distances_for nums 0 nums = expected }
+
+  let lemma check_sum_of_distances_test_002 () =
+    let nums = Cons 1 Nil in
+    let expected = Cons 0 Nil in
+    assert { distance_sum_from 1 0 0 nums = 0 };
+    assert { distances_for nums 0 nums = expected }
+
+  let lemma check_sum_of_distances_test_003 () =
+    let nums = Cons 10 (Cons 10 (Cons 10 (Cons 10 Nil))) in
+    let expected = Cons 6 (Cons 4 (Cons 4 (Cons 6 Nil))) in
+    assert { distance_sum_from 10 0 0 nums = 6 };
+    assert { distance_sum_from 10 1 0 nums = 4 };
+    assert { distance_sum_from 10 2 0 nums = 4 };
+    assert { distance_sum_from 10 3 0 nums = 6 };
+    assert { distances_for nums 0 nums = expected }
+
+  let lemma check_sum_of_distances_test_005 () =
+    let nums =
+      Cons 10 (Cons 20 (Cons 10 (Cons 30 (Cons 10 (Cons 40 (Cons 10 Nil)))))) in
+    let expected =
+      Cons 12 (Cons 0 (Cons 8 (Cons 0 (Cons 8 (Cons 0 (Cons 12 Nil)))))) in
+    assert { distance_sum_from 10 0 0 nums = 12 };
+    assert { distance_sum_from 20 1 0 nums = 0 };
+    assert { distance_sum_from 10 2 0 nums = 8 };
+    assert { distance_sum_from 30 3 0 nums = 0 };
+    assert { distance_sum_from 10 4 0 nums = 8 };
+    assert { distance_sum_from 40 5 0 nums = 0 };
+    assert { distance_sum_from 10 6 0 nums = 12 };
+    assert { distances_for nums 0 nums = expected }
+
+  let lemma check_sum_of_distances_test_006 () =
+    let nums =
+      Cons 9 (Cons 9 (Cons 9 (Cons 9 (Cons 9
+        (Cons 9 (Cons 9 (Cons 9 (Cons 9 (Cons 9 Nil))))))))) in
+    let expected =
+      Cons 45 (Cons 37 (Cons 31 (Cons 27 (Cons 25
+        (Cons 25 (Cons 27 (Cons 31 (Cons 37 (Cons 45 Nil))))))))) in
+    assert { distance_sum_from 9 0 0 nums = 45 };
+    assert { distance_sum_from 9 1 0 nums = 37 };
+    assert { distance_sum_from 9 2 0 nums = 31 };
+    assert { distance_sum_from 9 3 0 nums = 27 };
+    assert { distance_sum_from 9 4 0 nums = 25 };
+    assert { distance_sum_from 9 5 0 nums = 25 };
+    assert { distance_sum_from 9 9 0 nums = 45 };
+    assert { distances_for nums 0 nums = expected }
+
+  let lemma check_sum_of_distances_test_008 () =
+    let nums =
+      Cons 10 (Cons 20 (Cons 10 (Cons 10 (Cons 30 (Cons 20 (Cons 10 Nil)))))) in
+    let expected =
+      Cons 11 (Cons 4 (Cons 7 (Cons 7 (Cons 0 (Cons 4 (Cons 13 Nil)))))) in
+    assert { distance_sum_from 10 0 0 nums = 11 };
+    assert { distance_sum_from 20 1 0 nums = 4 };
+    assert { distance_sum_from 10 2 0 nums = 7 };
+    assert { distance_sum_from 10 3 0 nums = 7 };
+    assert { distance_sum_from 30 4 0 nums = 0 };
+    assert { distance_sum_from 20 5 0 nums = 4 };
+    assert { distance_sum_from 10 6 0 nums = 13 };
+    assert { distances_for nums 0 nums = expected }
+
+end

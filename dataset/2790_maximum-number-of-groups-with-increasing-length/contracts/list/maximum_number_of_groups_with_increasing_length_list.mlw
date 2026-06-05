@@ -1,0 +1,147 @@
+module MaximumNumberOfGroupsWithIncreasingLength_List_Spec
+
+  use int.Int
+  use int.MinMax
+  use list.List
+  use list.Length
+
+  let rec predicate positive_limits (usageLimits: list int)
+    variant { usageLimits }
+  =
+    match usageLimits with
+    | Nil -> true
+    | Cons limit rest -> 1 <= limit && positive_limits rest
+    end
+
+  let rec function capped_sum (usageLimits: list int) (groups: int) : int
+    variant { usageLimits }
+  =
+    match usageLimits with
+    | Nil -> 0
+    | Cons limit rest -> min limit groups + capped_sum rest groups
+    end
+
+  predicate feasible_groups (usageLimits: list int) (groups: int) =
+    0 <= groups /\
+    groups <= length usageLimits /\
+    groups * (groups + 1) <= 2 * capped_sum usageLimits groups
+
+  predicate optimal_groups (usageLimits: list int) (groups: int) =
+    feasible_groups usageLimits groups /\
+    (forall other: int. feasible_groups usageLimits other -> other <= groups)
+
+  val maximum_number_of_groups_with_increasing_length_list (usageLimits: list int) : int
+    requires { 1 <= length usageLimits }
+    requires { positive_limits usageLimits }
+    ensures  { optimal_groups usageLimits result }
+
+  let lemma check_test_008 () =
+    let usageLimits = Cons 1 Nil in
+    assert { positive_limits usageLimits };
+    assert { length usageLimits = 1 };
+    assert { capped_sum usageLimits 1 = 1 };
+    assert { feasible_groups usageLimits 1 };
+    assert { 2 <= 2 * capped_sum usageLimits 1 };
+    assert { not (feasible_groups usageLimits 2) };
+    assert { optimal_groups usageLimits 1 }
+
+  let lemma check_test_006 () =
+    let usageLimits = Cons 1 (Cons 1 Nil) in
+    assert { positive_limits (Cons 1 Nil) };
+    assert { positive_limits usageLimits };
+    assert { length usageLimits = 2 };
+    assert { capped_sum (Cons 1 Nil) 1 = 1 };
+    assert { capped_sum usageLimits 1 = 2 };
+    assert { feasible_groups usageLimits 1 };
+    assert { capped_sum (Cons 1 Nil) 2 = 1 };
+    assert { capped_sum usageLimits 2 = 2 };
+    assert { 2 * capped_sum usageLimits 2 = 4 };
+    assert { not (feasible_groups usageLimits 2) };
+    assert { optimal_groups usageLimits 1 }
+
+  let lemma check_test_003 () =
+    let usageLimits = Cons 1 (Cons 2 (Cons 5 Nil)) in
+    assert { positive_limits (Cons 5 Nil) };
+    assert { positive_limits (Cons 2 (Cons 5 Nil)) };
+    assert { positive_limits usageLimits };
+    assert { length usageLimits = 3 };
+    assert { capped_sum (Cons 5 Nil) 3 = 3 };
+    assert { capped_sum (Cons 2 (Cons 5 Nil)) 3 = 5 };
+    assert { capped_sum usageLimits 3 = 6 };
+    assert { 3 * (3 + 1) <= 2 * capped_sum usageLimits 3 };
+    assert { feasible_groups usageLimits 3 };
+    assert { not (feasible_groups usageLimits 4) };
+    assert { optimal_groups usageLimits 3 }
+
+  let lemma check_test_012 () =
+    let usageLimits = Cons 2 (Cons 1 (Cons 2 Nil)) in
+    assert { positive_limits (Cons 2 Nil) };
+    assert { positive_limits (Cons 1 (Cons 2 Nil)) };
+    assert { positive_limits usageLimits };
+    assert { length usageLimits = 3 };
+    assert { capped_sum (Cons 2 Nil) 2 = 2 };
+    assert { capped_sum (Cons 1 (Cons 2 Nil)) 2 = 3 };
+    assert { capped_sum usageLimits 2 = 5 };
+    assert { feasible_groups usageLimits 2 };
+    assert { capped_sum (Cons 2 Nil) 3 = 2 };
+    assert { capped_sum (Cons 1 (Cons 2 Nil)) 3 = 3 };
+    assert { capped_sum usageLimits 3 = 5 };
+    assert { not (feasible_groups usageLimits 3) };
+    assert { optimal_groups usageLimits 2 }
+
+  let lemma check_test_007 () =
+    let tail5 = Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 Nil)))) in
+    let usageLimits = Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 tail5)))) in
+    assert { positive_limits tail5 };
+    assert { positive_limits usageLimits };
+    assert { length usageLimits = 10 };
+    assert { capped_sum tail5 4 = 5 };
+    assert { capped_sum usageLimits 4 = 10 };
+    assert { 4 * (4 + 1) <= 2 * capped_sum usageLimits 4 };
+    assert { feasible_groups usageLimits 4 };
+    assert { capped_sum tail5 5 = 5 };
+    assert { capped_sum usageLimits 5 = 10 };
+    assert { not (feasible_groups usageLimits 5) };
+    assert { optimal_groups usageLimits 4 }
+
+  let lemma check_test_002 () =
+    let tail5 = Cons 5 (Cons 5 (Cons 5 (Cons 5 (Cons 5 Nil)))) in
+    let usageLimits = Cons 5 (Cons 5 (Cons 5 (Cons 5 (Cons 5 tail5)))) in
+    assert { positive_limits tail5 };
+    assert { positive_limits usageLimits };
+    assert { length usageLimits = 10 };
+    assert { capped_sum tail5 9 = 25 };
+    assert { capped_sum usageLimits 9 = 50 };
+    assert { 9 * (9 + 1) <= 2 * capped_sum usageLimits 9 };
+    assert { feasible_groups usageLimits 9 };
+    assert { capped_sum tail5 10 = 25 };
+    assert { capped_sum usageLimits 10 = 50 };
+    assert { not (feasible_groups usageLimits 10) };
+    assert { optimal_groups usageLimits 9 }
+
+  let lemma check_test_009 () =
+    let usageLimits =
+      Cons 1 (Cons 1000000000 (Cons 1 (Cons 1000000000 (Cons 1 Nil)))) in
+    assert { positive_limits (Cons 1 Nil) };
+    assert { positive_limits (Cons 1000000000 (Cons 1 Nil)) };
+    assert { positive_limits (Cons 1 (Cons 1000000000 (Cons 1 Nil))) };
+    assert {
+      positive_limits
+        (Cons 1000000000 (Cons 1 (Cons 1000000000 (Cons 1 Nil))))
+    };
+    assert { positive_limits usageLimits };
+    assert { length usageLimits = 5 };
+    assert { capped_sum (Cons 1 Nil) 4 = 1 };
+    assert { capped_sum (Cons 1000000000 (Cons 1 Nil)) 4 = 5 };
+    assert { capped_sum (Cons 1 (Cons 1000000000 (Cons 1 Nil))) 4 = 6 };
+    assert {
+      capped_sum
+        (Cons 1000000000 (Cons 1 (Cons 1000000000 (Cons 1 Nil)))) 4 = 10
+    };
+    assert { capped_sum usageLimits 4 = 11 };
+    assert { feasible_groups usageLimits 4 };
+    assert { capped_sum usageLimits 5 = 13 };
+    assert { not (feasible_groups usageLimits 5) };
+    assert { optimal_groups usageLimits 4 }
+
+end

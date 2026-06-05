@@ -1,0 +1,173 @@
+module MaximumGoodSubarraySum_Array_Spec
+
+  use int.Int
+  use int.Abs
+  use array.Array
+  use array.Init
+  use array.ArraySum
+
+  predicate valid_subarray (nums: array int) (i: int) (j: int) =
+    0 <= i <= j < length nums
+
+  function subarray_sum (nums: array int) (i: int) (j: int) : int =
+    sum nums i (j + 1)
+
+  predicate good_subarray (nums: array int) (k: int) (i: int) (j: int) =
+    valid_subarray nums i j /\ abs (nums[i] - nums[j]) = k
+
+  predicate no_good_subarray (nums: array int) (k: int) =
+    forall i j: int. not (good_subarray nums k i j)
+
+  predicate has_good_subarray_with_sum
+    (nums: array int) (k: int) (candidate: int) =
+    exists i j: int.
+      good_subarray nums k i j /\ subarray_sum nums i j = candidate
+
+  predicate dominates_all_good_subarrays
+    (nums: array int) (k: int) (candidate: int) =
+    forall i j: int.
+      good_subarray nums k i j -> subarray_sum nums i j <= candidate
+
+  predicate maximum_good_subarray_sum_spec
+    (nums: array int) (k: int) (result: int) =
+    (has_good_subarray_with_sum nums k result /\
+     dominates_all_good_subarrays nums k result) \/
+    (result = 0 /\ no_good_subarray nums k)
+
+  val maximum_good_subarray_sum_array (nums: array int) (k: int) : int
+    requires { 2 <= length nums }
+    requires { 1 <= k }
+    ensures  { maximum_good_subarray_sum_spec nums k result }
+
+  let lemma test_000 () =
+    let nums = init 2 [|1000000000; -1000000000|] in
+    assert { length nums = 2 };
+    assert { nums[0] = 1000000000 };
+    assert { nums[1] = -1000000000 };
+    assert { forall i: int. 0 <= i < length nums -> i = 0 \/ i = 1 };
+    assert { good_subarray nums 2000000000 0 1 };
+    assert { subarray_sum nums 0 1 = 0 };
+    assert { has_good_subarray_with_sum nums 2000000000 0 };
+    assert {
+      forall i j: int.
+        valid_subarray nums i j ->
+        (i = 0 /\ j = 0) \/ (i = 0 /\ j = 1) \/ (i = 1 /\ j = 1)
+    };
+    assert { dominates_all_good_subarrays nums 2000000000 0 };
+    assert { maximum_good_subarray_sum_spec nums 2000000000 0 }
+
+  let lemma test_001 () =
+    let nums = init 5 [|-1; 3; 2; 4; 5|] in
+    assert { length nums = 5 };
+    assert { nums[0] = -1 };
+    assert { nums[1] = 3 };
+    assert { nums[2] = 2 };
+    assert { nums[3] = 4 };
+    assert { nums[4] = 5 };
+    assert {
+      forall i: int. 0 <= i < length nums ->
+        i = 0 \/ i = 1 \/ i = 2 \/ i = 3 \/ i = 4
+    };
+    assert { good_subarray nums 3 0 2 };
+    assert { subarray_sum nums 0 2 = 4 };
+    assert { good_subarray nums 3 2 4 };
+    assert { subarray_sum nums 2 4 = 11 };
+    assert { has_good_subarray_with_sum nums 3 11 };
+    assert { dominates_all_good_subarrays nums 3 11 };
+    assert { maximum_good_subarray_sum_spec nums 3 11 }
+
+  let lemma test_006 () =
+    let nums = init 5 [|1; 3; 5; 7; 9|] in
+    assert { length nums = 5 };
+    assert { nums[0] = 1 };
+    assert { nums[1] = 3 };
+    assert { nums[2] = 5 };
+    assert { nums[3] = 7 };
+    assert { nums[4] = 9 };
+    assert {
+      forall i: int. 0 <= i < length nums ->
+        i = 0 \/ i = 1 \/ i = 2 \/ i = 3 \/ i = 4
+    };
+    assert { good_subarray nums 8 0 4 };
+    assert { subarray_sum nums 0 4 = 25 };
+    assert { has_good_subarray_with_sum nums 8 25 };
+    assert { dominates_all_good_subarrays nums 8 25 };
+    assert { maximum_good_subarray_sum_spec nums 8 25 }
+
+  let lemma test_009 () =
+    let nums = init 4 [|-1; -2; -3; -4|] in
+    assert { length nums = 4 };
+    assert { nums[0] = -1 };
+    assert { nums[1] = -2 };
+    assert { nums[2] = -3 };
+    assert { nums[3] = -4 };
+    assert {
+      forall i: int. 0 <= i < length nums ->
+        i = 0 \/ i = 1 \/ i = 2 \/ i = 3
+    };
+    assert { good_subarray nums 2 0 2 };
+    assert { subarray_sum nums 0 2 = -6 };
+    assert { good_subarray nums 2 1 3 };
+    assert { subarray_sum nums 1 3 = -9 };
+    assert { has_good_subarray_with_sum nums 2 (-6) };
+    assert { dominates_all_good_subarrays nums 2 (-6) };
+    assert { maximum_good_subarray_sum_spec nums 2 (-6) }
+
+  let lemma test_010 () =
+    let nums = init 5 [|1; -1; 1; -1; 1|] in
+    assert { length nums = 5 };
+    assert { nums[0] = 1 };
+    assert { nums[1] = -1 };
+    assert { nums[2] = 1 };
+    assert { nums[3] = -1 };
+    assert { nums[4] = 1 };
+    assert {
+      forall i: int. 0 <= i < length nums ->
+        i = 0 \/ i = 1 \/ i = 2 \/ i = 3 \/ i = 4
+    };
+    assert { good_subarray nums 2 0 1 };
+    assert { subarray_sum nums 0 1 = 0 };
+    assert { good_subarray nums 2 1 4 };
+    assert { subarray_sum nums 1 4 = 0 };
+    assert { has_good_subarray_with_sum nums 2 0 };
+    assert { dominates_all_good_subarrays nums 2 0 };
+    assert { maximum_good_subarray_sum_spec nums 2 0 }
+
+  let lemma test_011 () =
+    let nums = init 6 [|1; 2; 3; 4; 5; 6|] in
+    assert { length nums = 6 };
+    assert { nums[0] = 1 };
+    assert { nums[1] = 2 };
+    assert { nums[2] = 3 };
+    assert { nums[3] = 4 };
+    assert { nums[4] = 5 };
+    assert { nums[5] = 6 };
+    assert {
+      forall i: int. 0 <= i < length nums ->
+        i = 0 \/ i = 1 \/ i = 2 \/ i = 3 \/ i = 4 \/ i = 5
+    };
+    assert { good_subarray nums 1 4 5 };
+    assert { subarray_sum nums 4 5 = 11 };
+    assert { has_good_subarray_with_sum nums 1 11 };
+    assert { dominates_all_good_subarrays nums 1 11 };
+    assert { maximum_good_subarray_sum_spec nums 1 11 }
+
+  let lemma test_014 () =
+    let nums = init 5 [|5; 4; 3; 2; 1|] in
+    assert { length nums = 5 };
+    assert { nums[0] = 5 };
+    assert { nums[1] = 4 };
+    assert { nums[2] = 3 };
+    assert { nums[3] = 2 };
+    assert { nums[4] = 1 };
+    assert {
+      forall i: int. 0 <= i < length nums ->
+        i = 0 \/ i = 1 \/ i = 2 \/ i = 3 \/ i = 4
+    };
+    assert { good_subarray nums 4 0 4 };
+    assert { subarray_sum nums 0 4 = 15 };
+    assert { has_good_subarray_with_sum nums 4 15 };
+    assert { dominates_all_good_subarrays nums 4 15 };
+    assert { maximum_good_subarray_sum_spec nums 4 15 }
+
+end

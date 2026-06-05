@@ -1,0 +1,280 @@
+module FindAllKDistantIndicesInAnArray_List_Recursive_Implementation
+
+  use int.Int
+  use list.List
+  use list.Length
+
+  let rec nth_or_zero (nums: list int) (i: int) : int
+    variant { nums }
+  =
+    match nums with
+    | Nil -> 0
+    | Cons x xs ->
+        if i = 0 then x else nth_or_zero xs (i - 1)
+    end
+
+  let within_distance (i: int) (j: int) (k: int) : bool =
+    j <= i + k && i <= j + k
+
+  let rec exists_key_near_from
+    (nums: list int) (key: int) (k: int) (i: int) (j: int) : bool
+    variant { length nums - j }
+  =
+    if j >= length nums then false else
+    if within_distance i j k && nth_or_zero nums j = key then true
+    else exists_key_near_from nums key k i (j + 1)
+
+  let rec collect_indices
+    (nums: list int) (key: int) (k: int) (i: int) (n: int) : list int
+    variant { n - i }
+  =
+    if i >= n then Nil else
+    if exists_key_near_from nums key k i 0 then
+      Cons i (collect_indices nums key k (i + 1) n)
+    else
+      collect_indices nums key k (i + 1) n
+
+  let find_all_k_distant_indices_in_an_array_list
+    (nums: list int) (key: int) (k: int) : list int
+  =
+    collect_indices nums key k 0 (length nums)
+
+  let rec range (lo: int) (hi: int) : list int
+    variant { hi - lo }
+  =
+    if lo > hi then Nil else Cons lo (range (lo + 1) hi)
+
+  let rec append (xs: list int) (ys: list int) : list int
+    variant { xs }
+  =
+    match xs with
+    | Nil -> ys
+    | Cons x xt -> Cons x (append xt ys)
+    end
+
+  let rec repeat (n: int) (x: int) : list int
+    variant { n }
+  =
+    if n <= 0 then Nil else Cons x (repeat (n - 1) x)
+
+  let rec equal_int_list (xs: list int) (ys: list int) : bool
+    variant { xs }
+  =
+    match xs with
+    | Nil ->
+        match ys with
+        | Nil -> true
+        | Cons _ _ -> false
+        end
+    | Cons x xt ->
+        match ys with
+        | Nil -> false
+        | Cons y yt ->
+            if x = y then equal_int_list xt yt else false
+        end
+    end
+
+  let test_000 () : bool =
+    let nums = Cons 5 (Cons 1 (Cons 4 (Cons 1 (Cons 5 Nil)))) in
+    let expected = range 0 4 in
+    let r = find_all_k_distant_indices_in_an_array_list nums 5 2 in
+    equal_int_list r expected
+
+  let test_001 () : bool =
+    let nums = Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 Nil))))) in
+    let expected = range 0 5 in
+    let r = find_all_k_distant_indices_in_an_array_list nums 1 3 in
+    equal_int_list r expected
+
+  let test_003 () : bool =
+    let nums = Cons 1 (Cons 3 (Cons 5 (Cons 7 (Cons 9 Nil)))) in
+    let expected = range 0 3 in
+    let r = find_all_k_distant_indices_in_an_array_list nums 3 2 in
+    equal_int_list r expected
+
+  let test_006 () : bool =
+    let nums = Cons 5 (Cons 5 (Cons 5 (Cons 5 (Cons 5 (Cons 5 Nil))))) in
+    let expected = range 0 5 in
+    let r = find_all_k_distant_indices_in_an_array_list nums 5 3 in
+    equal_int_list r expected
+
+  let test_007 () : bool =
+    let nums = Cons 10 (Cons 20 (Cons 30 (Cons 40 (Cons 50 (Cons 20 Nil))))) in
+    let expected = range 0 5 in
+    let r = find_all_k_distant_indices_in_an_array_list nums 20 2 in
+    equal_int_list r expected
+
+  let test_008 () : bool =
+    let nums = Cons 1 (Cons 2 (Cons 3 (Cons 4 (Cons 5 Nil)))) in
+    let expected = range 0 2 in
+    let r = find_all_k_distant_indices_in_an_array_list nums 1 2 in
+    equal_int_list r expected
+
+  let test_009 () : bool =
+    let nums = Cons 2 (Cons 2 (Cons 2 (Cons 2 (Cons 2 Nil)))) in
+    let expected = range 0 4 in
+    let r = find_all_k_distant_indices_in_an_array_list nums 2 2 in
+    equal_int_list r expected
+
+  let test_010 () : bool =
+    let nums = Cons 1 (Cons 2 (Cons 3 (Cons 4 (Cons 5 Nil)))) in
+    let expected = range 2 4 in
+    let r = find_all_k_distant_indices_in_an_array_list nums 5 2 in
+    equal_int_list r expected
+
+  let test_011 () : bool =
+    let nums = Cons 10 (Cons 20 (Cons 30 (Cons 40 (Cons 50 Nil)))) in
+    let expected = range 0 4 in
+    let r = find_all_k_distant_indices_in_an_array_list nums 30 2 in
+    equal_int_list r expected
+
+  let test_012 () : bool =
+    let nums = Cons 5 (Cons 1 (Cons 5 (Cons 1 (Cons 5 Nil)))) in
+    let expected = range 0 4 in
+    let r = find_all_k_distant_indices_in_an_array_list nums 5 1 in
+    equal_int_list r expected
+
+  let test_013 () : bool =
+    let nums = Cons 3 (Cons 4 (Cons 9 (Cons 1 (Cons 3 (Cons 9 (Cons 5 Nil)))))) in
+    let expected = range 1 6 in
+    let r = find_all_k_distant_indices_in_an_array_list nums 9 1 in
+    equal_int_list r expected
+
+  let test_014 () : bool =
+    let nums = Cons 5 (Cons 4 (Cons 3 (Cons 2 (Cons 1 Nil)))) in
+    let expected = range 3 4 in
+    let r = find_all_k_distant_indices_in_an_array_list nums 1 1 in
+    equal_int_list r expected
+
+  let test_015 () : bool =
+    let nums =
+      Cons 100
+        (Cons 90
+          (Cons 80
+            (Cons 70
+              (Cons 60
+                (Cons 50 (Cons 40 (Cons 30 (Cons 20 (Cons 10 Nil))))))))) in
+    let expected = range 1 7 in
+    let r = find_all_k_distant_indices_in_an_array_list nums 60 3 in
+    equal_int_list r expected
+
+  let test_016 () : bool =
+    let nums =
+      Cons 10
+        (Cons 20
+          (Cons 30
+            (Cons 40
+              (Cons 50
+                (Cons 60 (Cons 70 (Cons 80 (Cons 90 (Cons 100 Nil))))))))) in
+    let expected = range 0 8 in
+    let r = find_all_k_distant_indices_in_an_array_list nums 50 4 in
+    equal_int_list r expected
+
+  let test_017 () : bool =
+    let nums =
+      Cons 10
+        (Cons 20
+          (Cons 30
+            (Cons 40 (Cons 50 (Cons 20 (Cons 30 (Cons 40 (Cons 50 Nil)))))))) in
+    let expected = range 0 7 in
+    let r = find_all_k_distant_indices_in_an_array_list nums 20 2 in
+    equal_int_list r expected
+
+  let test_018 () : bool =
+    let nums =
+      append
+        (Cons 5 (Cons 1 (Cons 5 (Cons 2 (Cons 5 (Cons 3 (Cons 5 (Cons 4 Nil))))))))
+        (repeat 12 5) in
+    let expected = range 0 19 in
+    let r = find_all_k_distant_indices_in_an_array_list nums 5 7 in
+    equal_int_list r expected
+
+  let test_019 () : bool =
+    let nums =
+      Cons 1000
+        (Cons 999
+          (Cons 998
+            (Cons 997
+              (Cons 996
+                (Cons 995 (Cons 994 (Cons 993 (Cons 992 (Cons 991 Nil))))))))) in
+    let expected = range 1 7 in
+    let r = find_all_k_distant_indices_in_an_array_list nums 996 3 in
+    equal_int_list r expected
+
+  let test_020 () : bool =
+    let nums =
+      Cons 1
+        (Cons 2
+          (Cons 3
+            (Cons 4
+              (Cons 5 (Cons 6 (Cons 7 (Cons 8 (Cons 9 (Cons 10 Nil))))))))) in
+    let expected = range 2 6 in
+    let r = find_all_k_distant_indices_in_an_array_list nums 5 2 in
+    equal_int_list r expected
+
+  let test_021 () : bool =
+    let nums =
+      Cons 5
+        (Cons 4
+          (Cons 5
+            (Cons 4
+              (Cons 5 (Cons 4 (Cons 5 (Cons 4 (Cons 5 (Cons 4 Nil))))))))) in
+    let expected = range 0 9 in
+    let r = find_all_k_distant_indices_in_an_array_list nums 4 2 in
+    equal_int_list r expected
+
+  let test_022 () : bool =
+    let nums =
+      Cons 1
+        (Cons 3
+          (Cons 5
+            (Cons 7
+              (Cons 9 (Cons 11 (Cons 13 (Cons 15 (Cons 17 (Cons 19 Nil))))))))) in
+    let expected = range 1 9 in
+    let r = find_all_k_distant_indices_in_an_array_list nums 11 4 in
+    equal_int_list r expected
+
+  let run_tests () : bool =
+    if test_000 () then
+    if test_001 () then
+    if test_003 () then
+    if test_006 () then
+    if test_007 () then
+    if test_008 () then
+    if test_009 () then
+    if test_010 () then
+    if test_011 () then
+    if test_012 () then
+    if test_013 () then
+    if test_014 () then
+    if test_015 () then
+    if test_016 () then
+    if test_017 () then
+    if test_018 () then
+    if test_019 () then
+    if test_020 () then
+    if test_021 () then
+    if test_022 () then
+      true
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+
+end

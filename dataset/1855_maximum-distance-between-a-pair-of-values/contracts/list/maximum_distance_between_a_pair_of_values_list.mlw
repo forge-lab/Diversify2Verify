@@ -1,0 +1,171 @@
+module MaximumDistanceBetweenAPairOfValues_List_Spec
+
+  use int.Int
+  use list.List
+  use list.Length
+  use list.Mem
+  use list.NthNoOpt
+
+  predicate values_in_range (l: list int) =
+    forall x: int. mem x l -> 1 <= x /\ x <= 100000
+
+  let rec predicate non_increasing (l: list int)
+    variant { l }
+  =
+    match l with
+    | Nil -> true
+    | Cons x xs ->
+        match xs with
+        | Nil -> true
+        | Cons y _ys -> x >= y && non_increasing xs
+        end
+    end
+
+  predicate valid_pair (nums1: list int) (nums2: list int) (i: int) (j: int) =
+    0 <= i /\ i < length nums1 /\
+    0 <= j /\ j < length nums2 /\
+    i <= j /\
+    nth i nums1 <= nth j nums2
+
+  predicate has_distance (nums1: list int) (nums2: list int) (d: int) =
+    exists i: int. exists j: int.
+      valid_pair nums1 nums2 i j /\ d = j - i
+
+  predicate maximum_distance (nums1: list int) (nums2: list int) (d: int) =
+    0 <= d /\
+    (d = 0 \/ has_distance nums1 nums2 d) /\
+    (forall i: int. forall j: int.
+       valid_pair nums1 nums2 i j -> j - i <= d)
+
+  val maximum_distance_between_a_pair_of_values_list
+    (nums1: list int) (nums2: list int) : int
+    requires { 1 <= length nums1 }
+    requires { 1 <= length nums2 }
+    requires { length nums1 <= 100000 }
+    requires { length nums2 <= 100000 }
+    requires { values_in_range nums1 }
+    requires { values_in_range nums2 }
+    requires { non_increasing nums1 }
+    requires { non_increasing nums2 }
+    ensures  { maximum_distance nums1 nums2 result }
+
+  let lemma test_000 () =
+    let nums1 = Cons 100 Nil in
+    let nums2 = Cons 101 Nil in
+    assert { length nums1 = 1 };
+    assert { length nums2 = 1 };
+    assert { values_in_range nums1 };
+    assert { values_in_range nums2 };
+    assert { non_increasing nums1 };
+    assert { non_increasing nums2 };
+    assert { nth 0 nums1 = 100 };
+    assert { nth 0 nums2 = 101 };
+    assert { valid_pair nums1 nums2 0 0 };
+    assert { has_distance nums1 nums2 0 };
+    assert { forall i: int. forall j: int.
+      valid_pair nums1 nums2 i j -> j - i <= 0 };
+    assert { maximum_distance nums1 nums2 0 }
+
+  let lemma test_001 () =
+    let nums1 = Cons 30 (Cons 29 (Cons 19 (Cons 5 Nil))) in
+    let nums2 = Cons 25 (Cons 25 (Cons 25 (Cons 25 (Cons 25 Nil)))) in
+    assert { length nums1 = 4 };
+    assert { length nums2 = 5 };
+    assert { values_in_range nums1 };
+    assert { values_in_range nums2 };
+    assert { non_increasing nums1 };
+    assert { non_increasing nums2 };
+    assert { nth 2 nums1 = 19 };
+    assert { nth 4 nums2 = 25 };
+    assert { valid_pair nums1 nums2 2 4 };
+    assert { has_distance nums1 nums2 2 };
+    assert { forall i: int. forall j: int.
+      valid_pair nums1 nums2 i j -> j - i <= 2 };
+    assert { maximum_distance nums1 nums2 2 }
+
+  let lemma test_007 () =
+    let nums1 = Cons 1 (Cons 1 (Cons 1 (Cons 1 Nil))) in
+    let nums2 = Cons 1 (Cons 1 (Cons 1 (Cons 1 Nil))) in
+    assert { length nums1 = 4 };
+    assert { length nums2 = 4 };
+    assert { values_in_range nums1 };
+    assert { values_in_range nums2 };
+    assert { non_increasing nums1 };
+    assert { non_increasing nums2 };
+    assert { nth 0 nums1 = 1 };
+    assert { nth 3 nums2 = 1 };
+    assert { valid_pair nums1 nums2 0 3 };
+    assert { has_distance nums1 nums2 3 };
+    assert { forall i: int. forall j: int.
+      valid_pair nums1 nums2 i j -> j - i <= 3 };
+    assert { maximum_distance nums1 nums2 3 }
+
+  let lemma test_009 () =
+    let nums1 = Cons 5 (Cons 5 (Cons 5 (Cons 5 Nil))) in
+    let nums2 = Cons 5 (Cons 5 (Cons 5 (Cons 5 (Cons 5 (Cons 5 Nil))))) in
+    assert { length nums1 = 4 };
+    assert { length nums2 = 6 };
+    assert { values_in_range nums1 };
+    assert { values_in_range nums2 };
+    assert { non_increasing nums1 };
+    assert { non_increasing nums2 };
+    assert { nth 0 nums1 = 5 };
+    assert { nth 5 nums2 = 5 };
+    assert { valid_pair nums1 nums2 0 5 };
+    assert { has_distance nums1 nums2 5 };
+    assert { forall i: int. forall j: int.
+      valid_pair nums1 nums2 i j -> j - i <= 5 };
+    assert { maximum_distance nums1 nums2 5 }
+
+  let lemma test_010 () =
+    let nums1 = Cons 10 (Cons 9 (Cons 8 (Cons 7 (Cons 6 Nil)))) in
+    let nums2 = Cons 6 (Cons 5 (Cons 4 (Cons 3 (Cons 2 (Cons 1 Nil))))) in
+    assert { length nums1 = 5 };
+    assert { length nums2 = 6 };
+    assert { values_in_range nums1 };
+    assert { values_in_range nums2 };
+    assert { non_increasing nums1 };
+    assert { non_increasing nums2 };
+    assert { not (valid_pair nums1 nums2 0 0) };
+    assert { not (valid_pair nums1 nums2 4 5) };
+    assert { forall i: int. forall j: int.
+      valid_pair nums1 nums2 i j -> false };
+    assert { forall i: int. forall j: int.
+      valid_pair nums1 nums2 i j -> j - i <= 0 };
+    assert { maximum_distance nums1 nums2 0 }
+
+  let lemma test_018 () =
+    let nums1 = Cons 2 (Cons 2 (Cons 2 Nil)) in
+    let nums2 = Cons 10 (Cons 10 (Cons 1 Nil)) in
+    assert { length nums1 = 3 };
+    assert { length nums2 = 3 };
+    assert { values_in_range nums1 };
+    assert { values_in_range nums2 };
+    assert { non_increasing nums1 };
+    assert { non_increasing nums2 };
+    assert { nth 0 nums1 = 2 };
+    assert { nth 1 nums2 = 10 };
+    assert { valid_pair nums1 nums2 0 1 };
+    assert { has_distance nums1 nums2 1 };
+    assert { forall i: int. forall j: int.
+      valid_pair nums1 nums2 i j -> j - i <= 1 };
+    assert { maximum_distance nums1 nums2 1 }
+
+  let lemma test_020 () =
+    let nums1 = Cons 55 (Cons 30 (Cons 5 (Cons 4 (Cons 2 Nil)))) in
+    let nums2 = Cons 100 (Cons 20 (Cons 10 (Cons 10 (Cons 5 Nil)))) in
+    assert { length nums1 = 5 };
+    assert { length nums2 = 5 };
+    assert { values_in_range nums1 };
+    assert { values_in_range nums2 };
+    assert { non_increasing nums1 };
+    assert { non_increasing nums2 };
+    assert { nth 2 nums1 = 5 };
+    assert { nth 4 nums2 = 5 };
+    assert { valid_pair nums1 nums2 2 4 };
+    assert { has_distance nums1 nums2 2 };
+    assert { forall i: int. forall j: int.
+      valid_pair nums1 nums2 i j -> j - i <= 2 };
+    assert { maximum_distance nums1 nums2 2 }
+
+end

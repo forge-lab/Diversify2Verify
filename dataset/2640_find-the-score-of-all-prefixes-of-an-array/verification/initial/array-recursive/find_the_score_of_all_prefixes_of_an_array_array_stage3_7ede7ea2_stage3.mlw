@@ -1,0 +1,136 @@
+module FindTheScoreOfAllPrefixesOfAnArray_Array_Stage3_Recursive
+
+  use int.Int
+  use int.MinMax
+  use array.Array
+  use array.Init
+
+  predicate valid_input (nums: array int) =
+    length nums >= 1 /\
+    forall i: int. 0 <= i < length nums -> 1 <= nums[i] <= 1000000000
+
+  let rec function prefix_max (nums: array int) (i: int) : int
+    requires { 0 <= i < length nums }
+    variant  { i }
+  =
+    if i = 0 then nums[0]
+    else max (prefix_max nums (i - 1)) nums[i]
+
+  let rec function prefix_score (nums: array int) (i: int) : int
+    requires { 0 <= i < length nums }
+    variant  { i }
+  =
+    if i = 0 then nums[0] + prefix_max nums 0
+    else prefix_score nums (i - 1) + nums[i] + prefix_max nums i
+
+  predicate result_matches (nums: array int) (ans: array int) =
+    valid_input nums /\
+    length ans = length nums /\
+    forall i: int. 0 <= i < length nums -> ans[i] = prefix_score nums i
+
+  let lemma executable_max_eq (x: int) (y: int)
+    ensures { (if x > y then x else y) = max x y }
+  =
+    if x > y then
+      assert { max x y = x }
+    else
+      assert { max x y = y }
+
+  let lemma executable_max_prefix_eq (nums: array int) (i: int) (current_max: int)
+    requires { valid_input nums }
+    requires { 0 <= i < length nums }
+    requires { i = 0 -> current_max = nums[0] }
+    requires { i > 0 -> current_max = prefix_max nums (i - 1) }
+    ensures  { (if nums[i] > current_max then nums[i] else current_max) = prefix_max nums i }
+  =
+    if i = 0 then
+      begin
+        executable_max_eq nums[i] current_max;
+        assert { current_max = nums[0] };
+        assert { nums[i] = nums[0] };
+        assert { prefix_max nums i = nums[0] }
+      end
+    else
+      begin
+        executable_max_eq nums[i] current_max;
+        assert { prefix_max nums i = max (prefix_max nums (i - 1)) nums[i] };
+        assert { current_max = prefix_max nums (i - 1) };
+        assert { max nums[i] current_max = max current_max nums[i] }
+      end
+
+  let lemma prefix_score_step (nums: array int) (i: int)
+    requires { valid_input nums }
+    requires { 0 <= i < length nums }
+    ensures  {
+      if i = 0 then
+        prefix_score nums i = nums[0] + prefix_max nums 0
+      else
+        prefix_score nums i = prefix_score nums (i - 1) + nums[i] + prefix_max nums i
+    }
+  =
+    if i = 0 then
+      assert { prefix_score nums i = nums[0] + prefix_max nums 0 }
+    else
+      assert { prefix_score nums i = prefix_score nums (i - 1) + nums[i] + prefix_max nums i }
+
+  let rec fill_scores
+    (nums: array int) (scores: array int) (i: int)
+    (current_max: int) (current_score: int) : unit
+    requires { valid_input nums }
+    requires { length scores = length nums }
+    requires { 0 <= i <= length nums }
+    requires { i = 0 -> current_max = nums[0] /\ current_score = 0 }
+    requires { i > 0 -> current_max = prefix_max nums (i - 1) /\ current_score = prefix_score nums (i - 1) }
+    requires { forall j: int. 0 <= j < i -> scores[j] = prefix_score nums j }
+    variant  { length nums - i }
+    ensures  { length scores = length nums }
+    ensures  { forall j: int. 0 <= j < length nums -> scores[j] = prefix_score nums j }
+  =
+    if i >= length nums then
+      begin
+        assert { i = length nums };
+        assert { forall j: int. 0 <= j < length nums -> j < i };
+        assert { forall j: int. 0 <= j < length nums -> scores[j] = prefix_score nums j }
+      end
+    else
+      begin
+        assert { 0 <= i < length nums };
+        let next_max = if nums[i] > current_max then nums[i] else current_max in
+        executable_max_prefix_eq nums i current_max;
+        assert { next_max = prefix_max nums i };
+        let next_score = current_score + nums[i] + next_max in
+        prefix_score_step nums i;
+        if i = 0 then
+          begin
+            assert { current_score = 0 };
+            assert { next_score = prefix_score nums i }
+          end
+        else
+          begin
+            assert { current_score = prefix_score nums (i - 1) };
+            assert { next_score = prefix_score nums i }
+          end;
+        scores[i] <- next_score;
+        assert { scores[i] = prefix_score nums i };
+        assert { forall j: int. 0 <= j < i -> scores[j] = prefix_score nums j };
+        assert { forall j: int. 0 <= j < i + 1 -> scores[j] = prefix_score nums j };
+        fill_scores nums scores (i + 1) next_max next_score
+      end
+
+  let find_the_score_of_all_prefixes_of_an_array_array (nums: array int) : array int
+    requires { valid_input nums }
+    ensures  { result_matches nums result }
+  =
+    if length nums = 0 then
+      make 0 0
+    else
+      begin
+        let scores = make (length nums) 0 in
+        fill_scores nums scores 0 nums[0] 0;
+        assert { length scores = length nums };
+        assert { forall i: int. 0 <= i < length nums -> scores[i] = prefix_score nums i };
+        assert { result_matches nums scores };
+        scores
+      end
+
+end

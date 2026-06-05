@@ -1,0 +1,262 @@
+module FindKThSmallestPairDistance_List_Stage3_Recursive
+
+  use int.Int
+  use int.Abs
+  use list.List
+  use list.Length
+  use list.Mem
+
+  let rec predicate bounded_values (nums: list int)
+    variant { nums }
+  =
+    match nums with
+    | Nil -> true
+    | Cons x xs -> (0 <= x && x <= 1000000) && bounded_values xs
+    end
+
+  let rec function count_head_pairs_le (x: int) (tail: list int) (d: int) : int
+    variant { tail }
+  =
+    match tail with
+    | Nil -> 0
+    | Cons y ys ->
+        (if abs (x - y) <= d then 1 else 0) + count_head_pairs_le x ys d
+    end
+
+  let rec function pair_count_le (nums: list int) (d: int) : int
+    variant { nums }
+  =
+    match nums with
+    | Nil -> 0
+    | Cons x xs -> count_head_pairs_le x xs d + pair_count_le xs d
+    end
+
+  predicate kth_pair_distance (nums: list int) (k: int) (r: int) =
+    0 <= r /\
+    pair_count_le nums r >= k /\
+    (forall d: int. 0 <= d /\ d < r -> pair_count_le nums d < k)
+
+  let lemma abs_diff_within_range (x: int) (y: int) (lo: int) (hi: int)
+    requires { lo <= x /\ x <= hi }
+    requires { lo <= y /\ y <= hi }
+    ensures  { abs (x - y) <= hi - lo }
+  =
+    if x >= y then begin
+      assert { abs (x - y) = x - y };
+      assert { x - y <= hi - lo }
+    end else begin
+      assert { abs (x - y) = y - x };
+      assert { y - x <= hi - lo }
+    end
+
+  let rec lemma count_head_pairs_le_range_full
+      (x: int) (tail: list int) (lo: int) (hi: int)
+    requires { lo <= x /\ x <= hi }
+    requires { forall y: int. mem y tail -> lo <= y /\ y <= hi }
+    ensures  { count_head_pairs_le x tail (hi - lo) = length tail }
+    variant  { tail }
+  =
+    match tail with
+    | Nil ->
+        assert { count_head_pairs_le x tail (hi - lo) = 0 };
+        assert { length tail = 0 }
+    | Cons y ys ->
+        assert { mem y (Cons y ys) };
+        assert { lo <= y /\ y <= hi };
+        abs_diff_within_range x y lo hi;
+        assert { abs (x - y) <= hi - lo };
+        assert { forall z: int. mem z ys -> lo <= z /\ z <= hi };
+        count_head_pairs_le_range_full x ys lo hi;
+        assert { count_head_pairs_le x (Cons y ys) (hi - lo) =
+          1 + count_head_pairs_le x ys (hi - lo) };
+        assert { length (Cons y ys) = 1 + length ys }
+    end
+
+  let rec lemma pair_count_le_range_full
+      (nums: list int) (lo: int) (hi: int)
+    requires { forall y: int. mem y nums -> lo <= y /\ y <= hi }
+    ensures  { 2 * pair_count_le nums (hi - lo) =
+      length nums * (length nums - 1) }
+    variant  { nums }
+  =
+    match nums with
+    | Nil ->
+        assert { nums = Nil };
+        assert { pair_count_le nums (hi - lo) = 0 };
+        assert { length nums = 0 };
+        assert { 2 * pair_count_le nums (hi - lo) =
+          length nums * (length nums - 1) }
+    | Cons x xs ->
+        assert { nums = Cons x xs };
+        assert { mem x (Cons x xs) };
+        assert { lo <= x /\ x <= hi };
+        assert { forall y: int. mem y xs -> lo <= y /\ y <= hi };
+        count_head_pairs_le_range_full x xs lo hi;
+        pair_count_le_range_full xs lo hi;
+        assert { count_head_pairs_le x xs (hi - lo) = length xs };
+        assert { pair_count_le (Cons x xs) (hi - lo) =
+          length xs + pair_count_le xs (hi - lo) };
+        assert { length (Cons x xs) = 1 + length xs };
+        assert { 2 * pair_count_le (Cons x xs) (hi - lo) =
+          length (Cons x xs) * (length (Cons x xs) - 1) };
+        assert { 2 * pair_count_le nums (hi - lo) =
+          length nums * (length nums - 1) }
+    end
+
+  let abs_diff (x: int) (y: int) : int
+    ensures { result = abs (x - y) }
+    ensures { 0 <= result }
+  =
+    if x >= y then begin
+      assert { x - y >= 0 };
+      x - y
+    end else begin
+      assert { y - x > 0 };
+      y - x
+    end
+
+  let rec impl_count_head_pairs_le (x: int) (tail: list int) (d: int) : int
+    ensures { result = count_head_pairs_le x tail d }
+    variant { tail }
+  =
+    match tail with
+    | Nil ->
+        assert { count_head_pairs_le x Nil d = 0 };
+        0
+    | Cons y ys ->
+        let here = if abs_diff x y <= d then 1 else 0 in
+        let rest = impl_count_head_pairs_le x ys d in
+        assert { here = if abs (x - y) <= d then 1 else 0 };
+        assert { rest = count_head_pairs_le x ys d };
+        here + rest
+    end
+
+  let rec impl_pair_count_le (nums: list int) (d: int) : int
+    ensures { result = pair_count_le nums d }
+    variant { nums }
+  =
+    match nums with
+    | Nil ->
+        assert { pair_count_le Nil d = 0 };
+        0
+    | Cons x xs ->
+        let head_pairs = impl_count_head_pairs_le x xs d in
+        let tail_pairs = impl_pair_count_le xs d in
+        assert { head_pairs = count_head_pairs_le x xs d };
+        assert { tail_pairs = pair_count_le xs d };
+        head_pairs + tail_pairs
+    end
+
+  let rec min_from (xs: list int) (current: int) : int
+    ensures { result <= current }
+    ensures { forall y: int. mem y (Cons current xs) -> result <= y }
+    ensures { bounded_values (Cons current xs) -> 0 <= result }
+    variant { xs }
+  =
+    match xs with
+    | Nil -> current
+    | Cons y ys ->
+        if y < current then begin
+          let r = min_from ys y in
+          assert { r <= y };
+          assert { r <= current };
+          assert { forall z: int. mem z (Cons current (Cons y ys)) -> r <= z };
+          r
+        end else begin
+          let r = min_from ys current in
+          assert { r <= current };
+          assert { r <= y };
+          assert { forall z: int. mem z (Cons current (Cons y ys)) -> r <= z };
+          r
+        end
+    end
+
+  let rec max_from (xs: list int) (current: int) : int
+    ensures { current <= result }
+    ensures { forall y: int. mem y (Cons current xs) -> y <= result }
+    ensures { bounded_values (Cons current xs) -> result <= 1000000 }
+    variant { xs }
+  =
+    match xs with
+    | Nil -> current
+    | Cons y ys ->
+        if y > current then begin
+          let r = max_from ys y in
+          assert { y <= r };
+          assert { current <= r };
+          assert { forall z: int. mem z (Cons current (Cons y ys)) -> z <= r };
+          r
+        end else begin
+          let r = max_from ys current in
+          assert { current <= r };
+          assert { y <= r };
+          assert { forall z: int. mem z (Cons current (Cons y ys)) -> z <= r };
+          r
+        end
+    end
+
+  let distance_upper_bound (nums: list int) : int
+    requires { bounded_values nums }
+    ensures  { 0 <= result }
+    ensures  { forall k: int.
+      length nums >= 2 /\ 1 <= k /\ 2 * k <= length nums * (length nums - 1) ->
+      pair_count_le nums result >= k }
+  =
+    match nums with
+    | Nil -> 0
+    | Cons x xs ->
+        let hi = max_from xs x in
+        let lo = min_from xs x in
+        assert { lo <= x };
+        assert { x <= hi };
+        assert { forall y: int. mem y nums -> lo <= y /\ y <= hi };
+        pair_count_le_range_full nums lo hi;
+        assert { 0 <= hi - lo };
+        assert { 2 * pair_count_le nums (hi - lo) =
+          length nums * (length nums - 1) };
+        assert { forall k: int.
+          length nums >= 2 /\ 1 <= k /\ 2 * k <= length nums * (length nums - 1) ->
+          pair_count_le nums (hi - lo) >= k };
+        hi - lo
+    end
+
+  let rec search_distance (nums: list int) (k: int) (d: int) (upper: int) : int
+    requires { 0 <= d }
+    requires { d <= upper }
+    requires { pair_count_le nums upper >= k }
+    requires { forall q: int. 0 <= q /\ q < d -> pair_count_le nums q < k }
+    ensures  { kth_pair_distance nums k result }
+    variant { upper - d }
+  =
+    let cnt = impl_pair_count_le nums d in
+    assert { cnt = pair_count_le nums d };
+    if cnt >= k then begin
+      assert { 0 <= d };
+      assert { pair_count_le nums d >= k };
+      assert { forall q: int. 0 <= q /\ q < d -> pair_count_le nums q < k };
+      d
+    end else if d >= upper then begin
+      assert { d = upper };
+      assert { pair_count_le nums upper >= k };
+      assert { forall q: int. 0 <= q /\ q < upper -> pair_count_le nums q < k };
+      upper
+    end else begin
+      assert { pair_count_le nums d < k };
+      assert { d + 1 <= upper };
+      assert { forall q: int. 0 <= q /\ q < d + 1 -> pair_count_le nums q < k };
+      search_distance nums k (d + 1) upper
+    end
+
+  let find_k_th_smallest_pair_distance_list (nums: list int) (k: int) : int
+    requires { length nums >= 2 }
+    requires { 1 <= k }
+    requires { 2 * k <= length nums * (length nums - 1) }
+    requires { bounded_values nums }
+    ensures  { kth_pair_distance nums k result }
+  =
+    let upper = distance_upper_bound nums in
+    assert { 0 <= upper };
+    assert { pair_count_le nums upper >= k };
+    search_distance nums k 0 upper
+
+end

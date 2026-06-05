@@ -1,0 +1,192 @@
+module ConstrainedSubsequenceSum_Array_Recursive_Implementation
+
+  use int.Int
+  use array.Array
+  use array.Init
+
+  predicate input_valid (nums: array int) (k: int) =
+    1 <= k <= length nums <= 100000 /\
+    forall i: int. 0 <= i < length nums -> (-10000) <= nums[i] <= 10000
+
+  let rec max_prev_from (dp: array int) (j: int) (stop: int) (best: int) : int
+    requires { 0 <= j <= stop <= length dp }
+    variant { stop - j }
+  =
+    if j >= stop then
+      best
+    else
+      let next_best = if dp[j] > best then dp[j] else best in
+      max_prev_from dp (j + 1) stop next_best
+
+  let rec fill_dp (nums: array int) (k: int) (dp: array int) (i: int) (best_so_far: int) : int
+    requires { length nums = length dp }
+    requires { 0 < length nums }
+    requires { 1 <= k }
+    requires { 1 <= i <= length nums }
+    variant { length nums - i }
+  =
+    if i >= length nums then
+      best_so_far
+    else
+      let start = if i - k > 0 then i - k else 0 in
+      let best_prev = max_prev_from dp start i 0 in
+      let current = nums[i] + best_prev in
+      dp[i] <- current;
+      let next_best = if current > best_so_far then current else best_so_far in
+      fill_dp nums k dp (i + 1) next_best
+
+  let constrained_subsequence_sum_array (nums: array int) (k: int) : int
+    requires { input_valid nums k }
+  =
+    let n = length nums in
+    if n = 0 then
+      0
+    else
+      let dp = make n 0 in
+      dp[0] <- nums[0];
+      fill_dp nums k dp 1 nums[0]
+
+  let test_000_constrained_subsequence_sum () : bool =
+    let nums = init 4 [|5; 7; -3; 5|] in
+    let r = constrained_subsequence_sum_array nums 1 in
+    r = 14
+
+  let test_001_constrained_subsequence_sum () : bool =
+    let nums = init 5 [|10; 2; -10; 5; 20|] in
+    let r = constrained_subsequence_sum_array nums 2 in
+    r = 37
+
+  let test_002_constrained_subsequence_sum () : bool =
+    let nums = init 5 [|1; 2; 3; 4; 5|] in
+    let r = constrained_subsequence_sum_array nums 3 in
+    r = 15
+
+  let test_003_constrained_subsequence_sum () : bool =
+    let nums = init 6 [|3; -1; 4; -2; 2; 1|] in
+    let r = constrained_subsequence_sum_array nums 2 in
+    r = 10
+
+  let test_004_constrained_subsequence_sum () : bool =
+    let nums = init 5 [|-1; -2; -3; -4; -5|] in
+    let r = constrained_subsequence_sum_array nums 4 in
+    r = -1
+
+  let test_005_constrained_subsequence_sum () : bool =
+    let nums = init 3 [|5; -1; 5|] in
+    let r = constrained_subsequence_sum_array nums 2 in
+    r = 10
+
+  let test_006_constrained_subsequence_sum () : bool =
+    let nums = init 3 [|-1; -2; -3|] in
+    let r = constrained_subsequence_sum_array nums 1 in
+    r = -1
+
+  let test_007_constrained_subsequence_sum () : bool =
+    let nums = init 5 [|5; 4; 3; 2; 1|] in
+    let r = constrained_subsequence_sum_array nums 5 in
+    r = 15
+
+  let test_008_constrained_subsequence_sum () : bool =
+    let nums = init 6 [|5; 3; -5; -10; -3; 7|] in
+    let r = constrained_subsequence_sum_array nums 4 in
+    r = 15
+
+  let test_009_constrained_subsequence_sum () : bool =
+    let nums = init 5 [|1; -1; 5; -2; 3|] in
+    let r = constrained_subsequence_sum_array nums 3 in
+    r = 9
+
+  let test_010_constrained_subsequence_sum () : bool =
+    let nums = init 5 [|10; -2; -10; -5; 20|] in
+    let r = constrained_subsequence_sum_array nums 2 in
+    r = 23
+
+  let test_011_constrained_subsequence_sum () : bool =
+    let nums = init 10 [|1; -1; 2; -2; 3; -3; 4; -4; 5; -5|] in
+    let r = constrained_subsequence_sum_array nums 2 in
+    r = 15
+
+  let test_012_constrained_subsequence_sum () : bool =
+    let nums = init 10 [|10; -10; 20; -20; 30; -30; 40; -40; 50; -50|] in
+    let r = constrained_subsequence_sum_array nums 2 in
+    r = 150
+
+  let test_013_constrained_subsequence_sum () : bool =
+    let nums = init 10 [|1; 2; 3; 4; 5; 6; 7; 8; 9; 10|] in
+    let r = constrained_subsequence_sum_array nums 10 in
+    r = 55
+
+  let test_014_constrained_subsequence_sum () : bool =
+    let nums = init 20 [|-1; -2; -3; -4; -5; -6; -7; -8; -9; -10; -11; -12; -13; -14; -15; -16; -17; -18; -19; -20|] in
+    let r = constrained_subsequence_sum_array nums 5 in
+    r = -1
+
+  let test_015_constrained_subsequence_sum () : bool =
+    let nums = init 7 [|-10; -20; -30; -40; -50; -60; -70|] in
+    let r = constrained_subsequence_sum_array nums 1 in
+    r = -10
+
+  let test_016_constrained_subsequence_sum () : bool =
+    let nums = init 20 [|1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1|] in
+    let r = constrained_subsequence_sum_array nums 20 in
+    r = 20
+
+  let test_017_constrained_subsequence_sum () : bool =
+    let nums = init 10 [|10; -10; 20; -20; 30; -30; 40; -40; 50; -50|] in
+    let r = constrained_subsequence_sum_array nums 4 in
+    r = 150
+
+  let test_018_constrained_subsequence_sum () : bool =
+    let nums = init 20 [|1; -1; 2; -2; 3; -3; 4; -4; 5; -5; 6; -6; 7; -7; 8; -8; 9; -9; 10; -10|] in
+    let r = constrained_subsequence_sum_array nums 10 in
+    r = 55
+
+  let test_019_constrained_subsequence_sum () : bool =
+    let nums = init 10 [|-1; -2; -3; -4; -5; -6; -7; -8; -9; -10|] in
+    let r = constrained_subsequence_sum_array nums 5 in
+    r = -1
+
+  let run_tests () : bool =
+    if test_000_constrained_subsequence_sum () then
+    if test_001_constrained_subsequence_sum () then
+    if test_002_constrained_subsequence_sum () then
+    if test_003_constrained_subsequence_sum () then
+    if test_004_constrained_subsequence_sum () then
+    if test_005_constrained_subsequence_sum () then
+    if test_006_constrained_subsequence_sum () then
+    if test_007_constrained_subsequence_sum () then
+    if test_008_constrained_subsequence_sum () then
+    if test_009_constrained_subsequence_sum () then
+    if test_010_constrained_subsequence_sum () then
+    if test_011_constrained_subsequence_sum () then
+    if test_012_constrained_subsequence_sum () then
+    if test_013_constrained_subsequence_sum () then
+    if test_014_constrained_subsequence_sum () then
+    if test_015_constrained_subsequence_sum () then
+    if test_016_constrained_subsequence_sum () then
+    if test_017_constrained_subsequence_sum () then
+    if test_018_constrained_subsequence_sum () then
+    if test_019_constrained_subsequence_sum () then
+      true
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+
+end

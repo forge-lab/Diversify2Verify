@@ -1,0 +1,95 @@
+module MinimumOperationsToMakeAllArrayElementsEqual_Array_Stage3_Imperative
+
+  use int.Int
+  use int.Abs
+  use int.Sum
+  use array.Array
+  use array.Init
+  use ref.Ref
+
+  predicate valid_input (nums: array int) (queries: array int) =
+    1 <= length nums <= 100000 /\
+    1 <= length queries <= 100000 /\
+    (forall i: int. 0 <= i < length nums -> 1 <= nums[i] <= 1000000000) /\
+    (forall j: int. 0 <= j < length queries -> 1 <= queries[j] <= 1000000000)
+
+  function operation_cost_at (nums: array int) (q: int) (i: int) : int =
+    abs (nums[i] - q)
+
+  function operations_for_query (nums: array int) (q: int) : int =
+    sum (fun i -> operation_cost_at nums q i) 0 (length nums)
+
+  predicate expected_at
+    (nums: array int) (queries: array int) (result: array int) (j: int)
+  =
+    0 <= j < length queries ->
+    result[j] = operations_for_query nums queries[j]
+
+  predicate minimum_operations_to_make_all_array_elements_equal_array_spec
+    (nums: array int) (queries: array int) (result: array int)
+  =
+    length result = length queries /\
+    forall j: int. 0 <= j < length queries ->
+      expected_at nums queries result j
+
+  let minimum_operations_to_make_all_array_elements_equal_array
+    (nums: array int) (queries: array int) : array int
+    requires { valid_input nums queries }
+    ensures  {
+      minimum_operations_to_make_all_array_elements_equal_array_spec
+        nums queries result
+    }
+  =
+    let n = length nums in
+    let m = length queries in
+    assert { 1 <= n <= 100000 };
+    assert { 1 <= m <= 100000 };
+    let result = make m 0 in
+    for j = 0 to m - 1 do
+      invariant { 0 <= j <= m }
+      invariant { n = length nums }
+      invariant { m = length queries }
+      invariant { length result = m }
+      invariant {
+        forall k: int. 0 <= k < j ->
+          expected_at nums queries result k
+      }
+
+      let total = ref 0 in
+      let q = queries[j] in
+      for i = 0 to n - 1 do
+        invariant { 0 <= i <= n }
+        invariant { n = length nums }
+        invariant { m = length queries }
+        invariant { 0 <= j < m }
+        invariant { q = queries[j] }
+        invariant {
+          !total = sum (fun k -> operation_cost_at nums q k) 0 i
+        }
+
+        assert { 0 <= i < length nums };
+        assert { operation_cost_at nums q i = abs (nums[i] - q) };
+        total := !total + abs (nums[i] - q);
+        assert {
+          !total = sum (fun k -> operation_cost_at nums q k) 0 (i + 1)
+        }
+      done;
+      assert { !total = sum (fun k -> operation_cost_at nums q k) 0 n };
+      assert { !total = operations_for_query nums q };
+      assert { q = queries[j] };
+      result[j] <- !total;
+      assert { result[j] = operations_for_query nums queries[j] };
+      assert { expected_at nums queries result j }
+    done;
+    assert { length result = length queries };
+    assert {
+      forall j: int. 0 <= j < length queries ->
+        expected_at nums queries result j
+    };
+    assert {
+      minimum_operations_to_make_all_array_elements_equal_array_spec
+        nums queries result
+    };
+    result
+
+end

@@ -1,0 +1,185 @@
+module PartitionArraySuchThatMaximumDifferenceIsK_Array_Spec
+
+  use int.Int
+  use array.Array
+  use array.Init
+  use ref.Ref
+
+  predicate same_group_range_ok (nums: array int) (k: int) (labels: array int) =
+    forall i j: int.
+      0 <= i < length nums ->
+      0 <= j < length nums ->
+      labels[i] = labels[j] ->
+      nums[i] - nums[j] <= k /\ nums[j] - nums[i] <= k
+
+  predicate valid_group_labels (nums: array int) (k: int) (groups: int) (labels: array int) =
+    length labels = length nums /\
+    0 <= groups /\
+    (forall i: int. 0 <= i < length nums -> 0 <= labels[i] < groups) /\
+    (forall g: int. 0 <= g < groups ->
+       exists i: int. 0 <= i < length nums /\ labels[i] = g) /\
+    same_group_range_ok nums k labels
+
+  predicate can_partition_with (nums: array int) (k: int) (groups: int) =
+    exists labels: array int. valid_group_labels nums k groups labels
+
+  predicate minimum_partition_count (nums: array int) (k: int) (result: int) =
+    0 <= result <= length nums /\
+    can_partition_with nums k result /\
+    (forall groups: int. 0 <= groups < result ->
+       not (can_partition_with nums k groups))
+
+  predicate sorted_array (nums: array int) =
+    forall i j: int.
+      0 <= i <= j < length nums -> nums[i] <= nums[j]
+
+  predicate sorted_prefix (nums: array int) (hi: int) =
+    0 <= hi <= length nums /\
+    forall i j: int.
+      0 <= i <= j < hi -> nums[i] <= nums[j]
+
+  predicate current_group_prefix_ok (nums: array int) (k: int) (start: int) (upto: int) =
+    0 <= start < upto <= length nums /\
+    forall i: int.
+      start <= i < upto -> nums[i] - nums[start] <= k
+
+  predicate greedy_prefix_state
+    (nums: array int) (k: int) (upto: int) (groups: int) (group_min: int) =
+    0 <= upto <= length nums /\
+    0 <= groups <= upto /\
+    (upto = 0 -> groups = 0) /\
+    (0 < upto ->
+       1 <= groups /\
+         exists start: int.
+           0 <= start < upto /\
+           group_min = nums[start] /\
+           current_group_prefix_ok nums k start upto)
+
+  predicate prefix_group_labels_ok
+    (nums: array int) (k: int) (labels: array int) (upto: int) (groups: int) =
+    length labels = length nums /\
+    0 <= upto <= length nums /\
+    0 <= groups /\
+    (forall i: int. 0 <= i < upto -> 0 <= labels[i] < groups) /\
+    (forall g: int. 0 <= g < groups ->
+       exists i: int. 0 <= i < upto /\ labels[i] = g) /\
+    (forall i j: int.
+       0 <= i < upto ->
+       0 <= j < upto ->
+       labels[i] = labels[j] ->
+       nums[i] - nums[j] <= k /\ nums[j] - nums[i] <= k)
+
+  exception InsertionPoint
+
+  let insertion_sort (nums: array int) : unit
+    ensures { sorted_array nums }
+  =
+    let n = length nums in
+    if n >= 2 then
+      for i = 1 to n - 1 do
+        invariant { n = length nums }
+        invariant { 1 <= i <= n }
+        invariant { sorted_prefix nums i }
+
+        let key = nums[i] in
+        let j = ref (i - 1) in
+        try
+          while !j >= 0 do
+            invariant { n = length nums }
+            invariant { -1 <= !j < i }
+            invariant { i < n }
+            invariant {
+              forall p: int.
+                !j + 1 < p <= i -> key < nums[p]
+            }
+            variant { !j + 1 }
+
+            if nums[!j] > key then begin
+              nums[!j + 1] <- nums[!j];
+              j := !j - 1
+            end else
+              raise InsertionPoint
+          done
+        with InsertionPoint ->
+          ()
+        end;
+          nums[!j + 1] <- key;
+          assert { 0 <= !j + 1 <= i };
+          assert {
+            forall p: int.
+              !j + 2 <= p <= i -> key < nums[p]
+          };
+          assert {
+            forall p q: int.
+              0 <= p <= q < !j + 1 -> nums[p] <= nums[q]
+          };
+          assert {
+            forall p: int.
+              0 <= p < !j + 1 -> nums[p] <= key
+          };
+          assert {
+            forall q: int.
+              !j + 2 <= q < i + 1 -> key <= nums[q]
+          };
+          assert { sorted_prefix nums (i + 1) }
+        done;
+      assert { sorted_array nums }
+
+  let partition_array_such_that_maximum_difference_is_k_array (nums: array int) (k: int) : int
+    requires { 0 <= k }
+    ensures  { minimum_partition_count nums k result }
+  =
+    let n = length nums in
+    if n = 0 then
+      0
+    else begin
+        insertion_sort nums;
+        assert { sorted_array nums };
+        let groups = ref 1 in
+        let group_min = ref nums[0] in
+        let ghost labels = make n 0 in
+        assert { length labels = length nums };
+        assert { labels[0] = 0 };
+        assert { 0 <= 0 < 1 };
+        assert { !group_min = nums[0] };
+        assert { current_group_prefix_ok nums k 0 1 };
+        assert { greedy_prefix_state nums k 1 !groups !group_min };
+        assert { prefix_group_labels_ok nums k labels 1 !groups };
+        for i = 1 to n - 1 do
+          invariant { n = length nums }
+          invariant { 1 <= i <= n }
+          invariant { sorted_array nums }
+          invariant { 1 <= !groups <= i }
+          invariant { greedy_prefix_state nums k i !groups !group_min }
+          invariant { length labels = length nums }
+          invariant { prefix_group_labels_ok nums k labels i !groups }
+
+          if nums[i] - !group_min > k then begin
+            groups := !groups + 1;
+            group_min := nums[i];
+            labels[i] <- !groups - 1;
+            assert { labels[i] = !groups - 1 };
+            assert { 0 <= labels[i] < !groups };
+            assert { current_group_prefix_ok nums k i (i + 1) };
+            assert { greedy_prefix_state nums k (i + 1) !groups !group_min }
+          end else begin
+            assert { nums[i] - !group_min <= k };
+            labels[i] <- !groups - 1;
+            assert { labels[i] = !groups - 1 };
+            assert { 0 <= labels[i] < !groups };
+            assert { greedy_prefix_state nums k (i + 1) !groups !group_min }
+          end
+        done;
+        assert { 1 <= !groups <= length nums };
+        assert { prefix_group_labels_ok nums k labels n !groups };
+        assert { valid_group_labels nums k !groups labels };
+        assert { can_partition_with nums k !groups };
+        assert {
+          forall groups': int.
+            0 <= groups' < !groups -> not (can_partition_with nums k groups')
+        };
+        assert { minimum_partition_count nums k !groups };
+        !groups
+      end
+
+end

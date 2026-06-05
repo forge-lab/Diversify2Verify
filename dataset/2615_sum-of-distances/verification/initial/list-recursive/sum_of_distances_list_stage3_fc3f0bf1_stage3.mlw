@@ -1,0 +1,58 @@
+module SumOfDistances_List_Stage3_Recursive
+
+  use int.Int
+  use int.Abs
+  use list.List
+  use list.Length
+  use list.Mem
+
+  predicate valid_input (nums: list int) =
+    length nums >= 1 /\
+    (forall x: int. mem x nums -> 0 <= x <= 1000000000)
+
+  let rec function distance_sum_from
+      (target: int) (target_index: int) (current_index: int) (nums: list int) : int
+    variant { nums }
+  =
+    match nums with
+    | Nil -> 0
+    | Cons x xs ->
+        (if x = target then
+           if current_index = target_index then 0
+           else abs (target_index - current_index)
+         else 0) + distance_sum_from target target_index (current_index + 1) xs
+    end
+
+  let rec function distances_for
+      (all_nums: list int) (current_index: int) (suffix: list int) : list int
+    variant { suffix }
+  =
+    match suffix with
+    | Nil -> Nil
+    | Cons x xs ->
+        Cons (distance_sum_from x current_index 0 all_nums)
+          (distances_for all_nums (current_index + 1) xs)
+    end
+
+  let rec lemma distances_for_length
+      (all_nums: list int) (current_index: int) (suffix: list int)
+    ensures { length (distances_for all_nums current_index suffix) = length suffix }
+    variant { suffix }
+  =
+    match suffix with
+    | Nil ->
+        ()
+    | Cons _ xs ->
+        distances_for_length all_nums (current_index + 1) xs
+    end
+
+  let sum_of_distances_list (nums: list int) : list int
+    requires { valid_input nums }
+    ensures  { result = distances_for nums 0 nums }
+    ensures  { length result = length nums }
+  =
+    let result = distances_for nums 0 nums in
+    distances_for_length nums 0 nums;
+    result
+
+end

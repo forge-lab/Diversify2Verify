@@ -1,0 +1,183 @@
+module MaximumTastinessOfCandyBasket_List_Spec
+
+  use int.Int
+  use int.Abs
+  use int.EuclideanDivision
+  use list.List
+  use list.Length
+  use list.Mem
+  use list.NumOcc
+
+  let rec predicate spaced_from (x: int) (basket: list int) (d: int)
+    variant { basket }
+  =
+    match basket with
+    | Nil -> true
+    | Cons y ys -> d <= abs (x - y) && spaced_from x ys d
+    end
+
+  let rec predicate pairwise_spaced (basket: list int) (d: int)
+    variant { basket }
+  =
+    match basket with
+    | Nil -> true
+    | Cons x xs -> spaced_from x xs d && pairwise_spaced xs d
+    end
+
+  predicate submultiset (basket: list int) (price: list int) =
+    forall x: int. num_occ x basket <= num_occ x price
+
+  predicate valid_basket
+    (price: list int) (basket: list int) (k: int) (d: int) =
+    length basket = k /\
+    submultiset basket price /\
+    pairwise_spaced basket d
+
+  predicate feasible_tastiness (price: list int) (k: int) (d: int) =
+    d >= 0 /\
+    exists basket: list int. valid_basket price basket k d
+
+  predicate maximum_tastiness (price: list int) (k: int) (result: int) =
+    feasible_tastiness price k result /\
+    (forall d: int. feasible_tastiness price k d -> d <= result)
+
+  let rec function insert_sorted (x: int) (l: list int) : list int
+    variant { l }
+  =
+    match l with
+    | Nil -> Cons x Nil
+    | Cons y ys ->
+        if x <= y then Cons x l else Cons y (insert_sorted x ys)
+    end
+
+  let rec function sort_list (l: list int) : list int
+    variant { l }
+  =
+    match l with
+    | Nil -> Nil
+    | Cons x xs -> insert_sorted x (sort_list xs)
+    end
+
+  let rec function last_value_from (l: list int) (current: int) : int
+    variant { l }
+  =
+    match l with
+    | Nil -> current
+    | Cons x xs -> last_value_from xs x
+    end
+
+  let rec function can_pick_from (prices: list int) (remaining: int) (last: int) (d: int) : bool
+    variant { prices }
+  =
+    if remaining <= 0 then true else
+    match prices with
+    | Nil -> false
+    | Cons x xs ->
+        if x - last >= d then can_pick_from xs (remaining - 1) x d
+        else can_pick_from xs remaining last d
+    end
+
+  let function feasible_tastiness_exec (sorted_prices: list int) (k: int) (d: int) : bool =
+    match sorted_prices with
+    | Nil -> false
+    | Cons x xs ->
+        if k <= 1 then true else can_pick_from xs (k - 1) x d
+    end
+
+  let rec function search_best (sorted_prices: list int) (k: int) (low: int) (high: int) : int
+    variant { high - low }
+  =
+    if low + 1 >= high then low
+    else
+      let mid = low + div (high - low) 2 in
+      if feasible_tastiness_exec sorted_prices k mid then
+        search_best sorted_prices k mid high
+      else
+        search_best sorted_prices k low mid
+
+  let lemma search_best_feasible_bridge
+    (price: list int) (k: int) (sorted_prices: list int)
+    requires { 2 <= k <= length price }
+    requires { forall x: int. mem x price -> 1 <= x }
+    requires { sorted_prices = sort_list price }
+    requires { sorted_prices <> Nil }
+    ensures  {
+      match sorted_prices with
+      | Nil -> true
+      | Cons first rest ->
+          feasible_tastiness price k
+            (search_best sorted_prices k 0 (last_value_from rest first - first + 1))
+      end
+    }
+  = ()
+
+  let lemma search_best_optimality_bridge
+    (price: list int) (k: int) (sorted_prices: list int)
+    requires { 2 <= k <= length price }
+    requires { forall x: int. mem x price -> 1 <= x }
+    requires { sorted_prices = sort_list price }
+    requires { sorted_prices <> Nil }
+    ensures  {
+      match sorted_prices with
+      | Nil -> true
+      | Cons first rest ->
+          forall d: int. feasible_tastiness price k d ->
+            d <= search_best sorted_prices k 0 (last_value_from rest first - first + 1)
+      end
+    }
+  = ()
+
+  let lemma maximum_tastiness_search_spec
+    (price: list int) (k: int) (sorted_prices: list int)
+    requires { 2 <= k <= length price }
+    requires { forall x: int. mem x price -> 1 <= x }
+    requires { sorted_prices = sort_list price }
+    requires { sorted_prices <> Nil }
+    ensures  {
+      match sorted_prices with
+      | Nil -> true
+      | Cons first rest ->
+          maximum_tastiness price k
+            (search_best sorted_prices k 0 (last_value_from rest first - first + 1))
+      end
+    }
+  =
+    match sorted_prices with
+    | Nil -> absurd
+    | Cons first rest ->
+        assert { sorted_prices = Cons first rest };
+        search_best_feasible_bridge price k sorted_prices;
+        assert {
+          feasible_tastiness price k
+            (search_best sorted_prices k 0 (last_value_from rest first - first + 1))
+        };
+        search_best_optimality_bridge price k sorted_prices;
+        assert {
+          forall d: int. feasible_tastiness price k d ->
+            d <= search_best sorted_prices k 0 (last_value_from rest first - first + 1)
+        };
+        assert {
+          maximum_tastiness price k
+            (search_best sorted_prices k 0 (last_value_from rest first - first + 1))
+        }
+    end
+
+  let maximum_tastiness_of_candy_basket_list (price: list int) (k: int) : int
+    requires { 2 <= k <= length price }
+    requires { forall x: int. mem x price -> 1 <= x }
+    ensures  { maximum_tastiness price k result }
+  =
+    let sorted_prices = sort_list price in
+    match sorted_prices with
+    | Nil -> 0
+    | Cons first rest ->
+        let last = last_value_from rest first in
+        let result = search_best sorted_prices k 0 (last - first + 1) in
+        maximum_tastiness_search_spec price k sorted_prices;
+        assert { last = last_value_from rest first };
+        assert { result = search_best sorted_prices k 0 (last_value_from rest first - first + 1) };
+        assert { maximum_tastiness price k result };
+        result
+    end
+
+end

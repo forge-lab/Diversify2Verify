@@ -1,0 +1,136 @@
+module SmallestMissingIntegerGreaterThanSequentialPrefixSum_List_Spec
+
+  use int.Int
+  use list.List
+  use list.Length
+  use list.Mem
+  use ref.Ref
+
+  predicate valid_input (nums: list int) =
+    1 <= length nums <= 50 /\
+    (forall x: int. mem x nums -> 1 <= x <= 50)
+
+  let rec function sequential_prefix_sum_from
+    (prev: int) (rest: list int) (acc: int) : int
+    variant { rest }
+  =
+    match rest with
+    | Nil -> acc
+    | Cons y ys ->
+        if y = prev + 1 then sequential_prefix_sum_from y ys (acc + y)
+        else acc
+    end
+
+  function sequential_prefix_sum (nums: list int) : int =
+    match nums with
+    | Nil -> 0
+    | Cons x xs -> sequential_prefix_sum_from x xs x
+    end
+
+  predicate smallest_missing_at_or_above (nums: list int) (s: int) (r: int) =
+    s <= r /\
+    not (mem r nums) /\
+    (forall y: int. s <= y < r -> mem y nums)
+
+  exception Found
+
+  let contains_list (nums: list int) (target: int) : bool
+    ensures { result = true <-> mem target nums }
+  =
+    try
+      let cur = ref nums in
+      while (match !cur with Nil -> false | Cons _ _ -> true end) do
+        invariant { mem target nums <-> mem target !cur }
+        invariant { 0 <= length !cur }
+        variant { length !cur }
+
+        match !cur with
+        | Nil ->
+            absurd
+        | Cons x xs ->
+            if x = target then begin
+              assert { mem target !cur };
+              assert { mem target nums };
+              raise Found
+            end;
+            assert { x <> target };
+            assert { mem target !cur <-> mem target xs };
+            cur := xs
+        end
+      done;
+      assert { !cur = Nil };
+      assert { not (mem target !cur) };
+      assert { not (mem target nums) };
+      false
+    with Found ->
+      assert { mem target nums };
+      true
+    end
+
+  let sequential_prefix_sum_exec (nums: list int) : int
+    ensures { result = sequential_prefix_sum nums }
+  =
+    match nums with
+    | Nil ->
+        0
+    | Cons x xs ->
+        let total = ref x in
+        let prev = ref x in
+        let cur = ref xs in
+        while (match !cur with Nil -> false | Cons _ _ -> true end) do
+          invariant { sequential_prefix_sum nums = sequential_prefix_sum_from !prev !cur !total }
+          invariant { 0 <= length !cur }
+          variant { length !cur }
+
+          match !cur with
+          | Nil ->
+              absurd
+          | Cons y ys ->
+              if y = !prev + 1 then begin
+                assert {
+                  sequential_prefix_sum_from !prev !cur !total =
+                  sequential_prefix_sum_from y ys (!total + y)
+                };
+                total := !total + y;
+                prev := y;
+                cur := ys
+              end else begin
+                assert { y <> !prev + 1 };
+                assert { sequential_prefix_sum_from !prev !cur !total = !total };
+                cur := Nil
+              end
+          end
+        done;
+        assert { !cur = Nil };
+        assert { sequential_prefix_sum_from !prev !cur !total = !total };
+        assert { sequential_prefix_sum nums = !total };
+        !total
+    end
+
+  let smallest_missing_integer_greater_than_sequential_prefix_sum_list
+    (nums: list int) : int
+    requires { valid_input nums }
+    ensures  { smallest_missing_at_or_above nums (sequential_prefix_sum nums) result }
+  =
+    let candidate = ref (sequential_prefix_sum_exec nums) in
+    while contains_list nums !candidate do
+      invariant { sequential_prefix_sum nums <= !candidate }
+      invariant {
+        forall y: int.
+          sequential_prefix_sum nums <= y < !candidate -> mem y nums
+      }
+      variant { 52 - !candidate }
+
+      assert { mem !candidate nums };
+      assert { 1 <= !candidate <= 50 };
+      candidate := !candidate + 1
+    done;
+    assert { not (mem !candidate nums) };
+    assert { sequential_prefix_sum nums <= !candidate };
+    assert {
+      forall y: int.
+        sequential_prefix_sum nums <= y < !candidate -> mem y nums
+    };
+    !candidate
+
+end

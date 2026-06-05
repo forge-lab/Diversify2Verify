@@ -1,0 +1,124 @@
+module MaximizeTheBeautyOfTheGarden_List_Spec
+
+  use int.Int
+  use list.List
+  use list.Length
+  use list.Sum
+
+  let rec predicate subsequence (kept: list int) (source: list int)
+    variant { source }
+  =
+    match kept with
+    | Nil -> true
+    | Cons x xs ->
+        match source with
+        | Nil -> false
+        | Cons y ys -> (x = y && subsequence xs ys) || subsequence kept ys
+        end
+    end
+
+  let rec predicate ends_with_value (l: list int) (x: int)
+    variant { l }
+  =
+    match l with
+    | Nil -> false
+    | Cons y ys ->
+        match ys with
+        | Nil -> y = x
+        | Cons _ _ -> ends_with_value ys x
+        end
+    end
+
+  predicate matching_endpoints (kept: list int) =
+    match kept with
+    | Nil -> false
+    | Cons first rest -> ends_with_value rest first
+    end
+
+  predicate valid_remaining (flowers: list int) (kept: list int) =
+    subsequence kept flowers /\
+    length kept >= 2 /\
+    matching_endpoints kept
+
+  predicate best_beauty (flowers: list int) (beauty: int) =
+    (exists kept: list int. valid_remaining flowers kept /\ sum kept = beauty) /\
+    (forall kept: list int. valid_remaining flowers kept -> sum kept <= beauty)
+
+  val maximize_the_beauty_of_the_garden_list (flowers: list int) : int
+    requires { exists kept: list int. valid_remaining flowers kept }
+    ensures  { best_beauty flowers result }
+
+  let lemma check_test_000 () =
+    let flowers =
+      Cons (-10000) (Cons 10000 (Cons (-10000) (Cons 10000
+        (Cons (-10000) (Cons 10000 Nil))))) in
+    let kept = Cons 10000 (Cons 10000 (Cons 10000 Nil)) in
+    assert { subsequence kept flowers };
+    assert { length kept = 3 };
+    assert { matching_endpoints kept };
+    assert { valid_remaining flowers kept };
+    assert { sum kept = 30000 };
+    assert { best_beauty flowers 30000 }
+
+  let lemma check_test_001 () =
+    let flowers =
+      Cons 5 (Cons 8 (Cons 5 (Cons 3 (Cons 5 (Cons 2 (Cons 5 Nil)))))) in
+    let kept = flowers in
+    assert { subsequence kept flowers };
+    assert { length kept = 7 };
+    assert { matching_endpoints kept };
+    assert { valid_remaining flowers kept };
+    assert { sum kept = 33 };
+    assert { best_beauty flowers 33 }
+
+  let lemma check_test_002 () =
+    let flowers = Cons 100 (Cons 1 (Cons 1 (Cons (-3) (Cons 1 Nil)))) in
+    let kept = Cons 1 (Cons 1 (Cons 1 Nil)) in
+    assert { subsequence kept flowers };
+    assert { length kept = 3 };
+    assert { matching_endpoints kept };
+    assert { valid_remaining flowers kept };
+    assert { sum kept = 3 };
+    assert { best_beauty flowers 3 }
+
+  let lemma check_test_005 () =
+    let flowers = Cons 1 (Cons 2 (Cons 3 (Cons 1 (Cons 2 Nil)))) in
+    let kept = Cons 2 (Cons 3 (Cons 1 (Cons 2 Nil))) in
+    assert { subsequence kept flowers };
+    assert { length kept = 4 };
+    assert { matching_endpoints kept };
+    assert { valid_remaining flowers kept };
+    assert { sum kept = 8 };
+    assert { best_beauty flowers 8 }
+
+  let lemma check_test_010 () =
+    let flowers = Cons (-1) (Cons (-2) (Cons 0 (Cons (-1) Nil))) in
+    let kept = Cons (-1) (Cons 0 (Cons (-1) Nil)) in
+    assert { subsequence kept flowers };
+    assert { length kept = 3 };
+    assert { matching_endpoints kept };
+    assert { valid_remaining flowers kept };
+    assert { sum kept = (-2) };
+    assert { best_beauty flowers (-2) }
+
+  let lemma check_test_013 () =
+    let flowers = Cons (-10000) (Cons 0 (Cons 10000 (Cons 0 (Cons (-10000) Nil)))) in
+    let kept = Cons 0 (Cons 10000 (Cons 0 Nil)) in
+    assert { subsequence kept flowers };
+    assert { length kept = 3 };
+    assert { matching_endpoints kept };
+    assert { valid_remaining flowers kept };
+    assert { sum kept = 10000 };
+    assert { best_beauty flowers 10000 }
+
+  let lemma check_test_014 () =
+    let flowers = Cons 5 (Cons 5 (Cons 5 (Cons 5 (Cons 5 Nil)))) in
+    let kept = flowers in
+    assert { subsequence kept flowers };
+    assert { length kept = 5 };
+    assert { matching_endpoints kept };
+    assert { valid_remaining flowers kept };
+    assert { sum kept = 25 };
+    assert { best_beauty flowers 25 }
+
+end

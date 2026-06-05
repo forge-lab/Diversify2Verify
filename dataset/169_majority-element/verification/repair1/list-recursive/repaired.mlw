@@ -1,0 +1,116 @@
+module MajorityElement_List_Stage3_Recursive
+
+  use int.Int
+  use list.List
+  use list.Length
+  use list.NumOcc
+  use list.Append
+
+  predicate is_majority (nums: list int) (x: int) =
+    2 * num_occ x nums > length nums
+
+  predicate has_majority (nums: list int) =
+    exists x: int. is_majority nums x
+
+  let rec function repeat_value (x: int) (n: int) : list int
+    variant { n }
+  =
+    if n <= 0 then Nil else Cons x (repeat_value x (n - 1))
+
+  lemma Repeat_Value_Length:
+    forall x: int, n: int. n >= 0 ->
+      length (repeat_value x n) = n
+
+  lemma Repeat_Value_Num_Occ_Same:
+    forall x: int, n: int. n >= 0 ->
+      num_occ x (repeat_value x n) = n
+
+  lemma Repeat_Value_Num_Occ_Other:
+    forall x y: int, n: int. n >= 0 -> x <> y ->
+      num_occ y (repeat_value x n) = 0
+
+  lemma Repeat_Value_Succ_Append:
+    forall x: int, n: int, tail: list int. n >= 0 ->
+      repeat_value x n ++ Cons x tail = repeat_value x (n + 1) ++ tail
+
+  lemma Repeat_Value_Zero_Append:
+    forall x y: int, tail: list int.
+      repeat_value x 0 ++ Cons y tail = repeat_value y 1 ++ tail
+
+  lemma Repeat_Value_Majority_Identifies:
+    forall x m: int, n: int. n >= 0 ->
+      is_majority (repeat_value x n) m -> m = x
+
+  lemma Num_Occ_Two_Values_Bound:
+    forall l [@induction]: list int, x y: int. x <> y ->
+      num_occ x l + num_occ y l <= length l
+
+  lemma Majority_Unique:
+    forall nums: list int, x y: int.
+      is_majority nums x -> is_majority nums y -> x = y
+
+  lemma Cancel_Pair_Preserves_Majority_Forward:
+    forall candidate x m: int, count: int, xs: list int.
+      count > 0 -> candidate <> x ->
+      is_majority (repeat_value candidate count ++ Cons x xs) m ->
+      is_majority (repeat_value candidate (count - 1) ++ xs) m
+
+  let rec majority_candidate (nums: list int) (candidate: int) (count: int) : int
+    ensures { count >= 0 ->
+      forall m: int.
+        is_majority (repeat_value candidate count ++ nums) m -> result = m }
+    variant { nums }
+  =
+    match nums with
+    | Nil ->
+        assert { count >= 0 ->
+          forall m: int.
+            is_majority (repeat_value candidate count ++ Nil) m -> m = candidate };
+        candidate
+    | Cons x xs ->
+        if count = 0 then
+          let r = majority_candidate xs x 1 in
+          assert { repeat_value candidate count ++ Cons x xs =
+                   repeat_value x 1 ++ xs };
+          assert { forall m: int.
+            is_majority (repeat_value candidate count ++ Cons x xs) m ->
+            r = m };
+          r
+        else if x = candidate then
+          let r = majority_candidate xs candidate (count + 1) in
+          assert { count >= 0 ->
+            repeat_value candidate count ++ Cons x xs =
+            repeat_value candidate (count + 1) ++ xs };
+          assert { count >= 0 -> forall m: int.
+            is_majority (repeat_value candidate count ++ Cons x xs) m ->
+            r = m };
+          r
+        else
+          let r = majority_candidate xs candidate (count - 1) in
+          assert { count >= 0 -> count > 0 };
+          assert { count >= 0 -> forall m: int.
+            is_majority (repeat_value candidate count ++ Cons x xs) m ->
+            is_majority (repeat_value candidate (count - 1) ++ xs) m };
+          assert { count >= 0 -> forall m: int.
+            is_majority (repeat_value candidate count ++ Cons x xs) m ->
+            r = m };
+          r
+        end
+
+  let majority_element_list (nums: list int) : int
+    requires { has_majority nums }
+    ensures  { is_majority nums result }
+  =
+    match nums with
+    | Nil ->
+        assert { not (has_majority Nil) };
+        0
+    | Cons x xs ->
+        let r = majority_candidate xs x 1 in
+        assert { nums = repeat_value x 1 ++ xs };
+        assert { forall m: int. is_majority nums m -> r = m };
+        assert { is_majority nums r };
+        r
+    end
+
+end

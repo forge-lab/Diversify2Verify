@@ -1,0 +1,152 @@
+module SpecialArrayWithXElementsGreaterThanOrEqualX_Array_Imperative
+
+  use int.Int
+  use array.Array
+  use array.Init
+  use ref.Ref
+
+  let count_ge_exec (nums: array int) (x: int) : int =
+    let count = ref 0 in
+    for i = 0 to length nums - 1 do
+      if nums[i] >= x then
+        count := !count + 1
+    done;
+    !count
+
+  let special_array_with_x_elements_greater_than_or_equal_x_array (nums: array int) : int =
+    let n = length nums in
+    let answer = ref (-1) in
+    for x = 0 to n do
+      if count_ge_exec nums x = x then
+        answer := x
+    done;
+    !answer
+
+  let check_case (nums: array int) (expected: int) : bool =
+    let r = special_array_with_x_elements_greater_than_or_equal_x_array nums in
+    r = expected
+
+  let test_000 () : bool =
+    let nums = init 6 [|6; 5; 4; 3; 2; 1|] in
+    check_case nums (-1)
+
+  let test_001 () : bool =
+    let nums = init 10 [|100; 100; 100; 100; 100; 100; 100; 100; 100; 100|] in
+    check_case nums 10
+
+  let test_002 () : bool =
+    let nums = init 6 [|0; 1; 2; 3; 4; 5|] in
+    check_case nums 3
+
+  let test_003 () : bool =
+    let nums = init 11 [|0; 1; 2; 3; 4; 5; 6; 7; 8; 9; 10|] in
+    check_case nums (-1)
+
+  let test_004 () : bool =
+    let nums = init 5 [|100; 200; 300; 400; 500|] in
+    check_case nums 5
+
+  let test_005 () : bool =
+    let nums = init 2 [|0; 0|] in
+    check_case nums (-1)
+
+  let test_006 () : bool =
+    let nums = init 1 [|1|] in
+    check_case nums 1
+
+  let test_007 () : bool =
+    let nums = init 10 [|1; 1; 2; 2; 3; 3; 4; 4; 5; 5|] in
+    check_case nums 4
+
+  let test_008 () : bool =
+    let nums = init 5 [|10; 20; 30; 40; 50|] in
+    check_case nums 5
+
+  let test_009 () : bool =
+    let nums = init 5 [|5; 5; 5; 5; 5|] in
+    check_case nums 5
+
+  let test_010 () : bool =
+    let nums = init 5 [|0; 0; 0; 0; 0|] in
+    check_case nums (-1)
+
+  let test_011 () : bool =
+    let nums = init 5 [|1; 2; 3; 4; 5|] in
+    check_case nums 3
+
+  let test_012 () : bool =
+    let nums = init 1 [|1000|] in
+    check_case nums 1
+
+  let test_013 () : bool =
+    let nums = init 6 [|0; 0; 0; 0; 0; 0|] in
+    check_case nums (-1)
+
+  let test_014 () : bool =
+    let nums = init 1 [|0|] in
+    check_case nums (-1)
+
+  let test_015 () : bool =
+    let nums = init 5 [|100; 200; 300; 400; 500|] in
+    check_case nums 5
+
+  let test_016 () : bool =
+    let nums = init 5 [|0; 4; 3; 0; 4|] in
+    check_case nums 3
+
+  let test_017 () : bool =
+    let nums = init 2 [|3; 5|] in
+    check_case nums 2
+
+  let test_018 () : bool =
+    let nums = init 5 [|1000; 999; 998; 997; 996|] in
+    check_case nums 5
+
+  let test_019 () : bool =
+    let nums = init 5 [|1; 2; 3; 3; 3|] in
+    check_case nums 3
+
+  let run_tests () : bool =
+    if test_000 () then
+    if test_001 () then
+    if test_002 () then
+    if test_003 () then
+    if test_004 () then
+    if test_005 () then
+    if test_006 () then
+    if test_007 () then
+    if test_008 () then
+    if test_009 () then
+    if test_010 () then
+    if test_011 () then
+    if test_012 () then
+    if test_013 () then
+    if test_014 () then
+    if test_015 () then
+    if test_016 () then
+    if test_017 () then
+    if test_018 () then
+    if test_019 () then
+      true
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+
+end

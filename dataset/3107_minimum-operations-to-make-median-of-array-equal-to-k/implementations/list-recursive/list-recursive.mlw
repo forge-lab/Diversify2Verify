@@ -1,0 +1,207 @@
+module MinimumOperationsToMakeMedianOfArrayEqualToK_List_Recursive_Implementation
+
+  use int.Int
+  use int.EuclideanDivision
+  use list.List
+  use list.Length
+
+  let rec insert_sorted (x: int) (nums: list int) : list int
+    variant { nums }
+  =
+    match nums with
+    | Nil -> Cons x Nil
+    | Cons y ys ->
+        if x <= y then
+          Cons x nums
+        else
+          Cons y (insert_sorted x ys)
+    end
+
+  let rec insertion_sort (nums: list int) : list int
+    variant { nums }
+  =
+    match nums with
+    | Nil -> Nil
+    | Cons x xs -> insert_sorted x (insertion_sort xs)
+    end
+
+  let rec suffix_raise_cost (nums: list int) (k: int) : int
+    variant { nums }
+  =
+    match nums with
+    | Nil -> 0
+    | Cons x xs ->
+        (if x < k then k - x else 0) + suffix_raise_cost xs k
+    end
+
+  let rec median_adjustment_from_sorted
+    (nums: list int) (median_index: int) (current_index: int) (k: int) (prefix_decrease: int) : int
+    variant { nums }
+  =
+    match nums with
+    | Nil -> 0
+    | Cons x xs ->
+        if current_index = median_index then
+          if x < k then
+            (k - x) + suffix_raise_cost xs k
+          else if x > k then
+            prefix_decrease + (x - k)
+          else
+            0
+        else
+          let next_prefix_decrease =
+            prefix_decrease + (if x > k then x - k else 0) in
+          median_adjustment_from_sorted xs median_index (current_index + 1) k next_prefix_decrease
+    end
+
+  let minimum_operations_to_make_median_of_array_equal_to_k_list
+    (nums: list int) (k: int) : int
+  =
+    let sorted_nums = insertion_sort nums in
+    let median_index = div (length sorted_nums) 2 in
+    median_adjustment_from_sorted sorted_nums median_index 0 k 0
+
+  let test_000 () : bool =
+    let nums = Cons 1 (Cons 3 (Cons 3 (Cons 3 (Cons 7 (Cons 7 (Cons 9 Nil)))))) in
+    let r = minimum_operations_to_make_median_of_array_equal_to_k_list nums 3 in
+    r = 0
+
+  let test_001 () : bool =
+    let nums = Cons 5 (Cons 5 (Cons 5 (Cons 5 (Cons 5 Nil)))) in
+    let r = minimum_operations_to_make_median_of_array_equal_to_k_list nums 5 in
+    r = 0
+
+  let test_002 () : bool =
+    let nums = Cons 1 (Cons 1000000000 (Cons 2 (Cons 999999999 (Cons 3 Nil)))) in
+    let r = minimum_operations_to_make_median_of_array_equal_to_k_list nums 500000000 in
+    r = 499999997
+
+  let test_003 () : bool =
+    let nums = Cons 2 (Cons 5 (Cons 6 (Cons 8 (Cons 5 Nil)))) in
+    let r = minimum_operations_to_make_median_of_array_equal_to_k_list nums 7 in
+    r = 3
+
+  let test_004 () : bool =
+    let nums = Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 Nil)))) in
+    let r = minimum_operations_to_make_median_of_array_equal_to_k_list nums 3 in
+    r = 6
+
+  let test_005 () : bool =
+    let nums = Cons 1 (Cons 2 (Cons 3 (Cons 4 (Cons 5 (Cons 6 Nil))))) in
+    let r = minimum_operations_to_make_median_of_array_equal_to_k_list nums 4 in
+    r = 0
+
+  let test_006 () : bool =
+    let nums = Cons 2 (Cons 5 (Cons 6 (Cons 8 (Cons 5 Nil)))) in
+    let r = minimum_operations_to_make_median_of_array_equal_to_k_list nums 4 in
+    r = 2
+
+  let test_007 () : bool =
+    let nums = Cons 5 (Cons 5 (Cons 5 (Cons 5 (Cons 5 (Cons 5 Nil))))) in
+    let r = minimum_operations_to_make_median_of_array_equal_to_k_list nums 5 in
+    r = 0
+
+  let test_008 () : bool =
+    let nums = Cons 1 (Cons 2 (Cons 3 (Cons 4 (Cons 5 (Cons 6 (Cons 7 (Cons 8 (Cons 9 Nil)))))))) in
+    let r = minimum_operations_to_make_median_of_array_equal_to_k_list nums 5 in
+    r = 0
+
+  let test_009 () : bool =
+    let nums = Cons 1 (Cons 2 (Cons 3 (Cons 100 (Cons 101 Nil)))) in
+    let r = minimum_operations_to_make_median_of_array_equal_to_k_list nums 3 in
+    r = 0
+
+  let test_010 () : bool =
+    let nums = Cons 1 (Cons 3 (Cons 3 (Cons 3 (Cons 7 Nil)))) in
+    let r = minimum_operations_to_make_median_of_array_equal_to_k_list nums 3 in
+    r = 0
+
+  let test_011 () : bool =
+    let nums = Cons 1 (Cons 3 (Cons 3 (Cons 3 (Cons 7 (Cons 7 (Cons 9 Nil)))))) in
+    let r = minimum_operations_to_make_median_of_array_equal_to_k_list nums 5 in
+    r = 2
+
+  let test_012 () : bool =
+    let nums = Cons 10 (Cons 20 (Cons 30 (Cons 40 (Cons 50 Nil)))) in
+    let r = minimum_operations_to_make_median_of_array_equal_to_k_list nums 30 in
+    r = 0
+
+  let test_013 () : bool =
+    let nums = Cons 10 (Cons 20 (Cons 30 (Cons 40 (Cons 50 Nil)))) in
+    let r = minimum_operations_to_make_median_of_array_equal_to_k_list nums 35 in
+    r = 5
+
+  let test_014 () : bool =
+    let nums = Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 Nil)))))))))))))) in
+    let r = minimum_operations_to_make_median_of_array_equal_to_k_list nums 2 in
+    r = 8
+
+  let test_015 () : bool =
+    let nums = Cons 2 (Cons 3 (Cons 1 (Cons 5 (Cons 4 (Cons 6 (Cons 8 (Cons 7 (Cons 9 Nil)))))))) in
+    let r = minimum_operations_to_make_median_of_array_equal_to_k_list nums 6 in
+    r = 1
+
+  let test_016 () : bool =
+    let nums = Cons 10 (Cons 10 (Cons 10 (Cons 10 (Cons 10 (Cons 10 (Cons 10 (Cons 10 (Cons 10 (Cons 10 (Cons 10 (Cons 10 (Cons 10 (Cons 10 (Cons 10 (Cons 10 (Cons 10 (Cons 10 (Cons 10 (Cons 10 Nil))))))))))))))))))) in
+    let r = minimum_operations_to_make_median_of_array_equal_to_k_list nums 20 in
+    r = 100
+
+  let test_017 () : bool =
+    let nums = Cons 1 (Cons 1 (Cons 1 (Cons 2 (Cons 2 (Cons 2 (Cons 3 (Cons 3 (Cons 3 (Cons 4 (Cons 4 (Cons 4 (Cons 5 (Cons 5 (Cons 5 (Cons 6 (Cons 6 (Cons 6 (Cons 7 (Cons 7 (Cons 7 (Cons 8 (Cons 8 (Cons 8 (Cons 9 (Cons 9 (Cons 9 (Cons 10 (Cons 10 (Cons 10 Nil))))))))))))))))))))))))))))) in
+    let r = minimum_operations_to_make_median_of_array_equal_to_k_list nums 5 in
+    r = 1
+
+  let test_018 () : bool =
+    let nums = Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 Nil))))))))))))))))))) in
+    let r = minimum_operations_to_make_median_of_array_equal_to_k_list nums 5 in
+    r = 40
+
+  let test_019 () : bool =
+    let nums = Cons 999999999 (Cons 999999999 (Cons 999999999 (Cons 999999999 (Cons 999999999 Nil)))) in
+    let r = minimum_operations_to_make_median_of_array_equal_to_k_list nums 1000000000 in
+    r = 3
+
+  let run_tests () : bool =
+    if test_000 () then
+    if test_001 () then
+    if test_002 () then
+    if test_003 () then
+    if test_004 () then
+    if test_005 () then
+    if test_006 () then
+    if test_007 () then
+    if test_008 () then
+    if test_009 () then
+    if test_010 () then
+    if test_011 () then
+    if test_012 () then
+    if test_013 () then
+    if test_014 () then
+    if test_015 () then
+    if test_016 () then
+    if test_017 () then
+    if test_018 () then
+    if test_019 () then
+      true
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+
+end

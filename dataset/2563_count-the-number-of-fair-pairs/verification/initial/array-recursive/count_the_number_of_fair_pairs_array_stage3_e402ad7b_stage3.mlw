@@ -1,0 +1,93 @@
+module CountTheNumberOfFairPairs_Array_Stage3_Recursive
+
+  use int.Int
+  use array.Array
+  use array.Init
+
+  predicate values_in_range (nums: array int) =
+    forall i: int.
+      0 <= i < length nums -> -1000000000 <= nums[i] <= 1000000000
+
+  predicate valid_input (nums: array int) (lower: int) (upper: int) =
+    1 <= length nums <= 100000 /\
+    values_in_range nums /\
+    -1000000000 <= lower <= upper <= 1000000000
+
+  predicate valid_pair (nums: array int) (i: int) (j: int) =
+    0 <= i < j < length nums
+
+  predicate fair_pair (nums: array int) (lower: int) (upper: int)
+      (i: int) (j: int) =
+    valid_pair nums i j /\
+    lower <= nums[i] + nums[j] <= upper
+
+  let rec function count_pairs_from_j
+      (nums: array int) (lower: int) (upper: int) (i: int) (j: int) : int
+    requires { 0 <= i < length nums }
+    requires { i < j <= length nums }
+    variant  { length nums - j }
+  =
+    if j = length nums then 0
+    else
+      (if lower <= nums[i] + nums[j] <= upper then 1 else 0) +
+      count_pairs_from_j nums lower upper i (j + 1)
+
+  let rec function count_pairs_from_i
+      (nums: array int) (lower: int) (upper: int) (i: int) : int
+    requires { 0 <= i <= length nums }
+    variant  { length nums - i }
+  =
+    if i = length nums then 0
+    else
+      count_pairs_from_j nums lower upper i (i + 1) +
+      count_pairs_from_i nums lower upper (i + 1)
+
+  function fair_pair_count (nums: array int) (lower: int) (upper: int) : int =
+    count_pairs_from_i nums lower upper 0
+
+  predicate count_the_number_of_fair_pairs_array_spec
+      (nums: array int) (lower: int) (upper: int) (res: int) =
+    res = fair_pair_count nums lower upper
+
+  let rec count_pairs_from_j_impl
+      (nums: array int) (lower: int) (upper: int) (i: int) (j: int) : int
+    requires { 0 <= i < length nums }
+    requires { i < j <= length nums }
+    variant  { length nums - j }
+    ensures  { result = count_pairs_from_j nums lower upper i j }
+  =
+    if j >= length nums then begin
+      assert { j = length nums };
+      0
+    end else begin
+      assert { i < j < length nums };
+      assert { i < j + 1 <= length nums };
+      (if lower <= nums[i] + nums[j] <= upper then 1 else 0) +
+      count_pairs_from_j_impl nums lower upper i (j + 1)
+    end
+
+  let rec count_pairs_from_i_impl
+      (nums: array int) (lower: int) (upper: int) (i: int) : int
+    requires { 0 <= i <= length nums }
+    variant  { length nums - i }
+    ensures  { result = count_pairs_from_i nums lower upper i }
+  =
+    if i >= length nums then begin
+      assert { i = length nums };
+      0
+    end else begin
+      assert { 0 <= i < length nums };
+      assert { i < i + 1 <= length nums };
+      count_pairs_from_j_impl nums lower upper i (i + 1) +
+      count_pairs_from_i_impl nums lower upper (i + 1)
+    end
+
+  let count_the_number_of_fair_pairs_array
+      (nums: array int) (lower: int) (upper: int) : int
+    requires { valid_input nums lower upper }
+    ensures  { count_the_number_of_fair_pairs_array_spec nums lower upper result }
+  =
+    assert { 0 <= 0 <= length nums };
+    count_pairs_from_i_impl nums lower upper 0
+
+end

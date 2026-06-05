@@ -1,0 +1,125 @@
+module SumOfMutatedArrayClosestToTarget_List_Stage3_Recursive
+
+  use int.Int
+  use int.Abs
+  use int.MinMax
+  use int.EuclideanDivision
+  use list.List
+
+  let rec predicate values_in_range (l: list int)
+    variant { l }
+  =
+    match l with
+    | Nil -> true
+    | Cons x xs -> 1 <= x && x <= 100000 && values_in_range xs
+    end
+
+  let rec function mutated_sum (l: list int) (v: int) : int
+    variant { l }
+  =
+    match l with
+    | Nil -> 0
+    | Cons x xs -> min x v + mutated_sum xs v
+    end
+
+  function distance_to_target (l: list int) (target: int) (v: int) : int =
+    abs (mutated_sum l v - target)
+
+  predicate best_mutation_value (l: list int) (target: int) (chosen: int) =
+    (forall v: int. distance_to_target l target chosen <= distance_to_target l target v) /\
+    (forall v: int.
+       distance_to_target l target chosen = distance_to_target l target v ->
+       chosen <= v)
+
+  let abs_int (x: int) : int
+    ensures { result = abs x }
+    ensures { 0 <= result }
+  =
+    if x < 0 then -x else x
+
+  let rec capped_sum (l: list int) (value: int) : int
+    ensures { result = mutated_sum l value }
+    variant { l }
+  =
+    match l with
+    | Nil -> 0
+    | Cons x xs ->
+        (if x <= value then x else value) + capped_sum xs value
+    end
+
+  let distance_for_value (l: list int) (target: int) (value: int) : int
+    ensures { result = distance_to_target l target value }
+    ensures { 0 <= result }
+  =
+    abs_int (capped_sum l value - target)
+
+  let rec max_from (l: list int) (best: int) : int
+    requires { 0 <= best }
+    requires { values_in_range l }
+    ensures  { 0 <= result }
+    variant { l }
+  =
+    match l with
+    | Nil -> best
+    | Cons x xs ->
+        if x > best then max_from xs x else max_from xs best
+    end
+
+  let max_value (l: list int) : int
+    requires { values_in_range l }
+    ensures  { 0 <= result }
+  =
+    match l with
+    | Nil -> 0
+    | Cons x xs -> max_from xs x
+    end
+
+  let rec lower_bound_value (l: list int) (target: int) (lo: int) (hi: int) : int
+    requires { 0 <= lo <= hi }
+    ensures  { lo <= result <= hi }
+    variant { hi - lo }
+  =
+    if lo >= hi then
+      lo
+    else
+      let mid = lo + div (hi - lo) 2 in
+      let s = capped_sum l mid in
+      if s < target then
+        lower_bound_value l target (mid + 1) hi
+      else
+        lower_bound_value l target lo mid
+
+  let choose_better_value (l: list int) (target: int) (left: int) (right: int) : int
+    requires { 0 <= left }
+    requires { 0 <= right }
+    ensures  { result = left \/ result = right }
+    ensures  { 0 <= result }
+  =
+    let left_distance = distance_for_value l target left in
+    let right_distance = distance_for_value l target right in
+    if left_distance < right_distance then
+      left
+    else if right_distance < left_distance then
+      right
+    else if left <= right then
+      left
+    else
+      right
+
+  let sum_of_mutated_array_closest_to_target_list (arr: list int) (target: int) : int
+    requires { arr <> Nil }
+    requires { values_in_range arr }
+    requires { 1 <= target /\ target <= 100000 }
+    ensures  { 0 <= result }
+    ensures  { best_mutation_value arr target result }
+  =
+    match arr with
+    | Nil -> 0
+    | Cons _ _ ->
+        let hi = max_value arr in
+        let right = lower_bound_value arr target 0 hi in
+        let left = if right = 0 then 0 else right - 1 in
+        choose_better_value arr target left right
+    end
+
+end

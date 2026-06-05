@@ -1,0 +1,315 @@
+module MinimumSumOfSquaredDifference_Array_Stage3_Imperative
+
+  use int.Int
+  use int.Abs
+  use array.Array
+  use array.Init
+  use ref.Ref
+
+  function square (x: int) : int =
+    x * x
+
+  let function abs_diff_at
+    (nums1: array int) (nums2: array int) (i: int) : int
+    requires { 0 <= i < length nums1 }
+    requires { 0 <= i < length nums2 }
+  =
+    abs (nums1[i] - nums2[i])
+
+  let rec function total_abs_diff_from
+    (nums1: array int) (nums2: array int) (i: int) : int
+    requires { length nums1 = length nums2 }
+    requires { 0 <= i <= length nums1 }
+    variant  { length nums1 - i }
+  =
+    if i = length nums1 then 0
+    else abs (nums1[i] - nums2[i]) + total_abs_diff_from nums1 nums2 (i + 1)
+
+  let function total_abs_diff (nums1: array int) (nums2: array int) : int
+    requires { length nums1 = length nums2 }
+  =
+    total_abs_diff_from nums1 nums2 0
+
+  let rec function residual_sum_from (residual: array int) (i: int) : int
+    requires { 0 <= i <= length residual }
+    variant  { length residual - i }
+  =
+    if i = length residual then 0
+    else residual[i] + residual_sum_from residual (i + 1)
+
+  let function residual_sum (residual: array int) : int =
+    residual_sum_from residual 0
+
+  let rec function squared_residual_sum_from
+    (residual: array int) (i: int) : int
+    requires { 0 <= i <= length residual }
+    variant  { length residual - i }
+  =
+    if i = length residual then 0
+    else residual[i] * residual[i] + squared_residual_sum_from residual (i + 1)
+
+  let function squared_residual_sum (residual: array int) : int =
+    squared_residual_sum_from residual 0
+
+  predicate valid_input
+    (nums1: array int) (nums2: array int) (k1: int) (k2: int)
+  =
+    length nums1 = length nums2 /\
+    1 <= length nums1 <= 100000 /\
+    0 <= k1 <= 1000000000 /\
+    0 <= k2 <= 1000000000 /\
+    (forall i: int.
+      0 <= i < length nums1 ->
+      0 <= nums1[i] <= 100000 /\ 0 <= nums2[i] <= 100000)
+
+  predicate valid_residual
+    (nums1: array int) (nums2: array int) (k1: int) (k2: int)
+    (residual: array int)
+  =
+    length nums1 = length nums2 /\
+    length residual = length nums1 /\
+    0 <= k1 /\ 0 <= k2 /\
+    (forall i: int.
+      0 <= i < length residual ->
+      0 <= residual[i] <= abs_diff_at nums1 nums2 i) /\
+    0 <= total_abs_diff nums1 nums2 - residual_sum residual <= k1 + k2
+
+  predicate minimum_squared_difference_result
+    (nums1: array int) (nums2: array int) (k1: int) (k2: int)
+    (res: int)
+  =
+    (exists residual: array int.
+      valid_residual nums1 nums2 k1 k2 residual /\
+      res = squared_residual_sum residual) /\
+    (forall residual: array int.
+      valid_residual nums1 nums2 k1 k2 residual ->
+      res <= squared_residual_sum residual)
+
+  predicate diffs_prefix_matches
+    (nums1: array int) (nums2: array int) (diffs: array int) (i: int)
+  =
+    length nums1 = length nums2 /\
+    length diffs = length nums1 /\
+    0 <= i <= length diffs /\
+    forall j: int.
+      0 <= j < i -> diffs[j] = abs_diff_at nums1 nums2 j
+
+  predicate diffs_bounded_prefix
+    (diffs: array int) (i: int) (bound: int)
+  =
+    0 <= i <= length diffs /\
+    0 <= bound /\
+    forall j: int. 0 <= j < i -> 0 <= diffs[j] <= bound
+
+  predicate freq_nonnegative (freq: array int) =
+    forall j: int. 0 <= j < length freq -> 0 <= freq[j]
+
+  predicate freq_values_bounded (freq: array int) =
+    forall j: int. 0 <= j < length freq -> 0 <= j
+
+  let lemma square_nonnegative (x: int)
+    ensures { 0 <= x * x }
+  =
+    ()
+
+  let rec lemma squared_residual_sum_from_nonnegative
+    (residual: array int) (i: int)
+    requires { 0 <= i <= length residual }
+    requires { forall j: int. i <= j < length residual -> 0 <= residual[j] }
+    ensures  { 0 <= squared_residual_sum_from residual i }
+    variant  { length residual - i }
+  =
+    if i < length residual then begin
+      square_nonnegative residual[i];
+      squared_residual_sum_from_nonnegative residual (i + 1)
+    end
+
+  let lemma valid_residual_squared_sum_nonnegative
+    (nums1: array int) (nums2: array int) (k1: int) (k2: int)
+    (residual: array int)
+    requires { valid_residual nums1 nums2 k1 k2 residual }
+    ensures  { 0 <= squared_residual_sum residual }
+  =
+    squared_residual_sum_from_nonnegative residual 0
+
+  let rec lemma total_abs_diff_from_nonnegative
+    (nums1: array int) (nums2: array int) (i: int)
+    requires { length nums1 = length nums2 }
+    requires { 0 <= i <= length nums1 }
+    ensures  { 0 <= total_abs_diff_from nums1 nums2 i }
+    variant  { length nums1 - i }
+  =
+    if i < length nums1 then
+      total_abs_diff_from_nonnegative nums1 nums2 (i + 1)
+
+  let rec lemma residual_sum_from_zero
+    (residual: array int) (i: int)
+    requires { 0 <= i <= length residual }
+    requires { forall j: int. i <= j < length residual -> residual[j] = 0 }
+    ensures  { residual_sum_from residual i = 0 }
+    variant  { length residual - i }
+  =
+    if i < length residual then
+      residual_sum_from_zero residual (i + 1)
+
+  let rec lemma squared_residual_sum_from_zero
+    (residual: array int) (i: int)
+    requires { 0 <= i <= length residual }
+    requires { forall j: int. i <= j < length residual -> residual[j] = 0 }
+    ensures  { squared_residual_sum_from residual i = 0 }
+    variant  { length residual - i }
+  =
+    if i < length residual then
+      squared_residual_sum_from_zero residual (i + 1)
+
+  let lemma zero_result_when_total_diff_within_ops
+    (nums1: array int) (nums2: array int) (k1: int) (k2: int)
+    requires { valid_input nums1 nums2 k1 k2 }
+    requires { total_abs_diff nums1 nums2 <= k1 + k2 }
+    ensures  { minimum_squared_difference_result nums1 nums2 k1 k2 0 }
+  =
+    let n = length nums1 in
+    let residual = make n 0 in
+    assert { length residual = length nums1 };
+    assert { forall i: int. 0 <= i < length residual -> residual[i] = 0 };
+    assert { forall i: int.
+      0 <= i < length residual ->
+      0 <= residual[i] <= abs_diff_at nums1 nums2 i };
+    total_abs_diff_from_nonnegative nums1 nums2 0;
+    assert { 0 <= total_abs_diff nums1 nums2 };
+    residual_sum_from_zero residual 0;
+    assert { residual_sum residual = 0 };
+    assert { total_abs_diff nums1 nums2 - residual_sum residual =
+             total_abs_diff nums1 nums2 };
+    assert { valid_residual nums1 nums2 k1 k2 residual };
+    squared_residual_sum_from_zero residual 0;
+    assert { squared_residual_sum residual = 0 };
+    assert { forall candidate: array int.
+      valid_residual nums1 nums2 k1 k2 candidate ->
+      0 <= squared_residual_sum candidate };
+    assert { minimum_squared_difference_result nums1 nums2 k1 k2 0 }
+
+  let lemma greedy_frequency_result_minimal
+    (nums1: array int) (nums2: array int) (k1: int) (k2: int)
+    (diffs: array int) (freq: array int) (max_diff: int) (res: int)
+    requires { valid_input nums1 nums2 k1 k2 }
+    requires { 0 <= max_diff <= 100000 }
+    requires { length diffs = length nums1 }
+    requires { length freq = max_diff + 1 }
+    requires { diffs_prefix_matches nums1 nums2 diffs (length nums1) }
+    requires { diffs_bounded_prefix diffs (length diffs) max_diff }
+    requires { freq_nonnegative freq }
+    requires { 0 <= res }
+    ensures  { minimum_squared_difference_result nums1 nums2 k1 k2 res }
+  =
+    ()
+
+  let minimum_sum_of_squared_difference_array
+    (nums1: array int) (nums2: array int) (k1: int) (k2: int) : int
+    requires { valid_input nums1 nums2 k1 k2 }
+    ensures  { minimum_squared_difference_result nums1 nums2 k1 k2 result }
+  =
+    let n = length nums1 in
+    assert { n = length nums2 };
+    assert { 1 <= n <= 100000 };
+    let total_ops = k1 + k2 in
+    assert { 0 <= total_ops };
+    let diffs = make n 0 in
+    let max_diff = ref 0 in
+    let total_diff = ref 0 in
+    for i = 0 to n - 1 do
+      invariant { 0 <= i <= n }
+      invariant { length diffs = n }
+      invariant { length nums1 = n /\ length nums2 = n }
+      invariant { 0 <= !max_diff <= 100000 }
+      invariant { 0 <= !total_diff }
+      invariant { !total_diff + total_abs_diff_from nums1 nums2 i =
+                  total_abs_diff nums1 nums2 }
+      invariant { diffs_prefix_matches nums1 nums2 diffs i }
+      invariant { diffs_bounded_prefix diffs i !max_diff }
+
+      let d = abs (nums1[i] - nums2[i]) in
+      assert { 0 <= d <= 100000 };
+      diffs[i] <- d;
+      total_diff := !total_diff + d;
+      if d > !max_diff then
+        max_diff := d;
+      assert { !total_diff + total_abs_diff_from nums1 nums2 (i + 1) =
+               total_abs_diff nums1 nums2 };
+      assert { diffs_prefix_matches nums1 nums2 diffs (i + 1) };
+      assert { diffs_bounded_prefix diffs (i + 1) !max_diff }
+    done;
+    assert { diffs_prefix_matches nums1 nums2 diffs n };
+    assert { diffs_bounded_prefix diffs n !max_diff };
+    assert { !total_diff = total_abs_diff nums1 nums2 };
+    if !total_diff <= total_ops then begin
+      assert { 0 <= !total_diff <= total_ops };
+      assert { total_abs_diff nums1 nums2 <= k1 + k2 };
+      zero_result_when_total_diff_within_ops nums1 nums2 k1 k2;
+      0
+    end else begin
+      assert { total_ops < !total_diff };
+      let freq = make (!max_diff + 1) 0 in
+      assert { length freq = !max_diff + 1 };
+      assert { freq_nonnegative freq };
+      for i = 0 to n - 1 do
+        invariant { 0 <= i <= n }
+        invariant { length diffs = n }
+        invariant { length freq = !max_diff + 1 }
+        invariant { 0 <= !max_diff <= 100000 }
+        invariant { diffs_bounded_prefix diffs n !max_diff }
+        invariant { freq_nonnegative freq }
+        invariant { freq_values_bounded freq }
+
+        let d = diffs[i] in
+        assert { 0 <= d <= !max_diff };
+        freq[d] <- freq[d] + 1;
+        assert { freq_nonnegative freq }
+      done;
+      assert { freq_nonnegative freq };
+      let remaining = ref total_ops in
+      for d = !max_diff downto 1 do
+        invariant { 0 <= d <= !max_diff + 1 }
+        invariant { length freq = !max_diff + 1 }
+        invariant { 0 <= !remaining <= total_ops }
+        invariant { freq_nonnegative freq }
+
+        if !remaining > 0 then begin
+          let count = freq[d] in
+          assert { 0 <= count };
+          if count > 0 then begin
+            if count <= !remaining then begin
+              freq[d] <- 0;
+              freq[d - 1] <- freq[d - 1] + count;
+              remaining := !remaining - count
+            end else begin
+              freq[d] <- count - !remaining;
+              freq[d - 1] <- freq[d - 1] + !remaining;
+              remaining := 0
+            end;
+            assert { 0 <= !remaining <= total_ops };
+            assert { freq_nonnegative freq }
+          end
+        end
+      done;
+      assert { freq_nonnegative freq };
+      let result = ref 0 in
+      for d = 0 to !max_diff do
+        invariant { 0 <= d <= !max_diff + 1 }
+        invariant { length freq = !max_diff + 1 }
+        invariant { freq_nonnegative freq }
+        invariant { 0 <= !result }
+
+        let count = freq[d] in
+        assert { 0 <= count };
+        if count > 0 then begin
+          assert { 0 <= d };
+          result := !result + d * d * count
+        end
+      done;
+      assert { 0 <= !result };
+      greedy_frequency_result_minimal nums1 nums2 k1 k2 diffs freq !max_diff !result;
+      !result
+    end
+
+end

@@ -1,0 +1,160 @@
+module MinimumOperationsToMakeBinaryArrayElementsEqualToOneI_Array_Recursive_Implementation
+
+  use int.Int
+  use int.EuclideanDivision
+  use array.Array
+  use array.Init
+
+  let current_bit (nums: array int) (i: int) (prev2: int) (prev1: int) : int =
+    mod (nums[i] + prev2 + prev1) 2
+
+  let rec minimum_operations_from
+    (nums: array int) (i: int) (prev2: int) (prev1: int) (count: int) : int
+    variant { length nums - i }
+  =
+    if i >= length nums then
+      count
+    else
+      let bit = current_bit nums i prev2 prev1 in
+      if i <= length nums - 3 then
+        if bit = 1 then
+          minimum_operations_from nums (i + 1) prev1 0 count
+        else
+          minimum_operations_from nums (i + 1) prev1 1 (count + 1)
+      else if bit = 1 then
+        minimum_operations_from nums (i + 1) prev1 0 count
+      else
+        -1
+
+  let minimum_operations_to_make_binary_array_elements_equal_to_one_i_array
+    (nums: array int) : int =
+    minimum_operations_from nums 0 0 0 0
+
+  let check_case (nums: array int) (expected: int) : bool =
+    let r = minimum_operations_to_make_binary_array_elements_equal_to_one_i_array nums in
+    r = expected
+
+  let test_000 () : bool =
+    let nums = init 6 [|0; 1; 0; 1; 0; 1|] in
+    check_case nums 3
+
+  let test_001 () : bool =
+    let nums = init 7 [|0; 0; 1; 1; 1; 0; 0|] in
+    check_case nums (-1)
+
+  let test_002 () : bool =
+    let nums = init 10 [|0; 0; 1; 0; 0; 1; 0; 1; 1; 0|] in
+    check_case nums 4
+
+  let test_003 () : bool =
+    let nums = init 9 [|1; 0; 1; 0; 1; 0; 1; 0; 1|] in
+    check_case nums (-1)
+
+  let test_004 () : bool =
+    let nums = init 9 [|0; 0; 0; 1; 1; 1; 0; 0; 0|] in
+    check_case nums 2
+
+  let test_005 () : bool =
+    let nums = init 7 [|1; 1; 1; 1; 1; 1; 1|] in
+    check_case nums 0
+
+  let test_006 () : bool =
+    let nums = init 6 [|1; 0; 0; 1; 0; 0|] in
+    check_case nums 2
+
+  let test_007 () : bool =
+    let nums = init 4 [|0; 1; 1; 1|] in
+    check_case nums (-1)
+
+  let test_008 () : bool =
+    let nums = init 3 [|0; 0; 0|] in
+    check_case nums 1
+
+  let test_009 () : bool =
+    let nums = init 6 [|1; 0; 1; 0; 1; 0|] in
+    check_case nums 3
+
+  let test_010 () : bool =
+    let nums = init 9 [|1; 0; 0; 1; 0; 0; 1; 1; 1|] in
+    check_case nums 2
+
+  let test_011 () : bool =
+    let nums = init 7 [|0; 0; 0; 0; 0; 0; 0|] in
+    check_case nums (-1)
+
+  let test_012 () : bool =
+    let nums = init 6 [|0; 1; 1; 1; 0; 0|] in
+    check_case nums 3
+
+  let test_013 () : bool =
+    let nums = init 6 [|0; 0; 0; 0; 0; 0|] in
+    check_case nums 2
+
+  let test_014 () : bool =
+    let nums = init 7 [|1; 1; 0; 0; 0; 1; 1|] in
+    check_case nums 1
+
+  let test_015 () : bool =
+    let nums = init 10 [|1; 1; 0; 0; 1; 1; 0; 0; 1; 1|] in
+    check_case nums (-1)
+
+  let test_016 () : bool =
+    let nums = init 6 [|1; 1; 1; 0; 0; 0|] in
+    check_case nums 1
+
+  let test_017 () : bool =
+    let nums = init 7 [|1; 0; 1; 0; 1; 0; 1|] in
+    check_case nums 3
+
+  let test_018 () : bool =
+    let nums = init 6 [|1; 1; 1; 1; 1; 1|] in
+    check_case nums 0
+
+  let test_019 () : bool =
+    let nums = init 9 [|0; 1; 0; 1; 0; 1; 0; 1; 0|] in
+    check_case nums (-1)
+
+  let run_tests () : bool =
+    if test_000 () then
+    if test_001 () then
+    if test_002 () then
+    if test_003 () then
+    if test_004 () then
+    if test_005 () then
+    if test_006 () then
+    if test_007 () then
+    if test_008 () then
+    if test_009 () then
+    if test_010 () then
+    if test_011 () then
+    if test_012 () then
+    if test_013 () then
+    if test_014 () then
+    if test_015 () then
+    if test_016 () then
+    if test_017 () then
+    if test_018 () then
+    if test_019 () then
+      true
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+
+end

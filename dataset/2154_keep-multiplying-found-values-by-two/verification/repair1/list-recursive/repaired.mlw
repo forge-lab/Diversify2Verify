@@ -1,0 +1,176 @@
+module KeepMultiplyingFoundValuesByTwo_List_Stage3_Recursive
+
+  use int.Int
+  use int.Power
+  use list.List
+  use list.Length
+  use list.Mem
+  use list.Elements
+  use set.Fset
+  use set.FsetInt
+
+  predicate valid_input (nums: list int) (original: int) =
+    1 <= length nums <= 1000 /\
+    1 <= original <= 1000 /\
+    forall x: int. Mem.mem x nums -> 1 <= x <= 1000
+
+  function doubled_value (original: int) (steps: int) : int =
+    original * power 2 steps
+
+  predicate doubling_prefix_found (nums: list int) (original: int) (steps: int) =
+    forall t: int. 0 <= t < steps -> Mem.mem (doubled_value original t) nums
+
+  predicate final_value (nums: list int) (original: int) (res: int) =
+    exists steps: int.
+      0 <= steps <= length nums /\
+      res = doubled_value original steps /\
+      doubling_prefix_found nums original steps /\
+      not (Mem.mem res nums)
+
+  let rec lemma elements_cardinal_length (nums: list int)
+    ensures { cardinal (elements nums) <= length nums }
+    variant { nums }
+  =
+    match nums with
+    | Nil -> ()
+    | Cons _ ys -> elements_cardinal_length ys
+    end
+
+  predicate doubled_prefix_set_subset (nums: list int) (original steps: int) =
+    subset (map (doubled_value original) (interval 0 steps)) (elements nums)
+
+  lemma doubled_prefix_subset_elements:
+    forall nums: list int, original steps: int.
+      doubling_prefix_found nums original steps ->
+      doubled_prefix_set_subset nums original steps
+
+  lemma doubled_prefix_cardinal:
+    forall original steps: int.
+      0 < original ->
+      0 <= steps ->
+      cardinal (map (doubled_value original) (interval 0 steps)) = steps
+
+  lemma doubling_prefix_length_bound:
+    forall nums: list int, original steps: int.
+      0 < original ->
+      0 <= steps ->
+      doubling_prefix_found nums original steps ->
+      steps <= length nums
+
+  lemma doubling_prefix_length_absent:
+    forall nums: list int, original: int.
+      valid_input nums original ->
+      doubling_prefix_found nums original (length nums) ->
+      not (Mem.mem (doubled_value original (length nums)) nums)
+
+  lemma doubled_value_zero:
+    forall current: int. doubled_value current 0 = current
+
+  lemma doubled_value_succ:
+    forall current k: int.
+      0 <= k ->
+      doubled_value (current * 2) k = doubled_value current (k + 1)
+
+  lemma keep_multiplying_step_summary:
+    forall nums: list int, current remaining r: int.
+      0 < remaining ->
+      Mem.mem current nums ->
+      (exists substeps: int.
+        0 <= substeps <= remaining - 1 /\
+        r = doubled_value (current * 2) substeps /\
+        (forall t: int. 0 <= t < substeps -> Mem.mem (doubled_value (current * 2) t) nums) /\
+        (substeps = remaining - 1 \/ not (Mem.mem r nums))) ->
+      (exists steps: int.
+        0 <= steps <= remaining /\
+        r = doubled_value current steps /\
+        (forall t: int. 0 <= t < steps -> Mem.mem (doubled_value current t) nums) /\
+        (steps = remaining \/ not (Mem.mem r nums)))
+
+  lemma result_present_implies_fuel_exhausted:
+    forall nums: list int, original r: int.
+      (exists steps: int.
+        0 <= steps <= length nums /\
+        r = doubled_value original steps /\
+        doubling_prefix_found nums original steps /\
+        (steps = length nums \/ not (Mem.mem r nums))) ->
+      Mem.mem r nums ->
+      r = doubled_value original (length nums) /\
+      doubling_prefix_found nums original (length nums)
+
+  let rec contains (nums: list int) (x: int) : bool
+    ensures { result <-> Mem.mem x nums }
+    variant { nums }
+  =
+    match nums with
+    | Nil ->
+        false
+    | Cons y ys ->
+        if y = x then
+          true
+        else
+          contains ys x
+    end
+
+  let rec keep_multiplying_from (nums: list int) (current: int) (remaining: int) : int
+    requires { 0 <= remaining }
+    ensures {
+      exists steps: int.
+        0 <= steps <= remaining /\
+        result = doubled_value current steps /\
+        (forall t: int. 0 <= t < steps -> Mem.mem (doubled_value current t) nums) /\
+        (steps = remaining \/ not (Mem.mem result nums))
+    }
+    variant { remaining }
+  =
+    if remaining <= 0 then
+      current
+    else if contains nums current then
+      begin
+        assert { Mem.mem current nums };
+        let r = keep_multiplying_from nums (current * 2) (remaining - 1) in
+        assert {
+          exists substeps: int.
+            0 <= substeps <= remaining - 1 /\
+            r = doubled_value (current * 2) substeps /\
+            (forall t: int. 0 <= t < substeps -> Mem.mem (doubled_value (current * 2) t) nums) /\
+            (substeps = remaining - 1 \/ not (Mem.mem r nums))
+        };
+        assert {
+          exists steps: int.
+            0 <= steps <= remaining /\
+            r = doubled_value current steps /\
+            (forall t: int. 0 <= t < steps -> Mem.mem (doubled_value current t) nums) /\
+            (steps = remaining \/ not (Mem.mem r nums))
+        };
+        r
+      end
+    else
+      begin
+        assert { not (Mem.mem current nums) };
+        assert { doubled_value current 0 = current };
+        current
+      end
+
+  let keep_multiplying_found_values_by_two_list (nums: list int) (original: int) : int
+    requires { valid_input nums original }
+    ensures  { final_value nums original result }
+  =
+    let r = keep_multiplying_from nums original (length nums) in
+    assert {
+      exists steps: int.
+        0 <= steps <= length nums /\
+        r = doubled_value original steps /\
+        doubling_prefix_found nums original steps /\
+        (steps = length nums \/ not (Mem.mem r nums))
+    };
+    if contains nums r then begin
+      assert { Mem.mem r nums };
+      assert { doubling_prefix_found nums original (length nums) };
+      assert { r = doubled_value original (length nums) };
+      assert { not (Mem.mem r nums) };
+      absurd
+    end;
+    assert { not (Mem.mem r nums) };
+    r
+
+end

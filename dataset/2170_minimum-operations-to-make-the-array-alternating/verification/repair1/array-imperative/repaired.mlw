@@ -1,0 +1,171 @@
+module MinimumOperationsToMakeTheArrayAlternating_Array_Stage3_Imperative
+
+  use int.Int
+  use int.EuclideanDivision
+  use array.Array
+  use array.Init
+  use array.NumOf as ArrayNumOf
+  use ref.Ref
+
+  predicate valid_input (nums: array int) =
+    1 <= length nums <= 100000 /\
+    forall i: int. 0 <= i < length nums -> 1 <= nums[i] <= 100000
+
+  predicate valid_assignment (even_value: int) (odd_value: int) =
+    even_value > 0 /\ odd_value > 0 /\ even_value <> odd_value
+
+  predicate wrong_for_assignment
+    (i: int) (v: int) (even_value: int) (odd_value: int) =
+    (mod i 2 = 0 /\ v <> even_value) \/
+    (mod i 2 = 1 /\ v <> odd_value)
+
+  function changes_for_assignment
+    (nums: array int) (even_value: int) (odd_value: int) : int =
+    ArrayNumOf.numof
+      (fun i v -> wrong_for_assignment i v even_value odd_value)
+      nums 0 (length nums)
+
+  predicate optimal_alternating_operations (nums: array int) (res: int) =
+    res >= 0 /\
+    exists even_value odd_value: int.
+      valid_assignment even_value odd_value /\
+      res = changes_for_assignment nums even_value odd_value /\
+      forall other_even other_odd: int.
+        valid_assignment other_even other_odd ->
+        res <= changes_for_assignment nums other_even other_odd
+
+  predicate distinct_prefix (values: array int) (size: int) =
+    forall p q: int. 0 <= p < q < size -> values[p] <> values[q]
+
+  let add_count (values: array int) (counts: array int) (size: int) (value: int) (ghost total: int) : int
+    requires { length values = length counts }
+    requires { 0 <= size < length values }
+    requires { value > 0 }
+    requires { 0 <= total }
+    requires { distinct_prefix values size }
+    requires { forall j: int. 0 <= j < size -> 0 <= counts[j] <= total }
+    ensures  { result = size \/ result = size + 1 }
+    ensures  { size <= result <= length values }
+    ensures  { distinct_prefix values result }
+    ensures  { forall j: int. 0 <= j < result -> 0 <= counts[j] <= total + 1 }
+  =
+    let found = ref false in
+    let next_size = ref size in
+    for i = 0 to size - 1 do
+      invariant { 0 <= i <= size }
+      invariant { size <= !next_size <= size + 1 }
+      invariant { distinct_prefix values size }
+      invariant { !found <-> exists j: int. 0 <= j < i /\ values[j] = value }
+      invariant { forall j: int. 0 <= j < size ->
+        if 0 <= j < i /\ values[j] = value then
+          0 <= counts[j] <= total + 1
+        else
+          0 <= counts[j] <= total }
+      if values[i] = value then (
+        assert { 0 <= counts[i] <= total };
+        counts[i] <- counts[i] + 1;
+        assert { 0 <= counts[i] <= total + 1 };
+        found := true
+      )
+    done;
+    if not !found then (
+      assert { forall j: int. 0 <= j < size -> values[j] <> value };
+      values[size] <- value;
+      counts[size] <- 1;
+      next_size := size + 1
+    );
+    assert { !next_size = size \/ !next_size = size + 1 };
+    assert { distinct_prefix values !next_size };
+    assert { forall j: int. 0 <= j < !next_size -> 0 <= counts[j] <= total + 1 };
+    !next_size
+
+  let top_two_counts (values: array int) (counts: array int) (size: int) (ghost total: int) : (int, int, int, int)
+    requires { length values = length counts }
+    requires { 0 <= size <= length values }
+    requires { 0 <= total }
+    requires { forall j: int. 0 <= j < size -> 0 <= counts[j] <= total }
+    ensures  { let (_, best_count, _, second_count) = result in
+               0 <= second_count <= best_count }
+    ensures  { let (_, best_count, _, second_count) = result in
+               0 <= second_count <= best_count <= total }
+  =
+    let best_value = ref 0 in
+    let best_count = ref 0 in
+    let second_value = ref 0 in
+    let second_count = ref 0 in
+    for i = 0 to size - 1 do
+      invariant { 0 <= i <= size }
+      invariant { 0 <= !second_count <= !best_count }
+      invariant { !best_count <= total }
+      invariant { !second_count <= total }
+      let value = values[i] in
+      let c = counts[i] in
+      assert { 0 <= c <= total };
+      if c > !best_count then (
+        second_value := !best_value;
+        second_count := !best_count;
+        best_value := value;
+        best_count := c
+      ) else if c > !second_count then (
+        assert { c <= !best_count };
+        second_value := value;
+        second_count := c
+      )
+    done;
+    assert { 0 <= !second_count <= !best_count };
+    assert { 0 <= !second_count <= !best_count <= total };
+    (!best_value, !best_count, !second_value, !second_count)
+
+  let minimum_operations_to_make_the_array_alternating_array (nums: array int) : int
+    requires { valid_input nums }
+    ensures  { optimal_alternating_operations nums result }
+  =
+    let n = length nums in
+    if n <= 1 then (
+      assert { n = 1 };
+      0
+    ) else
+    let even_values = make n 0 in
+    let even_counts = make n 0 in
+    let odd_values = make n 0 in
+    let odd_counts = make n 0 in
+    let even_size = ref 0 in
+    let odd_size = ref 0 in
+    let even_total = ref 0 in
+    let odd_total = ref 0 in
+    for i = 0 to n - 1 do
+      invariant { 0 <= i <= n }
+      invariant { 0 <= !even_size <= !even_total <= i }
+      invariant { 0 <= !odd_size <= !odd_total <= i }
+      invariant { !even_total + !odd_total = i }
+      invariant { distinct_prefix even_values !even_size }
+      invariant { distinct_prefix odd_values !odd_size }
+      invariant { forall j: int. 0 <= j < !even_size -> 0 <= even_counts[j] <= !even_total }
+      invariant { forall j: int. 0 <= j < !odd_size -> 0 <= odd_counts[j] <= !odd_total }
+      let value = nums[i] in
+      assert { value > 0 };
+      if mod i 2 = 0 then (
+        even_size := add_count even_values even_counts !even_size value !even_total;
+        even_total := !even_total + 1
+      ) else (
+        odd_size := add_count odd_values odd_counts !odd_size value !odd_total;
+        odd_total := !odd_total + 1
+      )
+    done;
+    assert { !even_total + !odd_total = n };
+    let (even_value_1, even_count_1, even_value_2, even_count_2) =
+      top_two_counts even_values even_counts !even_size !even_total in
+    let (odd_value_1, odd_count_1, odd_value_2, odd_count_2) =
+      top_two_counts odd_values odd_counts !odd_size !odd_total in
+    if even_value_1 <> odd_value_1 then (
+      assert { 0 <= even_count_1 <= !even_total };
+      assert { 0 <= odd_count_1 <= !odd_total };
+      (!even_total - even_count_1) + (!odd_total - odd_count_1)
+    ) else
+      let keep_even_best = (!even_total - even_count_1) + (!odd_total - odd_count_2) in
+      let keep_odd_best = (!even_total - even_count_2) + (!odd_total - odd_count_1) in
+      assert { 0 <= even_count_2 <= even_count_1 };
+      assert { 0 <= odd_count_2 <= odd_count_1 };
+      if keep_even_best <= keep_odd_best then keep_even_best else keep_odd_best
+
+end

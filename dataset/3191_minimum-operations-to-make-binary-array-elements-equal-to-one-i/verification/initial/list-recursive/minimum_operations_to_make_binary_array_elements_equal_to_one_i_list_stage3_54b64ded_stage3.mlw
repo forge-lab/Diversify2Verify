@@ -1,0 +1,47 @@
+module MinimumOperationsToMakeBinaryArrayElementsEqualToOneI_List_Stage3_Recursive
+
+  use int.Int
+  use list.List
+  use list.Length
+
+  let rec predicate binary_list (nums: list int)
+    variant { nums }
+  =
+    match nums with
+    | Nil -> true
+    | Cons x xs -> (x = 0 || x = 1) && binary_list xs
+    end
+
+  let function effective_bit (x: int) (prev2: int) (prev1: int) : int =
+    if prev2 = prev1 then x else 1 - x
+
+  let rec function min_ops_from (prev2: int) (prev1: int) (nums: list int) : int
+    variant { nums }
+  =
+    match nums with
+    | Nil -> 0
+    | Cons x Nil ->
+        if effective_bit x prev2 prev1 = 1 then 0 else -1
+    | Cons x (Cons y Nil) ->
+        if effective_bit x prev2 prev1 = 1 then
+          if effective_bit y prev1 0 = 1 then 0 else -1
+        else -1
+    | Cons x (Cons y (Cons z zs)) ->
+        if effective_bit x prev2 prev1 = 1 then
+          min_ops_from prev1 0 (Cons y (Cons z zs))
+        else
+          let rest = min_ops_from prev1 1 (Cons y (Cons z zs)) in
+          if rest = -1 then -1 else 1 + rest
+    end
+
+  let function minimum_operations_spec (nums: list int) : int =
+    min_ops_from 0 0 nums
+
+  let minimum_operations_to_make_binary_array_elements_equal_to_one_i_list (nums: list int) : int
+    requires { binary_list nums }
+    requires { length nums >= 3 }
+    ensures  { result = minimum_operations_spec nums }
+  =
+    min_ops_from 0 0 nums
+
+end

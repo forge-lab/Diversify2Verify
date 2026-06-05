@@ -1,0 +1,209 @@
+module MaximumGoodSubarraySum_List_Stage3_Imperative
+
+  use int.Int
+  use int.Abs
+  use list.List
+  use list.Length
+  use list.Append
+  use list.Sum
+  use ref.Ref
+
+  predicate first_value (l: list int) (x: int) =
+    match l with
+    | Nil -> false
+    | Cons y _ -> x = y
+    end
+
+  let rec predicate last_value (l: list int) (x: int)
+    variant { l }
+  =
+    match l with
+    | Nil -> false
+    | Cons y Nil -> x = y
+    | Cons _ ys -> last_value ys x
+    end
+
+  predicate good_segment (seg: list int) (k: int) =
+    exists first last: int.
+      first_value seg first /\
+      last_value seg last /\
+      abs (first - last) = k
+
+  predicate contiguous_segment (seg: list int) (nums: list int) =
+    exists left right: list int. nums = left ++ (seg ++ right)
+
+  predicate good_subarray_sum (nums: list int) (k: int) (s: int) =
+    exists seg: list int.
+      contiguous_segment seg nums /\
+      good_segment seg k /\
+      s = sum seg
+
+  predicate has_good_subarray_sum (nums: list int) (k: int) =
+    exists s: int. good_subarray_sum nums k s
+
+  predicate maximum_good_subarray_sum_spec (nums: list int) (k: int) (r: int) =
+    (has_good_subarray_sum nums k ->
+       good_subarray_sum nums k r /\
+       (forall s: int. good_subarray_sum nums k s -> s <= r)) /\
+    ((not (has_good_subarray_sum nums k)) -> r = 0)
+
+  let rec function scan_ends_found
+      (first: int) (running_sum: int) (cur: list int) (k: int)
+      (found: bool) : bool
+    variant { cur }
+  =
+    match cur with
+    | Nil -> found
+    | Cons y ys ->
+        let candidate = running_sum + y in
+        let found1 = if abs (first - y) = k then true else found in
+        scan_ends_found first candidate ys k found1
+    end
+
+  let rec function scan_ends_best
+      (first: int) (running_sum: int) (cur: list int) (k: int)
+      (found: bool) (best: int) : int
+    variant { cur }
+  =
+    match cur with
+    | Nil -> best
+    | Cons y ys ->
+        let candidate = running_sum + y in
+        let found1 = if abs (first - y) = k then true else found in
+        let best1 =
+          if abs (first - y) = k then
+            if found then
+              if candidate > best then candidate else best
+            else candidate
+          else best
+        in
+        scan_ends_best first candidate ys k found1 best1
+    end
+
+  let rec function scan_starts_found
+      (starts: list int) (k: int) (found: bool) : bool
+    variant { starts }
+  =
+    match starts with
+    | Nil -> found
+    | Cons h t ->
+        let found1 = scan_ends_found h h t k found in
+        scan_starts_found t k found1
+    end
+
+  let rec function scan_starts_best
+      (starts: list int) (k: int) (found: bool) (best: int) : int
+    variant { starts }
+  =
+    match starts with
+    | Nil -> best
+    | Cons h t ->
+        let found1 = scan_ends_found h h t k found in
+        let best1 = scan_ends_best h h t k found best in
+        scan_starts_best t k found1 best1
+    end
+
+  let lemma list_cursor_done (cur: list int)
+    requires { not (match cur with Nil -> false | Cons _ _ -> true end) }
+    ensures  { cur = Nil }
+  =
+    match cur with
+    | Nil -> ()
+    | Cons _ _ -> absurd
+    end
+
+  let lemma scan_starts_correct (nums: list int) (k: int)
+    requires { length nums >= 2 }
+    requires { k > 0 }
+    ensures  {
+      maximum_good_subarray_sum_spec nums k
+        (if scan_starts_found nums k false
+         then scan_starts_best nums k false 0
+         else 0)
+    }
+  =
+    ()
+
+  let maximum_good_subarray_sum_list (nums: list int) (k: int) : int
+    requires { length nums >= 2 }
+    requires { k > 0 }
+    ensures  { maximum_good_subarray_sum_spec nums k result }
+  =
+    let found = ref false in
+    let best = ref 0 in
+    let starts = ref nums in
+    while (match !starts with Nil -> false | Cons _ _ -> true end) do
+      invariant { 0 <= length !starts }
+      invariant { scan_starts_found !starts k !found =
+                  scan_starts_found nums k false }
+      invariant { scan_starts_best !starts k !found !best =
+                  scan_starts_best nums k false 0 }
+      invariant { not !found -> !best = 0 }
+      variant { length !starts }
+
+      match !starts with
+      | Nil ->
+          assert { false }
+      | Cons h t ->
+          let first = h in
+          let running_sum = ref h in
+          let cur = ref t in
+          let ghost outer_found = !found in
+          let ghost outer_best = !best in
+          while (match !cur with Nil -> false | Cons _ _ -> true end) do
+            invariant { 0 <= length !cur }
+            invariant { scan_ends_found first !running_sum !cur k !found =
+                        scan_ends_found first h t k outer_found }
+            invariant { scan_ends_best first !running_sum !cur k !found !best =
+                        scan_ends_best first h t k outer_found outer_best }
+            invariant { not !found -> !best = 0 }
+            variant { length !cur }
+
+            match !cur with
+            | Nil ->
+                assert { false }
+            | Cons y ys ->
+                let candidate = !running_sum + y in
+                running_sum := candidate;
+                if abs (first - y) = k then begin
+                  if not !found then begin
+                    found := true;
+                    best := candidate
+                  end else if candidate > !best then begin
+                    best := candidate
+                  end
+                end;
+                cur := ys
+            end
+          done;
+          list_cursor_done !cur;
+          assert { !cur = Nil };
+          assert { !found = scan_ends_found first h t k outer_found };
+          assert { !best = scan_ends_best first h t k outer_found outer_best };
+          assert { scan_starts_found (Cons h t) k outer_found =
+                   scan_starts_found t k !found };
+          assert { scan_starts_best (Cons h t) k outer_found outer_best =
+                   scan_starts_best t k !found !best };
+          starts := t
+      end
+    done;
+    list_cursor_done !starts;
+    assert { !starts = Nil };
+    assert { !found = scan_starts_found nums k false };
+    assert { !best = scan_starts_best nums k false 0 };
+    scan_starts_correct nums k;
+    if !found then begin
+      assert { scan_starts_found nums k false };
+      assert { (if scan_starts_found nums k false
+                then scan_starts_best nums k false 0 else 0) = !best };
+      assert { maximum_good_subarray_sum_spec nums k !best };
+      !best
+    end else begin
+      assert { not (scan_starts_found nums k false) };
+      assert { (if scan_starts_found nums k false
+                then scan_starts_best nums k false 0 else 0) = 0 };
+      assert { maximum_good_subarray_sum_spec nums k 0 };
+      0
+    end
+
+end

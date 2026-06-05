@@ -1,0 +1,269 @@
+module WaysToSplitArrayIntoThreeSubarrays_List_Stage3_Imperative
+
+  use int.Int
+  use int.EuclideanDivision
+  use list.List
+  use list.Length
+  use list.Append
+  use list.Sum
+  use ref.Ref
+
+  function split_modulus : int = 1000000007
+
+  let rec predicate nonnegative_list (nums: list int)
+    variant { nums }
+  =
+    match nums with
+    | Nil -> true
+    | Cons x xs -> 0 <= x && nonnegative_list xs
+    end
+
+  predicate good_split_parts (left: list int) (mid: list int) (right: list int) =
+    left <> Nil /\
+    mid <> Nil /\
+    right <> Nil /\
+    sum left <= sum mid /\
+    sum mid <= sum right
+
+  let function good_split_indicator (left: list int) (mid: list int) (right: list int) : int =
+    if sum left <= sum mid && sum mid <= sum right then 1 else 0
+
+  let rec function count_mid_splits (left: list int) (mid: list int) (right: list int) : int
+    variant { right }
+  =
+    match right with
+    | Nil -> 0
+    | Cons x xs ->
+        good_split_indicator left mid right +
+        count_mid_splits left (mid ++ Cons x Nil) xs
+    end
+
+  let rec function count_left_splits (left: list int) (remaining: list int) : int
+    variant { remaining }
+  =
+    match remaining with
+    | Nil -> 0
+    | Cons x xs ->
+        count_mid_splits left (Cons x Nil) xs +
+        count_left_splits (left ++ Cons x Nil) xs
+    end
+
+  let function count_good_splits (nums: list int) : int =
+    match nums with
+    | Nil -> 0
+    | Cons x xs -> count_left_splits (Cons x Nil) xs
+    end
+
+  let function count_mid_scan (left: list int) (mid_prefix: list int)
+      (remaining: list int) : int =
+    match remaining with
+    | Nil -> 0
+    | Cons y ys -> count_mid_splits left (mid_prefix ++ Cons y Nil) ys
+    end
+
+  let function count_left_scan (left_prefix: list int) (remaining: list int) : int =
+    match remaining with
+    | Nil -> 0
+    | Cons x xs -> count_left_splits (left_prefix ++ Cons x Nil) xs
+    end
+
+  let rec lemma sum_append (xs: list int) (ys: list int)
+    ensures { sum (xs ++ ys) = sum xs + sum ys }
+    variant { xs }
+  =
+    match xs with
+    | Nil -> ()
+    | Cons _ xt -> sum_append xt ys
+    end
+
+  let rec lemma append_assoc (xs: list int) (ys: list int) (zs: list int)
+    ensures { (xs ++ ys) ++ zs = xs ++ (ys ++ zs) }
+    variant { xs }
+  =
+    match xs with
+    | Nil -> ()
+    | Cons _ xt -> append_assoc xt ys zs
+    end
+
+  let lemma count_good_splits_scan (nums: list int)
+    ensures { count_left_scan Nil nums = count_good_splits nums }
+  =
+    match nums with
+    | Nil -> ()
+    | Cons _ _ -> ()
+    end
+
+  let lemma count_left_scan_step (left_prefix: list int) (x: int) (xs: list int)
+    ensures {
+      count_left_scan left_prefix (Cons x xs) =
+      count_mid_scan (left_prefix ++ Cons x Nil) Nil xs +
+      count_left_scan (left_prefix ++ Cons x Nil) xs
+    }
+  =
+    match xs with
+    | Nil -> ()
+    | Cons _ _ -> ()
+    end
+
+  let lemma count_mid_scan_step (left: list int) (mid_prefix: list int)
+      (y: int) (z: int) (zs: list int)
+    ensures {
+      count_mid_scan left mid_prefix (Cons y (Cons z zs)) =
+      good_split_indicator left (mid_prefix ++ Cons y Nil) (Cons z zs) +
+      count_mid_scan left (mid_prefix ++ Cons y Nil) (Cons z zs)
+    }
+  =
+    ()
+
+  let lemma count_mid_scan_done_nil (left: list int) (mid_prefix: list int)
+    ensures { count_mid_scan left mid_prefix Nil = 0 }
+  =
+    ()
+
+  let lemma count_mid_scan_done_one (left: list int) (mid_prefix: list int) (x: int)
+    ensures { count_mid_scan left mid_prefix (Cons x Nil) = 0 }
+  =
+    ()
+
+  let lemma count_left_scan_done_nil (left_prefix: list int)
+    ensures { count_left_scan left_prefix Nil = 0 }
+  =
+    ()
+
+  let lemma count_left_scan_done_one (left_prefix: list int) (x: int)
+    ensures { count_left_scan left_prefix (Cons x Nil) = 0 }
+  =
+    ()
+
+  let lemma count_left_scan_done_two (left_prefix: list int) (x: int) (y: int)
+    ensures { count_left_scan left_prefix (Cons x (Cons y Nil)) = 0 }
+  =
+    ()
+
+  let ways_to_split_array_into_three_subarrays_list (nums: list int) : int
+    requires { length nums >= 3 }
+    requires { nonnegative_list nums }
+    ensures  { result = mod (count_good_splits nums) split_modulus }
+  =
+    let modulus = 1000000007 in
+    let total_sum = ref 0 in
+    let total_cur = ref nums in
+    while (match !total_cur with Nil -> false | Cons _ _ -> true end) do
+      invariant { 0 <= length !total_cur }
+      invariant { !total_sum + sum !total_cur = sum nums }
+      variant   { length !total_cur }
+      match !total_cur with
+      | Nil -> ()
+      | Cons x xs ->
+          assert { length xs < length !total_cur };
+          total_sum := !total_sum + x;
+          total_cur := xs
+      end
+    done;
+    assert { !total_cur = Nil };
+    assert { !total_sum = sum nums };
+
+    let result = ref 0 in
+    let left_sum = ref 0 in
+    let left_cur = ref nums in
+    let ghost left_prefix = ref (Nil: list int) in
+    count_good_splits_scan nums;
+    while (match !left_cur with Cons _ (Cons _ (Cons _ _)) -> true | _ -> false end) do
+      invariant { 0 <= length !left_cur }
+      invariant { 0 <= !result }
+      invariant { nums = !left_prefix ++ !left_cur }
+      invariant { !left_sum = sum !left_prefix }
+      invariant { !result + count_left_scan !left_prefix !left_cur = count_good_splits nums }
+      variant   { length !left_cur }
+      match !left_cur with
+      | Nil -> ()
+      | Cons x xs ->
+          assert { length xs < length !left_cur };
+          left_sum := !left_sum + x;
+          let ghost new_left = !left_prefix ++ Cons x Nil in
+          sum_append !left_prefix (Cons x Nil);
+          assert { !left_sum = sum new_left };
+          count_left_scan_step !left_prefix x xs;
+          assert { count_left_scan !left_prefix !left_cur =
+                   count_mid_scan new_left Nil xs + count_left_scan new_left xs };
+          let mid_sum = ref 0 in
+          let right_sum = ref (!total_sum - !left_sum) in
+          let mid_cur = ref xs in
+          let ghost mid_prefix = ref (Nil: list int) in
+          append_assoc !left_prefix (Cons x Nil) xs;
+          sum_append new_left xs;
+          assert { !right_sum = sum xs };
+          while (match !mid_cur with Cons _ (Cons _ _) -> true | _ -> false end) do
+            invariant { 0 <= length !mid_cur }
+            invariant { 0 <= !result }
+            invariant { xs = !mid_prefix ++ !mid_cur }
+            invariant { !mid_sum = sum !mid_prefix }
+            invariant { !right_sum = sum !mid_cur }
+            invariant { !left_sum = sum new_left }
+            invariant { !result + count_mid_scan new_left !mid_prefix !mid_cur
+                        + count_left_scan new_left xs = count_good_splits nums }
+            variant   { length !mid_cur }
+            match !mid_cur with
+            | Nil -> ()
+            | Cons y ys ->
+                assert { length ys < length !mid_cur };
+                let ghost new_mid = !mid_prefix ++ Cons y Nil in
+                mid_sum := !mid_sum + y;
+                right_sum := !right_sum - y;
+                sum_append !mid_prefix (Cons y Nil);
+                assert { !mid_sum = sum new_mid };
+                append_assoc !mid_prefix (Cons y Nil) ys;
+                sum_append new_mid ys;
+                assert { !right_sum = sum ys };
+                match ys with
+                | Nil -> absurd
+                | Cons z zs ->
+                    count_mid_scan_step new_left !mid_prefix y z zs;
+                    assert { count_mid_scan new_left !mid_prefix !mid_cur =
+                             good_split_indicator new_left new_mid ys +
+                             count_mid_scan new_left new_mid ys }
+                end;
+                if !left_sum <= !mid_sum && !mid_sum <= !right_sum then
+                  result := !result + 1;
+                assert { !result + count_mid_scan new_left new_mid ys
+                         + count_left_scan new_left xs = count_good_splits nums };
+                mid_prefix := new_mid;
+                mid_cur := ys
+            end
+          done;
+          assert {
+            match !mid_cur with
+            | Nil -> true
+            | Cons _ Nil -> true
+            | Cons _ (Cons _ _) -> false
+            end
+          };
+          match !mid_cur with
+          | Nil -> count_mid_scan_done_nil new_left !mid_prefix
+          | Cons y Nil -> count_mid_scan_done_one new_left !mid_prefix y
+          | Cons _ (Cons _ _) -> absurd
+          end;
+          assert { count_mid_scan new_left !mid_prefix !mid_cur = 0 };
+          assert { !result + count_left_scan new_left xs = count_good_splits nums };
+          left_prefix := new_left;
+          left_cur := xs
+      end
+    done;
+    assert {
+      match !left_cur with
+      | Cons _ (Cons _ (Cons _ _)) -> false
+      | _ -> true
+      end
+    };
+    match !left_cur with
+    | Nil -> count_left_scan_done_nil !left_prefix
+    | Cons x Nil -> count_left_scan_done_one !left_prefix x
+    | Cons x (Cons y Nil) -> count_left_scan_done_two !left_prefix x y
+    | Cons _ (Cons _ (Cons _ _)) -> absurd
+    end;
+    assert { count_left_scan !left_prefix !left_cur = 0 };
+    assert { modulus = split_modulus };
+    assert { !result = count_good_splits nums };
+    mod !result modulus
+
+end

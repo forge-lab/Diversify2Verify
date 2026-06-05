@@ -1,0 +1,821 @@
+== Stage 1: first prover on whole file ==
+Running in /Users/rubenm/Desktop/Diversify2Verify/codex-runs/dataset-merge-verification/stage3a-repair/870_advantage-shuffle/array-recursive/advantage_shuffle_array_stage3_5258179f_stage3/generated/why3: why3 session create -o /Users/rubenm/Desktop/Diversify2Verify/codex-runs/dataset-merge-verification/stage3a-repair/870_advantage-shuffle/array-recursive/advantage_shuffle_array_stage3_5258179f_stage3/generated/why3/.why3_sessions/repaired_stage1 -P Z3,4.8.6 -t 10 -m 8192 repaired.mlw
+Session created successfully
+Running in /Users/rubenm/Desktop/Diversify2Verify/codex-runs/dataset-merge-verification/stage3a-repair/870_advantage-shuffle/array-recursive/advantage_shuffle_array_stage3_5258179f_stage3/generated/why3: why3 bench /Users/rubenm/Desktop/Diversify2Verify/codex-runs/dataset-merge-verification/stage3a-repair/870_advantage-shuffle/array-recursive/advantage_shuffle_array_stage3_5258179f_stage3/generated/why3/.why3_sessions/repaired_stage1
+Progress: 9/1/0                       Progress: 8/2/0                       Progress: 7/3/0                       Progress: 6/4/0                       Progress: 5/5/0                       Progress: 4/6/0                       Progress: 4/0/0                       Progress: 3/1/0                       Progress: 2/2/0                       Progress: 1/3/0                       Progress: 0/4/0                       Progress: 0/0/1                       
+Replay completed, saving session... done
+== Stage 1 stats ==
+= Statistics for session /Users/rubenm/Desktop/Diversify2Verify/codex-runs/dataset-merge-verification/stage3a-repair/870_advantage-shuffle/array-recursive/advantage_shuffle_array_stage3_5258179f_stage3/generated/why3/.why3_sessions/repaired_stage1
+
+== Number of root goals ==
+  total: 10  proved: 8
+
+== Number of sub goals ==
+  total: 0  proved: 0
+
+== Goals not proved ==
+  +-- file [../../repaired.mlw]
+    +-- theory AdvantageShuffle_Array_Spec
+      +-- goal fill_indices_from'vc
+      +-- goal advantage_shuffle_array'vc
+  
+== Goals proved by only one prover ==
+  +-- file [../../repaired.mlw]
+    +-- theory AdvantageShuffle_Array_Spec
+      +-- goal copy_array_from'vc: Z3 4.8.6
+      +-- goal copy_array'vc: Z3 4.8.6
+      +-- goal insert_sorted_prefix'vc: Z3 4.8.6
+      +-- goal insertion_sort_from'vc: Z3 4.8.6
+      +-- goal make_indices'vc: Z3 4.8.6
+      +-- goal insert_index_prefix'vc: Z3 4.8.6
+      +-- goal sort_indices_from'vc: Z3 4.8.6
+      +-- goal assign_advantage'vc: Z3 4.8.6
+  
+1 session(s) read, with a total of 10 proof goals.
+== Unproved root goals after first prover ==
+AdvantageShuffle_Array_Spec	fill_indices_from'vc
+AdvantageShuffle_Array_Spec	advantage_shuffle_array'vc
+== Stage 1: trying remaining goals with prover Alt-Ergo,2.4.0 ==
+---- stage1 | prover: Alt-Ergo,2.4.0 | theory: AdvantageShuffle_Array_Spec | goal: fill_indices_from'vc ----
+File repaired.mlw:
+Goal fill_indices_from'vc.
+Prover result is: Timeout (10.00s, 93021 steps).
+---- stage1 | prover: Alt-Ergo,2.4.0 | theory: AdvantageShuffle_Array_Spec | goal: advantage_shuffle_array'vc ----
+File repaired.mlw:
+Goal advantage_shuffle_array'vc.
+Prover result is: Timeout (10.00s, 77814 steps).
+Remaining after prover Alt-Ergo,2.4.0: 2
+== Stage 1: trying remaining goals with prover CVC4,1.8 ==
+---- stage1 | prover: CVC4,1.8 | theory: AdvantageShuffle_Array_Spec | goal: fill_indices_from'vc ----
+File repaired.mlw:
+Goal fill_indices_from'vc.
+Prover result is: Timeout (10.00s, 1399868 steps).
+---- stage1 | prover: CVC4,1.8 | theory: AdvantageShuffle_Array_Spec | goal: advantage_shuffle_array'vc ----
+File repaired.mlw:
+Goal advantage_shuffle_array'vc.
+Prover result is: Timeout (10.00s, 1169959 steps).
+Remaining after prover CVC4,1.8: 2
+== Goals still unproved after stage 1 ==
+AdvantageShuffle_Array_Spec	fill_indices_from'vc
+AdvantageShuffle_Array_Spec	advantage_shuffle_array'vc
+== Stage 2: split_vc on unproved goal ==
+Target theory: AdvantageShuffle_Array_Spec
+Target goal  : fill_indices_from'vc
+---- stage2 | prover: Z3,4.8.6 | theory: AdvantageShuffle_Array_Spec | goal: fill_indices_from'vc ----
+Transforms: split_vc
+File "repaired.mlw", line 83, characters 15-44:
+Sub-goal Postcondition of goal fill_indices_from'vc.
+Prover result is: Valid (0.01s, 3725 steps).
+
+File "repaired.mlw", line 84, characters 53-63:
+Sub-goal Postcondition of goal fill_indices_from'vc.
+Prover result is: Valid (0.01s, 48045 steps).
+
+File "repaired.mlw", line 90, characters 15-34:
+Sub-goal Assertion of goal fill_indices_from'vc.
+Prover result is: Valid (0.01s, 5401 steps).
+
+File "repaired.mlw", line 91, characters 6-17:
+Sub-goal Index in array bounds of goal fill_indices_from'vc.
+Prover result is: Valid (0.01s, 5410 steps).
+
+File "repaired.mlw", line 92, characters 6-35:
+Sub-goal Variant decrease of goal fill_indices_from'vc.
+Prover result is: Valid (0.01s, 34747 steps).
+
+File "repaired.mlw", line 92, characters 6-35:
+Sub-goal Precondition of goal fill_indices_from'vc.
+Prover result is: Valid (0.02s, 70418 steps).
+
+File "repaired.mlw", line 93, characters 53-63:
+Sub-goal Assertion of goal fill_indices_from'vc.
+Prover result is: Unknown (unknown) (0.09s, 566683 steps).
+
+File "repaired.mlw", line 83, characters 15-44:
+Sub-goal Postcondition of goal fill_indices_from'vc.
+Prover result is: Valid (0.02s, 71700 steps).
+
+File "repaired.mlw", line 84, characters 53-63:
+Sub-goal Postcondition of goal fill_indices_from'vc.
+Prover result is: Valid (0.01s, 72273 steps).
+---- stage2 | prover: Alt-Ergo,2.4.0 | theory: AdvantageShuffle_Array_Spec | goal: fill_indices_from'vc ----
+Transforms: split_vc
+File "repaired.mlw", line 83, characters 15-44:
+Sub-goal Postcondition of goal fill_indices_from'vc.
+Prover result is: Valid (0.01s, 7 steps).
+
+File "repaired.mlw", line 84, characters 53-63:
+Sub-goal Postcondition of goal fill_indices_from'vc.
+Prover result is: Valid (0.01s, 9 steps).
+
+File "repaired.mlw", line 90, characters 15-34:
+Sub-goal Assertion of goal fill_indices_from'vc.
+Prover result is: Valid (0.01s, 6 steps).
+
+File "repaired.mlw", line 91, characters 6-17:
+Sub-goal Index in array bounds of goal fill_indices_from'vc.
+Prover result is: Valid (0.01s, 7 steps).
+
+File "repaired.mlw", line 92, characters 6-35:
+Sub-goal Variant decrease of goal fill_indices_from'vc.
+Prover result is: Valid (0.01s, 13 steps).
+
+File "repaired.mlw", line 92, characters 6-35:
+Sub-goal Precondition of goal fill_indices_from'vc.
+Prover result is: Valid (0.01s, 13 steps).
+
+File "repaired.mlw", line 93, characters 53-63:
+Sub-goal Assertion of goal fill_indices_from'vc.
+Prover result is: Timeout (10.00s, 91898 steps).
+
+File "repaired.mlw", line 83, characters 15-44:
+Sub-goal Postcondition of goal fill_indices_from'vc.
+Prover result is: Valid (0.01s, 17 steps).
+
+File "repaired.mlw", line 84, characters 53-63:
+Sub-goal Postcondition of goal fill_indices_from'vc.
+Prover result is: Valid (0.01s, 30 steps).
+---- stage2 | prover: CVC4,1.8 | theory: AdvantageShuffle_Array_Spec | goal: fill_indices_from'vc ----
+Transforms: split_vc
+File "repaired.mlw", line 83, characters 15-44:
+Sub-goal Postcondition of goal fill_indices_from'vc.
+Prover result is: Valid (0.03s, 11132 steps).
+
+File "repaired.mlw", line 84, characters 53-63:
+Sub-goal Postcondition of goal fill_indices_from'vc.
+Prover result is: Valid (0.03s, 11392 steps).
+
+File "repaired.mlw", line 90, characters 15-34:
+Sub-goal Assertion of goal fill_indices_from'vc.
+Prover result is: Valid (0.03s, 11163 steps).
+
+File "repaired.mlw", line 91, characters 6-17:
+Sub-goal Index in array bounds of goal fill_indices_from'vc.
+Prover result is: Valid (0.03s, 11168 steps).
+
+File "repaired.mlw", line 92, characters 6-35:
+Sub-goal Variant decrease of goal fill_indices_from'vc.
+Prover result is: Valid (0.04s, 14813 steps).
+
+File "repaired.mlw", line 92, characters 6-35:
+Sub-goal Precondition of goal fill_indices_from'vc.
+Prover result is: Valid (0.03s, 14805 steps).
+
+File "repaired.mlw", line 93, characters 53-63:
+Sub-goal Assertion of goal fill_indices_from'vc.
+Prover result is: Timeout (10.00s, 1372250 steps).
+
+File "repaired.mlw", line 83, characters 15-44:
+Sub-goal Postcondition of goal fill_indices_from'vc.
+Prover result is: Valid (0.04s, 14954 steps).
+
+File "repaired.mlw", line 84, characters 53-63:
+Sub-goal Postcondition of goal fill_indices_from'vc.
+Prover result is: Valid (0.04s, 16174 steps).
+== Stage 2: split_vc on unproved goal ==
+Target theory: AdvantageShuffle_Array_Spec
+Target goal  : advantage_shuffle_array'vc
+---- stage2 | prover: Z3,4.8.6 | theory: AdvantageShuffle_Array_Spec | goal: advantage_shuffle_array'vc ----
+Transforms: split_vc
+File "repaired.mlw", line 204, characters 13-30:
+Sub-goal Assertion of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.01s, 3846 steps).
+
+File "repaired.mlw", line 205, characters 13-40:
+Sub-goal Assertion of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.01s, 3855 steps).
+
+File "repaired.mlw", line 207, characters 6-14:
+Sub-goal Array creation size of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.01s, 3865 steps).
+
+File "repaired.mlw", line 202, characters 15-58:
+Sub-goal Postcondition of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.01s, 6280 steps).
+
+File "repaired.mlw", line 202, characters 15-58:
+Sub-goal Postcondition of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.02s, 23601 steps).
+
+File "repaired.mlw", line 212, characters 16-43:
+Sub-goal Precondition of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.02s, 55485 steps).
+
+File "repaired.mlw", line 213, characters 19-40:
+Sub-goal Array creation size of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.01s, 57300 steps).
+
+File "repaired.mlw", line 215, characters 8-42:
+Sub-goal Precondition of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.01s, 58102 steps).
+
+File "repaired.mlw", line 216, characters 8-37:
+Sub-goal Precondition of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.01s, 4057 steps).
+
+File "repaired.mlw", line 216, characters 8-37:
+Sub-goal Precondition of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.01s, 58312 steps).
+
+File "repaired.mlw", line 216, characters 8-37:
+Sub-goal Precondition of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.01s, 4073 steps).
+
+File "repaired.mlw", line 217, characters 17-56:
+Sub-goal Assertion of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.01s, 4098 steps).
+
+File "repaired.mlw", line 218, characters 8-94:
+Sub-goal Precondition of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.01s, 59455 steps).
+
+File "repaired.mlw", line 218, characters 8-94:
+Sub-goal Precondition of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.01s, 59591 steps).
+
+File "repaired.mlw", line 218, characters 8-94:
+Sub-goal Precondition of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.01s, 59737 steps).
+
+File "repaired.mlw", line 218, characters 8-94:
+Sub-goal Precondition of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.01s, 4120 steps).
+
+File "repaired.mlw", line 218, characters 8-94:
+Sub-goal Precondition of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.01s, 60032 steps).
+
+File "repaired.mlw", line 218, characters 8-94:
+Sub-goal Precondition of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.01s, 59248 steps).
+
+File "repaired.mlw", line 218, characters 8-94:
+Sub-goal Precondition of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.01s, 59462 steps).
+
+File "repaired.mlw", line 218, characters 8-94:
+Sub-goal Precondition of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.01s, 4186 steps).
+
+File "repaired.mlw", line 202, characters 15-58:
+Sub-goal Postcondition of goal advantage_shuffle_array'vc.
+Prover result is: Timeout (10.00s, 46226967 steps).
+---- stage2 | prover: Alt-Ergo,2.4.0 | theory: AdvantageShuffle_Array_Spec | goal: advantage_shuffle_array'vc ----
+Transforms: split_vc
+File "repaired.mlw", line 204, characters 13-30:
+Sub-goal Assertion of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.01s, 6 steps).
+
+File "repaired.mlw", line 205, characters 13-40:
+Sub-goal Assertion of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.01s, 6 steps).
+
+File "repaired.mlw", line 207, characters 6-14:
+Sub-goal Array creation size of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.01s, 7 steps).
+
+File "repaired.mlw", line 202, characters 15-58:
+Sub-goal Postcondition of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.01s, 7 steps).
+
+File "repaired.mlw", line 202, characters 15-58:
+Sub-goal Postcondition of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.01s, 8 steps).
+
+File "repaired.mlw", line 212, characters 16-43:
+Sub-goal Precondition of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.01s, 11 steps).
+
+File "repaired.mlw", line 213, characters 19-40:
+Sub-goal Array creation size of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.01s, 15 steps).
+
+File "repaired.mlw", line 215, characters 8-42:
+Sub-goal Precondition of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.01s, 19 steps).
+
+File "repaired.mlw", line 216, characters 8-37:
+Sub-goal Precondition of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.01s, 22 steps).
+
+File "repaired.mlw", line 216, characters 8-37:
+Sub-goal Precondition of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.01s, 23 steps).
+
+File "repaired.mlw", line 216, characters 8-37:
+Sub-goal Precondition of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.01s, 23 steps).
+
+File "repaired.mlw", line 217, characters 17-56:
+Sub-goal Assertion of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.01s, 26 steps).
+
+File "repaired.mlw", line 218, characters 8-94:
+Sub-goal Precondition of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.01s, 26 steps).
+
+File "repaired.mlw", line 218, characters 8-94:
+Sub-goal Precondition of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.01s, 26 steps).
+
+File "repaired.mlw", line 218, characters 8-94:
+Sub-goal Precondition of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.01s, 26 steps).
+
+File "repaired.mlw", line 218, characters 8-94:
+Sub-goal Precondition of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.01s, 26 steps).
+
+File "repaired.mlw", line 218, characters 8-94:
+Sub-goal Precondition of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.01s, 28 steps).
+
+File "repaired.mlw", line 218, characters 8-94:
+Sub-goal Precondition of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.01s, 29 steps).
+
+File "repaired.mlw", line 218, characters 8-94:
+Sub-goal Precondition of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.01s, 30 steps).
+
+File "repaired.mlw", line 218, characters 8-94:
+Sub-goal Precondition of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.01s, 31 steps).
+
+File "repaired.mlw", line 202, characters 15-58:
+Sub-goal Postcondition of goal advantage_shuffle_array'vc.
+Prover result is: Timeout (10.00s, 72009 steps).
+---- stage2 | prover: CVC4,1.8 | theory: AdvantageShuffle_Array_Spec | goal: advantage_shuffle_array'vc ----
+Transforms: split_vc
+File "repaired.mlw", line 204, characters 13-30:
+Sub-goal Assertion of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.03s, 11382 steps).
+
+File "repaired.mlw", line 205, characters 13-40:
+Sub-goal Assertion of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.03s, 11385 steps).
+
+File "repaired.mlw", line 207, characters 6-14:
+Sub-goal Array creation size of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.03s, 11404 steps).
+
+File "repaired.mlw", line 202, characters 15-58:
+Sub-goal Postcondition of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.03s, 12576 steps).
+
+File "repaired.mlw", line 202, characters 15-58:
+Sub-goal Postcondition of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.03s, 12279 steps).
+
+File "repaired.mlw", line 212, characters 16-43:
+Sub-goal Precondition of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.03s, 11542 steps).
+
+File "repaired.mlw", line 213, characters 19-40:
+Sub-goal Array creation size of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.03s, 11761 steps).
+
+File "repaired.mlw", line 215, characters 8-42:
+Sub-goal Precondition of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.03s, 11923 steps).
+
+File "repaired.mlw", line 216, characters 8-37:
+Sub-goal Precondition of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.03s, 11808 steps).
+
+File "repaired.mlw", line 216, characters 8-37:
+Sub-goal Precondition of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.03s, 11960 steps).
+
+File "repaired.mlw", line 216, characters 8-37:
+Sub-goal Precondition of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.03s, 11839 steps).
+
+File "repaired.mlw", line 217, characters 17-56:
+Sub-goal Assertion of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.03s, 11862 steps).
+
+File "repaired.mlw", line 218, characters 8-94:
+Sub-goal Precondition of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.03s, 11994 steps).
+
+File "repaired.mlw", line 218, characters 8-94:
+Sub-goal Precondition of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.03s, 12016 steps).
+
+File "repaired.mlw", line 218, characters 8-94:
+Sub-goal Precondition of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.03s, 12021 steps).
+
+File "repaired.mlw", line 218, characters 8-94:
+Sub-goal Precondition of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.03s, 11909 steps).
+
+File "repaired.mlw", line 218, characters 8-94:
+Sub-goal Precondition of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.03s, 12106 steps).
+
+File "repaired.mlw", line 218, characters 8-94:
+Sub-goal Precondition of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.03s, 12146 steps).
+
+File "repaired.mlw", line 218, characters 8-94:
+Sub-goal Precondition of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.03s, 12185 steps).
+
+File "repaired.mlw", line 218, characters 8-94:
+Sub-goal Precondition of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.03s, 12033 steps).
+
+File "repaired.mlw", line 202, characters 15-58:
+Sub-goal Postcondition of goal advantage_shuffle_array'vc.
+Prover result is: Timeout (10.00s, 1396831 steps).
+== Goals still unproved after stage 2 (split_vc) ==
+AdvantageShuffle_Array_Spec	fill_indices_from'vc
+AdvantageShuffle_Array_Spec	advantage_shuffle_array'vc
+== Stage 3: split_vc + inline_all on still-unproved goal ==
+Target theory: AdvantageShuffle_Array_Spec
+Target goal  : fill_indices_from'vc
+---- stage3 | prover: Z3,4.8.6 | theory: AdvantageShuffle_Array_Spec | goal: fill_indices_from'vc ----
+Transforms: split_vc inline_all
+File "repaired.mlw", line 83, characters 15-44:
+Sub-goal Postcondition of goal fill_indices_from'vc.
+Prover result is: Valid (0.01s, 8910 steps).
+
+File "repaired.mlw", line 84, characters 53-63:
+Sub-goal Postcondition of goal fill_indices_from'vc.
+Prover result is: Valid (0.02s, 120188 steps).
+
+File "repaired.mlw", line 90, characters 15-34:
+Sub-goal Assertion of goal fill_indices_from'vc.
+Prover result is: Valid (0.01s, 31908 steps).
+
+File "repaired.mlw", line 91, characters 6-17:
+Sub-goal Index in array bounds of goal fill_indices_from'vc.
+Prover result is: Valid (0.01s, 12738 steps).
+
+File "repaired.mlw", line 92, characters 6-35:
+Sub-goal Variant decrease of goal fill_indices_from'vc.
+Prover result is: Valid (0.01s, 72421 steps).
+
+File "repaired.mlw", line 92, characters 6-35:
+Sub-goal Precondition of goal fill_indices_from'vc.
+Prover result is: Valid (0.02s, 140550 steps).
+
+File "repaired.mlw", line 93, characters 53-63:
+Sub-goal Assertion of goal fill_indices_from'vc.
+Prover result is: Timeout (10.00s, 138388835 steps).
+
+File "repaired.mlw", line 83, characters 15-44:
+Sub-goal Postcondition of goal fill_indices_from'vc.
+Prover result is: Valid (0.02s, 141874 steps).
+
+File "repaired.mlw", line 84, characters 53-63:
+Sub-goal Postcondition of goal fill_indices_from'vc.
+Prover result is: Valid (0.02s, 142852 steps).
+---- stage3 | prover: Alt-Ergo,2.4.0 | theory: AdvantageShuffle_Array_Spec | goal: fill_indices_from'vc ----
+Transforms: split_vc inline_all
+File "repaired.mlw", line 83, characters 15-44:
+Sub-goal Postcondition of goal fill_indices_from'vc.
+Prover result is: Valid (0.01s, 3 steps).
+
+File "repaired.mlw", line 84, characters 53-63:
+Sub-goal Postcondition of goal fill_indices_from'vc.
+Prover result is: Valid (0.01s, 12 steps).
+
+File "repaired.mlw", line 90, characters 15-34:
+Sub-goal Assertion of goal fill_indices_from'vc.
+Prover result is: Valid (0.01s, 6 steps).
+
+File "repaired.mlw", line 91, characters 6-17:
+Sub-goal Index in array bounds of goal fill_indices_from'vc.
+Prover result is: Valid (0.01s, 6 steps).
+
+File "repaired.mlw", line 92, characters 6-35:
+Sub-goal Variant decrease of goal fill_indices_from'vc.
+Prover result is: Valid (0.01s, 12 steps).
+
+File "repaired.mlw", line 92, characters 6-35:
+Sub-goal Precondition of goal fill_indices_from'vc.
+Prover result is: Valid (0.01s, 20 steps).
+
+File "repaired.mlw", line 93, characters 53-63:
+Sub-goal Assertion of goal fill_indices_from'vc.
+Prover result is: Timeout (10.00s, 105531 steps).
+
+File "repaired.mlw", line 83, characters 15-44:
+Sub-goal Postcondition of goal fill_indices_from'vc.
+Prover result is: Valid (0.01s, 14 steps).
+
+File "repaired.mlw", line 84, characters 53-63:
+Sub-goal Postcondition of goal fill_indices_from'vc.
+Prover result is: Valid (0.02s, 28 steps).
+---- stage3 | prover: CVC4,1.8 | theory: AdvantageShuffle_Array_Spec | goal: fill_indices_from'vc ----
+Transforms: split_vc inline_all
+File "repaired.mlw", line 83, characters 15-44:
+Sub-goal Postcondition of goal fill_indices_from'vc.
+Prover result is: Valid (0.05s, 22661 steps).
+
+File "repaired.mlw", line 84, characters 53-63:
+Sub-goal Postcondition of goal fill_indices_from'vc.
+Prover result is: Valid (0.06s, 26296 steps).
+
+File "repaired.mlw", line 90, characters 15-34:
+Sub-goal Assertion of goal fill_indices_from'vc.
+Prover result is: Valid (0.05s, 22682 steps).
+
+File "repaired.mlw", line 91, characters 6-17:
+Sub-goal Index in array bounds of goal fill_indices_from'vc.
+Prover result is: Valid (0.04s, 22687 steps).
+
+File "repaired.mlw", line 92, characters 6-35:
+Sub-goal Variant decrease of goal fill_indices_from'vc.
+Prover result is: Valid (0.06s, 26948 steps).
+
+File "repaired.mlw", line 92, characters 6-35:
+Sub-goal Precondition of goal fill_indices_from'vc.
+Prover result is: Valid (0.06s, 27053 steps).
+
+File "repaired.mlw", line 93, characters 53-63:
+Sub-goal Assertion of goal fill_indices_from'vc.
+Prover result is: Unknown (unknown + incomplete) (0.07s, 28984 steps).
+
+File "repaired.mlw", line 83, characters 15-44:
+Sub-goal Postcondition of goal fill_indices_from'vc.
+Prover result is: Valid (0.06s, 27143 steps).
+
+File "repaired.mlw", line 84, characters 53-63:
+Sub-goal Postcondition of goal fill_indices_from'vc.
+Prover result is: Valid (0.07s, 29023 steps).
+== Stage 3: split_vc + inline_all on still-unproved goal ==
+Target theory: AdvantageShuffle_Array_Spec
+Target goal  : advantage_shuffle_array'vc
+---- stage3 | prover: Z3,4.8.6 | theory: AdvantageShuffle_Array_Spec | goal: advantage_shuffle_array'vc ----
+Transforms: split_vc inline_all
+File "repaired.mlw", line 204, characters 13-30:
+Sub-goal Assertion of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.01s, 14462 steps).
+
+File "repaired.mlw", line 205, characters 13-40:
+Sub-goal Assertion of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.01s, 10121 steps).
+
+File "repaired.mlw", line 207, characters 6-14:
+Sub-goal Array creation size of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.01s, 10131 steps).
+
+File "repaired.mlw", line 202, characters 15-58:
+Sub-goal Postcondition of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.01s, 22205 steps).
+
+File "repaired.mlw", line 202, characters 15-58:
+Sub-goal Postcondition of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.02s, 93877 steps).
+
+File "repaired.mlw", line 212, characters 16-43:
+Sub-goal Precondition of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.02s, 135095 steps).
+
+File "repaired.mlw", line 213, characters 19-40:
+Sub-goal Array creation size of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.02s, 136346 steps).
+
+File "repaired.mlw", line 215, characters 8-42:
+Sub-goal Precondition of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.02s, 137309 steps).
+
+File "repaired.mlw", line 216, characters 8-37:
+Sub-goal Precondition of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.01s, 10349 steps).
+
+File "repaired.mlw", line 216, characters 8-37:
+Sub-goal Precondition of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.02s, 137541 steps).
+
+File "repaired.mlw", line 216, characters 8-37:
+Sub-goal Precondition of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.02s, 139313 steps).
+
+File "repaired.mlw", line 217, characters 17-56:
+Sub-goal Assertion of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.01s, 10478 steps).
+
+File "repaired.mlw", line 218, characters 8-94:
+Sub-goal Precondition of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.02s, 138960 steps).
+
+File "repaired.mlw", line 218, characters 8-94:
+Sub-goal Precondition of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.02s, 139106 steps).
+
+File "repaired.mlw", line 218, characters 8-94:
+Sub-goal Precondition of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.02s, 139258 steps).
+
+File "repaired.mlw", line 218, characters 8-94:
+Sub-goal Precondition of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.02s, 140930 steps).
+
+File "repaired.mlw", line 218, characters 8-94:
+Sub-goal Precondition of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.02s, 139735 steps).
+
+File "repaired.mlw", line 218, characters 8-94:
+Sub-goal Precondition of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.02s, 139519 steps).
+
+File "repaired.mlw", line 218, characters 8-94:
+Sub-goal Precondition of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.02s, 139817 steps).
+
+File "repaired.mlw", line 218, characters 8-94:
+Sub-goal Precondition of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.01s, 10690 steps).
+
+File "repaired.mlw", line 202, characters 15-58:
+Sub-goal Postcondition of goal advantage_shuffle_array'vc.
+Prover result is: Timeout (10.00s, 194074030 steps).
+---- stage3 | prover: Alt-Ergo,2.4.0 | theory: AdvantageShuffle_Array_Spec | goal: advantage_shuffle_array'vc ----
+Transforms: split_vc inline_all
+File "repaired.mlw", line 204, characters 13-30:
+Sub-goal Assertion of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.01s, 4 steps).
+
+File "repaired.mlw", line 205, characters 13-40:
+Sub-goal Assertion of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.01s, 4 steps).
+
+File "repaired.mlw", line 207, characters 6-14:
+Sub-goal Array creation size of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.01s, 7 steps).
+
+File "repaired.mlw", line 202, characters 15-58:
+Sub-goal Postcondition of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.01s, 11 steps).
+
+File "repaired.mlw", line 202, characters 15-58:
+Sub-goal Postcondition of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.01s, 5 steps).
+
+File "repaired.mlw", line 212, characters 16-43:
+Sub-goal Precondition of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.01s, 12 steps).
+
+File "repaired.mlw", line 213, characters 19-40:
+Sub-goal Array creation size of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.01s, 15 steps).
+
+File "repaired.mlw", line 215, characters 8-42:
+Sub-goal Precondition of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.01s, 20 steps).
+
+File "repaired.mlw", line 216, characters 8-37:
+Sub-goal Precondition of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.01s, 17 steps).
+
+File "repaired.mlw", line 216, characters 8-37:
+Sub-goal Precondition of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.01s, 22 steps).
+
+File "repaired.mlw", line 216, characters 8-37:
+Sub-goal Precondition of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.02s, 32 steps).
+
+File "repaired.mlw", line 217, characters 17-56:
+Sub-goal Assertion of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.01s, 21 steps).
+
+File "repaired.mlw", line 218, characters 8-94:
+Sub-goal Precondition of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.01s, 22 steps).
+
+File "repaired.mlw", line 218, characters 8-94:
+Sub-goal Precondition of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.01s, 22 steps).
+
+File "repaired.mlw", line 218, characters 8-94:
+Sub-goal Precondition of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.01s, 22 steps).
+
+File "repaired.mlw", line 218, characters 8-94:
+Sub-goal Precondition of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.02s, 33 steps).
+
+File "repaired.mlw", line 218, characters 8-94:
+Sub-goal Precondition of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.01s, 28 steps).
+
+File "repaired.mlw", line 218, characters 8-94:
+Sub-goal Precondition of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.01s, 24 steps).
+
+File "repaired.mlw", line 218, characters 8-94:
+Sub-goal Precondition of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.01s, 24 steps).
+
+File "repaired.mlw", line 218, characters 8-94:
+Sub-goal Precondition of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.01s, 24 steps).
+
+File "repaired.mlw", line 202, characters 15-58:
+Sub-goal Postcondition of goal advantage_shuffle_array'vc.
+Prover result is: Timeout (10.00s, 193978 steps).
+---- stage3 | prover: CVC4,1.8 | theory: AdvantageShuffle_Array_Spec | goal: advantage_shuffle_array'vc ----
+Transforms: split_vc inline_all
+File "repaired.mlw", line 204, characters 13-30:
+Sub-goal Assertion of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.06s, 26204 steps).
+
+File "repaired.mlw", line 205, characters 13-40:
+Sub-goal Assertion of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.05s, 26207 steps).
+
+File "repaired.mlw", line 207, characters 6-14:
+Sub-goal Array creation size of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.05s, 26216 steps).
+
+File "repaired.mlw", line 202, characters 15-58:
+Sub-goal Postcondition of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.08s, 39169 steps).
+
+File "repaired.mlw", line 202, characters 15-58:
+Sub-goal Postcondition of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.07s, 38694 steps).
+
+File "repaired.mlw", line 212, characters 16-43:
+Sub-goal Precondition of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.06s, 26498 steps).
+
+File "repaired.mlw", line 213, characters 19-40:
+Sub-goal Array creation size of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.06s, 26654 steps).
+
+File "repaired.mlw", line 215, characters 8-42:
+Sub-goal Precondition of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.06s, 26874 steps).
+
+File "repaired.mlw", line 216, characters 8-37:
+Sub-goal Precondition of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.05s, 26623 steps).
+
+File "repaired.mlw", line 216, characters 8-37:
+Sub-goal Precondition of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.06s, 26909 steps).
+
+File "repaired.mlw", line 216, characters 8-37:
+Sub-goal Precondition of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.07s, 28814 steps).
+
+File "repaired.mlw", line 217, characters 17-56:
+Sub-goal Assertion of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.06s, 26860 steps).
+
+File "repaired.mlw", line 218, characters 8-94:
+Sub-goal Precondition of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.06s, 27044 steps).
+
+File "repaired.mlw", line 218, characters 8-94:
+Sub-goal Precondition of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.06s, 27066 steps).
+
+File "repaired.mlw", line 218, characters 8-94:
+Sub-goal Precondition of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.06s, 27071 steps).
+
+File "repaired.mlw", line 218, characters 8-94:
+Sub-goal Precondition of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.07s, 29050 steps).
+
+File "repaired.mlw", line 218, characters 8-94:
+Sub-goal Precondition of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.06s, 27356 steps).
+
+File "repaired.mlw", line 218, characters 8-94:
+Sub-goal Precondition of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.06s, 27437 steps).
+
+File "repaired.mlw", line 218, characters 8-94:
+Sub-goal Precondition of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.06s, 27460 steps).
+
+File "repaired.mlw", line 218, characters 8-94:
+Sub-goal Precondition of goal advantage_shuffle_array'vc.
+Prover result is: Valid (0.06s, 27235 steps).
+
+File "repaired.mlw", line 202, characters 15-58:
+Sub-goal Postcondition of goal advantage_shuffle_array'vc.
+Prover result is: Timeout (10.00s, 1415453 steps).
+== Final summary ==
+Unproved root goals after first prover : 2
+Remaining failures after split_vc      : 2
+Remaining failures after stage 3       : 2
+Detailed logs stored in                : /Users/rubenm/Desktop/Diversify2Verify/codex-runs/dataset-merge-verification/stage3a-repair/870_advantage-shuffle/array-recursive/advantage_shuffle_array_stage3_5258179f_stage3/generated/why3/.why3_sessions/repaired_logs
+Still unproved goals:
+AdvantageShuffle_Array_Spec	fill_indices_from'vc
+AdvantageShuffle_Array_Spec	advantage_shuffle_array'vc
+VERIFY_RESULT: FAILURE
+VERIFY_REASON: unproved_goals_remain
+VERIFY_STAGE: stage3
+VERIFY_ROOT_TOTAL: 10
+VERIFY_ROOT_PROVED: 8
+VERIFY_ROOT_REMAINING: 2

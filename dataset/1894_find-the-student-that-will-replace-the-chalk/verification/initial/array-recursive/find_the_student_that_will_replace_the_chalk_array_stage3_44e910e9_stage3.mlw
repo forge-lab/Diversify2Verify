@@ -1,0 +1,86 @@
+module FindTheStudentThatWillReplaceTheChalk_Array_Spec
+
+  use int.Int
+  use int.EuclideanDivision
+  use array.Array
+  use array.Init
+  use array.ArraySum
+
+  predicate valid_input (chalk: array int) (k: int) =
+    1 <= length chalk <= 100000 /\
+    1 <= k <= 1000000000 /\
+    forall i: int. 0 <= i < length chalk -> 1 <= chalk[i] <= 100000
+
+  function total_chalk (chalk: array int) : int =
+    sum chalk 0 (length chalk)
+
+  function remaining_after_full_rounds (chalk: array int) (k: int) : int =
+    mod k (total_chalk chalk)
+
+  predicate replacement_student (chalk: array int) (k: int) (res: int) =
+    valid_input chalk k /\
+    0 <= res < length chalk /\
+    sum chalk 0 res <= remaining_after_full_rounds chalk k /\
+    remaining_after_full_rounds chalk k < sum chalk 0 (res + 1)
+
+  predicate replacement_from (chalk: array int) (i: int) (remaining: int) (res: int) =
+    i <= res < length chalk /\
+    sum chalk i res <= remaining /\
+    remaining < sum chalk i (res + 1)
+
+  let rec total_chalk_from (chalk: array int) (i: int) : int
+    requires { 0 <= i <= length chalk }
+    ensures  { result = sum chalk i (length chalk) }
+    variant  { length chalk - i }
+  =
+    if i >= length chalk then
+      0
+    else
+      chalk[i] + total_chalk_from chalk (i + 1)
+
+  let rec find_replacement_from (chalk: array int) (i: int) (remaining: int) : int
+    requires { 0 <= i < length chalk }
+    requires { 0 <= remaining < sum chalk i (length chalk) }
+    ensures  { replacement_from chalk i remaining result }
+    variant  { length chalk - i }
+  =
+    if i >= length chalk then
+      0
+    else if remaining < chalk[i] then begin
+      assert { sum chalk i i = 0 };
+      assert { sum chalk i (i + 1) = chalk[i] };
+      i
+    end else begin
+      assert { i + 1 < length chalk };
+      assert { 0 <= remaining - chalk[i] };
+      assert { remaining - chalk[i] < sum chalk (i + 1) (length chalk) };
+      let res = find_replacement_from chalk (i + 1) (remaining - chalk[i]) in
+      assert { replacement_from chalk (i + 1) (remaining - chalk[i]) res };
+      assert { sum chalk i res = chalk[i] + sum chalk (i + 1) res };
+      assert { sum chalk i (res + 1) = chalk[i] + sum chalk (i + 1) (res + 1) };
+      res
+    end
+
+  let find_the_student_that_will_replace_the_chalk_array (chalk: array int) (k: int) : int
+    requires { valid_input chalk k }
+    ensures  { replacement_student chalk k result }
+  =
+    if length chalk = 0 then
+      0
+    else
+      let total = total_chalk_from chalk 0 in
+      assert { total = total_chalk chalk };
+      assert { 0 < total };
+      let remaining =
+        if total = 0 then 0 else mod k total
+      in
+      assert { remaining = remaining_after_full_rounds chalk k };
+      assert { 0 <= remaining < sum chalk 0 (length chalk) };
+      let res = find_replacement_from chalk 0 remaining in
+      assert { replacement_from chalk 0 remaining res };
+      assert { 0 <= res < length chalk };
+      assert { sum chalk 0 res <= remaining_after_full_rounds chalk k };
+      assert { remaining_after_full_rounds chalk k < sum chalk 0 (res + 1) };
+      res
+
+end

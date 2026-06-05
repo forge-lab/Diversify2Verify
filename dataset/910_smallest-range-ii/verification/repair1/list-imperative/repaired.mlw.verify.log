@@ -1,0 +1,402 @@
+== Stage 1: first prover on whole file ==
+Running in /Users/rubenm/Desktop/Diversify2Verify/codex-runs/dataset-merge-verification/stage3a-repair/910_smallest-range-ii/list-imperative/smallest_range_ii_list_stage3_fa40a618_stage3/generated/why3: why3 session create -o /Users/rubenm/Desktop/Diversify2Verify/codex-runs/dataset-merge-verification/stage3a-repair/910_smallest-range-ii/list-imperative/smallest_range_ii_list_stage3_fa40a618_stage3/generated/why3/.why3_sessions/repaired_stage1 -P Z3,4.8.6 -t 10 -m 8192 repaired.mlw
+Session created successfully
+Running in /Users/rubenm/Desktop/Diversify2Verify/codex-runs/dataset-merge-verification/stage3a-repair/910_smallest-range-ii/list-imperative/smallest_range_ii_list_stage3_fa40a618_stage3/generated/why3: why3 bench /Users/rubenm/Desktop/Diversify2Verify/codex-runs/dataset-merge-verification/stage3a-repair/910_smallest-range-ii/list-imperative/smallest_range_ii_list_stage3_fa40a618_stage3/generated/why3/.why3_sessions/repaired_stage1
+Progress: 7/1/0                       Progress: 6/2/0                       Progress: 5/3/0                       Progress: 4/4/0                       Progress: 3/5/0                       Progress: 2/6/0                       Progress: 2/0/0                       Progress: 1/1/0                       Progress: 0/2/0                       Progress: 0/0/1                       
+Replay completed, saving session... done
+== Stage 1 stats ==
+= Statistics for session /Users/rubenm/Desktop/Diversify2Verify/codex-runs/dataset-merge-verification/stage3a-repair/910_smallest-range-ii/list-imperative/smallest_range_ii_list_stage3_fa40a618_stage3/generated/why3/.why3_sessions/repaired_stage1
+
+== Number of root goals ==
+  total: 8  proved: 7
+
+== Number of sub goals ==
+  total: 0  proved: 0
+
+== Goals not proved ==
+  +-- file [../../repaired.mlw]
+    +-- theory SmallestRangeIi_List_Stage3_Imperative
+      +-- goal smallest_range_ii_list'vc
+  
+== Goals proved by only one prover ==
+  +-- file [../../repaired.mlw]
+    +-- theory SmallestRangeIi_List_Stage3_Imperative
+      +-- goal choice_transform'vc: Z3 4.8.6
+      +-- goal optimal_score_implies_possible_score'vc: Z3 4.8.6
+      +-- goal min2'vc: Z3 4.8.6
+      +-- goal max2'vc: Z3 4.8.6
+      +-- goal insert_sorted'vc: Z3 4.8.6
+      +-- goal sort_list'vc: Z3 4.8.6
+      +-- goal last_value_with_current'vc: Z3 4.8.6
+  
+1 session(s) read, with a total of 8 proof goals.
+== Unproved root goals after first prover ==
+SmallestRangeIi_List_Stage3_Imperative	smallest_range_ii_list'vc
+== Stage 1: trying remaining goals with prover Alt-Ergo,2.4.0 ==
+---- stage1 | prover: Alt-Ergo,2.4.0 | theory: SmallestRangeIi_List_Stage3_Imperative | goal: smallest_range_ii_list'vc ----
+File repaired.mlw:
+Goal smallest_range_ii_list'vc.
+Prover result is: Timeout (10.00s, 94689 steps).
+Remaining after prover Alt-Ergo,2.4.0: 1
+== Stage 1: trying remaining goals with prover CVC4,1.8 ==
+---- stage1 | prover: CVC4,1.8 | theory: SmallestRangeIi_List_Stage3_Imperative | goal: smallest_range_ii_list'vc ----
+File repaired.mlw:
+Goal smallest_range_ii_list'vc.
+Prover result is: Unknown (unknown + incomplete) (0.04s, 11658 steps).
+Remaining after prover CVC4,1.8: 1
+== Goals still unproved after stage 1 ==
+SmallestRangeIi_List_Stage3_Imperative	smallest_range_ii_list'vc
+== Stage 2: split_vc on unproved goal ==
+Target theory: SmallestRangeIi_List_Stage3_Imperative
+Target goal  : smallest_range_ii_list'vc
+---- stage2 | prover: Z3,4.8.6 | theory: SmallestRangeIi_List_Stage3_Imperative | goal: smallest_range_ii_list'vc ----
+Transforms: split_vc
+File "repaired.mlw", line 131, characters 15-43:
+Sub-goal Postcondition of goal smallest_range_ii_list'vc.
+Prover result is: Timeout (10.00s, 117684841 steps).
+
+File "repaired.mlw", line 132, characters 65-80:
+Sub-goal Postcondition of goal smallest_range_ii_list'vc.
+Prover result is: Valid (0.01s, 19099 steps).
+
+File "repaired.mlw", line 133, characters 15-42:
+Sub-goal Postcondition of goal smallest_range_ii_list'vc.
+Prover result is: Valid (0.01s, 17610 steps).
+
+File "repaired.mlw", line 134, characters 15-26:
+Sub-goal Postcondition of goal smallest_range_ii_list'vc.
+Prover result is: Valid (0.01s, 1226 steps).
+
+File "repaired.mlw", line 144, characters 22-38:
+Sub-goal Loop invariant init of goal smallest_range_ii_list'vc.
+Prover result is: Valid (0.01s, 17767 steps).
+
+File "repaired.mlw", line 145, characters 22-33:
+Sub-goal Loop variant decrease of goal smallest_range_ii_list'vc.
+Prover result is: Valid (0.01s, 1244 steps).
+
+File "repaired.mlw", line 144, characters 22-38:
+Sub-goal Loop invariant preservation of goal smallest_range_ii_list'vc.
+Prover result is: Valid (0.01s, 1228 steps).
+
+File "repaired.mlw", line 152, characters 23-58:
+Sub-goal Assertion of goal smallest_range_ii_list'vc.
+Prover result is: Valid (0.01s, 2174 steps).
+
+File "repaired.mlw", line 153, characters 23-59:
+Sub-goal Assertion of goal smallest_range_ii_list'vc.
+Prover result is: Valid (0.01s, 2153 steps).
+
+File "repaired.mlw", line 145, characters 22-33:
+Sub-goal Loop variant decrease of goal smallest_range_ii_list'vc.
+Prover result is: Valid (0.01s, 23970 steps).
+
+File "repaired.mlw", line 144, characters 22-38:
+Sub-goal Loop invariant preservation of goal smallest_range_ii_list'vc.
+Prover result is: Valid (0.01s, 23845 steps).
+
+File "repaired.mlw", line 145, characters 22-33:
+Sub-goal Loop variant decrease of goal smallest_range_ii_list'vc.
+Prover result is: Valid (0.01s, 23257 steps).
+
+File "repaired.mlw", line 144, characters 22-38:
+Sub-goal Loop invariant preservation of goal smallest_range_ii_list'vc.
+Prover result is: Valid (0.01s, 23134 steps).
+
+File "repaired.mlw", line 160, characters 17-43:
+Sub-goal Assertion of goal smallest_range_ii_list'vc.
+Prover result is: Timeout (10.00s, 95266201 steps).
+
+File "repaired.mlw", line 161, characters 8-57:
+Sub-goal Precondition of goal smallest_range_ii_list'vc.
+Prover result is: Valid (0.01s, 1295 steps).
+
+File "repaired.mlw", line 162, characters 17-44:
+Sub-goal Assertion of goal smallest_range_ii_list'vc.
+Prover result is: Valid (0.01s, 1300 steps).
+
+File "repaired.mlw", line 163, characters 67-81:
+Sub-goal Assertion of goal smallest_range_ii_list'vc.
+Prover result is: Valid (0.01s, 21169 steps).
+
+File "repaired.mlw", line 164, characters 17-27:
+Sub-goal Assertion of goal smallest_range_ii_list'vc.
+Prover result is: Valid (0.01s, 22064 steps).
+
+File "repaired.mlw", line 131, characters 15-43:
+Sub-goal Postcondition of goal smallest_range_ii_list'vc.
+Prover result is: Valid (0.01s, 1327 steps).
+
+File "repaired.mlw", line 132, characters 65-80:
+Sub-goal Postcondition of goal smallest_range_ii_list'vc.
+Prover result is: Valid (0.01s, 21130 steps).
+
+File "repaired.mlw", line 133, characters 15-42:
+Sub-goal Postcondition of goal smallest_range_ii_list'vc.
+Prover result is: Valid (0.01s, 1349 steps).
+
+File "repaired.mlw", line 134, characters 15-26:
+Sub-goal Postcondition of goal smallest_range_ii_list'vc.
+Prover result is: Valid (0.01s, 1354 steps).
+---- stage2 | prover: Alt-Ergo,2.4.0 | theory: SmallestRangeIi_List_Stage3_Imperative | goal: smallest_range_ii_list'vc ----
+Transforms: split_vc
+File "repaired.mlw", line 131, characters 15-43:
+Sub-goal Postcondition of goal smallest_range_ii_list'vc.
+Prover result is: Timeout (10.00s, 78577 steps).
+
+File "repaired.mlw", line 132, characters 65-80:
+Sub-goal Postcondition of goal smallest_range_ii_list'vc.
+Prover result is: Valid (0.01s, 68 steps).
+
+File "repaired.mlw", line 133, characters 15-42:
+Sub-goal Postcondition of goal smallest_range_ii_list'vc.
+Prover result is: Valid (0.01s, 33 steps).
+
+File "repaired.mlw", line 134, characters 15-26:
+Sub-goal Postcondition of goal smallest_range_ii_list'vc.
+Prover result is: Valid (0.01s, 12 steps).
+
+File "repaired.mlw", line 144, characters 22-38:
+Sub-goal Loop invariant init of goal smallest_range_ii_list'vc.
+Prover result is: Valid (0.01s, 10 steps).
+
+File "repaired.mlw", line 145, characters 22-33:
+Sub-goal Loop variant decrease of goal smallest_range_ii_list'vc.
+Prover result is: Valid (0.01s, 12 steps).
+
+File "repaired.mlw", line 144, characters 22-38:
+Sub-goal Loop invariant preservation of goal smallest_range_ii_list'vc.
+Prover result is: Valid (0.01s, 12 steps).
+
+File "repaired.mlw", line 152, characters 23-58:
+Sub-goal Assertion of goal smallest_range_ii_list'vc.
+Prover result is: Valid (0.01s, 22 steps).
+
+File "repaired.mlw", line 153, characters 23-59:
+Sub-goal Assertion of goal smallest_range_ii_list'vc.
+Prover result is: Valid (0.01s, 22 steps).
+
+File "repaired.mlw", line 145, characters 22-33:
+Sub-goal Loop variant decrease of goal smallest_range_ii_list'vc.
+Prover result is: Valid (0.01s, 46 steps).
+
+File "repaired.mlw", line 144, characters 22-38:
+Sub-goal Loop invariant preservation of goal smallest_range_ii_list'vc.
+Prover result is: Valid (0.01s, 40 steps).
+
+File "repaired.mlw", line 145, characters 22-33:
+Sub-goal Loop variant decrease of goal smallest_range_ii_list'vc.
+Prover result is: Valid (0.01s, 41 steps).
+
+File "repaired.mlw", line 144, characters 22-38:
+Sub-goal Loop invariant preservation of goal smallest_range_ii_list'vc.
+Prover result is: Valid (0.01s, 36 steps).
+
+File "repaired.mlw", line 160, characters 17-43:
+Sub-goal Assertion of goal smallest_range_ii_list'vc.
+Prover result is: Timeout (10.00s, 143608 steps).
+
+File "repaired.mlw", line 161, characters 8-57:
+Sub-goal Precondition of goal smallest_range_ii_list'vc.
+Prover result is: Valid (0.01s, 14 steps).
+
+File "repaired.mlw", line 162, characters 17-44:
+Sub-goal Assertion of goal smallest_range_ii_list'vc.
+Prover result is: Valid (0.01s, 16 steps).
+
+File "repaired.mlw", line 163, characters 67-81:
+Sub-goal Assertion of goal smallest_range_ii_list'vc.
+Prover result is: Valid (0.01s, 44 steps).
+
+File "repaired.mlw", line 164, characters 17-27:
+Sub-goal Assertion of goal smallest_range_ii_list'vc.
+Prover result is: Valid (0.01s, 54 steps).
+
+File "repaired.mlw", line 131, characters 15-43:
+Sub-goal Postcondition of goal smallest_range_ii_list'vc.
+Prover result is: Valid (0.01s, 18 steps).
+
+File "repaired.mlw", line 132, characters 65-80:
+Sub-goal Postcondition of goal smallest_range_ii_list'vc.
+Prover result is: Valid (0.01s, 22 steps).
+
+File "repaired.mlw", line 133, characters 15-42:
+Sub-goal Postcondition of goal smallest_range_ii_list'vc.
+Prover result is: Valid (0.01s, 18 steps).
+
+File "repaired.mlw", line 134, characters 15-26:
+Sub-goal Postcondition of goal smallest_range_ii_list'vc.
+Prover result is: Valid (0.01s, 18 steps).
+---- stage2 | prover: CVC4,1.8 | theory: SmallestRangeIi_List_Stage3_Imperative | goal: smallest_range_ii_list'vc ----
+Transforms: split_vc
+File "repaired.mlw", line 131, characters 15-43:
+Sub-goal Postcondition of goal smallest_range_ii_list'vc.
+Prover result is: Unknown (unknown + incomplete) (0.02s, 4018 steps).
+
+File "repaired.mlw", line 132, characters 65-80:
+Sub-goal Postcondition of goal smallest_range_ii_list'vc.
+Prover result is: Valid (0.02s, 6858 steps).
+
+File "repaired.mlw", line 133, characters 15-42:
+Sub-goal Postcondition of goal smallest_range_ii_list'vc.
+Prover result is: Valid (0.02s, 3855 steps).
+
+File "repaired.mlw", line 134, characters 15-26:
+Sub-goal Postcondition of goal smallest_range_ii_list'vc.
+Prover result is: Valid (0.01s, 3523 steps).
+
+File "repaired.mlw", line 144, characters 22-38:
+Sub-goal Loop invariant init of goal smallest_range_ii_list'vc.
+Prover result is: Valid (0.02s, 3709 steps).
+
+File "repaired.mlw", line 145, characters 22-33:
+Sub-goal Loop variant decrease of goal smallest_range_ii_list'vc.
+Prover result is: Valid (0.01s, 3508 steps).
+
+File "repaired.mlw", line 144, characters 22-38:
+Sub-goal Loop invariant preservation of goal smallest_range_ii_list'vc.
+Prover result is: Valid (0.01s, 3495 steps).
+
+File "repaired.mlw", line 152, characters 23-58:
+Sub-goal Assertion of goal smallest_range_ii_list'vc.
+Prover result is: Valid (0.01s, 4164 steps).
+
+File "repaired.mlw", line 153, characters 23-59:
+Sub-goal Assertion of goal smallest_range_ii_list'vc.
+Prover result is: Valid (0.01s, 4167 steps).
+
+File "repaired.mlw", line 145, characters 22-33:
+Sub-goal Loop variant decrease of goal smallest_range_ii_list'vc.
+Prover result is: Valid (0.02s, 5097 steps).
+
+File "repaired.mlw", line 144, characters 22-38:
+Sub-goal Loop invariant preservation of goal smallest_range_ii_list'vc.
+Prover result is: Valid (0.02s, 5039 steps).
+
+File "repaired.mlw", line 145, characters 22-33:
+Sub-goal Loop variant decrease of goal smallest_range_ii_list'vc.
+Prover result is: Valid (0.02s, 4872 steps).
+
+File "repaired.mlw", line 144, characters 22-38:
+Sub-goal Loop invariant preservation of goal smallest_range_ii_list'vc.
+Prover result is: Valid (0.02s, 4814 steps).
+
+File "repaired.mlw", line 160, characters 17-43:
+Sub-goal Assertion of goal smallest_range_ii_list'vc.
+Prover result is: Unknown (unknown + incomplete) (0.02s, 4427 steps).
+
+File "repaired.mlw", line 161, characters 8-57:
+Sub-goal Precondition of goal smallest_range_ii_list'vc.
+Prover result is: Valid (0.01s, 3756 steps).
+
+File "repaired.mlw", line 162, characters 17-44:
+Sub-goal Assertion of goal smallest_range_ii_list'vc.
+Prover result is: Valid (0.01s, 3770 steps).
+
+File "repaired.mlw", line 163, characters 67-81:
+Sub-goal Assertion of goal smallest_range_ii_list'vc.
+Prover result is: Valid (0.02s, 4827 steps).
+
+File "repaired.mlw", line 164, characters 17-27:
+Sub-goal Assertion of goal smallest_range_ii_list'vc.
+Prover result is: Valid (0.02s, 5092 steps).
+
+File "repaired.mlw", line 131, characters 15-43:
+Sub-goal Postcondition of goal smallest_range_ii_list'vc.
+Prover result is: Valid (0.01s, 3860 steps).
+
+File "repaired.mlw", line 132, characters 65-80:
+Sub-goal Postcondition of goal smallest_range_ii_list'vc.
+Prover result is: Valid (0.02s, 4429 steps).
+
+File "repaired.mlw", line 133, characters 15-42:
+Sub-goal Postcondition of goal smallest_range_ii_list'vc.
+Prover result is: Valid (0.01s, 3929 steps).
+
+File "repaired.mlw", line 134, characters 15-26:
+Sub-goal Postcondition of goal smallest_range_ii_list'vc.
+Prover result is: Valid (0.01s, 3935 steps).
+== Goals still unproved after stage 2 (split_vc) ==
+SmallestRangeIi_List_Stage3_Imperative	smallest_range_ii_list'vc
+== Stage 3: split_vc + inline_all on still-unproved goal ==
+Target theory: SmallestRangeIi_List_Stage3_Imperative
+Target goal  : smallest_range_ii_list'vc
+---- stage3 | prover: Z3,4.8.6 | theory: SmallestRangeIi_List_Stage3_Imperative | goal: smallest_range_ii_list'vc ----
+Transforms: split_vc inline_all
+File "repaired.mlw", line 131, characters 15-43:
+Sub-goal Postcondition of goal smallest_range_ii_list'vc.
+Prover result is: Timeout (10.00s, 130504619 steps).
+
+File "repaired.mlw", line 132, characters 65-80:
+Sub-goal Postcondition of goal smallest_range_ii_list'vc.
+Prover result is: Valid (0.01s, 22771 steps).
+
+File "repaired.mlw", line 133, characters 15-42:
+Sub-goal Postcondition of goal smallest_range_ii_list'vc.
+Prover result is: Valid (0.01s, 2818 steps).
+
+File "repaired.mlw", line 134, characters 15-26:
+Sub-goal Postcondition of goal smallest_range_ii_list'vc.
+Prover result is: Valid (0.01s, 1923 steps).
+
+File "repaired.mlw", line 144, characters 22-38:
+Sub-goal Loop invariant init of goal smallest_range_ii_list'vc.
+Prover result is: Valid (0.01s, 19288 steps).
+
+File "repaired.mlw", line 145, characters 22-33:
+Sub-goal Loop variant decrease of goal smallest_range_ii_list'vc.
+Prover result is: Valid (0.01s, 1453 steps).
+
+File "repaired.mlw", line 144, characters 22-38:
+Sub-goal Loop invariant preservation of goal smallest_range_ii_list'vc.
+Prover result is: Valid (0.01s, 1433 steps).
+
+File "repaired.mlw", line 152, characters 23-58:
+Sub-goal Assertion of goal smallest_range_ii_list'vc.
+Prover result is: Valid (0.01s, 2695 steps).
+
+File "repaired.mlw", line 153, characters 23-59:
+Sub-goal Assertion of goal smallest_range_ii_list'vc.
+Prover result is: Valid (0.01s, 2642 steps).
+
+File "repaired.mlw", line 145, characters 22-33:
+Sub-goal Loop variant decrease of goal smallest_range_ii_list'vc.
+Prover result is: Valid (0.01s, 27434 steps).
+
+File "repaired.mlw", line 144, characters 22-38:
+Sub-goal Loop invariant preservation of goal smallest_range_ii_list'vc.
+Prover result is: Valid (0.01s, 27312 steps).
+
+File "repaired.mlw", line 145, characters 22-33:
+Sub-goal Loop variant decrease of goal smallest_range_ii_list'vc.
+Prover result is: Valid (0.01s, 26602 steps).
+
+File "repaired.mlw", line 144, characters 22-38:
+Sub-goal Loop invariant preservation of goal smallest_range_ii_list'vc.
+Prover result is: Valid (0.01s, 26480 steps).
+
+File "repaired.mlw", line 160, characters 17-43:
+Sub-goal Assertion of goal smallest_range_ii_list'vc.
+Prover result is: Timeout (10.00s, 124320978 steps).
+
+File "repaired.mlw", line 161, characters 8-57:
+Sub-goal Precondition of goal smallest_range_ii_list'vc.
+Prover result is: Valid (0.01s, 3020 steps).
+
+File "repaired.mlw", line 162, characters 17-44:
+Sub-goal Assertion of goal smallest_range_ii_list'vc.
+Prover result is: Valid (0.01s, 2001 steps).
+Infrastructure issue in stage 3 with prover Z3,4.8.6; aborting rest of stage 3.
+== Final summary ==
+Unproved root goals after first prover : 1
+Remaining failures after split_vc      : 1
+Remaining failures after stage 3       : 1
+Detailed logs stored in                : /Users/rubenm/Desktop/Diversify2Verify/codex-runs/dataset-merge-verification/stage3a-repair/910_smallest-range-ii/list-imperative/smallest_range_ii_list_stage3_fa40a618_stage3/generated/why3/.why3_sessions/repaired_logs
+Still unproved goals:
+SmallestRangeIi_List_Stage3_Imperative	smallest_range_ii_list'vc
+VERIFY_RESULT: FAILURE
+VERIFY_REASON: unproved_goals_remain
+VERIFY_STAGE: stage3
+VERIFY_ROOT_TOTAL: 8
+VERIFY_ROOT_PROVED: 7
+VERIFY_ROOT_REMAINING: 1

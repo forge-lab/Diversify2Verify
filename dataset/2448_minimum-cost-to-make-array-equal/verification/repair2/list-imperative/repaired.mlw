@@ -1,0 +1,246 @@
+module MinimumCostToMakeArrayEqual_List_Stage3_Imperative
+
+  use int.Int
+  use int.Abs
+  use list.List
+  use list.Length
+  use list.Mem
+  use ref.Ref
+
+  let rec predicate positive_list (l: list int)
+    variant { l }
+  =
+    match l with
+    | Nil -> true
+    | Cons x xs -> x > 0 && positive_list xs
+    end
+
+  let rec function weighted_cost_to (nums: list int) (costs: list int) (target: int) : int
+    variant { nums }
+  =
+    match nums with
+    | Nil -> 0
+    | Cons n ns ->
+        match costs with
+        | Nil -> 0
+        | Cons c cs -> c * abs (n - target) + weighted_cost_to ns cs target
+        end
+    end
+
+  predicate valid_input (nums: list int) (costs: list int) =
+    nums <> Nil /\
+    length nums = length costs /\
+    positive_list nums /\
+    positive_list costs
+
+  predicate minimum_cost_spec (nums: list int) (costs: list int) (result: int) =
+    result >= 0 /\
+    (exists target: int. result = weighted_cost_to nums costs target) /\
+    (forall target: int. result <= weighted_cost_to nums costs target)
+
+  predicate best_cost_seen (nums: list int) (costs: list int) (seen: list int) (best: int) =
+    (exists target: int. mem target seen /\ best = weighted_cost_to nums costs target) /\
+    (forall target: int. mem target seen -> best <= weighted_cost_to nums costs target)
+
+  let rec lemma weighted_cost_nonnegative (nums: list int) (costs: list int) (target: int)
+    requires { positive_list costs }
+    ensures  { weighted_cost_to nums costs target >= 0 }
+    variant  { nums }
+  =
+    match nums with
+    | Nil -> ()
+    | Cons n ns ->
+        match costs with
+        | Nil -> ()
+        | Cons c cs ->
+            weighted_cost_nonnegative ns cs target;
+            assert { c > 0 };
+            assert { abs (n - target) >= 0 };
+            assert { c * abs (n - target) >= 0 };
+            assert { weighted_cost_to ns cs target >= 0 }
+        end
+    end
+
+  let lemma weighted_abs_minimum_at_input_value (nums: list int) (costs: list int)
+    requires { valid_input nums costs }
+    ensures  { exists target: int.
+                 mem target nums /\
+                 (forall candidate: int.
+                    weighted_cost_to nums costs target <= weighted_cost_to nums costs candidate) }
+  =
+    ()
+
+  let lemma best_seen_cons (nums: list int) (costs: list int) (seen: list int)
+      (target: int) (best: int)
+    requires { best_cost_seen nums costs seen best }
+    ensures  { best <= weighted_cost_to nums costs target ->
+                 best_cost_seen nums costs (Cons target seen) best }
+    ensures  { weighted_cost_to nums costs target < best ->
+                 best_cost_seen nums costs (Cons target seen) (weighted_cost_to nums costs target) }
+  =
+    assert { mem target (Cons target seen) };
+    assert { forall y: int. mem y seen -> mem y (Cons target seen) };
+    assert { forall y: int.
+      mem y (Cons target seen) -> y = target \/ mem y seen };
+    assert { best <= weighted_cost_to nums costs target ->
+      best_cost_seen nums costs (Cons target seen) best };
+    assert { weighted_cost_to nums costs target < best ->
+      best_cost_seen nums costs (Cons target seen) (weighted_cost_to nums costs target) }
+
+  let lemma head_mem_in_original (nums: list int) (cur: list int)
+      (target: int) (remaining: list int)
+    requires { cur = Cons target remaining }
+    requires { forall x: int. mem x cur -> mem x nums }
+    ensures  { mem target nums }
+  =
+    assert { mem target cur }
+
+  let lemma tail_subset_from_cons (nums: list int) (cur: list int)
+      (target: int) (remaining: list int)
+    requires { cur = Cons target remaining }
+    requires { forall x: int. mem x cur -> mem x nums }
+    ensures  { forall x: int. mem x remaining -> mem x nums }
+  =
+    assert { forall x: int. mem x remaining -> mem x cur }
+
+  let lemma seen_subset_after_cons (nums: list int) (seen: list int)
+      (target: int)
+    requires { mem target nums }
+    requires { forall x: int. mem x seen -> mem x nums }
+    ensures  { forall x: int. mem x (Cons target seen) -> mem x nums }
+  =
+    assert { forall x: int. mem x (Cons target seen) -> x = target \/ mem x seen }
+
+  let lemma move_head_partition (nums: list int) (seen: list int)
+      (cur: list int) (target: int) (remaining: list int)
+    requires { cur = Cons target remaining }
+    requires { forall x: int. mem x nums -> mem x seen \/ mem x cur }
+    ensures  { forall x: int.
+                 mem x nums -> mem x (Cons target seen) \/ mem x remaining }
+  =
+    assert { forall x: int. mem x cur -> x = target \/ mem x remaining };
+    assert { forall x: int.
+      mem x nums -> mem x (Cons target seen) \/ mem x remaining }
+
+  let lemma minimum_from_seen_and_global
+      (nums: list int) (costs: list int) (seen: list int) (best: int)
+    requires { best >= 0 }
+    requires { best_cost_seen nums costs seen best }
+    requires { forall target: int. mem target nums -> mem target seen }
+    requires { exists optimum: int.
+                 mem optimum nums /\
+                 (forall candidate: int.
+                    weighted_cost_to nums costs optimum <=
+                    weighted_cost_to nums costs candidate) }
+    ensures  { minimum_cost_spec nums costs best }
+  =
+    assert { exists witness: int.
+      mem witness seen /\ best = weighted_cost_to nums costs witness };
+    let ghost optimum = any int
+      ensures { mem result nums /\
+        (forall candidate: int.
+          weighted_cost_to nums costs result <=
+          weighted_cost_to nums costs candidate) } in
+    assert { mem optimum seen };
+    assert { best <= weighted_cost_to nums costs optimum };
+    assert { forall candidate: int.
+      best <= weighted_cost_to nums costs candidate };
+    assert { minimum_cost_spec nums costs best }
+
+  let weighted_cost_to_exec (nums: list int) (costs: list int) (target: int) : int
+    requires { length nums = length costs }
+    requires { positive_list costs }
+    ensures  { result = weighted_cost_to nums costs target }
+    ensures  { result >= 0 }
+  =
+    let total = ref 0 in
+    let ns = ref nums in
+    let cs = ref costs in
+    while
+      (match !ns with
+       | Nil -> false
+       | Cons _ _ ->
+           match !cs with
+           | Nil -> false
+           | Cons _ _ -> true
+           end
+       end)
+    do
+      invariant { length !ns = length !cs }
+      invariant { positive_list !cs }
+      invariant { !total >= 0 }
+      invariant { !total + weighted_cost_to !ns !cs target = weighted_cost_to nums costs target }
+      variant   { length !ns }
+      match !ns with
+      | Nil -> ()
+      | Cons n ns' ->
+          match !cs with
+          | Nil -> ()
+          | Cons c cs' ->
+              assert { c > 0 };
+              assert { abs (n - target) >= 0 };
+              total := !total + c * abs (n - target);
+              ns := ns';
+              cs := cs'
+          end
+      end
+    done;
+    assert { !ns = Nil };
+    assert { weighted_cost_to !ns !cs target = 0 };
+    !total
+
+  let minimum_cost_to_make_array_equal_list (nums: list int) (cost: list int) : int
+    requires { valid_input nums cost }
+    ensures  { minimum_cost_spec nums cost result }
+  =
+    weighted_abs_minimum_at_input_value nums cost;
+    match nums with
+    | Nil -> absurd
+    | Cons first rest ->
+        let first_cost = weighted_cost_to_exec nums cost first in
+        let best = ref first_cost in
+        let cur = ref rest in
+        let ghost seen = ref (Cons first Nil) in
+        assert { mem first nums };
+        assert { forall target: int. mem target rest -> mem target nums };
+        assert { !best = weighted_cost_to nums cost first };
+        assert { best_cost_seen nums cost !seen !best };
+        while (match !cur with Nil -> false | Cons _ _ -> true end) do
+          invariant { positive_list !cur }
+          invariant { !best >= 0 }
+          invariant { best_cost_seen nums cost !seen !best }
+          invariant { forall target: int. mem target !seen -> mem target nums }
+          invariant { forall target: int. mem target !cur -> mem target nums }
+          invariant { forall target: int. mem target nums -> mem target !seen \/ mem target !cur }
+          variant   { length !cur }
+          match !cur with
+          | Nil -> ()
+          | Cons target remaining ->
+              let current = weighted_cost_to_exec nums cost target in
+              head_mem_in_original nums !cur target remaining;
+              assert { mem target nums };
+              best_seen_cons nums cost !seen target !best;
+              if current < !best then begin
+                assert { current = weighted_cost_to nums cost target };
+                assert { best_cost_seen nums cost (Cons target !seen) current };
+                best := current
+              end else begin
+                assert { !best <= current };
+                assert { best_cost_seen nums cost (Cons target !seen) !best }
+              end;
+              tail_subset_from_cons nums !cur target remaining;
+              seen_subset_after_cons nums !seen target;
+              move_head_partition nums !seen !cur target remaining;
+              seen := Cons target !seen;
+              cur := remaining
+          end
+        done;
+        assert { !cur = Nil };
+        assert { forall target: int. mem target nums -> mem target !seen };
+        assert { best_cost_seen nums cost !seen !best };
+        minimum_from_seen_and_global nums cost !seen !best;
+        assert { minimum_cost_spec nums cost !best };
+        !best
+    end
+
+end

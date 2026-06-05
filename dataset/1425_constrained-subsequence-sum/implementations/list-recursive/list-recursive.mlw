@@ -1,0 +1,181 @@
+module ConstrainedSubsequenceSum_List_Recursive_Implementation
+
+  use int.Int
+  use list.List
+  use list.Length
+
+  let rec max_recent_or_zero (recent: list int) (remaining: int) : int
+    variant { recent }
+  =
+    if remaining <= 0 then 0 else
+    match recent with
+    | Nil -> 0
+    | Cons x xs ->
+        let tail_best = max_recent_or_zero xs (remaining - 1) in
+        if x > tail_best then x else tail_best
+    end
+
+  let rec solve (nums: list int) (k: int) (recent: list int) (best: int) : int
+    variant { nums }
+  =
+    match nums with
+    | Nil -> best
+    | Cons x xs ->
+        let candidate = x + max_recent_or_zero recent k in
+        let next_best = if candidate > best then candidate else best in
+        solve xs k (Cons candidate recent) next_best
+    end
+
+  let constrained_subsequence_sum_list (nums: list int) (k: int) : int
+    requires { nums <> Nil }
+    requires { 1 <= k <= length nums }
+  =
+    match nums with
+    | Nil -> 0
+    | Cons x xs -> solve xs k (Cons x Nil) x
+    end
+
+  let test_test_000 () : bool =
+    let l = Cons 5 (Cons 7 (Cons (-3) (Cons 5 Nil))) in
+    let result = constrained_subsequence_sum_list l 1 in
+    result = 14
+
+  let test_test_001 () : bool =
+    let l = Cons 10 (Cons 2 (Cons (-10) (Cons 5 (Cons 20 Nil)))) in
+    let result = constrained_subsequence_sum_list l 2 in
+    result = 37
+
+  let test_test_002 () : bool =
+    let l = Cons 1 (Cons 2 (Cons 3 (Cons 4 (Cons 5 Nil)))) in
+    let result = constrained_subsequence_sum_list l 3 in
+    result = 15
+
+  let test_test_003 () : bool =
+    let l = Cons 3 (Cons (-1) (Cons 4 (Cons (-2) (Cons 2 (Cons 1 Nil))))) in
+    let result = constrained_subsequence_sum_list l 2 in
+    result = 10
+
+  let test_test_004 () : bool =
+    let l = Cons (-1) (Cons (-2) (Cons (-3) (Cons (-4) (Cons (-5) Nil)))) in
+    let result = constrained_subsequence_sum_list l 4 in
+    result = (-1)
+
+  let test_test_005 () : bool =
+    let l = Cons 5 (Cons (-1) (Cons 5 Nil)) in
+    let result = constrained_subsequence_sum_list l 2 in
+    result = 10
+
+  let test_test_006 () : bool =
+    let l = Cons (-1) (Cons (-2) (Cons (-3) Nil)) in
+    let result = constrained_subsequence_sum_list l 1 in
+    result = (-1)
+
+  let test_test_007 () : bool =
+    let l = Cons 5 (Cons 4 (Cons 3 (Cons 2 (Cons 1 Nil)))) in
+    let result = constrained_subsequence_sum_list l 5 in
+    result = 15
+
+  let test_test_008 () : bool =
+    let l = Cons 5 (Cons 3 (Cons (-5) (Cons (-10) (Cons (-3) (Cons 7 Nil))))) in
+    let result = constrained_subsequence_sum_list l 4 in
+    result = 15
+
+  let test_test_009 () : bool =
+    let l = Cons 1 (Cons (-1) (Cons 5 (Cons (-2) (Cons 3 Nil)))) in
+    let result = constrained_subsequence_sum_list l 3 in
+    result = 9
+
+  let test_test_010 () : bool =
+    let l = Cons 10 (Cons (-2) (Cons (-10) (Cons (-5) (Cons 20 Nil)))) in
+    let result = constrained_subsequence_sum_list l 2 in
+    result = 23
+
+  let test_test_011 () : bool =
+    let l = Cons 1 (Cons (-1) (Cons 2 (Cons (-2) (Cons 3 (Cons (-3) (Cons 4 (Cons (-4) (Cons 5 (Cons (-5) Nil))))))))) in
+    let result = constrained_subsequence_sum_list l 2 in
+    result = 15
+
+  let test_test_012 () : bool =
+    let l = Cons 10 (Cons (-10) (Cons 20 (Cons (-20) (Cons 30 (Cons (-30) (Cons 40 (Cons (-40) (Cons 50 (Cons (-50) Nil))))))))) in
+    let result = constrained_subsequence_sum_list l 2 in
+    result = 150
+
+  let test_test_013 () : bool =
+    let l = Cons 1 (Cons 2 (Cons 3 (Cons 4 (Cons 5 (Cons 6 (Cons 7 (Cons 8 (Cons 9 (Cons 10 Nil))))))))) in
+    let result = constrained_subsequence_sum_list l 10 in
+    result = 55
+
+  let test_test_014 () : bool =
+    let l = Cons (-1) (Cons (-2) (Cons (-3) (Cons (-4) (Cons (-5) (Cons (-6) (Cons (-7) (Cons (-8) (Cons (-9) (Cons (-10) (Cons (-11) (Cons (-12) (Cons (-13) (Cons (-14) (Cons (-15) (Cons (-16) (Cons (-17) (Cons (-18) (Cons (-19) (Cons (-20) Nil))))))))))))))))))) in
+    let result = constrained_subsequence_sum_list l 5 in
+    result = (-1)
+
+  let test_test_015 () : bool =
+    let l = Cons (-10) (Cons (-20) (Cons (-30) (Cons (-40) (Cons (-50) (Cons (-60) (Cons (-70) Nil)))))) in
+    let result = constrained_subsequence_sum_list l 1 in
+    result = (-10)
+
+  let test_test_016 () : bool =
+    let l = Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 Nil))))))))))))))))))) in
+    let result = constrained_subsequence_sum_list l 20 in
+    result = 20
+
+  let test_test_017 () : bool =
+    let l = Cons 10 (Cons (-10) (Cons 20 (Cons (-20) (Cons 30 (Cons (-30) (Cons 40 (Cons (-40) (Cons 50 (Cons (-50) Nil))))))))) in
+    let result = constrained_subsequence_sum_list l 4 in
+    result = 150
+
+  let test_test_018 () : bool =
+    let l = Cons 1 (Cons (-1) (Cons 2 (Cons (-2) (Cons 3 (Cons (-3) (Cons 4 (Cons (-4) (Cons 5 (Cons (-5) (Cons 6 (Cons (-6) (Cons 7 (Cons (-7) (Cons 8 (Cons (-8) (Cons 9 (Cons (-9) (Cons 10 (Cons (-10) Nil))))))))))))))))))) in
+    let result = constrained_subsequence_sum_list l 10 in
+    result = 55
+
+  let test_test_019 () : bool =
+    let l = Cons (-1) (Cons (-2) (Cons (-3) (Cons (-4) (Cons (-5) (Cons (-6) (Cons (-7) (Cons (-8) (Cons (-9) (Cons (-10) Nil))))))))) in
+    let result = constrained_subsequence_sum_list l 5 in
+    result = (-1)
+
+  let run_tests () : bool =
+    if test_test_000 () then
+    if test_test_001 () then
+    if test_test_002 () then
+    if test_test_003 () then
+    if test_test_004 () then
+    if test_test_005 () then
+    if test_test_006 () then
+    if test_test_007 () then
+    if test_test_008 () then
+    if test_test_009 () then
+    if test_test_010 () then
+    if test_test_011 () then
+    if test_test_012 () then
+    if test_test_013 () then
+    if test_test_014 () then
+    if test_test_015 () then
+    if test_test_016 () then
+    if test_test_017 () then
+    if test_test_018 () then
+    if test_test_019 () then
+      true
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+
+end

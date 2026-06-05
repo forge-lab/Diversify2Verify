@@ -1,0 +1,273 @@
+module CountSubarraysWithMoreOnesThanZeros_Array_Spec
+
+  use int.Int
+  use array.Array
+  use array.Init
+
+  constant modulo_value : int = 1000000007
+
+  predicate binary_array (nums: array int) =
+    forall i: int. 0 <= i < length nums -> nums[i] = 0 \/ nums[i] = 1
+
+  let rec function subarray_balance_from (nums: array int) (i: int) (u: int) : int
+    requires { 0 <= i <= u <= length nums }
+    variant  { u - i }
+  =
+    if i = u then 0
+    else (2 * nums[i] - 1) + subarray_balance_from nums (i + 1) u
+
+  let function subarray_balance (nums: array int) (l: int) (u: int) : int
+    requires { 0 <= l <= u <= length nums }
+  =
+    subarray_balance_from nums l u
+
+  predicate more_ones_than_zeros_subarray (nums: array int) (l: int) (u: int) =
+    0 <= l < u <= length nums /\ subarray_balance nums l u > 0
+
+  let rec function count_good_subarrays_until (nums: array int) (l: int) (u: int) : int
+    requires { 0 <= l < u <= length nums + 1 }
+    variant  { length nums + 1 - u }
+  =
+    if u = length nums + 1 then 0
+    else
+      (if subarray_balance nums l u > 0 then 1 else 0) +
+      count_good_subarrays_until nums l (u + 1)
+
+  let function count_good_subarrays_from (nums: array int) (l: int) : int
+    requires { 0 <= l < length nums }
+  =
+    count_good_subarrays_until nums l (l + 1)
+
+  let rec function total_more_ones_subarrays_from (nums: array int) (l: int) : int
+    requires { 0 <= l <= length nums }
+    variant  { length nums - l }
+  =
+    if l = length nums then 0
+    else count_good_subarrays_from nums l + total_more_ones_subarrays_from nums (l + 1)
+
+  let function total_more_ones_subarrays (nums: array int) : int =
+    total_more_ones_subarrays_from nums 0
+
+  predicate valid_modulo_result (nums: array int) (r: int) =
+    0 <= r < modulo_value /\
+    exists q: int. total_more_ones_subarrays nums = q * modulo_value + r
+
+  val count_subarrays_with_more_ones_than_zeros_array (nums: array int) : int
+    requires { 1 <= length nums <= 100000 }
+    requires { binary_array nums }
+    ensures  { valid_modulo_result nums result }
+
+  let lemma test_000 () =
+    let a = init 6 [|1; 1; 1; 1; 1; 0|] in
+    assert { length a = 6 };
+    assert { a[0] = 1 };
+    assert { a[1] = 1 };
+    assert { a[2] = 1 };
+    assert { a[3] = 1 };
+    assert { a[4] = 1 };
+    assert { a[5] = 0 };
+    assert { binary_array a };
+    assert { more_ones_than_zeros_subarray a 0 1 };
+    assert { more_ones_than_zeros_subarray a 0 6 };
+    assert { not (more_ones_than_zeros_subarray a 4 6) };
+    assert { not (more_ones_than_zeros_subarray a 5 6) };
+    assert { count_good_subarrays_from a 5 = 0 };
+    assert { count_good_subarrays_from a 4 = 1 };
+    assert { count_good_subarrays_from a 3 = 3 };
+    assert { count_good_subarrays_from a 2 = 4 };
+    assert { count_good_subarrays_from a 1 = 5 };
+    assert { count_good_subarrays_from a 0 = 6 };
+    assert { total_more_ones_subarrays_from a 6 = 0 };
+    assert { total_more_ones_subarrays_from a 5 = 0 };
+    assert { total_more_ones_subarrays_from a 4 = 1 };
+    assert { total_more_ones_subarrays_from a 3 = 4 };
+    assert { total_more_ones_subarrays_from a 2 = 8 };
+    assert { total_more_ones_subarrays_from a 1 = 13 };
+    assert { total_more_ones_subarrays_from a 0 = 19 };
+    assert { total_more_ones_subarrays a = 19 };
+    assert { valid_modulo_result a 19 }
+
+  let lemma test_001 () =
+    let a = init 5 [|1; 0; 1; 0; 1|] in
+    assert { length a = 5 };
+    assert { a[0] = 1 };
+    assert { a[1] = 0 };
+    assert { a[2] = 1 };
+    assert { a[3] = 0 };
+    assert { a[4] = 1 };
+    assert { binary_array a };
+    assert { more_ones_than_zeros_subarray a 0 1 };
+    assert { not (more_ones_than_zeros_subarray a 0 2) };
+    assert { more_ones_than_zeros_subarray a 0 3 };
+    assert { more_ones_than_zeros_subarray a 2 5 };
+    assert { count_good_subarrays_from a 4 = 1 };
+    assert { count_good_subarrays_from a 3 = 0 };
+    assert { count_good_subarrays_from a 2 = 2 };
+    assert { count_good_subarrays_from a 1 = 0 };
+    assert { count_good_subarrays_from a 0 = 3 };
+    assert { total_more_ones_subarrays_from a 5 = 0 };
+    assert { total_more_ones_subarrays_from a 4 = 1 };
+    assert { total_more_ones_subarrays_from a 3 = 1 };
+    assert { total_more_ones_subarrays_from a 2 = 3 };
+    assert { total_more_ones_subarrays_from a 1 = 3 };
+    assert { total_more_ones_subarrays_from a 0 = 6 };
+    assert { total_more_ones_subarrays a = 6 };
+    assert { valid_modulo_result a 6 }
+
+  let lemma test_002 () =
+    let a = init 8 [|1; 0; 0; 1; 0; 1; 1; 0|] in
+    assert { length a = 8 };
+    assert { a[0] = 1 };
+    assert { a[1] = 0 };
+    assert { a[2] = 0 };
+    assert { a[3] = 1 };
+    assert { a[4] = 0 };
+    assert { a[5] = 1 };
+    assert { a[6] = 1 };
+    assert { a[7] = 0 };
+    assert { binary_array a };
+    assert { more_ones_than_zeros_subarray a 0 1 };
+    assert { not (more_ones_than_zeros_subarray a 0 3) };
+    assert { more_ones_than_zeros_subarray a 3 7 };
+    assert { more_ones_than_zeros_subarray a 5 7 };
+    assert { count_good_subarrays_from a 7 = 0 };
+    assert { count_good_subarrays_from a 6 = 1 };
+    assert { count_good_subarrays_from a 5 = 3 };
+    assert { count_good_subarrays_from a 4 = 1 };
+    assert { count_good_subarrays_from a 3 = 4 };
+    assert { count_good_subarrays_from a 2 = 1 };
+    assert { count_good_subarrays_from a 1 = 0 };
+    assert { count_good_subarrays_from a 0 = 2 };
+    assert { total_more_ones_subarrays_from a 8 = 0 };
+    assert { total_more_ones_subarrays_from a 7 = 0 };
+    assert { total_more_ones_subarrays_from a 6 = 1 };
+    assert { total_more_ones_subarrays_from a 5 = 4 };
+    assert { total_more_ones_subarrays_from a 4 = 5 };
+    assert { total_more_ones_subarrays_from a 3 = 9 };
+    assert { total_more_ones_subarrays_from a 2 = 10 };
+    assert { total_more_ones_subarrays_from a 1 = 10 };
+    assert { total_more_ones_subarrays_from a 0 = 12 };
+    assert { total_more_ones_subarrays a = 12 };
+    assert { valid_modulo_result a 12 }
+
+  let lemma test_003 () =
+    let a = init 1 [|1|] in
+    assert { length a = 1 };
+    assert { a[0] = 1 };
+    assert { binary_array a };
+    assert { more_ones_than_zeros_subarray a 0 1 };
+    assert { count_good_subarrays_from a 0 = 1 };
+    assert { total_more_ones_subarrays_from a 1 = 0 };
+    assert { total_more_ones_subarrays_from a 0 = 1 };
+    assert { total_more_ones_subarrays a = 1 };
+    assert { valid_modulo_result a 1 }
+
+  let lemma test_004 () =
+    let a = init 8 [|1; 1; 0; 0; 1; 1; 0; 0|] in
+    assert { length a = 8 };
+    assert { a[0] = 1 };
+    assert { a[1] = 1 };
+    assert { a[2] = 0 };
+    assert { a[3] = 0 };
+    assert { a[4] = 1 };
+    assert { a[5] = 1 };
+    assert { a[6] = 0 };
+    assert { a[7] = 0 };
+    assert { binary_array a };
+    assert { more_ones_than_zeros_subarray a 0 1 };
+    assert { more_ones_than_zeros_subarray a 0 2 };
+    assert { not (more_ones_than_zeros_subarray a 0 4) };
+    assert { more_ones_than_zeros_subarray a 4 6 };
+    assert { count_good_subarrays_from a 7 = 0 };
+    assert { count_good_subarrays_from a 6 = 0 };
+    assert { count_good_subarrays_from a 5 = 1 };
+    assert { count_good_subarrays_from a 4 = 3 };
+    assert { count_good_subarrays_from a 3 = 1 };
+    assert { count_good_subarrays_from a 2 = 0 };
+    assert { count_good_subarrays_from a 1 = 2 };
+    assert { count_good_subarrays_from a 0 = 6 };
+    assert { total_more_ones_subarrays_from a 8 = 0 };
+    assert { total_more_ones_subarrays_from a 7 = 0 };
+    assert { total_more_ones_subarrays_from a 6 = 0 };
+    assert { total_more_ones_subarrays_from a 5 = 1 };
+    assert { total_more_ones_subarrays_from a 4 = 4 };
+    assert { total_more_ones_subarrays_from a 3 = 5 };
+    assert { total_more_ones_subarrays_from a 2 = 5 };
+    assert { total_more_ones_subarrays_from a 1 = 7 };
+    assert { total_more_ones_subarrays_from a 0 = 13 };
+    assert { total_more_ones_subarrays a = 13 };
+    assert { valid_modulo_result a 13 }
+
+  let lemma test_005 () =
+    let a = init 6 [|0; 0; 0; 1; 1; 1|] in
+    assert { length a = 6 };
+    assert { a[0] = 0 };
+    assert { a[1] = 0 };
+    assert { a[2] = 0 };
+    assert { a[3] = 1 };
+    assert { a[4] = 1 };
+    assert { a[5] = 1 };
+    assert { binary_array a };
+    assert { not (more_ones_than_zeros_subarray a 0 1) };
+    assert { more_ones_than_zeros_subarray a 3 4 };
+    assert { more_ones_than_zeros_subarray a 2 6 };
+    assert { more_ones_than_zeros_subarray a 1 6 };
+    assert { count_good_subarrays_from a 5 = 1 };
+    assert { count_good_subarrays_from a 4 = 2 };
+    assert { count_good_subarrays_from a 3 = 3 };
+    assert { count_good_subarrays_from a 2 = 2 };
+    assert { count_good_subarrays_from a 1 = 1 };
+    assert { count_good_subarrays_from a 0 = 0 };
+    assert { total_more_ones_subarrays_from a 6 = 0 };
+    assert { total_more_ones_subarrays_from a 5 = 1 };
+    assert { total_more_ones_subarrays_from a 4 = 3 };
+    assert { total_more_ones_subarrays_from a 3 = 6 };
+    assert { total_more_ones_subarrays_from a 2 = 8 };
+    assert { total_more_ones_subarrays_from a 1 = 9 };
+    assert { total_more_ones_subarrays_from a 0 = 9 };
+    assert { total_more_ones_subarrays a = 9 };
+    assert { valid_modulo_result a 9 }
+
+  let lemma test_006 () =
+    let a = init 10 [|1; 0; 1; 0; 1; 0; 1; 0; 1; 0|] in
+    assert { length a = 10 };
+    assert { a[0] = 1 };
+    assert { a[1] = 0 };
+    assert { a[2] = 1 };
+    assert { a[3] = 0 };
+    assert { a[4] = 1 };
+    assert { a[5] = 0 };
+    assert { a[6] = 1 };
+    assert { a[7] = 0 };
+    assert { a[8] = 1 };
+    assert { a[9] = 0 };
+    assert { binary_array a };
+    assert { more_ones_than_zeros_subarray a 0 1 };
+    assert { not (more_ones_than_zeros_subarray a 0 2) };
+    assert { more_ones_than_zeros_subarray a 0 3 };
+    assert { not (more_ones_than_zeros_subarray a 0 10) };
+    assert { count_good_subarrays_from a 9 = 0 };
+    assert { count_good_subarrays_from a 8 = 1 };
+    assert { count_good_subarrays_from a 7 = 0 };
+    assert { count_good_subarrays_from a 6 = 2 };
+    assert { count_good_subarrays_from a 5 = 0 };
+    assert { count_good_subarrays_from a 4 = 3 };
+    assert { count_good_subarrays_from a 3 = 0 };
+    assert { count_good_subarrays_from a 2 = 4 };
+    assert { count_good_subarrays_from a 1 = 0 };
+    assert { count_good_subarrays_from a 0 = 5 };
+    assert { total_more_ones_subarrays_from a 10 = 0 };
+    assert { total_more_ones_subarrays_from a 9 = 0 };
+    assert { total_more_ones_subarrays_from a 8 = 1 };
+    assert { total_more_ones_subarrays_from a 7 = 1 };
+    assert { total_more_ones_subarrays_from a 6 = 3 };
+    assert { total_more_ones_subarrays_from a 5 = 3 };
+    assert { total_more_ones_subarrays_from a 4 = 6 };
+    assert { total_more_ones_subarrays_from a 3 = 6 };
+    assert { total_more_ones_subarrays_from a 2 = 10 };
+    assert { total_more_ones_subarrays_from a 1 = 10 };
+    assert { total_more_ones_subarrays_from a 0 = 15 };
+    assert { total_more_ones_subarrays a = 15 };
+    assert { valid_modulo_result a 15 }
+
+end

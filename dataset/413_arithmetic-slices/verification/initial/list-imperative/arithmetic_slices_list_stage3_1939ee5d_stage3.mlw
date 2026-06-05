@@ -1,0 +1,91 @@
+module ArithmeticSlices_List_Spec
+
+  use int.Int
+  use list.List
+  use list.Length
+  use ref.Ref
+
+  let rec function count_arithmetic_extensions
+      (a: int) (b: int) (streak: int) (rest: list int) : int
+    variant { rest }
+  =
+    match rest with
+    | Nil -> 0
+    | Cons c cs ->
+        if b - a = c - b then
+          let next = streak + 1 in
+          next + count_arithmetic_extensions b c next cs
+        else
+          count_arithmetic_extensions b c 0 cs
+    end
+
+  let function arithmetic_slice_count (nums: list int) : int =
+    match nums with
+    | Nil -> 0
+    | Cons a tail ->
+        match tail with
+        | Nil -> 0
+        | Cons b rest -> count_arithmetic_extensions a b 0 rest
+        end
+    end
+
+  let arithmetic_slices_list (nums: list int) : int
+    ensures { result = arithmetic_slice_count nums }
+  =
+    match nums with
+    | Nil ->
+        assert { arithmetic_slice_count nums = 0 };
+        0
+    | Cons a tail ->
+        match tail with
+        | Nil ->
+            assert { arithmetic_slice_count nums = 0 };
+            0
+        | Cons b rest ->
+            assert { arithmetic_slice_count nums =
+                     count_arithmetic_extensions a b 0 rest };
+            let prev_a = ref a in
+            let prev_b = ref b in
+            let streak = ref 0 in
+            let total = ref 0 in
+            let cur = ref rest in
+            while (match !cur with Nil -> false | Cons _ _ -> true end) do
+              invariant {
+                !total +
+                count_arithmetic_extensions !prev_a !prev_b !streak !cur =
+                count_arithmetic_extensions a b 0 rest
+              }
+              invariant { 0 <= length !cur }
+              variant { length !cur }
+
+              match !cur with
+              | Nil -> ()
+              | Cons c cs ->
+                  if !prev_b - !prev_a = c - !prev_b then (
+                    assert {
+                      count_arithmetic_extensions !prev_a !prev_b !streak !cur =
+                      (!streak + 1) +
+                      count_arithmetic_extensions !prev_b c (!streak + 1) cs
+                    };
+                    streak := !streak + 1;
+                    total := !total + !streak
+                  ) else (
+                    assert {
+                      count_arithmetic_extensions !prev_a !prev_b !streak !cur =
+                      count_arithmetic_extensions !prev_b c 0 cs
+                    };
+                    streak := 0
+                  );
+                  prev_a := !prev_b;
+                  prev_b := c;
+                  cur := cs
+              end
+            done;
+            assert { !cur = Nil };
+            assert { count_arithmetic_extensions !prev_a !prev_b !streak !cur = 0 };
+            assert { !total = count_arithmetic_extensions a b 0 rest };
+            !total
+        end
+    end
+
+end

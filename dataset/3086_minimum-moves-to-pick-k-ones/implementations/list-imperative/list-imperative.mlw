@@ -1,0 +1,213 @@
+module MinimumMovesToPickKOnes_List_Imperative_Implementation
+
+  use int.Int
+  use list.List
+  use ref.Ref
+
+  let distance (x: int) (y: int) : int =
+    if x >= y then x - y else y - x
+
+  let rec insert_sorted (x: int) (l: list int) : list int
+    variant { l }
+  =
+    match l with
+    | Nil -> Cons x Nil
+    | Cons y ys ->
+        if x <= y then Cons x (Cons y ys) else Cons y (insert_sorted x ys)
+    end
+
+  let minimum_moves_to_pick_k_ones_list (nums: list int) (k: int) (maxChanges: int) : int =
+    let positions = ref (Nil: list int) in
+    let index = ref 0 in
+    let ones_count = ref 0 in
+    let cur = ref nums in
+    while (match !cur with Nil -> false | Cons _ _ -> true end) do
+      match !cur with
+      | Nil -> ()
+      | Cons x xs ->
+          if x = 1 then (positions := Cons !index !positions; ones_count := !ones_count + 1);
+          index := !index + 1;
+          cur := xs
+      end
+    done;
+    let n = !index in
+    let min_existing = if k > maxChanges then k - maxChanges else 0 in
+    let max_existing = if k < !ones_count then k else !ones_count in
+    let best = ref (if min_existing = 0 then 2 * k else n * k + 2 * k + 1) in
+    let center = ref 0 in
+    while !center < n do
+      let sorted_dists = ref (Nil: list int) in
+      let pos_cur = ref !positions in
+      while (match !pos_cur with Nil -> false | Cons _ _ -> true end) do
+        match !pos_cur with
+        | Nil -> ()
+        | Cons p ps ->
+            sorted_dists := insert_sorted (distance p !center) !sorted_dists;
+            pos_cur := ps
+        end
+      done;
+      let taken = ref 0 in
+      let dist_sum = ref 0 in
+      let dist_cur = ref !sorted_dists in
+      while (match !dist_cur with Nil -> false | Cons _ _ -> true end) do
+        match !dist_cur with
+        | Nil -> ()
+        | Cons d ds ->
+            if !taken < max_existing then (
+              dist_sum := !dist_sum + d;
+              taken := !taken + 1;
+              if !taken >= min_existing then
+                let cost = !dist_sum + 2 * (k - !taken) in
+                if cost < !best then best := cost
+            );
+            dist_cur := ds
+        end
+      done;
+      center := !center + 1
+    done;
+    !best
+
+  let test_000 () : bool =
+    let nums = Cons 0 (Cons 1 (Cons 0 (Cons 1 (Cons 0 (Cons 1 (Cons 0 (Cons 1 (Cons 0 (Cons 1 Nil))))))))) in
+    let r = minimum_moves_to_pick_k_ones_list nums 5 5 in
+    r = 8
+
+  let test_001 () : bool =
+    let nums = Cons 1 (Cons 1 (Cons 0 (Cons 0 (Cons 0 (Cons 0 (Cons 0 (Cons 0 (Cons 0 (Cons 1 Nil))))))))) in
+    let r = minimum_moves_to_pick_k_ones_list nums 3 2 in
+    r = 3
+
+  let test_002 () : bool =
+    let nums = Cons 1 (Cons 0 (Cons 0 (Cons 0 (Cons 0 (Cons 0 (Cons 0 (Cons 0 (Cons 0 (Cons 1 Nil))))))))) in
+    let r = minimum_moves_to_pick_k_ones_list nums 2 1 in
+    r = 2
+
+  let test_003 () : bool =
+    let nums = Cons 0 (Cons 0 (Cons 1 (Cons 0 (Cons 0 (Cons 0 (Cons 0 (Cons 0 (Cons 1 (Cons 0 Nil))))))))) in
+    let r = minimum_moves_to_pick_k_ones_list nums 2 1 in
+    r = 2
+
+  let test_004 () : bool =
+    let nums = Cons 1 (Cons 0 (Cons 0 (Cons 0 (Cons 0 (Cons 0 (Cons 0 (Cons 0 (Cons 0 (Cons 0 Nil))))))))) in
+    let r = minimum_moves_to_pick_k_ones_list nums 1 0 in
+    r = 0
+
+  let test_005 () : bool =
+    let nums = Cons 0 (Cons 0 (Cons 0 (Cons 0 Nil))) in
+    let r = minimum_moves_to_pick_k_ones_list nums 2 3 in
+    r = 4
+
+  let test_006 () : bool =
+    let nums = Cons 0 (Cons 1 (Cons 0 (Cons 1 (Cons 0 (Cons 1 (Cons 0 (Cons 1 (Cons 0 (Cons 1 Nil))))))))) in
+    let r = minimum_moves_to_pick_k_ones_list nums 4 0 in
+    r = 8
+
+  let test_007 () : bool =
+    let nums = Cons 1 (Cons 1 (Cons 0 (Cons 0 (Cons 0 (Cons 1 (Cons 1 (Cons 0 (Cons 0 (Cons 1 Nil))))))))) in
+    let r = minimum_moves_to_pick_k_ones_list nums 3 1 in
+    r = 3
+
+  let test_008 () : bool =
+    let nums = Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 Nil))))))))) in
+    let r = minimum_moves_to_pick_k_ones_list nums 5 3 in
+    r = 6
+
+  let test_009 () : bool =
+    let nums = Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 0 (Cons 0 (Cons 0 (Cons 0 (Cons 0 Nil))))))))) in
+    let r = minimum_moves_to_pick_k_ones_list nums 5 5 in
+    r = 6
+
+  let test_010 () : bool =
+    let nums = Cons 0 (Cons 1 (Cons 0 (Cons 1 (Cons 0 (Cons 1 (Cons 0 (Cons 1 (Cons 0 (Cons 1 Nil))))))))) in
+    let r = minimum_moves_to_pick_k_ones_list nums 5 0 in
+    r = 12
+
+  let test_011 () : bool =
+    let nums = Cons 0 (Cons 0 (Cons 0 (Cons 0 (Cons 0 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 Nil))))))))) in
+    let r = minimum_moves_to_pick_k_ones_list nums 5 5 in
+    r = 6
+
+  let test_012 () : bool =
+    let nums = Cons 0 (Cons 0 (Cons 1 (Cons 0 (Cons 0 (Cons 0 (Cons 0 (Cons 1 (Cons 0 (Cons 0 Nil))))))))) in
+    let r = minimum_moves_to_pick_k_ones_list nums 2 1 in
+    r = 2
+
+  let test_013 () : bool =
+    let nums = Cons 1 (Cons 0 (Cons 1 (Cons 0 (Cons 1 (Cons 0 (Cons 1 (Cons 0 (Cons 1 (Cons 0 Nil))))))))) in
+    let r = minimum_moves_to_pick_k_ones_list nums 5 2 in
+    r = 8
+
+  let test_014 () : bool =
+    let nums = Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 Nil))))))))) in
+    let r = minimum_moves_to_pick_k_ones_list nums 5 0 in
+    r = 6
+
+  let test_022 () : bool =
+    let nums = Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 0 (Cons 0 (Cons 0 (Cons 0 (Cons 0 (Cons 0 Nil))))))))) in
+    let r = minimum_moves_to_pick_k_ones_list nums 4 2 in
+    r = 4
+
+  let test_030 () : bool =
+    let nums = Cons 1 (Cons 1 (Cons 0 (Cons 0 (Cons 1 (Cons 0 (Cons 1 (Cons 0 (Cons 1 (Cons 0 Nil))))))))) in
+    let r = minimum_moves_to_pick_k_ones_list nums 4 0 in
+    r = 9
+
+  let test_040 () : bool =
+    let nums = Cons 0 (Cons 1 (Cons 0 (Cons 1 (Cons 0 (Cons 1 (Cons 0 (Cons 1 (Cons 0 (Cons 1 Nil))))))))) in
+    let r = minimum_moves_to_pick_k_ones_list nums 4 2 in
+    r = 6
+
+  let test_041 () : bool =
+    let nums = Cons 0 (Cons 1 (Cons 0 (Cons 1 (Cons 0 (Cons 1 (Cons 0 (Cons 1 (Cons 0 (Cons 1 Nil))))))))) in
+    let r = minimum_moves_to_pick_k_ones_list nums 5 3 in
+    r = 8
+
+  let test_048 () : bool =
+    let nums = Cons 0 (Cons 1 (Cons 1 (Cons 0 (Cons 0 (Cons 1 (Cons 0 (Cons 0 (Cons 1 (Cons 0 Nil))))))))) in
+    let r = minimum_moves_to_pick_k_ones_list nums 3 2 in
+    r = 3
+
+  let run_tests () : bool =
+    if test_000 () then
+    if test_001 () then
+    if test_002 () then
+    if test_003 () then
+    if test_004 () then
+    if test_005 () then
+    if test_006 () then
+    if test_007 () then
+    if test_008 () then
+    if test_009 () then
+    if test_010 () then
+    if test_011 () then
+    if test_012 () then
+    if test_013 () then
+    if test_014 () then
+    if test_022 () then
+    if test_030 () then
+    if test_040 () then
+    if test_041 () then
+    if test_048 () then
+      true
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+
+end

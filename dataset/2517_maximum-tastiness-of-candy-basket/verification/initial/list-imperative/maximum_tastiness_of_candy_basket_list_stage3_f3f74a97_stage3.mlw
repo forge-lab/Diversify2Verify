@@ -1,0 +1,206 @@
+module MaximumTastinessOfCandyBasket_List_Stage3_Imperative
+
+  use int.Int
+  use int.Abs
+  use int.EuclideanDivision
+  use list.List
+  use list.Length
+  use list.Mem
+  use list.NumOcc
+  use ref.Ref
+
+  let rec predicate spaced_from (x: int) (basket: list int) (d: int)
+    variant { basket }
+  =
+    match basket with
+    | Nil -> true
+    | Cons y ys -> d <= abs (x - y) && spaced_from x ys d
+    end
+
+  let rec predicate pairwise_spaced (basket: list int) (d: int)
+    variant { basket }
+  =
+    match basket with
+    | Nil -> true
+    | Cons x xs -> spaced_from x xs d && pairwise_spaced xs d
+    end
+
+  predicate submultiset (basket: list int) (price: list int) =
+    forall x: int. num_occ x basket <= num_occ x price
+
+  predicate valid_basket
+    (price: list int) (basket: list int) (k: int) (d: int) =
+    length basket = k /\
+    submultiset basket price /\
+    pairwise_spaced basket d
+
+  predicate feasible_tastiness (price: list int) (k: int) (d: int) =
+    d >= 0 /\
+    exists basket: list int. valid_basket price basket k d
+
+  predicate maximum_tastiness (price: list int) (k: int) (result: int) =
+    feasible_tastiness price k result /\
+    (forall d: int. feasible_tastiness price k d -> d <= result)
+
+  let rec predicate sorted_nondec (l: list int)
+    variant { l }
+  =
+    match l with
+    | Nil -> true
+    | Cons _ Nil -> true
+    | Cons x (Cons y ys) -> x <= y && sorted_nondec (Cons y ys)
+    end
+
+  let rec insert_sorted (x: int) (l: list int) : list int
+    ensures { length result = length l + 1 }
+    ensures { forall z: int.
+      num_occ z result = num_occ z l + (if z = x then 1 else 0) }
+    ensures { sorted_nondec l -> sorted_nondec result }
+    variant { l }
+  =
+    match l with
+    | Nil -> Cons x Nil
+    | Cons y ys ->
+        if x <= y then begin
+          assert { sorted_nondec l -> sorted_nondec (Cons x l) };
+          Cons x l
+        end else begin
+          let rest = insert_sorted x ys in
+          assert { length rest = length ys + 1 };
+          assert { forall z: int.
+            num_occ z rest = num_occ z ys + (if z = x then 1 else 0) };
+          Cons y rest
+        end
+    end
+
+  let sort_list (l: list int) : list int
+    ensures { length result = length l }
+    ensures { forall z: int. num_occ z result = num_occ z l }
+    ensures { sorted_nondec result }
+  =
+    let sorted = ref (Nil : list int) in
+    let cur = ref l in
+    while (match !cur with Nil -> false | Cons _ _ -> true end) do
+      invariant { 0 <= length !cur }
+      invariant { length !sorted + length !cur = length l }
+      invariant { forall z: int.
+        num_occ z !sorted + num_occ z !cur = num_occ z l }
+      invariant { sorted_nondec !sorted }
+      variant { length !cur }
+
+      match !cur with
+      | Nil -> ()
+      | Cons x xs ->
+          sorted := insert_sorted x !sorted;
+          cur := xs
+      end
+    done;
+    assert { !cur = Nil };
+    assert { forall z: int. num_occ z !sorted = num_occ z l };
+    !sorted
+
+  let last_value (l: list int) : int
+    ensures { l = Nil -> result = 0 }
+    ensures { l <> Nil -> mem result l }
+    ensures { sorted_nondec l -> forall x: int. mem x l -> x <= result }
+  =
+    match l with
+    | Nil -> 0
+    | Cons x xs ->
+        let last = ref x in
+        let cur = ref xs in
+        while (match !cur with Nil -> false | Cons _ _ -> true end) do
+          invariant { 0 <= length !cur }
+          invariant { mem !last l }
+          invariant { sorted_nondec l -> forall y: int. mem y l /\ not (mem y !cur) -> y <= !last }
+          variant { length !cur }
+
+          match !cur with
+          | Nil -> ()
+          | Cons y ys ->
+              last := y;
+              cur := ys
+          end
+        done;
+        assert { !cur = Nil };
+        !last
+    end
+
+  let feasible_tastiness_exec (sorted_prices: list int) (k: int) (d: int) : bool
+    requires { 1 <= k }
+    requires { d >= 0 }
+    ensures { result = true -> feasible_tastiness sorted_prices k d }
+    ensures { result = false -> not feasible_tastiness sorted_prices k d }
+  =
+    match sorted_prices with
+    | Nil -> false
+    | Cons first rest ->
+        if k <= 1 then true else
+        let chosen = ref 1 in
+        let last = ref first in
+        let cur = ref rest in
+        while (match !cur with Nil -> false | Cons _ _ -> true end) do
+          invariant { 1 <= !chosen <= k }
+          invariant { mem !last sorted_prices }
+          invariant { 0 <= length !cur }
+          invariant { !chosen < k -> !chosen <= length sorted_prices }
+          invariant { d >= 0 }
+          variant { length !cur }
+
+          match !cur with
+          | Nil -> ()
+          | Cons x xs ->
+              if !chosen < k && x - !last >= d then (
+                chosen := !chosen + 1;
+                last := x
+              );
+              cur := xs
+          end
+        done;
+        assert { !cur = Nil };
+        !chosen >= k
+    end
+
+  let maximum_tastiness_of_candy_basket_list (price: list int) (k: int) : int
+    requires { 2 <= k <= length price }
+    requires { forall x: int. mem x price -> 1 <= x }
+    ensures  { maximum_tastiness price k result }
+  =
+    let sorted_prices = sort_list price in
+    match sorted_prices with
+    | Nil ->
+        assert { length sorted_prices = length price };
+        assert { false };
+        0
+    | Cons first _ ->
+        let low = ref 0 in
+        let high = ref (last_value sorted_prices - first + 1) in
+        assert { 0 <= !low };
+        assert { feasible_tastiness price k !low };
+        while !low + 1 < !high do
+          invariant { 0 <= !low < !high }
+          invariant { feasible_tastiness price k !low }
+          invariant { forall d: int. !high <= d -> not feasible_tastiness price k d }
+          variant { !high - !low }
+
+          let mid = !low + div (!high - !low) 2 in
+          assert { !low <= mid < !high };
+          if feasible_tastiness_exec sorted_prices k mid then begin
+            assert { feasible_tastiness sorted_prices k mid };
+            assert { forall z: int. num_occ z sorted_prices = num_occ z price };
+            assert { feasible_tastiness price k mid };
+            low := mid
+          end else begin
+            assert { not feasible_tastiness sorted_prices k mid };
+            assert { forall z: int. num_occ z sorted_prices = num_occ z price };
+            assert { not feasible_tastiness price k mid };
+            high := mid
+          end
+        done;
+        assert { !low + 1 >= !high };
+        assert { forall d: int. feasible_tastiness price k d -> d <= !low };
+        assert { maximum_tastiness price k !low };
+        !low
+    end
+
+end

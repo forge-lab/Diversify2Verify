@@ -1,0 +1,104 @@
+module SplitArrayLargestSum_Array_Stage3_Imperative
+
+  use int.Int
+  use int.EuclideanDivision
+  use array.Array
+  use array.ArraySum
+  use ref.Ref
+
+  predicate valid_partition (nums: array int) (k: int) (cuts: array int) =
+    length cuts = k + 1 /\
+    cuts[0] = 0 /\
+    cuts[k] = length nums /\
+    (forall p: int. 0 <= p <= k -> 0 <= cuts[p] <= length nums) /\
+    (forall p: int. 0 <= p < k -> cuts[p] < cuts[p + 1])
+
+  predicate feasible_with_bound (nums: array int) (k: int) (bound: int) =
+    exists cuts: array int.
+      valid_partition nums k cuts /\
+      forall p: int. 0 <= p < k -> sum nums cuts[p] cuts[p + 1] <= bound
+
+  predicate optimal_split_result (nums: array int) (k: int) (result: int) =
+    feasible_with_bound nums k result /\
+    forall bound: int. feasible_with_bound nums k bound -> result <= bound
+
+  let max_array_value (nums: array int) : int
+    ensures { length nums = 0 -> result = 0 }
+    ensures { length nums > 0 -> exists i: int. 0 <= i < length nums /\ result = nums[i] }
+    ensures { length nums > 0 -> forall i: int. 0 <= i < length nums -> nums[i] <= result }
+  =
+    if length nums = 0 then
+      0
+    else
+      let current = ref nums[0] in
+      for i = 1 to length nums - 1 do
+        invariant { 1 <= i <= length nums }
+        invariant { exists j: int. 0 <= j < i /\ !current = nums[j] }
+        invariant { forall j: int. 0 <= j < i -> nums[j] <= !current }
+        if nums[i] > !current then
+          current := nums[i]
+      done;
+      !current
+
+  let total_sum (nums: array int) : int
+    ensures { result = sum nums 0 (length nums) }
+  =
+    let total = ref 0 in
+    for i = 0 to length nums - 1 do
+      invariant { 0 <= i <= length nums }
+      invariant { !total = sum nums 0 i }
+      total := !total + nums[i]
+    done;
+    !total
+
+  let can_split_with_bound (nums: array int) (k: int) (bound: int) : bool
+    requires { 0 <= length nums }
+    ensures { result = True \/ result = False }
+  =
+    if length nums = 0 then
+      true
+    else
+      let parts = ref 1 in
+      let current = ref 0 in
+      let feasible = ref true in
+      for i = 0 to length nums - 1 do
+        invariant { 0 <= i <= length nums }
+        invariant { 1 <= !parts <= i + 1 }
+        invariant { 0 <= !current }
+        if nums[i] > bound then
+          feasible := false
+        else if !current + nums[i] <= bound then
+          current := !current + nums[i]
+        else begin
+          parts := !parts + 1;
+          current := nums[i]
+        end
+      done;
+      !feasible && !parts <= k
+
+  let split_array_largest_sum_array (nums: array int) (k: int) : int
+    requires { 1 <= length nums <= 1000 }
+    requires { forall i: int. 0 <= i < length nums -> 0 <= nums[i] <= 1000000 }
+    requires { 1 <= k <= 50 }
+    requires { k <= length nums }
+    ensures  { optimal_split_result nums k result }
+  =
+    if length nums = 0 then
+      0
+    else
+      let lo = ref (max_array_value nums) in
+      let hi = ref (total_sum nums) in
+      while !lo < !hi do
+        invariant { !lo <= !hi }
+        invariant { 0 <= !lo }
+        invariant { !hi <= sum nums 0 (length nums) }
+        variant { !hi - !lo }
+        let mid = !lo + div (!hi - !lo) 2 in
+        if can_split_with_bound nums k mid then
+          hi := mid
+        else
+          lo := mid + 1
+      done;
+      !lo
+
+end

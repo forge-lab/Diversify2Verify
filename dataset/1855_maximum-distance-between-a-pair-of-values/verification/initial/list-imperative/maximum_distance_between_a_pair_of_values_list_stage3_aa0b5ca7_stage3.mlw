@@ -1,0 +1,94 @@
+module MaximumDistanceBetweenAPairOfValues_List_Stage3_Imperative
+
+  use int.Int
+  use list.List
+  use list.Length
+  use list.Mem
+  use list.NthNoOpt
+  use ref.Ref
+
+  predicate values_in_range (l: list int) =
+    forall x: int. mem x l -> 1 <= x /\ x <= 100000
+
+  let rec predicate non_increasing (l: list int)
+    variant { l }
+  =
+    match l with
+    | Nil -> true
+    | Cons x xs ->
+        match xs with
+        | Nil -> true
+        | Cons y _ys -> x >= y && non_increasing xs
+        end
+    end
+
+  predicate valid_pair (nums1: list int) (nums2: list int) (i: int) (j: int) =
+    0 <= i /\ i < length nums1 /\
+    0 <= j /\ j < length nums2 /\
+    i <= j /\
+    nth i nums1 <= nth j nums2
+
+  predicate has_distance (nums1: list int) (nums2: list int) (d: int) =
+    exists i: int. exists j: int.
+      valid_pair nums1 nums2 i j /\ d = j - i
+
+  predicate maximum_distance (nums1: list int) (nums2: list int) (d: int) =
+    0 <= d /\
+    (d = 0 \/ has_distance nums1 nums2 d) /\
+    (forall i: int. forall j: int.
+       valid_pair nums1 nums2 i j -> j - i <= d)
+
+  let maximum_distance_between_a_pair_of_values_list
+    (nums1: list int) (nums2: list int) : int
+    requires { 1 <= length nums1 }
+    requires { 1 <= length nums2 }
+    requires { length nums1 <= 100000 }
+    requires { length nums2 <= 100000 }
+    requires { values_in_range nums1 }
+    requires { values_in_range nums2 }
+    requires { non_increasing nums1 }
+    requires { non_increasing nums2 }
+    ensures  { maximum_distance nums1 nums2 result }
+  =
+    let best = ref 0 in
+    let i = ref 0 in
+    let cur1 = ref nums1 in
+    let start2 = ref nums2 in
+    while (match !cur1 with Nil -> false | Cons _ _ -> true end) do
+      invariant { 0 <= !best }
+      invariant { 0 <= !i }
+      invariant { !i + length !cur1 = length nums1 }
+      invariant { length !start2 <= length nums2 }
+      variant { length !cur1 }
+      match !cur1 with
+      | Nil -> ()
+      | Cons x xs ->
+          let j = ref !i in
+          let cur2 = ref !start2 in
+          while (match !cur2 with Nil -> false | Cons _ _ -> true end) do
+            invariant { 0 <= !best }
+            invariant { !i <= !j }
+            invariant { !j + length !cur2 = !i + length !start2 }
+            variant { length !cur2 }
+            match !cur2 with
+            | Nil -> ()
+            | Cons y ys ->
+                if x <= y then (
+                  let distance = !j - !i in
+                  if distance > !best then best := distance
+                );
+                cur2 := ys;
+                j := !j + 1
+            end
+          done;
+          cur1 := xs;
+          i := !i + 1;
+          match !start2 with
+          | Nil -> ()
+          | Cons _ ys -> start2 := ys
+          end
+      end
+    done;
+    !best
+
+end

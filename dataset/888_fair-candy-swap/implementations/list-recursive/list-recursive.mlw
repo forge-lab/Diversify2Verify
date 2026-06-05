@@ -1,0 +1,267 @@
+module FairCandySwap_List_Recursive_Implementation
+
+  use int.Int
+  use int.EuclideanDivision
+  use list.List
+
+  let make_pair (x: int) (y: int) : list int =
+    Cons x (Cons y Nil)
+
+  let pair_matches (r: list int) (x: int) (y: int) : bool =
+    match r with
+    | Cons a (Cons b Nil) -> a = x && b = y
+    | _ -> false
+    end
+
+  let rec sum_list (sizes: list int) : int
+    variant { sizes }
+  =
+    match sizes with
+    | Nil -> 0
+    | Cons x xs -> x + sum_list xs
+    end
+
+  let rec contains (sizes: list int) (target: int) : bool
+    variant { sizes }
+  =
+    match sizes with
+    | Nil -> false
+    | Cons x xs ->
+        if x = target then true else contains xs target
+    end
+
+  let rec find_swap_from (aliceSizes: list int) (bobSizes: list int) (delta: int) : list int
+    variant { aliceSizes }
+  =
+    match aliceSizes with
+    | Nil -> Nil
+    | Cons a rest ->
+        let b = a - delta in
+        if contains bobSizes b then
+          make_pair a b
+        else
+          find_swap_from rest bobSizes delta
+    end
+
+  let fair_candy_swap_list (aliceSizes: list int) (bobSizes: list int) : list int =
+    let delta = div (sum_list aliceSizes - sum_list bobSizes) 2 in
+    find_swap_from aliceSizes bobSizes delta
+
+  let test_002 () : bool =
+    let aliceSizes = Cons 1 (Cons 1 Nil) in
+    let bobSizes = Cons 2 (Cons 2 Nil) in
+    let result = fair_candy_swap_list aliceSizes bobSizes in
+    pair_matches result 1 2
+
+  let test_003 () : bool =
+    let aliceSizes = Cons 5 (Cons 4 (Cons 3 Nil)) in
+    let bobSizes = Cons 7 (Cons 8 (Cons 9 Nil)) in
+    let result = fair_candy_swap_list aliceSizes bobSizes in
+    pair_matches result 3 9
+
+  let test_006 () : bool =
+    let aliceSizes = Cons 1 (Cons 2 (Cons 5 Nil)) in
+    let bobSizes = Cons 2 (Cons 4 Nil) in
+    let result = fair_candy_swap_list aliceSizes bobSizes in
+    pair_matches result 5 4
+
+  let test_008 () : bool =
+    let aliceSizes = Cons 1 (Cons 2 Nil) in
+    let bobSizes = Cons 2 (Cons 3 Nil) in
+    let result = fair_candy_swap_list aliceSizes bobSizes in
+    pair_matches result 1 2
+
+  let test_010 () : bool =
+    let aliceSizes = Cons 2 Nil in
+    let bobSizes = Cons 1 (Cons 3 Nil) in
+    let result = fair_candy_swap_list aliceSizes bobSizes in
+    pair_matches result 2 3
+
+  let test_011 () : bool =
+    let aliceSizes = Cons 35 (Cons 17 (Cons 4 (Cons 24 (Cons 10 Nil)))) in
+    let bobSizes = Cons 66 (Cons 56 (Cons 5 (Cons 1 (Cons 58 Nil)))) in
+    let result = fair_candy_swap_list aliceSizes bobSizes in
+    pair_matches result 10 58
+
+  let test_012 () : bool =
+    let aliceSizes = Cons 4 (Cons 1 (Cons 2 (Cons 1 Nil))) in
+    let bobSizes = Cons 1 (Cons 2 (Cons 2 (Cons 3 Nil))) in
+    let result = fair_candy_swap_list aliceSizes bobSizes in
+    pair_matches result 1 1
+
+  let test_015 () : bool =
+    let aliceSizes =
+      Cons 5 (Cons 15 (Cons 25 (Cons 35 (Cons 45
+      (Cons 55 (Cons 65 (Cons 75 (Cons 85 (Cons 95 Nil))))))))) in
+    let bobSizes =
+      Cons 10 (Cons 20 (Cons 30 (Cons 40 (Cons 50
+      (Cons 60 (Cons 70 (Cons 80 (Cons 90 (Cons 100 Nil))))))))) in
+    let result = fair_candy_swap_list aliceSizes bobSizes in
+    pair_matches result 5 30
+
+  let test_030 () : bool =
+    let aliceSizes = Cons 100000 (Cons 1 (Cons 2 (Cons 3 Nil))) in
+    let bobSizes = Cons 99999 (Cons 4 (Cons 5 (Cons 6 Nil))) in
+    let result = fair_candy_swap_list aliceSizes bobSizes in
+    pair_matches result 1 5
+
+  let test_031 () : bool =
+    let aliceSizes =
+      Cons 100 (Cons 200 (Cons 300 (Cons 400 (Cons 500
+      (Cons 600 (Cons 700 (Cons 800 (Cons 900 (Cons 1000 Nil))))))))) in
+    let bobSizes =
+      Cons 50 (Cons 150 (Cons 250 (Cons 350 (Cons 450
+      (Cons 550 (Cons 650 (Cons 750 (Cons 850 (Cons 950 Nil))))))))) in
+    let result = fair_candy_swap_list aliceSizes bobSizes in
+    pair_matches result 300 50
+
+  let test_043 () : bool =
+    let aliceSizes =
+      Cons 1 (Cons 3 (Cons 5 (Cons 7 (Cons 9
+      (Cons 11 (Cons 13 (Cons 15 (Cons 17 (Cons 19 Nil))))))))) in
+    let bobSizes =
+      Cons 2 (Cons 4 (Cons 6 (Cons 8 (Cons 10
+      (Cons 12 (Cons 14 (Cons 16 (Cons 18 (Cons 20 Nil))))))))) in
+    let result = fair_candy_swap_list aliceSizes bobSizes in
+    pair_matches result 1 6
+
+  let test_044 () : bool =
+    let aliceSizes = Cons 99999 (Cons 88888 (Cons 77777 (Cons 66666 (Cons 55555 Nil)))) in
+    let bobSizes = Cons 11111 (Cons 22222 (Cons 33333 (Cons 44444 (Cons 66666 (Cons 77777 (Cons 88888 Nil)))))) in
+    let result = fair_candy_swap_list aliceSizes bobSizes in
+    pair_matches result 99999 77777
+
+  let test_045 () : bool =
+    let aliceSizes =
+      Cons 1000 (Cons 2000 (Cons 3000 (Cons 4000 (Cons 5000
+      (Cons 6000 (Cons 7000 (Cons 8000 (Cons 9000 (Cons 10000 Nil))))))))) in
+    let bobSizes =
+      Cons 1500 (Cons 2500 (Cons 3500 (Cons 4500 (Cons 5500
+      (Cons 6500 (Cons 7500 (Cons 8500 (Cons 9500 (Cons 10500 Nil))))))))) in
+    let result = fair_candy_swap_list aliceSizes bobSizes in
+    pair_matches result 1000 3500
+
+  let test_052 () : bool =
+    let aliceSizes =
+      Cons 88 (Cons 44 (Cons 22 (Cons 11 (Cons 55
+      (Cons 33 (Cons 66 (Cons 99 (Cons 77 Nil)))))))) in
+    let bobSizes =
+      Cons 132 (Cons 66 (Cons 33 (Cons 22 (Cons 110
+      (Cons 44 (Cons 88 (Cons 11 (Cons 77 Nil)))))))) in
+    let result = fair_candy_swap_list aliceSizes bobSizes in
+    pair_matches result 88 132
+
+  let test_054 () : bool =
+    let aliceSizes = Cons 10000 (Cons 20000 (Cons 30000 (Cons 40000 (Cons 50000 (Cons 60000 Nil))))) in
+    let bobSizes = Cons 15000 (Cons 25000 (Cons 35000 (Cons 45000 (Cons 55000 (Cons 65000 Nil))))) in
+    let result = fair_candy_swap_list aliceSizes bobSizes in
+    pair_matches result 10000 25000
+
+  let test_055 () : bool =
+    let aliceSizes = Cons 1000 (Cons 2000 (Cons 3000 (Cons 4000 (Cons 5000 Nil)))) in
+    let bobSizes = Cons 5500 (Cons 6500 (Cons 7500 (Cons 8500 Nil))) in
+    let result = fair_candy_swap_list aliceSizes bobSizes in
+    pair_matches result 1000 7500
+
+  let test_065 () : bool =
+    let aliceSizes = Cons 10000 (Cons 20000 (Cons 30000 (Cons 40000 (Cons 50000 Nil)))) in
+    let bobSizes = Cons 5000 (Cons 15000 (Cons 25000 (Cons 35000 (Cons 45000 (Cons 55000 Nil))))) in
+    let result = fair_candy_swap_list aliceSizes bobSizes in
+    pair_matches result 10000 25000
+
+  let test_066 () : bool =
+    let aliceSizes =
+      Cons 5 (Cons 7 (Cons 9 (Cons 11 (Cons 13
+      (Cons 15 (Cons 17 (Cons 19 (Cons 21 (Cons 23 Nil))))))))) in
+    let bobSizes =
+      Cons 2 (Cons 4 (Cons 6 (Cons 8 (Cons 10
+      (Cons 12 (Cons 14 (Cons 16 (Cons 18 (Cons 20 Nil))))))))) in
+    let result = fair_candy_swap_list aliceSizes bobSizes in
+    pair_matches result 17 2
+
+  let test_070 () : bool =
+    let aliceSizes = Cons 1 (Cons 3 (Cons 5 (Cons 7 (Cons 9 (Cons 11 Nil))))) in
+    let bobSizes = Cons 2 (Cons 4 (Cons 6 (Cons 8 (Cons 10 (Cons 12 Nil))))) in
+    let result = fair_candy_swap_list aliceSizes bobSizes in
+    pair_matches result 1 4
+
+  let test_076 () : bool =
+    let aliceSizes =
+      Cons 1 (Cons 3 (Cons 5 (Cons 7 (Cons 9
+      (Cons 11 (Cons 13 (Cons 15 (Cons 17 (Cons 19 Nil))))))))) in
+    let bobSizes =
+      Cons 2 (Cons 4 (Cons 6 (Cons 8 (Cons 10
+      (Cons 12 (Cons 14 (Cons 16 (Cons 18 (Cons 20 Nil))))))))) in
+    let result = fair_candy_swap_list aliceSizes bobSizes in
+    pair_matches result 1 6
+
+  let test_081 () : bool =
+    let aliceSizes =
+      Cons 1000 (Cons 2000 (Cons 3000 (Cons 4000 (Cons 5000
+      (Cons 6000 (Cons 7000 (Cons 8000 (Cons 9000 (Cons 10000
+      (Cons 11000 (Cons 12000 (Cons 13000 (Cons 14000 Nil))))))))))))) in
+    let bobSizes =
+      Cons 500 (Cons 1500 (Cons 2500 (Cons 3500 (Cons 4500
+      (Cons 5500 (Cons 6500 (Cons 7500 (Cons 8500 (Cons 9500
+      (Cons 10500 (Cons 11500 (Cons 12500 (Cons 13500 Nil))))))))))))) in
+    let result = fair_candy_swap_list aliceSizes bobSizes in
+    pair_matches result 4000 500
+
+  let test_083 () : bool =
+    let aliceSizes =
+      Cons 10 (Cons 20 (Cons 30 (Cons 40 (Cons 50
+      (Cons 60 (Cons 70 (Cons 80 (Cons 90 (Cons 100 Nil))))))))) in
+    let bobSizes =
+      Cons 5 (Cons 15 (Cons 25 (Cons 35 (Cons 45
+      (Cons 55 (Cons 65 (Cons 75 (Cons 85 (Cons 95 Nil))))))))) in
+    let result = fair_candy_swap_list aliceSizes bobSizes in
+    pair_matches result 30 5
+
+  let run_tests () : bool =
+    if test_002 () then
+    if test_003 () then
+    if test_006 () then
+    if test_008 () then
+    if test_010 () then
+    if test_011 () then
+    if test_012 () then
+    if test_015 () then
+    if test_030 () then
+    if test_031 () then
+    if test_043 () then
+    if test_044 () then
+    if test_045 () then
+    if test_052 () then
+    if test_054 () then
+    if test_055 () then
+    if test_065 () then
+    if test_066 () then
+    if test_070 () then
+    if test_076 () then
+    if test_081 () then
+    if test_083 () then
+      true
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+
+end

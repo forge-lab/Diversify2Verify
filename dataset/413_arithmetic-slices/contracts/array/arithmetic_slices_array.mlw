@@ -1,0 +1,127 @@
+module ArithmeticSlices_Array_Spec
+
+  use int.Int
+  use array.Array
+  use array.Init
+
+  let rec function is_arithmetic_run (nums: array int) (lo: int) (hi: int) : bool
+    requires { 0 <= lo <= hi < length nums }
+    variant  { hi - lo }
+  =
+    if hi <= lo + 1 then true
+    else if nums[hi] - nums[hi - 1] = nums[lo + 1] - nums[lo] then
+      is_arithmetic_run nums lo (hi - 1)
+    else false
+
+  predicate arithmetic_slice (nums: array int) (lo: int) (hi: int) =
+    0 <= lo /\ lo + 2 <= hi < length nums /\
+    is_arithmetic_run nums lo hi = true /\
+    (forall k: int.
+       lo <= k < hi -> nums[k + 1] - nums[k] = nums[lo + 1] - nums[lo])
+
+  let rec function count_ends_from (nums: array int) (lo: int) (hi: int) : int
+    requires { 0 <= lo }
+    requires { lo + 2 <= hi <= length nums }
+    variant  { length nums - hi }
+  =
+    if hi = length nums then 0
+    else
+      (if is_arithmetic_run nums lo hi then 1 else 0) +
+      count_ends_from nums lo (hi + 1)
+
+  let rec function count_starts_from (nums: array int) (lo: int) : int
+    requires { 0 <= lo <= length nums }
+    variant  { length nums - lo }
+  =
+    if lo + 2 >= length nums then 0
+    else count_ends_from nums lo (lo + 2) + count_starts_from nums (lo + 1)
+
+  function arithmetic_slice_count (nums: array int) : int =
+    count_starts_from nums 0
+
+  val arithmetic_slices_array (nums: array int) : int
+    requires { 1 <= length nums <= 5000 }
+    requires { forall i: int. 0 <= i < length nums -> -1000 <= nums[i] <= 1000 }
+    ensures  { result = arithmetic_slice_count nums }
+    ensures  { result >= 0 }
+
+  let lemma test_000_all_equal_ten () =
+    let nums = init 10 [|1; 1; 1; 1; 1; 1; 1; 1; 1; 1|] in
+    assert { length nums = 10 };
+    assert { nums[0] = 1 };
+    assert { nums[9] = 1 };
+    assert { arithmetic_slice nums 0 2 };
+    assert { arithmetic_slice nums 0 9 };
+    assert { arithmetic_slice nums 7 9 };
+    assert { count_ends_from nums 0 2 = 8 };
+    assert { arithmetic_slice_count nums = 36 }
+
+  let lemma test_001_mixed_suffix_run () =
+    let nums = init 6 [|1; 2; 4; 5; 6; 7|] in
+    assert { length nums = 6 };
+    assert { nums[0] = 1 };
+    assert { nums[1] = 2 };
+    assert { nums[2] = 4 };
+    assert { nums[5] = 7 };
+    assert { not (arithmetic_slice nums 0 2) };
+    assert { arithmetic_slice nums 2 4 };
+    assert { arithmetic_slice nums 3 5 };
+    assert { arithmetic_slice nums 2 5 };
+    assert { arithmetic_slice_count nums = 3 }
+
+  let lemma test_002_negative_step () =
+    let nums = init 4 [|3; -1; -5; -9|] in
+    assert { length nums = 4 };
+    assert { nums[0] = 3 };
+    assert { nums[1] = -1 };
+    assert { nums[2] = -5 };
+    assert { nums[3] = -9 };
+    assert { arithmetic_slice nums 0 2 };
+    assert { arithmetic_slice nums 1 3 };
+    assert { arithmetic_slice nums 0 3 };
+    assert { arithmetic_slice_count nums = 3 }
+
+  let lemma test_003_decreasing_ten () =
+    let nums = init 10 [|10; 9; 8; 7; 6; 5; 4; 3; 2; 1|] in
+    assert { length nums = 10 };
+    assert { nums[0] = 10 };
+    assert { nums[1] = 9 };
+    assert { nums[9] = 1 };
+    assert { arithmetic_slice nums 0 2 };
+    assert { arithmetic_slice nums 0 9 };
+    assert { arithmetic_slice nums 7 9 };
+    assert { count_ends_from nums 0 2 = 8 };
+    assert { arithmetic_slice_count nums = 36 }
+
+  let lemma test_004_positive_step_five () =
+    let nums = init 5 [|1; 3; 5; 7; 9|] in
+    assert { length nums = 5 };
+    assert { nums[0] = 1 };
+    assert { nums[1] = 3 };
+    assert { nums[4] = 9 };
+    assert { arithmetic_slice nums 0 2 };
+    assert { arithmetic_slice nums 1 3 };
+    assert { arithmetic_slice nums 2 4 };
+    assert { arithmetic_slice nums 0 4 };
+    assert { arithmetic_slice_count nums = 6 }
+
+  let lemma test_005_increasing_ten () =
+    let nums = init 10 [|1; 2; 3; 4; 5; 6; 7; 8; 9; 10|] in
+    assert { length nums = 10 };
+    assert { nums[0] = 1 };
+    assert { nums[1] = 2 };
+    assert { nums[9] = 10 };
+    assert { arithmetic_slice nums 0 2 };
+    assert { arithmetic_slice nums 0 9 };
+    assert { arithmetic_slice nums 7 9 };
+    assert { count_ends_from nums 0 2 = 8 };
+    assert { arithmetic_slice_count nums = 36 }
+
+  let lemma test_006_singleton () =
+    let nums = init 1 [|1|] in
+    assert { length nums = 1 };
+    assert { nums[0] = 1 };
+    assert { count_starts_from nums 0 = 0 };
+    assert { arithmetic_slice_count nums = 0 }
+
+end

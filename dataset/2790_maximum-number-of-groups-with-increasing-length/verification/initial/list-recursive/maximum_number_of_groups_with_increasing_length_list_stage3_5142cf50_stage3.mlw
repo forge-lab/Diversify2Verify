@@ -1,0 +1,113 @@
+module MaximumNumberOfGroupsWithIncreasingLength_List_Stage3_Recursive
+
+  use int.Int
+  use int.MinMax
+  use list.List
+  use list.Length
+
+  let rec predicate positive_limits (usageLimits: list int)
+    variant { usageLimits }
+  =
+    match usageLimits with
+    | Nil -> true
+    | Cons limit rest -> 1 <= limit && positive_limits rest
+    end
+
+  let rec function capped_sum (usageLimits: list int) (groups: int) : int
+    variant { usageLimits }
+  =
+    match usageLimits with
+    | Nil -> 0
+    | Cons limit rest -> min limit groups + capped_sum rest groups
+    end
+
+  predicate feasible_groups (usageLimits: list int) (groups: int) =
+    0 <= groups /\
+    groups <= length usageLimits /\
+    groups * (groups + 1) <= 2 * capped_sum usageLimits groups
+
+  predicate optimal_groups (usageLimits: list int) (groups: int) =
+    feasible_groups usageLimits groups /\
+    (forall other: int. feasible_groups usageLimits other -> other <= groups)
+
+  let min_int (a: int) (b: int) : int
+    ensures { result = min a b }
+  =
+    if a <= b then a else b
+
+  let rec list_length (usageLimits: list int) : int
+    ensures { result = length usageLimits }
+    variant { usageLimits }
+  =
+    match usageLimits with
+    | Nil -> 0
+    | Cons _ rest -> 1 + list_length rest
+    end
+
+  let rec capped_sum_exec (usageLimits: list int) (groups: int) : int
+    ensures { result = capped_sum usageLimits groups }
+    variant { usageLimits }
+  =
+    match usageLimits with
+    | Nil -> 0
+    | Cons limit rest -> min_int limit groups + capped_sum_exec rest groups
+    end
+
+  let feasible_groups_exec (usageLimits: list int) (groups: int) : bool
+    ensures { result <-> feasible_groups usageLimits groups }
+  =
+    0 <= groups &&
+    groups <= list_length usageLimits &&
+    groups * (groups + 1) <= 2 * capped_sum_exec usageLimits groups
+
+  let rec lemma capped_sum_zero (usageLimits: list int)
+    requires { positive_limits usageLimits }
+    ensures  { capped_sum usageLimits 0 = 0 }
+    variant  { usageLimits }
+  =
+    match usageLimits with
+    | Nil -> ()
+    | Cons _ rest -> capped_sum_zero rest
+    end
+
+  let rec search_groups (usageLimits: list int) (groups: int) : int
+    requires { positive_limits usageLimits }
+    requires { 0 <= groups }
+    ensures  { 0 <= result <= groups }
+    ensures  { feasible_groups usageLimits result }
+    ensures  { forall other: int.
+      feasible_groups usageLimits other /\ other <= groups -> other <= result }
+    variant  { groups }
+  =
+    if groups <= 0 then begin
+      capped_sum_zero usageLimits;
+      assert { groups = 0 };
+      assert { capped_sum usageLimits 0 = 0 };
+      assert { feasible_groups usageLimits 0 };
+      0
+    end else if feasible_groups_exec usageLimits groups then begin
+      assert { feasible_groups usageLimits groups };
+      groups
+    end else begin
+      assert { not (feasible_groups usageLimits groups) };
+      let r = search_groups usageLimits (groups - 1) in
+      assert { forall other: int.
+        feasible_groups usageLimits other /\ other <= groups -> other <= r };
+      r
+    end
+
+  let maximum_number_of_groups_with_increasing_length_list
+      (usageLimits: list int) : int
+    requires { 1 <= length usageLimits }
+    requires { positive_limits usageLimits }
+    ensures  { optimal_groups usageLimits result }
+  =
+    let n = list_length usageLimits in
+    assert { n = length usageLimits };
+    assert { 0 <= n };
+    let r = search_groups usageLimits n in
+    assert { feasible_groups usageLimits r };
+    assert { forall other: int. feasible_groups usageLimits other -> other <= r };
+    r
+
+end

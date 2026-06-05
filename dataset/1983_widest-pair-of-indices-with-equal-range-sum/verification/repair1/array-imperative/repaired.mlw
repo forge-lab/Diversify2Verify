@@ -1,0 +1,244 @@
+module WidestPairOfIndicesWithEqualRangeSum_Array_Spec
+
+  use int.Int
+  use array.Array
+  use array.Init
+  use array.ArraySum
+  use ref.Ref
+
+  predicate binary_value (x: int) =
+    x = 0 \/ x = 1
+
+  predicate valid_binary_arrays (nums1: array int) (nums2: array int) =
+    length nums1 = length nums2 /\
+    1 <= length nums1 /\
+    (forall k: int.
+      0 <= k < length nums1 ->
+      binary_value nums1[k] /\ binary_value nums2[k])
+
+  function range_width (i: int) (j: int) : int =
+    j - i + 1
+
+  predicate equal_range_sum (nums1: array int) (nums2: array int) (i: int) (j: int) =
+    length nums1 = length nums2 /\
+    0 <= i <= j < length nums1 /\
+    sum nums1 i (j + 1) = sum nums2 i (j + 1)
+
+  predicate widest_equal_range_distance (nums1: array int) (nums2: array int) (r: int) =
+    length nums1 = length nums2 /\
+    0 <= r <= length nums1 /\
+    (r = 0 \/
+      exists i j: int.
+        equal_range_sum nums1 nums2 i j /\
+        r = range_width i j) /\
+    (forall i j: int.
+      equal_range_sum nums1 nums2 i j ->
+      range_width i j <= r)
+
+  predicate processed_outer
+      (nums1: array int) (nums2: array int) (upto: int) (best: int) =
+    length nums1 = length nums2 /\
+    0 <= upto <= length nums1 /\
+    0 <= best <= length nums1 /\
+    (best = 0 \/
+      exists i j: int.
+        0 <= i < upto /\ i <= j < length nums1 /\
+        equal_range_sum nums1 nums2 i j /\
+        best = range_width i j) /\
+    (forall i j: int.
+      0 <= i < upto /\ i <= j < length nums1 /\
+      equal_range_sum nums1 nums2 i j ->
+      range_width i j <= best)
+
+  predicate processed_inner
+      (nums1: array int) (nums2: array int) (i: int) (next_j: int) (best: int) =
+    length nums1 = length nums2 /\
+    0 <= i <= next_j <= length nums1 /\
+    0 <= best <= length nums1 /\
+    (forall j: int.
+      i <= j < next_j /\ equal_range_sum nums1 nums2 i j ->
+      range_width i j <= best)
+
+  predicate current_row_witness
+      (nums1: array int) (nums2: array int)
+      (i: int) (next_j: int) (best: int) (outer_best: int) =
+    outer_best <= best /\
+    (best = outer_best \/
+      exists j: int.
+        i <= j < next_j /\
+        equal_range_sum nums1 nums2 i j /\
+        best = range_width i j)
+
+  let lemma processed_inner_increase
+      (nums1: array int) (nums2: array int)
+      (i: int) (next_j: int) (old_best: int) (new_best: int)
+    requires { processed_inner nums1 nums2 i next_j old_best }
+    requires { old_best <= new_best <= length nums1 }
+    ensures  { processed_inner nums1 nums2 i next_j new_best }
+  =
+    assert {
+      forall j: int.
+        i <= j < next_j /\ equal_range_sum nums1 nums2 i j ->
+        range_width i j <= new_best
+    }
+
+  let lemma processed_inner_extend
+      (nums1: array int) (nums2: array int)
+      (i: int) (j: int) (best: int)
+    requires { processed_inner nums1 nums2 i j best }
+    requires { j < length nums1 }
+    requires { equal_range_sum nums1 nums2 i j -> range_width i j <= best }
+    ensures  { processed_inner nums1 nums2 i (j + 1) best }
+  =
+    assert {
+      forall k: int.
+        i <= k < j + 1 /\ equal_range_sum nums1 nums2 i k ->
+        range_width i k <= best
+    }
+
+  let lemma current_row_witness_keep
+      (nums1: array int) (nums2: array int)
+      (i: int) (j: int) (best: int) (outer_best: int)
+    requires { current_row_witness nums1 nums2 i j best outer_best }
+    requires { i <= j }
+    ensures  { current_row_witness nums1 nums2 i (j + 1) best outer_best }
+  =
+    assert {
+      best = outer_best \/
+      exists k: int.
+        i <= k < j + 1 /\
+        equal_range_sum nums1 nums2 i k /\
+        best = range_width i k
+    }
+
+  let lemma current_row_witness_update
+      (nums1: array int) (nums2: array int)
+      (i: int) (j: int) (best: int) (outer_best: int)
+    requires { i <= j < length nums1 }
+    requires { outer_best <= best }
+    requires { equal_range_sum nums1 nums2 i j }
+    requires { best = range_width i j }
+    ensures  { current_row_witness nums1 nums2 i (j + 1) best outer_best }
+  =
+    assert {
+      exists k: int.
+        i <= k < j + 1 /\
+        equal_range_sum nums1 nums2 i k /\
+        best = range_width i k
+    }
+
+  let lemma processed_outer_extend
+      (nums1: array int) (nums2: array int)
+      (i: int) (best: int) (outer_best: int)
+    requires { processed_outer nums1 nums2 i outer_best }
+    requires { processed_inner nums1 nums2 i (length nums1) best }
+    requires { current_row_witness nums1 nums2 i (length nums1) best outer_best }
+    ensures  { processed_outer nums1 nums2 (i + 1) best }
+  =
+    assert { length nums1 = length nums2 };
+    assert { 0 <= i < length nums1 };
+    assert { 0 <= best <= length nums1 };
+    if best = outer_best then begin
+      assert {
+        best = 0 \/
+        exists k l: int.
+          0 <= k < i + 1 /\ k <= l < length nums1 /\
+          equal_range_sum nums1 nums2 k l /\
+          best = range_width k l
+      }
+    end else begin
+      assert {
+        exists l: int.
+          i <= l < length nums1 /\
+          equal_range_sum nums1 nums2 i l /\
+          best = range_width i l
+      };
+      assert {
+        exists k l: int.
+          0 <= k < i + 1 /\ k <= l < length nums1 /\
+          equal_range_sum nums1 nums2 k l /\
+          best = range_width k l
+      }
+    end;
+    assert {
+      forall k l: int.
+        0 <= k < i + 1 /\ k <= l < length nums1 /\
+        equal_range_sum nums1 nums2 k l ->
+        range_width k l <= best
+    }
+
+  let lemma processed_outer_implies_widest
+      (nums1: array int) (nums2: array int) (best: int)
+    requires { processed_outer nums1 nums2 (length nums1) best }
+    ensures  { widest_equal_range_distance nums1 nums2 best }
+  =
+    assert {
+      forall i j: int.
+        equal_range_sum nums1 nums2 i j ->
+        range_width i j <= best
+    }
+
+  let widest_pair_of_indices_with_equal_range_sum_array
+      (nums1: array int) (nums2: array int) : int
+    requires { valid_binary_arrays nums1 nums2 }
+    ensures  { widest_equal_range_distance nums1 nums2 result }
+  =
+    let n = length nums1 in
+    assert { length nums2 = n };
+    let best = ref 0 in
+    for i = 0 to n - 1 do
+      invariant { length nums1 = n /\ length nums2 = n }
+      invariant { processed_outer nums1 nums2 i !best }
+      let outer_best = !best in
+      assert { processed_outer nums1 nums2 i outer_best };
+      let diff = ref 0 in
+      for j = i to n - 1 do
+        invariant { length nums1 = n /\ length nums2 = n }
+        invariant { 0 <= i <= j <= n }
+        invariant { processed_outer nums1 nums2 i outer_best }
+        invariant { processed_inner nums1 nums2 i j !best }
+        invariant { current_row_witness nums1 nums2 i j !best outer_best }
+        invariant { !diff = sum nums1 i j - sum nums2 i j }
+        let before_best = !best in
+        assert { processed_inner nums1 nums2 i j before_best };
+        assert { current_row_witness nums1 nums2 i j before_best outer_best };
+        diff := !diff + nums1[j] - nums2[j];
+        assert { !diff = sum nums1 i (j + 1) - sum nums2 i (j + 1) };
+        if !diff = 0 then begin
+          assert { equal_range_sum nums1 nums2 i j };
+          let width = j - i + 1 in
+          assert { width = range_width i j };
+          if width > !best then begin
+            best := width;
+            assert { before_best <= !best };
+            assert { !best = range_width i j };
+            assert { equal_range_sum nums1 nums2 i j };
+            current_row_witness_update nums1 nums2 i j !best outer_best
+          end else begin
+            assert { !best = before_best };
+            assert { range_width i j <= !best };
+            current_row_witness_keep nums1 nums2 i j !best outer_best
+          end
+        end else begin
+          assert { !best = before_best };
+          assert { not (equal_range_sum nums1 nums2 i j) };
+          current_row_witness_keep nums1 nums2 i j !best outer_best
+        end;
+        assert { before_best <= !best };
+        processed_inner_increase nums1 nums2 i j before_best !best;
+        assert { equal_range_sum nums1 nums2 i j -> range_width i j <= !best };
+        processed_inner_extend nums1 nums2 i j !best;
+        assert { processed_inner nums1 nums2 i (j + 1) !best };
+        assert { current_row_witness nums1 nums2 i (j + 1) !best outer_best }
+      done;
+      assert { processed_inner nums1 nums2 i n !best };
+      assert { current_row_witness nums1 nums2 i n !best outer_best };
+      processed_outer_extend nums1 nums2 i !best outer_best;
+      assert { processed_outer nums1 nums2 (i + 1) !best }
+    done;
+    assert { processed_outer nums1 nums2 n !best };
+    processed_outer_implies_widest nums1 nums2 !best;
+    assert { widest_equal_range_distance nums1 nums2 !best };
+    !best
+
+end

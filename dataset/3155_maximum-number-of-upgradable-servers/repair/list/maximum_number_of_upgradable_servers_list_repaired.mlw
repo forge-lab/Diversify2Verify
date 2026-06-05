@@ -1,0 +1,225 @@
+module MaximumNumberOfUpgradableServers_List_Spec
+
+  use int.Int
+  use int.MinMax
+  use int.EuclideanDivision
+  use list.List
+
+  let rec predicate valid_inputs (count: list int) (upgrade: list int)
+      (sell: list int) (money: list int)
+    variant { count }
+  =
+    match count with
+    | Nil ->
+        match upgrade with
+        | Nil ->
+            match sell with
+            | Nil ->
+                match money with
+                | Nil -> true
+                | Cons _ _ -> false
+                end
+            | Cons _ _ -> false
+            end
+        | Cons _ _ -> false
+        end
+    | Cons c cs ->
+        c >= 1 &&
+        match upgrade with
+        | Nil -> false
+        | Cons u us ->
+            u >= 1 &&
+            match sell with
+            | Nil -> false
+            | Cons s ss ->
+                s >= 1 &&
+                match money with
+                | Nil -> false
+                | Cons m ms -> m >= 1 && valid_inputs cs us ss ms
+                end
+            end
+        end
+    end
+
+  predicate feasible_upgrades (c: int) (u: int) (s: int) (m: int) (x: int) =
+    0 <= x /\ x <= c /\ x * u <= m + (c - x) * s
+
+  predicate maximum_upgrades_for_center (c: int) (u: int) (s: int) (m: int) (x: int) =
+    feasible_upgrades c u s m x /\
+    (forall y: int. feasible_upgrades c u s m y -> y <= x)
+
+  let function maximum_upgrades_amount (c: int) (u: int) (s: int) (m: int) : int =
+    if u + s <= 0 then 0 else min c (div (m + c * s) (u + s))
+
+  let rec function expected_answers (count: list int) (upgrade: list int)
+      (sell: list int) (money: list int) : list int
+    variant { count }
+  =
+    match count with
+    | Nil -> Nil
+    | Cons c cs ->
+        match upgrade with
+        | Nil -> Nil
+        | Cons u us ->
+            match sell with
+            | Nil -> Nil
+            | Cons s ss ->
+                match money with
+                | Nil -> Nil
+                | Cons m ms ->
+                    Cons (maximum_upgrades_amount c u s m)
+                      (expected_answers cs us ss ms)
+                end
+            end
+        end
+    end
+
+  predicate answers_for_lists (count: list int) (upgrade: list int)
+      (sell: list int) (money: list int) (answer: list int) =
+    answer = expected_answers count upgrade sell money
+
+  val maximum_number_of_upgradable_servers_list (count: list int) (upgrade: list int)
+      (sell: list int) (money: list int) : list int
+    requires { valid_inputs count upgrade sell money }
+    ensures  { answers_for_lists count upgrade sell money result }
+
+  let lemma check_test_000 () =
+    let count = Cons 100000 Nil in
+    let upgrade = Cons 100000 Nil in
+    let sell = Cons 100000 Nil in
+    let money = Cons 1000000000 Nil in
+    let expected = Cons 55000 Nil in
+    assert { valid_inputs count upgrade sell money };
+    assert { feasible_upgrades 100000 100000 100000 1000000000 55000 };
+    assert { maximum_upgrades_for_center 100000 100000 100000 1000000000 55000 };
+    assert { answers_for_lists Nil Nil Nil Nil Nil };
+    assert { answers_for_lists count upgrade sell money expected }
+
+  let lemma check_test_001 () =
+    let count_tail2 = Cons 30 Nil in
+    let count_tail1 = Cons 20 count_tail2 in
+    let count = Cons 10 count_tail1 in
+    let upgrade_tail2 = Cons 3 Nil in
+    let upgrade_tail1 = Cons 4 upgrade_tail2 in
+    let upgrade = Cons 5 upgrade_tail1 in
+    let sell_tail2 = Cons 3 Nil in
+    let sell_tail1 = Cons 2 sell_tail2 in
+    let sell = Cons 1 sell_tail1 in
+    let money_tail2 = Cons 150 Nil in
+    let money_tail1 = Cons 100 money_tail2 in
+    let money = Cons 50 money_tail1 in
+    let expected_tail2 = Cons 30 Nil in
+    let expected_tail1 = Cons 20 expected_tail2 in
+    let expected = Cons 10 expected_tail1 in
+    assert { valid_inputs count upgrade sell money };
+    assert { maximum_upgrades_for_center 30 3 3 150 30 };
+    assert { answers_for_lists count_tail2 upgrade_tail2 sell_tail2 money_tail2 expected_tail2 };
+    assert { maximum_upgrades_for_center 20 4 2 100 20 };
+    assert { answers_for_lists count_tail1 upgrade_tail1 sell_tail1 money_tail1 expected_tail1 };
+    assert { maximum_upgrades_for_center 10 5 1 50 10 };
+    assert { answers_for_lists count upgrade sell money expected }
+
+  let lemma check_test_002 () =
+    let count_tail2 = Cons 30 Nil in
+    let count_tail1 = Cons 20 count_tail2 in
+    let count = Cons 10 count_tail1 in
+    let upgrade_tail2 = Cons 3 Nil in
+    let upgrade_tail1 = Cons 2 upgrade_tail2 in
+    let upgrade = Cons 1 upgrade_tail1 in
+    let sell_tail2 = Cons 6 Nil in
+    let sell_tail1 = Cons 5 sell_tail2 in
+    let sell = Cons 4 sell_tail1 in
+    let money_tail2 = Cons 100 Nil in
+    let money_tail1 = Cons 100 money_tail2 in
+    let money = Cons 100 money_tail1 in
+    let expected_tail2 = Cons 30 Nil in
+    let expected_tail1 = Cons 20 expected_tail2 in
+    let expected = Cons 10 expected_tail1 in
+    assert { valid_inputs count upgrade sell money };
+    assert { maximum_upgrades_for_center 30 3 6 100 30 };
+    assert { answers_for_lists count_tail2 upgrade_tail2 sell_tail2 money_tail2 expected_tail2 };
+    assert { maximum_upgrades_for_center 20 2 5 100 20 };
+    assert { answers_for_lists count_tail1 upgrade_tail1 sell_tail1 money_tail1 expected_tail1 };
+    assert { maximum_upgrades_for_center 10 1 4 100 10 };
+    assert { answers_for_lists count upgrade sell money expected }
+
+  let lemma check_test_003 () =
+    let count_tail = Cons 3 Nil in
+    let count = Cons 4 count_tail in
+    let upgrade_tail = Cons 5 Nil in
+    let upgrade = Cons 3 upgrade_tail in
+    let sell_tail = Cons 2 Nil in
+    let sell = Cons 4 sell_tail in
+    let money_tail = Cons 9 Nil in
+    let money = Cons 8 money_tail in
+    let expected_tail = Cons 2 Nil in
+    let expected = Cons 3 expected_tail in
+    assert { valid_inputs count upgrade sell money };
+    assert { feasible_upgrades 4 3 4 8 3 };
+    assert { maximum_upgrades_for_center 4 3 4 8 3 };
+    assert { feasible_upgrades 3 5 2 9 2 };
+    assert { maximum_upgrades_for_center 3 5 2 9 2 };
+    assert { answers_for_lists count_tail upgrade_tail sell_tail money_tail expected_tail };
+    assert { answers_for_lists count upgrade sell money expected }
+
+  let lemma check_test_004 () =
+    let count_tail2 = Cons 5 Nil in
+    let count_tail1 = Cons 5 count_tail2 in
+    let count = Cons 5 count_tail1 in
+    let upgrade_tail2 = Cons 30 Nil in
+    let upgrade_tail1 = Cons 20 upgrade_tail2 in
+    let upgrade = Cons 10 upgrade_tail1 in
+    let sell_tail2 = Cons 15 Nil in
+    let sell_tail1 = Cons 10 sell_tail2 in
+    let sell = Cons 5 sell_tail1 in
+    let money_tail2 = Cons 100 Nil in
+    let money_tail1 = Cons 100 money_tail2 in
+    let money = Cons 100 money_tail1 in
+    let expected_tail2 = Cons 3 Nil in
+    let expected_tail1 = Cons 5 expected_tail2 in
+    let expected = Cons 5 expected_tail1 in
+    assert { valid_inputs count upgrade sell money };
+    assert { maximum_upgrades_for_center 5 30 15 100 3 };
+    assert { answers_for_lists count_tail2 upgrade_tail2 sell_tail2 money_tail2 expected_tail2 };
+    assert { maximum_upgrades_for_center 5 20 10 100 5 };
+    assert { answers_for_lists count_tail1 upgrade_tail1 sell_tail1 money_tail1 expected_tail1 };
+    assert { maximum_upgrades_for_center 5 10 5 100 5 };
+    assert { answers_for_lists count upgrade sell money expected }
+
+  let lemma check_test_005 () =
+    let count = Cons 1 Nil in
+    let upgrade = Cons 2 Nil in
+    let sell = Cons 1 Nil in
+    let money = Cons 1 Nil in
+    let expected = Cons 0 Nil in
+    assert { valid_inputs count upgrade sell money };
+    assert { feasible_upgrades 1 2 1 1 0 };
+    assert { maximum_upgrades_for_center 1 2 1 1 0 };
+    assert { answers_for_lists Nil Nil Nil Nil Nil };
+    assert { answers_for_lists count upgrade sell money expected }
+
+  let lemma check_test_006 () =
+    let count_tail2 = Cons 30 Nil in
+    let count_tail1 = Cons 20 count_tail2 in
+    let count = Cons 10 count_tail1 in
+    let upgrade_tail2 = Cons 15 Nil in
+    let upgrade_tail1 = Cons 10 upgrade_tail2 in
+    let upgrade = Cons 5 upgrade_tail1 in
+    let sell_tail2 = Cons 3 Nil in
+    let sell_tail1 = Cons 2 sell_tail2 in
+    let sell = Cons 1 sell_tail1 in
+    let money_tail2 = Cons 300 Nil in
+    let money_tail1 = Cons 200 money_tail2 in
+    let money = Cons 100 money_tail1 in
+    let expected_tail2 = Cons 21 Nil in
+    let expected_tail1 = Cons 20 expected_tail2 in
+    let expected = Cons 10 expected_tail1 in
+    assert { valid_inputs count upgrade sell money };
+    assert { maximum_upgrades_for_center 30 15 3 300 21 };
+    assert { answers_for_lists count_tail2 upgrade_tail2 sell_tail2 money_tail2 expected_tail2 };
+    assert { maximum_upgrades_for_center 20 10 2 200 20 };
+    assert { answers_for_lists count_tail1 upgrade_tail1 sell_tail1 money_tail1 expected_tail1 };
+    assert { maximum_upgrades_for_center 10 5 1 100 10 };
+    assert { answers_for_lists count upgrade sell money expected }
+
+end

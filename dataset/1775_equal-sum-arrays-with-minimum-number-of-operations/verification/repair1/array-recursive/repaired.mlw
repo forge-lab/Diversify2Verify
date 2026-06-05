@@ -1,0 +1,275 @@
+module EqualSumArraysWithMinimumNumberOfOperations_Array_Stage3
+
+  use int.Int
+  use int.NumOf
+  use array.Array
+  use array.Init
+  use array.ArraySum
+
+  function dice_sum (a: array int) : int =
+    ArraySum.sum a 0 (length a)
+
+  function changed_positions (delta: array int) : int =
+    NumOf.numof (fun i -> delta[i] <> 0) 0 (length delta)
+
+  predicate valid_dice_array (a: array int) =
+    1 <= length a <= 100000 /\
+    forall i: int. 0 <= i < length a -> 1 <= a[i] <= 6
+
+  predicate decrease_plan (nums: array int) (delta: array int) =
+    length delta = length nums /\
+    forall i: int. 0 <= i < length nums -> 0 <= delta[i] <= nums[i] - 1
+
+  predicate increase_plan (nums: array int) (delta: array int) =
+    length delta = length nums /\
+    forall i: int. 0 <= i < length nums -> 0 <= delta[i] <= 6 - nums[i]
+
+  function plan_gain (delta1: array int) (delta2: array int) : int =
+    ArraySum.sum delta1 0 (length delta1) + ArraySum.sum delta2 0 (length delta2)
+
+  function plan_cost (delta1: array int) (delta2: array int) : int =
+    changed_positions delta1 + changed_positions delta2
+
+  predicate equalizing_plan
+    (nums1: array int) (nums2: array int) (delta1: array int) (delta2: array int) =
+    (dice_sum nums1 >= dice_sum nums2 /\
+      decrease_plan nums1 delta1 /\
+      increase_plan nums2 delta2 /\
+      plan_gain delta1 delta2 = dice_sum nums1 - dice_sum nums2) \/
+    (dice_sum nums2 >= dice_sum nums1 /\
+      increase_plan nums1 delta1 /\
+      decrease_plan nums2 delta2 /\
+      plan_gain delta1 delta2 = dice_sum nums2 - dice_sum nums1)
+
+  predicate minimum_operations_spec
+    (nums1: array int) (nums2: array int) (res: int) =
+    (res = (-1) /\
+      forall delta1 delta2: array int.
+        not (equalizing_plan nums1 nums2 delta1 delta2)) \/
+    (0 <= res /\
+      exists delta1 delta2: array int.
+        equalizing_plan nums1 nums2 delta1 delta2 /\
+        plan_cost delta1 delta2 = res /\
+        forall other1 other2: array int.
+          equalizing_plan nums1 nums2 other1 other2 ->
+          res <= plan_cost other1 other2)
+
+  predicate zero_count_array (counts: array int) =
+    length counts = 6 /\
+    forall g: int. 0 <= g < 6 -> counts[g] = 0
+
+  predicate decrease_counts_model (a: array int) (counts: array int) =
+    length counts = 6 /\
+    counts[0] = 0 /\
+    forall g: int. 1 <= g < 6 ->
+      counts[g] = NumOf.numof (fun i -> a[i] - 1 = g) 0 (length a)
+
+  predicate increase_counts_model (a: array int) (counts: array int) =
+    length counts = 6 /\
+    counts[0] = 0 /\
+    forall g: int. 1 <= g < 6 ->
+      counts[g] = NumOf.numof (fun i -> 6 - a[i] = g) 0 (length a)
+
+  predicate operation_counts_model (decrease_from: array int) (increase_to: array int)
+    (counts: array int) =
+    length counts = 6 /\
+    counts[0] = 0 /\
+    forall g: int. 1 <= g < 6 ->
+      counts[g] =
+        NumOf.numof (fun i -> decrease_from[i] - 1 = g) 0 (length decrease_from) +
+        NumOf.numof (fun i -> 6 - increase_to[i] = g) 0 (length increase_to)
+
+  function bucket_gain (used: array int) : int =
+    used[1] + 2 * used[2] + 3 * used[3] + 4 * used[4] + 5 * used[5]
+
+  function bucket_cost (used: array int) : int =
+    used[1] + used[2] + used[3] + used[4] + used[5]
+
+  predicate feasible_bucket_use (counts: array int) (max_gain: int) (used: array int) =
+    length counts = 6 /\
+    length used = 6 /\
+    0 <= max_gain <= 5 /\
+    used[0] = 0 /\
+    forall g: int. 0 <= g < 6 ->
+      if 1 <= g <= max_gain then 0 <= used[g] <= counts[g] else used[g] = 0
+
+  predicate minimum_count_operations
+    (counts: array int) (max_gain: int) (remaining: int) (res: int) =
+    length counts = 6 /\
+    0 <= max_gain <= 5 /\
+    ((remaining <= 0 /\ res = 0) \/
+     (remaining > 0 /\ res = (-1) /\
+       forall used: array int.
+         feasible_bucket_use counts max_gain used ->
+         bucket_gain used < remaining) \/
+     (remaining > 0 /\ 0 <= res /\
+       exists used: array int.
+         feasible_bucket_use counts max_gain used /\
+         bucket_gain used >= remaining /\
+         bucket_cost used = res /\
+         forall other: array int.
+           feasible_bucket_use counts max_gain other ->
+           bucket_gain other >= remaining ->
+           res <= bucket_cost other))
+
+  let lemma impossible_when_left_capacity_too_small
+    (nums1: array int) (nums2: array int)
+    requires { valid_dice_array nums1 }
+    requires { valid_dice_array nums2 }
+    requires { 6 * length nums1 < length nums2 }
+    ensures  { minimum_operations_spec nums1 nums2 (-1) }
+  =
+    ()
+
+  let lemma impossible_when_right_capacity_too_small
+    (nums1: array int) (nums2: array int)
+    requires { valid_dice_array nums1 }
+    requires { valid_dice_array nums2 }
+    requires { 6 * length nums2 < length nums1 }
+    ensures  { minimum_operations_spec nums1 nums2 (-1) }
+  =
+    ()
+
+  let lemma zero_operations_when_sums_equal
+    (nums1: array int) (nums2: array int)
+    requires { valid_dice_array nums1 }
+    requires { valid_dice_array nums2 }
+    requires { dice_sum nums1 = dice_sum nums2 }
+    ensures  { minimum_operations_spec nums1 nums2 0 }
+  =
+    ()
+
+  let lemma counted_greedy_result_is_minimum
+    (decrease_from: array int) (increase_to: array int) (counts: array int) (res: int)
+    requires { valid_dice_array decrease_from }
+    requires { valid_dice_array increase_to }
+    requires { dice_sum decrease_from > dice_sum increase_to }
+    requires { operation_counts_model decrease_from increase_to counts }
+    requires { minimum_count_operations counts 5 (dice_sum decrease_from - dice_sum increase_to) res }
+    ensures  { minimum_operations_spec decrease_from increase_to res }
+  =
+    ()
+
+  let lemma minimum_operations_spec_symmetric
+    (nums1: array int) (nums2: array int) (res: int)
+    requires { minimum_operations_spec nums2 nums1 res }
+    ensures  { minimum_operations_spec nums1 nums2 res }
+  =
+    ()
+
+  let rec sum_from (a: array int) (i: int) : int
+    requires { 0 <= i <= length a }
+    variant  { length a - i }
+    ensures  { result = ArraySum.sum a i (length a) }
+  =
+    if i >= length a then
+      0
+    else
+      a[i] + sum_from a (i + 1)
+
+  let sum_array (a: array int) : int
+    ensures { result = dice_sum a }
+  =
+    sum_from a 0
+
+  let rec fill_decrease_counts (a: array int) (counts: array int) (i: int) : unit
+    requires { valid_dice_array a }
+    requires { length counts = 6 }
+    requires { 0 <= i <= length a }
+    variant  { length a - i }
+    ensures  { length counts = 6 }
+  =
+    if i >= length a then
+      ()
+    else
+      let gain = a[i] - 1 in
+      assert { 0 <= gain <= 5 };
+      if gain > 0 then counts[gain] <- counts[gain] + 1 else ();
+      fill_decrease_counts a counts (i + 1)
+
+  let rec fill_increase_counts (a: array int) (counts: array int) (i: int) : unit
+    requires { valid_dice_array a }
+    requires { length counts = 6 }
+    requires { 0 <= i <= length a }
+    variant  { length a - i }
+    ensures  { length counts = 6 }
+  =
+    if i >= length a then
+      ()
+    else
+      let gain = 6 - a[i] in
+      assert { 0 <= gain <= 5 };
+      if gain > 0 then counts[gain] <- counts[gain] + 1 else ();
+      fill_increase_counts a counts (i + 1)
+
+  let rec consume_gains (remaining: int) (counts: array int) (gain: int) : int
+    requires { length counts = 6 }
+    requires { 0 <= gain <= 5 }
+    variant  { remaining + gain }
+    ensures  { minimum_count_operations (old counts) gain remaining result }
+  =
+    if remaining <= 0 then
+      0
+    else if gain <= 0 then
+      -1
+    else if counts[gain] = 0 then
+      consume_gains remaining counts (gain - 1)
+    else if remaining <= gain then
+      1
+    else
+      (counts[gain] <- counts[gain] - 1;
+       let tail = consume_gains (remaining - gain) counts gain in
+       if tail < 0 then -1 else 1 + tail)
+
+  let equal_sum_arrays_with_minimum_number_of_operations_array
+    (nums1: array int) (nums2: array int) : int
+    requires { valid_dice_array nums1 }
+    requires { valid_dice_array nums2 }
+    ensures  { minimum_operations_spec nums1 nums2 result }
+  =
+    if 6 * length nums1 < length nums2 then
+      (
+      impossible_when_left_capacity_too_small nums1 nums2;
+      assert { minimum_operations_spec nums1 nums2 (-1) };
+      -1)
+    else if 6 * length nums2 < length nums1 then
+      (
+      impossible_when_right_capacity_too_small nums1 nums2;
+      assert { minimum_operations_spec nums1 nums2 (-1) };
+      -1)
+    else
+      let sum1 = sum_array nums1 in
+      let sum2 = sum_array nums2 in
+      if sum1 = sum2 then
+        (
+        zero_operations_when_sums_equal nums1 nums2;
+        assert { minimum_operations_spec nums1 nums2 0 };
+        0)
+      else
+        let counts = make 6 0 in
+        assert { length counts = 6 };
+        assert { zero_count_array counts };
+        if sum1 > sum2 then
+          (fill_decrease_counts nums1 counts 0;
+           fill_increase_counts nums2 counts 0;
+           assert { operation_counts_model nums1 nums2 counts };
+           let ghost counts_before = copy counts in
+           assert { operation_counts_model nums1 nums2 counts_before };
+           let res = consume_gains (sum1 - sum2) counts 5 in
+           counted_greedy_result_is_minimum nums1 nums2 counts_before res;
+           assert { minimum_operations_spec nums1 nums2 res };
+           res)
+        else
+          (fill_decrease_counts nums2 counts 0;
+           fill_increase_counts nums1 counts 0;
+           assert { operation_counts_model nums2 nums1 counts };
+           let ghost counts_before = copy counts in
+           assert { operation_counts_model nums2 nums1 counts_before };
+           let res = consume_gains (sum2 - sum1) counts 5 in
+           counted_greedy_result_is_minimum nums2 nums1 counts_before res;
+           assert { minimum_operations_spec nums2 nums1 res };
+           minimum_operations_spec_symmetric nums1 nums2 res;
+           assert { minimum_operations_spec nums1 nums2 res };
+           res)
+
+end

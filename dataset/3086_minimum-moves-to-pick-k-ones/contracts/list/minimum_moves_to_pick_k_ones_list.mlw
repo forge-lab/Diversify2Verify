@@ -1,0 +1,206 @@
+module MinimumMovesToPickKOnes_List_Spec
+
+  use int.Int
+  use int.Abs
+  use list.List
+  use list.Length
+  use list.Mem
+  use list.NthNoOpt
+  use list.NumOcc
+
+  predicate binary_list (nums: list int) =
+    forall i: int. 0 <= i /\ i < length nums -> nth i nums = 0 \/ nth i nums = 1
+
+  predicate valid_pick_positions (nums: list int) (positions: list int) =
+    forall p: int.
+      mem p positions ->
+      0 <= p /\ p < length nums /\ nth p nums = 1
+
+  predicate distinct_positions (positions: list int) =
+    forall p: int. num_occ p positions <= 1
+
+  let rec function sum_distances (center: int) (positions: list int) : int
+    variant { positions }
+  =
+    match positions with
+    | Nil -> 0
+    | Cons p ps -> abs (p - center) + sum_distances center ps
+    end
+
+  predicate input_constraints (nums: list int) (k: int) (maxChanges: int) =
+    2 <= length nums /\
+    length nums <= 100000 /\
+    binary_list nums /\
+    1 <= k /\
+    k <= 100000 /\
+    0 <= maxChanges /\
+    maxChanges <= 100000 /\
+    maxChanges + num_occ 1 nums >= k
+
+  predicate feasible_pick_plan
+      (nums: list int) (k: int) (maxChanges: int)
+      (center: int) (picked: list int) (changed: int) (cost: int) =
+    0 <= center /\
+    center < length nums /\
+    0 <= changed /\
+    changed <= maxChanges /\
+    length picked + changed = k /\
+    distinct_positions picked /\
+    valid_pick_positions nums picked /\
+    cost = sum_distances center picked + 2 * changed
+
+  predicate no_better_plan
+      (nums: list int) (k: int) (maxChanges: int) (bound: int) =
+    forall center: int. forall picked: list int. forall changed cost: int.
+      feasible_pick_plan nums k maxChanges center picked changed cost -> bound <= cost
+
+  predicate minimum_moves_characterization
+      (nums: list int) (k: int) (maxChanges: int) (moves: int) =
+    (exists center: int. exists picked: list int. exists changed: int.
+       feasible_pick_plan nums k maxChanges center picked changed moves) /\
+    no_better_plan nums k maxChanges moves
+
+  val minimum_moves_to_pick_k_ones_list (nums: list int) (k: int) (maxChanges: int) : int
+    requires { input_constraints nums k maxChanges }
+    ensures  { minimum_moves_characterization nums k maxChanges result }
+
+  let lemma check_test_000 () =
+    let nums =
+      Cons 0 (Cons 1 (Cons 0 (Cons 1 (Cons 0 (Cons 1 (Cons 0
+      (Cons 1 (Cons 0 (Cons 1 Nil))))))))) in
+    let picked = Cons 5 (Cons 3 (Cons 7 Nil)) in
+    assert { length nums = 10 };
+    assert { nth 1 nums = 1 };
+    assert { nth 3 nums = 1 };
+    assert { nth 5 nums = 1 };
+    assert { nth 7 nums = 1 };
+    assert { nth 9 nums = 1 };
+    assert { num_occ 1 nums = 5 };
+    assert { binary_list nums };
+    assert { input_constraints nums 5 5 };
+    assert { distinct_positions picked };
+    assert { valid_pick_positions nums picked };
+    assert { sum_distances 5 Nil = 0 };
+    assert { sum_distances 5 (Cons 7 Nil) = 2 };
+    assert { sum_distances 5 (Cons 3 (Cons 7 Nil)) = 4 };
+    assert { sum_distances 5 picked = 4 };
+    assert { feasible_pick_plan nums 5 5 5 picked 2 8 };
+    assert { no_better_plan nums 5 5 8 };
+    assert { minimum_moves_characterization nums 5 5 8 }
+
+  let lemma check_test_001 () =
+    let nums =
+      Cons 1 (Cons 1 (Cons 0 (Cons 0 (Cons 0 (Cons 0 (Cons 0
+      (Cons 0 (Cons 0 (Cons 1 Nil))))))))) in
+    let picked = Cons 1 (Cons 0 Nil) in
+    assert { length nums = 10 };
+    assert { nth 0 nums = 1 };
+    assert { nth 1 nums = 1 };
+    assert { nth 9 nums = 1 };
+    assert { num_occ 1 nums = 3 };
+    assert { binary_list nums };
+    assert { input_constraints nums 3 2 };
+    assert { distinct_positions picked };
+    assert { valid_pick_positions nums picked };
+    assert { sum_distances 1 Nil = 0 };
+    assert { sum_distances 1 (Cons 0 Nil) = 1 };
+    assert { sum_distances 1 picked = 1 };
+    assert { feasible_pick_plan nums 3 2 1 picked 1 3 };
+    assert { no_better_plan nums 3 2 3 };
+    assert { minimum_moves_characterization nums 3 2 3 }
+
+  let lemma check_test_002 () =
+    let nums =
+      Cons 1 (Cons 0 (Cons 0 (Cons 0 (Cons 0 (Cons 0 (Cons 0
+      (Cons 0 (Cons 0 (Cons 1 Nil))))))))) in
+    let picked = Cons 0 Nil in
+    assert { length nums = 10 };
+    assert { nth 0 nums = 1 };
+    assert { nth 9 nums = 1 };
+    assert { num_occ 1 nums = 2 };
+    assert { binary_list nums };
+    assert { input_constraints nums 2 1 };
+    assert { distinct_positions picked };
+    assert { valid_pick_positions nums picked };
+    assert { sum_distances 0 Nil = 0 };
+    assert { sum_distances 0 picked = 0 };
+    assert { feasible_pick_plan nums 2 1 0 picked 1 2 };
+    assert { no_better_plan nums 2 1 2 };
+    assert { minimum_moves_characterization nums 2 1 2 }
+
+  let lemma check_test_003 () =
+    let nums =
+      Cons 0 (Cons 0 (Cons 1 (Cons 0 (Cons 0 (Cons 0 (Cons 0
+      (Cons 0 (Cons 1 (Cons 0 Nil))))))))) in
+    let picked = Cons 2 Nil in
+    assert { length nums = 10 };
+    assert { nth 2 nums = 1 };
+    assert { nth 8 nums = 1 };
+    assert { num_occ 1 nums = 2 };
+    assert { binary_list nums };
+    assert { input_constraints nums 2 1 };
+    assert { distinct_positions picked };
+    assert { valid_pick_positions nums picked };
+    assert { sum_distances 2 Nil = 0 };
+    assert { sum_distances 2 picked = 0 };
+    assert { feasible_pick_plan nums 2 1 2 picked 1 2 };
+    assert { no_better_plan nums 2 1 2 };
+    assert { minimum_moves_characterization nums 2 1 2 }
+
+  let lemma check_test_004 () =
+    let nums =
+      Cons 1 (Cons 0 (Cons 0 (Cons 0 (Cons 0 (Cons 0 (Cons 0
+      (Cons 0 (Cons 0 (Cons 0 Nil))))))))) in
+    let picked = Cons 0 Nil in
+    assert { length nums = 10 };
+    assert { nth 0 nums = 1 };
+    assert { num_occ 1 nums = 1 };
+    assert { binary_list nums };
+    assert { input_constraints nums 1 0 };
+    assert { distinct_positions picked };
+    assert { valid_pick_positions nums picked };
+    assert { sum_distances 0 picked = 0 };
+    assert { feasible_pick_plan nums 1 0 0 picked 0 0 };
+    assert { no_better_plan nums 1 0 0 };
+    assert { minimum_moves_characterization nums 1 0 0 }
+
+  let lemma check_test_005 () =
+    let nums = Cons 0 (Cons 0 (Cons 0 (Cons 0 Nil))) in
+    let picked: list int = Nil in
+    assert { length nums = 4 };
+    assert { num_occ 1 nums = 0 };
+    assert { binary_list nums };
+    assert { input_constraints nums 2 3 };
+    assert { distinct_positions picked };
+    assert { valid_pick_positions nums picked };
+    assert { sum_distances 0 picked = 0 };
+    assert { feasible_pick_plan nums 2 3 0 picked 2 4 };
+    assert { no_better_plan nums 2 3 4 };
+    assert { minimum_moves_characterization nums 2 3 4 }
+
+  let lemma check_test_006 () =
+    let nums =
+      Cons 0 (Cons 1 (Cons 0 (Cons 1 (Cons 0 (Cons 1 (Cons 0
+      (Cons 1 (Cons 0 (Cons 1 Nil))))))))) in
+    let picked = Cons 3 (Cons 1 (Cons 5 (Cons 7 Nil))) in
+    assert { length nums = 10 };
+    assert { nth 1 nums = 1 };
+    assert { nth 3 nums = 1 };
+    assert { nth 5 nums = 1 };
+    assert { nth 7 nums = 1 };
+    assert { nth 9 nums = 1 };
+    assert { num_occ 1 nums = 5 };
+    assert { binary_list nums };
+    assert { input_constraints nums 4 0 };
+    assert { distinct_positions picked };
+    assert { valid_pick_positions nums picked };
+    assert { sum_distances 3 Nil = 0 };
+    assert { sum_distances 3 (Cons 7 Nil) = 4 };
+    assert { sum_distances 3 (Cons 5 (Cons 7 Nil)) = 6 };
+    assert { sum_distances 3 (Cons 1 (Cons 5 (Cons 7 Nil))) = 8 };
+    assert { sum_distances 3 picked = 8 };
+    assert { feasible_pick_plan nums 4 0 3 picked 0 8 };
+    assert { no_better_plan nums 4 0 8 };
+    assert { minimum_moves_characterization nums 4 0 8 }
+
+end

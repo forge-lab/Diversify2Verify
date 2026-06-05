@@ -1,0 +1,105 @@
+module MinimumCostsUsingTheTrainLine_Array_Spec
+
+  use int.Int
+  use int.MinMax
+  use array.Array
+  use array.Init
+  use array.ArrayEq
+
+  predicate valid_input (regular: array int) (express: array int) (expressCost: int) =
+    1 <= length regular <= 100000 /\
+    length express = length regular /\
+    1 <= expressCost <= 100000 /\
+    (forall i: int. 0 <= i < length regular -> 1 <= regular[i] <= 100000) /\
+    (forall i: int. 0 <= i < length express -> 1 <= express[i] <= 100000)
+
+  let rec function route_cost
+      (regular: array int) (express: array int) (expressCost: int) (k: int) (route: int) : int
+    requires { length regular = length express }
+    requires { 0 <= k <= length regular }
+    requires { route = 0 \/ route = 1 }
+    variant  { k }
+  =
+    if k = 0 then
+      if route = 0 then 0 else expressCost
+    else if route = 0 then
+      min (route_cost regular express expressCost (k - 1) 0)
+          (route_cost regular express expressCost (k - 1) 1) + regular[k - 1]
+    else
+      min (route_cost regular express expressCost (k - 1) 1)
+          (route_cost regular express expressCost (k - 1) 0 + expressCost) + express[k - 1]
+
+  let function min_stop_cost (regular: array int) (express: array int) (expressCost: int) (k: int) : int
+    requires { length regular = length express }
+    requires { 1 <= k <= length regular }
+  =
+    min (route_cost regular express expressCost k 0)
+        (route_cost regular express expressCost k 1)
+
+  predicate valid_costs_output
+      (regular: array int) (express: array int) (expressCost: int) (costs: array int) =
+    valid_input regular express expressCost /\
+    length costs = length regular /\
+    forall i: int. 0 <= i < length costs ->
+      costs[i] = min_stop_cost regular express expressCost (i + 1)
+
+  let rec fill_costs
+      (regular: array int)
+      (express: array int)
+      (expressCost: int)
+      (costs: array int)
+      (i: int)
+      (regular_cost: int)
+      (express_cost: int) : unit
+    requires { valid_input regular express expressCost }
+    requires { length costs = length regular }
+    requires { 0 <= i <= length regular }
+    requires { regular_cost = route_cost regular express expressCost i 0 }
+    requires { express_cost = route_cost regular express expressCost i 1 }
+    requires {
+      forall j: int. 0 <= j < i ->
+        costs[j] = min_stop_cost regular express expressCost (j + 1)
+    }
+    ensures  {
+      forall j: int. 0 <= j < length costs ->
+        costs[j] = min_stop_cost regular express expressCost (j + 1)
+    }
+    variant { length regular - i }
+  =
+    if i >= length regular then
+      ()
+    else
+      let next_regular = (min regular_cost express_cost) + regular[i] in
+      let next_express = (min express_cost (regular_cost + expressCost)) + express[i] in
+      let next_stop = min next_regular next_express in
+      assert { 0 <= i < length regular };
+      assert { length express = length regular };
+      assert { next_regular = route_cost regular express expressCost (i + 1) 0 };
+      assert { next_express = route_cost regular express expressCost (i + 1) 1 };
+      assert { next_stop = min_stop_cost regular express expressCost (i + 1) };
+      costs[i] <- next_stop;
+      assert { costs[i] = min_stop_cost regular express expressCost (i + 1) };
+      assert {
+        forall j: int. 0 <= j < i + 1 ->
+          costs[j] = min_stop_cost regular express expressCost (j + 1)
+      };
+      fill_costs regular express expressCost costs (i + 1) next_regular next_express
+
+  let minimum_costs_using_the_train_line_array
+      (regular: array int)
+      (express: array int)
+      (expressCost: int) : array int
+    requires { valid_input regular express expressCost }
+    ensures  { valid_costs_output regular express expressCost result }
+  =
+    let n = length regular in
+    let costs = make n 0 in
+    assert { length costs = length regular };
+    fill_costs regular express expressCost costs 0 0 expressCost;
+    assert {
+      forall i: int. 0 <= i < length costs ->
+        costs[i] = min_stop_cost regular express expressCost (i + 1)
+    };
+    costs
+
+end

@@ -1,0 +1,129 @@
+module MaximumPointsYouCanObtainFromCards_List_Spec
+
+  use int.Int
+  use list.List
+  use list.Length
+  use list.Prefix
+  use list.Reverse
+  use list.Sum
+
+  predicate valid_take_split (cardPoints: list int) (k: int) (left_count: int) =
+    0 <= left_count <= k /\ k <= length cardPoints
+
+  function split_score (cardPoints: list int) (k: int) (left_count: int) : int =
+    sum (prefix left_count cardPoints) +
+    sum (prefix (k - left_count) (reverse cardPoints))
+
+  predicate is_maximum_card_score (cardPoints: list int) (k: int) (answer: int) =
+    1 <= k <= length cardPoints /\
+    (exists left_count: int.
+       valid_take_split cardPoints k left_count /\
+       answer = split_score cardPoints k left_count) /\
+    (forall other_count: int.
+       valid_take_split cardPoints k other_count ->
+       split_score cardPoints k other_count <= answer)
+
+  val maximum_points_you_can_obtain_from_cards_list (cardPoints: list int) (k: int) : int
+    requires { 1 <= k <= length cardPoints }
+    ensures  { is_maximum_card_score cardPoints k result }
+
+  let lemma check_test_000 () =
+    let l =
+      Cons 5 (Cons 2 (Cons 1 (Cons 2 (Cons 5 Nil)))) in
+    assert { length l = 5 };
+    assert { forall i: int. valid_take_split l 3 i -> i = 0 \/ i = 1 \/ i = 2 \/ i = 3 };
+    assert { split_score l 3 0 = 8 };
+    assert { split_score l 3 1 = 12 };
+    assert { split_score l 3 2 = 12 };
+    assert { split_score l 3 3 = 8 };
+    assert { valid_take_split l 3 1 };
+    assert { is_maximum_card_score l 3 12 }
+
+  let lemma check_test_001 () =
+    let l =
+      Cons 9 (Cons 7 (Cons 7 (Cons 9 (Cons 7 (Cons 7 (Cons 9 Nil)))))) in
+    assert { length l = 7 };
+    assert {
+      forall i: int. valid_take_split l 7 i ->
+        i = 0 \/ i = 1 \/ i = 2 \/ i = 3 \/ i = 4 \/ i = 5 \/ i = 6 \/ i = 7
+    };
+    assert { split_score l 7 0 = 55 };
+    assert { split_score l 7 1 = 55 };
+    assert { split_score l 7 2 = 55 };
+    assert { split_score l 7 3 = 55 };
+    assert { split_score l 7 4 = 55 };
+    assert { split_score l 7 5 = 55 };
+    assert { split_score l 7 6 = 55 };
+    assert { split_score l 7 7 = 55 };
+    assert { valid_take_split l 7 0 };
+    assert { is_maximum_card_score l 7 55 }
+
+  let lemma check_test_002 () =
+    let l =
+      Cons 1 (Cons 1000 (Cons 1 Nil)) in
+    assert { length l = 3 };
+    assert { forall i: int. valid_take_split l 1 i -> i = 0 \/ i = 1 };
+    assert { split_score l 1 0 = 1 };
+    assert { split_score l 1 1 = 1 };
+    assert { valid_take_split l 1 0 };
+    assert { is_maximum_card_score l 1 1 }
+
+  let lemma check_test_003 () =
+    let l =
+      Cons 10 (Cons 9 (Cons 8 (Cons 7 (Cons 6
+      (Cons 5 (Cons 4 (Cons 3 (Cons 2 (Cons 1 Nil))))))))) in
+    assert { length l = 10 };
+    assert {
+      forall i: int. valid_take_split l 5 i ->
+        i = 0 \/ i = 1 \/ i = 2 \/ i = 3 \/ i = 4 \/ i = 5
+    };
+    assert { split_score l 5 0 = 15 };
+    assert { split_score l 5 1 = 20 };
+    assert { split_score l 5 2 = 25 };
+    assert { split_score l 5 3 = 30 };
+    assert { split_score l 5 4 = 35 };
+    assert { split_score l 5 5 = 40 };
+    assert { valid_take_split l 5 5 };
+    assert { is_maximum_card_score l 5 40 }
+
+  let lemma check_test_004 () =
+    let l =
+      Cons 2 (Cons 2 (Cons 2 Nil)) in
+    assert { length l = 3 };
+    assert { forall i: int. valid_take_split l 2 i -> i = 0 \/ i = 1 \/ i = 2 };
+    assert { split_score l 2 0 = 4 };
+    assert { split_score l 2 1 = 4 };
+    assert { split_score l 2 2 = 4 };
+    assert { valid_take_split l 2 0 };
+    assert { is_maximum_card_score l 2 4 }
+
+  let lemma check_test_006 () =
+    let l =
+      Cons 1 (Cons 2 (Cons 3 (Cons 4 (Cons 5 (Cons 6 (Cons 1 Nil)))))) in
+    assert { length l = 7 };
+    assert { forall i: int. valid_take_split l 3 i -> i = 0 \/ i = 1 \/ i = 2 \/ i = 3 };
+    assert { split_score l 3 0 = 12 };
+    assert { split_score l 3 1 = 8 };
+    assert { split_score l 3 2 = 4 };
+    assert { split_score l 3 3 = 6 };
+    assert { valid_take_split l 3 0 };
+    assert { is_maximum_card_score l 3 12 }
+
+  let lemma check_test_009 () =
+    let l =
+      Cons 100 (Cons 400 (Cons 300 (Cons 100 (Cons 200
+      (Cons 500 (Cons 600 (Cons 300 (Cons 400 Nil)))))))) in
+    assert { length l = 9 };
+    assert {
+      forall i: int. valid_take_split l 4 i ->
+        i = 0 \/ i = 1 \/ i = 2 \/ i = 3 \/ i = 4
+    };
+    assert { split_score l 4 0 = 1800 };
+    assert { split_score l 4 1 = 1400 };
+    assert { split_score l 4 2 = 1200 };
+    assert { split_score l 4 3 = 1200 };
+    assert { split_score l 4 4 = 900 };
+    assert { valid_take_split l 4 0 };
+    assert { is_maximum_card_score l 4 1800 }
+
+end

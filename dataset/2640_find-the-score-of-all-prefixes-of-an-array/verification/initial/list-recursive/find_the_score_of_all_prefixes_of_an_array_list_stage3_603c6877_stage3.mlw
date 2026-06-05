@@ -1,0 +1,78 @@
+module FindTheScoreOfAllPrefixesOfAnArray_List_Stage3_Recursive
+
+  use int.Int
+  use int.MinMax
+  use list.List
+
+  let rec predicate values_in_domain (nums: list int)
+    variant { nums }
+  =
+    match nums with
+    | Nil -> true
+    | Cons x xs -> 1 <= x && x <= 1000000000 && values_in_domain xs
+    end
+
+  predicate valid_input (nums: list int) =
+    nums <> Nil /\ values_in_domain nums
+
+  let rec function prefix_scores_from
+    (nums: list int) (current_max: int) (running_score: int) : list int
+    variant { nums }
+  =
+    match nums with
+    | Nil -> Nil
+    | Cons x xs ->
+        let next_max = max current_max x in
+        let next_score = running_score + x + next_max in
+        Cons next_score (prefix_scores_from xs next_max next_score)
+    end
+
+  function prefix_scores (nums: list int) : list int =
+    match nums with
+    | Nil -> Nil
+    | Cons x xs ->
+        let first_score = x + x in
+        Cons first_score (prefix_scores_from xs x first_score)
+    end
+
+  predicate result_matches (nums: list int) (ans: list int) =
+    valid_input nums /\ ans = prefix_scores nums
+
+  let rec prefix_scores_from_exec
+    (nums: list int) (current_max: int) (running_score: int) : list int
+    ensures { result = prefix_scores_from nums current_max running_score }
+    variant { nums }
+  =
+    match nums with
+    | Nil ->
+        assert { prefix_scores_from nums current_max running_score = Nil };
+        Nil
+    | Cons x xs ->
+        let next_max = max current_max x in
+        let next_score = running_score + x + next_max in
+        let rest = prefix_scores_from_exec xs next_max next_score in
+        assert { rest = prefix_scores_from xs next_max next_score };
+        assert {
+          prefix_scores_from nums current_max running_score =
+          Cons next_score (prefix_scores_from xs next_max next_score)
+        };
+        Cons next_score rest
+    end
+
+  let find_the_score_of_all_prefixes_of_an_array_list (nums: list int) : list int
+    requires { valid_input nums }
+    ensures  { result_matches nums result }
+  =
+    match nums with
+    | Nil ->
+        assert { false };
+        Nil
+    | Cons x xs ->
+        let first_score = x + x in
+        let tail_scores = prefix_scores_from_exec xs x first_score in
+        assert { tail_scores = prefix_scores_from xs x first_score };
+        assert { prefix_scores nums = Cons first_score (prefix_scores_from xs x first_score) };
+        Cons first_score tail_scores
+    end
+
+end

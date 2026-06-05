@@ -1,0 +1,155 @@
+module CountTheNumberOfFairPairs_Array_Recursive_Implementation
+
+  use int.Int
+  use array.Array
+  use array.Init
+
+  let rec count_pairs_from_j (nums: array int) (lower: int) (upper: int) (i: int) (j: int) : int
+    variant { length nums - j }
+  =
+    if j >= length nums then
+      0
+    else
+      (if lower <= nums[i] + nums[j] <= upper then 1 else 0) +
+      count_pairs_from_j nums lower upper i (j + 1)
+
+  let rec count_pairs_from_i (nums: array int) (lower: int) (upper: int) (i: int) : int
+    variant { length nums - i }
+  =
+    if i >= length nums then
+      0
+    else
+      count_pairs_from_j nums lower upper i (i + 1) +
+      count_pairs_from_i nums lower upper (i + 1)
+
+  let count_the_number_of_fair_pairs_array (nums: array int) (lower: int) (upper: int) : int =
+    count_pairs_from_i nums lower upper 0
+
+  let check_case (nums: array int) (lower: int) (upper: int) (expected: int) : bool =
+    let r = count_the_number_of_fair_pairs_array nums lower upper in
+    r = expected
+
+  let test_000 () : bool =
+    let nums = init 4 [|1000000000; (-1000000000); 500000000; (-500000000)|] in
+    check_case nums 0 0 2
+
+  let test_001 () : bool =
+    let nums = init 6 [|0; 1; 7; 4; 4; 5|] in
+    check_case nums 3 6 6
+
+  let test_002 () : bool =
+    let nums = init 5 [|5; 5; 5; 5; 5|] in
+    check_case nums 10 10 10
+
+  let test_003 () : bool =
+    let nums = init 5 [|(-1); 0; 1; 2; 3|] in
+    check_case nums 0 4 8
+
+  let test_004 () : bool =
+    let nums = init 5 [|(-1); 0; 1; 2; 3|] in
+    check_case nums (-2) 2 6
+
+  let test_005 () : bool =
+    let nums = init 5 [|10; 20; 30; 40; 50|] in
+    check_case nums 50 70 6
+
+  let test_006 () : bool =
+    let nums = init 4 [|1000000000; (-1000000000); 500000000; (-500000000)|] in
+    check_case nums (-1500000000) 1500000000 6
+
+  let test_007 () : bool =
+    let nums = init 5 [|(-1); 0; 1; 2; 3|] in
+    check_case nums 0 2 5
+
+  let test_008 () : bool =
+    let nums = init 5 [|1; 7; 9; 2; 5|] in
+    check_case nums 11 11 1
+
+  let test_009 () : bool =
+    let nums = init 10 [|1; 2; 3; 4; 5; 6; 7; 8; 9; 10|] in
+    check_case nums 5 15 37
+
+  let test_010 () : bool =
+    let nums = init 5 [|5; 5; 5; 5; 5|] in
+    check_case nums 10 10 10
+
+  let test_011 () : bool =
+    let nums = init 5 [|(-1); 0; 1; 2; 3|] in
+    check_case nums 0 2 5
+
+  let test_012 () : bool =
+    let nums = init 5 [|(-10); (-20); (-30); (-40); (-50)|] in
+    check_case nums (-80) (-50) 7
+
+  let test_013 () : bool =
+    let nums = init 5 [|1; 2; 3; 4; 5|] in
+    check_case nums 5 8 7
+
+  let test_014 () : bool =
+    let nums = init 5 [|(-1); 0; 1; 2; 3|] in
+    check_case nums 0 4 8
+
+  let test_015 () : bool =
+    let nums = init 20 [|1; 2; 3; 4; 5; 6; 7; 8; 9; 10; 11; 12; 13; 14; 15; 16; 17; 18; 19; 20|] in
+    check_case nums 1 38 189
+
+  let test_016 () : bool =
+    let nums = init 20 [|0; 0; 0; 0; 0; 0; 0; 0; 0; 0; 0; 0; 0; 0; 0; 0; 0; 0; 0; 0|] in
+    check_case nums 0 0 190
+
+  let test_017 () : bool =
+    let nums = init 10 [|10; 20; 30; 40; 50; 60; 70; 80; 90; 100|] in
+    check_case nums 50 150 37
+
+  let test_018 () : bool =
+    let nums = init 10 [|(-100); (-90); (-80); (-70); (-60); (-50); (-40); (-30); (-20); (-10)|] in
+    check_case nums (-150) (-50) 37
+
+  let test_019 () : bool =
+    let nums = init 15 [|1; 2; 3; 4; 5; 6; 7; 8; 9; 10; 11; 12; 13; 14; 15|] in
+    check_case nums 10 20 64
+
+  let run_tests () : bool =
+    if test_000 () then
+    if test_001 () then
+    if test_002 () then
+    if test_003 () then
+    if test_004 () then
+    if test_005 () then
+    if test_006 () then
+    if test_007 () then
+    if test_008 () then
+    if test_009 () then
+    if test_010 () then
+    if test_011 () then
+    if test_012 () then
+    if test_013 () then
+    if test_014 () then
+    if test_015 () then
+    if test_016 () then
+    if test_017 () then
+    if test_018 () then
+    if test_019 () then
+      true
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+
+end

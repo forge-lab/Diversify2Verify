@@ -1,0 +1,233 @@
+module MinimumOperationsToMakeMedianOfArrayEqualToK_List_Stage3_Imperative
+
+  use int.Int
+  use int.Abs
+  use int.EuclideanDivision
+  use list.List
+  use list.Length
+  use list.NumOcc
+  use ref.Ref
+
+  let rec predicate all_nonnegative (nums: list int)
+    variant { nums }
+  =
+    match nums with
+    | Nil -> true
+    | Cons x xs -> 0 <= x && all_nonnegative xs
+    end
+
+  let rec function count_lt (nums: list int) (k: int) : int
+    variant { nums }
+  =
+    match nums with
+    | Nil -> 0
+    | Cons x xs -> (if x < k then 1 else 0) + count_lt xs k
+    end
+
+  let rec function count_gt (nums: list int) (k: int) : int
+    variant { nums }
+  =
+    match nums with
+    | Nil -> 0
+    | Cons x xs -> (if x > k then 1 else 0) + count_gt xs k
+    end
+
+  predicate upper_median_is (nums: list int) (k: int) =
+    nums <> Nil /\
+    count_lt nums k <= div (length nums) 2 /\
+    count_gt nums k <= length nums - div (length nums) 2 - 1
+
+  let rec function transform_cost (nums: list int) (final: list int) : int
+    variant { nums }
+  =
+    match nums, final with
+    | Nil, Nil -> 0
+    | Cons x xs, Cons y ys -> abs (x - y) + transform_cost xs ys
+    | _, _ -> 0
+    end
+
+  predicate minimum_operations_result (nums: list int) (k: int) (ops: int) =
+    0 <= ops /\
+    exists final: list int.
+      length final = length nums /\
+      upper_median_is final k /\
+      transform_cost nums final = ops /\
+      (forall other: list int.
+        length other = length nums /\ upper_median_is other k ->
+        ops <= transform_cost nums other)
+
+  let rec predicate sorted_nondec (xs: list int)
+    variant { xs }
+  =
+    match xs with
+    | Nil -> true
+    | Cons _ Nil -> true
+    | Cons x (Cons y ys) -> x <= y && sorted_nondec (Cons y ys)
+    end
+
+  let rec function cost_count_lt (nums: list int) (k: int) (c: int) : int
+    variant { nums }
+  =
+    match nums with
+    | Nil -> 0
+    | Cons x xs ->
+        (if x < k && c = k - x then 1 else 0) + cost_count_lt xs k c
+    end
+
+  let rec function cost_count_gt (nums: list int) (k: int) (c: int) : int
+    variant { nums }
+  =
+    match nums with
+    | Nil -> 0
+    | Cons x xs ->
+        (if x > k && c = x - k then 1 else 0) + cost_count_gt xs k c
+    end
+
+  let rec function sum_first_log (n: int) (xs: list int) : int
+    variant { xs }
+  =
+    if n <= 0 then 0 else
+    match xs with
+    | Nil -> 0
+    | Cons x ys -> x + sum_first_log (n - 1) ys
+    end
+
+  let rec insert_sorted (x: int) (xs: list int) : list int
+    requires { 0 <= x }
+    requires { all_nonnegative xs }
+    requires { sorted_nondec xs }
+    ensures  { all_nonnegative result }
+    ensures  { sorted_nondec result }
+    ensures  { length result = length xs + 1 }
+    ensures  { forall c: int.
+      num_occ c result = (if c = x then 1 else 0) + num_occ c xs }
+    variant { xs }
+  =
+    match xs with
+    | Nil -> Cons x Nil
+    | Cons y ys ->
+        if x <= y then Cons x xs else Cons y (insert_sorted x ys)
+    end
+
+  let rec sum_first (n: int) (xs: list int) : int
+    requires { all_nonnegative xs }
+    ensures  { 0 <= result }
+    ensures  { result = sum_first_log n xs }
+    variant { xs }
+  =
+    if n <= 0 then 0 else
+    match xs with
+    | Nil -> 0
+    | Cons x ys -> x + sum_first (n - 1) ys
+    end
+
+  let lemma optimal_cost_lists_bridge
+    (nums: list int) (k: int)
+    (below_costs: list int) (above_costs: list int)
+    (max_below: int) (max_above: int)
+    (raise_needed: int) (lower_needed: int)
+    requires { nums <> Nil }
+    requires { k >= 0 }
+    requires { all_nonnegative nums }
+    requires { all_nonnegative below_costs }
+    requires { all_nonnegative above_costs }
+    requires { sorted_nondec below_costs }
+    requires { sorted_nondec above_costs }
+    requires { length below_costs = count_lt nums k }
+    requires { length above_costs = count_gt nums k }
+    requires { forall c: int. num_occ c below_costs = cost_count_lt nums k c }
+    requires { forall c: int. num_occ c above_costs = cost_count_gt nums k c }
+    requires { max_below = div (length nums) 2 }
+    requires { max_above = length nums - div (length nums) 2 - 1 }
+    requires { raise_needed =
+      (if count_lt nums k > max_below then count_lt nums k - max_below else 0) }
+    requires { lower_needed =
+      (if count_gt nums k > max_above then count_gt nums k - max_above else 0) }
+    ensures  { minimum_operations_result nums k
+      (sum_first_log raise_needed below_costs + sum_first_log lower_needed above_costs) }
+  = ()
+
+  let minimum_operations_to_make_median_of_array_equal_to_k_list
+    (nums: list int) (k: int) : int
+    requires { nums <> Nil }
+    requires { k >= 0 }
+    requires { all_nonnegative nums }
+    ensures  { minimum_operations_result nums k result }
+  =
+    let below_costs = ref (Nil: list int) in
+    let above_costs = ref (Nil: list int) in
+    let below_count = ref 0 in
+    let above_count = ref 0 in
+    let total_count = ref 0 in
+    let cur = ref nums in
+    while (match !cur with Nil -> false | Cons _ _ -> true end) do
+      invariant { 0 <= !total_count }
+      invariant { 0 <= !below_count }
+      invariant { 0 <= !above_count }
+      invariant { !total_count + length !cur = length nums }
+      invariant { !below_count + count_lt !cur k = count_lt nums k }
+      invariant { !above_count + count_gt !cur k = count_gt nums k }
+      invariant { all_nonnegative !below_costs }
+      invariant { all_nonnegative !above_costs }
+      invariant { sorted_nondec !below_costs }
+      invariant { sorted_nondec !above_costs }
+      invariant { length !below_costs = !below_count }
+      invariant { length !above_costs = !above_count }
+      invariant { forall c: int.
+        num_occ c !below_costs + cost_count_lt !cur k c = cost_count_lt nums k c }
+      invariant { forall c: int.
+        num_occ c !above_costs + cost_count_gt !cur k c = cost_count_gt nums k c }
+      variant   { length !cur }
+
+      match !cur with
+      | Nil -> absurd
+      | Cons x xs ->
+          assert { length !cur = 1 + length xs };
+          total_count := !total_count + 1;
+          if x < k then
+            (assert { 0 <= k - x };
+             below_count := !below_count + 1;
+             below_costs := insert_sorted (k - x) !below_costs)
+          else if x > k then
+            (assert { 0 <= x - k };
+             above_count := !above_count + 1;
+             above_costs := insert_sorted (x - k) !above_costs);
+          cur := xs
+      end
+    done;
+    match !cur with
+    | Nil -> ()
+    | Cons _ _ -> absurd
+    end;
+    assert { !cur = Nil };
+    assert { length !cur = 0 };
+    assert { !total_count = length nums };
+    assert { !below_count = count_lt nums k };
+    assert { !above_count = count_gt nums k };
+    assert { forall c: int. cost_count_lt !cur k c = 0 };
+    assert { forall c: int. cost_count_gt !cur k c = 0 };
+    assert { forall c: int. num_occ c !below_costs = cost_count_lt nums k c };
+    assert { forall c: int. num_occ c !above_costs = cost_count_gt nums k c };
+    let max_below = div !total_count 2 in
+    let max_above = !total_count - max_below - 1 in
+    assert { max_below = div (length nums) 2 };
+    assert { max_above = length nums - div (length nums) 2 - 1 };
+    let raise_needed =
+      if !below_count > max_below then !below_count - max_below else 0 in
+    let lower_needed =
+      if !above_count > max_above then !above_count - max_above else 0 in
+    assert { raise_needed =
+      (if count_lt nums k > max_below then count_lt nums k - max_below else 0) };
+    assert { lower_needed =
+      (if count_gt nums k > max_above then count_gt nums k - max_above else 0) };
+    assert { 0 <= raise_needed };
+    assert { 0 <= lower_needed };
+    let result =
+      sum_first raise_needed !below_costs + sum_first lower_needed !above_costs in
+    assert { 0 <= result };
+    optimal_cost_lists_bridge nums k !below_costs !above_costs
+      max_below max_above raise_needed lower_needed;
+    assert { minimum_operations_result nums k result };
+    result
+
+end

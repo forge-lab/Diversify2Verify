@@ -1,0 +1,150 @@
+module MajorityElement_Array_Imperative_Implementation
+
+  use int.Int
+  use array.Array
+  use array.Init
+  use ref.Ref
+
+  let majority_element_array (nums: array int) : int =
+    if length nums = 0 then 0 else
+      let candidate = ref nums[0] in
+      let balance = ref 1 in
+      for i = 1 to length nums - 1 do
+        if !balance = 0 then begin
+          candidate := nums[i];
+          balance := 1
+        end else if nums[i] = !candidate then
+          balance := !balance + 1
+        else
+          balance := !balance - 1
+      done;
+      !candidate
+
+  let check_case (nums: array int) (expected: int) : bool =
+    let r = majority_element_array nums in
+    r = expected
+
+  let test_test_000 () : bool =
+    let nums = init 7 [|1; 1; 2; 2; 2; 2; 2|] in
+    check_case nums 2
+
+  let test_test_001 () : bool =
+    let nums = init 7 [|1; 1; 1; 1; 2; 2; 3|] in
+    check_case nums 1
+
+  let test_test_002 () : bool =
+    let nums = init 7 [|2; 2; 1; 1; 1; 2; 2|] in
+    check_case nums 2
+
+  let test_test_003 () : bool =
+    let nums = init 10 [|-1; 100; -1; -1; -1; -1; 1; 1; 1; 1|] in
+    check_case nums (-1)
+
+  let test_test_004 () : bool =
+    let nums = init 9 [|1; 2; 3; 4; 5; 4; 4; 4; 4|] in
+    check_case nums 4
+
+  let test_test_005 () : bool =
+    let nums = init 7 [|4; 4; 4; 4; 2; 2; 3|] in
+    check_case nums 4
+
+  let test_test_006 () : bool =
+    let nums = init 11 [|1000000000; 1000000000; 1000000000; 1000000000; 1000000000; 1000000000; 1; 1; 1; 1; 1|] in
+    check_case nums 1000000000
+
+  let test_test_007 () : bool =
+    let nums = init 8 [|5; 5; 4; 5; 5; 6; 5; 5|] in
+    check_case nums 5
+
+  let test_test_008 () : bool =
+    let nums = init 10 [|1; 2; 3; 4; 5; 1; 1; 1; 1; 1|] in
+    check_case nums 1
+
+  let test_test_009 () : bool =
+    let nums = init 5 [|1000000000; -1000000000; 1000000000; 1000000000; 1000000000|] in
+    check_case nums 1000000000
+
+  let test_test_010 () : bool =
+    let nums = init 11 [|1; 1; 1; 1; 2; 2; 3; 3; 3; 3; 3|] in
+    check_case nums 3
+
+  let test_test_011 () : bool =
+    let nums = init 20 [|5; 5; 5; 5; 5; 5; 5; 5; 5; 5; 5; 5; 5; 5; 5; 5; 5; 5; 5; 5|] in
+    check_case nums 5
+
+  let test_test_012 () : bool =
+    let nums = init 13 [|7; 7; 7; 7; 7; 7; 7; 7; 0; 0; 0; 0; 0|] in
+    check_case nums 7
+
+  let test_test_013 () : bool =
+    let nums = init 11 [|-1000000000; -1000000000; -1000000000; -1000000000; -1000000000; -1000000000; 1; 1; 1; 1; 1|] in
+    check_case nums (-1000000000)
+
+  let test_test_014 () : bool =
+    let nums = init 7 [|1; 1; 2; 2; 1; 1; 1|] in
+    check_case nums 1
+
+  let test_test_015 () : bool =
+    let nums = init 10 [|8; 8; 8; 8; 8; 8; 8; 8; 8; 8|] in
+    check_case nums 8
+
+  let test_test_016 () : bool =
+    let nums = init 15 [|5; 5; 5; 5; 5; 5; 5; 5; 5; 5; 1; 1; 1; 1; 1|] in
+    check_case nums 5
+
+  let test_test_017 () : bool =
+    let nums = init 15 [|1; 2; 3; 4; 5; 6; 7; 8; 9; 1; 1; 1; 1; 1; 1|] in
+    check_case nums 1
+
+  let test_test_018 () : bool =
+    let nums = init 3 [|3; 2; 3|] in
+    check_case nums 3
+
+  let test_test_019 () : bool =
+    let nums = init 15 [|0; 0; 0; 0; 0; 0; 0; 0; 0; 0; 0; 0; 0; 0; 0|] in
+    check_case nums 0
+
+  let run_tests () : bool =
+    if test_test_000 () then
+    if test_test_001 () then
+    if test_test_002 () then
+    if test_test_003 () then
+    if test_test_004 () then
+    if test_test_005 () then
+    if test_test_006 () then
+    if test_test_007 () then
+    if test_test_008 () then
+    if test_test_009 () then
+    if test_test_010 () then
+    if test_test_011 () then
+    if test_test_012 () then
+    if test_test_013 () then
+    if test_test_014 () then
+    if test_test_015 () then
+    if test_test_016 () then
+    if test_test_017 () then
+    if test_test_018 () then
+    if test_test_019 () then
+      true
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+
+end

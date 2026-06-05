@@ -1,0 +1,90 @@
+module SumOfDistances_Array_Spec
+
+  use int.Int
+  use int.Abs
+  use int.Sum
+  use array.Array
+  use array.Init
+
+  predicate valid_input (nums: array int) =
+    1 <= length nums <= 100000 /\
+    forall i: int. 0 <= i < length nums -> 0 <= nums[i] <= 1000000000
+
+  predicate same_value_other (nums: array int) (i: int) (j: int) =
+    0 <= i < length nums /\ 0 <= j < length nums /\
+    i <> j /\ nums[j] = nums[i]
+
+  function distance_contribution (nums: array int) (i: int) (j: int) : int =
+    if 0 <= i < length nums /\ 0 <= j < length nums /\ i <> j /\ nums[j] = nums[i]
+    then abs (i - j)
+    else 0
+
+  function sum_distances_at (nums: array int) (i: int) : int =
+    sum (fun j -> distance_contribution nums i j) 0 (length nums)
+
+  predicate output_matches (nums: array int) (result: array int) =
+    length result = length nums /\
+    forall i: int. 0 <= i < length nums ->
+      result[i] = sum_distances_at nums i
+
+  let abs_diff (i: int) (j: int) : int
+    ensures { result = abs (i - j) }
+  =
+    if i >= j then begin
+      assert { i - j >= 0 };
+      i - j
+    end else begin
+      assert { i - j < 0 };
+      j - i
+    end
+
+  let rec distance_sum_from (nums: array int) (i: int) (j: int) : int
+    requires { 0 <= i < length nums }
+    requires { 0 <= j <= length nums }
+    ensures  { result = sum (fun k -> distance_contribution nums i k) j (length nums) }
+    variant  { length nums - j }
+  =
+    if j >= length nums then
+      0
+    else begin
+      let contribution =
+        if j <> i && nums[j] = nums[i] then abs_diff i j else 0 in
+      assert { contribution = distance_contribution nums i j };
+      assert { sum (fun k -> distance_contribution nums i k) j (length nums) =
+        distance_contribution nums i j +
+        sum (fun k -> distance_contribution nums i k) (j + 1) (length nums) };
+      contribution + distance_sum_from nums i (j + 1)
+    end
+
+  let rec fill_result (nums: array int) (out: array int) (i: int) : unit
+    requires { valid_input nums }
+    requires { length out = length nums }
+    requires { 0 <= i <= length nums }
+    ensures  { length out = length nums }
+    ensures  { forall k: int. 0 <= k < i -> out[k] = (old out)[k] }
+    ensures  { forall k: int. i <= k < length nums -> out[k] = sum_distances_at nums k }
+    variant  { length nums - i }
+  =
+    if i >= length nums then
+      ()
+    else begin
+      let value = distance_sum_from nums i 0 in
+      assert { value = sum_distances_at nums i };
+      out[i] <- value;
+      assert { out[i] = sum_distances_at nums i };
+      fill_result nums out (i + 1);
+      assert { forall k: int. i + 1 <= k < length nums -> out[k] = sum_distances_at nums k };
+      assert { out[i] = sum_distances_at nums i }
+    end
+
+  let sum_of_distances_array (nums: array int) : array int
+    requires { valid_input nums }
+    ensures  { output_matches nums result }
+  =
+    let result = make (length nums) 0 in
+    fill_result nums result 0;
+    assert { length result = length nums };
+    assert { forall i: int. 0 <= i < length nums -> result[i] = sum_distances_at nums i };
+    result
+
+end

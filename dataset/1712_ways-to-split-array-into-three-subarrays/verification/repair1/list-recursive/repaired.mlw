@@ -1,0 +1,153 @@
+module WaysToSplitArrayIntoThreeSubarrays_List_Stage3_Recursive
+
+  use int.Int
+  use int.EuclideanDivision
+  use list.List
+  use list.Length
+  use list.Append
+  use list.Sum
+
+  function split_modulus : int = 1000000007
+
+  let rec predicate nonnegative_list (nums: list int)
+    variant { nums }
+  =
+    match nums with
+    | Nil -> true
+    | Cons x xs -> 0 <= x && nonnegative_list xs
+    end
+
+  predicate good_split_parts (left: list int) (mid: list int) (right: list int) =
+    left <> Nil /\
+    mid <> Nil /\
+    right <> Nil /\
+    sum left <= sum mid /\
+    sum mid <= sum right
+
+  let function good_split_indicator (left: list int) (mid: list int) (right: list int) : int =
+    if sum left <= sum mid && sum mid <= sum right then 1 else 0
+
+  let rec lemma sum_append_singleton (prefix: list int) (x: int)
+    ensures { sum (prefix ++ Cons x Nil) = sum prefix + x }
+    variant { prefix }
+  =
+    match prefix with
+    | Nil ->
+        assert { prefix ++ Cons x Nil = Cons x Nil };
+        assert { sum prefix = 0 };
+        assert { sum (Cons x Nil) = x }
+    | Cons y ys ->
+        sum_append_singleton ys x;
+        assert { prefix ++ Cons x Nil = Cons y (ys ++ Cons x Nil) };
+        assert { sum (prefix ++ Cons x Nil) = y + sum (ys ++ Cons x Nil) };
+        assert { sum prefix = y + sum ys };
+        assert { sum (prefix ++ Cons x Nil) = (y + sum ys) + x }
+    end
+
+  let rec function count_mid_splits (left: list int) (mid: list int) (right: list int) : int
+    variant { right }
+  =
+    match right with
+    | Nil -> 0
+    | Cons x xs ->
+        good_split_indicator left mid right +
+        count_mid_splits left (mid ++ Cons x Nil) xs
+    end
+
+  let rec function count_left_splits (left: list int) (remaining: list int) : int
+    variant { remaining }
+  =
+    match remaining with
+    | Nil -> 0
+    | Cons x xs ->
+        count_mid_splits left (Cons x Nil) xs +
+        count_left_splits (left ++ Cons x Nil) xs
+    end
+
+  let function count_good_splits (nums: list int) : int =
+    match nums with
+    | Nil -> 0
+    | Cons x xs -> count_left_splits (Cons x Nil) xs
+    end
+
+  let rec sum_list_exec (nums: list int) : int
+    ensures { result = sum nums }
+    variant { nums }
+  =
+    match nums with
+    | Nil -> 0
+    | Cons x xs ->
+        assert { sum nums = x + sum xs };
+        x + sum_list_exec xs
+    end
+
+  let rec count_mid_splits_exec
+    (left: list int) (mid: list int) (right: list int)
+    (left_sum: int) (mid_sum: int) (right_sum: int) : int
+    requires { left_sum = sum left }
+    requires { mid_sum = sum mid }
+    requires { right_sum = sum right }
+    ensures  { result = count_mid_splits left mid right }
+    variant  { right }
+  =
+    match right with
+    | Nil ->
+        0
+    | Cons x xs ->
+        assert { right = Cons x xs };
+        assert { sum right = x + sum xs };
+        assert { right_sum - x = sum xs };
+        sum_append_singleton mid x;
+        assert { sum (mid ++ Cons x Nil) = sum mid + x };
+        assert { mid_sum + x = sum (mid ++ Cons x Nil) };
+        let add =
+          if left_sum <= mid_sum && mid_sum <= right_sum then 1 else 0 in
+        assert { add = good_split_indicator left mid right };
+        add +
+        count_mid_splits_exec
+          left (mid ++ Cons x Nil) xs
+          left_sum (mid_sum + x) (right_sum - x)
+    end
+
+  let rec count_left_splits_exec
+    (left: list int) (remaining: list int)
+    (left_sum: int) (remaining_sum: int) : int
+    requires { left_sum = sum left }
+    requires { remaining_sum = sum remaining }
+    ensures  { result = count_left_splits left remaining }
+    variant  { remaining }
+  =
+    match remaining with
+    | Nil ->
+        0
+    | Cons x xs ->
+        assert { remaining = Cons x xs };
+        assert { sum remaining = x + sum xs };
+        let right_sum = remaining_sum - x in
+        assert { right_sum = sum xs };
+        assert { x = sum (Cons x Nil) };
+        sum_append_singleton left x;
+        assert { sum (left ++ Cons x Nil) = sum left + x };
+        assert { left_sum + x = sum (left ++ Cons x Nil) };
+        count_mid_splits_exec left (Cons x Nil) xs left_sum x right_sum +
+        count_left_splits_exec (left ++ Cons x Nil) xs (left_sum + x) right_sum
+    end
+
+  let ways_to_split_array_into_three_subarrays_list (nums: list int) : int
+    requires { length nums >= 3 }
+    requires { nonnegative_list nums }
+    ensures  { result = mod (count_good_splits nums) split_modulus }
+  =
+    match nums with
+    | Nil ->
+        0
+    | Cons x xs ->
+        assert { count_good_splits nums = count_left_splits (Cons x Nil) xs };
+        assert { x = sum (Cons x Nil) };
+        let xs_sum = sum_list_exec xs in
+        assert { xs_sum = sum xs };
+        assert { split_modulus = 1000000007 };
+        mod (count_left_splits_exec (Cons x Nil) xs x xs_sum) 1000000007
+    end
+
+end

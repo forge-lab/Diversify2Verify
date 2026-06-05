@@ -1,0 +1,104 @@
+module MaximumElementAfterDecreasingAndRearranging_Array_Stage3_Imperative
+
+  use int.Int
+  use array.Array
+  use array.Init
+  use array.NumOf
+  use ref.Ref
+
+  function count_at_least (arr: array int) (threshold: int) : int =
+    numof (fun _ v -> threshold <= v) arr 0 (length arr)
+
+  predicate achievable_height (arr: array int) (height: int) =
+    1 <= height <= length arr /\
+    forall threshold: int.
+      1 <= threshold <= height ->
+      count_at_least arr threshold >= height - threshold + 1
+
+  predicate optimal_maximum_after_operations (arr: array int) (answer: int) =
+    achievable_height arr answer /\
+    forall height: int. achievable_height arr height -> height <= answer
+
+  exception NotAchievable
+
+  let count_at_least_exec (arr: array int) (threshold: int) : int
+    ensures { result = count_at_least arr threshold }
+  =
+    let count = ref 0 in
+    for i = 0 to length arr - 1 do
+      invariant { 0 <= !count <= i }
+      invariant { !count = numof (fun _ v -> threshold <= v) arr 0 i }
+      if arr[i] >= threshold then
+        count := !count + 1
+    done;
+    assert { !count = numof (fun _ v -> threshold <= v) arr 0 (length arr) };
+    !count
+
+  let achievable_height_exec (arr: array int) (height: int) : bool
+    ensures { result <-> achievable_height arr height }
+  =
+    if height < 1 then false else
+    if height > length arr then false else
+    try
+      for threshold = 1 to height do
+        invariant { 1 <= threshold <= height + 1 }
+        invariant {
+          forall t: int.
+            1 <= t < threshold ->
+            count_at_least arr t >= height - t + 1
+        }
+        let count = count_at_least_exec arr threshold in
+        if count < height - threshold + 1 then
+          raise NotAchievable
+      done;
+      assert {
+        forall t: int.
+          1 <= t <= height ->
+          count_at_least arr t >= height - t + 1
+      };
+      assert { achievable_height arr height };
+      true
+    with NotAchievable ->
+      assert { not (achievable_height arr height) };
+      false
+    end
+
+  let maximum_element_after_decreasing_and_rearranging_array (arr: array int) : int
+    requires { length arr >= 1 }
+    requires { forall i: int. 0 <= i < length arr -> arr[i] >= 1 }
+    ensures  { optimal_maximum_after_operations arr result }
+  =
+    let best = ref 1 in
+    assert { count_at_least arr 1 = length arr };
+    assert { achievable_height arr 1 };
+    for height = 1 to length arr do
+      invariant { 1 <= !best <= height }
+      invariant { achievable_height arr !best }
+      invariant {
+        forall h: int.
+          1 <= h < height ->
+          achievable_height arr h ->
+          h <= !best
+      }
+      if achievable_height_exec arr height then begin
+        assert { achievable_height arr height };
+        best := height
+      end
+    done;
+    assert { 1 <= !best <= length arr };
+    assert { achievable_height arr !best };
+    assert {
+      forall h: int.
+        1 <= h <= length arr ->
+        achievable_height arr h ->
+        h <= !best
+    };
+    assert {
+      forall h: int.
+        achievable_height arr h ->
+        h <= !best
+    };
+    assert { optimal_maximum_after_operations arr !best };
+    !best
+
+end

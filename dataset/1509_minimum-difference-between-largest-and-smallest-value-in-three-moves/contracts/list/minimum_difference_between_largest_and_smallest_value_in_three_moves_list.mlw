@@ -1,0 +1,179 @@
+module MinimumDifferenceBetweenLargestAndSmallestValueInThreeMoves_List_Spec
+
+  use int.Int
+  use list.List
+  use list.Length
+  use list.Mem
+
+  predicate values_in_bounds (nums: list int) =
+    forall x: int. mem x nums -> -1000000000 <= x <= 1000000000
+
+  predicate valid_input (nums: list int) =
+    1 <= length nums <= 100000 /\
+    values_in_bounds nums
+
+  let rec function kept_count (nums: list int) (lo: int) (hi: int) : int
+    variant { nums }
+  =
+    match nums with
+    | Nil -> 0
+    | Cons x xs -> (if lo <= x <= hi then 1 else 0) + kept_count xs lo hi
+    end
+
+  predicate achievable_difference (nums: list int) (diff: int) =
+    0 <= diff /\
+    exists lo hi: int.
+      lo <= hi /\
+      hi - lo = diff /\
+      kept_count nums lo hi >= length nums - 3
+
+  predicate minimum_difference_between_largest_and_smallest_value_in_three_moves_list_spec
+      (nums: list int) (res: int) =
+    achievable_difference nums res /\
+    forall d: int. 0 <= d < res -> not (achievable_difference nums d)
+
+  val minimum_difference_between_largest_and_smallest_value_in_three_moves_list (nums: list int) : int
+    requires { valid_input nums }
+    ensures  { minimum_difference_between_largest_and_smallest_value_in_three_moves_list_spec nums result }
+
+  let lemma test_000_python_assertions () =
+    let nums = Cons 3 (Cons 100 (Cons 20 Nil)) in
+    assert { length nums = 3 };
+    assert { mem 3 nums };
+    assert { mem 100 nums };
+    assert { mem 20 nums };
+    assert { forall x: int. mem x nums -> x = 3 \/ x = 100 \/ x = 20 };
+    assert { values_in_bounds nums };
+    assert { valid_input nums };
+    assert { kept_count Nil 3 3 = 0 };
+    assert { kept_count (Cons 20 Nil) 3 3 = 0 };
+    assert { kept_count (Cons 100 (Cons 20 Nil)) 3 3 = 0 };
+    assert { kept_count nums 3 3 = 1 };
+    assert { achievable_difference nums 0 };
+    assert { minimum_difference_between_largest_and_smallest_value_in_three_moves_list_spec nums 0 }
+
+  let lemma test_001_python_assertions () =
+    let nums = Cons 1 Nil in
+    assert { length nums = 1 };
+    assert { mem 1 nums };
+    assert { forall x: int. mem x nums -> x = 1 };
+    assert { values_in_bounds nums };
+    assert { valid_input nums };
+    assert { kept_count Nil 1 1 = 0 };
+    assert { kept_count nums 1 1 = 1 };
+    assert { achievable_difference nums 0 };
+    assert { minimum_difference_between_largest_and_smallest_value_in_three_moves_list_spec nums 0 }
+
+  let lemma test_003_python_assertions () =
+    let nums =
+      Cons (-1) (Cons (-2) (Cons (-3) (Cons (-4) (Cons (-5)
+        (Cons (-6) (Cons (-7) (Cons (-8) (Cons (-9) (Cons (-10) Nil))))))))) in
+    assert { length nums = 10 };
+    assert { mem (-1) nums };
+    assert { mem (-4) nums };
+    assert { mem (-10) nums };
+    assert {
+      forall x: int. mem x nums ->
+        x = (-1) \/ x = (-2) \/ x = (-3) \/ x = (-4) \/ x = (-5) \/
+        x = (-6) \/ x = (-7) \/ x = (-8) \/ x = (-9) \/ x = (-10)
+    };
+    assert { values_in_bounds nums };
+    assert { valid_input nums };
+    assert { kept_count (Cons (-10) Nil) (-10) (-4) = 1 };
+    assert { kept_count (Cons (-9) (Cons (-10) Nil)) (-10) (-4) = 2 };
+    assert { kept_count (Cons (-8) (Cons (-9) (Cons (-10) Nil))) (-10) (-4) = 3 };
+    assert { kept_count (Cons (-7) (Cons (-8) (Cons (-9) (Cons (-10) Nil)))) (-10) (-4) = 4 };
+    assert { kept_count (Cons (-6) (Cons (-7) (Cons (-8) (Cons (-9) (Cons (-10) Nil))))) (-10) (-4) = 5 };
+    assert { kept_count (Cons (-5) (Cons (-6) (Cons (-7) (Cons (-8) (Cons (-9) (Cons (-10) Nil)))))) (-10) (-4) = 6 };
+    assert { kept_count (Cons (-4) (Cons (-5) (Cons (-6) (Cons (-7) (Cons (-8) (Cons (-9) (Cons (-10) Nil))))))) (-10) (-4) = 7 };
+    assert { kept_count nums (-10) (-4) = 7 };
+    assert { achievable_difference nums 6 };
+    assert { not (achievable_difference nums 0) };
+    assert { not (achievable_difference nums 1) };
+    assert { not (achievable_difference nums 2) };
+    assert { not (achievable_difference nums 3) };
+    assert { not (achievable_difference nums 4) };
+    assert { not (achievable_difference nums 5) };
+    assert { minimum_difference_between_largest_and_smallest_value_in_three_moves_list_spec nums 6 }
+
+  let lemma test_008_python_assertions () =
+    let nums = Cons 6 (Cons 6 (Cons 0 (Cons 1 (Cons 1 (Cons 4 (Cons 6 Nil)))))) in
+    assert { length nums = 7 };
+    assert { mem 6 nums };
+    assert { mem 0 nums };
+    assert { mem 1 nums };
+    assert { mem 4 nums };
+    assert { forall x: int. mem x nums -> x = 6 \/ x = 0 \/ x = 1 \/ x = 4 };
+    assert { values_in_bounds nums };
+    assert { valid_input nums };
+    assert { kept_count (Cons 6 Nil) 4 6 = 1 };
+    assert { kept_count (Cons 4 (Cons 6 Nil)) 4 6 = 2 };
+    assert { kept_count (Cons 1 (Cons 4 (Cons 6 Nil))) 4 6 = 2 };
+    assert { kept_count (Cons 1 (Cons 1 (Cons 4 (Cons 6 Nil)))) 4 6 = 2 };
+    assert { kept_count (Cons 0 (Cons 1 (Cons 1 (Cons 4 (Cons 6 Nil))))) 4 6 = 2 };
+    assert { kept_count (Cons 6 (Cons 0 (Cons 1 (Cons 1 (Cons 4 (Cons 6 Nil)))))) 4 6 = 3 };
+    assert { kept_count nums 4 6 = 4 };
+    assert { achievable_difference nums 2 };
+    assert { not (achievable_difference nums 0) };
+    assert { not (achievable_difference nums 1) };
+    assert { minimum_difference_between_largest_and_smallest_value_in_three_moves_list_spec nums 2 }
+
+  let lemma test_011_python_assertions () =
+    let nums = Cons 1 (Cons 5 (Cons 0 (Cons 10 (Cons 14 Nil)))) in
+    assert { length nums = 5 };
+    assert { mem 1 nums };
+    assert { mem 5 nums };
+    assert { mem 0 nums };
+    assert { mem 10 nums };
+    assert { mem 14 nums };
+    assert { forall x: int. mem x nums -> x = 1 \/ x = 5 \/ x = 0 \/ x = 10 \/ x = 14 };
+    assert { values_in_bounds nums };
+    assert { valid_input nums };
+    assert { kept_count (Cons 14 Nil) 0 1 = 0 };
+    assert { kept_count (Cons 10 (Cons 14 Nil)) 0 1 = 0 };
+    assert { kept_count (Cons 0 (Cons 10 (Cons 14 Nil))) 0 1 = 1 };
+    assert { kept_count (Cons 5 (Cons 0 (Cons 10 (Cons 14 Nil)))) 0 1 = 1 };
+    assert { kept_count nums 0 1 = 2 };
+    assert { achievable_difference nums 1 };
+    assert { not (achievable_difference nums 0) };
+    assert { minimum_difference_between_largest_and_smallest_value_in_three_moves_list_spec nums 1 }
+
+  let lemma test_012_python_assertions () =
+    let nums = Cons 5 (Cons 3 (Cons 2 (Cons 4 Nil))) in
+    assert { length nums = 4 };
+    assert { mem 5 nums };
+    assert { mem 3 nums };
+    assert { mem 2 nums };
+    assert { mem 4 nums };
+    assert { forall x: int. mem x nums -> x = 5 \/ x = 3 \/ x = 2 \/ x = 4 };
+    assert { values_in_bounds nums };
+    assert { valid_input nums };
+    assert { kept_count Nil 3 3 = 0 };
+    assert { kept_count (Cons 4 Nil) 3 3 = 0 };
+    assert { kept_count (Cons 2 (Cons 4 Nil)) 3 3 = 0 };
+    assert { kept_count (Cons 3 (Cons 2 (Cons 4 Nil))) 3 3 = 1 };
+    assert { kept_count nums 3 3 = 1 };
+    assert { achievable_difference nums 0 };
+    assert { minimum_difference_between_largest_and_smallest_value_in_three_moves_list_spec nums 0 }
+
+  let lemma test_013_python_assertions () =
+    let nums = Cons 1 (Cons 2 (Cons 3 (Cons 4 (Cons 5 Nil)))) in
+    assert { length nums = 5 };
+    assert { mem 1 nums };
+    assert { mem 2 nums };
+    assert { mem 3 nums };
+    assert { mem 4 nums };
+    assert { mem 5 nums };
+    assert { forall x: int. mem x nums -> x = 1 \/ x = 2 \/ x = 3 \/ x = 4 \/ x = 5 };
+    assert { values_in_bounds nums };
+    assert { valid_input nums };
+    assert { kept_count (Cons 5 Nil) 1 2 = 0 };
+    assert { kept_count (Cons 4 (Cons 5 Nil)) 1 2 = 0 };
+    assert { kept_count (Cons 3 (Cons 4 (Cons 5 Nil))) 1 2 = 0 };
+    assert { kept_count (Cons 2 (Cons 3 (Cons 4 (Cons 5 Nil)))) 1 2 = 1 };
+    assert { kept_count nums 1 2 = 2 };
+    assert { achievable_difference nums 1 };
+    assert { not (achievable_difference nums 0) };
+    assert { minimum_difference_between_largest_and_smallest_value_in_three_moves_list_spec nums 1 }
+
+end

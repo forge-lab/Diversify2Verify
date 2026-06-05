@@ -1,0 +1,120 @@
+module ReducingDishes_Array_Spec
+
+  use int.Int
+  use array.Array
+  use array.Init
+  use array.NumOfEq
+  use list.List
+
+  let rec function score_from (prep: array int) (i: int) : int
+    requires { 0 <= i <= length prep }
+    variant  { length prep - i }
+  =
+    if i = length prep then 0
+    else ((i + 1) * prep[i]) + score_from prep (i + 1)
+
+  function like_time_score (prep: array int) : int =
+    score_from prep 0
+
+  predicate valid_preparation (satisfaction: array int) (prep: array int) =
+    length prep <= length satisfaction /\
+    forall x: int.
+      numof prep x 0 (length prep) <= numof satisfaction x 0 (length satisfaction)
+
+  predicate feasible_score (satisfaction: array int) (score: int) =
+    exists prep: array int.
+      valid_preparation satisfaction prep /\ like_time_score prep = score
+
+  predicate optimal_like_time (satisfaction: array int) (result: int) =
+    result >= 0 /\
+    feasible_score satisfaction result /\
+    forall prep: array int.
+      valid_preparation satisfaction prep -> like_time_score prep <= result
+
+  let rec array_to_list_from (a: array int) (i: int) : list int
+    requires { 0 <= i <= length a }
+    variant { length a - i }
+  =
+    if i >= length a then
+      Nil
+    else begin
+      assert { 0 <= i < length a };
+      assert { 0 <= i + 1 <= length a };
+      Cons a[i] (array_to_list_from a (i + 1))
+    end
+
+  let array_to_list (a: array int) : list int =
+    assert { 0 <= 0 <= length a };
+    array_to_list_from a 0
+
+  let rec insert_sorted (x: int) (l: list int) : list int
+    variant { l }
+  =
+    match l with
+    | Nil -> Cons x Nil
+    | Cons y ys ->
+        if x <= y then Cons x l else Cons y (insert_sorted x ys)
+    end
+
+  let rec sort_asc (l: list int) : list int
+    variant { l }
+  =
+    match l with
+    | Nil -> Nil
+    | Cons x xs -> insert_sorted x (sort_asc xs)
+    end
+
+  let rec reverse_acc (l: list int) (acc: list int) : list int
+    variant { l }
+  =
+    match l with
+    | Nil -> acc
+    | Cons x xs -> reverse_acc xs (Cons x acc)
+    end
+
+  let reverse (l: list int) : list int =
+    reverse_acc l Nil
+
+  let rec best_total_desc (l: list int) (current_sum: int) (current_total: int) : int
+    variant { l }
+    ensures { result >= current_total }
+    ensures { 0 <= current_total -> 0 <= result }
+  =
+    match l with
+    | Nil -> current_total
+    | Cons x xs ->
+        let next_sum = current_sum + x in
+        if next_sum > 0 then begin
+          assert { current_total + next_sum > current_total };
+          best_total_desc xs next_sum (current_total + next_sum)
+        end
+        else
+          current_total
+    end
+
+  let reducing_dishes_array_core (satisfaction: array int) : int
+    ensures { result >= 0 }
+    ensures { feasible_score satisfaction result }
+    ensures { forall prep: array int.
+      valid_preparation satisfaction prep -> like_time_score prep <= result }
+  =
+    let sorted_desc = reverse (sort_asc (array_to_list satisfaction)) in
+    let r = best_total_desc sorted_desc 0 0 in
+    assert { r >= 0 };
+    assert { feasible_score satisfaction r };
+    assert { forall prep: array int.
+      valid_preparation satisfaction prep -> like_time_score prep <= r };
+    r
+
+  let reducing_dishes_array (satisfaction: array int) : int
+    ensures { optimal_like_time satisfaction result }
+  =
+    let r = reducing_dishes_array_core satisfaction in
+    assert { r >= 0 };
+    assert { feasible_score satisfaction r };
+    assert { forall prep: array int.
+      valid_preparation satisfaction prep -> like_time_score prep <= r };
+    assert { optimal_like_time satisfaction r };
+    r
+
+end

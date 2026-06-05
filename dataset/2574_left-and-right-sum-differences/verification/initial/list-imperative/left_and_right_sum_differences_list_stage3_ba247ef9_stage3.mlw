@@ -1,0 +1,122 @@
+module LeftAndRightSumDifferences_List_Stage3_Imperative
+
+  use int.Int
+  use int.Abs
+  use list.List
+  use list.Append
+  use list.Length
+  use list.Sum
+  use list.Reverse
+  use ref.Ref
+
+  let rec predicate left_right_diff_from (left: int) (nums: list int) (out: list int)
+    variant { nums }
+  =
+    match nums with
+    | Nil ->
+        match out with
+        | Nil -> true
+        | Cons _ _ -> false
+        end
+    | Cons x xs ->
+        match out with
+        | Nil -> false
+        | Cons y ys ->
+            y = abs (left - sum xs) &&
+            left_right_diff_from (left + x) xs ys
+        end
+    end
+
+  predicate left_right_diff_result (nums: list int) (out: list int) =
+    left_right_diff_from 0 nums out
+
+  let rec ghost function diffs_from (left: int) (nums: list int) : list int
+    variant { nums }
+  =
+    match nums with
+    | Nil -> Nil
+    | Cons x xs -> Cons (abs (left - sum xs)) (diffs_from (left + x) xs)
+    end
+
+  let rec lemma diffs_from_spec (left: int) (nums: list int)
+    ensures { left_right_diff_from left nums (diffs_from left nums) }
+    variant { nums }
+  =
+    match nums with
+    | Nil -> ()
+    | Cons x xs ->
+        diffs_from_spec (left + x) xs
+    end
+
+  let reverse_list (l: list int) : list int
+    ensures { result = reverse l }
+  =
+    let acc = ref (Nil : list int) in
+    let cur = ref l in
+    while (match !cur with Nil -> false | Cons _ _ -> true end) do
+      invariant { reverse l = reverse !cur ++ !acc }
+      variant { length !cur }
+
+      match !cur with
+      | Nil -> ()
+      | Cons x xs ->
+          acc := Cons x !acc;
+          cur := xs
+      end
+    done;
+    assert { !cur = Nil };
+    !acc
+
+  let sum_list (l: list int) : int
+    ensures { result = sum l }
+  =
+    let total = ref 0 in
+    let cur = ref l in
+    while (match !cur with Nil -> false | Cons _ _ -> true end) do
+      invariant { !total + sum !cur = sum l }
+      variant { length !cur }
+
+      match !cur with
+      | Nil -> ()
+      | Cons x xs ->
+          total := !total + x;
+          cur := xs
+      end
+    done;
+    assert { !cur = Nil };
+    !total
+
+  let left_and_right_sum_differences_list (nums: list int) : list int
+    ensures { left_right_diff_result nums result }
+  =
+    let total = sum_list nums in
+    let left = ref 0 in
+    let remaining = ref total in
+    let cur = ref nums in
+    let out_rev = ref (Nil : list int) in
+    let ghost processed_rev = ref (Nil : list int) in
+    while (match !cur with Nil -> false | Cons _ _ -> true end) do
+      invariant { total = sum nums }
+      invariant { reverse !processed_rev ++ !cur = nums }
+      invariant { !remaining = sum !cur }
+      invariant { !left = sum (reverse !processed_rev) }
+      invariant { !left + !remaining = total }
+      invariant { !out_rev = reverse (diffs_from 0 (reverse !processed_rev)) }
+      variant { length !cur }
+
+      match !cur with
+      | Nil -> ()
+      | Cons x xs ->
+          remaining := !remaining - x;
+          out_rev := Cons (abs (!left - !remaining)) !out_rev;
+          left := !left + x;
+          ghost processed_rev := Cons x !processed_rev;
+          cur := xs
+      end
+    done;
+    assert { !cur = Nil };
+    let result = reverse_list !out_rev in
+    diffs_from_spec 0 nums;
+    result
+
+end

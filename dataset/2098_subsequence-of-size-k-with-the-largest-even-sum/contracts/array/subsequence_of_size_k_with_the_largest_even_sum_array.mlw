@@ -1,0 +1,169 @@
+module SubsequenceOfSizeKWithTheLargestEvenSum_Array_Spec
+
+  use int.Int
+  use int.EuclideanDivision
+  use int.Sum as IntSum
+  use array.Array
+  use array.Init
+
+  predicate valid_nums (nums: array int) =
+    1 <= length nums <= 100000 /\
+    forall i: int. 0 <= i < length nums -> 0 <= nums[i] <= 100000
+
+  predicate valid_choice (nums: array int) (k: int) (choice: array int) =
+    length choice = k /\
+    (forall t: int. 0 <= t < k -> 0 <= choice[t] < length nums) /\
+    (forall i j: int. 0 <= i < j < k -> choice[i] < choice[j])
+
+  function subsequence_sum (nums: array int) (choice: array int) : int =
+    IntSum.sum (fun t -> nums[choice[t]]) 0 (length choice)
+
+  predicate even_candidate_sum (nums: array int) (k: int) (s: int) =
+    exists choice: array int.
+      valid_choice nums k choice /\
+      s = subsequence_sum nums choice /\
+      mod s 2 = 0
+
+  predicate optimal_even_subsequence_sum
+      (nums: array int) (k: int) (result: int) =
+    (result = -1 /\
+     forall s: int. not (even_candidate_sum nums k s)) \/
+    (even_candidate_sum nums k result /\
+     forall s: int. even_candidate_sum nums k s -> s <= result)
+
+  val subsequence_of_size_k_with_the_largest_even_sum_array
+      (nums: array int) (k: int) : int
+    requires { valid_nums nums }
+    requires { 1 <= k <= length nums }
+    ensures  { optimal_even_subsequence_sum nums k result }
+
+  let lemma test_000_python_assertions () =
+    let nums = init 5 [|0; 0; 0; 0; 0|] in
+    let choice = init 2 [|0; 1|] in
+    assert { length nums = 5 };
+    assert { nums[0] = 0 };
+    assert { nums[1] = 0 };
+    assert { nums[2] = 0 };
+    assert { nums[3] = 0 };
+    assert { nums[4] = 0 };
+    assert { valid_nums nums };
+    assert { length choice = 2 };
+    assert { choice[0] = 0 };
+    assert { choice[1] = 1 };
+    assert { valid_choice nums 2 choice };
+    assert { subsequence_sum nums choice = 0 };
+    assert { even_candidate_sum nums 2 0 };
+    assert { optimal_even_subsequence_sum nums 2 0 }
+
+  let lemma test_002_python_assertions () =
+    let nums = init 3 [|4; 6; 2|] in
+    let choice = init 3 [|0; 1; 2|] in
+    assert { length nums = 3 };
+    assert { nums[0] = 4 };
+    assert { nums[1] = 6 };
+    assert { nums[2] = 2 };
+    assert { valid_nums nums };
+    assert { length choice = 3 };
+    assert { choice[0] = 0 };
+    assert { choice[1] = 1 };
+    assert { choice[2] = 2 };
+    assert { valid_choice nums 3 choice };
+    assert { subsequence_sum nums choice = 12 };
+    assert { even_candidate_sum nums 3 12 };
+    assert { optimal_even_subsequence_sum nums 3 12 }
+
+  let lemma test_004_python_assertions () =
+    let nums = init 3 [|1; 3; 5|] in
+    let choice0 = init 1 [|0|] in
+    let choice1 = init 1 [|1|] in
+    let choice2 = init 1 [|2|] in
+    assert { length nums = 3 };
+    assert { nums[0] = 1 };
+    assert { nums[1] = 3 };
+    assert { nums[2] = 5 };
+    assert { valid_nums nums };
+    assert { valid_choice nums 1 choice0 };
+    assert { valid_choice nums 1 choice1 };
+    assert { valid_choice nums 1 choice2 };
+    assert { subsequence_sum nums choice0 = 1 };
+    assert { subsequence_sum nums choice1 = 3 };
+    assert { subsequence_sum nums choice2 = 5 };
+    assert { forall i: int. 0 <= i < length nums -> i = 0 \/ i = 1 \/ i = 2 };
+    assert { forall s: int. not (even_candidate_sum nums 1 s) };
+    assert { optimal_even_subsequence_sum nums 1 (-1) }
+
+  let lemma test_005_python_assertions () =
+    let nums = init 10 [|5; 5; 5; 5; 5; 5; 5; 5; 5; 5|] in
+    let choice = init 4 [|0; 1; 2; 3|] in
+    assert { length nums = 10 };
+    assert { nums[0] = 5 };
+    assert { nums[1] = 5 };
+    assert { nums[2] = 5 };
+    assert { nums[3] = 5 };
+    assert { nums[4] = 5 };
+    assert { nums[5] = 5 };
+    assert { nums[6] = 5 };
+    assert { nums[7] = 5 };
+    assert { nums[8] = 5 };
+    assert { nums[9] = 5 };
+    assert { valid_nums nums };
+    assert { valid_choice nums 4 choice };
+    assert { subsequence_sum nums choice = 20 };
+    assert { even_candidate_sum nums 4 20 };
+    assert { optimal_even_subsequence_sum nums 4 20 }
+
+  let lemma test_006_python_assertions () =
+    let nums = init 6 [|1; 2; 3; 4; 5; 6|] in
+    let choice = init 4 [|2; 3; 4; 5|] in
+    assert { length nums = 6 };
+    assert { nums[0] = 1 };
+    assert { nums[1] = 2 };
+    assert { nums[2] = 3 };
+    assert { nums[3] = 4 };
+    assert { nums[4] = 5 };
+    assert { nums[5] = 6 };
+    assert { valid_nums nums };
+    assert { choice[0] = 2 };
+    assert { choice[1] = 3 };
+    assert { choice[2] = 4 };
+    assert { choice[3] = 5 };
+    assert { valid_choice nums 4 choice };
+    assert { subsequence_sum nums choice = 18 };
+    assert { even_candidate_sum nums 4 18 };
+    assert { optimal_even_subsequence_sum nums 4 18 }
+
+  let lemma test_007_python_assertions () =
+    let nums = init 6 [|1; 1; 1; 1; 1; 1|] in
+    let choice = init 3 [|0; 1; 2|] in
+    assert { length nums = 6 };
+    assert { nums[0] = 1 };
+    assert { nums[1] = 1 };
+    assert { nums[2] = 1 };
+    assert { nums[3] = 1 };
+    assert { nums[4] = 1 };
+    assert { nums[5] = 1 };
+    assert { valid_nums nums };
+    assert { valid_choice nums 3 choice };
+    assert { subsequence_sum nums choice = 3 };
+    assert { forall s: int. not (even_candidate_sum nums 3 s) };
+    assert { optimal_even_subsequence_sum nums 3 (-1) }
+
+  let lemma test_011_python_assertions () =
+    let nums = init 5 [|4; 1; 5; 3; 1|] in
+    let choice = init 3 [|0; 2; 3|] in
+    assert { length nums = 5 };
+    assert { nums[0] = 4 };
+    assert { nums[1] = 1 };
+    assert { nums[2] = 5 };
+    assert { nums[3] = 3 };
+    assert { nums[4] = 1 };
+    assert { valid_nums nums };
+    assert { choice[0] = 0 };
+    assert { choice[1] = 2 };
+    assert { choice[2] = 3 };
+    assert { valid_choice nums 3 choice };
+    assert { subsequence_sum nums choice = 12 };
+    assert { even_candidate_sum nums 3 12 };
+    assert { optimal_even_subsequence_sum nums 3 12 }
+
+end

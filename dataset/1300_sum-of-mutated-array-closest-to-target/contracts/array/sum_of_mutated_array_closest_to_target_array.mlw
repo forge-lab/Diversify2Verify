@@ -1,0 +1,108 @@
+module SumOfMutatedArrayClosestToTarget_Array_Spec
+
+  use int.Int
+  use int.Abs
+  use int.MinMax
+  use int.Sum
+  use array.Array
+  use array.Init
+
+  function mutated_sum (arr: array int) (value: int) : int =
+    sum (fun i -> min arr[i] value) 0 (length arr)
+
+  function mutation_distance (arr: array int) (target: int) (value: int) : int =
+    abs (mutated_sum arr value - target)
+
+  predicate value_is_optimal (arr: array int) (target: int) (value: int) =
+    value >= 0 /\
+    (forall candidate: int.
+       candidate >= 0 ->
+       mutation_distance arr target value <= mutation_distance arr target candidate) /\
+    (forall candidate: int.
+       candidate >= 0 ->
+       mutation_distance arr target candidate = mutation_distance arr target value ->
+       value <= candidate)
+
+  val sum_of_mutated_array_closest_to_target_array (arr: array int) (target: int) : int
+    requires { 1 <= length arr <= 10000 }
+    requires { 1 <= target <= 100000 }
+    requires { forall i: int. 0 <= i < length arr -> 1 <= arr[i] <= 100000 }
+    ensures  { value_is_optimal arr target result }
+
+  let lemma test_000_sum_of_mutated_array_closest_to_target () =
+    let a = init 5 [|1; 2; 3; 4; 5|] in
+    assert { length a = 5 };
+    assert { a[0] = 1 };
+    assert { a[1] = 2 };
+    assert { a[2] = 3 };
+    assert { a[3] = 4 };
+    assert { a[4] = 5 };
+    assert { mutated_sum a 3 = 12 };
+    assert { mutation_distance a 11 3 = 1 };
+    assert { value_is_optimal a 11 3 }
+
+  let lemma test_001_sum_of_mutated_array_closest_to_target () =
+    let a = init 5 [|5; 5; 5; 5; 5|] in
+    assert { length a = 5 };
+    assert { a[0] = 5 };
+    assert { a[1] = 5 };
+    assert { a[2] = 5 };
+    assert { a[3] = 5 };
+    assert { a[4] = 5 };
+    assert { mutated_sum a 3 = 15 };
+    assert { mutation_distance a 17 3 = 2 };
+    assert { value_is_optimal a 17 3 }
+
+  let lemma test_003_sum_of_mutated_array_closest_to_target () =
+    let a = init 3 [|2; 3; 5|] in
+    assert { length a = 3 };
+    assert { a[0] = 2 };
+    assert { a[1] = 3 };
+    assert { a[2] = 5 };
+    assert { mutated_sum a 5 = 10 };
+    assert { mutation_distance a 10 5 = 0 };
+    assert { value_is_optimal a 10 5 }
+
+  let lemma test_005_sum_of_mutated_array_closest_to_target () =
+    let a = init 3 [|10000; 10000; 10000|] in
+    assert { length a = 3 };
+    assert { a[0] = 10000 };
+    assert { a[1] = 10000 };
+    assert { a[2] = 10000 };
+    assert { mutated_sum a 3333 = 9999 };
+    assert { mutation_distance a 10000 3333 = 1 };
+    assert { value_is_optimal a 10000 3333 }
+
+  let lemma test_008_sum_of_mutated_array_closest_to_target () =
+    let a = init 5 [|60864; 25176; 27249; 21296; 20204|] in
+    assert { length a = 5 };
+    assert { a[0] = 60864 };
+    assert { a[1] = 25176 };
+    assert { a[2] = 27249 };
+    assert { a[3] = 21296 };
+    assert { a[4] = 20204 };
+    assert { mutated_sum a 11361 = 56805 };
+    assert { mutation_distance a 56803 11361 = 2 };
+    assert { value_is_optimal a 56803 11361 }
+
+  let lemma test_010_sum_of_mutated_array_closest_to_target () =
+    let a = init 3 [|100000; 100000; 100000|] in
+    assert { length a = 3 };
+    assert { a[0] = 100000 };
+    assert { a[1] = 100000 };
+    assert { a[2] = 100000 };
+    assert { mutated_sum a 100000 = 300000 };
+    assert { mutation_distance a 299999 100000 = 1 };
+    assert { value_is_optimal a 299999 100000 }
+
+  let lemma test_016_sum_of_mutated_array_closest_to_target () =
+    let a = init 3 [|4; 9; 3|] in
+    assert { length a = 3 };
+    assert { a[0] = 4 };
+    assert { a[1] = 9 };
+    assert { a[2] = 3 };
+    assert { mutated_sum a 3 = 9 };
+    assert { mutation_distance a 10 3 = 1 };
+    assert { value_is_optimal a 10 3 }
+
+end

@@ -1,0 +1,171 @@
+module CountOfInterestingSubarrays_Array_Imperative
+
+  use int.Int
+  use int.EuclideanDivision
+  use array.Array
+  use array.Init
+  use ref.Ref
+
+  let count_of_interesting_subarrays_array
+    (nums: array int) (modulo: int) (k: int) : int
+    requires { 1 <= modulo }
+  =
+    let total = ref 0 in
+    let n = length nums in
+    for l = 0 to n - 1 do
+      let matching = ref 0 in
+      for r = l to n - 1 do
+        if mod nums[r] modulo = k then
+          matching := !matching + 1;
+        if mod !matching modulo = k then
+          total := !total + 1
+      done
+    done;
+    !total
+
+  let test_000 () : bool =
+    let nums = init 3 [|3; 2; 4|] in
+    let r = count_of_interesting_subarrays_array nums 2 1 in
+    r = 3
+
+  let test_001 () : bool =
+    let nums = init 5 [|8; 12; 16; 20; 24|] in
+    let r = count_of_interesting_subarrays_array nums 4 0 in
+    r = 2
+
+  let test_002 () : bool =
+    let nums = init 7 [|7; 7; 7; 7; 7; 7; 7|] in
+    let r = count_of_interesting_subarrays_array nums 7 0 in
+    r = 1
+
+  let test_003 () : bool =
+    let nums = init 4 [|3; 1; 9; 6|] in
+    let r = count_of_interesting_subarrays_array nums 3 0 in
+    r = 2
+
+  let test_004 () : bool =
+    let nums = init 4 [|5; 5; 5; 5|] in
+    let r = count_of_interesting_subarrays_array nums 5 0 in
+    r = 0
+
+  let test_005 () : bool =
+    let nums = init 5 [|1; 3; 5; 7; 9|] in
+    let r = count_of_interesting_subarrays_array nums 2 1 in
+    r = 9
+
+  let test_006 () : bool =
+    let nums = init 7 [|7; 7; 7; 7; 7; 7; 7|] in
+    let r = count_of_interesting_subarrays_array nums 7 3 in
+    r = 0
+
+  let test_007 () : bool =
+    let nums = init 5 [|11; 22; 33; 44; 55|] in
+    let r = count_of_interesting_subarrays_array nums 11 0 in
+    r = 0
+
+  let test_008 () : bool =
+    let nums = init 5 [|7; 7; 7; 7; 7|] in
+    let r = count_of_interesting_subarrays_array nums 7 0 in
+    r = 0
+
+  let test_009 () : bool =
+    let nums = init 5 [|2; 4; 6; 8; 10|] in
+    let r = count_of_interesting_subarrays_array nums 2 0 in
+    r = 6
+
+  let test_010 () : bool =
+    let nums = init 5 [|1; 1; 1; 1; 1|] in
+    let r = count_of_interesting_subarrays_array nums 2 1 in
+    r = 9
+
+  let test_011 () : bool =
+    let nums = init 5 [|7; 14; 21; 28; 35|] in
+    let r = count_of_interesting_subarrays_array nums 7 0 in
+    r = 0
+
+  let test_012 () : bool =
+    let nums = init 5 [|10; 20; 30; 40; 50|] in
+    let r = count_of_interesting_subarrays_array nums 5 0 in
+    r = 1
+
+  let test_013 () : bool =
+    let nums = init 5 [|5; 5; 5; 5; 5|] in
+    let r = count_of_interesting_subarrays_array nums 5 0 in
+    r = 1
+
+  let test_014 () : bool =
+    let nums = init 5 [|13; 19; 3; 5; 17|] in
+    let r = count_of_interesting_subarrays_array nums 5 2 in
+    r = 0
+
+  let test_015 () : bool =
+    let nums = init 5 [|10; 20; 30; 40; 50|] in
+    let r = count_of_interesting_subarrays_array nums 10 0 in
+    r = 0
+
+  let test_016 () : bool =
+    let nums = init 5 [|1; 2; 3; 4; 5|] in
+    let r = count_of_interesting_subarrays_array nums 2 1 in
+    r = 9
+
+  let test_017 () : bool =
+    let nums = init 15
+      [|13; 26; 39; 52; 65; 78; 91; 104; 117; 130; 143; 156; 169; 182; 195|] in
+    let r = count_of_interesting_subarrays_array nums 13 0 in
+    r = 3
+
+  let test_018 () : bool =
+    let nums = init 10 [|8; 16; 24; 32; 40; 48; 56; 64; 72; 80|] in
+    let r = count_of_interesting_subarrays_array nums 8 4 in
+    r = 0
+
+  let test_019 () : bool =
+    let nums = init 16
+      [|21; 32; 43; 54; 65; 76; 87; 98; 109; 120; 131; 142; 153; 164; 175; 186|] in
+    let r = count_of_interesting_subarrays_array nums 7 3 in
+    r = 0
+
+  let run_tests () : bool =
+    if test_000 () then
+    if test_001 () then
+    if test_002 () then
+    if test_003 () then
+    if test_004 () then
+    if test_005 () then
+    if test_006 () then
+    if test_007 () then
+    if test_008 () then
+    if test_009 () then
+    if test_010 () then
+    if test_011 () then
+    if test_012 () then
+    if test_013 () then
+    if test_014 () then
+    if test_015 () then
+    if test_016 () then
+    if test_017 () then
+    if test_018 () then
+    if test_019 () then
+      true
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+
+end

@@ -1,0 +1,187 @@
+module FindIndicesWithIndexAndValueDifferenceI_Array_Imperative
+
+  use int.Int
+  use int.Abs
+  use array.Array
+  use array.Init
+  use ref.Ref
+
+  let result_is (r: array int) (i: int) (j: int) : bool =
+    if length r = 2 then
+      if r[0] = i then
+        r[1] = j
+      else
+        false
+    else
+      false
+
+  let find_indices_with_index_and_value_difference_i_array
+      (nums: array int) (indexDifference: int) (valueDifference: int) : array int =
+    let min_idx = ref 0 in
+    let max_idx = ref 0 in
+    let answer_i = ref (-1) in
+    let answer_j = ref (-1) in
+    for j = 0 to length nums - 1 do
+      if !answer_i = (-1) then
+        if j >= indexDifference then
+          let candidate = j - indexDifference in
+          if candidate >= 0 then
+            if nums[candidate] < nums[!min_idx] then
+              min_idx := candidate;
+            if nums[candidate] > nums[!max_idx] then
+              max_idx := candidate;
+            if abs (nums[j] - nums[!min_idx]) >= valueDifference then begin
+              answer_i := !min_idx;
+              answer_j := j
+            end else
+              if abs (nums[j] - nums[!max_idx]) >= valueDifference then begin
+                answer_i := !max_idx;
+                answer_j := j
+              end
+    done;
+    init 2 [|!answer_i; !answer_j|]
+
+  let test_000 () : bool =
+    let nums = init 5 [|1; 3; 5; 7; 9|] in
+    let r = find_indices_with_index_and_value_difference_i_array nums 2 6 in
+    result_is r 0 3
+
+  let test_001 () : bool =
+    let nums = init 5 [|0; 0; 0; 0; 0|] in
+    let r = find_indices_with_index_and_value_difference_i_array nums 0 0 in
+    result_is r 0 0
+
+  let test_002 () : bool =
+    let nums = init 5 [|10; 20; 30; 40; 50|] in
+    let r = find_indices_with_index_and_value_difference_i_array nums 1 25 in
+    result_is r 0 3
+
+  let test_003 () : bool =
+    let nums = init 4 [|0; 0; 0; 0|] in
+    let r = find_indices_with_index_and_value_difference_i_array nums 3 1 in
+    result_is r (-1) (-1)
+
+  let test_004 () : bool =
+    let nums = init 4 [|0; 0; 0; 0|] in
+    let r = find_indices_with_index_and_value_difference_i_array nums 1 1 in
+    result_is r (-1) (-1)
+
+  let test_005 () : bool =
+    let nums = init 5 [|10; 5; 15; 20; 25|] in
+    let r = find_indices_with_index_and_value_difference_i_array nums 2 10 in
+    result_is r 1 3
+
+  let test_006 () : bool =
+    let nums = init 5 [|4; 2; 3; 1; 5|] in
+    let r = find_indices_with_index_and_value_difference_i_array nums 1 2 in
+    result_is r 0 1
+
+  let test_007 () : bool =
+    let nums = init 5 [|1; 3; 5; 7; 9|] in
+    let r = find_indices_with_index_and_value_difference_i_array nums 3 4 in
+    result_is r 0 3
+
+  let test_008 () : bool =
+    let nums = init 6 [|45; 46; 47; 48; 49; 50|] in
+    let r = find_indices_with_index_and_value_difference_i_array nums 2 5 in
+    result_is r 0 5
+
+  let test_009 () : bool =
+    let nums = init 5 [|4; 2; 3; 4; 5|] in
+    let r = find_indices_with_index_and_value_difference_i_array nums 1 2 in
+    result_is r 0 1
+
+  let test_010 () : bool =
+    let nums = init 5 [|50; 40; 30; 20; 10|] in
+    let r = find_indices_with_index_and_value_difference_i_array nums 2 15 in
+    result_is r 0 2
+
+  let test_011 () : bool =
+    let nums = init 3 [|1; 2; 3|] in
+    let r = find_indices_with_index_and_value_difference_i_array nums 2 4 in
+    result_is r (-1) (-1)
+
+  let test_012 () : bool =
+    let nums = init 10 [|1; 2; 3; 4; 5; 6; 7; 8; 9; 10|] in
+    let r = find_indices_with_index_and_value_difference_i_array nums 5 5 in
+    result_is r 0 5
+
+  let test_013 () : bool =
+    let nums = init 2 [|2; 1|] in
+    let r = find_indices_with_index_and_value_difference_i_array nums 0 0 in
+    result_is r 0 0
+
+  let test_014 () : bool =
+    let nums = init 5 [|50; 40; 30; 20; 10|] in
+    let r = find_indices_with_index_and_value_difference_i_array nums 2 30 in
+    result_is r 0 3
+
+  let test_015 () : bool =
+    let nums = init 5 [|3; 5; 7; 9; 11|] in
+    let r = find_indices_with_index_and_value_difference_i_array nums 1 2 in
+    result_is r 0 1
+
+  let test_016 () : bool =
+    let nums = init 5 [|5; 5; 5; 5; 5|] in
+    let r = find_indices_with_index_and_value_difference_i_array nums 1 1 in
+    result_is r (-1) (-1)
+
+  let test_017 () : bool =
+    let nums = init 5 [|3; 3; 3; 3; 3|] in
+    let r = find_indices_with_index_and_value_difference_i_array nums 0 0 in
+    result_is r 0 0
+
+  let test_018 () : bool =
+    let nums = init 5 [|10; 20; 30; 40; 50|] in
+    let r = find_indices_with_index_and_value_difference_i_array nums 3 15 in
+    result_is r 0 3
+
+  let test_019 () : bool =
+    let nums = init 5 [|10; 20; 30; 40; 50|] in
+    let r = find_indices_with_index_and_value_difference_i_array nums 3 20 in
+    result_is r 0 3
+
+  let run_tests () : bool =
+    if test_000 () then
+    if test_001 () then
+    if test_002 () then
+    if test_003 () then
+    if test_004 () then
+    if test_005 () then
+    if test_006 () then
+    if test_007 () then
+    if test_008 () then
+    if test_009 () then
+    if test_010 () then
+    if test_011 () then
+    if test_012 () then
+    if test_013 () then
+    if test_014 () then
+    if test_015 () then
+    if test_016 () then
+    if test_017 () then
+    if test_018 () then
+    if test_019 () then
+      true
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+
+end

@@ -1,0 +1,209 @@
+module AdvantageShuffle_List_Stage3_Recursive
+
+  use int.Int
+  use list.List
+  use list.Length
+  use list.Permut
+
+  let rec function advantage_count (chosen: list int) (targets: list int) : int
+    variant { chosen }
+  =
+    match chosen with
+    | Nil -> 0
+    | Cons x xs ->
+        match targets with
+        | Nil -> 0
+        | Cons y ys ->
+            (if x > y then 1 else 0) + advantage_count xs ys
+        end
+    end
+
+  predicate valid_advantage_shuffle (nums1: list int) (nums2: list int) (out: list int) =
+    length nums1 = length nums2 /\
+    length out = length nums2 /\
+    permut out nums1 /\
+    (forall candidate: list int.
+       permut candidate nums1 ->
+       advantage_count out nums2 >= advantage_count candidate nums2)
+
+  type target_entry = Target int int
+  type placed_entry = Placed int int
+
+  let target_value (entry: target_entry) : int =
+    match entry with
+    | Target value _ -> value
+    end
+
+  let target_index (entry: target_entry) : int =
+    match entry with
+    | Target _ index -> index
+    end
+
+  let placed_index (entry: placed_entry) : int =
+    match entry with
+    | Placed index _ -> index
+    end
+
+  let placed_value (entry: placed_entry) : int =
+    match entry with
+    | Placed _ value -> value
+    end
+
+  let rec insert_int_sorted (x: int) (xs: list int) : list int
+    ensures { length result = length xs + 1 }
+    ensures { permut result (Cons x xs) }
+    variant { xs }
+  =
+    match xs with
+    | Nil -> Cons x Nil
+    | Cons y ys ->
+        if x < y then Cons x xs else Cons y (insert_int_sorted x ys)
+    end
+
+  let rec sort_ints (xs: list int) : list int
+    ensures { length result = length xs }
+    ensures { permut result xs }
+    variant { xs }
+  =
+    match xs with
+    | Nil -> Nil
+    | Cons x rest -> insert_int_sorted x (sort_ints rest)
+    end
+
+  let rec insert_target_sorted (entry: target_entry) (xs: list target_entry) : list target_entry
+    ensures { length result = length xs + 1 }
+    ensures { permut result (Cons entry xs) }
+    variant { xs }
+  =
+    match xs with
+    | Nil -> Cons entry Nil
+    | Cons y ys ->
+        if target_value entry < target_value y then
+          Cons entry xs
+        else
+          Cons y (insert_target_sorted entry ys)
+    end
+
+  let rec sort_targets (xs: list target_entry) : list target_entry
+    ensures { length result = length xs }
+    ensures { permut result xs }
+    variant { xs }
+  =
+    match xs with
+    | Nil -> Nil
+    | Cons x rest -> insert_target_sorted x (sort_targets rest)
+    end
+
+  let rec insert_placed_sorted (entry: placed_entry) (xs: list placed_entry) : list placed_entry
+    ensures { length result = length xs + 1 }
+    ensures { permut result (Cons entry xs) }
+    variant { xs }
+  =
+    match xs with
+    | Nil -> Cons entry Nil
+    | Cons y ys ->
+        if placed_index entry < placed_index y then
+          Cons entry xs
+        else
+          Cons y (insert_placed_sorted entry ys)
+    end
+
+  let rec sort_placed (xs: list placed_entry) : list placed_entry
+    ensures { length result = length xs }
+    ensures { permut result xs }
+    variant { xs }
+  =
+    match xs with
+    | Nil -> Nil
+    | Cons x rest -> insert_placed_sorted x (sort_placed rest)
+    end
+
+  let rec index_targets (nums2: list int) (i: int) : list target_entry
+    ensures { length result = length nums2 }
+    variant { nums2 }
+  =
+    match nums2 with
+    | Nil -> Nil
+    | Cons x xs -> Cons (Target x i) (index_targets xs (i + 1))
+    end
+
+  let rec last_int (xs: list int) : int
+    variant { xs }
+  =
+    match xs with
+    | Nil -> 0
+    | Cons x Nil -> x
+    | Cons _ ys -> last_int ys
+    end
+
+  let rec drop_last_int (xs: list int) : list int
+    ensures { length result <= length xs }
+    variant { xs }
+  =
+    match xs with
+    | Nil -> Nil
+    | Cons _ Nil -> Nil
+    | Cons x ys -> Cons x (drop_last_int ys)
+    end
+
+  let rec last_target (xs: list target_entry) : target_entry
+    variant { xs }
+  =
+    match xs with
+    | Nil -> Target 0 0
+    | Cons x Nil -> x
+    | Cons _ ys -> last_target ys
+    end
+
+  let rec drop_last_target (xs: list target_entry) : list target_entry
+    ensures { length result <= length xs }
+    variant { xs }
+  =
+    match xs with
+    | Nil -> Nil
+    | Cons _ Nil -> Nil
+    | Cons x ys -> Cons x (drop_last_target ys)
+    end
+
+  let rec assign_advantage (available: list int) (targets: list target_entry) : list placed_entry
+    ensures { length available = length targets -> length result = length targets }
+    variant { targets }
+  =
+    match targets with
+    | Nil -> Nil
+    | _ ->
+        let current_target = last_target targets in
+        let remaining_targets = drop_last_target targets in
+        match available with
+        | Nil -> Nil
+        | Cons smallest rest ->
+            let largest = last_int available in
+            if largest > target_value current_target then
+              let remaining_available = drop_last_int available in
+              Cons (Placed (target_index current_target) largest)
+                (assign_advantage remaining_available remaining_targets)
+            else
+              Cons (Placed (target_index current_target) smallest)
+                (assign_advantage rest remaining_targets)
+        end
+    end
+
+  let rec extract_values (xs: list placed_entry) : list int
+    ensures { length result = length xs }
+    variant { xs }
+  =
+    match xs with
+    | Nil -> Nil
+    | Cons x rest -> Cons (placed_value x) (extract_values rest)
+    end
+
+  let advantage_shuffle_list (nums1: list int) (nums2: list int) : list int
+    requires { length nums1 = length nums2 }
+    ensures  { valid_advantage_shuffle nums1 nums2 result }
+  =
+    let sorted_nums1 = sort_ints nums1 in
+    let indexed_targets = sort_targets (index_targets nums2 0) in
+    let placements = assign_advantage sorted_nums1 indexed_targets in
+    extract_values (sort_placed placements)
+
+end

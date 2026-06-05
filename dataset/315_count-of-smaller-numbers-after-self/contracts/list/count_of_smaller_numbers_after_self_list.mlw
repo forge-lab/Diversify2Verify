@@ -1,0 +1,147 @@
+module CountOfSmallerNumbersAfterSelf_List_Spec
+
+  use int.Int
+  use list.List
+
+  let rec function count_smaller_than (x: int) (l: list int) : int
+    variant { l }
+  =
+    match l with
+    | Nil -> 0
+    | Cons y ys -> (if y < x then 1 else 0) + count_smaller_than x ys
+    end
+
+  let rec function smaller_counts (nums: list int) : list int
+    variant { nums }
+  =
+    match nums with
+    | Nil -> Nil
+    | Cons x xs -> Cons (count_smaller_than x xs) (smaller_counts xs)
+    end
+
+  val count_of_smaller_numbers_after_self_list (nums: list int) : list int
+    ensures { result = smaller_counts nums }
+
+  let lemma check_test_000 () =
+    let nums = Cons (-1) (Cons (-1) Nil) in
+    let expected = Cons 0 (Cons 0 Nil) in
+    assert { count_smaller_than (-1) Nil = 0 };
+    assert { count_smaller_than (-1) (Cons (-1) Nil) = 0 };
+    assert { smaller_counts (Cons (-1) Nil) = Cons 0 Nil };
+    assert { smaller_counts nums = expected }
+
+  let lemma check_test_001 () =
+    let tail4 = Cons 5000 Nil in
+    let tail3 = Cons 0 tail4 in
+    let tail2 = Cons 5000 tail3 in
+    let tail1 = Cons (-10000) tail2 in
+    let nums = Cons 10000 tail1 in
+    let expected = Cons 4 (Cons 0 (Cons 1 (Cons 0 (Cons 0 Nil)))) in
+    assert { count_smaller_than 5000 Nil = 0 };
+    assert { count_smaller_than 0 tail4 = 0 };
+    assert { count_smaller_than 5000 tail3 = 1 };
+    assert { count_smaller_than (-10000) tail2 = 0 };
+    assert { count_smaller_than 10000 tail1 = 4 };
+    assert { smaller_counts tail4 = Cons 0 Nil };
+    assert { smaller_counts tail3 = Cons 0 (Cons 0 Nil) };
+    assert { smaller_counts tail2 = Cons 1 (Cons 0 (Cons 0 Nil)) };
+    assert { smaller_counts tail1 = Cons 0 (Cons 1 (Cons 0 (Cons 0 Nil))) };
+    assert { smaller_counts nums = expected }
+
+  let lemma check_test_002 () =
+    let tail6 = Cons 10 Nil in
+    let tail5 = Cons 9 tail6 in
+    let tail4 = Cons 8 tail5 in
+    let tail3 = Cons 7 tail4 in
+    let tail2 = Cons 6 tail3 in
+    let tail1 = Cons 5 tail2 in
+    let nums = Cons 4 tail1 in
+    let expected = Cons 0 (Cons 0 (Cons 0 (Cons 0 (Cons 0 (Cons 0 (Cons 0 Nil)))))) in
+    assert { count_smaller_than 10 Nil = 0 };
+    assert { count_smaller_than 9 tail6 = 0 };
+    assert { count_smaller_than 8 tail5 = 0 };
+    assert { count_smaller_than 7 tail4 = 0 };
+    assert { count_smaller_than 6 tail3 = 0 };
+    assert { count_smaller_than 5 tail2 = 0 };
+    assert { count_smaller_than 4 tail1 = 0 };
+    assert { smaller_counts tail6 = Cons 0 Nil };
+    assert { smaller_counts tail5 = Cons 0 (Cons 0 Nil) };
+    assert { smaller_counts tail4 = Cons 0 (Cons 0 (Cons 0 Nil)) };
+    assert { smaller_counts tail3 = Cons 0 (Cons 0 (Cons 0 (Cons 0 Nil))) };
+    assert { smaller_counts tail2 = Cons 0 (Cons 0 (Cons 0 (Cons 0 (Cons 0 Nil)))) };
+    assert { smaller_counts tail1 = Cons 0 (Cons 0 (Cons 0 (Cons 0 (Cons 0 (Cons 0 Nil))))) };
+    assert { smaller_counts nums = expected }
+
+  let lemma check_test_003 () =
+    let tail5 = Cons 1 Nil in
+    let tail4 = Cons 0 tail5 in
+    let tail3 = Cons 1 tail4 in
+    let tail2 = Cons 0 tail3 in
+    let tail1 = Cons 1 tail2 in
+    let nums = Cons 0 tail1 in
+    let expected = Cons 0 (Cons 2 (Cons 0 (Cons 1 (Cons 0 (Cons 0 Nil))))) in
+    assert { count_smaller_than 1 Nil = 0 };
+    assert { count_smaller_than 0 tail5 = 0 };
+    assert { count_smaller_than 1 tail4 = 1 };
+    assert { count_smaller_than 0 tail3 = 0 };
+    assert { count_smaller_than 1 tail2 = 2 };
+    assert { count_smaller_than 0 tail1 = 0 };
+    assert { smaller_counts tail5 = Cons 0 Nil };
+    assert { smaller_counts tail4 = Cons 0 (Cons 0 Nil) };
+    assert { smaller_counts tail3 = Cons 1 (Cons 0 (Cons 0 Nil)) };
+    assert { smaller_counts tail2 = Cons 0 (Cons 1 (Cons 0 (Cons 0 Nil))) };
+    assert { smaller_counts tail1 = Cons 2 (Cons 0 (Cons 1 (Cons 0 (Cons 0 Nil)))) };
+    assert { smaller_counts nums = expected }
+
+  let lemma check_test_004 () =
+    let tail4 = Cons 2 Nil in
+    let tail3 = Cons (-2) tail4 in
+    let tail2 = Cons 1 tail3 in
+    let tail1 = Cons (-1) tail2 in
+    let nums = Cons 0 tail1 in
+    let expected = Cons 2 (Cons 1 (Cons 1 (Cons 0 (Cons 0 Nil)))) in
+    assert { count_smaller_than 2 Nil = 0 };
+    assert { count_smaller_than (-2) tail4 = 0 };
+    assert { count_smaller_than 1 tail3 = 1 };
+    assert { count_smaller_than (-1) tail2 = 1 };
+    assert { count_smaller_than 0 tail1 = 2 };
+    assert { smaller_counts tail4 = Cons 0 Nil };
+    assert { smaller_counts tail3 = Cons 0 (Cons 0 Nil) };
+    assert { smaller_counts tail2 = Cons 1 (Cons 0 (Cons 0 Nil)) };
+    assert { smaller_counts tail1 = Cons 1 (Cons 1 (Cons 0 (Cons 0 Nil))) };
+    assert { smaller_counts nums = expected }
+
+  let lemma check_test_006 () =
+    let tail4 = Cons 96 Nil in
+    let tail3 = Cons 97 tail4 in
+    let tail2 = Cons 98 tail3 in
+    let tail1 = Cons 99 tail2 in
+    let nums = Cons 100 tail1 in
+    let expected = Cons 4 (Cons 3 (Cons 2 (Cons 1 (Cons 0 Nil)))) in
+    assert { count_smaller_than 96 Nil = 0 };
+    assert { count_smaller_than 97 tail4 = 1 };
+    assert { count_smaller_than 98 tail3 = 2 };
+    assert { count_smaller_than 99 tail2 = 3 };
+    assert { count_smaller_than 100 tail1 = 4 };
+    assert { smaller_counts tail4 = Cons 0 Nil };
+    assert { smaller_counts tail3 = Cons 1 (Cons 0 Nil) };
+    assert { smaller_counts tail2 = Cons 2 (Cons 1 (Cons 0 Nil)) };
+    assert { smaller_counts tail1 = Cons 3 (Cons 2 (Cons 1 (Cons 0 Nil))) };
+    assert { smaller_counts nums = expected }
+
+  let lemma check_test_019 () =
+    let tail3 = Cons 1 Nil in
+    let tail2 = Cons 6 tail3 in
+    let tail1 = Cons 2 tail2 in
+    let nums = Cons 5 tail1 in
+    let expected = Cons 2 (Cons 1 (Cons 1 (Cons 0 Nil))) in
+    assert { count_smaller_than 1 Nil = 0 };
+    assert { count_smaller_than 6 tail3 = 1 };
+    assert { count_smaller_than 2 tail2 = 1 };
+    assert { count_smaller_than 5 tail1 = 2 };
+    assert { smaller_counts tail3 = Cons 0 Nil };
+    assert { smaller_counts tail2 = Cons 1 (Cons 0 Nil) };
+    assert { smaller_counts tail1 = Cons 1 (Cons 1 (Cons 0 Nil)) };
+    assert { smaller_counts nums = expected }
+
+end

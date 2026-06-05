@@ -1,0 +1,180 @@
+module KeepMultiplyingFoundValuesByTwo_Array_Spec
+
+  use int.Int
+  use int.Power
+  use array.Array
+  use array.Init
+
+  predicate valid_input (nums: array int) (original: int) =
+    1 <= length nums <= 1000 /\
+    1 <= original <= 1000 /\
+    forall i: int. 0 <= i < length nums -> 1 <= nums[i] <= 1000
+
+  predicate contains_value (nums: array int) (x: int) =
+    exists i: int. 0 <= i < length nums /\ nums[i] = x
+
+  function doubled_value (original: int) (steps: int) : int =
+    original * power 2 steps
+
+  predicate doubling_prefix_found (nums: array int) (original: int) (steps: int) =
+    forall t: int. 0 <= t < steps -> contains_value nums (doubled_value original t)
+
+  predicate final_value (nums: array int) (original: int) (res: int) =
+    exists steps: int.
+      0 <= steps <= length nums /\
+      res = doubled_value original steps /\
+      doubling_prefix_found nums original steps /\
+      not (contains_value nums res)
+
+  val keep_multiplying_found_values_by_two_array (nums: array int) (original: int) : int
+    requires { valid_input nums original }
+    ensures  { final_value nums original result }
+
+  let lemma test_000_python_assertions () =
+    let nums = init 5 [|10; 20; 30; 40; 50|] in
+    assert { length nums = 5 };
+    assert { nums[0] = 10 };
+    assert { nums[1] = 20 };
+    assert { nums[2] = 30 };
+    assert { nums[3] = 40 };
+    assert { nums[4] = 50 };
+    assert { valid_input nums 5 };
+    assert { doubled_value 5 0 = 5 };
+    assert { doubling_prefix_found nums 5 0 };
+    assert {
+      forall i: int. 0 <= i < length nums ->
+        i = 0 \/ i = 1 \/ i = 2 \/ i = 3 \/ i = 4
+    };
+    assert { not (contains_value nums 5) };
+    assert { final_value nums 5 5 }
+
+  let lemma test_002_python_assertions () =
+    let nums = init 5 [|3; 6; 9; 12; 15|] in
+    assert { length nums = 5 };
+    assert { nums[0] = 3 };
+    assert { nums[1] = 6 };
+    assert { nums[2] = 9 };
+    assert { nums[3] = 12 };
+    assert { nums[4] = 15 };
+    assert { valid_input nums 3 };
+    assert { contains_value nums 3 };
+    assert { contains_value nums 6 };
+    assert { contains_value nums 12 };
+    assert { doubled_value 3 0 = 3 };
+    assert { doubled_value 3 1 = 6 };
+    assert { doubled_value 3 2 = 12 };
+    assert { doubled_value 3 3 = 24 };
+    assert { doubling_prefix_found nums 3 3 };
+    assert {
+      forall i: int. 0 <= i < length nums ->
+        i = 0 \/ i = 1 \/ i = 2 \/ i = 3 \/ i = 4
+    };
+    assert { not (contains_value nums 24) };
+    assert { final_value nums 3 24 }
+
+  let lemma test_003_python_assertions () =
+    let nums = init 4 [|1; 2; 4; 8|] in
+    assert { length nums = 4 };
+    assert { nums[0] = 1 };
+    assert { nums[1] = 2 };
+    assert { nums[2] = 4 };
+    assert { nums[3] = 8 };
+    assert { valid_input nums 1 };
+    assert { contains_value nums 1 };
+    assert { contains_value nums 2 };
+    assert { contains_value nums 4 };
+    assert { contains_value nums 8 };
+    assert { doubled_value 1 0 = 1 };
+    assert { doubled_value 1 1 = 2 };
+    assert { doubled_value 1 2 = 4 };
+    assert { doubled_value 1 3 = 8 };
+    assert { doubled_value 1 4 = 16 };
+    assert { doubling_prefix_found nums 1 4 };
+    assert {
+      forall i: int. 0 <= i < length nums ->
+        i = 0 \/ i = 1 \/ i = 2 \/ i = 3
+    };
+    assert { not (contains_value nums 16) };
+    assert { final_value nums 1 16 }
+
+  let lemma test_005_python_assertions () =
+    let nums = init 3 [|2; 7; 9|] in
+    assert { length nums = 3 };
+    assert { nums[0] = 2 };
+    assert { nums[1] = 7 };
+    assert { nums[2] = 9 };
+    assert { valid_input nums 4 };
+    assert { doubled_value 4 0 = 4 };
+    assert { doubling_prefix_found nums 4 0 };
+    assert {
+      forall i: int. 0 <= i < length nums ->
+        i = 0 \/ i = 1 \/ i = 2
+    };
+    assert { not (contains_value nums 4) };
+    assert { final_value nums 4 4 }
+
+  let lemma test_006_python_assertions () =
+    let nums = init 5 [|1000; 1000; 1000; 1000; 1000|] in
+    assert { length nums = 5 };
+    assert { nums[0] = 1000 };
+    assert { nums[1] = 1000 };
+    assert { nums[2] = 1000 };
+    assert { nums[3] = 1000 };
+    assert { nums[4] = 1000 };
+    assert { valid_input nums 1000 };
+    assert { contains_value nums 1000 };
+    assert { doubled_value 1000 0 = 1000 };
+    assert { doubled_value 1000 1 = 2000 };
+    assert { doubling_prefix_found nums 1000 1 };
+    assert {
+      forall i: int. 0 <= i < length nums ->
+        i = 0 \/ i = 1 \/ i = 2 \/ i = 3 \/ i = 4
+    };
+    assert { not (contains_value nums 2000) };
+    assert { final_value nums 1000 2000 }
+
+  let lemma test_008_python_assertions () =
+    let nums = init 5 [|10; 20; 30; 40; 50|] in
+    assert { length nums = 5 };
+    assert { nums[0] = 10 };
+    assert { nums[1] = 20 };
+    assert { nums[2] = 30 };
+    assert { nums[3] = 40 };
+    assert { nums[4] = 50 };
+    assert { valid_input nums 10 };
+    assert { contains_value nums 10 };
+    assert { contains_value nums 20 };
+    assert { contains_value nums 40 };
+    assert { doubled_value 10 0 = 10 };
+    assert { doubled_value 10 1 = 20 };
+    assert { doubled_value 10 2 = 40 };
+    assert { doubled_value 10 3 = 80 };
+    assert { doubling_prefix_found nums 10 3 };
+    assert {
+      forall i: int. 0 <= i < length nums ->
+        i = 0 \/ i = 1 \/ i = 2 \/ i = 3 \/ i = 4
+    };
+    assert { not (contains_value nums 80) };
+    assert { final_value nums 10 80 }
+
+  let lemma test_009_python_assertions () =
+    let nums = init 5 [|2; 2; 2; 2; 2|] in
+    assert { length nums = 5 };
+    assert { nums[0] = 2 };
+    assert { nums[1] = 2 };
+    assert { nums[2] = 2 };
+    assert { nums[3] = 2 };
+    assert { nums[4] = 2 };
+    assert { valid_input nums 2 };
+    assert { contains_value nums 2 };
+    assert { doubled_value 2 0 = 2 };
+    assert { doubled_value 2 1 = 4 };
+    assert { doubling_prefix_found nums 2 1 };
+    assert {
+      forall i: int. 0 <= i < length nums ->
+        i = 0 \/ i = 1 \/ i = 2 \/ i = 3 \/ i = 4
+    };
+    assert { not (contains_value nums 4) };
+    assert { final_value nums 2 4 }
+
+end

@@ -1,0 +1,132 @@
+module ContainerWithMostWater_List_Spec
+
+  use int.Int
+  use int.MinMax
+  use list.List
+  use list.Length
+  use list.Mem
+  use list.NthNoOpt
+
+  predicate valid_pair (height: list int) (i: int) (j: int) =
+    0 <= i /\ i < j /\ j < length height
+
+  function water_area (height: list int) (i: int) (j: int) : int =
+    (j - i) * min (nth i height) (nth j height)
+
+  predicate max_container_area (height: list int) (m: int) =
+    0 <= m /\
+    (exists i: int. exists j: int.
+       valid_pair height i j /\ m = water_area height i j) /\
+    (forall i: int. forall j: int.
+       valid_pair height i j -> water_area height i j <= m)
+
+  predicate valid_shifted_pair (height: list int) (base: int) (i: int) (j: int) =
+    base <= i /\ i < j /\ j < base + length height
+
+  function shifted_water_area (height: list int) (base: int) (i: int) (j: int) : int =
+    (j - i) * min (nth (i - base) height) (nth (j - base) height)
+
+  predicate max_area_from_rights
+      (left_height: int) (left_index: int) (rights: list int) (right_index: int) (m: int) =
+    0 <= m /\
+    (rights = Nil /\ m = 0 \/
+     exists j: int.
+       right_index <= j /\ j < right_index + length rights /\
+       m = (j - left_index) * min left_height (nth (j - right_index) rights)) /\
+    (forall j: int.
+       right_index <= j /\ j < right_index + length rights ->
+       (j - left_index) * min left_height (nth (j - right_index) rights) <= m)
+
+  predicate max_area_from_lefts (height: list int) (base: int) (m: int) =
+    0 <= m /\
+    (2 <= length height ->
+       exists i: int. exists j: int.
+         valid_shifted_pair height base i j /\
+         m = shifted_water_area height base i j) /\
+    (forall i: int. forall j: int.
+       valid_shifted_pair height base i j ->
+       shifted_water_area height base i j <= m)
+
+  let min_int (a: int) (b: int) : int
+    ensures { result = min a b }
+    ensures { result = a \/ result = b }
+    ensures { result <= a /\ result <= b }
+  =
+    if a <= b then a else b
+
+  let max_int (a: int) (b: int) : int
+    ensures { result = max a b }
+    ensures { result = a \/ result = b }
+    ensures { a <= result /\ b <= result }
+  =
+    if a >= b then a else b
+
+  let rec best_with_left
+      (left_height: int)
+      (left_index: int)
+      (rights: list int)
+      (right_index: int) : int
+    requires { 0 <= left_height }
+    requires { left_index < right_index }
+    requires { forall x: int. mem x rights -> 0 <= x }
+    ensures  { max_area_from_rights left_height left_index rights right_index result }
+    variant { rights }
+  =
+    match rights with
+    | Nil ->
+        assert { max_area_from_rights left_height left_index Nil right_index 0 };
+        0
+    | Cons right_height rest ->
+        assert { 0 <= right_height };
+        let area = (right_index - left_index) * min_int left_height right_height in
+        assert { 0 <= area };
+        let best_rest = best_with_left left_height left_index rest (right_index + 1) in
+        assert { max_area_from_rights left_height left_index rest (right_index + 1) best_rest };
+        let best = max_int area best_rest in
+        assert { area <= best /\ best_rest <= best };
+        best
+    end
+
+  let rec scan_lefts (heights: list int) (left_index: int) : int
+    requires { 0 <= left_index }
+    requires { forall x: int. mem x heights -> 0 <= x }
+    ensures  { max_area_from_lefts heights left_index result }
+    variant { heights }
+  =
+    match heights with
+    | Nil ->
+        assert { max_area_from_lefts Nil left_index 0 };
+        0
+    | Cons left_height rights ->
+        assert { 0 <= left_height };
+        match rights with
+        | Nil ->
+            assert { max_area_from_lefts (Cons left_height Nil) left_index 0 };
+            0
+        | _ ->
+            let best_here = best_with_left left_height left_index rights (left_index + 1) in
+            assert { max_area_from_rights left_height left_index rights (left_index + 1) best_here };
+            let best_rest = scan_lefts rights (left_index + 1) in
+            assert { max_area_from_lefts rights (left_index + 1) best_rest };
+            let best = max_int best_here best_rest in
+            assert { best_here <= best /\ best_rest <= best };
+            best
+        end
+    end
+
+  let container_with_most_water_list (height: list int) : int
+    requires { 2 <= length height }
+    requires { forall x: int. mem x height -> 0 <= x }
+    ensures  { max_container_area height result }
+    ensures  { 0 <= result }
+  =
+    let r = scan_lefts height 0 in
+    assert { max_area_from_lefts height 0 r };
+    assert { forall i: int. forall j: int.
+      valid_shifted_pair height 0 i j <-> valid_pair height i j };
+    assert { forall i: int. forall j: int.
+      valid_pair height i j -> shifted_water_area height 0 i j = water_area height i j };
+    assert { max_container_area height r };
+    r
+
+end

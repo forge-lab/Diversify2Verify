@@ -1,0 +1,96 @@
+module FindTheDistanceValueBetweenTwoArrays_Array_Stage3_Recursive
+
+  use int.Int
+  use int.Abs
+  use array.Array
+  use array.Init
+  use array.NumOf
+
+  predicate far_from_all (arr2: array int) (x: int) (d: int) =
+    forall j: int. 0 <= j < length arr2 -> abs (x - arr2[j]) > d
+
+  function distance_value (arr1: array int) (arr2: array int) (d: int) : int =
+    numof (fun _ v -> far_from_all arr2 v d) arr1 0 (length arr1)
+
+  predicate far_from_all_from (arr2: array int) (x: int) (d: int) (j: int) =
+    forall k: int. j <= k < length arr2 -> abs (x - arr2[k]) > d
+
+  function distance_value_from
+      (arr1: array int) (arr2: array int) (d: int) (i: int) : int =
+    numof (fun _ v -> far_from_all arr2 v d) arr1 i (length arr1)
+
+  let abs_int (x: int) : int
+    ensures { result = abs x }
+  =
+    if x < 0 then -x else x
+
+  let rec has_close_value_from (arr2: array int) (x: int) (d: int) (j: int) : bool
+    requires { 0 <= j <= length arr2 }
+    ensures  { result <-> exists k: int. j <= k < length arr2 /\ abs (x - arr2[k]) <= d }
+    ensures  { not result <-> far_from_all_from arr2 x d j }
+    variant  { length arr2 - j }
+  =
+    if j >= length arr2 then begin
+      assert { j = length arr2 };
+      false
+    end else begin
+      assert { 0 <= j < length arr2 };
+      if abs_int (x - arr2[j]) <= d then begin
+        assert { abs (x - arr2[j]) <= d };
+        true
+      end else begin
+        assert { abs (x - arr2[j]) > d };
+        let r = has_close_value_from arr2 x d (j + 1) in
+        assert {
+          r <->
+          exists k: int. j + 1 <= k < length arr2 /\ abs (x - arr2[k]) <= d
+        };
+        assert { not r <-> far_from_all_from arr2 x d (j + 1) };
+        r
+      end
+    end
+
+  let rec count_far_values_from
+      (arr1: array int) (arr2: array int) (d: int) (i: int) : int
+    requires { 0 <= i <= length arr1 }
+    ensures  { result = distance_value_from arr1 arr2 d i }
+    variant  { length arr1 - i }
+  =
+    if i >= length arr1 then begin
+      assert { i = length arr1 };
+      assert { distance_value_from arr1 arr2 d i = 0 };
+      0
+    end else begin
+      assert { 0 <= i < length arr1 };
+      let close = has_close_value_from arr2 arr1[i] d 0 in
+      assert { far_from_all_from arr2 arr1[i] d 0 <-> far_from_all arr2 arr1[i] d };
+      if close then begin
+        assert { not (far_from_all arr2 arr1[i] d) };
+        let tail = count_far_values_from arr1 arr2 d (i + 1) in
+        assert {
+          distance_value_from arr1 arr2 d i =
+          distance_value_from arr1 arr2 d (i + 1) +
+          (if far_from_all arr2 arr1[i] d then 1 else 0)
+        };
+        tail
+      end else begin
+        assert { far_from_all arr2 arr1[i] d };
+        let tail = count_far_values_from arr1 arr2 d (i + 1) in
+        assert {
+          distance_value_from arr1 arr2 d i =
+          distance_value_from arr1 arr2 d (i + 1) +
+          (if far_from_all arr2 arr1[i] d then 1 else 0)
+        };
+        1 + tail
+      end
+    end
+
+  let find_the_distance_value_between_two_arrays_array
+      (arr1: array int) (arr2: array int) (d: int) : int
+    ensures { result = distance_value arr1 arr2 d }
+  =
+    let r = count_far_values_from arr1 arr2 d 0 in
+    assert { distance_value_from arr1 arr2 d 0 = distance_value arr1 arr2 d };
+    r
+
+end

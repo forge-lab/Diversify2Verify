@@ -1,0 +1,137 @@
+== Stage 1: first prover on whole file ==
+Running in /Users/rubenm/Desktop/Diversify2Verify/codex-runs/dataset-merge-verification/stage3a-repair/910_smallest-range-ii/list-recursive/smallest_range_ii_list_stage3_ee1dfc9e_stage3/generated/why3: why3 session create -o /Users/rubenm/Desktop/Diversify2Verify/codex-runs/dataset-merge-verification/stage3a-repair/910_smallest-range-ii/list-recursive/smallest_range_ii_list_stage3_ee1dfc9e_stage3/generated/why3/.why3_sessions/repaired_stage1 -P Z3,4.8.6 -t 10 -m 8192 repaired.mlw
+Session created successfully
+Running in /Users/rubenm/Desktop/Diversify2Verify/codex-runs/dataset-merge-verification/stage3a-repair/910_smallest-range-ii/list-recursive/smallest_range_ii_list_stage3_ee1dfc9e_stage3/generated/why3: why3 bench /Users/rubenm/Desktop/Diversify2Verify/codex-runs/dataset-merge-verification/stage3a-repair/910_smallest-range-ii/list-recursive/smallest_range_ii_list_stage3_ee1dfc9e_stage3/generated/why3/.why3_sessions/repaired_stage1
+Progress: 7/1/0                       Progress: 6/2/0                       Progress: 5/3/0                       Progress: 4/4/0                       Progress: 3/5/0                       Progress: 2/6/0                       Progress: 2/0/1                       Progress: 1/1/1                       Progress: 0/2/1                       Progress: 0/1/2                       Progress: 0/0/1                       
+Replay completed, saving session... done
+== Stage 1 stats ==
+= Statistics for session /Users/rubenm/Desktop/Diversify2Verify/codex-runs/dataset-merge-verification/stage3a-repair/910_smallest-range-ii/list-recursive/smallest_range_ii_list_stage3_ee1dfc9e_stage3/generated/why3/.why3_sessions/repaired_stage1
+
+== Number of root goals ==
+  total: 8  proved: 6
+
+== Number of sub goals ==
+  total: 0  proved: 0
+
+== Goals not proved ==
+  +-- file [../../repaired.mlw]
+    +-- theory SmallestRangeIi_List_Spec
+      +-- goal smallest_range_ii_possible_result'vc
+      +-- goal smallest_range_ii_lower_bound'vc
+  
+== Goals proved by only one prover ==
+  +-- file [../../repaired.mlw]
+    +-- theory SmallestRangeIi_List_Spec
+      +-- goal choice_transform'vc: Z3 4.8.6
+      +-- goal insert_sorted'vc: Z3 4.8.6
+      +-- goal sort_list'vc: Z3 4.8.6
+      +-- goal last_value_with_current'vc: Z3 4.8.6
+      +-- goal best_split'vc: Z3 4.8.6
+      +-- goal smallest_range_ii_list'vc: Z3 4.8.6
+  
+1 session(s) read, with a total of 8 proof goals.
+== Unproved root goals after first prover ==
+SmallestRangeIi_List_Spec	smallest_range_ii_possible_result'vc
+SmallestRangeIi_List_Spec	smallest_range_ii_lower_bound'vc
+== Stage 1: trying remaining goals with prover Alt-Ergo,2.4.0 ==
+---- stage1 | prover: Alt-Ergo,2.4.0 | theory: SmallestRangeIi_List_Spec | goal: smallest_range_ii_possible_result'vc ----
+File repaired.mlw:
+Goal smallest_range_ii_possible_result'vc.
+Prover result is: Timeout (10.00s, 280239 steps).
+---- stage1 | prover: Alt-Ergo,2.4.0 | theory: SmallestRangeIi_List_Spec | goal: smallest_range_ii_lower_bound'vc ----
+File repaired.mlw:
+Goal smallest_range_ii_lower_bound'vc.
+Prover result is: Timeout (10.00s, 129589 steps).
+Remaining after prover Alt-Ergo,2.4.0: 2
+== Stage 1: trying remaining goals with prover CVC4,1.8 ==
+---- stage1 | prover: CVC4,1.8 | theory: SmallestRangeIi_List_Spec | goal: smallest_range_ii_possible_result'vc ----
+File repaired.mlw:
+Goal smallest_range_ii_possible_result'vc.
+Prover result is: Unknown (unknown + incomplete) (0.03s, 7802 steps).
+---- stage1 | prover: CVC4,1.8 | theory: SmallestRangeIi_List_Spec | goal: smallest_range_ii_lower_bound'vc ----
+File repaired.mlw:
+Goal smallest_range_ii_lower_bound'vc.
+Prover result is: Timeout (10.00s, 1613190 steps).
+Remaining after prover CVC4,1.8: 2
+== Goals still unproved after stage 1 ==
+SmallestRangeIi_List_Spec	smallest_range_ii_possible_result'vc
+SmallestRangeIi_List_Spec	smallest_range_ii_lower_bound'vc
+== Stage 2: split_vc on unproved goal ==
+Target theory: SmallestRangeIi_List_Spec
+Target goal  : smallest_range_ii_possible_result'vc
+---- stage2 | prover: Z3,4.8.6 | theory: SmallestRangeIi_List_Spec | goal: smallest_range_ii_possible_result'vc ----
+Transforms: split_vc
+File "repaired.mlw", line 105, characters 15-53:
+Sub-goal Postcondition of goal smallest_range_ii_possible_result'vc.
+Prover result is: Timeout (10.00s, 116893936 steps).
+---- stage2 | prover: Alt-Ergo,2.4.0 | theory: SmallestRangeIi_List_Spec | goal: smallest_range_ii_possible_result'vc ----
+Transforms: split_vc
+File "repaired.mlw", line 105, characters 15-53:
+Sub-goal Postcondition of goal smallest_range_ii_possible_result'vc.
+Prover result is: Timeout (10.00s, 283077 steps).
+---- stage2 | prover: CVC4,1.8 | theory: SmallestRangeIi_List_Spec | goal: smallest_range_ii_possible_result'vc ----
+Transforms: split_vc
+File "repaired.mlw", line 105, characters 15-53:
+Sub-goal Postcondition of goal smallest_range_ii_possible_result'vc.
+Prover result is: Unknown (unknown + incomplete) (0.03s, 7610 steps).
+== Stage 2: split_vc on unproved goal ==
+Target theory: SmallestRangeIi_List_Spec
+Target goal  : smallest_range_ii_lower_bound'vc
+---- stage2 | prover: Z3,4.8.6 | theory: SmallestRangeIi_List_Spec | goal: smallest_range_ii_lower_bound'vc ----
+Transforms: split_vc
+File "repaired.mlw", line 123, characters 65-90:
+Sub-goal Postcondition of goal smallest_range_ii_lower_bound'vc.
+Prover result is: Timeout (10.00s, 42264047 steps).
+---- stage2 | prover: Alt-Ergo,2.4.0 | theory: SmallestRangeIi_List_Spec | goal: smallest_range_ii_lower_bound'vc ----
+Transforms: split_vc
+File "repaired.mlw", line 123, characters 65-90:
+Sub-goal Postcondition of goal smallest_range_ii_lower_bound'vc.
+Prover result is: Timeout (10.00s, 132080 steps).
+---- stage2 | prover: CVC4,1.8 | theory: SmallestRangeIi_List_Spec | goal: smallest_range_ii_lower_bound'vc ----
+Transforms: split_vc
+
+Infrastructure issue in stage 2 with prover CVC4,1.8; aborting rest of stage 2.
+== Goals still unproved after stage 2 (split_vc) ==
+SmallestRangeIi_List_Spec	smallest_range_ii_possible_result'vc
+SmallestRangeIi_List_Spec	smallest_range_ii_lower_bound'vc
+== Stage 3: split_vc + inline_all on still-unproved goal ==
+Target theory: SmallestRangeIi_List_Spec
+Target goal  : smallest_range_ii_possible_result'vc
+---- stage3 | prover: Z3,4.8.6 | theory: SmallestRangeIi_List_Spec | goal: smallest_range_ii_possible_result'vc ----
+Transforms: split_vc inline_all
+File "repaired.mlw", line 105, characters 15-53:
+Sub-goal Postcondition of goal smallest_range_ii_possible_result'vc.
+Prover result is: Timeout (10.00s, 88724005 steps).
+---- stage3 | prover: Alt-Ergo,2.4.0 | theory: SmallestRangeIi_List_Spec | goal: smallest_range_ii_possible_result'vc ----
+Transforms: split_vc inline_all
+File "repaired.mlw", line 105, characters 15-53:
+Sub-goal Postcondition of goal smallest_range_ii_possible_result'vc.
+Prover result is: Timeout (10.00s, 192692 steps).
+== Stage 3: split_vc + inline_all on still-unproved goal ==
+Target theory: SmallestRangeIi_List_Spec
+Target goal  : smallest_range_ii_lower_bound'vc
+---- stage3 | prover: Z3,4.8.6 | theory: SmallestRangeIi_List_Spec | goal: smallest_range_ii_lower_bound'vc ----
+Transforms: split_vc inline_all
+File "repaired.mlw", line 123, characters 65-90:
+Sub-goal Postcondition of goal smallest_range_ii_lower_bound'vc.
+Prover result is: High failure (signaled)
+  (8.85s)HighFailure (signaled),
+  Prover exit status: killed by signal 24
+  prover output:
+  
+  .
+Infrastructure issue in stage 3 with prover Z3,4.8.6; aborting rest of stage 3.
+== Final summary ==
+Unproved root goals after first prover : 2
+Remaining failures after split_vc      : 2
+Remaining failures after stage 3       : 2
+Detailed logs stored in                : /Users/rubenm/Desktop/Diversify2Verify/codex-runs/dataset-merge-verification/stage3a-repair/910_smallest-range-ii/list-recursive/smallest_range_ii_list_stage3_ee1dfc9e_stage3/generated/why3/.why3_sessions/repaired_logs
+Still unproved goals:
+SmallestRangeIi_List_Spec	smallest_range_ii_possible_result'vc
+SmallestRangeIi_List_Spec	smallest_range_ii_lower_bound'vc
+VERIFY_RESULT: FAILURE
+VERIFY_REASON: unproved_goals_remain
+VERIFY_STAGE: stage3
+VERIFY_ROOT_TOTAL: 8
+VERIFY_ROOT_PROVED: 6
+VERIFY_ROOT_REMAINING: 2

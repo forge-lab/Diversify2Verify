@@ -1,0 +1,157 @@
+module AppendKIntegersWithMinimalSum_List_Spec
+
+  use int.Int
+  use list.List
+  use list.Length
+  use list.Mem
+  use list.NumOcc
+  use list.Sum
+
+  predicate valid_append_choices (nums: list int) (chosen: list int) (k: int) =
+    length chosen = k /\
+    (forall x: int. mem x chosen ->
+      x > 0 /\ not (mem x nums) /\ num_occ x chosen = 1)
+
+  predicate append_k_minimal_sum (nums: list int) (k: int) (r: int) =
+    exists chosen: list int.
+      valid_append_choices nums chosen k /\
+      r = sum chosen /\
+      (forall other: list int. valid_append_choices nums other k -> r <= sum other)
+
+  val append_k_integers_with_minimal_sum_list (nums: list int) (k: int) : int
+    requires { k >= 0 }
+    ensures  { append_k_minimal_sum nums k result }
+
+  let lemma check_test_000 () =
+    let nums = Cons 1 (Cons 2 (Cons 3 (Cons 4 (Cons 5 Nil)))) in
+    let chosen = Cons 6 (Cons 7 (Cons 8 Nil)) in
+    assert { length chosen = 3 };
+    assert { sum chosen = 21 };
+    assert { mem 6 chosen };
+    assert { mem 7 chosen };
+    assert { mem 8 chosen };
+    assert { not (mem 6 nums) };
+    assert { not (mem 7 nums) };
+    assert { not (mem 8 nums) };
+    assert { num_occ 6 chosen = 1 };
+    assert { num_occ 7 chosen = 1 };
+    assert { num_occ 8 chosen = 1 };
+    assert { forall x: int. mem x chosen -> x = 6 \/ x = 7 \/ x = 8 };
+    assert { valid_append_choices nums chosen 3 };
+    assert { valid_append_choices nums chosen 3 /\ sum chosen = 21 }
+
+  let lemma check_test_001 () =
+    let nums = Cons 1 (Cons 4 (Cons 25 (Cons 10 (Cons 25 Nil)))) in
+    let chosen = Cons 2 (Cons 3 Nil) in
+    assert { length chosen = 2 };
+    assert { sum chosen = 5 };
+    assert { mem 2 chosen };
+    assert { mem 3 chosen };
+    assert { not (mem 2 nums) };
+    assert { not (mem 3 nums) };
+    assert { num_occ 2 chosen = 1 };
+    assert { num_occ 3 chosen = 1 };
+    assert { forall x: int. mem x chosen -> x = 2 \/ x = 3 };
+    assert { valid_append_choices nums chosen 2 };
+    assert { valid_append_choices nums chosen 2 /\ sum chosen = 5 }
+
+  let lemma check_test_003 () =
+    let nums = Cons 1000000000 Nil in
+    let chosen = Cons 1 Nil in
+    assert { length chosen = 1 };
+    assert { sum chosen = 1 };
+    assert { mem 1 chosen };
+    assert { not (mem 1 nums) };
+    assert { num_occ 1 chosen = 1 };
+    assert { forall x: int. mem x chosen -> x = 1 };
+    assert { valid_append_choices nums chosen 1 };
+    assert { valid_append_choices nums chosen 1 /\ sum chosen = 1 }
+
+  let lemma check_test_006 () =
+    let nums = Cons 1 (Cons 3 (Cons 5 (Cons 7 (Cons 9 Nil)))) in
+    let chosen = Cons 2 (Cons 4 (Cons 6 (Cons 8 (Cons 10 Nil)))) in
+    assert { length chosen = 5 };
+    assert { sum chosen = 30 };
+    assert { mem 2 chosen };
+    assert { mem 4 chosen };
+    assert { mem 6 chosen };
+    assert { mem 8 chosen };
+    assert { mem 10 chosen };
+    assert { not (mem 2 nums) };
+    assert { not (mem 4 nums) };
+    assert { not (mem 6 nums) };
+    assert { not (mem 8 nums) };
+    assert { not (mem 10 nums) };
+    assert { num_occ 2 chosen = 1 };
+    assert { num_occ 4 chosen = 1 };
+    assert { num_occ 6 chosen = 1 };
+    assert { num_occ 8 chosen = 1 };
+    assert { num_occ 10 chosen = 1 };
+    assert { forall x: int. mem x chosen -> x = 2 \/ x = 4 \/ x = 6 \/ x = 8 \/ x = 10 };
+    assert { valid_append_choices nums chosen 5 };
+    assert { valid_append_choices nums chosen 5 /\ sum chosen = 30 }
+
+  let lemma check_test_007 () =
+    let nums = Cons 10 (Cons 20 (Cons 30 (Cons 40 (Cons 50 Nil)))) in
+    let chosen = Cons 1 (Cons 2 (Cons 3 (Cons 4 (Cons 5 Nil)))) in
+    assert { length chosen = 5 };
+    assert { sum chosen = 15 };
+    assert { mem 1 chosen };
+    assert { mem 2 chosen };
+    assert { mem 3 chosen };
+    assert { mem 4 chosen };
+    assert { mem 5 chosen };
+    assert { not (mem 1 nums) };
+    assert { not (mem 2 nums) };
+    assert { not (mem 3 nums) };
+    assert { not (mem 4 nums) };
+    assert { not (mem 5 nums) };
+    assert { num_occ 1 chosen = 1 };
+    assert { num_occ 2 chosen = 1 };
+    assert { num_occ 3 chosen = 1 };
+    assert { num_occ 4 chosen = 1 };
+    assert { num_occ 5 chosen = 1 };
+    assert { forall x: int. mem x chosen -> x = 1 \/ x = 2 \/ x = 3 \/ x = 4 \/ x = 5 };
+    assert { valid_append_choices nums chosen 5 };
+    assert { valid_append_choices nums chosen 5 /\ sum chosen = 15 }
+
+  let lemma check_test_008 () =
+    let nums = Cons 5 (Cons 6 Nil) in
+    let chosen = Cons 1 (Cons 2 (Cons 3 (Cons 4 (Cons 7 (Cons 8 Nil))))) in
+    assert { length chosen = 6 };
+    assert { sum chosen = 25 };
+    assert { mem 1 chosen };
+    assert { mem 2 chosen };
+    assert { mem 3 chosen };
+    assert { mem 4 chosen };
+    assert { mem 7 chosen };
+    assert { mem 8 chosen };
+    assert { not (mem 1 nums) };
+    assert { not (mem 2 nums) };
+    assert { not (mem 3 nums) };
+    assert { not (mem 4 nums) };
+    assert { not (mem 7 nums) };
+    assert { not (mem 8 nums) };
+    assert { num_occ 1 chosen = 1 };
+    assert { num_occ 2 chosen = 1 };
+    assert { num_occ 3 chosen = 1 };
+    assert { num_occ 4 chosen = 1 };
+    assert { num_occ 7 chosen = 1 };
+    assert { num_occ 8 chosen = 1 };
+    assert { forall x: int. mem x chosen -> x = 1 \/ x = 2 \/ x = 3 \/ x = 4 \/ x = 7 \/ x = 8 };
+    assert { valid_append_choices nums chosen 6 };
+    assert { valid_append_choices nums chosen 6 /\ sum chosen = 25 }
+
+  let lemma check_test_009 () =
+    let nums = Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 Nil)))) in
+    let chosen = Cons 2 Nil in
+    assert { length chosen = 1 };
+    assert { sum chosen = 2 };
+    assert { mem 2 chosen };
+    assert { not (mem 2 nums) };
+    assert { num_occ 2 chosen = 1 };
+    assert { forall x: int. mem x chosen -> x = 2 };
+    assert { valid_append_choices nums chosen 1 };
+    assert { valid_append_choices nums chosen 1 /\ sum chosen = 2 }
+
+end

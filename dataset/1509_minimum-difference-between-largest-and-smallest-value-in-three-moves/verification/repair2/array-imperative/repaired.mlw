@@ -1,0 +1,323 @@
+module MinimumDifferenceBetweenLargestAndSmallestValueInThreeMoves_Array_Spec
+
+  use int.Int
+  use array.Array
+  use array.Init
+  use ref.Ref
+
+  predicate values_in_bounds (nums: array int) =
+    forall i: int. 0 <= i < length nums -> -1000000000 <= nums[i] <= 1000000000
+
+  predicate valid_input (nums: array int) =
+    1 <= length nums <= 100000 /\
+    values_in_bounds nums
+
+  let rec function kept_count_from (nums: array int) (lo: int) (hi: int) (i: int) : int
+    requires { 0 <= i <= length nums }
+    variant  { length nums - i }
+  = if i = length nums then 0 else
+      (if lo <= nums[i] then
+         if nums[i] <= hi then 1 else 0
+       else 0) + kept_count_from nums lo hi (i + 1)
+
+  function kept_count (nums: array int) (lo: int) (hi: int) : int =
+    kept_count_from nums lo hi 0
+
+  let rec lemma kept_count_from_nonnegative
+      (nums: array int) (lo: int) (hi: int) (i: int)
+    requires { 0 <= i <= length nums }
+    ensures  { kept_count_from nums lo hi i >= 0 }
+    variant  { length nums - i }
+  =
+    if i < length nums then begin
+      kept_count_from_nonnegative nums lo hi (i + 1);
+      assert {
+        (if lo <= nums[i] then
+           if nums[i] <= hi then 1 else 0
+         else 0) >= 0
+      }
+    end
+
+  let rec lemma kept_count_from_monotone_start
+      (nums: array int) (lo: int) (hi: int) (i: int) (j: int)
+    requires { 0 <= i <= j <= length nums }
+    ensures  { kept_count_from nums lo hi i >= kept_count_from nums lo hi j }
+    variant  { j - i }
+  =
+    if i < j then begin
+      kept_count_from_monotone_start nums lo hi (i + 1) j;
+      assert {
+        (if lo <= nums[i] then
+           if nums[i] <= hi then 1 else 0
+         else 0) >= 0
+      }
+    end
+
+  let rec lemma kept_count_from_contains_index
+      (nums: array int) (lo: int) (hi: int) (i: int) (k: int)
+    requires { 0 <= i <= k < length nums }
+    requires { lo <= nums[k] <= hi }
+    ensures  { kept_count_from nums lo hi i >= 1 }
+    variant  { k - i }
+  =
+    if i = k then begin
+      kept_count_from_nonnegative nums lo hi (i + 1);
+      assert { lo <= nums[i] <= hi };
+      assert {
+        (if lo <= nums[i] then
+           if nums[i] <= hi then 1 else 0
+         else 0) = 1
+      }
+    end else begin
+      assert { i < k };
+      kept_count_from_contains_index nums lo hi (i + 1) k;
+      assert {
+        (if lo <= nums[i] then
+           if nums[i] <= hi then 1 else 0
+         else 0) >= 0
+      }
+    end
+
+  predicate achievable_difference (nums: array int) (diff: int) =
+    0 <= diff /\
+    exists lo hi: int.
+      lo <= hi /\
+      hi - lo = diff /\
+      kept_count nums lo hi >= length nums - 3
+
+  predicate minimum_difference_between_largest_and_smallest_value_in_three_moves_array_spec
+      (nums: array int) (res: int) =
+    achievable_difference nums res /\
+    forall d: int. 0 <= d < res -> not (achievable_difference nums d)
+
+  predicate sorted_array (a: array int) =
+    forall i j: int. 0 <= i <= j < length a -> a[i] <= a[j]
+
+  predicate sorted_prefix (a: array int) (hi: int) =
+    forall i j: int. 0 <= i <= j < hi -> a[i] <= a[j]
+
+  predicate same_array_values (a: array int) (b: array int) =
+    length a = length b /\
+    forall i: int. 0 <= i < length a -> a[i] = b[i]
+
+  let rec lemma kept_count_from_same_array_values
+      (a: array int) (b: array int) (lo: int) (hi: int) (i: int)
+    requires { same_array_values a b }
+    requires { 0 <= i <= length a }
+    ensures  { kept_count_from a lo hi i = kept_count_from b lo hi i }
+    variant  { length a - i }
+  =
+    if i < length a then begin
+      assert { length a = length b };
+      assert { a[i] = b[i] };
+      kept_count_from_same_array_values a b lo hi (i + 1)
+    end
+
+  let lemma kept_count_same_array_values
+      (a: array int) (b: array int) (lo: int) (hi: int)
+    requires { same_array_values a b }
+    ensures  { kept_count a lo hi = kept_count b lo hi }
+  =
+    kept_count_from_same_array_values a b lo hi 0
+
+  let lemma kept_count_singleton_positive (nums: array int) (i: int)
+    requires { 0 <= i < length nums }
+    ensures  { kept_count nums nums[i] nums[i] >= 1 }
+  =
+    kept_count_from_contains_index nums nums[i] nums[i] 0 i
+
+  let rec lemma sorted_range_count_from_lower_bound
+      (a: array int) (lo_i: int) (hi_i: int) (i: int)
+    requires { sorted_array a }
+    requires { 0 <= lo_i <= i <= hi_i < length a }
+    ensures  { kept_count_from a a[lo_i] a[hi_i] i >= hi_i - i + 1 }
+    variant  { hi_i - i }
+  =
+    assert { a[lo_i] <= a[i] };
+    assert { a[i] <= a[hi_i] };
+    assert {
+      (if a[lo_i] <= a[i] then
+         if a[i] <= a[hi_i] then 1 else 0
+       else 0) = 1
+    };
+    if i < hi_i then begin
+      sorted_range_count_from_lower_bound a lo_i hi_i (i + 1);
+      assert { kept_count_from a a[lo_i] a[hi_i] (i + 1) >= hi_i - i }
+    end else begin
+      kept_count_from_nonnegative a a[lo_i] a[hi_i] (i + 1);
+      assert { hi_i - i + 1 = 1 }
+    end
+
+  let lemma sorted_window_achievable
+      (nums: array int) (sorted: array int) (lo_i: int) (hi_i: int)
+    requires { length nums = length sorted }
+    requires { sorted_array sorted }
+    requires { forall lo hi: int. kept_count nums lo hi = kept_count sorted lo hi }
+    requires { 0 <= lo_i <= hi_i < length sorted }
+    requires { hi_i - lo_i + 1 >= length sorted - 3 }
+    ensures  { achievable_difference nums (sorted[hi_i] - sorted[lo_i]) }
+  =
+    assert { sorted[lo_i] <= sorted[hi_i] };
+    sorted_range_count_from_lower_bound sorted lo_i hi_i lo_i;
+    kept_count_from_monotone_start sorted sorted[lo_i] sorted[hi_i] 0 lo_i;
+    assert { kept_count sorted sorted[lo_i] sorted[hi_i] >= hi_i - lo_i + 1 };
+    assert { kept_count nums sorted[lo_i] sorted[hi_i] =
+             kept_count sorted sorted[lo_i] sorted[hi_i] };
+    assert { kept_count nums sorted[lo_i] sorted[hi_i] >= length nums - 3 };
+    assert { achievable_difference nums (sorted[hi_i] - sorted[lo_i]) }
+
+  let lemma sorted_four_window_minimal
+      (nums: array int) (sorted: array int) (n: int) (r: int)
+      (d0: int) (d1: int) (d2: int) (d3: int)
+    requires { length nums = n }
+    requires { length sorted = n }
+    requires { n > 4 }
+    requires { sorted_array sorted }
+    requires { forall lo hi: int. kept_count nums lo hi = kept_count sorted lo hi }
+    requires { d0 = sorted[n - 4] - sorted[0] }
+    requires { d1 = sorted[n - 3] - sorted[1] }
+    requires { d2 = sorted[n - 2] - sorted[2] }
+    requires { d3 = sorted[n - 1] - sorted[3] }
+    requires { r <= d0 /\ r <= d1 /\ r <= d2 /\ r <= d3 }
+    requires { r = d0 \/ r = d1 \/ r = d2 \/ r = d3 }
+    ensures  { minimum_difference_between_largest_and_smallest_value_in_three_moves_array_spec nums r }
+  =
+    assert { 0 <= 0 <= n - 4 < n };
+    assert { 0 <= 1 <= n - 3 < n };
+    assert { 0 <= 2 <= n - 2 < n };
+    assert { 0 <= 3 <= n - 1 < n };
+    if r = d0 then
+      sorted_window_achievable nums sorted 0 (n - 4)
+    else if r = d1 then
+      sorted_window_achievable nums sorted 1 (n - 3)
+    else if r = d2 then
+      sorted_window_achievable nums sorted 2 (n - 2)
+    else begin
+      assert { r = d3 };
+      sorted_window_achievable nums sorted 3 (n - 1)
+    end;
+    assert { achievable_difference nums r };
+    assert { forall d: int. 0 <= d < r -> not (achievable_difference nums d) }
+
+  let copy_array (nums: array int) : array int
+    ensures { length result = length nums }
+    ensures { same_array_values nums result }
+  =
+    let n = length nums in
+    let copied = make n 0 in
+    for i = 0 to n - 1 do
+      invariant { length copied = n }
+      invariant { forall k: int. 0 <= k < i -> copied[k] = nums[k] }
+      copied[i] <- nums[i]
+    done;
+    copied
+
+  let insertion_sort (nums: array int) : unit
+    ensures { length nums = old (length nums) }
+    ensures { sorted_array nums }
+    ensures { forall lo hi: int. kept_count nums lo hi = old (kept_count nums lo hi) }
+  =
+    let n = length nums in
+    for i = 1 to n - 1 do
+      invariant { 0 <= i <= n }
+      invariant { length nums = n }
+      invariant { sorted_prefix nums i }
+      invariant { forall lo hi: int. kept_count nums lo hi = old (kept_count nums lo hi) }
+      let key = nums[i] in
+      let j = ref (i - 1) in
+      let searching = ref true in
+      while !searching do
+        invariant { -1 <= !j < i }
+        invariant { length nums = n }
+        invariant { sorted_prefix nums i }
+        invariant { forall lo hi: int. kept_count nums lo hi = old (kept_count nums lo hi) }
+        invariant { !searching -> -1 <= !j < i }
+        invariant { not !searching -> -1 <= !j < i }
+        invariant { forall k: int. !j < k <= i -> key <= nums[k] }
+        variant  { if !searching then !j + 2 else 0 }
+        if !j >= 0 then
+          if nums[!j] > key then begin
+            let old_j = !j in
+            assert { 0 <= old_j < i };
+            assert { 0 <= old_j + 1 <= i };
+            nums[!j + 1] <- nums[!j];
+            j := old_j - 1;
+            assert { !j + 1 = old_j };
+            assert { !j + 1 < old_j + 1 }
+          end else
+            begin
+              assert { nums[!j] <= key };
+              searching := false;
+              assert { not !searching }
+            end
+        else
+          begin
+            searching := false;
+            assert { not !searching }
+          end
+      done;
+      assert { not !searching };
+      assert { -1 <= !j < i };
+      assert { 0 <= !j + 1 <= i };
+      nums[!j + 1] <- key
+      ;
+      assert { sorted_prefix nums (i + 1) };
+      assert { forall lo hi: int. kept_count nums lo hi = old (kept_count nums lo hi) }
+    done
+    ;
+    assert { sorted_prefix nums n };
+    assert { sorted_array nums }
+
+  let min4 (a: int) (b: int) (c: int) (d: int) : int
+    ensures { result <= a /\ result <= b /\ result <= c /\ result <= d }
+    ensures { result = a \/ result = b \/ result = c \/ result = d }
+  =
+    let left = if a <= b then a else b in
+    let right = if c <= d then c else d in
+    if left <= right then left else right
+
+  let minimum_difference_between_largest_and_smallest_value_in_three_moves_array (nums: array int) : int
+    requires { valid_input nums }
+    ensures  { minimum_difference_between_largest_and_smallest_value_in_three_moves_array_spec nums result }
+  =
+    let n = length nums in
+    if n <= 4 then
+      begin
+        assert { 1 <= n <= 4 };
+        assert { 0 <= 0 < length nums };
+        kept_count_singleton_positive nums 0;
+        assert { kept_count nums nums[0] nums[0] >= 1 };
+        assert { kept_count nums nums[0] nums[0] >= length nums - 3 };
+        assert { achievable_difference nums 0 };
+        assert { forall d: int. 0 <= d < 0 -> not (achievable_difference nums d) };
+        0
+      end
+    else
+      let sorted = copy_array nums in
+      assert { length sorted = n };
+      assert { same_array_values nums sorted };
+      assert { forall lo hi: int. kept_count nums lo hi = kept_count sorted lo hi };
+      insertion_sort sorted;
+      assert { length sorted = n };
+      assert { sorted_array sorted };
+      assert { forall lo hi: int. kept_count nums lo hi = kept_count sorted lo hi };
+      assert { 0 <= 0 <= n - 4 < n };
+      assert { 0 <= 1 <= n - 3 < n };
+      assert { 0 <= 2 <= n - 2 < n };
+      assert { 0 <= 3 <= n - 1 < n };
+      let drop_3_largest = sorted[n - 4] - sorted[0] in
+      let drop_2_largest_1_smallest = sorted[n - 3] - sorted[1] in
+      let drop_1_largest_2_smallest = sorted[n - 2] - sorted[2] in
+      let drop_3_smallest = sorted[n - 1] - sorted[3] in
+      sorted_window_achievable nums sorted 0 (n - 4);
+      sorted_window_achievable nums sorted 1 (n - 3);
+      sorted_window_achievable nums sorted 2 (n - 2);
+      sorted_window_achievable nums sorted 3 (n - 1);
+      let res = min4 drop_3_largest drop_2_largest_1_smallest drop_1_largest_2_smallest drop_3_smallest in
+      sorted_four_window_minimal
+        nums sorted n res
+        drop_3_largest drop_2_largest_1_smallest drop_1_largest_2_smallest drop_3_smallest;
+      assert { minimum_difference_between_largest_and_smallest_value_in_three_moves_array_spec nums res };
+      res
+
+end

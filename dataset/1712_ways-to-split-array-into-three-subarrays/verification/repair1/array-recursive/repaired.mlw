@@ -1,0 +1,194 @@
+module WaysToSplitArrayIntoThreeSubarrays_Array_Stage3_Recursive
+
+  use int.Int
+  use int.EuclideanDivision
+  use int.NumOf as IntNumOf
+  use array.Array
+  use array.Init
+  use array.ArraySum
+
+  predicate valid_input (nums: array int) =
+    3 <= length nums <= 100000 /\
+    forall k: int. 0 <= k < length nums -> 0 <= nums[k] <= 10000
+
+  predicate valid_split_bounds (nums: array int) (i: int) (j: int) =
+    1 <= i < j < length nums
+
+  function range_sum (nums: array int) (lo: int) (hi: int) : int =
+    sum nums lo hi
+
+  predicate good_split (nums: array int) (i: int) (j: int) =
+    valid_split_bounds nums i j /\
+    range_sum nums 0 i <= range_sum nums i j /\
+    range_sum nums i j <= range_sum nums j (length nums)
+
+  function split_code_base (nums: array int) : int =
+    length nums + 1
+
+  function split_left_end (nums: array int) (code: int) : int =
+    div code (split_code_base nums)
+
+  function split_mid_end (nums: array int) (code: int) : int =
+    mod code (split_code_base nums)
+
+  function encoded_bound (nums: array int) : int =
+    split_code_base nums * split_code_base nums
+
+  predicate encoded_good_split (nums: array int) (code: int) =
+    good_split nums (split_left_end nums code) (split_mid_end nums code)
+
+  function good_split_count (nums: array int) : int =
+    IntNumOf.numof (fun code -> encoded_good_split nums code)
+      0 (encoded_bound nums)
+
+  predicate ways_to_split_array_into_three_subarrays_array_spec
+      (nums: array int) (res: int) =
+    res = mod (good_split_count nums) 1000000007
+
+  function split_code_start (nums: array int) (i: int) : int =
+    i * split_code_base nums
+
+  lemma encoded_suffix_empty:
+    forall nums: array int, i: int.
+      length nums <= i <= split_code_base nums ->
+      IntNumOf.numof (fun code -> encoded_good_split nums code)
+        (split_code_start nums i) (encoded_bound nums) = 0
+
+  lemma encoded_row_count:
+    forall nums: array int, i: int.
+      1 <= i < length nums ->
+      IntNumOf.numof (fun code -> encoded_good_split nums code)
+        (split_code_start nums i) (split_code_start nums (i + 1)) =
+      IntNumOf.numof (fun jj -> good_split nums i jj)
+        (i + 1) (length nums)
+
+  lemma encoded_suffix_step:
+    forall nums: array int, i: int.
+      1 <= i < length nums ->
+      IntNumOf.numof (fun code -> encoded_good_split nums code)
+        (split_code_start nums i) (encoded_bound nums) =
+      IntNumOf.numof (fun jj -> good_split nums i jj)
+        (i + 1) (length nums) +
+      IntNumOf.numof (fun code -> encoded_good_split nums code)
+        (split_code_start nums (i + 1)) (encoded_bound nums)
+
+  lemma encoded_prefix_before_first_empty:
+    forall nums: array int.
+      0 <= length nums ->
+      IntNumOf.numof (fun code -> encoded_good_split nums code)
+        0 (split_code_start nums 1) = 0
+
+  lemma good_split_count_from_first_suffix:
+    forall nums: array int.
+      0 <= length nums ->
+      good_split_count nums =
+      IntNumOf.numof (fun code -> encoded_good_split nums code)
+        (split_code_start nums 1) (encoded_bound nums)
+
+  let rec sum_range_from (nums: array int) (i: int) (hi: int) : int
+    requires { 0 <= i <= hi <= length nums }
+    ensures  { result = range_sum nums i hi }
+    variant  { hi - i }
+  =
+    if i >= hi then
+      0
+    else
+      nums[i] + sum_range_from nums (i + 1) hi
+
+  let sum_range (nums: array int) (lo: int) (hi: int) : int
+    requires { 0 <= lo <= hi <= length nums }
+    ensures  { result = range_sum nums lo hi }
+  =
+    sum_range_from nums lo hi
+
+  let is_good_split (nums: array int) (i: int) (j: int) : bool
+    requires { 1 <= i < j < length nums }
+    ensures  { result <-> good_split nums i j }
+  =
+    let left = sum_range nums 0 i in
+    let middle = sum_range nums i j in
+    let right = sum_range nums j (length nums) in
+    if left <= middle then
+      middle <= right
+    else
+      false
+
+  let rec count_splits_from_j (nums: array int) (i: int) (j: int) : int
+    requires { 1 <= i < length nums /\ i + 1 <= j <= length nums }
+    ensures  { result = IntNumOf.numof (fun jj -> good_split nums i jj) j (length nums) }
+    ensures  { 0 <= result }
+    variant  { length nums - j }
+  =
+    if j >= length nums then
+      0
+    else
+      let add = if is_good_split nums i j then 1 else 0 in
+      add + count_splits_from_j nums i (j + 1)
+
+  let rec count_splits_from_i (nums: array int) (i: int) : int
+    requires { 1 <= i <= length nums }
+    ensures  {
+      result =
+        IntNumOf.numof (fun code -> encoded_good_split nums code)
+          (split_code_start nums i) (encoded_bound nums)
+    }
+    ensures  { 0 <= result }
+    variant  { length nums - i }
+  =
+    if i >= length nums then begin
+      assert { i = length nums };
+      assert { i <= split_code_base nums };
+      assert {
+        IntNumOf.numof (fun code -> encoded_good_split nums code)
+          (split_code_start nums i) (encoded_bound nums) = 0
+      };
+      0
+    end
+    else
+      let row = count_splits_from_j nums i (i + 1) in
+      let rest = count_splits_from_i nums (i + 1) in
+      assert {
+        row =
+        IntNumOf.numof (fun jj -> good_split nums i jj)
+          (i + 1) (length nums)
+      };
+      assert {
+        rest =
+        IntNumOf.numof (fun code -> encoded_good_split nums code)
+          (split_code_start nums (i + 1)) (encoded_bound nums)
+      };
+      assert {
+        IntNumOf.numof (fun code -> encoded_good_split nums code)
+          (split_code_start nums i) (encoded_bound nums) =
+        row + rest
+      };
+      row + rest
+
+  let ways_to_split_array_into_three_subarrays_array (nums: array int) : int
+    requires { valid_input nums }
+    ensures  { ways_to_split_array_into_three_subarrays_array_spec nums result }
+  =
+    if length nums < 3 then
+      0
+    else begin
+      let count = count_splits_from_i nums 1 in
+      assert {
+        count =
+          IntNumOf.numof (fun code -> encoded_good_split nums code)
+            (split_code_start nums 1) (encoded_bound nums)
+      };
+      assert { split_code_start nums 1 = split_code_base nums };
+      assert {
+        IntNumOf.numof (fun code -> encoded_good_split nums code)
+          0 (split_code_start nums 1) = 0
+      };
+      assert {
+        good_split_count nums =
+          IntNumOf.numof (fun code -> encoded_good_split nums code)
+            (split_code_start nums 1) (encoded_bound nums)
+      };
+      assert { count = good_split_count nums };
+      mod count 1000000007
+    end
+
+end

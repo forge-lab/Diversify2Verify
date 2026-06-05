@@ -1,0 +1,62 @@
+module CountNumberOfNiceSubarrays_Array_Stage3_Recursive
+
+  use int.Int
+  use int.EuclideanDivision
+  use array.Array
+  use array.Init
+  use array.NumOf as ArrayNumOf
+
+  predicate valid_input (nums: array int) (k: int) =
+    1 <= length nums <= 50000 /\
+    1 <= k <= length nums /\
+    forall i: int. 0 <= i < length nums -> 1 <= nums[i] <= 100000
+
+  function odd_count (nums: array int) (l: int) (r: int) : int =
+    ArrayNumOf.numof (fun _ v -> mod v 2 = 1) nums l r
+
+  predicate valid_subarray (nums: array int) (l: int) (r: int) =
+    0 <= l < r <= length nums
+
+  predicate nice_subarray (nums: array int) (k: int) (l: int) (r: int) =
+    valid_subarray nums l r /\
+    odd_count nums l r = k
+
+  let rec function nice_count_from_end_acc
+    (nums: array int) (k: int) (l: int) (e: int) (odds: int) : int
+    requires { 0 <= l <= e <= length nums }
+    variant  { length nums - e }
+  =
+    if e = length nums then 0
+    else
+      let odds1 = odds + (if mod nums[e] 2 = 1 then 1 else 0) in
+      (if odds1 = k then 1 else 0) +
+      nice_count_from_end_acc nums k l (e + 1) odds1
+
+  let function nice_count_from_end (nums: array int) (k: int) (l: int) : int
+    requires { 0 <= l <= length nums }
+  =
+    nice_count_from_end_acc nums k l l 0
+
+  let rec function nice_count_from_start
+    (nums: array int) (k: int) (l: int) : int
+    requires { 0 <= l <= length nums }
+    variant  { length nums - l }
+  =
+    if l = length nums then 0
+    else nice_count_from_end nums k l +
+         nice_count_from_start nums k (l + 1)
+
+  function nice_subarray_count (nums: array int) (k: int) : int =
+    nice_count_from_start nums k 0
+
+  predicate count_number_of_nice_subarrays_array_spec
+    (nums: array int) (k: int) (res: int) =
+    res = nice_subarray_count nums k
+
+  let count_number_of_nice_subarrays_array (nums: array int) (k: int) : int
+    requires { valid_input nums k }
+    ensures  { count_number_of_nice_subarrays_array_spec nums k result }
+  =
+    nice_count_from_start nums k 0
+
+end

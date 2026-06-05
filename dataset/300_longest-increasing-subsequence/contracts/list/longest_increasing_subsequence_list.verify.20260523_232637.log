@@ -1,0 +1,137 @@
+== Stage 1: first prover on whole file ==
+Running in /Users/rubenm/Desktop/Diversify2Verify/codex-runs/stage1a-list/300_longest-increasing-subsequence-20260523-203118/generated/why3/list: why3 session create -o /Users/rubenm/Desktop/Diversify2Verify/codex-runs/stage1a-list/300_longest-increasing-subsequence-20260523-203118/generated/why3/list/.why3_sessions/longest_increasing_subsequence_list_stage1 -P Z3,4.8.6 -t 10 -m 8192 longest_increasing_subsequence_list.mlw
+Session created successfully
+Running in /Users/rubenm/Desktop/Diversify2Verify/codex-runs/stage1a-list/300_longest-increasing-subsequence-20260523-203118/generated/why3/list: why3 bench /Users/rubenm/Desktop/Diversify2Verify/codex-runs/stage1a-list/300_longest-increasing-subsequence-20260523-203118/generated/why3/list/.why3_sessions/longest_increasing_subsequence_list_stage1
+Progress: 8/1/0                       Progress: 7/2/0                       Progress: 6/3/0                       Progress: 5/4/0                       Progress: 4/5/0                       Progress: 3/6/0                       Progress: 3/2/2                       Progress: 2/3/2                       Progress: 1/4/2                       Progress: 1/3/2                       Progress: 0/4/2                       Progress: 0/2/2                       Progress: 0/1/2                       Progress: 0/0/2                       Progress: 0/0/1                       
+Replay completed, saving session... done
+== Stage 1 stats ==
+= Statistics for session /Users/rubenm/Desktop/Diversify2Verify/codex-runs/stage1a-list/300_longest-increasing-subsequence-20260523-203118/generated/why3/list/.why3_sessions/longest_increasing_subsequence_list_stage1
+
+== Number of root goals ==
+  total: 9  proved: 6
+
+== Number of sub goals ==
+  total: 0  proved: 0
+
+== Goals not proved ==
+  +-- file [../../longest_increasing_subsequence_list.mlw]
+    +-- theory LongestIncreasingSubsequence_List_Spec
+      +-- goal test_005_mixed_expected_four'vc
+      +-- goal test_008_problem_example_expected_four'vc
+      +-- goal test_011_longer_mixed_expected_six'vc
+  
+== Goals proved by only one prover ==
+  +-- file [../../longest_increasing_subsequence_list.mlw]
+    +-- theory LongestIncreasingSubsequence_List_Spec
+      +-- goal is_subsequence'vc: Z3 4.8.6
+      +-- goal strictly_increasing'vc: Z3 4.8.6
+      +-- goal test_000_decreasing_expected_one'vc: Z3 4.8.6
+      +-- goal test_001_singleton_expected_one'vc: Z3 4.8.6
+      +-- goal test_002_all_equal_expected_one'vc: Z3 4.8.6
+      +-- goal test_004_negative_mix_expected_two'vc: Z3 4.8.6
+  
+1 session(s) read, with a total of 9 proof goals.
+== Unproved root goals after first prover ==
+LongestIncreasingSubsequence_List_Spec	test_005_mixed_expected_four'vc
+LongestIncreasingSubsequence_List_Spec	test_008_problem_example_expected_four'vc
+LongestIncreasingSubsequence_List_Spec	test_011_longer_mixed_expected_six'vc
+== Stage 1: trying remaining goals with prover Alt-Ergo,2.4.0 ==
+---- stage1 | prover: Alt-Ergo,2.4.0 | theory: LongestIncreasingSubsequence_List_Spec | goal: test_005_mixed_expected_four'vc ----
+File longest_increasing_subsequence_list.mlw:
+Goal test_005_mixed_expected_four'vc.
+Prover result is: Timeout (10.00s, 292286 steps).
+---- stage1 | prover: Alt-Ergo,2.4.0 | theory: LongestIncreasingSubsequence_List_Spec | goal: test_008_problem_example_expected_four'vc ----
+File longest_increasing_subsequence_list.mlw:
+Goal test_008_problem_example_expected_four'vc.
+Prover result is: Timeout (10.00s, 301737 steps).
+---- stage1 | prover: Alt-Ergo,2.4.0 | theory: LongestIncreasingSubsequence_List_Spec | goal: test_011_longer_mixed_expected_six'vc ----
+File longest_increasing_subsequence_list.mlw:
+Goal test_011_longer_mixed_expected_six'vc.
+Prover result is: Timeout (10.00s, 281727 steps).
+Remaining after prover Alt-Ergo,2.4.0: 3
+== Stage 1: trying remaining goals with prover CVC4,1.8 ==
+---- stage1 | prover: CVC4,1.8 | theory: LongestIncreasingSubsequence_List_Spec | goal: test_005_mixed_expected_four'vc ----
+File longest_increasing_subsequence_list.mlw:
+Goal test_005_mixed_expected_four'vc.
+Prover result is: Valid (1.32s, 564056 steps).
+Solved in stage 1 using prover: CVC4,1.8
+---- stage1 | prover: CVC4,1.8 | theory: LongestIncreasingSubsequence_List_Spec | goal: test_008_problem_example_expected_four'vc ----
+File longest_increasing_subsequence_list.mlw:
+Goal test_008_problem_example_expected_four'vc.
+Prover result is: Valid (5.72s, 5215768 steps).
+Solved in stage 1 using prover: CVC4,1.8
+---- stage1 | prover: CVC4,1.8 | theory: LongestIncreasingSubsequence_List_Spec | goal: test_011_longer_mixed_expected_six'vc ----
+File longest_increasing_subsequence_list.mlw:
+Goal test_011_longer_mixed_expected_six'vc.
+Prover result is: Timeout (8.77s, 7697200 steps).
+Remaining after prover CVC4,1.8: 1
+== Goals still unproved after stage 1 ==
+LongestIncreasingSubsequence_List_Spec	test_011_longer_mixed_expected_six'vc
+== Stage 2: split_vc on unproved goal ==
+Target theory: LongestIncreasingSubsequence_List_Spec
+Target goal  : test_011_longer_mixed_expected_six'vc
+---- stage2 | prover: Z3,4.8.6 | theory: LongestIncreasingSubsequence_List_Spec | goal: test_011_longer_mixed_expected_six'vc ----
+Transforms: split_vc
+File "longest_increasing_subsequence_list.mlw", line 164, characters 13-29:
+Sub-goal Assertion of goal test_011_longer_mixed_expected_six'vc.
+Prover result is: Valid (0.02s, 25895 steps).
+
+File "longest_increasing_subsequence_list.mlw", line 165, characters 13-46:
+Sub-goal Assertion of goal test_011_longer_mixed_expected_six'vc.
+Prover result is: Valid (0.01s, 17224 steps).
+
+File "longest_increasing_subsequence_list.mlw", line 166, characters 13-56:
+Sub-goal Assertion of goal test_011_longer_mixed_expected_six'vc.
+Prover result is: Valid (0.01s, 27546 steps).
+
+File "longest_increasing_subsequence_list.mlw", line 167, characters 13-66:
+Sub-goal Assertion of goal test_011_longer_mixed_expected_six'vc.
+Prover result is: Valid (0.01s, 29273 steps).
+
+File "longest_increasing_subsequence_list.mlw", line 168, characters 13-76:
+Sub-goal Assertion of goal test_011_longer_mixed_expected_six'vc.
+Prover result is: Valid (0.01s, 31328 steps).
+
+File "longest_increasing_subsequence_list.mlw", line 170, character 6 to line 171, character 61:
+Sub-goal Assertion of goal test_011_longer_mixed_expected_six'vc.
+Prover result is: Valid (0.01s, 33436 steps).
+
+File "longest_increasing_subsequence_list.mlw", line 173, characters 13-36:
+Sub-goal Assertion of goal test_011_longer_mixed_expected_six'vc.
+Prover result is: Valid (0.01s, 35673 steps).
+
+File "longest_increasing_subsequence_list.mlw", line 174, characters 13-36:
+Sub-goal Assertion of goal test_011_longer_mixed_expected_six'vc.
+Prover result is: Valid (0.18s, 2671513 steps).
+
+File "longest_increasing_subsequence_list.mlw", line 175, characters 13-50:
+Sub-goal Assertion of goal test_011_longer_mixed_expected_six'vc.
+Prover result is: Valid (0.01s, 21267 steps).
+
+File "longest_increasing_subsequence_list.mlw", line 176, characters 13-27:
+Sub-goal Assertion of goal test_011_longer_mixed_expected_six'vc.
+Prover result is: Valid (0.01s, 30138 steps).
+
+File "longest_increasing_subsequence_list.mlw", line 177, characters 13-53:
+Sub-goal Assertion of goal test_011_longer_mixed_expected_six'vc.
+Prover result is: Valid (0.01s, 31257 steps).
+
+File "longest_increasing_subsequence_list.mlw", line 180, characters 53-72:
+Sub-goal Assertion of goal test_011_longer_mixed_expected_six'vc.
+Prover result is: Valid (1.58s, 15874371 steps).
+
+File "longest_increasing_subsequence_list.mlw", line 182, characters 13-57:
+Sub-goal Assertion of goal test_011_longer_mixed_expected_six'vc.
+Prover result is: Valid (0.01s, 42110 steps).
+Solved with split_vc using prover: Z3,4.8.6
+== Final summary ==
+Unproved root goals after first prover : 1
+Remaining failures after split_vc      : 0
+Remaining failures after stage 3       : 0
+Detailed logs stored in                : /Users/rubenm/Desktop/Diversify2Verify/codex-runs/stage1a-list/300_longest-increasing-subsequence-20260523-203118/generated/why3/list/.why3_sessions/longest_increasing_subsequence_list_logs
+VERIFY_RESULT: SUCCESS
+VERIFY_REASON: proved_after_stage2
+VERIFY_STAGE: stage2
+VERIFY_ROOT_TOTAL: 9
+VERIFY_ROOT_PROVED: 9
+VERIFY_ROOT_REMAINING: 0

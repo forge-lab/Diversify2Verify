@@ -1,0 +1,67 @@
+module CountSubarraysWithMoreOnesThanZeros_Array_Stage3_Recursive
+
+  use int.Int
+  use int.EuclideanDivision
+  use array.Array
+  use array.Init
+
+  constant modulo_value : int = 1000000007
+
+  predicate binary_array (nums: array int) =
+    forall i: int. 0 <= i < length nums -> nums[i] = 0 \/ nums[i] = 1
+
+  let rec function subarray_balance_from (nums: array int) (i: int) (u: int) : int
+    requires { 0 <= i <= u <= length nums }
+    variant  { u - i }
+  =
+    if i = u then 0
+    else (2 * nums[i] - 1) + subarray_balance_from nums (i + 1) u
+
+  let function subarray_balance (nums: array int) (l: int) (u: int) : int
+    requires { 0 <= l <= u <= length nums }
+  =
+    subarray_balance_from nums l u
+
+  predicate more_ones_than_zeros_subarray (nums: array int) (l: int) (u: int) =
+    0 <= l < u <= length nums /\ subarray_balance nums l u > 0
+
+  let rec function count_good_subarrays_until (nums: array int) (l: int) (u: int) : int
+    requires { 0 <= l < u <= length nums + 1 }
+    variant  { length nums + 1 - u }
+  =
+    if u = length nums + 1 then 0
+    else
+      (if subarray_balance nums l u > 0 then 1 else 0) +
+      count_good_subarrays_until nums l (u + 1)
+
+  let function count_good_subarrays_from (nums: array int) (l: int) : int
+    requires { 0 <= l < length nums }
+  =
+    count_good_subarrays_until nums l (l + 1)
+
+  let rec function total_more_ones_subarrays_from (nums: array int) (l: int) : int
+    requires { 0 <= l <= length nums }
+    variant  { length nums - l }
+  =
+    if l = length nums then 0
+    else count_good_subarrays_from nums l + total_more_ones_subarrays_from nums (l + 1)
+
+  let function total_more_ones_subarrays (nums: array int) : int =
+    total_more_ones_subarrays_from nums 0
+
+  predicate valid_modulo_result (nums: array int) (r: int) =
+    0 <= r < modulo_value /\
+    exists q: int. total_more_ones_subarrays nums = q * modulo_value + r
+
+  let count_subarrays_with_more_ones_than_zeros_array (nums: array int) : int
+    requires { 1 <= length nums <= 100000 }
+    requires { binary_array nums }
+    ensures  { valid_modulo_result nums result }
+  =
+    let total = total_more_ones_subarrays nums in
+    let result = mod total 1000000007 in
+    assert { 0 <= result < modulo_value };
+    assert { exists q: int. total = q * modulo_value + result };
+    result
+
+end

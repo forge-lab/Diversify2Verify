@@ -1,0 +1,222 @@
+module MinimumCostsUsingTheTrainLine_List_Imperative
+
+  use int.Int
+  use int.MinMax
+  use list.List
+  use list.Length
+  use ref.Ref
+
+  let rec reverse_list_acc (remaining: list int) (acc: list int) : list int
+    variant { remaining }
+  =
+    match remaining with
+    | Nil -> acc
+    | Cons x xs -> reverse_list_acc xs (Cons x acc)
+    end
+
+  let reverse_list (l: list int) : list int =
+    reverse_list_acc l Nil
+
+  let rec equal_int_lists (left: list int) (right: list int) : bool
+    variant { left }
+  =
+    match left, right with
+    | Nil, Nil -> true
+    | Cons x xs, Cons y ys -> x = y && equal_int_lists xs ys
+    | _, _ -> false
+    end
+
+  let minimum_costs_using_the_train_line_list
+      (regular: list int) (express: list int) (expressCost: int) : list int
+    requires { length regular = length express }
+  =
+    let regular_so_far = ref 0 in
+    let express_so_far = ref expressCost in
+    let regular_cur = ref regular in
+    let express_cur = ref express in
+    let result_rev = ref Nil in
+    while (match !regular_cur, !express_cur with Cons _ _, Cons _ _ -> true | _, _ -> false end) do
+      match !regular_cur, !express_cur with
+      | Cons r rs, Cons e es ->
+          let next_regular = min !regular_so_far !express_so_far + r in
+          let next_express = min (!regular_so_far + expressCost) !express_so_far + e in
+          let best = min next_regular next_express in
+          result_rev := Cons best !result_rev;
+          regular_so_far := next_regular;
+          express_so_far := next_express;
+          regular_cur := rs;
+          express_cur := es
+      | _, _ -> ()
+      end
+    done;
+    reverse_list !result_rev
+
+  let check_case
+      (regular: list int) (express: list int) (expressCost: int) (expected: list int) : bool =
+    let r = minimum_costs_using_the_train_line_list regular express expressCost in
+    equal_int_lists r expected
+
+  let test_000 () : bool =
+    let regular = Cons 1 (Cons 1 (Cons 1 (Cons 1 Nil))) in
+    let express = Cons 1 (Cons 1 (Cons 1 (Cons 1 Nil))) in
+    let expected = Cons 1 (Cons 2 (Cons 3 (Cons 4 Nil))) in
+    check_case regular express 1 expected
+
+  let test_001 () : bool =
+    let regular = Cons 10 (Cons 20 (Cons 30 Nil)) in
+    let express = Cons 5 (Cons 15 (Cons 25 Nil)) in
+    let expected = Cons 7 (Cons 22 (Cons 47 Nil)) in
+    check_case regular express 2 expected
+
+  let test_002 () : bool =
+    let regular = Cons 2 (Cons 4 (Cons 6 (Cons 8 Nil))) in
+    let express = Cons 1 (Cons 3 (Cons 5 (Cons 7 Nil))) in
+    let expected = Cons 2 (Cons 6 (Cons 12 (Cons 20 Nil))) in
+    check_case regular express 10 expected
+
+  let test_003 () : bool =
+    let regular = Cons 10 (Cons 20 (Cons 30 Nil)) in
+    let express = Cons 5 (Cons 15 (Cons 25 Nil)) in
+    let expected = Cons 10 (Cons 30 (Cons 55 Nil)) in
+    check_case regular express 10 expected
+
+  let test_004 () : bool =
+    let regular = Cons 5 (Cons 5 (Cons 5 Nil)) in
+    let express = Cons 10 (Cons 10 (Cons 10 Nil)) in
+    let expected = Cons 5 (Cons 10 (Cons 15 Nil)) in
+    check_case regular express 1 expected
+
+  let test_005 () : bool =
+    let regular = Cons 5 Nil in
+    let express = Cons 10 Nil in
+    let expected = Cons 5 Nil in
+    check_case regular express 7 expected
+
+  let test_006 () : bool =
+    let regular = Cons 2 (Cons 4 (Cons 6 (Cons 8 Nil))) in
+    let express = Cons 1 (Cons 3 (Cons 5 (Cons 7 Nil))) in
+    let expected = Cons 2 (Cons 6 (Cons 12 (Cons 20 Nil))) in
+    check_case regular express 5 expected
+
+  let test_007 () : bool =
+    let regular = Cons 1 (Cons 2 (Cons 3 (Cons 4 (Cons 5 Nil)))) in
+    let express = Cons 5 (Cons 4 (Cons 3 (Cons 2 (Cons 1 Nil)))) in
+    let expected = Cons 1 (Cons 3 (Cons 6 (Cons 10 (Cons 15 Nil)))) in
+    check_case regular express 10 expected
+
+  let test_008 () : bool =
+    let regular = Cons 100 (Cons 200 (Cons 300 Nil)) in
+    let express = Cons 150 (Cons 250 (Cons 350 Nil)) in
+    let expected = Cons 100 (Cons 300 (Cons 600 Nil)) in
+    check_case regular express 10 expected
+
+  let test_009 () : bool =
+    let regular = Cons 1 (Cons 6 (Cons 9 (Cons 5 Nil))) in
+    let express = Cons 5 (Cons 2 (Cons 3 (Cons 10 Nil))) in
+    let expected = Cons 1 (Cons 7 (Cons 14 (Cons 19 Nil))) in
+    check_case regular express 8 expected
+
+  let test_010 () : bool =
+    let regular = Cons 5 (Cons 10 (Cons 15 Nil)) in
+    let express = Cons 3 (Cons 6 (Cons 9 Nil)) in
+    let expected = Cons 5 (Cons 14 (Cons 23 Nil)) in
+    check_case regular express 5 expected
+
+  let test_011 () : bool =
+    let regular = Cons 3 (Cons 3 (Cons 3 Nil)) in
+    let express = Cons 1 (Cons 1 (Cons 1 Nil)) in
+    let expected = Cons 3 (Cons 6 (Cons 8 Nil)) in
+    check_case regular express 5 expected
+
+  let test_012 () : bool =
+    let regular = Cons 10 (Cons 20 (Cons 30 Nil)) in
+    let express = Cons 15 (Cons 25 (Cons 35 Nil)) in
+    let expected = Cons 10 (Cons 30 (Cons 60 Nil)) in
+    check_case regular express 10 expected
+
+  let test_013 () : bool =
+    let regular = Cons 3 (Cons 3 (Cons 3 Nil)) in
+    let express = Cons 4 (Cons 4 (Cons 4 Nil)) in
+    let expected = Cons 3 (Cons 6 (Cons 9 Nil)) in
+    check_case regular express 5 expected
+
+  let test_014 () : bool =
+    let regular = Cons 11 (Cons 5 (Cons 13 Nil)) in
+    let express = Cons 7 (Cons 10 (Cons 6 Nil)) in
+    let expected = Cons 10 (Cons 15 (Cons 24 Nil)) in
+    check_case regular express 3 expected
+
+  let test_015 () : bool =
+    let regular = Cons 5 (Cons 5 (Cons 5 (Cons 5 (Cons 5 (Cons 5 (Cons 5 (Cons 5 (Cons 5 (Cons 5 (Cons 5 (Cons 5 (Cons 5 (Cons 5 (Cons 5 (Nil))))))))))))))) in
+    let express = Cons 3 (Cons 3 (Cons 3 (Cons 3 (Cons 3 (Cons 3 (Cons 3 (Cons 3 (Cons 3 (Cons 3 (Cons 3 (Cons 3 (Cons 3 (Cons 3 (Cons 3 (Nil))))))))))))))) in
+    let expected = Cons 5 (Cons 10 (Cons 15 (Cons 20 (Cons 25 (Cons 28 (Cons 31 (Cons 34 (Cons 37 (Cons 40 (Cons 43 (Cons 46 (Cons 49 (Cons 52 (Cons 55 (Nil))))))))))))))) in
+    check_case regular express 10 expected
+
+  let test_016 () : bool =
+    let regular = Cons 100 (Cons 100 (Cons 100 (Cons 100 (Cons 100 (Cons 100 (Cons 100 (Cons 100 (Cons 100 (Cons 100 (Nil)))))))))) in
+    let express = Cons 1 (Cons 2 (Cons 3 (Cons 4 (Cons 5 (Cons 6 (Cons 7 (Cons 8 (Cons 9 (Cons 10 (Nil)))))))))) in
+    let expected = Cons 100 (Cons 153 (Cons 156 (Cons 160 (Cons 165 (Cons 171 (Cons 178 (Cons 186 (Cons 195 (Cons 205 (Nil)))))))))) in
+    check_case regular express 150 expected
+
+  let test_017 () : bool =
+    let regular = Cons 100000 (Cons 100000 (Cons 100000 Nil)) in
+    let express = Cons 100000 (Cons 100000 (Cons 100000 Nil)) in
+    let expected = Cons 100000 (Cons 200000 (Cons 300000 Nil)) in
+    check_case regular express 1 expected
+
+  let test_018 () : bool =
+    let regular = Cons 1 (Cons 3 (Cons 5 (Cons 7 (Cons 9 (Cons 11 (Cons 13 (Cons 15 (Cons 17 (Cons 19 (Nil)))))))))) in
+    let express = Cons 2 (Cons 4 (Cons 6 (Cons 8 (Cons 10 (Cons 12 (Cons 14 (Cons 16 (Cons 18 (Cons 20 (Nil)))))))))) in
+    let expected = Cons 1 (Cons 4 (Cons 9 (Cons 16 (Cons 25 (Cons 36 (Cons 49 (Cons 64 (Cons 81 (Cons 100 (Nil)))))))))) in
+    check_case regular express 100 expected
+
+  let test_019 () : bool =
+    let regular = Cons 5 (Cons 5 (Cons 5 (Cons 5 (Cons 5 (Cons 5 (Cons 5 (Cons 5 (Cons 5 (Cons 5 (Cons 5 (Cons 5 (Cons 5 (Cons 5 (Cons 5 (Cons 5 (Cons 5 (Cons 5 (Cons 5 (Cons 5 (Nil)))))))))))))))))))) in
+    let express = Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Nil)))))))))))))))))))) in
+    let expected = Cons 5 (Cons 10 (Cons 13 (Cons 14 (Cons 15 (Cons 16 (Cons 17 (Cons 18 (Cons 19 (Cons 20 (Cons 21 (Cons 22 (Cons 23 (Cons 24 (Cons 25 (Cons 26 (Cons 27 (Cons 28 (Cons 29 (Cons 30 (Nil)))))))))))))))))))) in
+    check_case regular express 10 expected
+
+  let run_tests () : bool =
+    if test_000 () then
+    if test_001 () then
+    if test_002 () then
+    if test_003 () then
+    if test_004 () then
+    if test_005 () then
+    if test_006 () then
+    if test_007 () then
+    if test_008 () then
+    if test_009 () then
+    if test_010 () then
+    if test_011 () then
+    if test_012 () then
+    if test_013 () then
+    if test_014 () then
+    if test_015 () then
+    if test_016 () then
+    if test_017 () then
+    if test_018 () then
+    if test_019 () then
+      true
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+
+end

@@ -1,0 +1,102 @@
+module MaximumSumCircularSubarray_List_Spec
+
+  use int.Int
+  use list.List
+  use list.Append
+  use list.Sum
+
+  predicate linear_segment (nums: list int) (seg: list int) =
+    seg <> Nil /\
+    exists left right: list int.
+      nums = (left ++ seg) ++ right
+
+  predicate wrapped_segment (nums: list int) (seg: list int) =
+    seg <> Nil /\
+    exists prefix middle suffix: list int.
+      prefix <> Nil /\
+      suffix <> Nil /\
+      nums = (prefix ++ middle) ++ suffix /\
+      seg = suffix ++ prefix
+
+  predicate circular_segment (nums: list int) (seg: list int) =
+    linear_segment nums seg \/ wrapped_segment nums seg
+
+  predicate is_max_circular_subarray_sum (nums: list int) (answer: int) =
+    nums <> Nil /\
+    (exists seg: list int. circular_segment nums seg /\ answer = sum seg) /\
+    (forall seg: list int. circular_segment nums seg -> sum seg <= answer)
+
+  let max2 (x: int) (y: int) : int
+    ensures { result = x \/ result = y }
+    ensures { x <= result /\ y <= result }
+  =
+    if x >= y then x else y
+
+  let min2 (x: int) (y: int) : int
+    ensures { result = x \/ result = y }
+    ensures { result <= x /\ result <= y }
+  =
+    if x <= y then x else y
+
+  let rec total_sum (nums: list int) : int
+    variant { nums }
+  =
+    match nums with
+    | Nil -> 0
+    | Cons x xs -> x + total_sum xs
+    end
+
+  let rec max_element_from (nums: list int) (current: int) : int
+    variant { nums }
+  =
+    match nums with
+    | Nil -> current
+    | Cons x xs ->
+        if x > current then
+          max_element_from xs x
+        else
+          max_element_from xs current
+    end
+
+  let rec max_subarray_from
+      (nums: list int) (best_ending_here: int) (best_so_far: int) : int
+    variant { nums }
+  =
+    match nums with
+    | Nil -> best_so_far
+    | Cons x xs ->
+        let next_best_ending_here = max2 x (best_ending_here + x) in
+        let next_best_so_far = max2 best_so_far next_best_ending_here in
+        max_subarray_from xs next_best_ending_here next_best_so_far
+    end
+
+  let rec min_subarray_from
+      (nums: list int) (worst_ending_here: int) (worst_so_far: int) : int
+    variant { nums }
+  =
+    match nums with
+    | Nil -> worst_so_far
+    | Cons x xs ->
+        let next_worst_ending_here = min2 x (worst_ending_here + x) in
+        let next_worst_so_far = min2 worst_so_far next_worst_ending_here in
+        min_subarray_from xs next_worst_ending_here next_worst_so_far
+    end
+
+  let maximum_sum_circular_subarray_list (nums: list int) : int
+    requires { nums <> Nil }
+    ensures  { is_max_circular_subarray_sum nums result }
+  =
+    match nums with
+    | Nil -> 0
+    | Cons x xs ->
+        let total = total_sum nums in
+        let max_linear = max_subarray_from xs x x in
+        let min_linear = min_subarray_from xs x x in
+        let max_elem = max_element_from xs x in
+        if max_elem < 0 then
+          max_linear
+        else
+          max2 max_linear (total - min_linear)
+    end
+
+end

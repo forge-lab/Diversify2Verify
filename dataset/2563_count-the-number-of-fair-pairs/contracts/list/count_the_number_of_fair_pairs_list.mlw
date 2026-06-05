@@ -1,0 +1,145 @@
+module CountTheNumberOfFairPairs_List_Spec
+
+  use int.Int
+  use list.List
+
+  let rec function count_fair_with (x: int) (ys: list int) (lower: int) (upper: int) : int
+    variant { ys }
+  =
+    match ys with
+    | Nil -> 0
+    | Cons y rest ->
+        (if lower <= x + y && x + y <= upper then 1 else 0) +
+        count_fair_with x rest lower upper
+    end
+
+  let rec function fair_pair_count (nums: list int) (lower: int) (upper: int) : int
+    variant { nums }
+  =
+    match nums with
+    | Nil -> 0
+    | Cons x rest ->
+        count_fair_with x rest lower upper +
+        fair_pair_count rest lower upper
+    end
+
+  val count_the_number_of_fair_pairs_list (nums: list int) (lower: int) (upper: int) : int
+    ensures { result = fair_pair_count nums lower upper }
+
+  let lemma test_000_count_the_number_of_fair_pairs_list () =
+    let l4 = Cons (-500000000) Nil in
+    let l3 = Cons 500000000 l4 in
+    let l2 = Cons (-1000000000) l3 in
+    let l1 = Cons 1000000000 l2 in
+    assert { count_fair_with 1000000000 l2 0 0 = 1 };
+    assert { count_fair_with (-1000000000) l3 0 0 = 0 };
+    assert { count_fair_with 500000000 l4 0 0 = 1 };
+    assert { count_fair_with (-500000000) Nil 0 0 = 0 };
+    assert { fair_pair_count l4 0 0 = 0 };
+    assert { fair_pair_count l3 0 0 = 1 };
+    assert { fair_pair_count l2 0 0 = 1 };
+    assert { fair_pair_count l1 0 0 = 2 }
+
+  let lemma test_001_count_the_number_of_fair_pairs_list () =
+    let l6 = Cons 5 Nil in
+    let l5 = Cons 4 l6 in
+    let l4 = Cons 4 l5 in
+    let l3 = Cons 7 l4 in
+    let l2 = Cons 1 l3 in
+    let l1 = Cons 0 l2 in
+    assert { count_fair_with 0 l2 3 6 = 3 };
+    assert { count_fair_with 1 l3 3 6 = 3 };
+    assert { count_fair_with 7 l4 3 6 = 0 };
+    assert { count_fair_with 4 l5 3 6 = 0 };
+    assert { count_fair_with 4 l6 3 6 = 0 };
+    assert { count_fair_with 5 Nil 3 6 = 0 };
+    assert { fair_pair_count l6 3 6 = 0 };
+    assert { fair_pair_count l5 3 6 = 0 };
+    assert { fair_pair_count l4 3 6 = 0 };
+    assert { fair_pair_count l3 3 6 = 0 };
+    assert { fair_pair_count l2 3 6 = 3 };
+    assert { fair_pair_count l1 3 6 = 6 }
+
+  let lemma test_002_count_the_number_of_fair_pairs_list () =
+    let l5 = Cons 5 Nil in
+    let l4 = Cons 5 l5 in
+    let l3 = Cons 5 l4 in
+    let l2 = Cons 5 l3 in
+    let l1 = Cons 5 l2 in
+    assert { count_fair_with 5 l2 10 10 = 4 };
+    assert { count_fair_with 5 l3 10 10 = 3 };
+    assert { count_fair_with 5 l4 10 10 = 2 };
+    assert { count_fair_with 5 l5 10 10 = 1 };
+    assert { count_fair_with 5 Nil 10 10 = 0 };
+    assert { fair_pair_count l5 10 10 = 0 };
+    assert { fair_pair_count l4 10 10 = 1 };
+    assert { fair_pair_count l3 10 10 = 3 };
+    assert { fair_pair_count l2 10 10 = 6 };
+    assert { fair_pair_count l1 10 10 = 10 }
+
+  let lemma test_003_count_the_number_of_fair_pairs_list () =
+    let l5 = Cons 3 Nil in
+    let l4 = Cons 2 l5 in
+    let l3 = Cons 1 l4 in
+    let l2 = Cons 0 l3 in
+    let l1 = Cons (-1) l2 in
+    assert { count_fair_with (-1) l2 0 4 = 3 };
+    assert { count_fair_with 0 l3 0 4 = 3 };
+    assert { count_fair_with 1 l4 0 4 = 2 };
+    assert { count_fair_with 2 l5 0 4 = 0 };
+    assert { count_fair_with 3 Nil 0 4 = 0 };
+    assert { fair_pair_count l5 0 4 = 0 };
+    assert { fair_pair_count l4 0 4 = 0 };
+    assert { fair_pair_count l3 0 4 = 2 };
+    assert { fair_pair_count l2 0 4 = 5 };
+    assert { fair_pair_count l1 0 4 = 8 }
+
+  let lemma test_004_count_the_number_of_fair_pairs_list () =
+    let l5 = Cons 3 Nil in
+    let l4 = Cons 2 l5 in
+    let l3 = Cons 1 l4 in
+    let l2 = Cons 0 l3 in
+    let l1 = Cons (-1) l2 in
+    assert { count_fair_with (-1) l2 (-2) 2 = 4 };
+    assert { count_fair_with 0 l3 (-2) 2 = 2 };
+    assert { count_fair_with 1 l4 (-2) 2 = 0 };
+    assert { count_fair_with 2 l5 (-2) 2 = 0 };
+    assert { count_fair_with 3 Nil (-2) 2 = 0 };
+    assert { fair_pair_count l5 (-2) 2 = 0 };
+    assert { fair_pair_count l4 (-2) 2 = 0 };
+    assert { fair_pair_count l3 (-2) 2 = 0 };
+    assert { fair_pair_count l2 (-2) 2 = 2 };
+    assert { fair_pair_count l1 (-2) 2 = 6 }
+
+  let lemma test_005_count_the_number_of_fair_pairs_list () =
+    let l5 = Cons 50 Nil in
+    let l4 = Cons 40 l5 in
+    let l3 = Cons 30 l4 in
+    let l2 = Cons 20 l3 in
+    let l1 = Cons 10 l2 in
+    assert { count_fair_with 10 l2 50 70 = 2 };
+    assert { count_fair_with 20 l3 50 70 = 3 };
+    assert { count_fair_with 30 l4 50 70 = 1 };
+    assert { count_fair_with 40 l5 50 70 = 0 };
+    assert { count_fair_with 50 Nil 50 70 = 0 };
+    assert { fair_pair_count l5 50 70 = 0 };
+    assert { fair_pair_count l4 50 70 = 0 };
+    assert { fair_pair_count l3 50 70 = 1 };
+    assert { fair_pair_count l2 50 70 = 4 };
+    assert { fair_pair_count l1 50 70 = 6 }
+
+  let lemma test_006_count_the_number_of_fair_pairs_list () =
+    let l4 = Cons (-500000000) Nil in
+    let l3 = Cons 500000000 l4 in
+    let l2 = Cons (-1000000000) l3 in
+    let l1 = Cons 1000000000 l2 in
+    assert { count_fair_with 1000000000 l2 (-1500000000) 1500000000 = 3 };
+    assert { count_fair_with (-1000000000) l3 (-1500000000) 1500000000 = 2 };
+    assert { count_fair_with 500000000 l4 (-1500000000) 1500000000 = 1 };
+    assert { count_fair_with (-500000000) Nil (-1500000000) 1500000000 = 0 };
+    assert { fair_pair_count l4 (-1500000000) 1500000000 = 0 };
+    assert { fair_pair_count l3 (-1500000000) 1500000000 = 1 };
+    assert { fair_pair_count l2 (-1500000000) 1500000000 = 3 };
+    assert { fair_pair_count l1 (-1500000000) 1500000000 = 6 }
+
+end

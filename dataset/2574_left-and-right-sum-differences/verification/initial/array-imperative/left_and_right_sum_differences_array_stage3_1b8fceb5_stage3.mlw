@@ -1,0 +1,69 @@
+module LeftAndRightSumDifferences_Array_Stage3_Imperative
+
+  use int.Int
+  use int.Abs
+  use array.Array
+  use array.Init
+  use array.ArraySum
+  use ref.Ref
+
+  function left_sum (nums: array int) (i: int) : int =
+    sum nums 0 i
+
+  function right_sum (nums: array int) (i: int) : int =
+    sum nums (i + 1) (length nums)
+
+  predicate answer_at (nums: array int) (answer: array int) (i: int) =
+    0 <= i < length nums /\
+    0 <= i < length answer /\
+    answer[i] = abs (left_sum nums i - right_sum nums i)
+
+  predicate left_right_sum_differences_spec (nums: array int) (answer: array int) =
+    length answer = length nums /\
+    forall i: int. 0 <= i < length nums -> answer_at nums answer i
+
+  let left_and_right_sum_differences_array (nums: array int) : array int
+    ensures { left_right_sum_differences_spec nums result }
+  =
+    let n = length nums in
+    let result = make n 0 in
+    if n = 0 then begin
+      assert { length result = length nums };
+      assert { forall i: int. 0 <= i < length nums -> answer_at nums result i };
+      result
+    end else begin
+      let total = ref 0 in
+      for i = 0 to n - 1 do
+        invariant { 0 <= i <= n }
+        invariant { !total = sum nums 0 i }
+
+        total := !total + nums[i];
+        assert { !total = sum nums 0 (i + 1) }
+      done;
+      assert { !total = sum nums 0 n };
+
+      let left = ref 0 in
+      for i = 0 to n - 1 do
+        invariant { 0 <= i <= n }
+        invariant { length result = n }
+        invariant { !total = sum nums 0 n }
+        invariant { !left = sum nums 0 i }
+        invariant { forall k: int. 0 <= k < i -> answer_at nums result k }
+
+        let right = !total - !left - nums[i] in
+        assert { !left = left_sum nums i };
+        assert { right = sum nums (i + 1) n };
+        assert { right = right_sum nums i };
+        result[i] <- abs (!left - right);
+        assert { result[i] = abs (left_sum nums i - right_sum nums i) };
+        assert { answer_at nums result i };
+        left := !left + nums[i];
+        assert { !left = sum nums 0 (i + 1) }
+      done;
+      assert { length result = length nums };
+      assert { forall i: int. 0 <= i < length nums -> answer_at nums result i };
+      assert { left_right_sum_differences_spec nums result };
+      result
+    end
+
+end

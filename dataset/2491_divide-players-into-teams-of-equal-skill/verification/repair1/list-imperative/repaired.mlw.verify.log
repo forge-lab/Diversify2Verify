@@ -1,0 +1,101 @@
+== Stage 1: first prover on whole file ==
+Running in /Users/rubenm/Desktop/Diversify2Verify/codex-runs/dataset-merge-verification/stage3a-repair/2491_divide-players-into-teams-of-equal-skill/list-imperative/divide_players_into_teams_of_equal_skill_list_stage3_58aa49f1_stage3/generated/why3: why3 session create -o /Users/rubenm/Desktop/Diversify2Verify/codex-runs/dataset-merge-verification/stage3a-repair/2491_divide-players-into-teams-of-equal-skill/list-imperative/divide_players_into_teams_of_equal_skill_list_stage3_58aa49f1_stage3/generated/why3/.why3_sessions/repaired_stage1 -P Z3,4.8.6 -t 10 -m 8192 repaired.mlw
+Session created successfully
+Running in /Users/rubenm/Desktop/Diversify2Verify/codex-runs/dataset-merge-verification/stage3a-repair/2491_divide-players-into-teams-of-equal-skill/list-imperative/divide_players_into_teams_of_equal_skill_list_stage3_58aa49f1_stage3/generated/why3: why3 bench /Users/rubenm/Desktop/Diversify2Verify/codex-runs/dataset-merge-verification/stage3a-repair/2491_divide-players-into-teams-of-equal-skill/list-imperative/divide_players_into_teams_of_equal_skill_list_stage3_58aa49f1_stage3/generated/why3/.why3_sessions/repaired_stage1
+Progress: 9/1/0                       Progress: 8/2/0                       Progress: 7/3/0                       Progress: 6/4/0                       Progress: 5/5/0                       Progress: 4/6/0                       Progress: 4/0/0                       Progress: 3/1/0                       Progress: 2/2/0                       Progress: 1/3/0                       Progress: 0/4/0                       Progress: 0/0/2                       
+Replay completed, saving session... done
+== Stage 1 stats ==
+= Statistics for session /Users/rubenm/Desktop/Diversify2Verify/codex-runs/dataset-merge-verification/stage3a-repair/2491_divide-players-into-teams-of-equal-skill/list-imperative/divide_players_into_teams_of_equal_skill_list_stage3_58aa49f1_stage3/generated/why3/.why3_sessions/repaired_stage1
+
+== Number of root goals ==
+  total: 10  proved: 8
+
+== Number of sub goals ==
+  total: 0  proved: 0
+
+== Goals not proved ==
+  +-- file [../../repaired.mlw]
+    +-- theory DividePlayersIntoTeamsOfEqualSkill_List_Spec
+      +-- goal half_length'vc
+      +-- goal divide_players_into_teams_of_equal_skill_list'vc
+  
+== Goals proved by only one prover ==
+  +-- file [../../repaired.mlw]
+    +-- theory DividePlayersIntoTeamsOfEqualSkill_List_Spec
+      +-- goal list_sum'vc: Z3 4.8.6
+      +-- goal team_skill_sum'vc: Z3 4.8.6
+      +-- goal team_player_count'vc: Z3 4.8.6
+      +-- goal chemistry_sum'vc: Z3 4.8.6
+      +-- goal all_team_sums'vc: Z3 4.8.6
+      +-- goal insert_sorted'vc: Z3 4.8.6
+      +-- goal sort_list'vc: Z3 4.8.6
+      +-- goal reverse_aux'vc: Z3 4.8.6
+  
+1 session(s) read, with a total of 10 proof goals.
+== Unproved root goals after first prover ==
+DividePlayersIntoTeamsOfEqualSkill_List_Spec	half_length'vc
+DividePlayersIntoTeamsOfEqualSkill_List_Spec	divide_players_into_teams_of_equal_skill_list'vc
+== Stage 1: trying remaining goals with prover Alt-Ergo,2.4.0 ==
+---- stage1 | prover: Alt-Ergo,2.4.0 | theory: DividePlayersIntoTeamsOfEqualSkill_List_Spec | goal: half_length'vc ----
+File repaired.mlw:
+Goal half_length'vc.
+Prover result is: Valid (0.01s, 211 steps).
+Solved in stage 1 using prover: Alt-Ergo,2.4.0
+---- stage1 | prover: Alt-Ergo,2.4.0 | theory: DividePlayersIntoTeamsOfEqualSkill_List_Spec | goal: divide_players_into_teams_of_equal_skill_list'vc ----
+File repaired.mlw:
+Goal divide_players_into_teams_of_equal_skill_list'vc.
+Prover result is: Timeout (10.00s, 268055 steps).
+Remaining after prover Alt-Ergo,2.4.0: 1
+== Stage 1: trying remaining goals with prover CVC4,1.8 ==
+---- stage1 | prover: CVC4,1.8 | theory: DividePlayersIntoTeamsOfEqualSkill_List_Spec | goal: divide_players_into_teams_of_equal_skill_list'vc ----
+File repaired.mlw:
+Goal divide_players_into_teams_of_equal_skill_list'vc.
+Prover result is: Unknown (unknown + incomplete) (0.26s, 71107 steps).
+Remaining after prover CVC4,1.8: 1
+== Goals still unproved after stage 1 ==
+DividePlayersIntoTeamsOfEqualSkill_List_Spec	divide_players_into_teams_of_equal_skill_list'vc
+== Stage 2: split_vc on unproved goal ==
+Target theory: DividePlayersIntoTeamsOfEqualSkill_List_Spec
+Target goal  : divide_players_into_teams_of_equal_skill_list'vc
+---- stage2 | prover: Z3,4.8.6 | theory: DividePlayersIntoTeamsOfEqualSkill_List_Spec | goal: divide_players_into_teams_of_equal_skill_list'vc ----
+Transforms: split_vc
+File "repaired.mlw", line 147, characters 15-39:
+Sub-goal Postcondition of goal
+divide_players_into_teams_of_equal_skill_list'vc.
+Prover result is: Timeout (10.00s, 137738109 steps).
+
+File "repaired.mlw", line 147, characters 15-39:
+Sub-goal Postcondition of goal
+divide_players_into_teams_of_equal_skill_list'vc.
+Prover result is: Timeout (10.00s, 28922996 steps).
+Infrastructure issue in stage 2 with prover Z3,4.8.6; aborting rest of stage 2.
+== Goals still unproved after stage 2 (split_vc) ==
+DividePlayersIntoTeamsOfEqualSkill_List_Spec	divide_players_into_teams_of_equal_skill_list'vc
+== Stage 3: split_vc + inline_all on still-unproved goal ==
+Target theory: DividePlayersIntoTeamsOfEqualSkill_List_Spec
+Target goal  : divide_players_into_teams_of_equal_skill_list'vc
+---- stage3 | prover: Alt-Ergo,2.4.0 | theory: DividePlayersIntoTeamsOfEqualSkill_List_Spec | goal: divide_players_into_teams_of_equal_skill_list'vc ----
+Transforms: split_vc inline_all
+File "repaired.mlw", line 147, characters 15-39:
+Sub-goal Postcondition of goal
+divide_players_into_teams_of_equal_skill_list'vc.
+Prover result is: Timeout (10.00s, 231525 steps).
+
+File "repaired.mlw", line 147, characters 15-39:
+Sub-goal Postcondition of goal
+divide_players_into_teams_of_equal_skill_list'vc.
+Prover result is: Timeout (10.00s, 237975 steps).
+Infrastructure issue in stage 3 with prover Alt-Ergo,2.4.0; aborting rest of stage 3.
+== Final summary ==
+Unproved root goals after first prover : 1
+Remaining failures after split_vc      : 1
+Remaining failures after stage 3       : 1
+Detailed logs stored in                : /Users/rubenm/Desktop/Diversify2Verify/codex-runs/dataset-merge-verification/stage3a-repair/2491_divide-players-into-teams-of-equal-skill/list-imperative/divide_players_into_teams_of_equal_skill_list_stage3_58aa49f1_stage3/generated/why3/.why3_sessions/repaired_logs
+Still unproved goals:
+DividePlayersIntoTeamsOfEqualSkill_List_Spec	divide_players_into_teams_of_equal_skill_list'vc
+VERIFY_RESULT: FAILURE
+VERIFY_REASON: unproved_goals_remain
+VERIFY_STAGE: stage3
+VERIFY_ROOT_TOTAL: 10
+VERIFY_ROOT_PROVED: 9
+VERIFY_ROOT_REMAINING: 1

@@ -1,0 +1,297 @@
+module MinimizeTheMaximumDifferenceOfPairs_List_Stage3_Imperative
+
+  use int.Int
+  use int.Abs
+  use int.EuclideanDivision
+  use list.List
+  use list.Length
+  use list.NumOcc
+  use list.RevAppend
+  use ref.Ref
+
+  type int_pair = Pair int int
+
+  let rec function endpoint_occ_pairs (x: int) (pairs: list int_pair) : int
+    variant { pairs }
+  =
+    match pairs with
+    | Nil -> 0
+    | Cons (Pair a b) rest ->
+        (if x = a then 1 else 0) + (if x = b then 1 else 0) +
+        endpoint_occ_pairs x rest
+    end
+
+  let rec predicate pair_diffs_at_most (pairs: list int_pair) (d: int)
+    variant { pairs }
+  =
+    match pairs with
+    | Nil -> true
+    | Cons (Pair a b) rest ->
+        abs (a - b) <= d && pair_diffs_at_most rest d
+    end
+
+  predicate valid_pairing_with_bound
+    (nums: list int) (p: int) (d: int) (pairs: list int_pair) =
+    0 <= d /\
+    length pairs = p /\
+    pair_diffs_at_most pairs d /\
+    (forall x: int. endpoint_occ_pairs x pairs <= num_occ x nums)
+
+  predicate minimized_max_difference (nums: list int) (p: int) (answer: int) =
+    0 <= answer /\
+    (exists pairs: list int_pair. valid_pairing_with_bound nums p answer pairs) /\
+    (forall d: int.
+       0 <= d < answer ->
+       not (exists pairs: list int_pair. valid_pairing_with_bound nums p d pairs))
+
+  let rec predicate sorted_non_decreasing (nums: list int)
+    variant { nums }
+  =
+    match nums with
+    | Nil -> true
+    | Cons _ Nil -> true
+    | Cons x (Cons y ys) ->
+        x <= y && sorted_non_decreasing (Cons y ys)
+    end
+
+  let rec function insert_model (sorted_nums: list int) (x: int) : list int
+    variant { sorted_nums }
+  =
+    match sorted_nums with
+    | Nil -> Cons x Nil
+    | Cons y ys ->
+        if y < x then Cons y (insert_model ys x) else Cons x sorted_nums
+    end
+
+  let rec function sort_acc (sorted_nums: list int) (cur: list int) : list int
+    variant { cur }
+  =
+    match cur with
+    | Nil -> sorted_nums
+    | Cons x xs -> sort_acc (insert_model sorted_nums x) xs
+    end
+
+  let rec lemma insert_model_sorted (sorted_nums: list int) (x: int)
+    requires { sorted_non_decreasing sorted_nums }
+    ensures  { sorted_non_decreasing (insert_model sorted_nums x) }
+    variant  { sorted_nums }
+  =
+    match sorted_nums with
+    | Nil -> ()
+    | Cons _ Nil -> ()
+    | Cons y (Cons z zs) ->
+        if y < x then begin
+          if z < x then begin
+            insert_model_sorted (Cons z zs) x;
+            assert { y <= z }
+          end else begin
+            assert { x <= z };
+            assert { sorted_non_decreasing (Cons x (Cons z zs)) }
+          end;
+          assert { y <= x };
+          assert { sorted_non_decreasing (Cons y (insert_model (Cons z zs) x)) }
+        end else begin
+          assert { x <= y };
+          assert { sorted_non_decreasing (Cons x (Cons y (Cons z zs))) }
+        end
+    end
+
+  let rec lemma insert_model_length (sorted_nums: list int) (x: int)
+    ensures { length (insert_model sorted_nums x) = length sorted_nums + 1 }
+    variant { sorted_nums }
+  =
+    match sorted_nums with
+    | Nil -> ()
+    | Cons _ ys -> insert_model_length ys x
+    end
+
+  let rec lemma sort_acc_sorted (sorted_nums: list int) (cur: list int)
+    requires { sorted_non_decreasing sorted_nums }
+    ensures  { sorted_non_decreasing (sort_acc sorted_nums cur) }
+    variant  { cur }
+  =
+    match cur with
+    | Nil -> ()
+    | Cons x xs ->
+        insert_model_sorted sorted_nums x;
+        sort_acc_sorted (insert_model sorted_nums x) xs
+    end
+
+  let reverse_onto (rev_prefix: list int) (suffix: list int) : list int
+    ensures { result = rev_append rev_prefix suffix }
+    ensures { length result = length rev_prefix + length suffix }
+  =
+    let result = ref suffix in
+    let cur = ref rev_prefix in
+    while (match !cur with Nil -> false | Cons _ _ -> true end) do
+      invariant { 0 <= length !cur }
+      invariant { rev_append !cur !result = rev_append rev_prefix suffix }
+      invariant { length !result + length !cur = length rev_prefix + length suffix }
+      variant { length !cur }
+      match !cur with
+      | Nil -> ()
+      | Cons x xs ->
+          result := Cons x !result;
+          cur := xs
+      end
+    done;
+    assert { !cur = Nil };
+    !result
+
+  let insert_sorted (sorted_nums: list int) (x: int) : list int
+    requires { sorted_non_decreasing sorted_nums }
+    ensures  { result = insert_model sorted_nums x }
+    ensures  { sorted_non_decreasing result }
+    ensures  { length result = length sorted_nums + 1 }
+  =
+    let rev_prefix = ref (Nil : list int) in
+    let cur = ref sorted_nums in
+    while (match !cur with Cons y _ -> y < x | Nil -> false end) do
+      invariant { 0 <= length !cur }
+      invariant { insert_model sorted_nums x = rev_append !rev_prefix (insert_model !cur x) }
+      invariant { sorted_non_decreasing !cur }
+      variant { length !cur }
+      match !cur with
+      | Nil -> ()
+      | Cons y ys ->
+          assert { y < x };
+          rev_prefix := Cons y !rev_prefix;
+          cur := ys
+      end
+    done;
+    match !cur with
+    | Nil ->
+        assert { insert_model !cur x = Cons x !cur }
+    | Cons y _ ->
+        assert { not (y < x) };
+        assert { x <= y };
+        assert { insert_model !cur x = Cons x !cur }
+    end;
+    let result = reverse_onto !rev_prefix (Cons x !cur) in
+    assert { result = rev_append !rev_prefix (Cons x !cur) };
+    assert { result = insert_model sorted_nums x };
+    insert_model_sorted sorted_nums x;
+    insert_model_length sorted_nums x;
+    result
+
+  let sort_list (nums: list int) : list int
+    ensures { result = sort_acc (Nil: list int) nums }
+    ensures { sorted_non_decreasing result }
+    ensures { length result = length nums }
+    ensures { nums <> Nil -> result <> Nil }
+  =
+    let sorted = ref (Nil : list int) in
+    let cur = ref nums in
+    while (match !cur with Nil -> false | Cons _ _ -> true end) do
+      invariant { 0 <= length !cur }
+      invariant { sorted_non_decreasing !sorted }
+      invariant { sort_acc !sorted !cur = sort_acc (Nil: list int) nums }
+      invariant { length !sorted + length !cur = length nums }
+      variant { length !cur }
+      match !cur with
+      | Nil -> ()
+      | Cons x xs ->
+          let next_sorted = insert_sorted !sorted x in
+          assert { next_sorted = insert_model !sorted x };
+          sorted := next_sorted;
+          cur := xs
+      end
+    done;
+    assert { !cur = Nil };
+    assert { sort_acc !sorted !cur = !sorted };
+    sort_acc_sorted (Nil: list int) nums;
+    !sorted
+
+  let last_of_sorted (sorted_nums: list int) : int =
+    match sorted_nums with
+    | Nil -> 0
+    | Cons first rest ->
+        let last = ref first in
+        let cur = ref rest in
+        while (match !cur with Nil -> false | Cons _ _ -> true end) do
+          invariant { 0 <= length !cur }
+          variant { length !cur }
+          match !cur with
+          | Nil -> ()
+          | Cons x xs ->
+              last := x;
+              cur := xs
+          end
+        done;
+        !last
+    end
+
+  let count_pairs_with_bound (sorted_nums: list int) (d: int) : int =
+    let count = ref 0 in
+    let cur = ref sorted_nums in
+    while (match !cur with Cons _ (Cons _ _) -> true | _ -> false end) do
+      invariant { 0 <= length !cur }
+      invariant { 0 <= !count }
+      variant { length !cur }
+      match !cur with
+      | Cons x (Cons y ys) ->
+          if y - x <= d then begin
+            count := !count + 1;
+            cur := ys
+          end else
+            cur := Cons y ys
+      | _ -> ()
+      end
+    done;
+    !count
+
+  let minimize_the_maximum_difference_of_pairs_list (nums: list int) (p: int) : int
+    requires { 0 <= p }
+    requires { 2 * p <= length nums }
+    ensures  { minimized_max_difference nums p result }
+  =
+    if p <= 0 then begin
+      assert { p = 0 };
+      assert { valid_pairing_with_bound nums p 0 (Nil: list int_pair) };
+      assert { minimized_max_difference nums p 0 };
+      0
+    end else begin
+      assert { 0 < p };
+      assert { 2 <= 2 * p };
+      assert { 0 < length nums };
+      assert { nums <> Nil };
+      let sorted_nums = sort_list nums in
+      assert { sorted_nums <> Nil };
+      assert { sorted_non_decreasing sorted_nums };
+      match sorted_nums with
+      | Nil ->
+          assert { false };
+          0
+      | Cons first _ ->
+          let low = ref 0 in
+          let last = last_of_sorted sorted_nums in
+          let upper = last - first in
+          assert { first <= last };
+          assert { 0 <= upper };
+          let high = ref upper in
+          assert { 0 <= !low };
+          assert { !low <= !high };
+          while !low < !high do
+            invariant { 0 <= !low <= !high }
+            invariant { sorted_non_decreasing sorted_nums }
+            variant { !high - !low }
+            let mid = !low + div (!high - !low) 2 in
+            assert { 0 <= !high - !low };
+            assert { 0 <= div (!high - !low) 2 };
+            assert { !low <= mid <= !high };
+            if count_pairs_with_bound sorted_nums mid >= p then begin
+              assert { !low <= mid };
+              high := mid
+            end else begin
+              assert { mid < !high };
+              low := mid + 1
+            end
+          done;
+          assert { !low = !high };
+          assert { 0 <= !low };
+          assert { minimized_max_difference nums p !low };
+          !low
+      end
+    end
+
+end

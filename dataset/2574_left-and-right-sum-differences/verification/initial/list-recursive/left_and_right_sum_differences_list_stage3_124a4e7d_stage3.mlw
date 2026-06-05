@@ -1,0 +1,68 @@
+module LeftAndRightSumDifferences_List_Stage3_Recursive
+
+  use int.Int
+  use int.Abs
+  use list.List
+  use list.Sum
+
+  let rec predicate left_right_diff_from (left: int) (nums: list int) (out: list int)
+    variant { nums }
+  =
+    match nums with
+    | Nil ->
+        match out with
+        | Nil -> true
+        | Cons _ _ -> false
+        end
+    | Cons x xs ->
+        match out with
+        | Nil -> false
+        | Cons y ys ->
+            y = abs (left - sum xs) &&
+            left_right_diff_from (left + x) xs ys
+        end
+    end
+
+  predicate left_right_diff_result (nums: list int) (out: list int) =
+    left_right_diff_from 0 nums out
+
+  let rec sum_list (nums: list int) : int
+    ensures { result = sum nums }
+    variant { nums }
+  =
+    match nums with
+    | Nil -> 0
+    | Cons x xs ->
+        let tail_sum = sum_list xs in
+        assert { tail_sum = sum xs };
+        x + tail_sum
+    end
+
+  let rec build_differences (left_sum: int) (remaining_sum: int) (nums: list int) : list int
+    requires { remaining_sum = sum nums }
+    ensures  { left_right_diff_from left_sum nums result }
+    variant  { nums }
+  =
+    match nums with
+    | Nil ->
+        assert { sum Nil = 0 };
+        Nil
+    | Cons x xs ->
+        assert { sum nums = x + sum xs };
+        let right_sum = remaining_sum - x in
+        assert { right_sum = sum xs };
+        let tail = build_differences (left_sum + x) right_sum xs in
+        assert { left_right_diff_from (left_sum + x) xs tail };
+        Cons (abs (left_sum - right_sum)) tail
+    end
+
+  let left_and_right_sum_differences_list (nums: list int) : list int
+    ensures { left_right_diff_result nums result }
+  =
+    let total = sum_list nums in
+    assert { total = sum nums };
+    let result = build_differences 0 total nums in
+    assert { left_right_diff_from 0 nums result };
+    result
+
+end

@@ -1,0 +1,157 @@
+module FindTwoNonOverlappingSubArraysEachWithTargetSum_List_Spec
+
+  use int.Int
+  use list.List
+  use list.Length
+  use list.Append
+  use list.Sum
+
+  let rec predicate all_between (l: list int) (lo: int) (hi: int)
+    variant { l }
+  =
+    match l with
+    | Nil -> true
+    | Cons x xs -> lo <= x && x <= hi && all_between xs lo hi
+    end
+
+  predicate target_sum_segment (target: int) (segment: list int) =
+    segment <> Nil /\ sum segment = target
+
+  predicate ordered_target_segments
+    (arr: list int) (target: int) (first: list int) (second: list int)
+  =
+    exists prefix middle suffix: list int.
+      arr = prefix ++ (first ++ (middle ++ (second ++ suffix))) /\
+      target_sum_segment target first /\
+      target_sum_segment target second
+
+  predicate target_segment_pair_total
+    (arr: list int) (target: int) (total: int)
+  =
+    exists first second: list int.
+      ordered_target_segments arr target first second /\
+      total = length first + length second
+
+  predicate no_target_segment_pair (arr: list int) (target: int) =
+    forall first second: list int.
+      not (ordered_target_segments arr target first second)
+
+  predicate minimum_target_segment_pair_result
+    (arr: list int) (target: int) (r: int)
+  =
+    (r = -1 /\ no_target_segment_pair arr target) \/
+    (r > 0 /\
+     target_segment_pair_total arr target r /\
+     (forall total: int.
+        target_segment_pair_total arr target total -> r <= total))
+
+  val find_two_non_overlapping_sub_arrays_each_with_target_sum_list
+    (arr: list int) (target: int) : int
+    requires { 1 <= length arr <= 100000 }
+    requires { all_between arr 1 1000 }
+    requires { 1 <= target <= 100000000 }
+    ensures  { minimum_target_segment_pair_result arr target result }
+
+  let lemma check_test_000 () =
+    let first = Cons 5 (Cons 5 Nil) in
+    let second = Cons 5 (Cons 5 Nil) in
+    let suffix = Cons 5 Nil in
+    let arr = first ++ (second ++ suffix) in
+    assert { all_between arr 1 1000 };
+    assert { length first = 2 };
+    assert { length second = 2 };
+    assert { sum first = 10 };
+    assert { sum second = 10 };
+    assert { target_sum_segment 10 first };
+    assert { target_sum_segment 10 second };
+    assert { ordered_target_segments arr 10 first second };
+    assert { target_segment_pair_total arr 10 4 }
+
+  let lemma check_test_001 () =
+    let prefix = Cons 1 (Cons 2 (Cons 3 Nil)) in
+    let first = Cons 4 (Cons 5 (Cons 6 Nil)) in
+    let second = Cons 7 (Cons 8 Nil) in
+    let suffix = Cons 9 (Cons 10 Nil) in
+    let arr = prefix ++ (first ++ (second ++ suffix)) in
+    assert { all_between arr 1 1000 };
+    assert { length first = 3 };
+    assert { length second = 2 };
+    assert { sum first = 15 };
+    assert { sum second = 15 };
+    assert { target_sum_segment 15 first };
+    assert { target_sum_segment 15 second };
+    assert { ordered_target_segments arr 15 first second };
+    assert { target_segment_pair_total arr 15 5 }
+
+  let lemma check_test_004 () =
+    let arr = Cons 1 (Cons 2 (Cons 3 (Cons 4 (Cons 5 Nil)))) in
+    let only = Cons 2 (Cons 3 (Cons 4 Nil)) in
+    assert { all_between arr 1 1000 };
+    assert { length only = 3 };
+    assert { sum only = 9 };
+    assert { target_sum_segment 9 only };
+    assert { no_target_segment_pair arr 9 };
+    assert { minimum_target_segment_pair_result arr 9 (-1) }
+
+  let lemma check_test_005 () =
+    let first = Cons 3 Nil in
+    let middle = Cons 2 (Cons 2 (Cons 4 Nil)) in
+    let second = Cons 3 Nil in
+    let arr = first ++ (middle ++ second) in
+    assert { all_between arr 1 1000 };
+    assert { length first = 1 };
+    assert { length second = 1 };
+    assert { sum first = 3 };
+    assert { sum second = 3 };
+    assert { target_sum_segment 3 first };
+    assert { target_sum_segment 3 second };
+    assert { ordered_target_segments arr 3 first second };
+    assert { target_segment_pair_total arr 3 2 };
+    assert {
+      forall total: int.
+        target_segment_pair_total arr 3 total -> 2 <= total
+    };
+    assert { minimum_target_segment_pair_result arr 3 2 }
+
+  let lemma check_test_008 () =
+    let arr = Cons 1000 (Cons 1000 (Cons 1000 Nil)) in
+    let overlapping = Cons 1000 (Cons 1000 Nil) in
+    assert { all_between arr 1 1000 };
+    assert { length overlapping = 2 };
+    assert { sum overlapping = 2000 };
+    assert { target_sum_segment 2000 overlapping };
+    assert { no_target_segment_pair arr 2000 };
+    assert { minimum_target_segment_pair_result arr 2000 (-1) }
+
+  let lemma check_test_009 () =
+    let first = Cons 7 Nil in
+    let middle = Cons 3 (Cons 4 Nil) in
+    let second = Cons 7 Nil in
+    let arr = first ++ (middle ++ second) in
+    assert { all_between arr 1 1000 };
+    assert { length first = 1 };
+    assert { length second = 1 };
+    assert { sum first = 7 };
+    assert { sum second = 7 };
+    assert { sum middle = 7 };
+    assert { target_sum_segment 7 first };
+    assert { target_sum_segment 7 second };
+    assert { target_sum_segment 7 middle };
+    assert { ordered_target_segments arr 7 first second };
+    assert { target_segment_pair_total arr 7 2 };
+    assert {
+      forall total: int.
+        target_segment_pair_total arr 7 total -> 2 <= total
+    };
+    assert { minimum_target_segment_pair_result arr 7 2 }
+
+  let lemma check_test_020 () =
+    let arr =
+      Cons 4 (Cons 3 (Cons 2 (Cons 6 (Cons 2 (Cons 3 (Cons 4 Nil)))))) in
+    let only = Cons 6 Nil in
+    assert { all_between arr 1 1000 };
+    assert { length only = 1 };
+    assert { sum only = 6 };
+    assert { target_sum_segment 6 only }
+
+end

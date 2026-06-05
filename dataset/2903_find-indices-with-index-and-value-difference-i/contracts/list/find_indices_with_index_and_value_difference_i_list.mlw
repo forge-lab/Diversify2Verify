@@ -1,0 +1,121 @@
+module FindIndicesWithIndexAndValueDifferenceI_List_Spec
+
+  use int.Int
+  use int.Abs
+  use list.List
+  use list.Length
+  use list.NthNoOpt
+
+  predicate input_constraints (nums: list int) (indexDifference: int) (valueDifference: int) =
+    1 <= length nums <= 100 /\
+    0 <= indexDifference <= 100 /\
+    0 <= valueDifference <= 50 /\
+    (forall k: int. 0 <= k < length nums -> 0 <= nth k nums <= 50)
+
+  function answer_pair (i: int) (j: int) : list int =
+    Cons i (Cons j Nil)
+
+  predicate valid_pair (nums: list int) (indexDifference: int) (valueDifference: int)
+                       (i: int) (j: int) =
+    0 <= i < length nums /\
+    0 <= j < length nums /\
+    abs (i - j) >= indexDifference /\
+    abs (nth i nums - nth j nums) >= valueDifference
+
+  predicate no_valid_pair (nums: list int) (indexDifference: int) (valueDifference: int) =
+    forall i j: int. not (valid_pair nums indexDifference valueDifference i j)
+
+  predicate valid_answer (nums: list int) (indexDifference: int) (valueDifference: int)
+                         (answer: list int) =
+    (no_valid_pair nums indexDifference valueDifference /\
+     answer = answer_pair (-1) (-1)) \/
+    (exists i j: int.
+       answer = answer_pair i j /\
+       valid_pair nums indexDifference valueDifference i j)
+
+  val find_indices_with_index_and_value_difference_i_list
+      (nums: list int) (indexDifference: int) (valueDifference: int) : list int
+    requires { input_constraints nums indexDifference valueDifference }
+    ensures  { valid_answer nums indexDifference valueDifference result }
+
+  let lemma check_test_000 () =
+    let nums = Cons 1 (Cons 3 (Cons 5 (Cons 7 (Cons 9 Nil)))) in
+    let expected = answer_pair 0 3 in
+    assert { length nums = 5 };
+    assert { nth 0 nums = 1 };
+    assert { nth 3 nums = 7 };
+    assert { input_constraints nums 2 6 };
+    assert { valid_pair nums 2 6 0 3 };
+    assert { expected = answer_pair 0 3 };
+    assert { valid_answer nums 2 6 expected }
+
+  let lemma check_test_001 () =
+    let nums = Cons 0 (Cons 0 (Cons 0 (Cons 0 (Cons 0 Nil)))) in
+    let expected = answer_pair 0 0 in
+    assert { length nums = 5 };
+    assert { nth 0 nums = 0 };
+    assert { input_constraints nums 0 0 };
+    assert { valid_pair nums 0 0 0 0 };
+    assert { expected = answer_pair 0 0 };
+    assert { valid_answer nums 0 0 expected }
+
+  let lemma check_test_002 () =
+    let nums = Cons 10 (Cons 20 (Cons 30 (Cons 40 (Cons 50 Nil)))) in
+    let expected = answer_pair 0 3 in
+    assert { length nums = 5 };
+    assert { nth 0 nums = 10 };
+    assert { nth 3 nums = 40 };
+    assert { input_constraints nums 1 25 };
+    assert { valid_pair nums 1 25 0 3 };
+    assert { expected = answer_pair 0 3 };
+    assert { valid_answer nums 1 25 expected }
+
+  let lemma check_test_003 () =
+    let nums = Cons 0 (Cons 0 (Cons 0 (Cons 0 Nil))) in
+    let expected = answer_pair (-1) (-1) in
+    assert { length nums = 4 };
+    assert { nth 0 nums = 0 };
+    assert { nth 1 nums = 0 };
+    assert { nth 2 nums = 0 };
+    assert { nth 3 nums = 0 };
+    assert { input_constraints nums 3 1 };
+    assert { no_valid_pair nums 3 1 };
+    assert { expected = answer_pair (-1) (-1) };
+    assert { valid_answer nums 3 1 expected }
+
+  let lemma check_test_004 () =
+    let nums = Cons 0 (Cons 0 (Cons 0 (Cons 0 Nil))) in
+    let expected = answer_pair (-1) (-1) in
+    assert { length nums = 4 };
+    assert { nth 0 nums = 0 };
+    assert { nth 1 nums = 0 };
+    assert { nth 2 nums = 0 };
+    assert { nth 3 nums = 0 };
+    assert { input_constraints nums 1 1 };
+    assert { no_valid_pair nums 1 1 };
+    assert { expected = answer_pair (-1) (-1) };
+    assert { valid_answer nums 1 1 expected }
+
+  let lemma check_test_005 () =
+    let nums = Cons 10 (Cons 5 (Cons 15 (Cons 20 (Cons 25 Nil)))) in
+    let expected = answer_pair 1 3 in
+    assert { length nums = 5 };
+    assert { nth 1 nums = 5 };
+    assert { nth 3 nums = 20 };
+    assert { input_constraints nums 2 10 };
+    assert { valid_pair nums 2 10 1 3 };
+    assert { expected = answer_pair 1 3 };
+    assert { valid_answer nums 2 10 expected }
+
+  let lemma check_test_006 () =
+    let nums = Cons 4 (Cons 2 (Cons 3 (Cons 1 (Cons 5 Nil)))) in
+    let expected = answer_pair 0 1 in
+    assert { length nums = 5 };
+    assert { nth 0 nums = 4 };
+    assert { nth 1 nums = 2 };
+    assert { input_constraints nums 1 2 };
+    assert { valid_pair nums 1 2 0 1 };
+    assert { expected = answer_pair 0 1 };
+    assert { valid_answer nums 1 2 expected }
+
+end

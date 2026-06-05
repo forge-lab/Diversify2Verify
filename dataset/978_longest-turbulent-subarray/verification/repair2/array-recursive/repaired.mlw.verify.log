@@ -1,0 +1,202 @@
+== Stage 1: first prover on whole file ==
+Running in /Users/rubenm/Desktop/Diversify2Verify/codex-runs/repair2-split2/stage3a-rerepair/978_longest-turbulent-subarray/array-recursive/longest_turbulent_subarray_array_stage3_082815d0_stage3/repaired/generated/why3: why3 session create -o /Users/rubenm/Desktop/Diversify2Verify/codex-runs/repair2-split2/stage3a-rerepair/978_longest-turbulent-subarray/array-recursive/longest_turbulent_subarray_array_stage3_082815d0_stage3/repaired/generated/why3/.why3_sessions/repaired_stage1 -P Z3,4.8.6 -t 10 -m 8192 repaired.mlw
+Session created successfully
+Running in /Users/rubenm/Desktop/Diversify2Verify/codex-runs/repair2-split2/stage3a-rerepair/978_longest-turbulent-subarray/array-recursive/longest_turbulent_subarray_array_stage3_082815d0_stage3/repaired/generated/why3: why3 bench /Users/rubenm/Desktop/Diversify2Verify/codex-runs/repair2-split2/stage3a-rerepair/978_longest-turbulent-subarray/array-recursive/longest_turbulent_subarray_array_stage3_082815d0_stage3/repaired/generated/why3/.why3_sessions/repaired_stage1
+Progress: 10/1/0                       Progress: 9/2/0                       Progress: 8/3/0                       Progress: 7/4/0                       Progress: 6/5/0                       Progress: 5/6/0                       Progress: 5/0/0                       Progress: 4/1/0                       Progress: 3/2/0                       Progress: 2/3/0                       Progress: 1/4/0                       Progress: 0/5/0                       Progress: 0/0/1                       
+Replay completed, saving session... done
+== Stage 1 stats ==
+= Statistics for session /Users/rubenm/Desktop/Diversify2Verify/codex-runs/repair2-split2/stage3a-rerepair/978_longest-turbulent-subarray/array-recursive/longest_turbulent_subarray_array_stage3_082815d0_stage3/repaired/generated/why3/.why3_sessions/repaired_stage1
+
+== Number of root goals ==
+  total: 11  proved: 9
+
+== Number of sub goals ==
+  total: 0  proved: 0
+
+== Goals not proved ==
+  +-- file [../../repaired.mlw]
+    +-- theory LongestTurbulentSubarray_Array_Stage3_Recursive
+      +-- goal turbulent_ending_extend_nonzero'vc
+      +-- goal longest_turbulent_subarray_array'vc
+  
+== Goals proved by only one prover ==
+  +-- file [../../repaired.mlw]
+    +-- theory LongestTurbulentSubarray_Array_Stage3_Recursive
+      +-- goal best_prefix_full_implies_max'vc: Z3 4.8.6
+      +-- goal equal_adjacent_turbulent_ending_one'vc: Z3 4.8.6
+      +-- goal best_prefix_extend_after_reset'vc: Z3 4.8.6
+      +-- goal recursive_scan_state_after_equal'vc: Z3 4.8.6
+      +-- goal turbulent_ending_restart_two'vc: Z3 4.8.6
+      +-- goal best_prefix_extend_with_candidate'vc: Z3 4.8.6
+      +-- goal recursive_scan_state_after_nonzero'vc: Z3 4.8.6
+      +-- goal comparison_sign'vc: Z3 4.8.6
+      +-- goal longest_turbulent_subarray_array_from'vc: Z3 4.8.6
+  
+1 session(s) read, with a total of 11 proof goals.
+== Unproved root goals after first prover ==
+LongestTurbulentSubarray_Array_Stage3_Recursive	turbulent_ending_extend_nonzero'vc
+LongestTurbulentSubarray_Array_Stage3_Recursive	longest_turbulent_subarray_array'vc
+== Stage 1: trying remaining goals with prover Alt-Ergo,2.4.0 ==
+---- stage1 | prover: Alt-Ergo,2.4.0 | theory: LongestTurbulentSubarray_Array_Stage3_Recursive | goal: turbulent_ending_extend_nonzero'vc ----
+File repaired.mlw:
+Goal turbulent_ending_extend_nonzero'vc.
+Prover result is: Timeout (10.00s, 93796 steps).
+---- stage1 | prover: Alt-Ergo,2.4.0 | theory: LongestTurbulentSubarray_Array_Stage3_Recursive | goal: longest_turbulent_subarray_array'vc ----
+File repaired.mlw:
+Goal longest_turbulent_subarray_array'vc.
+Prover result is: Valid (0.01s, 146 steps).
+Solved in stage 1 using prover: Alt-Ergo,2.4.0
+Remaining after prover Alt-Ergo,2.4.0: 1
+== Stage 1: trying remaining goals with prover CVC4,1.8 ==
+---- stage1 | prover: CVC4,1.8 | theory: LongestTurbulentSubarray_Array_Stage3_Recursive | goal: turbulent_ending_extend_nonzero'vc ----
+File repaired.mlw:
+Goal turbulent_ending_extend_nonzero'vc.
+Prover result is: Timeout (10.00s, 351128 steps).
+Remaining after prover CVC4,1.8: 1
+== Goals still unproved after stage 1 ==
+LongestTurbulentSubarray_Array_Stage3_Recursive	turbulent_ending_extend_nonzero'vc
+== Stage 2: split_vc on unproved goal ==
+Target theory: LongestTurbulentSubarray_Array_Stage3_Recursive
+Target goal  : turbulent_ending_extend_nonzero'vc
+---- stage2 | prover: Z3,4.8.6 | theory: LongestTurbulentSubarray_Array_Stage3_Recursive | goal: turbulent_ending_extend_nonzero'vc ----
+Transforms: split_vc
+File "repaired.mlw", line 152, characters 13-56:
+Sub-goal Assertion of goal turbulent_ending_extend_nonzero'vc.
+Prover result is: Valid (0.01s, 1796 steps).
+
+File "repaired.mlw", line 153, characters 13-55:
+Sub-goal Assertion of goal turbulent_ending_extend_nonzero'vc.
+Prover result is: Valid (0.01s, 26255 steps).
+
+File "repaired.mlw", line 154, characters 13-33:
+Sub-goal Assertion of goal turbulent_ending_extend_nonzero'vc.
+Prover result is: Valid (0.01s, 9422 steps).
+
+File "repaired.mlw", line 155, characters 13-32:
+Sub-goal Assertion of goal turbulent_ending_extend_nonzero'vc.
+Prover result is: Valid (0.01s, 26363 steps).
+
+File "repaired.mlw", line 157, characters 15-30:
+Sub-goal Assertion of goal turbulent_ending_extend_nonzero'vc.
+Prover result is: Valid (0.01s, 2621 steps).
+
+File "repaired.mlw", line 158, characters 15-53:
+Sub-goal Assertion of goal turbulent_ending_extend_nonzero'vc.
+Prover result is: Valid (0.01s, 31783 steps).
+
+File "repaired.mlw", line 160, characters 15-32:
+Sub-goal Assertion of goal turbulent_ending_extend_nonzero'vc.
+Prover result is: Valid (0.01s, 2603 steps).
+
+File "repaired.mlw", line 161, characters 15-49:
+Sub-goal Assertion of goal turbulent_ending_extend_nonzero'vc.
+Prover result is: Valid (0.01s, 2636 steps).
+
+File "repaired.mlw", line 162, characters 15-30:
+Sub-goal Assertion of goal turbulent_ending_extend_nonzero'vc.
+Prover result is: Timeout (10.00s, 159231304 steps).
+
+File "repaired.mlw", line 164, character 8 to line 165, character 56:
+Sub-goal Assertion of goal turbulent_ending_extend_nonzero'vc.
+Prover result is: Valid (0.01s, 31495 steps).
+
+File "repaired.mlw", line 167, characters 15-63:
+Sub-goal Assertion of goal turbulent_ending_extend_nonzero'vc.
+Prover result is: Valid (0.01s, 49564 steps).
+
+File "repaired.mlw", line 172, characters 8-34:
+Sub-goal Assertion of goal turbulent_ending_extend_nonzero'vc.
+Prover result is: Valid (0.01s, 35661 steps).
+
+File "repaired.mlw", line 177, characters 8-28:
+Sub-goal Assertion of goal turbulent_ending_extend_nonzero'vc.
+Prover result is: Valid (0.01s, 32432 steps).
+
+File "repaired.mlw", line 182, characters 8-36:
+Sub-goal Assertion of goal turbulent_ending_extend_nonzero'vc.
+Prover result is: Valid (0.01s, 31869 steps).
+
+File "repaired.mlw", line 184, characters 13-56:
+Sub-goal Assertion of goal turbulent_ending_extend_nonzero'vc.
+Prover result is: Valid (0.01s, 36259 steps).
+
+File "repaired.mlw", line 150, characters 15-58:
+Sub-goal Postcondition of goal turbulent_ending_extend_nonzero'vc.
+Prover result is: Valid (0.01s, 2185 steps).
+---- stage2 | prover: Alt-Ergo,2.4.0 | theory: LongestTurbulentSubarray_Array_Stage3_Recursive | goal: turbulent_ending_extend_nonzero'vc ----
+Transforms: split_vc
+File "repaired.mlw", line 152, characters 13-56:
+Sub-goal Assertion of goal turbulent_ending_extend_nonzero'vc.
+Prover result is: Valid (0.01s, 14 steps).
+
+File "repaired.mlw", line 153, characters 13-55:
+Sub-goal Assertion of goal turbulent_ending_extend_nonzero'vc.
+Prover result is: Valid (0.01s, 20 steps).
+
+File "repaired.mlw", line 154, characters 13-33:
+Sub-goal Assertion of goal turbulent_ending_extend_nonzero'vc.
+Prover result is: Valid (0.01s, 16 steps).
+
+File "repaired.mlw", line 155, characters 13-32:
+Sub-goal Assertion of goal turbulent_ending_extend_nonzero'vc.
+Prover result is: Valid (0.01s, 17 steps).
+
+File "repaired.mlw", line 157, characters 15-30:
+Sub-goal Assertion of goal turbulent_ending_extend_nonzero'vc.
+Prover result is: Valid (0.01s, 22 steps).
+
+File "repaired.mlw", line 158, characters 15-53:
+Sub-goal Assertion of goal turbulent_ending_extend_nonzero'vc.
+Prover result is: Valid (0.01s, 114 steps).
+
+File "repaired.mlw", line 160, characters 15-32:
+Sub-goal Assertion of goal turbulent_ending_extend_nonzero'vc.
+Prover result is: Valid (0.01s, 24 steps).
+
+File "repaired.mlw", line 161, characters 15-49:
+Sub-goal Assertion of goal turbulent_ending_extend_nonzero'vc.
+Prover result is: Valid (0.01s, 24 steps).
+
+File "repaired.mlw", line 162, characters 15-30:
+Sub-goal Assertion of goal turbulent_ending_extend_nonzero'vc.
+Prover result is: Valid (0.10s, 2054 steps).
+
+File "repaired.mlw", line 164, character 8 to line 165, character 56:
+Sub-goal Assertion of goal turbulent_ending_extend_nonzero'vc.
+Prover result is: Valid (0.01s, 200 steps).
+
+File "repaired.mlw", line 167, characters 15-63:
+Sub-goal Assertion of goal turbulent_ending_extend_nonzero'vc.
+Prover result is: Valid (0.04s, 1026 steps).
+
+File "repaired.mlw", line 172, characters 8-34:
+Sub-goal Assertion of goal turbulent_ending_extend_nonzero'vc.
+Prover result is: Valid (0.02s, 392 steps).
+
+File "repaired.mlw", line 177, characters 8-28:
+Sub-goal Assertion of goal turbulent_ending_extend_nonzero'vc.
+Prover result is: Valid (0.01s, 99 steps).
+
+File "repaired.mlw", line 182, characters 8-36:
+Sub-goal Assertion of goal turbulent_ending_extend_nonzero'vc.
+Prover result is: Valid (0.01s, 36 steps).
+
+File "repaired.mlw", line 184, characters 13-56:
+Sub-goal Assertion of goal turbulent_ending_extend_nonzero'vc.
+Prover result is: Valid (0.02s, 359 steps).
+
+File "repaired.mlw", line 150, characters 15-58:
+Sub-goal Postcondition of goal turbulent_ending_extend_nonzero'vc.
+Prover result is: Valid (0.01s, 20 steps).
+Solved with split_vc using prover: Alt-Ergo,2.4.0
+== Final summary ==
+Unproved root goals after first prover : 1
+Remaining failures after split_vc      : 0
+Remaining failures after stage 3       : 0
+Detailed logs stored in                : /Users/rubenm/Desktop/Diversify2Verify/codex-runs/repair2-split2/stage3a-rerepair/978_longest-turbulent-subarray/array-recursive/longest_turbulent_subarray_array_stage3_082815d0_stage3/repaired/generated/why3/.why3_sessions/repaired_logs
+VERIFY_RESULT: SUCCESS
+VERIFY_REASON: proved_after_stage2
+VERIFY_STAGE: stage2
+VERIFY_ROOT_TOTAL: 11
+VERIFY_ROOT_PROVED: 11
+VERIFY_ROOT_REMAINING: 0

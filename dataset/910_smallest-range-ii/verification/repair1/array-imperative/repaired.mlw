@@ -1,0 +1,119 @@
+module SmallestRangeIi_Array_Spec
+
+  use int.Int
+  use array.Array
+  use ref.Ref
+
+  predicate valid_input (nums: array int) (k: int) =
+    1 <= length nums <= 10000 /\
+    0 <= k <= 10000 /\
+    (forall i: int. 0 <= i < length nums -> 0 <= nums[i] <= 10000)
+
+  predicate choice_in_interval (x: int) (k: int) (lo: int) (hi: int) =
+    (lo <= x + k <= hi) \/ (lo <= x - k <= hi)
+
+  predicate choice_at_fits (nums: array int) (k: int) (lo: int) (hi: int) (i: int) =
+    0 <= i < length nums -> choice_in_interval nums[i] k lo hi
+
+  predicate all_choices_fit (nums: array int) (k: int) (lo: int) (hi: int) =
+    forall i: int. 0 <= i < length nums -> choice_in_interval nums[i] k lo hi
+
+  predicate range_width_feasible (nums: array int) (k: int) (w: int) =
+    w >= 0 /\
+    (exists lo hi: int.
+       lo <= hi /\
+       hi - lo = w /\
+       all_choices_fit nums k lo hi)
+
+  predicate no_smaller_feasible (nums: array int) (k: int) (r: int) =
+    forall w: int. 0 <= w < r -> not (range_width_feasible nums k w)
+
+  predicate smallest_range_score (nums: array int) (k: int) (r: int) =
+    range_width_feasible nums k r /\
+    no_smaller_feasible nums k r
+
+  exception InsertionPoint
+
+  let min_int (x: int) (y: int) : int
+    ensures { result = x \/ result = y }
+    ensures { result <= x /\ result <= y }
+    ensures { result = x \/ y <= x }
+    ensures { result = y \/ x <= y }
+  =
+    if x <= y then x else y
+
+  let max_int (x: int) (y: int) : int
+    ensures { result = x \/ result = y }
+    ensures { x <= result /\ y <= result }
+    ensures { result = x \/ x <= y }
+    ensures { result = y \/ y <= x }
+  =
+    if x >= y then x else y
+
+  let copy_array (nums: array int) : array int
+    ensures { length result = length nums }
+    ensures { forall i: int. 0 <= i < length nums -> result[i] = nums[i] }
+  =
+    let n = length nums in
+    let result = make n 0 in
+    for i = 0 to n - 1 do
+      invariant { length result = n }
+      invariant { n = length nums }
+      invariant { forall j: int. 0 <= j < i -> result[j] = nums[j] }
+      result[i] <- nums[i]
+    done;
+    result
+
+  let insertion_sort (nums: array int) : unit
+    ensures { length nums = old (length nums) }
+  =
+    let n = length nums in
+    if n >= 2 then
+      for i = 1 to n - 1 do
+        invariant { n = length nums }
+        let key = nums[i] in
+        let j = ref (i - 1) in
+        try
+          while !j >= 0 do
+            invariant { n = length nums }
+            invariant { -1 <= !j < i }
+            variant { !j + 1 }
+            if nums[!j] > key then begin
+              nums[!j + 1] <- nums[!j];
+              j := !j - 1
+            end else
+              raise InsertionPoint
+          done
+        with InsertionPoint ->
+          ()
+        end;
+        assert { -1 <= !j < i };
+        nums[!j + 1] <- key
+      done
+
+  let smallest_range_ii_array (nums: array int) (k: int) : int
+    requires { valid_input nums k }
+    ensures  { smallest_range_score nums k result }
+  =
+    let n = length nums in
+    if n <= 1 then
+      0
+    else begin
+      let sorted = copy_array nums in
+      insertion_sort sorted;
+      let answer = ref (sorted[n - 1] - sorted[0]) in
+      let smallest = sorted[0] + k in
+      let largest = sorted[n - 1] - k in
+      for i = 0 to n - 2 do
+        invariant { n = length nums }
+        invariant { length sorted = n }
+        let high = max_int (sorted[i] + k) largest in
+        let low = min_int smallest (sorted[i + 1] - k) in
+        let width = high - low in
+        if width < !answer then
+          answer := width
+      done;
+      !answer
+    end
+
+end

@@ -1,0 +1,153 @@
+module SpecialArrayWithXElementsGreaterThanOrEqualX_Array_Stage3_Imperative
+
+  use int.Int
+  use int.NumOf as IntNumOf
+  use array.Array
+  use array.NumOf
+  use ref.Ref
+
+  function count_ge (nums: array int) (x: int) : int =
+    NumOf.numof (fun _ v -> v >= x) nums 0 (length nums)
+
+  predicate special_candidate (nums: array int) (x: int) =
+    0 <= x <= length nums /\ count_ge nums x = x
+
+  predicate special_array_result (nums: array int) (result: int) =
+    (result = -1 /\
+      forall x: int. 0 <= x <= length nums -> not (special_candidate nums x)) \/
+    (special_candidate nums result /\
+      forall x: int. special_candidate nums x -> x = result)
+
+  let lemma count_ge_monotone_threshold (nums: array int) (x y: int)
+    requires { x <= y }
+    ensures  { count_ge nums y <= count_ge nums x }
+  =
+    assert {
+      forall j: int. 0 <= j < length nums ->
+        nums[j] >= y -> nums[j] >= x
+    };
+    assert {
+      IntNumOf.numof (fun j -> nums[j] >= x) 0 (length nums) >=
+      IntNumOf.numof (fun j -> nums[j] >= y) 0 (length nums)
+    };
+    assert {
+      count_ge nums x =
+      IntNumOf.numof (fun j -> nums[j] >= x) 0 (length nums)
+    };
+    assert {
+      count_ge nums y =
+      IntNumOf.numof (fun j -> nums[j] >= y) 0 (length nums)
+    }
+
+  let lemma special_candidate_unique (nums: array int) (x y: int)
+    requires { special_candidate nums x }
+    requires { special_candidate nums y }
+    ensures  { x = y }
+  =
+    if x < y then begin
+      count_ge_monotone_threshold nums x y;
+      assert { count_ge nums y <= count_ge nums x };
+      assert { count_ge nums x = x };
+      assert { count_ge nums y = y };
+      assert { y <= x };
+      assert { false }
+    end else if y < x then begin
+      count_ge_monotone_threshold nums y x;
+      assert { count_ge nums x <= count_ge nums y };
+      assert { count_ge nums x = x };
+      assert { count_ge nums y = y };
+      assert { x <= y };
+      assert { false }
+    end else
+      assert { x = y }
+
+  let count_ge_exec (nums: array int) (x: int) : int
+    ensures { result = count_ge nums x }
+  =
+    let count = ref 0 in
+    for i = 0 to length nums - 1 do
+      invariant { 0 <= i <= length nums }
+      invariant { !count = NumOf.numof (fun _ v -> v >= x) nums 0 i }
+      if nums[i] >= x then begin
+        assert {
+          NumOf.numof (fun _ v -> v >= x) nums 0 (i + 1) =
+          1 + NumOf.numof (fun _ v -> v >= x) nums 0 i
+        };
+        count := !count + 1
+      end else begin
+        assert {
+          NumOf.numof (fun _ v -> v >= x) nums 0 (i + 1) =
+          NumOf.numof (fun _ v -> v >= x) nums 0 i
+        }
+      end
+    done;
+    assert {
+      !count = NumOf.numof (fun _ v -> v >= x) nums 0 (length nums)
+    };
+    !count
+
+  let special_array_with_x_elements_greater_than_or_equal_x_array (nums: array int) : int
+    ensures { special_array_result nums result }
+  =
+    let n = length nums in
+    let answer = ref (-1) in
+    for x = 0 to n do
+      invariant { n = length nums }
+      invariant { 0 <= x <= n + 1 }
+      invariant { -1 <= !answer <= n }
+      invariant { !answer = -1 \/ special_candidate nums !answer }
+      invariant {
+        forall y: int. 0 <= y < x ->
+          special_candidate nums y -> y = !answer
+      }
+      let c = count_ge_exec nums x in
+      assert { c = count_ge nums x };
+      if c = x then begin
+        assert { 0 <= x <= length nums };
+        assert { special_candidate nums x };
+        let old_answer = !answer in
+        assert { old_answer = -1 \/ special_candidate nums old_answer };
+        if old_answer <> -1 then begin
+          special_candidate_unique nums old_answer x;
+          assert { old_answer = x }
+        end;
+        assert {
+          forall y: int. 0 <= y < x ->
+            special_candidate nums y -> y = x
+        };
+        answer := x;
+        assert { !answer = x };
+        assert { special_candidate nums !answer };
+        assert {
+          forall y: int. 0 <= y < x + 1 ->
+            special_candidate nums y -> y = !answer
+        }
+      end else begin
+        assert { not (special_candidate nums x) };
+        assert {
+          forall y: int. 0 <= y < x + 1 ->
+            special_candidate nums y -> y = !answer
+        }
+      end
+    done;
+    assert {
+      forall y: int. 0 <= y <= length nums ->
+        special_candidate nums y -> y = !answer
+    };
+    if !answer = -1 then begin
+      assert {
+        forall y: int. 0 <= y <= length nums ->
+          not (special_candidate nums y)
+      };
+      assert { special_array_result nums !answer };
+      !answer
+    end else begin
+      assert { special_candidate nums !answer };
+      assert {
+        forall y: int. special_candidate nums y -> y = !answer
+      };
+      assert { special_array_result nums !answer };
+      !answer
+    end
+
+end

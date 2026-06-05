@@ -1,0 +1,260 @@
+module DividePlayersIntoTeamsOfEqualSkill_List_Spec
+
+  use int.Int
+  use list.List
+  use list.Length
+  use list.Mem
+  use list.NumOcc
+
+  type team = { player_a: int; player_b: int }
+
+  let rec function list_sum (skill: list int) : int
+    variant { skill }
+  =
+    match skill with
+    | Nil -> 0
+    | Cons x rest -> x + list_sum rest
+    end
+
+  let rec function team_skill_sum (teams: list team) : int
+    variant { teams }
+  =
+    match teams with
+    | Nil -> 0
+    | Cons t rest -> t.player_a + t.player_b + team_skill_sum rest
+    end
+
+  let rec function team_player_count (x: int) (teams: list team) : int
+    variant { teams }
+  =
+    match teams with
+    | Nil -> 0
+    | Cons t rest ->
+        (if t.player_a = x then 1 else 0) +
+        (if t.player_b = x then 1 else 0) +
+        team_player_count x rest
+    end
+
+  let rec function chemistry_sum (teams: list team) : int
+    variant { teams }
+  =
+    match teams with
+    | Nil -> 0
+    | Cons t rest -> t.player_a * t.player_b + chemistry_sum rest
+    end
+
+  let rec predicate all_team_sums (target_sum: int) (teams: list team)
+    variant { teams }
+  =
+    match teams with
+    | Nil -> true
+    | Cons t rest ->
+        t.player_a + t.player_b = target_sum &&
+        all_team_sums target_sum rest
+    end
+
+  predicate same_player_multiset (skill: list int) (teams: list team) =
+    (forall x: int. num_occ x skill = team_player_count x teams) /\
+    list_sum skill = team_skill_sum teams
+
+  predicate valid_division (skill: list int) (teams: list team) (target_sum: int) =
+    length skill = 2 * length teams &&
+    all_team_sums target_sum teams &&
+    same_player_multiset skill teams &&
+    team_skill_sum teams = target_sum * length teams
+
+  predicate has_valid_division (skill: list int) =
+    exists teams: list team, target_sum: int.
+      valid_division skill teams target_sum
+
+  predicate valid_skill_values (skill: list int) =
+    forall x: int. mem x skill -> 1 <= x <= 1000
+
+  predicate even_list_length (skill: list int) =
+    exists k: int. 0 <= k && length skill = 2 * k
+
+  predicate result_spec (skill: list int) (r: int) =
+    (r = (-1) && not (has_valid_division skill)) \/
+    (r <> (-1) &&
+      exists teams: list team, target_sum: int.
+        valid_division skill teams target_sum &&
+        r = chemistry_sum teams)
+
+  let rec function insert_sorted (l: list int) (x: int) : list int
+    variant { l }
+  =
+    match l with
+    | Nil -> Cons x Nil
+    | Cons y ys ->
+        if x <= y then Cons x l else Cons y (insert_sorted ys x)
+    end
+
+  let rec function insertion_sort (l: list int) : list int
+    variant { l }
+  =
+    match l with
+    | Nil -> Nil
+    | Cons x xs -> insert_sorted (insertion_sort xs) x
+    end
+
+  let rec function reverse_append (l: list int) (acc: list int) : list int
+    variant { l }
+  =
+    match l with
+    | Nil -> acc
+    | Cons x xs -> reverse_append xs (Cons x acc)
+    end
+
+  let function reverse (l: list int) : list int =
+    reverse_append l Nil
+
+  let rec function pair_count (l: list int) : int
+    variant { length l }
+  =
+    match l with
+    | Nil -> 0
+    | Cons _ Nil -> 0
+    | Cons _ (Cons _ rest) ->
+        assert { length rest < length l };
+        1 + pair_count rest
+    end
+
+  let rec function pair_teams
+    (left: list int) (right: list int) (remaining: int) : list team
+    variant { remaining }
+  =
+    if remaining <= 0 then Nil else
+    match left, right with
+    | Cons x xs, Cons y ys ->
+        Cons { player_a = x; player_b = y } (pair_teams xs ys (remaining - 1))
+    | _, _ -> Nil
+    end
+
+  let rec function pair_chemistry
+    (left: list int) (right: list int) (remaining: int) (target: int) : int
+    variant { remaining }
+  =
+    if remaining <= 0 then 0 else
+    match left, right with
+    | Cons x xs, Cons y ys ->
+        if x + y = target then
+          let sub = pair_chemistry xs ys (remaining - 1) target in
+          if sub = -1 then -1 else x * y + sub
+        else -1
+    | _, _ -> -1
+    end
+
+  let rec lemma pair_chemistry_success_model
+    (left: list int) (right: list int) (remaining: int) (target: int)
+    ensures { pair_chemistry left right remaining target <> -1 ->
+      pair_chemistry left right remaining target =
+        chemistry_sum (pair_teams left right remaining) /\
+      all_team_sums target (pair_teams left right remaining) }
+    variant { remaining }
+  =
+    if remaining <= 0 then
+      assert { pair_chemistry left right remaining target = 0 }
+    else
+      match left, right with
+      | Cons x xs, Cons y ys ->
+          if x + y = target then begin
+            pair_chemistry_success_model xs ys (remaining - 1) target;
+            assert {
+              pair_chemistry left right remaining target <> -1 ->
+              pair_chemistry left right remaining target =
+                chemistry_sum (pair_teams left right remaining)
+            };
+            assert {
+              pair_chemistry left right remaining target <> -1 ->
+              all_team_sums target (pair_teams left right remaining)
+            }
+          end
+      | _, _ -> ()
+      end
+
+  let lemma sorted_pairing_success_bridge
+    (skill sorted reversed: list int) (remaining target r: int)
+    requires { 2 <= length skill }
+    requires { length skill <= 100000 }
+    requires { even_list_length skill }
+    requires { valid_skill_values skill }
+    requires { sorted = insertion_sort skill }
+    requires { reversed = reverse sorted }
+    requires { remaining = pair_count sorted }
+    requires { match sorted, reversed with
+      | Cons first _, Cons last _ -> target = first + last
+      | _, _ -> false
+      end }
+    requires { r = pair_chemistry sorted reversed remaining target }
+    requires { r <> -1 }
+    ensures  { valid_division skill (pair_teams sorted reversed remaining) target }
+    ensures  { r = chemistry_sum (pair_teams sorted reversed remaining) }
+    ensures  { result_spec skill r }
+  = ()
+
+  let lemma sorted_pairing_failure_bridge
+    (skill sorted reversed: list int) (remaining target: int)
+    requires { 2 <= length skill }
+    requires { length skill <= 100000 }
+    requires { even_list_length skill }
+    requires { valid_skill_values skill }
+    requires { sorted = insertion_sort skill }
+    requires { reversed = reverse sorted }
+    requires { remaining = pair_count sorted }
+    requires { match sorted, reversed with
+      | Cons first _, Cons last _ -> target = first + last
+      | _, _ -> false
+      end }
+    requires { pair_chemistry sorted reversed remaining target = -1 }
+    ensures  { not (has_valid_division skill) }
+    ensures  { result_spec skill (-1) }
+  = ()
+
+  let lemma sorted_pairing_empty_bridge
+    (skill sorted reversed: list int) (remaining: int)
+    requires { 2 <= length skill }
+    requires { length skill <= 100000 }
+    requires { even_list_length skill }
+    requires { valid_skill_values skill }
+    requires { sorted = insertion_sort skill }
+    requires { reversed = reverse sorted }
+    requires { remaining = pair_count sorted }
+    requires { match sorted, reversed with
+      | Cons _ _, Cons _ _ -> false
+      | _, _ -> true
+      end }
+    ensures  { not (has_valid_division skill) }
+    ensures  { result_spec skill (-1) }
+  = ()
+
+  let divide_players_into_teams_of_equal_skill_list (skill: list int) : int
+    requires { 2 <= length skill }
+    requires { length skill <= 100000 }
+    requires { even_list_length skill }
+    requires { valid_skill_values skill }
+    ensures  { result_spec skill result }
+  =
+    let sorted = insertion_sort skill in
+    let reversed = reverse sorted in
+    let remaining = pair_count sorted in
+    match sorted, reversed with
+    | Cons first _, Cons last _ ->
+        let target = first + last in
+        let r = pair_chemistry sorted reversed remaining target in
+        if r = -1 then begin
+          sorted_pairing_failure_bridge skill sorted reversed remaining target;
+          assert { result_spec skill r };
+          r
+        end else begin
+          pair_chemistry_success_model sorted reversed remaining target;
+          sorted_pairing_success_bridge skill sorted reversed remaining target r;
+          assert { result_spec skill r };
+          r
+        end
+    | _, _ ->
+        sorted_pairing_empty_bridge skill sorted reversed remaining;
+        assert { result_spec skill (-1) };
+        -1
+    end
+
+end

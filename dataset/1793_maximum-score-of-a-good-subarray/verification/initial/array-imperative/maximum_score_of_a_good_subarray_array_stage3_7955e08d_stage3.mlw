@@ -1,0 +1,76 @@
+module MaximumScoreOfAGoodSubarray_Array_Stage3_Imperative
+
+  use int.Int
+  use array.Array
+  use array.Init
+  use ref.Ref
+
+  predicate valid_good_subarray (nums: array int) (k: int) (l: int) (r: int) =
+    0 <= l <= k <= r < length nums
+
+  predicate segment_min (nums: array int) (l: int) (r: int) (m: int) =
+    0 <= l <= r < length nums /\
+    (forall i: int. l <= i <= r -> m <= nums[i]) /\
+    (exists p: int. l <= p <= r /\ nums[p] = m)
+
+  function segment_score (l: int) (r: int) (m: int) : int =
+    m * (r - l + 1)
+
+  predicate maximum_good_subarray_score (nums: array int) (k: int) (score: int) =
+    (exists l r m: int.
+       valid_good_subarray nums k l r /\
+       segment_min nums l r m /\
+       score = segment_score l r m) /\
+    (forall l r m: int.
+       valid_good_subarray nums k l r ->
+       segment_min nums l r m ->
+       segment_score l r m <= score)
+
+  let maximum_score_of_a_good_subarray_array (nums: array int) (k: int) : int
+    requires { 1 <= length nums }
+    requires { 0 <= k < length nums }
+    requires { forall i: int. 0 <= i < length nums -> 1 <= nums[i] <= 20000 }
+    ensures  { maximum_good_subarray_score nums k result }
+  =
+    let n = length nums in
+    let left = ref k in
+    let right = ref k in
+    let current_min = ref nums[k] in
+    let best = ref nums[k] in
+    while !left > 0 || !right < n - 1 do
+      invariant { n = length nums }
+      invariant { 1 <= n }
+      invariant { 0 <= k < n }
+      invariant { 0 <= !left <= k <= !right < n }
+      invariant { segment_min nums !left !right !current_min }
+      invariant { 1 <= !current_min <= 20000 }
+      invariant { exists l r m: int.
+        valid_good_subarray nums k l r /\
+        segment_min nums l r m /\
+        !best = segment_score l r m }
+      invariant { segment_score !left !right !current_min <= !best }
+      invariant { 1 <= !best }
+      variant   { !left + (n - 1 - !right) }
+
+      if !left = 0 then
+        right := !right + 1
+      else if !right = n - 1 then
+        left := !left - 1
+      else if nums[!left - 1] < nums[!right + 1] then
+        right := !right + 1
+      else
+        left := !left - 1;
+
+      if nums[!left] < !current_min then
+        current_min := nums[!left];
+      if nums[!right] < !current_min then
+        current_min := nums[!right];
+
+      let width = !right - !left + 1 in
+      let score = !current_min * width in
+      if score > !best then
+        best := score
+    done;
+    !best
+
+end

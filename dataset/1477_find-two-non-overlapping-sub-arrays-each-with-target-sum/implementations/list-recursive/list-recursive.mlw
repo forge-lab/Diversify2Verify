@@ -1,0 +1,283 @@
+module FindTwoNonOverlappingSubArraysEachWithTargetSum_List_Recursive_Implementation
+
+  use int.Int
+  use list.List
+
+  let min_int (a: int) (b: int) : int =
+    if a <= b then a else b
+
+  let rec prefix_len_from_start
+    (arr: list int) (target: int) (current_sum: int) (current_len: int) : int
+    variant { arr }
+  =
+    match arr with
+    | Nil -> 1000000000
+    | Cons x xs ->
+        let next_sum = current_sum + x in
+        let next_len = current_len + 1 in
+        if next_sum = target then
+          next_len
+        else
+          prefix_len_from_start xs target next_sum next_len
+    end
+
+  let prefix_len (arr: list int) (target: int) : int =
+    prefix_len_from_start arr target 0 0
+
+  let rec drop (n: int) (arr: list int) : list int
+    variant { arr }
+  =
+    if n <= 0 then
+      arr
+    else
+      match arr with
+      | Nil -> Nil
+      | Cons _ xs -> drop (n - 1) xs
+      end
+
+  let rec min_single_target_segment (arr: list int) (target: int) : int
+    variant { arr }
+  =
+    match arr with
+    | Nil -> 1000000000
+    | Cons _ xs ->
+        let here = prefix_len arr target in
+        let later = min_single_target_segment xs target in
+        min_int here later
+    end
+
+  let rec min_target_segment_pair_total (arr: list int) (target: int) : int
+    variant { arr }
+  =
+    match arr with
+    | Nil -> 1000000000
+    | Cons _ xs ->
+        let first_len = prefix_len arr target in
+        let with_here =
+          if first_len >= 1000000000 then
+            1000000000
+          else
+            let rest = drop first_len arr in
+            let second_len = min_single_target_segment rest target in
+            if second_len >= 1000000000 then
+              1000000000
+            else
+              first_len + second_len
+        in
+        let without_here = min_target_segment_pair_total xs target in
+        min_int with_here without_here
+    end
+
+  let find_two_non_overlapping_sub_arrays_each_with_target_sum_list
+    (arr: list int) (target: int) : int
+  =
+    let best = min_target_segment_pair_total arr target in
+    if best >= 1000000000 then -1 else best
+
+  let test_000 () : bool =
+    let arr = Cons 5 (Cons 5 (Cons 5 (Cons 5 (Cons 5 Nil)))) in
+    let r = find_two_non_overlapping_sub_arrays_each_with_target_sum_list arr 10 in
+    r = 4
+
+  let test_001 () : bool =
+    let arr =
+      Cons 1 (Cons 2 (Cons 3 (Cons 4 (Cons 5
+      (Cons 6 (Cons 7 (Cons 8 (Cons 9 (Cons 10 Nil))))))))) in
+    let r = find_two_non_overlapping_sub_arrays_each_with_target_sum_list arr 15 in
+    r = 5
+
+  let test_002 () : bool =
+    let arr =
+      Cons 2 (Cons 2 (Cons 2 (Cons 2 (Cons 2
+      (Cons 2 (Cons 2 (Cons 2 (Cons 2 (Cons 2 Nil))))))))) in
+    let r = find_two_non_overlapping_sub_arrays_each_with_target_sum_list arr 6 in
+    r = 6
+
+  let test_003 () : bool =
+    let arr =
+      Cons 1 (Cons 1 (Cons 1 (Cons 2 (Cons 2
+      (Cons 2 (Cons 3 (Cons 3 (Cons 3 Nil)))))))) in
+    let r = find_two_non_overlapping_sub_arrays_each_with_target_sum_list arr 6 in
+    r = 5
+
+  let test_004 () : bool =
+    let arr = Cons 1 (Cons 2 (Cons 3 (Cons 4 (Cons 5 Nil)))) in
+    let r = find_two_non_overlapping_sub_arrays_each_with_target_sum_list arr 9 in
+    r = -1
+
+  let test_005 () : bool =
+    let arr = Cons 3 (Cons 2 (Cons 2 (Cons 4 (Cons 3 Nil)))) in
+    let r = find_two_non_overlapping_sub_arrays_each_with_target_sum_list arr 3 in
+    r = 2
+
+  let test_006 () : bool =
+    let arr = Cons 5 (Cons 5 (Cons 4 (Cons 4 (Cons 5 Nil)))) in
+    let r = find_two_non_overlapping_sub_arrays_each_with_target_sum_list arr 9 in
+    r = 4
+
+  let test_007 () : bool =
+    let arr =
+      Cons 2 (Cons 2 (Cons 2 (Cons 2 (Cons 2
+      (Cons 2 (Cons 2 (Cons 2 (Cons 2 (Cons 2 Nil))))))))) in
+    let r = find_two_non_overlapping_sub_arrays_each_with_target_sum_list arr 4 in
+    r = 4
+
+  let test_008 () : bool =
+    let arr = Cons 1000 (Cons 1000 (Cons 1000 Nil)) in
+    let r = find_two_non_overlapping_sub_arrays_each_with_target_sum_list arr 2000 in
+    r = -1
+
+  let test_009 () : bool =
+    let arr = Cons 7 (Cons 3 (Cons 4 (Cons 7 Nil))) in
+    let r = find_two_non_overlapping_sub_arrays_each_with_target_sum_list arr 7 in
+    r = 2
+
+  let test_010 () : bool =
+    let arr = Cons 1000 (Cons 1000 (Cons 1000 (Cons 1000 (Cons 1000 Nil)))) in
+    let r = find_two_non_overlapping_sub_arrays_each_with_target_sum_list arr 2000 in
+    r = 4
+
+  let test_011 () : bool =
+    let arr =
+      Cons 1 (Cons 1 (Cons 1 (Cons 2 (Cons 2
+      (Cons 2 (Cons 3 (Cons 3 (Cons 3 Nil)))))))) in
+    let r = find_two_non_overlapping_sub_arrays_each_with_target_sum_list arr 3 in
+    r = 2
+
+  let test_012 () : bool =
+    let arr =
+      Cons 1 (Cons 2 (Cons 1 (Cons 2 (Cons 1
+      (Cons 2 (Cons 1 (Cons 2 (Cons 1 (Cons 2 Nil))))))))) in
+    let r = find_two_non_overlapping_sub_arrays_each_with_target_sum_list arr 3 in
+    r = 4
+
+  let test_013 () : bool =
+    let arr = Cons 1000 (Cons 1000 (Cons 1000 (Cons 1000 (Cons 1000 Nil)))) in
+    let r = find_two_non_overlapping_sub_arrays_each_with_target_sum_list arr 5000 in
+    r = -1
+
+  let test_014 () : bool =
+    let arr = Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 Nil))))))) in
+    let r = find_two_non_overlapping_sub_arrays_each_with_target_sum_list arr 2 in
+    r = 4
+
+  let test_015 () : bool =
+    let arr =
+      Cons 5 (Cons 5 (Cons 5 (Cons 5 (Cons 5
+      (Cons 5 (Cons 5 (Cons 5 (Cons 5 Nil)))))))) in
+    let r = find_two_non_overlapping_sub_arrays_each_with_target_sum_list arr 15 in
+    r = 6
+
+  let test_016 () : bool =
+    let arr = Cons 1 (Cons 2 (Cons 3 (Cons 4 (Cons 5 Nil)))) in
+    let r = find_two_non_overlapping_sub_arrays_each_with_target_sum_list arr 10 in
+    r = -1
+
+  let test_017 () : bool =
+    let arr = Cons 10 (Cons 20 (Cons 30 (Cons 40 (Cons 50 Nil)))) in
+    let r = find_two_non_overlapping_sub_arrays_each_with_target_sum_list arr 60 in
+    r = -1
+
+  let test_018 () : bool =
+    let arr =
+      Cons 1 (Cons 4 (Cons 4 (Cons 4 (Cons 4
+      (Cons 4 (Cons 4 (Cons 4 (Cons 4 (Cons 1 Nil))))))))) in
+    let r = find_two_non_overlapping_sub_arrays_each_with_target_sum_list arr 8 in
+    r = 4
+
+  let test_019 () : bool =
+    let arr =
+      Cons 5 (Cons 5 (Cons 5 (Cons 5 (Cons 5
+      (Cons 5 (Cons 5 (Cons 5 (Cons 5 (Cons 5 Nil))))))))) in
+    let r = find_two_non_overlapping_sub_arrays_each_with_target_sum_list arr 15 in
+    r = 6
+
+  let test_020 () : bool =
+    let arr = Cons 4 (Cons 3 (Cons 2 (Cons 6 (Cons 2 (Cons 3 (Cons 4 Nil)))))) in
+    let r = find_two_non_overlapping_sub_arrays_each_with_target_sum_list arr 6 in
+    r = -1
+
+  let test_021 () : bool =
+    let arr = Cons 10 (Cons 20 (Cons 30 (Cons 40 (Cons 50 Nil)))) in
+    let r = find_two_non_overlapping_sub_arrays_each_with_target_sum_list arr 90 in
+    r = -1
+
+  let test_022 () : bool =
+    let arr =
+      Cons 999 (Cons 1 (Cons 999 (Cons 1 (Cons 999
+      (Cons 1 (Cons 999 (Cons 1 (Cons 999 (Cons 1 Nil))))))))) in
+    let r = find_two_non_overlapping_sub_arrays_each_with_target_sum_list arr 1000 in
+    r = 4
+
+  let test_023 () : bool =
+    let arr =
+      Cons 25 (Cons 25 (Cons 25 (Cons 25 (Cons 25
+      (Cons 25 (Cons 25 (Cons 25 (Cons 25 (Cons 25
+      (Cons 25 (Cons 25 (Cons 25 (Cons 25 (Cons 25
+      (Cons 25 (Cons 25 (Cons 25 (Cons 25 (Cons 25 Nil))))))))))))))))))) in
+    let r = find_two_non_overlapping_sub_arrays_each_with_target_sum_list arr 50 in
+    r = 4
+
+  let test_024 () : bool =
+    let arr =
+      Cons 3 (Cons 1 (Cons 2 (Cons 4 (Cons 3
+      (Cons 2 (Cons 1 (Cons 3 (Cons 4 (Cons 2
+      (Cons 1 (Cons 3 (Cons 5 (Cons 2 (Cons 1
+      (Cons 3 (Cons 4 (Cons 2 (Cons 1 (Cons 3 Nil))))))))))))))))))) in
+    let r = find_two_non_overlapping_sub_arrays_each_with_target_sum_list arr 6 in
+    r = 4
+
+  let run_tests () : bool =
+    if test_000 () then
+    if test_001 () then
+    if test_002 () then
+    if test_003 () then
+    if test_004 () then
+    if test_005 () then
+    if test_006 () then
+    if test_007 () then
+    if test_008 () then
+    if test_009 () then
+    if test_010 () then
+    if test_011 () then
+    if test_012 () then
+    if test_013 () then
+    if test_014 () then
+    if test_015 () then
+    if test_016 () then
+    if test_017 () then
+    if test_018 () then
+    if test_019 () then
+    if test_020 () then
+    if test_021 () then
+    if test_022 () then
+    if test_023 () then
+    if test_024 () then
+      true
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+
+end

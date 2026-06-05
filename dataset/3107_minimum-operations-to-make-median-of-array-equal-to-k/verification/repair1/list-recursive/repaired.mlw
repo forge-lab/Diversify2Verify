@@ -1,0 +1,178 @@
+module MinimumOperationsToMakeMedianOfArrayEqualToK_List_Spec
+
+  use int.Int
+  use int.Abs
+  use int.EuclideanDivision
+  use list.List
+  use list.Length
+
+  let rec predicate all_nonnegative (nums: list int)
+    variant { nums }
+  =
+    match nums with
+    | Nil -> true
+    | Cons x xs -> 0 <= x && all_nonnegative xs
+    end
+
+  let rec function count_lt (nums: list int) (k: int) : int
+    variant { nums }
+  =
+    match nums with
+    | Nil -> 0
+    | Cons x xs -> (if x < k then 1 else 0) + count_lt xs k
+    end
+
+  let rec function count_gt (nums: list int) (k: int) : int
+    variant { nums }
+  =
+    match nums with
+    | Nil -> 0
+    | Cons x xs -> (if x > k then 1 else 0) + count_gt xs k
+    end
+
+  predicate upper_median_is (nums: list int) (k: int) =
+    nums <> Nil /\
+    count_lt nums k <= div (length nums) 2 /\
+    count_gt nums k <= length nums - div (length nums) 2 - 1
+
+  let rec function transform_cost (nums: list int) (final: list int) : int
+    variant { nums }
+  =
+    match nums, final with
+    | Nil, Nil -> 0
+    | Cons x xs, Cons y ys -> abs (x - y) + transform_cost xs ys
+    | _, _ -> 0
+    end
+
+  predicate minimum_operations_result (nums: list int) (k: int) (ops: int) =
+    0 <= ops /\
+    exists final: list int.
+      length final = length nums /\
+      upper_median_is final k /\
+      transform_cost nums final = ops /\
+      (forall other: list int.
+        length other = length nums /\ upper_median_is other k ->
+        ops <= transform_cost nums other)
+
+  let rec insert_sorted (x: int) (nums: list int) : list int
+    ensures { length result = length nums + 1 }
+    ensures { 0 <= x -> all_nonnegative nums -> all_nonnegative result }
+    variant { nums }
+  =
+    match nums with
+    | Nil -> Cons x Nil
+    | Cons y ys ->
+        if x <= y then
+          Cons x nums
+        else
+          Cons y (insert_sorted x ys)
+    end
+
+  let rec insertion_sort (nums: list int) : list int
+    ensures { length result = length nums }
+    ensures { all_nonnegative nums -> all_nonnegative result }
+    variant { nums }
+  =
+    match nums with
+    | Nil -> Nil
+    | Cons x xs -> insert_sorted x (insertion_sort xs)
+    end
+
+  let rec function suffix_raise_cost_model (nums: list int) (k: int) : int
+    variant { nums }
+  =
+    match nums with
+    | Nil -> 0
+    | Cons x xs ->
+        (if x < k then k - x else 0) + suffix_raise_cost_model xs k
+    end
+
+  let rec function median_adjustment_model
+    (nums: list int) (median_index: int) (current_index: int) (k: int) (prefix_decrease: int) : int
+    variant { nums }
+  =
+    match nums with
+    | Nil -> 0
+    | Cons x xs ->
+        if current_index = median_index then
+          if x < k then
+            (k - x) + suffix_raise_cost_model xs k
+          else if x > k then
+            prefix_decrease + (x - k)
+          else
+            0
+        else
+          let next_prefix_decrease =
+            prefix_decrease + (if x > k then x - k else 0) in
+          median_adjustment_model xs median_index (current_index + 1) k next_prefix_decrease
+    end
+
+  let rec suffix_raise_cost (nums: list int) (k: int) : int
+    requires { k >= 0 }
+    requires { all_nonnegative nums }
+    ensures  { result >= 0 }
+    ensures  { result = suffix_raise_cost_model nums k }
+    variant { nums }
+  =
+    match nums with
+    | Nil -> 0
+    | Cons x xs ->
+        (if x < k then k - x else 0) + suffix_raise_cost xs k
+    end
+
+  let rec median_adjustment_from_sorted
+    (nums: list int) (median_index: int) (current_index: int) (k: int) (prefix_decrease: int) : int
+    requires { k >= 0 }
+    requires { prefix_decrease >= 0 }
+    requires { all_nonnegative nums }
+    ensures  { result >= 0 }
+    ensures  { result = median_adjustment_model nums median_index current_index k prefix_decrease }
+    variant { nums }
+  =
+    match nums with
+    | Nil -> 0
+    | Cons x xs ->
+        if current_index = median_index then
+          if x < k then
+            (k - x) + suffix_raise_cost xs k
+          else if x > k then
+            prefix_decrease + (x - k)
+          else
+            0
+        else
+          let next_prefix_decrease =
+            prefix_decrease + (if x > k then x - k else 0) in
+          median_adjustment_from_sorted xs median_index (current_index + 1) k next_prefix_decrease
+    end
+
+  let lemma sorted_adjustment_establishes_minimum_result
+    (nums: list int) (sorted_nums: list int) (k: int)
+    requires { nums <> Nil }
+    requires { k >= 0 }
+    requires { all_nonnegative nums }
+    requires { length sorted_nums = length nums }
+    requires { all_nonnegative sorted_nums }
+    ensures  {
+      minimum_operations_result nums k
+        (median_adjustment_model sorted_nums (div (length sorted_nums) 2) 0 k 0)
+    }
+  = ()
+
+  let minimum_operations_to_make_median_of_array_equal_to_k_list
+    (nums: list int) (k: int) : int
+    requires { nums <> Nil }
+    requires { k >= 0 }
+    requires { all_nonnegative nums }
+    ensures  { minimum_operations_result nums k result }
+  =
+    let sorted_nums = insertion_sort nums in
+    let median_index = div (length sorted_nums) 2 in
+    assert { length sorted_nums = length nums };
+    assert { all_nonnegative sorted_nums };
+    sorted_adjustment_establishes_minimum_result nums sorted_nums k;
+    let ops = median_adjustment_from_sorted sorted_nums median_index 0 k 0 in
+    assert { ops = median_adjustment_model sorted_nums median_index 0 k 0 };
+    assert { median_index = div (length sorted_nums) 2 };
+    ops
+
+end

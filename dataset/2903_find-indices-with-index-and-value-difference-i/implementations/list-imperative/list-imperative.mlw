@@ -1,0 +1,255 @@
+module FindIndicesWithIndexAndValueDifferenceI_List_Imperative_Implementation
+
+  use int.Int
+  use list.List
+  use ref.Ref
+
+  let answer_pair (i: int) (j: int) : list int =
+    Cons i (Cons j Nil)
+
+  let pair_eq (left: list int) (right: list int) : bool =
+    match left with
+    | Cons i1 tail1 ->
+        match tail1 with
+        | Cons j1 Nil ->
+            match right with
+            | Cons i2 tail2 ->
+                match tail2 with
+                | Cons j2 Nil -> i1 = i2 && j1 = j2
+                | _ -> false
+                end
+            | _ -> false
+            end
+        | _ -> false
+        end
+    | _ -> false
+    end
+
+  let find_indices_with_index_and_value_difference_i_list
+      (nums: list int) (indexDifference: int) (valueDifference: int) : list int =
+    match nums with
+    | Nil -> answer_pair (-1) (-1)
+    | Cons first _ ->
+        let current_cur = ref nums in
+        let current_index = ref 0 in
+        let shift = ref 0 in
+        while !shift < indexDifference do
+          match !current_cur with
+          | Nil ->
+              shift := indexDifference
+          | Cons _ tail ->
+              current_cur := tail;
+              current_index := !current_index + 1;
+              shift := !shift + 1
+          end
+        done;
+        let candidate_cur = ref nums in
+        let candidate_index = ref 0 in
+        let min_value = ref first in
+        let max_value = ref first in
+        let min_index = ref 0 in
+        let max_index = ref 0 in
+        let found = ref false in
+        let result = ref (answer_pair (-1) (-1)) in
+        while
+          match !current_cur with
+          | Nil -> false
+          | Cons _ _ -> not !found
+          end
+        do
+          match !current_cur with
+          | Nil -> ()
+          | Cons current_value current_tail ->
+              match !candidate_cur with
+              | Nil ->
+                  current_cur := Nil
+              | Cons candidate_value candidate_tail ->
+                  if candidate_value < !min_value then (
+                    min_value := candidate_value;
+                    min_index := !candidate_index
+                  );
+                  if candidate_value > !max_value then (
+                    max_value := candidate_value;
+                    max_index := !candidate_index
+                  );
+                  if !max_value - current_value >= valueDifference then (
+                    result := answer_pair !max_index !current_index;
+                    found := true
+                  ) else if current_value - !min_value >= valueDifference then (
+                    result := answer_pair !min_index !current_index;
+                    found := true
+                  );
+                  candidate_cur := candidate_tail;
+                  candidate_index := !candidate_index + 1;
+                  current_cur := current_tail;
+                  current_index := !current_index + 1
+              end
+          end
+        done;
+        !result
+    end
+
+  let test_000 () : bool =
+    let nums = Cons 1 (Cons 3 (Cons 5 (Cons 7 (Cons 9 Nil)))) in
+    let expected = answer_pair 0 3 in
+    let result = find_indices_with_index_and_value_difference_i_list nums 2 6 in
+    pair_eq result expected
+
+  let test_001 () : bool =
+    let nums = Cons 0 (Cons 0 (Cons 0 (Cons 0 (Cons 0 Nil)))) in
+    let expected = answer_pair 0 0 in
+    let result = find_indices_with_index_and_value_difference_i_list nums 0 0 in
+    pair_eq result expected
+
+  let test_002 () : bool =
+    let nums = Cons 10 (Cons 20 (Cons 30 (Cons 40 (Cons 50 Nil)))) in
+    let expected = answer_pair 0 3 in
+    let result = find_indices_with_index_and_value_difference_i_list nums 1 25 in
+    pair_eq result expected
+
+  let test_003 () : bool =
+    let nums = Cons 0 (Cons 0 (Cons 0 (Cons 0 Nil))) in
+    let expected = answer_pair (-1) (-1) in
+    let result = find_indices_with_index_and_value_difference_i_list nums 3 1 in
+    pair_eq result expected
+
+  let test_004 () : bool =
+    let nums = Cons 0 (Cons 0 (Cons 0 (Cons 0 Nil))) in
+    let expected = answer_pair (-1) (-1) in
+    let result = find_indices_with_index_and_value_difference_i_list nums 1 1 in
+    pair_eq result expected
+
+  let test_005 () : bool =
+    let nums = Cons 10 (Cons 5 (Cons 15 (Cons 20 (Cons 25 Nil)))) in
+    let expected = answer_pair 1 3 in
+    let result = find_indices_with_index_and_value_difference_i_list nums 2 10 in
+    pair_eq result expected
+
+  let test_006 () : bool =
+    let nums = Cons 4 (Cons 2 (Cons 3 (Cons 1 (Cons 5 Nil)))) in
+    let expected = answer_pair 0 1 in
+    let result = find_indices_with_index_and_value_difference_i_list nums 1 2 in
+    pair_eq result expected
+
+  let test_007 () : bool =
+    let nums = Cons 1 (Cons 3 (Cons 5 (Cons 7 (Cons 9 Nil)))) in
+    let expected = answer_pair 0 3 in
+    let result = find_indices_with_index_and_value_difference_i_list nums 3 4 in
+    pair_eq result expected
+
+  let test_008 () : bool =
+    let nums = Cons 45 (Cons 46 (Cons 47 (Cons 48 (Cons 49 (Cons 50 Nil))))) in
+    let expected = answer_pair 0 5 in
+    let result = find_indices_with_index_and_value_difference_i_list nums 2 5 in
+    pair_eq result expected
+
+  let test_009 () : bool =
+    let nums = Cons 4 (Cons 2 (Cons 3 (Cons 4 (Cons 5 Nil)))) in
+    let expected = answer_pair 0 1 in
+    let result = find_indices_with_index_and_value_difference_i_list nums 1 2 in
+    pair_eq result expected
+
+  let test_010 () : bool =
+    let nums = Cons 50 (Cons 40 (Cons 30 (Cons 20 (Cons 10 Nil)))) in
+    let expected = answer_pair 0 2 in
+    let result = find_indices_with_index_and_value_difference_i_list nums 2 15 in
+    pair_eq result expected
+
+  let test_011 () : bool =
+    let nums = Cons 1 (Cons 2 (Cons 3 Nil)) in
+    let expected = answer_pair (-1) (-1) in
+    let result = find_indices_with_index_and_value_difference_i_list nums 2 4 in
+    pair_eq result expected
+
+  let test_012 () : bool =
+    let nums = Cons 1 (Cons 2 (Cons 3 (Cons 4 (Cons 5 (Cons 6 (Cons 7 (Cons 8 (Cons 9 (Cons 10 Nil))))))))) in
+    let expected = answer_pair 0 5 in
+    let result = find_indices_with_index_and_value_difference_i_list nums 5 5 in
+    pair_eq result expected
+
+  let test_013 () : bool =
+    let nums = Cons 2 (Cons 1 Nil) in
+    let expected = answer_pair 0 0 in
+    let result = find_indices_with_index_and_value_difference_i_list nums 0 0 in
+    pair_eq result expected
+
+  let test_014 () : bool =
+    let nums = Cons 50 (Cons 40 (Cons 30 (Cons 20 (Cons 10 Nil)))) in
+    let expected = answer_pair 0 3 in
+    let result = find_indices_with_index_and_value_difference_i_list nums 2 30 in
+    pair_eq result expected
+
+  let test_015 () : bool =
+    let nums = Cons 3 (Cons 5 (Cons 7 (Cons 9 (Cons 11 Nil)))) in
+    let expected = answer_pair 0 1 in
+    let result = find_indices_with_index_and_value_difference_i_list nums 1 2 in
+    pair_eq result expected
+
+  let test_016 () : bool =
+    let nums = Cons 5 (Cons 5 (Cons 5 (Cons 5 (Cons 5 Nil)))) in
+    let expected = answer_pair (-1) (-1) in
+    let result = find_indices_with_index_and_value_difference_i_list nums 1 1 in
+    pair_eq result expected
+
+  let test_017 () : bool =
+    let nums = Cons 3 (Cons 3 (Cons 3 (Cons 3 (Cons 3 Nil)))) in
+    let expected = answer_pair 0 0 in
+    let result = find_indices_with_index_and_value_difference_i_list nums 0 0 in
+    pair_eq result expected
+
+  let test_018 () : bool =
+    let nums = Cons 10 (Cons 20 (Cons 30 (Cons 40 (Cons 50 Nil)))) in
+    let expected = answer_pair 0 3 in
+    let result = find_indices_with_index_and_value_difference_i_list nums 3 15 in
+    pair_eq result expected
+
+  let test_019 () : bool =
+    let nums = Cons 10 (Cons 20 (Cons 30 (Cons 40 (Cons 50 Nil)))) in
+    let expected = answer_pair 0 3 in
+    let result = find_indices_with_index_and_value_difference_i_list nums 3 20 in
+    pair_eq result expected
+
+  let run_tests () : bool =
+    if test_000 () then
+    if test_001 () then
+    if test_002 () then
+    if test_003 () then
+    if test_004 () then
+    if test_005 () then
+    if test_006 () then
+    if test_007 () then
+    if test_008 () then
+    if test_009 () then
+    if test_010 () then
+    if test_011 () then
+    if test_012 () then
+    if test_013 () then
+    if test_014 () then
+    if test_015 () then
+    if test_016 () then
+    if test_017 () then
+    if test_018 () then
+    if test_019 () then
+      true
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+
+end

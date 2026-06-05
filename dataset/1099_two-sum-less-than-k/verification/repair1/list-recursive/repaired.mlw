@@ -1,0 +1,277 @@
+module TwoSumLessThanK_List_Spec
+
+  use int.Int
+  use list.List
+  use list.Length
+
+  let rec predicate all_between (l: list int) (lo: int) (hi: int)
+    variant { l }
+  =
+    match l with
+    | Nil -> true
+    | Cons x xs -> lo <= x && x <= hi && all_between xs lo hi
+    end
+
+  let rec predicate has_sum_with (x: int) (l: list int) (s: int)
+    variant { l }
+  =
+    match l with
+    | Nil -> false
+    | Cons y ys -> x + y = s || has_sum_with x ys s
+    end
+
+  let rec predicate has_pair_sum (l: list int) (s: int)
+    variant { l }
+  =
+    match l with
+    | Nil -> false
+    | Cons x xs -> has_sum_with x xs s || has_pair_sum xs s
+    end
+
+  let function max_int (a: int) (b: int) : int =
+    if a >= b then a else b
+
+  let rec function best_with_first (x: int) (xs: list int) (k: int) : int
+    variant { xs }
+  =
+    match xs with
+    | Nil -> -1
+    | Cons y ys ->
+        let tail_best = best_with_first x ys k in
+        let candidate = x + y in
+        if candidate < k then max_int candidate tail_best else tail_best
+    end
+
+  let rec function best_pair_sum_less_than (l: list int) (k: int) : int
+    variant { l }
+  =
+    match l with
+    | Nil -> -1
+    | Cons x xs -> max_int (best_with_first x xs k) (best_pair_sum_less_than xs k)
+    end
+
+  predicate no_pair_sum_below (nums: list int) (k: int) =
+    forall s: int. s < k -> not (has_pair_sum nums s)
+
+  predicate valid_two_sum_less_than_k (nums: list int) (k: int) (r: int) =
+    (r = -1 /\ no_pair_sum_below nums k) \/
+    (r < k /\
+     has_pair_sum nums r /\
+     (forall s: int. s < k /\ has_pair_sum nums s -> s <= r))
+
+  predicate valid_sum_with_best (x: int) (xs: list int) (k: int) (r: int) =
+    (r = -1 /\ (forall s: int. s < k -> not (has_sum_with x xs s))) \/
+    (r < k /\
+     has_sum_with x xs r /\
+     (forall s: int. s < k /\ has_sum_with x xs s -> s <= r))
+
+  let lemma max_int_left_or_right (a: int) (b: int)
+    ensures { max_int a b = a \/ max_int a b = b }
+    ensures { a <= max_int a b }
+    ensures { b <= max_int a b }
+  =
+    if a >= b then
+      assert { max_int a b = a }
+    else
+      assert { max_int a b = b }
+
+  let rec lemma has_sum_with_positive (x: int) (xs: list int) (s: int)
+    requires { 1 <= x }
+    requires { all_between xs 1 1000 }
+    requires { has_sum_with x xs s }
+    ensures  { 2 <= s }
+    variant  { xs }
+  =
+    match xs with
+    | Nil ->
+        assert { not (has_sum_with x Nil s) };
+        absurd
+    | Cons y ys ->
+        assert { 1 <= y };
+        assert { all_between ys 1 1000 };
+        if x + y = s then
+          assert { 2 <= s }
+        else
+          begin
+            assert { has_sum_with x ys s };
+            has_sum_with_positive x ys s
+          end
+    end
+
+  let rec lemma has_pair_sum_positive (nums: list int) (s: int)
+    requires { all_between nums 1 1000 }
+    requires { has_pair_sum nums s }
+    ensures  { 2 <= s }
+    variant  { nums }
+  =
+    match nums with
+    | Nil ->
+        assert { not (has_pair_sum Nil s) };
+        absurd
+    | Cons x xs ->
+        assert { 1 <= x };
+        assert { all_between xs 1 1000 };
+        if has_sum_with x xs s then
+          has_sum_with_positive x xs s
+        else
+          begin
+            assert { has_pair_sum xs s };
+            has_pair_sum_positive xs s
+          end
+    end
+
+  let lemma valid_sum_with_best_minus_one_no_sum
+    (x: int) (xs: list int) (k: int)
+    requires { 1 <= x }
+    requires { all_between xs 1 1000 }
+    requires { valid_sum_with_best x xs k (-1) }
+    ensures  { forall s: int. s < k -> not (has_sum_with x xs s) }
+  =
+    assert { not (has_sum_with x xs (-1)) };
+    assert { forall s: int. s < k -> not (has_sum_with x xs s) }
+
+  let lemma valid_pair_sum_minus_one_no_pair
+    (nums: list int) (k: int)
+    requires { all_between nums 1 1000 }
+    requires { valid_two_sum_less_than_k nums k (-1) }
+    ensures  { forall s: int. s < k -> not (has_pair_sum nums s) }
+  =
+    assert { not (has_pair_sum nums (-1)) };
+    assert { forall s: int. s < k -> not (has_pair_sum nums s) }
+
+  let rec lemma best_with_first_valid (x: int) (xs: list int) (k: int)
+    requires { 1 <= x }
+    requires { all_between xs 1 1000 }
+    ensures { valid_sum_with_best x xs k (best_with_first x xs k) }
+    variant { xs }
+  =
+    match xs with
+    | Nil ->
+        assert { best_with_first x Nil k = -1 };
+        assert { forall s: int. s < k -> not (has_sum_with x Nil s) }
+    | Cons y ys ->
+        assert { 1 <= y };
+        assert { all_between ys 1 1000 };
+        best_with_first_valid x ys k;
+        let tail_best = best_with_first x ys k in
+        let candidate = x + y in
+        assert { 2 <= candidate };
+        max_int_left_or_right candidate tail_best;
+        if candidate < k then
+          begin
+            assert { has_sum_with x (Cons y ys) candidate };
+            if max_int candidate tail_best = candidate then
+              begin
+                assert { best_with_first x (Cons y ys) k = candidate };
+                assert { forall s: int.
+                  s < k /\ has_sum_with x (Cons y ys) s -> s <= candidate };
+                assert { valid_sum_with_best x (Cons y ys) k candidate }
+              end
+            else
+              begin
+                assert { best_with_first x (Cons y ys) k = tail_best };
+                assert { tail_best = max_int candidate tail_best };
+                assert { candidate <= tail_best };
+                assert { 2 <= tail_best };
+                assert { forall s: int.
+                  s < k /\ has_sum_with x (Cons y ys) s -> s <= tail_best };
+                assert { has_sum_with x (Cons y ys) tail_best };
+                assert { tail_best < k };
+                assert { valid_sum_with_best x (Cons y ys) k tail_best }
+              end
+          end
+        else
+          begin
+            assert { best_with_first x (Cons y ys) k = tail_best };
+            assert { forall s: int.
+              s < k /\ has_sum_with x (Cons y ys) s -> has_sum_with x ys s };
+            assert { valid_sum_with_best x ys k tail_best };
+            assert { valid_sum_with_best x (Cons y ys) k tail_best }
+          end
+    end
+
+  let rec lemma best_pair_sum_valid (nums: list int) (k: int)
+    requires { all_between nums 1 1000 }
+    ensures { valid_two_sum_less_than_k nums k (best_pair_sum_less_than nums k) }
+    variant { nums }
+  =
+    match nums with
+    | Nil ->
+        assert { best_pair_sum_less_than Nil k = -1 };
+        assert { forall s: int. s < k -> not (has_pair_sum Nil s) };
+        assert { no_pair_sum_below Nil k }
+    | Cons x xs ->
+        assert { 1 <= x };
+        assert { all_between xs 1 1000 };
+        best_with_first_valid x xs k;
+        best_pair_sum_valid xs k;
+        let with_x = best_with_first x xs k in
+        let in_tail = best_pair_sum_less_than xs k in
+        let best = max_int with_x in_tail in
+        max_int_left_or_right with_x in_tail;
+        assert { best_pair_sum_less_than (Cons x xs) k = best };
+        if with_x = -1 && in_tail = -1 then
+          begin
+            assert { best = -1 };
+            valid_sum_with_best_minus_one_no_sum x xs k;
+            valid_pair_sum_minus_one_no_pair xs k;
+            assert { forall s: int.
+              s < k -> not (has_sum_with x xs s) };
+            assert { forall s: int.
+              s < k -> not (has_pair_sum xs s) };
+            assert { forall s: int.
+              s < k -> not (has_pair_sum (Cons x xs) s) };
+            assert { no_pair_sum_below (Cons x xs) k }
+          end
+        else
+          begin
+            assert { best = with_x \/ best = in_tail };
+            assert { best < k };
+            assert { has_pair_sum (Cons x xs) best };
+            assert { forall s: int.
+              s < k /\ has_pair_sum (Cons x xs) s -> s <= best };
+            assert { valid_two_sum_less_than_k (Cons x xs) k best }
+          end
+    end
+
+  let max_int_impl (a: int) (b: int) : int
+    ensures { result = max_int a b }
+  =
+    if a >= b then a else b
+
+  let rec best_with_first_impl (x: int) (xs: list int) (k: int) : int
+    ensures { result = best_with_first x xs k }
+    variant { xs }
+  =
+    match xs with
+    | Nil -> -1
+    | Cons y ys ->
+        let tail_best = best_with_first_impl x ys k in
+        let candidate = x + y in
+        if candidate < k then max_int_impl candidate tail_best else tail_best
+    end
+
+  let rec best_pair_sum_less_than_impl (nums: list int) (k: int) : int
+    ensures { result = best_pair_sum_less_than nums k }
+    variant { nums }
+  =
+    match nums with
+    | Nil -> -1
+    | Cons x xs ->
+        let best_with_x = best_with_first_impl x xs k in
+        let best_in_tail = best_pair_sum_less_than_impl xs k in
+        max_int_impl best_with_x best_in_tail
+    end
+
+  let two_sum_less_than_k_list (nums: list int) (k: int) : int
+    requires { 1 <= length nums <= 100 }
+    requires { all_between nums 1 1000 }
+    requires { 1 <= k <= 2000 }
+    ensures  { result = best_pair_sum_less_than nums k }
+    ensures  { valid_two_sum_less_than_k nums k result }
+  =
+    let r = best_pair_sum_less_than_impl nums k in
+    best_pair_sum_valid nums k;
+    r
+
+end

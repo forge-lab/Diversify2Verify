@@ -1,0 +1,198 @@
+module SumOfMutatedArrayClosestToTarget_List_Imperative_Implementation
+
+  use int.Int
+  use int.Abs
+  use int.EuclideanDivision
+  use int.MinMax
+  use list.List
+  use ref.Ref
+
+  let mutated_sum_with_cap (arr: list int) (cap: int) : int =
+    let total = ref 0 in
+    let cur = ref arr in
+    while (match !cur with Nil -> false | Cons _ _ -> true end) do
+      match !cur with
+      | Nil -> ()
+      | Cons x xs ->
+          total := !total + min x cap;
+          cur := xs
+      end
+    done;
+    !total
+
+  let max_value_in_list (arr: list int) : int =
+    let best = ref 0 in
+    let cur = ref arr in
+    while (match !cur with Nil -> false | Cons _ _ -> true end) do
+      match !cur with
+      | Nil -> ()
+      | Cons x xs ->
+          if x > !best then best := x;
+          cur := xs
+      end
+    done;
+    !best
+
+  let sum_of_mutated_array_closest_to_target_list (arr: list int) (target: int) : int =
+    let upper = max_value_in_list arr in
+    let low = ref 0 in
+    let high = ref upper in
+    while !low < !high do
+      let mid = !low + div (!high - !low) 2 in
+      let current_sum = mutated_sum_with_cap arr mid in
+      if current_sum < target then
+        low := mid + 1
+      else
+        high := mid
+    done;
+    let right = !low in
+    let left = if right = 0 then 0 else right - 1 in
+    let left_distance = abs (mutated_sum_with_cap arr left - target) in
+    let right_distance = abs (mutated_sum_with_cap arr right - target) in
+    if left_distance <= right_distance then left else right
+
+  let test_000 () : bool =
+    let arr = Cons 1 (Cons 2 (Cons 3 (Cons 4 (Cons 5 Nil)))) in
+    let r = sum_of_mutated_array_closest_to_target_list arr 11 in
+    r = 3
+
+  let test_001 () : bool =
+    let arr = Cons 5 (Cons 5 (Cons 5 (Cons 5 (Cons 5 Nil)))) in
+    let r = sum_of_mutated_array_closest_to_target_list arr 17 in
+    r = 3
+
+  let test_002 () : bool =
+    let arr = Cons 10 (Cons 20 (Cons 30 (Cons 40 (Cons 50 Nil)))) in
+    let r = sum_of_mutated_array_closest_to_target_list arr 100 in
+    r = 23
+
+  let test_003 () : bool =
+    let arr = Cons 2 (Cons 3 (Cons 5 Nil)) in
+    let r = sum_of_mutated_array_closest_to_target_list arr 10 in
+    r = 5
+
+  let test_004 () : bool =
+    let arr = Cons 9 (Cons 9 (Cons 9 (Cons 9 (Cons 9 Nil)))) in
+    let r = sum_of_mutated_array_closest_to_target_list arr 40 in
+    r = 8
+
+  let test_005 () : bool =
+    let arr = Cons 10000 (Cons 10000 (Cons 10000 Nil)) in
+    let r = sum_of_mutated_array_closest_to_target_list arr 10000 in
+    r = 3333
+
+  let test_006 () : bool =
+    let arr = Cons 99999 (Cons 99999 (Cons 99999 (Cons 99999 Nil))) in
+    let r = sum_of_mutated_array_closest_to_target_list arr 100000 in
+    r = 25000
+
+  let test_007 () : bool =
+    let arr = Cons 1 (Cons 2 (Cons 3 (Cons 4 (Cons 5 (Cons 6 (Cons 7 (Cons 8 (Cons 9 (Cons 10 Nil))))))))) in
+    let r = sum_of_mutated_array_closest_to_target_list arr 50 in
+    r = 7
+
+  let test_008 () : bool =
+    let arr = Cons 60864 (Cons 25176 (Cons 27249 (Cons 21296 (Cons 20204 Nil)))) in
+    let r = sum_of_mutated_array_closest_to_target_list arr 56803 in
+    r = 11361
+
+  let test_009 () : bool =
+    let arr = Cons 100000 (Cons 100000 (Cons 100000 Nil)) in
+    let r = sum_of_mutated_array_closest_to_target_list arr 100000 in
+    r = 33333
+
+  let test_010 () : bool =
+    let arr = Cons 100000 (Cons 100000 (Cons 100000 Nil)) in
+    let r = sum_of_mutated_array_closest_to_target_list arr 299999 in
+    r = 100000
+
+  let test_011 () : bool =
+    let arr = Cons 5 (Cons 5 (Cons 5 (Cons 5 (Cons 5 Nil)))) in
+    let r = sum_of_mutated_array_closest_to_target_list arr 20 in
+    r = 4
+
+  let test_012 () : bool =
+    let arr = Cons 10 (Cons 20 (Cons 30 Nil)) in
+    let r = sum_of_mutated_array_closest_to_target_list arr 25 in
+    r = 8
+
+  let test_013 () : bool =
+    let arr = Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 Nil)))) in
+    let r = sum_of_mutated_array_closest_to_target_list arr 3 in
+    r = 1
+
+  let test_014 () : bool =
+    let arr = Cons 1 (Cons 2 (Cons 3 (Cons 4 (Cons 5 Nil)))) in
+    let r = sum_of_mutated_array_closest_to_target_list arr 15 in
+    r = 5
+
+  let test_015 () : bool =
+    let arr = Cons 100000 (Cons 100000 (Cons 100000 Nil)) in
+    let r = sum_of_mutated_array_closest_to_target_list arr 250000 in
+    r = 83333
+
+  let test_016 () : bool =
+    let arr = Cons 4 (Cons 9 (Cons 3 Nil)) in
+    let r = sum_of_mutated_array_closest_to_target_list arr 10 in
+    r = 3
+
+  let test_017 () : bool =
+    let arr = Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 Nil)))) in
+    let r = sum_of_mutated_array_closest_to_target_list arr 5 in
+    r = 1
+
+  let test_018 () : bool =
+    let arr = Cons 10000 (Cons 20000 (Cons 30000 (Cons 40000 (Cons 50000 Nil)))) in
+    let r = sum_of_mutated_array_closest_to_target_list arr 100000 in
+    r = 23333
+
+  let test_019 () : bool =
+    let tail5 = Cons 10000 (Cons 10000 (Cons 10000 (Cons 10000 (Cons 10000 Nil)))) in
+    let arr = Cons 10000 (Cons 10000 (Cons 10000 (Cons 10000 (Cons 10000 tail5)))) in
+    let r = sum_of_mutated_array_closest_to_target_list arr 95000 in
+    r = 9500
+
+  let run_tests () : bool =
+    if test_000 () then
+    if test_001 () then
+    if test_002 () then
+    if test_003 () then
+    if test_004 () then
+    if test_005 () then
+    if test_006 () then
+    if test_007 () then
+    if test_008 () then
+    if test_009 () then
+    if test_010 () then
+    if test_011 () then
+    if test_012 () then
+    if test_013 () then
+    if test_014 () then
+    if test_015 () then
+    if test_016 () then
+    if test_017 () then
+    if test_018 () then
+    if test_019 () then
+      true
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+
+end

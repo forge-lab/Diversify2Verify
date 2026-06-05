@@ -1,0 +1,181 @@
+module FindTheScoreOfAllPrefixesOfAnArray_List_Stage3_Imperative
+
+  use int.Int
+  use int.MinMax
+  use list.List
+  use list.Length
+  use ref.Ref
+
+  let rec predicate values_in_domain (nums: list int)
+    variant { nums }
+  =
+    match nums with
+    | Nil -> true
+    | Cons x xs -> 1 <= x && x <= 1000000000 && values_in_domain xs
+    end
+
+  predicate valid_input (nums: list int) =
+    nums <> Nil /\ values_in_domain nums
+
+  let rec function prefix_scores_from
+    (nums: list int) (current_max: int) (running_score: int) : list int
+    variant { nums }
+  =
+    match nums with
+    | Nil -> Nil
+    | Cons x xs ->
+        let next_max = max current_max x in
+        let next_score = running_score + x + next_max in
+        Cons next_score (prefix_scores_from xs next_max next_score)
+    end
+
+  function prefix_scores (nums: list int) : list int =
+    match nums with
+    | Nil -> Nil
+    | Cons x xs ->
+        let first_score = x + x in
+        Cons first_score (prefix_scores_from xs x first_score)
+    end
+
+  predicate result_matches (nums: list int) (ans: list int) =
+    valid_input nums /\ ans = prefix_scores nums
+
+  let rec function rev_append (l: list int) (acc: list int) : list int
+    variant { l }
+  =
+    match l with
+    | Nil -> acc
+    | Cons x xs -> rev_append xs (Cons x acc)
+    end
+
+  function reverse_spec (l: list int) : list int =
+    rev_append l Nil
+
+  let rec function scores_rev_after
+    (nums: list int) (current_max: int) (running_score: int)
+    (scores_rev: list int) : list int
+    variant { nums }
+  =
+    match nums with
+    | Nil -> scores_rev
+    | Cons x xs ->
+        let next_max = max current_max x in
+        let next_score = running_score + x + next_max in
+        scores_rev_after xs next_max next_score (Cons next_score scores_rev)
+    end
+
+  let rec lemma scores_rev_after_to_prefix_scores_from
+    (nums: list int) (current_max: int) (running_score: int)
+    (scores_rev: list int)
+    ensures {
+      reverse_spec (scores_rev_after nums current_max running_score scores_rev) =
+      rev_append scores_rev (prefix_scores_from nums current_max running_score)
+    }
+    variant { nums }
+  =
+    match nums with
+    | Nil -> ()
+    | Cons x xs ->
+        let next_max = max current_max x in
+        let next_score = running_score + x + next_max in
+        scores_rev_after_to_prefix_scores_from xs next_max next_score
+          (Cons next_score scores_rev);
+        assert {
+          prefix_scores_from nums current_max running_score =
+          Cons next_score (prefix_scores_from xs next_max next_score)
+        };
+        assert {
+          rev_append (Cons next_score scores_rev)
+            (prefix_scores_from xs next_max next_score) =
+          rev_append scores_rev
+            (Cons next_score (prefix_scores_from xs next_max next_score))
+        }
+    end
+
+  let reverse_list (l: list int) : list int
+    ensures { result = reverse_spec l }
+  =
+    let acc = ref (Nil : list int) in
+    let cur = ref l in
+    while (match !cur with Nil -> false | Cons _ _ -> true end) do
+      invariant { rev_append !cur !acc = reverse_spec l }
+      variant { length !cur }
+      match !cur with
+      | Nil -> absurd
+      | Cons x xs ->
+          let old_acc = !acc in
+          acc := Cons x old_acc;
+          cur := xs;
+          assert {
+            rev_append !cur !acc = rev_append (Cons x xs) old_acc
+          }
+      end
+    done;
+    assert { !cur = Nil };
+    !acc
+
+  let find_the_score_of_all_prefixes_of_an_array_list
+    (nums: list int) : list int
+    requires { valid_input nums }
+    ensures  { result_matches nums result }
+  =
+    match nums with
+    | Nil -> absurd
+    | Cons first rest ->
+        let first_score = first + first in
+        let current_max = ref first in
+        let running_score = ref first_score in
+        let scores_rev = ref (Cons !running_score Nil) in
+        let cur = ref rest in
+        while (match !cur with Nil -> false | Cons _ _ -> true end) do
+          invariant {
+            scores_rev_after !cur !current_max !running_score !scores_rev =
+            scores_rev_after rest first first_score (Cons first_score Nil)
+          }
+          variant { length !cur }
+          match !cur with
+          | Nil -> absurd
+          | Cons x xs ->
+              let old_max = !current_max in
+              let old_score = !running_score in
+              let old_scores_rev = !scores_rev in
+              if x > old_max then begin
+                current_max := x;
+                assert { !current_max = max old_max x }
+              end else begin
+                assert { !current_max = old_max };
+                assert { !current_max = max old_max x }
+              end;
+              let next_score = old_score + x + !current_max in
+              running_score := next_score;
+              scores_rev := Cons next_score old_scores_rev;
+              cur := xs;
+              assert {
+                scores_rev_after !cur !current_max !running_score !scores_rev =
+                scores_rev_after (Cons x xs) old_max old_score old_scores_rev
+              }
+          end
+        done;
+        assert { !cur = Nil };
+        assert {
+          !scores_rev =
+          scores_rev_after rest first first_score (Cons first_score Nil)
+        };
+        scores_rev_after_to_prefix_scores_from rest first first_score
+          (Cons first_score Nil);
+        let result = reverse_list !scores_rev in
+        assert {
+          result =
+          rev_append (Cons first_score Nil)
+            (prefix_scores_from rest first first_score)
+        };
+        assert {
+          rev_append (Cons first_score Nil)
+            (prefix_scores_from rest first first_score) =
+          Cons first_score (prefix_scores_from rest first first_score)
+        };
+        assert { result = prefix_scores nums };
+        result
+    end
+
+end

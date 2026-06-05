@@ -1,0 +1,227 @@
+module MinimumCostToMakeArrayEqual_Array_Spec
+
+  use int.Int
+  use int.Abs
+  use array.Array
+  use list.List
+
+  predicate valid_inputs (nums: array int) (cost: array int) =
+    length nums = length cost /\
+    length nums > 0 /\
+    (forall i: int. 0 <= i < length nums -> nums[i] >= 1 /\ cost[i] >= 1)
+
+  let rec function weighted_equalization_cost_from
+      (nums: array int) (cost: array int) (target: int) (i: int) : int
+    requires { valid_inputs nums cost }
+    requires { 0 <= i <= length nums }
+    variant  { length nums - i }
+  =
+    if i = length nums then 0
+    else cost[i] * abs (nums[i] - target) +
+         weighted_equalization_cost_from nums cost target (i + 1)
+
+  function weighted_equalization_cost
+      (nums: array int) (cost: array int) (target: int) : int =
+    weighted_equalization_cost_from nums cost target 0
+
+  predicate minimum_weighted_equalization_cost
+      (nums: array int) (cost: array int) (best: int) =
+    valid_inputs nums cost /\
+    best >= 0 /\
+    (exists target: int.
+       best = weighted_equalization_cost nums cost target /\
+       (forall other: int.
+          weighted_equalization_cost nums cost target <=
+          weighted_equalization_cost nums cost other))
+
+  type weighted_entry = Entry int int
+
+  let function entry_value (entry: weighted_entry) : int =
+    match entry with
+    | Entry value _ -> value
+    end
+
+  let function entry_weight (entry: weighted_entry) : int =
+    match entry with
+    | Entry _ weight -> weight
+    end
+
+  let rec function all_weights_positive (xs: list weighted_entry) : bool
+    variant { xs }
+  =
+    match xs with
+    | Nil -> true
+    | Cons x rest -> entry_weight x >= 1 && all_weights_positive rest
+    end
+
+  let rec function sorted_by_value (xs: list weighted_entry) : bool
+    variant { xs }
+  =
+    match xs with
+    | Nil -> true
+    | Cons _ Nil -> true
+    | Cons x (Cons y rest) ->
+        entry_value x <= entry_value y && sorted_by_value (Cons y rest)
+    end
+
+  predicate entry_mem (entry: weighted_entry) (xs: list weighted_entry) =
+    match xs with
+    | Nil -> false
+    | Cons x rest -> x = entry \/ entry_mem entry rest
+    end
+
+  predicate entries_cover_inputs
+      (nums: array int) (cost: array int) (xs: list weighted_entry) =
+    forall i: int. 0 <= i < length nums -> entry_mem (Entry nums[i] cost[i]) xs
+
+  let rec function total_entry_cost
+      (xs: list weighted_entry) (target: int) : int
+    variant { xs }
+  =
+    match xs with
+    | Nil -> 0
+    | Cons x rest ->
+        entry_weight x * abs (entry_value x - target) +
+        total_entry_cost rest target
+    end
+
+  let rec function weighted_entries_from
+      (nums: array int) (cost: array int) (i: int) : list weighted_entry
+    requires { valid_inputs nums cost }
+    requires { 0 <= i <= length nums }
+    ensures  { all_weights_positive result = true }
+    variant  { length nums - i }
+  =
+    if i >= length nums then
+      Nil
+    else
+      Cons (Entry nums[i] cost[i]) (weighted_entries_from nums cost (i + 1))
+
+  let rec function insert_entry_sorted
+      (entry: weighted_entry) (xs: list weighted_entry) : list weighted_entry
+    requires { sorted_by_value xs = true }
+    ensures  { sorted_by_value result = true }
+    ensures  { entry_mem entry result }
+    ensures  { forall x: weighted_entry. entry_mem x xs -> entry_mem x result }
+    ensures  { forall x: weighted_entry. entry_mem x result -> x = entry \/ entry_mem x xs }
+    variant  { xs }
+  =
+    match xs with
+    | Nil -> Cons entry Nil
+    | Cons y ys ->
+        if entry_value entry <= entry_value y then
+          Cons entry xs
+        else
+          Cons y (insert_entry_sorted entry ys)
+    end
+
+  let rec function sort_entries (xs: list weighted_entry) : list weighted_entry
+    ensures { sorted_by_value result = true }
+    ensures { forall x: weighted_entry. entry_mem x result <-> entry_mem x xs }
+    variant { xs }
+  =
+    match xs with
+    | Nil -> Nil
+    | Cons x rest -> insert_entry_sorted x (sort_entries rest)
+    end
+
+  let rec function total_weight (xs: list weighted_entry) : int
+    ensures { all_weights_positive xs = true -> result >= 0 }
+    variant { xs }
+  =
+    match xs with
+    | Nil -> 0
+    | Cons x rest -> entry_weight x + total_weight rest
+    end
+
+  let rec function weighted_median_from
+      (xs: list weighted_entry) (prefix_weight: int) (all_weight: int) : int
+    variant { xs }
+  =
+    match xs with
+    | Nil -> 0
+    | Cons x rest ->
+        let next_weight = prefix_weight + entry_weight x in
+        if 2 * next_weight >= all_weight then
+          entry_value x
+        else
+          weighted_median_from rest next_weight all_weight
+    end
+
+  lemma sorted_insert_preserves_membership:
+    forall entry x: weighted_entry, xs: list weighted_entry.
+      sorted_by_value xs = true ->
+      (entry_mem x (insert_entry_sorted entry xs) <->
+       x = entry \/ entry_mem x xs)
+
+  lemma sort_entries_preserves_membership:
+    forall x: weighted_entry, xs: list weighted_entry.
+      entry_mem x (sort_entries xs) <-> entry_mem x xs
+
+  lemma weighted_entries_cover_all_inputs:
+    forall nums cost: array int.
+      valid_inputs nums cost ->
+      entries_cover_inputs nums cost (weighted_entries_from nums cost 0)
+
+  lemma sort_entries_cover_all_inputs:
+    forall nums cost: array int.
+      valid_inputs nums cost ->
+      entries_cover_inputs nums cost
+        (sort_entries (weighted_entries_from nums cost 0))
+
+  lemma sorted_generated_entries_cost_matches_array_cost:
+    forall nums cost: array int, target: int.
+      valid_inputs nums cost ->
+      total_entry_cost (sort_entries (weighted_entries_from nums cost 0)) target =
+      weighted_equalization_cost nums cost target
+
+  lemma weighted_median_from_sorted_minimizes_generated_entries:
+    forall nums cost: array int, xs: list weighted_entry, target: int.
+      valid_inputs nums cost ->
+      xs = sort_entries (weighted_entries_from nums cost 0) ->
+      sorted_by_value xs = true ->
+      all_weights_positive xs = true ->
+      target = weighted_median_from xs 0 (total_weight xs) ->
+      (forall other: int.
+         total_entry_cost xs target <= total_entry_cost xs other)
+
+  lemma weighted_median_algorithm_correct:
+    forall nums cost: array int, sorted_entries: list weighted_entry, target result: int.
+      valid_inputs nums cost ->
+      sorted_entries = sort_entries (weighted_entries_from nums cost 0) ->
+      target = weighted_median_from sorted_entries 0 (total_weight sorted_entries) ->
+      result = weighted_equalization_cost nums cost target ->
+      minimum_weighted_equalization_cost nums cost result
+
+  let minimum_cost_to_make_array_equal_array
+      (nums: array int) (cost: array int) : int
+    requires { valid_inputs nums cost }
+    ensures  { minimum_weighted_equalization_cost nums cost result }
+  =
+    let entries = weighted_entries_from nums cost 0 in
+    let sorted_entries = sort_entries entries in
+    let all_weight = total_weight sorted_entries in
+    let target = weighted_median_from sorted_entries 0 all_weight in
+    let result = weighted_equalization_cost_from nums cost target 0 in
+    assert { entries = weighted_entries_from nums cost 0 };
+    assert { sorted_entries = sort_entries (weighted_entries_from nums cost 0) };
+    assert { all_weight = total_weight sorted_entries };
+    assert { target = weighted_median_from sorted_entries 0 (total_weight sorted_entries) };
+    assert { result = weighted_equalization_cost nums cost target };
+    assert { all_weights_positive entries = true };
+    assert { all_weights_positive sorted_entries = true };
+    assert { entries_cover_inputs nums cost entries };
+    assert { entries_cover_inputs nums cost sorted_entries };
+    assert {
+      total_entry_cost sorted_entries target =
+      weighted_equalization_cost nums cost target
+    };
+    assert {
+      forall other: int.
+        total_entry_cost sorted_entries target <=
+        total_entry_cost sorted_entries other
+    };
+    assert { minimum_weighted_equalization_cost nums cost result };
+    result
+
+end

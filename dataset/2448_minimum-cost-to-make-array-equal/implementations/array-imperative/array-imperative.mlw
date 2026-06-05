@@ -1,0 +1,197 @@
+module MinimumCostToMakeArrayEqual_Array_Imperative_Implementation
+
+  use int.Int
+  use array.Array
+  use array.Init
+  use ref.Ref
+
+  predicate valid_inputs (nums: array int) (cost: array int) =
+    length nums = length cost /\
+    length nums > 0 /\
+    (forall i: int. 0 <= i < length nums -> nums[i] >= 1 /\ cost[i] >= 1)
+
+  let weighted_equalization_cost (nums: array int) (cost: array int) (target: int) : int
+    requires { valid_inputs nums cost }
+  =
+    let total = ref 0 in
+    for i = 0 to length nums - 1 do
+      let diff = if nums[i] >= target then nums[i] - target else target - nums[i] in
+      total := !total + cost[i] * diff
+    done;
+    !total
+
+  let minimum_cost_to_make_array_equal_array (nums: array int) (cost: array int) : int
+    requires { valid_inputs nums cost }
+  =
+    let best = ref (weighted_equalization_cost nums cost nums[0]) in
+    for i = 0 to length nums - 1 do
+      let candidate = weighted_equalization_cost nums cost nums[i] in
+      if candidate < !best then
+        best := candidate
+    done;
+    !best
+
+  let test_000 () : bool =
+    let nums = init 5 [|6; 1; 3; 9; 3|] in
+    let cost = init 5 [|2; 1; 2; 1; 2|] in
+    let r = minimum_cost_to_make_array_equal_array nums cost in
+    r = 14
+
+  let test_001 () : bool =
+    let nums = init 4 [|1; 3; 5; 2|] in
+    let cost = init 4 [|2; 3; 1; 14|] in
+    let r = minimum_cost_to_make_array_equal_array nums cost in
+    r = 8
+
+  let test_002 () : bool =
+    let nums = init 5 [|2; 2; 2; 2; 2|] in
+    let cost = init 5 [|4; 2; 8; 1; 3|] in
+    let r = minimum_cost_to_make_array_equal_array nums cost in
+    r = 0
+
+  let test_003 () : bool =
+    let nums = init 3 [|6; 1; 9|] in
+    let cost = init 3 [|2; 5; 7|] in
+    let r = minimum_cost_to_make_array_equal_array nums cost in
+    r = 46
+
+  let test_004 () : bool =
+    let nums = init 3 [|1; 2; 3|] in
+    let cost = init 3 [|1; 2; 3|] in
+    let r = minimum_cost_to_make_array_equal_array nums cost in
+    r = 4
+
+  let test_005 () : bool =
+    let nums = init 3 [|10; 1; 10|] in
+    let cost = init 3 [|1; 100; 1|] in
+    let r = minimum_cost_to_make_array_equal_array nums cost in
+    r = 18
+
+  let test_006 () : bool =
+    let nums = init 5 [|6; 1; 9; 8; 2|] in
+    let cost = init 5 [|4; 2; 8; 1; 3|] in
+    let r = minimum_cost_to_make_array_equal_array nums cost in
+    r = 48
+
+  let test_007 () : bool =
+    let nums = init 2 [|100000; 100000|] in
+    let cost = init 2 [|1000000; 1000000|] in
+    let r = minimum_cost_to_make_array_equal_array nums cost in
+    r = 0
+
+  let test_008 () : bool =
+    let nums = init 10 [|1; 1; 1; 1; 1; 1; 1; 1; 1; 1|] in
+    let cost = init 10 [|1; 1; 1; 1; 1; 1; 1; 1; 1; 1|] in
+    let r = minimum_cost_to_make_array_equal_array nums cost in
+    r = 0
+
+  let test_009 () : bool =
+    let nums = init 5 [|5; 5; 5; 5; 5|] in
+    let cost = init 5 [|10; 10; 10; 10; 10|] in
+    let r = minimum_cost_to_make_array_equal_array nums cost in
+    r = 0
+
+  let test_010 () : bool =
+    let nums = init 3 [|1; 2; 3|] in
+    let cost = init 3 [|1; 1; 1|] in
+    let r = minimum_cost_to_make_array_equal_array nums cost in
+    r = 2
+
+  let test_011 () : bool =
+    let nums = init 3 [|10; 5; 15|] in
+    let cost = init 3 [|1; 10; 1|] in
+    let r = minimum_cost_to_make_array_equal_array nums cost in
+    r = 15
+
+  let test_012 () : bool =
+    let nums = init 3 [|1; 2; 3|] in
+    let cost = init 3 [|9; 3; 5|] in
+    let r = minimum_cost_to_make_array_equal_array nums cost in
+    r = 13
+
+  let test_013 () : bool =
+    let nums = init 2 [|100000; 1000000|] in
+    let cost = init 2 [|100; 1|] in
+    let r = minimum_cost_to_make_array_equal_array nums cost in
+    r = 900000
+
+  let test_014 () : bool =
+    let nums = init 4 [|1000000; 1000000; 1000000; 1000000|] in
+    let cost = init 4 [|1000000; 1000000; 1000000; 1000000|] in
+    let r = minimum_cost_to_make_array_equal_array nums cost in
+    r = 0
+
+  let test_015 () : bool =
+    let nums = init 10 [|1; 1; 1; 1; 1; 1; 1; 1; 1; 1|] in
+    let cost = init 10 [|1; 2; 3; 4; 5; 6; 7; 8; 9; 10|] in
+    let r = minimum_cost_to_make_array_equal_array nums cost in
+    r = 0
+
+  let test_016 () : bool =
+    let nums = init 5 [|100; 200; 300; 400; 500|] in
+    let cost = init 5 [|5; 4; 3; 2; 1|] in
+    let r = minimum_cost_to_make_array_equal_array nums cost in
+    r = 1500
+
+  let test_017 () : bool =
+    let nums = init 20 [|1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1|] in
+    let cost = init 20 [|1; 2; 3; 4; 5; 6; 7; 8; 9; 10; 11; 12; 13; 14; 15; 16; 17; 18; 19; 20|] in
+    let r = minimum_cost_to_make_array_equal_array nums cost in
+    r = 0
+
+  let test_018 () : bool =
+    let nums = init 20 [|1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1|] in
+    let cost = init 20 [|1000; 2000; 3000; 4000; 5000; 6000; 7000; 8000; 9000; 10000; 11000; 12000; 13000; 14000; 15000; 16000; 17000; 18000; 19000; 20000|] in
+    let r = minimum_cost_to_make_array_equal_array nums cost in
+    r = 0
+
+  let test_019 () : bool =
+    let nums = init 15 [|10; 10; 10; 10; 10; 10; 10; 10; 10; 10; 10; 10; 10; 10; 10|] in
+    let cost = init 15 [|1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1|] in
+    let r = minimum_cost_to_make_array_equal_array nums cost in
+    r = 0
+
+  let run_tests () : bool =
+    if test_000 () then
+    if test_001 () then
+    if test_002 () then
+    if test_003 () then
+    if test_004 () then
+    if test_005 () then
+    if test_006 () then
+    if test_007 () then
+    if test_008 () then
+    if test_009 () then
+    if test_010 () then
+    if test_011 () then
+    if test_012 () then
+    if test_013 () then
+    if test_014 () then
+    if test_015 () then
+    if test_016 () then
+    if test_017 () then
+    if test_018 () then
+    if test_019 () then
+      true
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+
+end

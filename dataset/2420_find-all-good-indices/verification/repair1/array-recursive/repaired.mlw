@@ -1,0 +1,215 @@
+module FindAllGoodIndices_Array_Stage3
+
+  use int.Int
+  use int.NumOf as IntNumOf
+  use array.Array
+  use array.Init
+
+  predicate non_increasing_on (nums: array int) (lo: int) (hi: int) =
+    0 <= lo /\ lo <= hi /\ hi < length nums /\
+    forall j: int. lo <= j < hi -> nums[j] >= nums[j + 1]
+
+  predicate non_decreasing_on (nums: array int) (lo: int) (hi: int) =
+    0 <= lo /\ lo <= hi /\ hi < length nums /\
+    forall j: int. lo <= j < hi -> nums[j] <= nums[j + 1]
+
+  predicate good_index (nums: array int) (k: int) (i: int) =
+    k <= i < length nums - k /\
+    non_increasing_on nums (i - k) (i - 1) /\
+    non_decreasing_on nums (i + 1) (i + k)
+
+  predicate strictly_increasing_indices (a: array int) =
+    forall p q: int. 0 <= p < q < length a -> a[p] < a[q]
+
+  predicate result_is_good_indices
+    (nums: array int) (k: int) (result: array int) =
+    strictly_increasing_indices result /\
+    (forall p: int. 0 <= p < length result ->
+      good_index nums k result[p]) /\
+    (forall i: int. good_index nums k i ->
+      exists p: int. 0 <= p < length result /\ result[p] = i)
+
+  function good_count_from
+    (nums: array int) (k: int) (i: int) (upper: int) : int =
+    IntNumOf.numof (fun j -> good_index nums k j) i upper
+
+  let lemma good_count_from_good_step
+    (nums: array int) (k: int) (i: int) (upper: int)
+    requires { 1 <= k }
+    requires { k <= i < upper <= length nums - k }
+    requires { good_index nums k i }
+    ensures  {
+      good_count_from nums k i upper =
+        1 + good_count_from nums k (i + 1) upper
+    }
+  =
+    assert { not (i >= upper) }
+
+  let lemma good_count_from_bad_step
+    (nums: array int) (k: int) (i: int) (upper: int)
+    requires { 1 <= k }
+    requires { k <= i < upper <= length nums - k }
+    requires { not good_index nums k i }
+    ensures  {
+      good_count_from nums k i upper =
+        good_count_from nums k (i + 1) upper
+    }
+  =
+    assert { not (i >= upper) }
+
+  predicate filled_prefix
+    (nums: array int) (k: int) (lo: int) (i: int) (res: array int) (out: int) =
+    0 <= out <= length res /\
+    (forall p: int. 0 <= p < out ->
+      lo <= res[p] < i /\ good_index nums k res[p]) /\
+    (forall p q: int. 0 <= p < q < out -> res[p] < res[q]) /\
+    (forall idx: int. lo <= idx < i /\ good_index nums k idx ->
+      exists p: int. 0 <= p < out /\ res[p] = idx)
+
+  let lemma filled_prefix_covers_all_good_indices
+    (nums: array int) (k: int) (upper: int) (res: array int) (out: int)
+    requires { upper = length nums - k }
+    requires { filled_prefix nums k k upper res out }
+    ensures  {
+      forall idx: int. good_index nums k idx ->
+        exists p: int. 0 <= p < out /\ res[p] = idx
+    }
+  =
+    assert {
+      forall idx: int. good_index nums k idx ->
+        k <= idx < upper
+    }
+
+  let rec non_increasing_from (nums: array int) (j: int) (stop: int) : bool
+    requires { 0 <= j <= stop < length nums }
+    variant  { stop - j }
+    ensures  { result <-> non_increasing_on nums j stop }
+  =
+    if j >= stop then
+      true
+    else if nums[j] >= nums[j + 1] then
+      non_increasing_from nums (j + 1) stop
+    else
+      false
+
+  let rec non_decreasing_from (nums: array int) (j: int) (stop: int) : bool
+    requires { 0 <= j <= stop < length nums }
+    variant  { stop - j }
+    ensures  { result <-> non_decreasing_on nums j stop }
+  =
+    if j >= stop then
+      true
+    else if nums[j] <= nums[j + 1] then
+      non_decreasing_from nums (j + 1) stop
+    else
+      false
+
+  let is_good_index (nums: array int) (k: int) (i: int) : bool
+    requires { 1 <= k }
+    requires { k <= i < length nums - k }
+    ensures  { result <-> good_index nums k i }
+  =
+    non_increasing_from nums (i - k) (i - 1) &&
+    non_decreasing_from nums (i + 1) (i + k)
+
+  let rec count_good_from (nums: array int) (k: int) (i: int) (upper: int) : int
+    requires { 1 <= k }
+    requires { k <= i <= upper <= length nums - k }
+    variant  { upper - i }
+    ensures  { result = good_count_from nums k i upper }
+    ensures  { 0 <= result <= upper - i }
+  =
+    if i >= upper then
+      0
+    else
+      (if is_good_index nums k i then 1 else 0) +
+      count_good_from nums k (i + 1) upper
+
+  let rec fill_good_from
+    (nums: array int) (k: int) (i: int) (upper: int)
+    (res: array int) (out: int) : int
+    requires { 1 <= k }
+    requires { k <= i <= upper <= length nums - k }
+    requires { upper = length nums - k }
+    requires { 0 <= out <= length res }
+    requires { length res = out + good_count_from nums k i upper }
+    requires { filled_prefix nums k k i res out }
+    variant  { upper - i }
+    ensures  { result = length res }
+    ensures  { strictly_increasing_indices res }
+    ensures  {
+      forall p: int. 0 <= p < length res ->
+        good_index nums k res[p]
+    }
+    ensures  {
+      forall idx: int. good_index nums k idx ->
+        exists p: int. 0 <= p < length res /\ res[p] = idx
+    }
+  =
+    if i >= upper then
+      begin
+      assert { i = upper };
+      assert { good_count_from nums k i upper = 0 };
+      assert { out = length res };
+      assert { filled_prefix nums k k upper res out };
+      filled_prefix_covers_all_good_indices nums k upper res out;
+      assert {
+        forall idx: int. good_index nums k idx ->
+          exists p: int. 0 <= p < length res /\ res[p] = idx
+      };
+      out
+      end
+    else if is_good_index nums k i then begin
+      assert { i < upper };
+      assert { good_index nums k i };
+      good_count_from_good_step nums k i upper;
+      assert {
+        length res = (out + 1) + good_count_from nums k (i + 1) upper
+      };
+      assert { out < length res };
+      res[out] <- i;
+      assert { res[out] = i };
+      assert {
+        forall p: int. 0 <= p < out ->
+          k <= res[p] < i /\ good_index nums k res[p]
+      };
+      assert {
+        forall p: int. 0 <= p < out + 1 ->
+          k <= res[p] < i + 1 /\ good_index nums k res[p]
+      };
+      assert {
+        forall p q: int. 0 <= p < q < out + 1 -> res[p] < res[q]
+      };
+      assert {
+        forall idx: int. k <= idx < i + 1 /\ good_index nums k idx ->
+          exists p: int. 0 <= p < out + 1 /\ res[p] = idx
+      };
+      assert { filled_prefix nums k k (i + 1) res (out + 1) };
+      fill_good_from nums k (i + 1) upper res (out + 1)
+    end else begin
+      assert { i < upper };
+      assert { not good_index nums k i };
+      good_count_from_bad_step nums k i upper;
+      assert {
+        length res = out + good_count_from nums k (i + 1) upper
+      };
+      assert {
+        forall idx: int. k <= idx < i + 1 /\ good_index nums k idx ->
+          k <= idx < i
+      };
+      assert { filled_prefix nums k k (i + 1) res out };
+      fill_good_from nums k (i + 1) upper res out
+    end
+
+  let find_all_good_indices_array (nums: array int) (k: int) : array int
+    requires { 1 <= k }
+    requires { 2 * k <= length nums }
+    ensures  { result_is_good_indices nums k result }
+  =
+    let upper = length nums - k in
+    let count = count_good_from nums k k upper in
+    let result = make count 0 in
+    let _ = fill_good_from nums k k upper result 0 in
+    result
+
+end

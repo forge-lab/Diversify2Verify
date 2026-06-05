@@ -1,0 +1,76 @@
+module AppendKIntegersWithMinimalSum_List_Stage3_Recursive
+
+  use int.Int
+  use list.List
+  use list.Length
+  use list.Mem
+  use list.NumOcc
+  use list.Sum
+
+  predicate valid_append_choices (nums: list int) (chosen: list int) (k: int) =
+    length chosen = k /\
+    (forall x: int. mem x chosen ->
+      x > 0 /\ not (mem x nums) /\ num_occ x chosen = 1)
+
+  predicate append_k_minimal_sum (nums: list int) (k: int) (r: int) =
+    exists chosen: list int.
+      valid_append_choices nums chosen k /\
+      r = sum chosen /\
+      (forall other: list int. valid_append_choices nums other k -> r <= sum other)
+
+  let rec mem_int (x: int) (xs: list int) : bool
+    ensures { result <-> mem x xs }
+    variant { xs }
+  =
+    match xs with
+    | Nil -> false
+    | Cons y ys ->
+        if x = y then true else mem_int x ys
+    end
+
+  let rec count_distinct_positive_seen (seen: list int) (nums: list int) : int
+    ensures { result >= 0 }
+    variant { nums }
+  =
+    match nums with
+    | Nil -> 0
+    | Cons x xs ->
+        if x > 0 then
+          if mem_int x seen then
+            count_distinct_positive_seen seen xs
+          else
+            1 + count_distinct_positive_seen (Cons x seen) xs
+        else
+          count_distinct_positive_seen seen xs
+    end
+
+  let count_distinct_positive (nums: list int) : int
+    ensures { result >= 0 }
+  =
+    count_distinct_positive_seen Nil nums
+
+  let rec sum_missing_in_steps (nums: list int) (remaining: int) (candidate: int) (steps: int) : int
+    requires { remaining >= 0 }
+    requires { candidate > 0 }
+    requires { steps >= 0 }
+    ensures  { result >= 0 }
+    ensures  { remaining = 0 -> result = 0 }
+    variant { steps }
+  =
+    if remaining = 0 then
+      0
+    else if steps = 0 then
+      0
+    else if mem_int candidate nums then
+      sum_missing_in_steps nums remaining (candidate + 1) (steps - 1)
+    else
+      candidate + sum_missing_in_steps nums (remaining - 1) (candidate + 1) (steps - 1)
+
+  let append_k_integers_with_minimal_sum_list (nums: list int) (k: int) : int
+    requires { k >= 0 }
+    ensures  { append_k_minimal_sum nums k result }
+  =
+    let steps = k + count_distinct_positive nums in
+    sum_missing_in_steps nums k 1 steps
+
+end

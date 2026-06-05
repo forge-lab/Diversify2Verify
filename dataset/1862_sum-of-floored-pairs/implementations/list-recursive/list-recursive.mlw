@@ -1,0 +1,202 @@
+module SumOfFlooredPairs_List_Recursive_Implementation
+
+  use int.Int
+  use int.EuclideanDivision
+  use list.List
+  use list.Length
+
+  let result_modulus : int = 1000000007
+
+  let rec predicate all_values_in_range (l: list int)
+    variant { l }
+  =
+    match l with
+    | Nil -> true
+    | Cons x xs -> 1 <= x && x <= 100000 && all_values_in_range xs
+    end
+
+  predicate valid_problem_input (nums: list int) =
+    nums <> Nil /\
+    length nums <= 100000 /\
+    all_values_in_range nums
+
+  let rec row_floor_sum (x: int) (denoms: list int) : int
+    variant { denoms }
+  =
+    match denoms with
+    | Nil -> 0
+    | Cons y ys -> div x y + row_floor_sum x ys
+    end
+
+  let rec floored_pair_sum (nums: list int) (denoms: list int) : int
+    variant { nums }
+  =
+    match nums with
+    | Nil -> 0
+    | Cons x xs -> row_floor_sum x denoms + floored_pair_sum xs denoms
+    end
+
+  let sum_of_floored_pairs_list (nums: list int) : int
+    requires { valid_problem_input nums }
+  =
+    mod (floored_pair_sum nums nums) result_modulus
+
+  let test_000 () : bool =
+    let nums = Cons 7 (Cons 7 (Cons 7 (Cons 7 (Cons 7 (Cons 7 (Cons 7 Nil)))))) in
+    let r = sum_of_floored_pairs_list nums in
+    r = 49
+
+  let test_001 () : bool =
+    let nums =
+      Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1
+      (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 Nil))))))))) in
+    let r = sum_of_floored_pairs_list nums in
+    r = 100
+
+  let test_002 () : bool =
+    let nums = Cons 2 (Cons 5 (Cons 9 Nil)) in
+    let r = sum_of_floored_pairs_list nums in
+    r = 10
+
+  let test_003 () : bool =
+    let nums = Cons 100000 (Cons 1 (Cons 100000 Nil)) in
+    let r = sum_of_floored_pairs_list nums in
+    r = 200005
+
+  let test_004 () : bool =
+    let nums =
+      Cons 100000 (Cons 50000 (Cons 25000 (Cons 12500
+      (Cons 6250 Nil)))) in
+    let r = sum_of_floored_pairs_list nums in
+    r = 57
+
+  let test_005 () : bool =
+    let nums = Cons 5 (Cons 5 (Cons 5 (Cons 5 (Cons 5 (Cons 5 (Cons 5 (Cons 5 (Cons 5 (Cons 5 (Cons 5 (Cons 5 (Cons 5 (Cons 5 (Cons 5 (Cons 5 (Cons 5 (Cons 5 (Cons 5 (Cons 5 (Nil)))))))))))))))))))) in
+    let r = sum_of_floored_pairs_list nums in
+    r = 400
+
+  let test_006 () : bool =
+    let nums = Cons 10 (Cons 20 (Cons 30 (Cons 40 (Cons 50 Nil)))) in
+    let r = sum_of_floored_pairs_list nums in
+    r = 27
+
+  let test_007 () : bool =
+    let nums =
+      Cons 1 (Cons 3 (Cons 5 (Cons 7 (Cons 9
+      (Cons 11 (Cons 13 (Cons 15 (Cons 17 (Cons 19 Nil))))))))) in
+    let r = sum_of_floored_pairs_list nums in
+    r = 178
+
+  let test_008 () : bool =
+    let nums = Cons 1 (Cons 2 (Cons 3 (Cons 4 (Cons 5 Nil)))) in
+    let r = sum_of_floored_pairs_list nums in
+    r = 27
+
+  let test_009 () : bool =
+    let nums = Cons 100000 (Cons 100000 (Cons 100000 Nil)) in
+    let r = sum_of_floored_pairs_list nums in
+    r = 9
+
+  let test_010 () : bool =
+    let nums = Cons 1 (Cons 2 (Cons 4 (Cons 8 (Cons 16 (Cons 32 (Cons 64 (Cons 128 (Cons 256 (Cons 512 (Cons 1024 (Cons 2048 (Cons 4096 (Cons 8192 (Cons 16384 (Nil))))))))))))))) in
+    let r = sum_of_floored_pairs_list nums in
+    r = 65519
+
+  let test_011 () : bool =
+    let nums = Cons 99999 (Cons 99998 (Cons 99997 (Cons 99996 (Cons 99995 (Cons 99994 (Cons 99993 (Cons 99992 (Cons 99991 (Cons 99990 (Cons 99989 (Cons 99988 (Cons 99987 (Cons 99986 (Cons 99985 (Cons 99984 (Cons 99983 (Cons 99982 (Cons 99981 (Cons 99980 (Nil)))))))))))))))))))) in
+    let r = sum_of_floored_pairs_list nums in
+    r = 210
+
+  let test_012 () : bool =
+    let nums = Cons 5 (Cons 10 (Cons 15 (Cons 20 (Cons 25 (Cons 30 (Cons 35 (Cons 40 (Cons 45 (Cons 50 (Cons 55 (Cons 60 (Cons 65 (Cons 70 (Cons 75 (Cons 80 (Cons 85 (Cons 90 (Cons 95 (Cons 100 (Nil)))))))))))))))))))) in
+    let r = sum_of_floored_pairs_list nums in
+    r = 600
+
+  let test_013 () : bool =
+    let nums = Cons 100000 (Cons 90000 (Cons 80000 (Cons 70000 (Cons 60000 (Cons 50000 (Cons 40000 (Cons 30000 (Cons 20000 (Cons 10000 (Nil)))))))))) in
+    let r = sum_of_floored_pairs_list nums in
+    r = 127
+
+  let test_014 () : bool =
+    let nums = Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Nil))))))))))))))))))))))))))))))))))))))))))))))))))))))))) in
+    let r = sum_of_floored_pairs_list nums in
+    r = 3249
+
+  let test_016 () : bool =
+    let nums = Cons 1 (Cons 2 (Cons 3 (Cons 4 (Cons 5 (Cons 6 (Cons 7 (Cons 8 (Cons 9 (Cons 10 (Cons 11 (Cons 12 (Cons 13 (Cons 14 (Cons 15 (Cons 16 (Cons 17 (Cons 18 (Cons 19 (Cons 20 (Cons 21 (Cons 22 (Cons 23 (Cons 24 (Cons 25 (Cons 26 (Cons 27 (Cons 28 (Cons 29 (Cons 30 (Nil)))))))))))))))))))))))))))))) in
+    let r = sum_of_floored_pairs_list nums in
+    r = 1492
+
+  let test_017 () : bool =
+    let nums = Cons 100 (Cons 200 (Cons 300 (Cons 400 (Cons 500 (Cons 600 (Cons 700 (Cons 800 (Cons 900 (Cons 1000 (Nil)))))))))) in
+    let r = sum_of_floored_pairs_list nums in
+    r = 127
+
+  let test_018 () : bool =
+    let nums =
+      Cons 1 (Cons 1 (Cons 2 (Cons 2 (Cons 3
+      (Cons 3 (Cons 4 (Cons 4 (Cons 5 (Cons 5
+      (Cons 6 (Cons 6 (Cons 7 (Cons 7 (Cons 8
+      (Cons 8 (Cons 9 (Cons 9 (Cons 10 (Cons 10
+      (Cons 11 (Cons 11 (Cons 12 (Cons 12 (Cons 13
+      (Cons 13 (Cons 14 (Cons 14 (Cons 15 (Cons 15
+      (Cons 16 (Cons 16 (Cons 17 (Cons 17 (Cons 18
+      (Cons 18 (Cons 19 (Cons 19 (Cons 20
+      (Cons 20 Nil))))))))))))))))))))))))))))))))))))))) in
+    let r = sum_of_floored_pairs_list nums in
+    r = 2400
+
+  let test_020 () : bool =
+    let nums = Cons 1 (Cons 3 (Cons 5 (Cons 7 (Cons 9 (Cons 11 (Cons 13 (Cons 15 (Cons 17 (Cons 19 (Cons 21 (Cons 23 (Cons 25 (Cons 27 (Cons 29 (Cons 31 (Cons 33 (Cons 35 (Cons 37 (Cons 39 (Cons 41 (Cons 43 (Cons 45 (Cons 47 (Cons 49 (Cons 51 (Cons 53 (Cons 55 (Cons 57 (Cons 59 (Cons 61 (Cons 63 (Cons 65 (Cons 67 (Cons 69 (Cons 71 (Cons 73 (Cons 75 (Cons 77 (Cons 79 (Cons 81 (Cons 83 (Cons 85 (Cons 87 (Cons 89 (Cons 91 (Cons 93 (Cons 95 (Cons 97 (Cons 99 (Nil)))))))))))))))))))))))))))))))))))))))))))))))))) in
+    let r = sum_of_floored_pairs_list nums in
+    r = 6268
+
+  let test_021 () : bool =
+    let nums = Cons 1 (Cons 3 (Cons 5 (Cons 7 (Cons 9 (Cons 11 (Cons 13 (Cons 15 (Cons 17 (Cons 19 (Cons 21 (Cons 23 (Cons 25 (Cons 27 (Cons 29 (Cons 31 (Cons 33 (Cons 35 (Cons 37 (Cons 39 (Nil)))))))))))))))))))) in
+    let r = sum_of_floored_pairs_list nums in
+    r = 834
+
+  let run_tests () : bool =
+    if test_000 () then
+    if test_001 () then
+    if test_002 () then
+    if test_003 () then
+    if test_004 () then
+    if test_005 () then
+    if test_006 () then
+    if test_007 () then
+    if test_008 () then
+    if test_009 () then
+    if test_010 () then
+    if test_011 () then
+    if test_012 () then
+    if test_013 () then
+    if test_014 () then
+    if test_016 () then
+    if test_017 () then
+    if test_018 () then
+    if test_020 () then
+    if test_021 () then
+      true
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+
+end

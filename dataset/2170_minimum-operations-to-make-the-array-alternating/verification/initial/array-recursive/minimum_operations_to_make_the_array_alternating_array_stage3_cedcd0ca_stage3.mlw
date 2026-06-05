@@ -1,0 +1,102 @@
+module MinimumOperationsToMakeTheArrayAlternating_Array_Spec
+
+  use int.Int
+  use int.EuclideanDivision
+  use array.Array
+  use array.Init
+  use array.NumOf as ArrayNumOf
+
+  predicate valid_input (nums: array int) =
+    1 <= length nums <= 100000 /\
+    forall i: int. 0 <= i < length nums -> 1 <= nums[i] <= 100000
+
+  predicate valid_assignment (even_value: int) (odd_value: int) =
+    even_value > 0 /\ odd_value > 0 /\ even_value <> odd_value
+
+  predicate wrong_for_assignment
+    (i: int) (v: int) (even_value: int) (odd_value: int) =
+    (mod i 2 = 0 /\ v <> even_value) \/
+    (mod i 2 = 1 /\ v <> odd_value)
+
+  function changes_for_assignment
+    (nums: array int) (even_value: int) (odd_value: int) : int =
+    ArrayNumOf.numof
+      (fun i v -> wrong_for_assignment i v even_value odd_value)
+      nums 0 (length nums)
+
+  predicate optimal_alternating_operations (nums: array int) (res: int) =
+    res >= 0 /\
+    exists even_value odd_value: int.
+      valid_assignment even_value odd_value /\
+      res = changes_for_assignment nums even_value odd_value /\
+      forall other_even other_odd: int.
+        valid_assignment other_even other_odd ->
+        res <= changes_for_assignment nums other_even other_odd
+
+  let candidate_value (nums: array int) (k: int) : int
+    requires { 0 <= k <= length nums }
+    ensures  { k < length nums -> result = nums[k] }
+    ensures  { k = length nums -> result = 100001 }
+    ensures  { valid_input nums -> result > 0 }
+  =
+    if k < length nums then nums[k] else 100001
+
+  let rec changes_for_assignment_from
+    (nums: array int) (even_value: int) (odd_value: int) (i: int) : int
+    requires { 0 <= i <= length nums }
+    variant  { length nums - i }
+    ensures  { result >= 0 }
+    ensures  { i = 0 -> result = changes_for_assignment nums even_value odd_value }
+  =
+    if i >= length nums then
+      0
+    else
+      let wrong =
+        if mod i 2 = 0 then
+          if nums[i] = even_value then 0 else 1
+        else
+          if nums[i] = odd_value then 0 else 1
+      in
+      wrong + changes_for_assignment_from nums even_value odd_value (i + 1)
+
+  let rec best_odd_cost_from (nums: array int) (even_value: int) (odd_idx: int) : int
+    requires { valid_input nums }
+    requires { 0 <= odd_idx <= length nums + 1 }
+    requires { even_value > 0 }
+    variant  { (length nums + 1) - odd_idx }
+    ensures  { result >= 0 }
+    ensures  { result <= length nums + 1 }
+  =
+    if odd_idx = length nums + 1 then
+      length nums + 1
+    else
+      let rest = best_odd_cost_from nums even_value (odd_idx + 1) in
+      let odd_value = candidate_value nums odd_idx in
+      if even_value = odd_value then
+        rest
+      else
+        let current = changes_for_assignment_from nums even_value odd_value 0 in
+        if current < rest then current else rest
+
+  let rec best_total_cost_from (nums: array int) (even_idx: int) : int
+    requires { valid_input nums }
+    requires { 0 <= even_idx <= length nums + 1 }
+    variant  { (length nums + 1) - even_idx }
+    ensures  { result >= 0 }
+    ensures  { result <= length nums + 1 }
+  =
+    if even_idx = length nums + 1 then
+      length nums + 1
+    else
+      let rest = best_total_cost_from nums (even_idx + 1) in
+      let even_value = candidate_value nums even_idx in
+      let current = best_odd_cost_from nums even_value 0 in
+      if current < rest then current else rest
+
+  let minimum_operations_to_make_the_array_alternating_array (nums: array int) : int
+    requires { valid_input nums }
+    ensures  { optimal_alternating_operations nums result }
+  =
+    best_total_cost_from nums 0
+
+end

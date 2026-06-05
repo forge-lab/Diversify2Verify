@@ -1,0 +1,179 @@
+module SumOfFlooredPairs_List_Spec
+
+  use int.Int
+  use int.EuclideanDivision
+  use list.List
+  use list.Length
+
+  function result_modulus : int = 1000000007
+
+  let rec predicate all_values_in_range (l: list int)
+    variant { l }
+  =
+    match l with
+    | Nil -> true
+    | Cons x xs -> 1 <= x && x <= 100000 && all_values_in_range xs
+    end
+
+  predicate valid_problem_input (nums: list int) =
+    nums <> Nil /\
+    length nums <= 100000 /\
+    all_values_in_range nums
+
+  let rec function row_floor_sum (x: int) (denoms: list int) : int
+    variant { denoms }
+  =
+    match denoms with
+    | Nil -> 0
+    | Cons y ys -> div x y + row_floor_sum x ys
+    end
+
+  let rec function floored_pair_sum (nums: list int) (denoms: list int) : int
+    variant { nums }
+  =
+    match nums with
+    | Nil -> 0
+    | Cons x xs -> row_floor_sum x denoms + floored_pair_sum xs denoms
+    end
+
+  predicate sum_of_floored_pairs_list_spec (nums: list int) (res: int) =
+    res = mod (floored_pair_sum nums nums) result_modulus
+
+  val sum_of_floored_pairs_list (nums: list int) : int
+    requires { valid_problem_input nums }
+    ensures  { sum_of_floored_pairs_list_spec nums result }
+    ensures  { 0 <= result < result_modulus }
+
+  let lemma test_000_python_assertions () =
+    let nums =
+      Cons 7 (Cons 7 (Cons 7 (Cons 7 (Cons 7 (Cons 7 (Cons 7 Nil)))))) in
+    let t6 = Cons 7 Nil in
+    let t5 = Cons 7 t6 in
+    let t4 = Cons 7 t5 in
+    let t3 = Cons 7 t4 in
+    let t2 = Cons 7 t3 in
+    let t1 = Cons 7 t2 in
+    assert { valid_problem_input nums };
+    assert { row_floor_sum 7 nums = 7 };
+    assert { floored_pair_sum t6 nums = 7 };
+    assert { floored_pair_sum t5 nums = 14 };
+    assert { floored_pair_sum t4 nums = 21 };
+    assert { floored_pair_sum t3 nums = 28 };
+    assert { floored_pair_sum t2 nums = 35 };
+    assert { floored_pair_sum t1 nums = 42 };
+    assert { floored_pair_sum nums nums = 49 };
+    assert { sum_of_floored_pairs_list_spec nums 49 }
+
+  let lemma test_001_python_assertions () =
+    let nums =
+      Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1
+      (Cons 1 (Cons 1 (Cons 1 (Cons 1 (Cons 1 Nil))))))))) in
+    let t10 = Cons 1 Nil in
+    let t9 = Cons 1 t10 in
+    let t8 = Cons 1 t9 in
+    let t7 = Cons 1 t8 in
+    let t6 = Cons 1 t7 in
+    let t5 = Cons 1 t6 in
+    assert { valid_problem_input nums };
+    assert { row_floor_sum 1 nums = 10 };
+    assert { floored_pair_sum t10 nums = 10 };
+    assert { floored_pair_sum t9 nums = 20 };
+    assert { floored_pair_sum t8 nums = 30 };
+    assert { floored_pair_sum t7 nums = 40 };
+    assert { floored_pair_sum t6 nums = 50 };
+    assert { floored_pair_sum t5 nums = 60 };
+    assert { floored_pair_sum nums nums = 100 };
+    assert { sum_of_floored_pairs_list_spec nums 100 }
+
+  let lemma test_002_python_assertions () =
+    let nums = Cons 2 (Cons 5 (Cons 9 Nil)) in
+    let tail1 = Cons 5 (Cons 9 Nil) in
+    let tail2 = Cons 9 Nil in
+    assert { valid_problem_input nums };
+    assert { div 2 2 = 1 };
+    assert { div 2 5 = 0 };
+    assert { div 2 9 = 0 };
+    assert { row_floor_sum 2 nums = 1 };
+    assert { row_floor_sum 5 nums = 3 };
+    assert { row_floor_sum 9 nums = 6 };
+    assert { floored_pair_sum tail2 nums = 6 };
+    assert { floored_pair_sum tail1 nums = 9 };
+    assert { floored_pair_sum nums nums = 10 };
+    assert { sum_of_floored_pairs_list_spec nums 10 }
+
+  let lemma test_003_python_assertions () =
+    let nums = Cons 100000 (Cons 1 (Cons 100000 Nil)) in
+    let tail1 = Cons 1 (Cons 100000 Nil) in
+    let tail2 = Cons 100000 Nil in
+    assert { valid_problem_input nums };
+    assert { div 100000 100000 = 1 };
+    assert { div 100000 1 = 100000 };
+    assert { div 1 100000 = 0 };
+    assert { row_floor_sum 100000 nums = 100002 };
+    assert { row_floor_sum 1 nums = 1 };
+    assert { floored_pair_sum tail2 nums = 100002 };
+    assert { floored_pair_sum tail1 nums = 100003 };
+    assert { floored_pair_sum nums nums = 200005 };
+    assert { sum_of_floored_pairs_list_spec nums 200005 }
+
+  let lemma test_004_python_assertions () =
+    let nums =
+      Cons 100000 (Cons 50000 (Cons 25000 (Cons 12500
+      (Cons 6250 Nil)))) in
+    let tail1 =
+      Cons 50000 (Cons 25000 (Cons 12500 (Cons 6250 Nil))) in
+    let tail2 = Cons 25000 (Cons 12500 (Cons 6250 Nil)) in
+    let tail3 = Cons 12500 (Cons 6250 Nil) in
+    let tail4 = Cons 6250 Nil in
+    assert { valid_problem_input nums };
+    assert { row_floor_sum 100000 nums = 31 };
+    assert { row_floor_sum 50000 nums = 15 };
+    assert { row_floor_sum 25000 nums = 7 };
+    assert { row_floor_sum 12500 nums = 3 };
+    assert { row_floor_sum 6250 nums = 1 };
+    assert { floored_pair_sum tail4 nums = 1 };
+    assert { floored_pair_sum tail3 nums = 4 };
+    assert { floored_pair_sum tail2 nums = 11 };
+    assert { floored_pair_sum tail1 nums = 26 };
+    assert { floored_pair_sum nums nums = 57 };
+    assert { sum_of_floored_pairs_list_spec nums 57 }
+
+  let lemma test_006_python_assertions () =
+    let nums = Cons 10 (Cons 20 (Cons 30 (Cons 40 (Cons 50 Nil)))) in
+    let tail1 = Cons 20 (Cons 30 (Cons 40 (Cons 50 Nil))) in
+    let tail2 = Cons 30 (Cons 40 (Cons 50 Nil)) in
+    let tail3 = Cons 40 (Cons 50 Nil) in
+    let tail4 = Cons 50 Nil in
+    assert { valid_problem_input nums };
+    assert { row_floor_sum 10 nums = 1 };
+    assert { row_floor_sum 20 nums = 3 };
+    assert { row_floor_sum 30 nums = 5 };
+    assert { row_floor_sum 40 nums = 8 };
+    assert { row_floor_sum 50 nums = 10 };
+    assert { floored_pair_sum tail4 nums = 10 };
+    assert { floored_pair_sum tail3 nums = 18 };
+    assert { floored_pair_sum tail2 nums = 23 };
+    assert { floored_pair_sum tail1 nums = 26 };
+    assert { floored_pair_sum nums nums = 27 };
+    assert { sum_of_floored_pairs_list_spec nums 27 }
+
+  let lemma test_008_python_assertions () =
+    let nums = Cons 1 (Cons 2 (Cons 3 (Cons 4 (Cons 5 Nil)))) in
+    let tail1 = Cons 2 (Cons 3 (Cons 4 (Cons 5 Nil))) in
+    let tail2 = Cons 3 (Cons 4 (Cons 5 Nil)) in
+    let tail3 = Cons 4 (Cons 5 Nil) in
+    let tail4 = Cons 5 Nil in
+    assert { valid_problem_input nums };
+    assert { row_floor_sum 1 nums = 1 };
+    assert { row_floor_sum 2 nums = 3 };
+    assert { row_floor_sum 3 nums = 5 };
+    assert { row_floor_sum 4 nums = 8 };
+    assert { row_floor_sum 5 nums = 10 };
+    assert { floored_pair_sum tail4 nums = 10 };
+    assert { floored_pair_sum tail3 nums = 18 };
+    assert { floored_pair_sum tail2 nums = 23 };
+    assert { floored_pair_sum tail1 nums = 26 };
+    assert { floored_pair_sum nums nums = 27 };
+    assert { sum_of_floored_pairs_list_spec nums 27 }
+
+end

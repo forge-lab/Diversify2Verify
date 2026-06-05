@@ -1,0 +1,155 @@
+module MinimumDifferenceBetweenLargestAndSmallestValueInThreeMoves_List_Stage3_Imperative
+
+  use int.Int
+  use list.List
+  use list.Length
+  use list.Mem
+  use ref.Ref
+
+  predicate values_in_bounds (nums: list int) =
+    forall x: int. mem x nums -> -1000000000 <= x <= 1000000000
+
+  predicate valid_input (nums: list int) =
+    1 <= length nums <= 100000 /\
+    values_in_bounds nums
+
+  let rec function kept_count (nums: list int) (lo: int) (hi: int) : int
+    variant { nums }
+  =
+    match nums with
+    | Nil -> 0
+    | Cons x xs -> (if lo <= x <= hi then 1 else 0) + kept_count xs lo hi
+    end
+
+  predicate achievable_difference (nums: list int) (diff: int) =
+    0 <= diff /\
+    exists lo hi: int.
+      lo <= hi /\
+      hi - lo = diff /\
+      kept_count nums lo hi >= length nums - 3
+
+  predicate minimum_difference_between_largest_and_smallest_value_in_three_moves_list_spec
+      (nums: list int) (res: int) =
+    achievable_difference nums res /\
+    forall d: int. 0 <= d < res -> not (achievable_difference nums d)
+
+  let lemma singleton_interval_keeps_head (x: int) (xs: list int)
+    ensures { kept_count (Cons x xs) x x >= 1 }
+  =
+    assert { x <= x <= x }
+
+  let min2 (a: int) (b: int) : int
+    ensures { result = a \/ result = b }
+    ensures { result <= a /\ result <= b }
+  =
+    if a <= b then a else b
+
+  let min4 (a: int) (b: int) (c: int) (d: int) : int
+    ensures { result = a \/ result = b \/ result = c \/ result = d }
+    ensures { result <= a /\ result <= b /\ result <= c /\ result <= d }
+  =
+    min2 (min2 a b) (min2 c d)
+
+  let minimum_difference_between_largest_and_smallest_value_in_three_moves_list (nums: list int) : int
+    requires { valid_input nums }
+    ensures  { minimum_difference_between_largest_and_smallest_value_in_three_moves_list_spec nums result }
+  =
+    match nums with
+    | Nil -> 0
+    | _ ->
+        let seen = ref 0 in
+        let smallest_1 = ref 1000000001 in
+        let smallest_2 = ref 1000000001 in
+        let smallest_3 = ref 1000000001 in
+        let smallest_4 = ref 1000000001 in
+        let largest_1 = ref (-1000000001) in
+        let largest_2 = ref (-1000000001) in
+        let largest_3 = ref (-1000000001) in
+        let largest_4 = ref (-1000000001) in
+        let cur = ref nums in
+        while (match !cur with Nil -> false | Cons _ _ -> true end) do
+          invariant { 0 <= !seen <= length nums }
+          invariant { 0 <= length !cur }
+          invariant { !seen + length !cur = length nums }
+          invariant { !smallest_1 <= !smallest_2 <= !smallest_3 <= !smallest_4 }
+          invariant { !largest_1 >= !largest_2 >= !largest_3 >= !largest_4 }
+          variant { length !cur }
+
+          match !cur with
+          | Nil -> ()
+          | Cons x xs ->
+              seen := !seen + 1;
+              if x <= !smallest_1 then (
+                smallest_4 := !smallest_3;
+                smallest_3 := !smallest_2;
+                smallest_2 := !smallest_1;
+                smallest_1 := x
+              ) else if x <= !smallest_2 then (
+                smallest_4 := !smallest_3;
+                smallest_3 := !smallest_2;
+                smallest_2 := x
+              ) else if x <= !smallest_3 then (
+                smallest_4 := !smallest_3;
+                smallest_3 := x
+              ) else if x < !smallest_4 then
+                smallest_4 := x;
+              if x >= !largest_1 then (
+                largest_4 := !largest_3;
+                largest_3 := !largest_2;
+                largest_2 := !largest_1;
+                largest_1 := x
+              ) else if x >= !largest_2 then (
+                largest_4 := !largest_3;
+                largest_3 := !largest_2;
+                largest_2 := x
+              ) else if x >= !largest_3 then (
+                largest_4 := !largest_3;
+                largest_3 := x
+              ) else if x > !largest_4 then
+                largest_4 := x;
+              cur := xs
+          end
+        done;
+        match !cur with
+        | Nil ->
+            assert { !cur = Nil }
+        | Cons _ _ ->
+            absurd
+        end;
+        if !seen <= 4 then (
+          assert { length nums <= 4 };
+          match nums with
+          | Nil ->
+              absurd
+          | Cons h t ->
+              singleton_interval_keeps_head h t;
+              assert { kept_count nums h h >= 1 };
+              assert { length nums - 3 <= 1 };
+              assert { achievable_difference nums 0 };
+              assert { forall d: int. 0 <= d < 0 -> not (achievable_difference nums d) };
+              0
+          end
+        ) else
+        let diff_remove_three_largest = !largest_4 - !smallest_1 in
+        let diff_remove_two_largest = !largest_3 - !smallest_2 in
+        let diff_remove_one_largest = !largest_2 - !smallest_3 in
+        let diff_remove_three_smallest = !largest_1 - !smallest_4 in
+        let result =
+          min4 diff_remove_three_largest diff_remove_two_largest
+            diff_remove_one_largest diff_remove_three_smallest in
+        assert {
+          result = diff_remove_three_largest \/
+          result = diff_remove_two_largest \/
+          result = diff_remove_one_largest \/
+          result = diff_remove_three_smallest
+        };
+        assert {
+          result <= diff_remove_three_largest /\
+          result <= diff_remove_two_largest /\
+          result <= diff_remove_one_largest /\
+          result <= diff_remove_three_smallest
+        };
+        result
+    end
+
+end

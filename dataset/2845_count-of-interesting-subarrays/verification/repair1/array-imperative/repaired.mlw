@@ -1,0 +1,182 @@
+module CountOfInterestingSubarrays_Array_Spec
+
+  use int.Int
+  use int.EuclideanDivision
+  use array.Array
+  use array.Init
+  use ref.Ref
+
+  predicate valid_input (nums: array int) (modulo: int) (k: int) =
+    1 <= length nums <= 100000 /\
+    1 <= modulo <= 1000000000 /\
+    0 <= k < modulo /\
+    forall i: int. 0 <= i < length nums -> 1 <= nums[i] <= 1000000000
+
+  predicate matches_mod (nums: array int) (modulo: int) (k: int) (i: int) =
+    if 1 <= modulo /\ 0 <= i < length nums then
+      mod nums[i] modulo = k
+    else
+      false
+
+  let rec function matching_index_count
+    (nums: array int) (modulo: int) (k: int) (l: int) (r: int) : int
+    requires { 1 <= modulo }
+    requires { 0 <= l <= r + 1 <= length nums }
+    variant  { r + 1 - l }
+  =
+    if l = r + 1 then 0
+    else
+      (if mod nums[l] modulo = k then 1 else 0) +
+      matching_index_count nums modulo k (l + 1) r
+
+  predicate interesting_subarray
+    (nums: array int) (modulo: int) (k: int) (l: int) (r: int) =
+    if 1 <= modulo /\ 0 <= l <= r < length nums then
+      mod (matching_index_count nums modulo k l r) modulo = k
+    else
+      false
+
+  let rec function interesting_right_count_from
+    (nums: array int) (modulo: int) (k: int) (l: int) (r: int) : int
+    requires { 1 <= modulo }
+    requires { 0 <= l <= r <= length nums }
+    variant  { length nums - r }
+  =
+    if r = length nums then 0
+    else
+      (if mod (matching_index_count nums modulo k l r) modulo = k then 1 else 0) +
+      interesting_right_count_from nums modulo k l (r + 1)
+
+  let function interesting_right_count
+    (nums: array int) (modulo: int) (k: int) (l: int) : int
+    requires { 1 <= modulo }
+    requires { 0 <= l <= length nums }
+  =
+    interesting_right_count_from nums modulo k l l
+
+  let rec function interesting_subarray_total_from
+    (nums: array int) (modulo: int) (k: int) (l: int) : int
+    requires { 1 <= modulo }
+    requires { 0 <= l <= length nums }
+    variant  { length nums - l }
+  =
+    if l = length nums then 0
+    else
+      interesting_right_count nums modulo k l +
+      interesting_subarray_total_from nums modulo k (l + 1)
+
+  let function interesting_subarray_total
+    (nums: array int) (modulo: int) (k: int) : int
+    requires { 1 <= modulo }
+  =
+    interesting_subarray_total_from nums modulo k 0
+
+  let function matching_index_count_until
+    (nums: array int) (modulo: int) (k: int) (l: int) (r: int) : int
+    requires { 1 <= modulo }
+    requires { 0 <= l <= r <= length nums }
+  =
+    if l = r then 0
+    else matching_index_count nums modulo k l (r - 1)
+
+  let rec function interesting_right_count_prefix_from
+    (nums: array int) (modulo: int) (k: int) (l: int) (r: int) : int
+    requires { 1 <= modulo }
+    requires { 0 <= l <= r <= length nums }
+    variant  { r - l }
+  =
+    if r = l then 0
+    else
+      interesting_right_count_prefix_from nums modulo k l (r - 1) +
+      (if mod (matching_index_count_until nums modulo k l r) modulo = k then 1 else 0)
+
+  let rec function interesting_subarray_total_prefix
+    (nums: array int) (modulo: int) (k: int) (l: int) : int
+    requires { 1 <= modulo }
+    requires { 0 <= l <= length nums }
+    variant  { l }
+  =
+    if l = 0 then 0
+    else
+      interesting_subarray_total_prefix nums modulo k (l - 1) +
+      interesting_right_count nums modulo k (l - 1)
+
+  let rec lemma matching_index_count_extend_right
+    (nums: array int) (modulo: int) (k: int) (l: int) (r: int)
+    requires { 1 <= modulo }
+    requires { 0 <= l <= r < length nums }
+    ensures  {
+      matching_index_count_until nums modulo k l (r + 1) =
+      matching_index_count_until nums modulo k l r +
+      (if mod nums[r] modulo = k then 1 else 0)
+    }
+    variant  { r - l }
+  =
+    if l < r then begin
+      matching_index_count_extend_right nums modulo k (l + 1) r;
+      assert { 0 <= l <= r - 1 < length nums };
+      assert {
+        matching_index_count_until nums modulo k l r =
+        (if mod nums[l] modulo = k then 1 else 0) +
+        matching_index_count_until nums modulo k (l + 1) r
+      };
+      assert {
+        matching_index_count_until nums modulo k l (r + 1) =
+        (if mod nums[l] modulo = k then 1 else 0) +
+        matching_index_count_until nums modulo k (l + 1) (r + 1)
+      }
+    end
+
+  let count_of_interesting_subarrays_array
+    (nums: array int) (modulo: int) (k: int) : int
+    requires { valid_input nums modulo k }
+    ensures  { result = interesting_subarray_total nums modulo k }
+  =
+    assert { 1 <= modulo };
+    let total = ref 0 in
+    let n = length nums in
+    assert { 1 <= n };
+    for l = 0 to n - 1 do
+      invariant { 0 <= l <= n }
+      invariant { n = length nums }
+      invariant { !total = interesting_subarray_total_prefix nums modulo k l }
+
+      let matching = ref 0 in
+      assert { matching_index_count_until nums modulo k l l = 0 };
+      for r = l to n - 1 do
+        invariant { 0 <= l <= r <= n }
+        invariant { n = length nums }
+        invariant { !matching = matching_index_count_until nums modulo k l r }
+        invariant {
+          !total =
+          interesting_subarray_total_prefix nums modulo k l +
+          interesting_right_count_prefix_from nums modulo k l r
+        }
+
+        if mod nums[r] modulo = k then
+          matching := !matching + 1;
+        matching_index_count_extend_right nums modulo k l r;
+        assert { !matching = matching_index_count_until nums modulo k l (r + 1) };
+
+        if mod !matching modulo = k then
+          total := !total + 1;
+        assert {
+          !total =
+          interesting_subarray_total_prefix nums modulo k l +
+          interesting_right_count_prefix_from nums modulo k l (r + 1)
+        }
+      done;
+
+      assert {
+        !total =
+        interesting_subarray_total_prefix nums modulo k l +
+        interesting_right_count_prefix_from nums modulo k l n
+      };
+      assert { !total = interesting_subarray_total_prefix nums modulo k (l + 1) }
+    done;
+
+    assert { !total = interesting_subarray_total_prefix nums modulo k n };
+    assert { interesting_subarray_total_prefix nums modulo k n = interesting_subarray_total nums modulo k };
+    !total
+
+end

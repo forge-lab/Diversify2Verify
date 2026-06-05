@@ -1,0 +1,196 @@
+module PartitionArraySuchThatMaximumDifferenceIsK_Array_Spec
+
+  use int.Int
+  use array.Array
+  use array.Init
+
+  predicate same_group_range_ok (nums: array int) (k: int) (labels: array int) =
+    forall i j: int.
+      0 <= i < length nums ->
+      0 <= j < length nums ->
+      labels[i] = labels[j] ->
+      nums[i] - nums[j] <= k /\ nums[j] - nums[i] <= k
+
+  predicate valid_group_labels (nums: array int) (k: int) (groups: int) (labels: array int) =
+    length labels = length nums /\
+    0 <= groups /\
+    (forall i: int. 0 <= i < length nums -> 0 <= labels[i] < groups) /\
+    (forall g: int. 0 <= g < groups ->
+       exists i: int. 0 <= i < length nums /\ labels[i] = g) /\
+    same_group_range_ok nums k labels
+
+  predicate can_partition_with (nums: array int) (k: int) (groups: int) =
+    exists labels: array int. valid_group_labels nums k groups labels
+
+  predicate minimum_partition_count (nums: array int) (k: int) (result: int) =
+    0 <= result <= length nums /\
+    can_partition_with nums k result /\
+    (forall groups: int. 0 <= groups < result ->
+       not (can_partition_with nums k groups))
+
+  val partition_array_such_that_maximum_difference_is_k_array (nums: array int) (k: int) : int
+    requires { 0 <= k }
+    ensures  { minimum_partition_count nums k result }
+
+  let lemma test_000_partition_array_such_that_maximum_difference_is_k () =
+    let nums = init 2 [|1; 100000|] in
+    let labels = init 2 [|0; 0|] in
+    assert { length nums = 2 };
+    assert { nums[0] = 1 };
+    assert { nums[1] = 100000 };
+    assert { length labels = 2 };
+    assert { labels[0] = 0 };
+    assert { labels[1] = 0 };
+    assert {
+      forall i: int. 0 <= i < length nums ->
+        i = 0 \/ i = 1
+    };
+    assert { same_group_range_ok nums 99999 labels };
+    assert { valid_group_labels nums 99999 1 labels };
+    assert { can_partition_with nums 99999 1 };
+    assert { minimum_partition_count nums 99999 1 }
+
+  let lemma test_004_partition_array_such_that_maximum_difference_is_k () =
+    let nums = init 5 [|5; 5; 5; 5; 5|] in
+    let labels = init 5 [|0; 0; 0; 0; 0|] in
+    assert { length nums = 5 };
+    assert { nums[0] = 5 };
+    assert { nums[1] = 5 };
+    assert { nums[2] = 5 };
+    assert { nums[3] = 5 };
+    assert { nums[4] = 5 };
+    assert { length labels = 5 };
+    assert { labels[0] = 0 };
+    assert { labels[1] = 0 };
+    assert { labels[2] = 0 };
+    assert { labels[3] = 0 };
+    assert { labels[4] = 0 };
+    assert {
+      forall i: int. 0 <= i < length nums ->
+        i = 0 \/ i = 1 \/ i = 2 \/ i = 3 \/ i = 4
+    };
+    assert { same_group_range_ok nums 0 labels };
+    assert { valid_group_labels nums 0 1 labels };
+    assert { can_partition_with nums 0 1 };
+    assert { minimum_partition_count nums 0 1 }
+
+  let lemma test_005_partition_array_such_that_maximum_difference_is_k () =
+    let nums = init 3 [|1; 2; 3|] in
+    let labels = init 3 [|0; 0; 1|] in
+    assert { length nums = 3 };
+    assert { nums[0] = 1 };
+    assert { nums[1] = 2 };
+    assert { nums[2] = 3 };
+    assert { length labels = 3 };
+    assert { labels[0] = 0 };
+    assert { labels[1] = 0 };
+    assert { labels[2] = 1 };
+    assert {
+      forall i: int. 0 <= i < length nums ->
+        i = 0 \/ i = 1 \/ i = 2
+    };
+    assert { same_group_range_ok nums 1 labels };
+    assert { valid_group_labels nums 1 2 labels };
+    assert { can_partition_with nums 1 2 };
+    assert { not (can_partition_with nums 1 1) };
+    assert { minimum_partition_count nums 1 2 }
+
+  let lemma test_006_partition_array_such_that_maximum_difference_is_k () =
+    let nums = init 5 [|1; 3; 5; 7; 9|] in
+    let labels = init 5 [|0; 1; 2; 3; 4|] in
+    assert { length nums = 5 };
+    assert { nums[0] = 1 };
+    assert { nums[1] = 3 };
+    assert { nums[2] = 5 };
+    assert { nums[3] = 7 };
+    assert { nums[4] = 9 };
+    assert { length labels = 5 };
+    assert { labels[0] = 0 };
+    assert { labels[1] = 1 };
+    assert { labels[2] = 2 };
+    assert { labels[3] = 3 };
+    assert { labels[4] = 4 };
+    assert {
+      forall i: int. 0 <= i < length nums ->
+        i = 0 \/ i = 1 \/ i = 2 \/ i = 3 \/ i = 4
+    };
+    assert { same_group_range_ok nums 1 labels };
+    assert { valid_group_labels nums 1 5 labels };
+    assert { can_partition_with nums 1 5 };
+    assert { not (can_partition_with nums 1 4) };
+    assert { minimum_partition_count nums 1 5 }
+
+  let lemma test_009_partition_array_such_that_maximum_difference_is_k () =
+    let nums = init 5 [|3; 6; 1; 2; 5|] in
+    let labels = init 5 [|0; 1; 0; 0; 1|] in
+    assert { length nums = 5 };
+    assert { nums[0] = 3 };
+    assert { nums[1] = 6 };
+    assert { nums[2] = 1 };
+    assert { nums[3] = 2 };
+    assert { nums[4] = 5 };
+    assert { length labels = 5 };
+    assert { labels[0] = 0 };
+    assert { labels[1] = 1 };
+    assert { labels[2] = 0 };
+    assert { labels[3] = 0 };
+    assert { labels[4] = 1 };
+    assert {
+      forall i: int. 0 <= i < length nums ->
+        i = 0 \/ i = 1 \/ i = 2 \/ i = 3 \/ i = 4
+    };
+    assert { same_group_range_ok nums 2 labels };
+    assert { valid_group_labels nums 2 2 labels };
+    assert { can_partition_with nums 2 2 };
+    assert { not (can_partition_with nums 2 1) };
+    assert { minimum_partition_count nums 2 2 }
+
+  let lemma test_011_partition_array_such_that_maximum_difference_is_k () =
+    let nums = init 4 [|2; 2; 4; 5|] in
+    let labels = init 4 [|0; 0; 1; 2|] in
+    assert { length nums = 4 };
+    assert { nums[0] = 2 };
+    assert { nums[1] = 2 };
+    assert { nums[2] = 4 };
+    assert { nums[3] = 5 };
+    assert { length labels = 4 };
+    assert { labels[0] = 0 };
+    assert { labels[1] = 0 };
+    assert { labels[2] = 1 };
+    assert { labels[3] = 2 };
+    assert {
+      forall i: int. 0 <= i < length nums ->
+        i = 0 \/ i = 1 \/ i = 2 \/ i = 3
+    };
+    assert { same_group_range_ok nums 0 labels };
+    assert { valid_group_labels nums 0 3 labels };
+    assert { can_partition_with nums 0 3 };
+    assert { not (can_partition_with nums 0 2) };
+    assert { minimum_partition_count nums 0 3 }
+
+  let lemma test_013_partition_array_such_that_maximum_difference_is_k () =
+    let nums = init 5 [|5; 4; 3; 2; 1|] in
+    let labels = init 5 [|0; 0; 0; 0; 1|] in
+    assert { length nums = 5 };
+    assert { nums[0] = 5 };
+    assert { nums[1] = 4 };
+    assert { nums[2] = 3 };
+    assert { nums[3] = 2 };
+    assert { nums[4] = 1 };
+    assert { length labels = 5 };
+    assert { labels[0] = 0 };
+    assert { labels[1] = 0 };
+    assert { labels[2] = 0 };
+    assert { labels[3] = 0 };
+    assert { labels[4] = 1 };
+    assert {
+      forall i: int. 0 <= i < length nums ->
+        i = 0 \/ i = 1 \/ i = 2 \/ i = 3 \/ i = 4
+    };
+    assert { same_group_range_ok nums 3 labels };
+    assert { valid_group_labels nums 3 2 labels };
+    assert { can_partition_with nums 3 2 };
+    assert { not (can_partition_with nums 3 1) };
+    assert { minimum_partition_count nums 3 2 }
+
+end

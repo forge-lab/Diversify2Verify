@@ -1,0 +1,225 @@
+module ReducingDishes_List_Stage3_Imperative
+
+  use int.Int
+  use list.List
+  use list.NumOcc
+  use list.Length
+  use ref.Ref
+
+  let rec function like_time_from (time: int) (cooked: list int) : int
+    variant { cooked }
+  =
+    match cooked with
+    | Nil -> 0
+    | Cons x xs -> time * x + like_time_from (time + 1) xs
+    end
+
+  function like_time (cooked: list int) : int =
+    like_time_from 1 cooked
+
+  let rec function sum_list (l: list int) : int
+    variant { l }
+  =
+    match l with
+    | Nil -> 0
+    | Cons x xs -> x + sum_list xs
+    end
+
+  let rec lemma like_time_shift (time: int) (cooked: list int)
+    ensures { like_time_from (time + 1) cooked =
+              like_time_from time cooked + sum_list cooked }
+    variant { cooked }
+  =
+    match cooked with
+    | Nil -> ()
+    | Cons _ xs -> like_time_shift (time + 1) xs
+    end
+
+  let lemma like_time_cons_sum (x: int) (cooked: list int)
+    ensures { like_time (Cons x cooked) =
+              like_time cooked + x + sum_list cooked }
+  =
+    like_time_shift 1 cooked
+
+  predicate sub_multiset (chosen: list int) (available: list int) =
+    forall x: int. num_occ x chosen <= num_occ x available
+
+  predicate max_like_time (satisfaction: list int) (best: int) =
+    (exists cooked: list int.
+       sub_multiset cooked satisfaction /\
+       best = like_time cooked) /\
+    (forall other: list int.
+       sub_multiset other satisfaction -> like_time other <= best)
+
+  predicate upper_bounds_all_choices (satisfaction: list int) (best: int) =
+    forall other: list int.
+      sub_multiset other satisfaction -> like_time other <= best
+
+  let rec function nonincreasing (l: list int) : bool
+    variant { l }
+  =
+    match l with
+    | Nil -> true
+    | Cons _ Nil -> true
+    | Cons x (Cons y ys) ->
+        if y <= x then nonincreasing (Cons y ys) else false
+    end
+
+  let rec function greedy_choice_from
+      (running: int) (chosen: list int) (remaining: list int) : list int
+    variant { remaining }
+  =
+    match remaining with
+    | Nil -> chosen
+    | Cons x xs ->
+        if running + x > 0 then
+          greedy_choice_from (running + x) (Cons x chosen) xs
+        else
+          chosen
+    end
+
+  let rec function greedy_score_from
+      (running: int) (total: int) (remaining: list int) : int
+    variant { remaining }
+  =
+    match remaining with
+    | Nil -> total
+    | Cons x xs ->
+        if running + x > 0 then
+          greedy_score_from (running + x) (total + running + x) xs
+        else
+          total
+    end
+
+  predicate greedy_descending_solution
+      (descending chosen: list int) (best: int) =
+    nonincreasing descending = true /\
+    chosen = greedy_choice_from 0 Nil descending /\
+    best = greedy_score_from 0 0 descending
+
+  let lemma max_like_time_intro (satisfaction witness: list int) (best: int)
+    requires { sub_multiset witness satisfaction }
+    requires { best = like_time witness }
+    requires { upper_bounds_all_choices satisfaction best }
+    ensures  { max_like_time satisfaction best }
+  = ()
+
+  let lemma greedy_descending_optimality_bridge
+      (satisfaction descending chosen: list int) (best: int)
+    requires { forall v: int. num_occ v descending = num_occ v satisfaction }
+    requires { greedy_descending_solution descending chosen best }
+    requires { sub_multiset chosen satisfaction }
+    requires { best = like_time chosen }
+    ensures  { upper_bounds_all_choices satisfaction best }
+  = ()
+
+  let rec function insert_sorted (x: int) (l: list int) : list int
+    ensures { forall v: int. num_occ v result = num_occ v (Cons x l) }
+    variant { l }
+  =
+    match l with
+    | Nil -> Cons x Nil
+    | Cons y ys ->
+        if x <= y then
+          Cons x l
+        else
+          let inserted_tail = insert_sorted x ys in
+          assert { forall v: int.
+            num_occ v inserted_tail = num_occ v (Cons x ys) };
+          assert { forall v: int.
+            num_occ v (Cons y inserted_tail) =
+            num_occ v (Cons y (Cons x ys)) };
+          assert { forall v: int.
+            num_occ v (Cons y (Cons x ys)) =
+            num_occ v (Cons x (Cons y ys)) };
+          Cons y inserted_tail
+    end
+
+  let reverse_list (l: list int) : list int =
+    ensures { forall v: int. num_occ v result = num_occ v l }
+    let acc = ref Nil in
+    let cur = ref l in
+    while (match !cur with Nil -> false | Cons _ _ -> true end) do
+      invariant { 0 <= length !cur }
+      invariant { forall v: int. num_occ v !acc + num_occ v !cur = num_occ v l }
+      variant { length !cur }
+
+      match !cur with
+      | Nil -> ()
+      | Cons x xs ->
+          acc := Cons x !acc;
+          cur := xs
+      end
+    done;
+    assert { !cur = Nil };
+    !acc
+
+  let sort_list (l: list int) : list int =
+    ensures { forall v: int. num_occ v result = num_occ v l }
+    let sorted = ref Nil in
+    let cur = ref l in
+    while (match !cur with Nil -> false | Cons _ _ -> true end) do
+      invariant { 0 <= length !cur }
+      invariant { forall v: int. num_occ v !sorted + num_occ v !cur = num_occ v l }
+      variant { length !cur }
+
+      match !cur with
+      | Nil -> ()
+      | Cons x xs ->
+          sorted := insert_sorted x !sorted;
+          cur := xs
+      end
+    done;
+    assert { !cur = Nil };
+    !sorted
+
+  let reducing_dishes_list (satisfaction: list int) : int
+    ensures { max_like_time satisfaction result }
+  =
+    let descending = reverse_list (sort_list satisfaction) in
+    let running_sum = ref 0 in
+    let total = ref 0 in
+    let chosen = ref Nil in
+    let cur = ref descending in
+    assert { forall v: int. num_occ v descending = num_occ v satisfaction };
+    while (match !cur with Nil -> false | Cons _ _ -> true end) do
+      invariant { 0 <= length !cur }
+      invariant { !running_sum = sum_list !chosen }
+      invariant { !total = like_time !chosen }
+      invariant { forall v: int.
+        num_occ v !chosen + num_occ v !cur <= num_occ v satisfaction }
+      variant { length !cur }
+
+      match !cur with
+      | Nil -> ()
+      | Cons x xs ->
+          let next_sum = !running_sum + x in
+          if next_sum > 0 then begin
+            assert { next_sum > 0 };
+            assert { next_sum = x + sum_list !chosen };
+            like_time_cons_sum x !chosen;
+            assert { like_time (Cons x !chosen) = !total + next_sum };
+            assert { forall v: int.
+              num_occ v (Cons x !chosen) + num_occ v xs <= num_occ v satisfaction };
+            running_sum := next_sum;
+            total := !total + next_sum;
+            chosen := Cons x !chosen;
+            cur := xs
+          end else begin
+            assert { next_sum <= 0 };
+            assert { forall v: int.
+              num_occ v !chosen <= num_occ v satisfaction };
+            cur := Nil
+          end
+      end
+    done;
+    assert { !cur = Nil };
+    assert { sub_multiset !chosen satisfaction };
+    assert { !total = like_time !chosen };
+    assert { greedy_descending_solution descending !chosen !total };
+    greedy_descending_optimality_bridge satisfaction descending !chosen !total;
+    assert { upper_bounds_all_choices satisfaction !total };
+    max_like_time_intro satisfaction !chosen !total;
+    !total
+
+end

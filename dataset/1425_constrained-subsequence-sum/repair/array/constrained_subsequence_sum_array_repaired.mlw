@@ -1,0 +1,194 @@
+module ConstrainedSubsequenceSum_Array_Spec
+
+  use int.Int
+  use array.Array
+  use array.Init
+
+  predicate input_valid (nums: array int) (k: int) =
+    1 <= k <= length nums <= 100000 /\
+    forall i: int. 0 <= i < length nums -> (-10000) <= nums[i] <= 10000
+
+  predicate valid_selection (nums: array int) (k: int) (pick: array int) =
+    length pick > 0 /\
+    (forall t: int. 0 <= t < length pick -> 0 <= pick[t] < length nums) /\
+    (forall t: int. 0 <= t < length pick - 1 ->
+      pick[t] < pick[t + 1] /\ pick[t + 1] - pick[t] <= k)
+
+  let rec function selected_sum_from
+    (nums: array int) (pick: array int) (pos: int) : int
+    requires { 0 <= pos <= length pick }
+    requires { forall t: int. pos <= t < length pick -> 0 <= pick[t] < length nums }
+    variant  { length pick - pos }
+  =
+    if pos = length pick then 0
+    else nums[pick[pos]] + selected_sum_from nums pick (pos + 1)
+
+  let function selected_sum (nums: array int) (pick: array int) : int
+    requires { forall t: int. 0 <= t < length pick -> 0 <= pick[t] < length nums }
+  =
+    selected_sum_from nums pick 0
+
+  predicate constrained_subsequence_sum_spec
+    (nums: array int) (k: int) (best: int) =
+    (exists pick: array int.
+      valid_selection nums k pick /\ selected_sum nums pick = best) /\
+    (forall pick: array int.
+      valid_selection nums k pick -> selected_sum nums pick <= best)
+
+  val constrained_subsequence_sum_array (nums: array int) (k: int) : int
+    requires { input_valid nums k }
+    ensures  { constrained_subsequence_sum_spec nums k result }
+
+  let lemma test_000_constrained_subsequence_sum () =
+    let nums = init 4 [|5; 7; -3; 5|] in
+    let pick = init 4 [|0; 1; 2; 3|] in
+    assert { length nums = 4 };
+    assert { nums[0] = 5 /\ nums[1] = 7 /\ nums[2] = (-3) /\ nums[3] = 5 };
+    assert { length pick = 4 };
+    assert { pick[0] = 0 /\ pick[1] = 1 /\ pick[2] = 2 /\ pick[3] = 3 };
+    assert { input_valid nums 1 };
+    assert { valid_selection nums 1 pick };
+    assert { selected_sum_from nums pick 4 = 0 };
+    assert { selected_sum_from nums pick 3 = 5 };
+    assert { selected_sum_from nums pick 2 = 2 };
+    assert { selected_sum_from nums pick 1 = 9 };
+    assert { selected_sum_from nums pick 0 = 14 };
+    assert { selected_sum nums pick = 14 };
+    assert { exists q: array int. valid_selection nums 1 q /\ selected_sum nums q = 14 };
+    assert {
+      forall q: array int.
+        valid_selection nums 1 q -> selected_sum nums q <= 14
+    };
+    assert { constrained_subsequence_sum_spec nums 1 14 }
+
+  let lemma test_001_constrained_subsequence_sum () =
+    let nums = init 5 [|10; 2; -10; 5; 20|] in
+    let pick = init 4 [|0; 1; 3; 4|] in
+    assert { length nums = 5 };
+    assert { nums[0] = 10 /\ nums[1] = 2 /\ nums[2] = (-10) };
+    assert { nums[3] = 5 /\ nums[4] = 20 };
+    assert { length pick = 4 };
+    assert { pick[0] = 0 /\ pick[1] = 1 /\ pick[2] = 3 /\ pick[3] = 4 };
+    assert { input_valid nums 2 };
+    assert { valid_selection nums 2 pick };
+    assert { selected_sum_from nums pick 4 = 0 };
+    assert { selected_sum_from nums pick 3 = 20 };
+    assert { selected_sum_from nums pick 2 = 25 };
+    assert { selected_sum_from nums pick 1 = 27 };
+    assert { selected_sum_from nums pick 0 = 37 };
+    assert { selected_sum nums pick = 37 };
+    assert { exists q: array int. valid_selection nums 2 q /\ selected_sum nums q = 37 };
+    assert {
+      forall q: array int.
+        valid_selection nums 2 q -> selected_sum nums q <= 37
+    };
+    assert { constrained_subsequence_sum_spec nums 2 37 }
+
+  let lemma test_002_constrained_subsequence_sum () =
+    let nums = init 5 [|1; 2; 3; 4; 5|] in
+    let pick = init 5 [|0; 1; 2; 3; 4|] in
+    assert { length nums = 5 };
+    assert { nums[0] = 1 /\ nums[1] = 2 /\ nums[2] = 3 };
+    assert { nums[3] = 4 /\ nums[4] = 5 };
+    assert { length pick = 5 };
+    assert { pick[0] = 0 /\ pick[1] = 1 /\ pick[2] = 2 };
+    assert { pick[3] = 3 /\ pick[4] = 4 };
+    assert { input_valid nums 3 };
+    assert { valid_selection nums 3 pick };
+    assert { selected_sum_from nums pick 5 = 0 };
+    assert { selected_sum_from nums pick 4 = 5 };
+    assert { selected_sum_from nums pick 3 = 9 };
+    assert { selected_sum_from nums pick 2 = 12 };
+    assert { selected_sum_from nums pick 1 = 14 };
+    assert { selected_sum_from nums pick 0 = 15 };
+    assert { selected_sum nums pick = 15 };
+    assert { exists q: array int. valid_selection nums 3 q /\ selected_sum nums q = 15 };
+    assert {
+      forall q: array int.
+        valid_selection nums 3 q -> selected_sum nums q <= 15
+    };
+    assert { constrained_subsequence_sum_spec nums 3 15 }
+
+  let lemma test_003_constrained_subsequence_sum () =
+    let nums = init 6 [|3; -1; 4; -2; 2; 1|] in
+    let pick = init 4 [|0; 2; 4; 5|] in
+    assert { length nums = 6 };
+    assert { nums[0] = 3 /\ nums[1] = (-1) /\ nums[2] = 4 };
+    assert { nums[3] = (-2) /\ nums[4] = 2 /\ nums[5] = 1 };
+    assert { length pick = 4 };
+    assert { pick[0] = 0 /\ pick[1] = 2 /\ pick[2] = 4 /\ pick[3] = 5 };
+    assert { input_valid nums 2 };
+    assert { valid_selection nums 2 pick };
+    assert { selected_sum_from nums pick 4 = 0 };
+    assert { selected_sum_from nums pick 3 = 1 };
+    assert { selected_sum_from nums pick 2 = 3 };
+    assert { selected_sum_from nums pick 1 = 7 };
+    assert { selected_sum_from nums pick 0 = 10 };
+    assert { selected_sum nums pick = 10 };
+    assert { exists q: array int. valid_selection nums 2 q /\ selected_sum nums q = 10 };
+    assert {
+      forall q: array int.
+        valid_selection nums 2 q -> selected_sum nums q <= 10
+    };
+    assert { constrained_subsequence_sum_spec nums 2 10 }
+
+  let lemma test_004_constrained_subsequence_sum () =
+    let nums = init 5 [|-1; -2; -3; -4; -5|] in
+    let pick = init 1 [|0|] in
+    assert { length nums = 5 };
+    assert { nums[0] = (-1) /\ nums[1] = (-2) /\ nums[2] = (-3) };
+    assert { nums[3] = (-4) /\ nums[4] = (-5) };
+    assert { length pick = 1 };
+    assert { pick[0] = 0 };
+    assert { input_valid nums 4 };
+    assert { valid_selection nums 4 pick };
+    assert { selected_sum_from nums pick 1 = 0 };
+    assert { selected_sum_from nums pick 0 = (-1) };
+    assert { selected_sum nums pick = (-1) };
+    assert { exists q: array int. valid_selection nums 4 q /\ selected_sum nums q = (-1) };
+    assert {
+      forall q: array int.
+        valid_selection nums 4 q -> selected_sum nums q <= (-1)
+    };
+    assert { constrained_subsequence_sum_spec nums 4 (-1) }
+
+  let lemma test_005_constrained_subsequence_sum () =
+    let nums = init 3 [|5; -1; 5|] in
+    let pick = init 2 [|0; 2|] in
+    assert { length nums = 3 };
+    assert { nums[0] = 5 /\ nums[1] = (-1) /\ nums[2] = 5 };
+    assert { length pick = 2 };
+    assert { pick[0] = 0 /\ pick[1] = 2 };
+    assert { input_valid nums 2 };
+    assert { valid_selection nums 2 pick };
+    assert { selected_sum_from nums pick 2 = 0 };
+    assert { selected_sum_from nums pick 1 = 5 };
+    assert { selected_sum_from nums pick 0 = 10 };
+    assert { selected_sum nums pick = 10 };
+    assert { exists q: array int. valid_selection nums 2 q /\ selected_sum nums q = 10 };
+    assert {
+      forall q: array int.
+        valid_selection nums 2 q -> selected_sum nums q <= 10
+    };
+    assert { constrained_subsequence_sum_spec nums 2 10 }
+
+  let lemma test_006_constrained_subsequence_sum () =
+    let nums = init 3 [|-1; -2; -3|] in
+    let pick = init 1 [|0|] in
+    assert { length nums = 3 };
+    assert { nums[0] = (-1) /\ nums[1] = (-2) /\ nums[2] = (-3) };
+    assert { length pick = 1 };
+    assert { pick[0] = 0 };
+    assert { input_valid nums 1 };
+    assert { valid_selection nums 1 pick };
+    assert { selected_sum_from nums pick 1 = 0 };
+    assert { selected_sum_from nums pick 0 = (-1) };
+    assert { selected_sum nums pick = (-1) };
+    assert { exists q: array int. valid_selection nums 1 q /\ selected_sum nums q = (-1) };
+    assert {
+      forall q: array int.
+        valid_selection nums 1 q -> selected_sum nums q <= (-1)
+    };
+    assert { constrained_subsequence_sum_spec nums 1 (-1) }
+
+end

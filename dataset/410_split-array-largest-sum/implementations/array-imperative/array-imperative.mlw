@@ -1,0 +1,184 @@
+module SplitArrayLargestSum_Array_Imperative
+
+  use int.Int
+  use int.EuclideanDivision
+  use array.Array
+  use array.Init
+  use ref.Ref
+
+  let max_array_value (nums: array int) : int =
+    if length nums = 0 then
+      0
+    else
+      let current = ref nums[0] in
+      for i = 1 to length nums - 1 do
+        if nums[i] > !current then
+          current := nums[i]
+      done;
+      !current
+
+  let total_sum (nums: array int) : int =
+    let total = ref 0 in
+    for i = 0 to length nums - 1 do
+      total := !total + nums[i]
+    done;
+    !total
+
+  let can_split_with_bound (nums: array int) (k: int) (bound: int) : bool =
+    if length nums = 0 then
+      true
+    else
+      let parts = ref 1 in
+      let current = ref 0 in
+      let feasible = ref true in
+      for i = 0 to length nums - 1 do
+        if nums[i] > bound then
+          feasible := false
+        else if !current + nums[i] <= bound then
+          current := !current + nums[i]
+        else begin
+          parts := !parts + 1;
+          current := nums[i]
+        end
+      done;
+      !feasible && !parts <= k
+
+  let split_array_largest_sum_array (nums: array int) (k: int) : int =
+    if length nums = 0 then
+      0
+    else
+      let lo = ref (max_array_value nums) in
+      let hi = ref (total_sum nums) in
+      while !lo < !hi do
+        variant { !hi - !lo }
+        let mid = !lo + div (!hi - !lo) 2 in
+        if can_split_with_bound nums k mid then
+          hi := mid
+        else
+          lo := mid + 1
+      done;
+      !lo
+
+  let test_000 () : bool =
+    let nums = init 5 [|7; 2; 5; 10; 8|] in
+    let r = split_array_largest_sum_array nums 2 in
+    r = 18
+
+  let test_001 () : bool =
+    let nums = init 5 [|5; 5; 5; 5; 5|] in
+    let r = split_array_largest_sum_array nums 5 in
+    r = 5
+
+  let test_002 () : bool =
+    let nums = init 4 [|10; 10; 10; 10|] in
+    let r = split_array_largest_sum_array nums 2 in
+    r = 20
+
+  let test_003 () : bool =
+    let nums = init 11 [|10; 5; 13; 4; 8; 4; 5; 11; 14; 9; 15|] in
+    let r = split_array_largest_sum_array nums 6 in
+    r = 23
+
+  let test_004 () : bool =
+    let nums = init 10 [|1; 2; 3; 4; 5; 6; 7; 8; 9; 10|] in
+    let r = split_array_largest_sum_array nums 5 in
+    r = 15
+
+  let test_005 () : bool =
+    let nums = init 10 [|5; 5; 5; 5; 5; 5; 5; 5; 5; 5|] in
+    let r = split_array_largest_sum_array nums 10 in
+    r = 5
+
+  let test_006 () : bool =
+    let nums = init 5 [|10; 10; 10; 10; 10|] in
+    let r = split_array_largest_sum_array nums 5 in
+    r = 10
+
+  let test_007 () : bool =
+    let nums = init 5 [|1; 2; 3; 4; 5|] in
+    let r = split_array_largest_sum_array nums 2 in
+    r = 9
+
+  let test_008 () : bool =
+    let nums = init 3 [|1; 1000000; 1|] in
+    let r = split_array_largest_sum_array nums 2 in
+    r = 1000001
+
+  let test_009 () : bool =
+    let nums = init 3 [|1; 4; 4|] in
+    let r = split_array_largest_sum_array nums 3 in
+    r = 4
+
+  let test_010 () : bool =
+    let nums = init 9 [|1; 2; 3; 4; 5; 6; 7; 8; 9|] in
+    let r = split_array_largest_sum_array nums 3 in
+    r = 17
+
+  let test_011 () : bool =
+    let nums = init 11 [|10; 5; 13; 4; 8; 4; 5; 11; 14; 9; 15|] in
+    let r = split_array_largest_sum_array nums 8 in
+    r = 15
+
+  let test_012 () : bool =
+    let nums = init 5 [|4; 2; 5; 1; 7|] in
+    let r = split_array_largest_sum_array nums 3 in
+    r = 7
+
+  let test_013 () : bool =
+    let nums = init 11 [|10; 5; 13; 4; 8; 4; 5; 11; 14; 9; 15|] in
+    let r = split_array_largest_sum_array nums 3 in
+    r = 38
+
+  let test_014 () : bool =
+    let nums = init 10 [|1; 1; 1; 1; 1; 1; 1; 1; 1; 1|] in
+    let r = split_array_largest_sum_array nums 10 in
+    r = 1
+
+  let test_015 () : bool =
+    let nums = init 10 [|0; 0; 0; 0; 0; 0; 0; 0; 0; 0|] in
+    let r = split_array_largest_sum_array nums 5 in
+    r = 0
+
+  let test_016 () : bool =
+    let nums = init 1 [|1000000|] in
+    let r = split_array_largest_sum_array nums 1 in
+    r = 1000000
+
+  let test_017 () : bool =
+    let nums = init 20 [|1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1; 1|] in
+    let r = split_array_largest_sum_array nums 5 in
+    r = 4
+
+  let test_018 () : bool =
+    let nums = init 10 [|10; 20; 30; 40; 50; 60; 70; 80; 90; 100|] in
+    let r = split_array_largest_sum_array nums 5 in
+    r = 150
+
+  let test_019 () : bool =
+    let nums = init 11 [|3; 2; 5; 7; 1; 10; 4; 2; 8; 6; 3|] in
+    let r = split_array_largest_sum_array nums 4 in
+    r = 17
+
+  let run_tests () : bool =
+    test_000 () &&
+    test_001 () &&
+    test_002 () &&
+    test_003 () &&
+    test_004 () &&
+    test_005 () &&
+    test_006 () &&
+    test_007 () &&
+    test_008 () &&
+    test_009 () &&
+    test_010 () &&
+    test_011 () &&
+    test_012 () &&
+    test_013 () &&
+    test_014 () &&
+    test_015 () &&
+    test_016 () &&
+    test_017 () &&
+    test_018 () &&
+    test_019 ()
+
+end

@@ -1,0 +1,62 @@
+module MinimumCostsUsingTheTrainLine_List_Spec
+
+  use int.Int
+  use int.MinMax
+  use list.List
+  use list.Length
+
+  let rec function minimum_costs_from
+      (regular: list int) (express: list int) (expressCost: int)
+      (regular_so_far: int) (express_so_far: int) : list int
+    variant { regular }
+  =
+    match regular with
+    | Nil -> Nil
+    | Cons r rs ->
+        match express with
+        | Nil -> Nil
+        | Cons e es ->
+            let next_regular = min regular_so_far express_so_far + r in
+            let next_express = min (regular_so_far + expressCost) express_so_far + e in
+            Cons (min next_regular next_express)
+              (minimum_costs_from rs es expressCost next_regular next_express)
+        end
+    end
+
+  function minimum_costs_using_the_train_line_spec
+      (regular: list int) (express: list int) (expressCost: int) : list int =
+    minimum_costs_from regular express expressCost 0 expressCost
+
+  let rec minimum_costs_from_exec
+      (regular: list int) (express: list int) (expressCost: int)
+      (regular_so_far: int) (express_so_far: int) : list int
+    ensures { result = minimum_costs_from regular express expressCost regular_so_far express_so_far }
+    ensures { length regular = length express -> length result = length regular }
+    variant { regular }
+  =
+    match regular with
+    | Nil -> Nil
+    | Cons r rs ->
+        match express with
+        | Nil -> Nil
+        | Cons e es ->
+            let next_regular = (min regular_so_far express_so_far) + r in
+            let next_express = (min (regular_so_far + expressCost) express_so_far) + e in
+            let tail = minimum_costs_from_exec rs es expressCost next_regular next_express in
+            assert { tail = minimum_costs_from rs es expressCost next_regular next_express };
+            Cons (min next_regular next_express) tail
+        end
+    end
+
+  let minimum_costs_using_the_train_line_list
+      (regular: list int) (express: list int) (expressCost: int) : list int
+    requires { length regular = length express }
+    ensures  { result = minimum_costs_using_the_train_line_spec regular express expressCost }
+    ensures  { length result = length regular }
+  =
+    let result = minimum_costs_from_exec regular express expressCost 0 expressCost in
+    assert { result = minimum_costs_from regular express expressCost 0 expressCost };
+    assert { result = minimum_costs_using_the_train_line_spec regular express expressCost };
+    result
+
+end

@@ -1,0 +1,98 @@
+module MinimumCostsUsingTheTrainLine_List_Spec
+
+  use int.Int
+  use int.MinMax
+  use list.List
+  use list.Length
+
+  let rec function minimum_costs_from
+      (regular: list int) (express: list int) (expressCost: int)
+      (regular_so_far: int) (express_so_far: int) : list int
+    variant { regular }
+  =
+    match regular with
+    | Nil -> Nil
+    | Cons r rs ->
+        match express with
+        | Nil -> Nil
+        | Cons e es ->
+            let next_regular = min regular_so_far express_so_far + r in
+            let next_express = min (regular_so_far + expressCost) express_so_far + e in
+            Cons (min next_regular next_express)
+              (minimum_costs_from rs es expressCost next_regular next_express)
+        end
+    end
+
+  function minimum_costs_using_the_train_line_spec
+      (regular: list int) (express: list int) (expressCost: int) : list int =
+    minimum_costs_from regular express expressCost 0 expressCost
+
+  val minimum_costs_using_the_train_line_list (regular: list int) (express: list int) (expressCost: int) : list int
+    requires { length regular = length express }
+    ensures  { result = minimum_costs_using_the_train_line_spec regular express expressCost }
+    ensures  { length result = length regular }
+
+  let lemma check_test_000 () =
+    let regular = Cons 1 (Cons 1 (Cons 1 (Cons 1 Nil))) in
+    let express = Cons 1 (Cons 1 (Cons 1 (Cons 1 Nil))) in
+    let expected = Cons 1 (Cons 2 (Cons 3 (Cons 4 Nil))) in
+    assert { minimum_costs_from Nil Nil 1 4 5 = Nil };
+    assert { minimum_costs_from (Cons 1 Nil) (Cons 1 Nil) 1 3 4 = Cons 4 Nil };
+    assert { minimum_costs_from (Cons 1 (Cons 1 Nil)) (Cons 1 (Cons 1 Nil)) 1 2 3 = Cons 3 (Cons 4 Nil) };
+    assert { minimum_costs_from (Cons 1 (Cons 1 (Cons 1 Nil))) (Cons 1 (Cons 1 (Cons 1 Nil))) 1 1 2 = Cons 2 (Cons 3 (Cons 4 Nil)) };
+    assert { minimum_costs_using_the_train_line_spec regular express 1 = expected }
+
+  let lemma check_test_001 () =
+    let regular = Cons 10 (Cons 20 (Cons 30 Nil)) in
+    let express = Cons 5 (Cons 15 (Cons 25 Nil)) in
+    let expected = Cons 7 (Cons 22 (Cons 47 Nil)) in
+    assert { minimum_costs_from Nil Nil 2 52 47 = Nil };
+    assert { minimum_costs_from (Cons 30 Nil) (Cons 25 Nil) 2 22 22 = Cons 47 Nil };
+    assert { minimum_costs_from (Cons 20 (Cons 30 Nil)) (Cons 15 (Cons 25 Nil)) 2 7 7 = Cons 22 (Cons 47 Nil) };
+    assert { minimum_costs_using_the_train_line_spec regular express 2 = expected }
+
+  let lemma check_test_003 () =
+    let regular = Cons 10 (Cons 20 (Cons 30 Nil)) in
+    let express = Cons 5 (Cons 15 (Cons 25 Nil)) in
+    let expected = Cons 10 (Cons 30 (Cons 55 Nil)) in
+    assert { minimum_costs_from Nil Nil 10 60 55 = Nil };
+    assert { minimum_costs_from (Cons 30 Nil) (Cons 25 Nil) 10 30 30 = Cons 55 Nil };
+    assert { minimum_costs_from (Cons 20 (Cons 30 Nil)) (Cons 15 (Cons 25 Nil)) 10 10 15 = Cons 30 (Cons 55 Nil) };
+    assert { minimum_costs_using_the_train_line_spec regular express 10 = expected }
+
+  let lemma check_test_005 () =
+    let regular = Cons 5 Nil in
+    let express = Cons 10 Nil in
+    let expected = Cons 5 Nil in
+    assert { minimum_costs_from Nil Nil 7 5 17 = Nil };
+    assert { minimum_costs_using_the_train_line_spec regular express 7 = expected }
+
+  let lemma check_test_009 () =
+    let regular = Cons 1 (Cons 6 (Cons 9 (Cons 5 Nil))) in
+    let express = Cons 5 (Cons 2 (Cons 3 (Cons 10 Nil))) in
+    let expected = Cons 1 (Cons 7 (Cons 14 (Cons 19 Nil))) in
+    assert { minimum_costs_from Nil Nil 8 19 24 = Nil };
+    assert { minimum_costs_from (Cons 5 Nil) (Cons 10 Nil) 8 14 14 = Cons 19 Nil };
+    assert { minimum_costs_from (Cons 9 (Cons 5 Nil)) (Cons 3 (Cons 10 Nil)) 8 7 10 = Cons 14 (Cons 19 Nil) };
+    assert { minimum_costs_from (Cons 6 (Cons 9 (Cons 5 Nil))) (Cons 2 (Cons 3 (Cons 10 Nil))) 8 1 13 = Cons 7 (Cons 14 (Cons 19 Nil)) };
+    assert { minimum_costs_using_the_train_line_spec regular express 8 = expected }
+
+  let lemma check_test_014 () =
+    let regular = Cons 11 (Cons 5 (Cons 13 Nil)) in
+    let express = Cons 7 (Cons 10 (Cons 6 Nil)) in
+    let expected = Cons 10 (Cons 15 (Cons 24 Nil)) in
+    assert { minimum_costs_from Nil Nil 3 28 24 = Nil };
+    assert { minimum_costs_from (Cons 13 Nil) (Cons 6 Nil) 3 15 20 = Cons 24 Nil };
+    assert { minimum_costs_from (Cons 5 (Cons 13 Nil)) (Cons 10 (Cons 6 Nil)) 3 10 10 = Cons 15 (Cons 24 Nil) };
+    assert { minimum_costs_using_the_train_line_spec regular express 3 = expected }
+
+  let lemma check_test_022 () =
+    let regular = Cons 100000 (Cons 100000 (Cons 100000 Nil)) in
+    let express = Cons 1 (Cons 1 (Cons 1 Nil)) in
+    let expected = Cons 100000 (Cons 100002 (Cons 100003 Nil)) in
+    assert { minimum_costs_from Nil Nil 100000 200003 100003 = Nil };
+    assert { minimum_costs_from (Cons 100000 Nil) (Cons 1 Nil) 100000 200002 100002 = Cons 100003 Nil };
+    assert { minimum_costs_from (Cons 100000 (Cons 100000 Nil)) (Cons 1 (Cons 1 Nil)) 100000 100000 100001 = Cons 100002 (Cons 100003 Nil) };
+    assert { minimum_costs_using_the_train_line_spec regular express 100000 = expected }
+
+end

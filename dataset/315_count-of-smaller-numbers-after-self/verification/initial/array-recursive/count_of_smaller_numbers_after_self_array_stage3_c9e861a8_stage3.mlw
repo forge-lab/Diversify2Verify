@@ -1,0 +1,74 @@
+module CountOfSmallerNumbersAfterSelf_Array_Spec
+
+  use int.Int
+  use array.Array
+  use array.Init
+  use array.NumOf
+
+  predicate smaller_to_right (nums: array int) (i: int) (j: int) =
+    0 <= i < j < length nums /\ nums[j] < nums[i]
+
+  function count_smaller_after (nums: array int) (i: int) : int =
+    numof (fun j v -> i < j /\ v < nums[i]) nums 0 (length nums)
+
+  predicate valid_counts (nums: array int) (counts: array int) =
+    length counts = length nums /\
+    forall i: int. 0 <= i < length nums ->
+      counts[i] = count_smaller_after nums i
+
+  let rec count_smaller_after_from_exec
+    (nums: array int) (pivot: int) (j: int) : int
+    requires { 0 <= pivot < length nums }
+    requires { pivot < j <= length nums }
+    variant  { length nums - j }
+    ensures  { result =
+      numof (fun k v -> pivot < k /\ v < nums[pivot])
+        nums j (length nums) }
+  =
+    if j >= length nums then begin
+      assert { j = length nums };
+      0
+    end else begin
+      assert { pivot < j < length nums };
+      let here = if nums[j] < nums[pivot] then 1 else 0 in
+      here + count_smaller_after_from_exec nums pivot (j + 1)
+    end
+
+  let count_smaller_after_exec (nums: array int) (i: int) : int
+    requires { 0 <= i < length nums }
+    ensures  { result = count_smaller_after nums i }
+  =
+    assert { i < i + 1 <= length nums };
+    count_smaller_after_from_exec nums i (i + 1)
+
+  let count_of_smaller_numbers_after_self_array (nums: array int) : array int
+    ensures { valid_counts nums result }
+  =
+    let counts = make (length nums) 0 in
+    let rec fill_result (i: int) : unit
+      requires { 0 <= i <= length nums }
+      variant  { length nums - i }
+      ensures  { length counts = length nums }
+      ensures  { forall k: int.
+        0 <= k < i -> counts[k] = old counts[k] }
+      ensures  { forall k: int.
+        i <= k < length nums -> counts[k] = count_smaller_after nums k }
+    =
+      if i < length nums then begin
+        assert { 0 <= i < length nums };
+        counts[i] <- count_smaller_after_exec nums i;
+        assert { counts[i] = count_smaller_after nums i };
+        fill_result (i + 1)
+      end else begin
+        assert { i = length nums };
+        ()
+      end
+    in
+    assert { length counts = length nums };
+    fill_result 0;
+    assert { length counts = length nums };
+    assert { forall k: int.
+      0 <= k < length nums -> counts[k] = count_smaller_after nums k };
+    counts
+
+end

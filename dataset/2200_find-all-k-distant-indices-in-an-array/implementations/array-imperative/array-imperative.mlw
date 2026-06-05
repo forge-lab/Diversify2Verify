@@ -1,0 +1,214 @@
+module FindAllKDistantIndicesInAnArray_Array_Imperative
+
+  use int.Int
+  use array.Array
+  use array.Init
+  use ref.Ref
+
+  exception ArraysDiffer
+
+  let arrays_equal (a: array int) (b: array int) : bool =
+    if length a <> length b then false else
+    if length a = 0 then true else
+    try
+      for i = 0 to length a - 1 do
+        if a[i] <> b[i] then raise ArraysDiffer
+      done;
+      true
+    with ArraysDiffer ->
+      false
+    end
+
+  let find_all_k_distant_indices_in_an_array_array (nums: array int) (key: int) (k: int) : array int =
+    let n = length nums in
+    if n = 0 then
+      make 0 0
+    else
+      let marks = make n 0 in
+      for j = 0 to n - 1 do
+        if nums[j] = key then
+          let left = if j - k < 0 then 0 else j - k in
+          let right = if j + k >= n then n - 1 else j + k in
+          for i = left to right do
+            marks[i] <- 1
+          done
+      done;
+      let count = ref 0 in
+      for i = 0 to n - 1 do
+        if marks[i] = 1 then
+          count := !count + 1
+      done;
+      let result = make !count 0 in
+      let out = ref 0 in
+      for i = 0 to n - 1 do
+        if marks[i] = 1 then begin
+          result[!out] <- i;
+          out := !out + 1
+        end
+      done;
+      result
+
+  let test_test_000 () : bool =
+    let nums = init 5 [|5; 1; 4; 1; 5|] in
+    let expected = init 5 [|0; 1; 2; 3; 4|] in
+    let r = find_all_k_distant_indices_in_an_array_array nums 5 2 in
+    arrays_equal r expected
+
+  let test_test_001 () : bool =
+    let nums = init 6 [|1; 1; 1; 1; 1; 1|] in
+    let expected = init 6 [|0; 1; 2; 3; 4; 5|] in
+    let r = find_all_k_distant_indices_in_an_array_array nums 1 3 in
+    arrays_equal r expected
+
+  let test_test_003 () : bool =
+    let nums = init 5 [|1; 3; 5; 7; 9|] in
+    let expected = init 4 [|0; 1; 2; 3|] in
+    let r = find_all_k_distant_indices_in_an_array_array nums 3 2 in
+    arrays_equal r expected
+
+  let test_test_006 () : bool =
+    let nums = init 6 [|5; 5; 5; 5; 5; 5|] in
+    let expected = init 6 [|0; 1; 2; 3; 4; 5|] in
+    let r = find_all_k_distant_indices_in_an_array_array nums 5 3 in
+    arrays_equal r expected
+
+  let test_test_007 () : bool =
+    let nums = init 6 [|10; 20; 30; 40; 50; 20|] in
+    let expected = init 6 [|0; 1; 2; 3; 4; 5|] in
+    let r = find_all_k_distant_indices_in_an_array_array nums 20 2 in
+    arrays_equal r expected
+
+  let test_test_008 () : bool =
+    let nums = init 5 [|1; 2; 3; 4; 5|] in
+    let expected = init 3 [|0; 1; 2|] in
+    let r = find_all_k_distant_indices_in_an_array_array nums 1 2 in
+    arrays_equal r expected
+
+  let test_test_009 () : bool =
+    let nums = init 5 [|2; 2; 2; 2; 2|] in
+    let expected = init 5 [|0; 1; 2; 3; 4|] in
+    let r = find_all_k_distant_indices_in_an_array_array nums 2 2 in
+    arrays_equal r expected
+
+  let test_test_010 () : bool =
+    let nums = init 5 [|1; 2; 3; 4; 5|] in
+    let expected = init 3 [|2; 3; 4|] in
+    let r = find_all_k_distant_indices_in_an_array_array nums 5 2 in
+    arrays_equal r expected
+
+  let test_test_011 () : bool =
+    let nums = init 5 [|10; 20; 30; 40; 50|] in
+    let expected = init 5 [|0; 1; 2; 3; 4|] in
+    let r = find_all_k_distant_indices_in_an_array_array nums 30 2 in
+    arrays_equal r expected
+
+  let test_test_012 () : bool =
+    let nums = init 5 [|5; 1; 5; 1; 5|] in
+    let expected = init 5 [|0; 1; 2; 3; 4|] in
+    let r = find_all_k_distant_indices_in_an_array_array nums 5 1 in
+    arrays_equal r expected
+
+  let test_test_013 () : bool =
+    let nums = init 7 [|3; 4; 9; 1; 3; 9; 5|] in
+    let expected = init 6 [|1; 2; 3; 4; 5; 6|] in
+    let r = find_all_k_distant_indices_in_an_array_array nums 9 1 in
+    arrays_equal r expected
+
+  let test_test_014 () : bool =
+    let nums = init 5 [|5; 4; 3; 2; 1|] in
+    let expected = init 2 [|3; 4|] in
+    let r = find_all_k_distant_indices_in_an_array_array nums 1 1 in
+    arrays_equal r expected
+
+  let test_test_015 () : bool =
+    let nums = init 10 [|100; 90; 80; 70; 60; 50; 40; 30; 20; 10|] in
+    let expected = init 7 [|1; 2; 3; 4; 5; 6; 7|] in
+    let r = find_all_k_distant_indices_in_an_array_array nums 60 3 in
+    arrays_equal r expected
+
+  let test_test_016 () : bool =
+    let nums = init 10 [|10; 20; 30; 40; 50; 60; 70; 80; 90; 100|] in
+    let expected = init 9 [|0; 1; 2; 3; 4; 5; 6; 7; 8|] in
+    let r = find_all_k_distant_indices_in_an_array_array nums 50 4 in
+    arrays_equal r expected
+
+  let test_test_017 () : bool =
+    let nums = init 9 [|10; 20; 30; 40; 50; 20; 30; 40; 50|] in
+    let expected = init 8 [|0; 1; 2; 3; 4; 5; 6; 7|] in
+    let r = find_all_k_distant_indices_in_an_array_array nums 20 2 in
+    arrays_equal r expected
+
+  let test_test_018 () : bool =
+    let nums = init 20 [|5; 1; 5; 2; 5; 3; 5; 4; 5; 5; 5; 5; 5; 5; 5; 5; 5; 5; 5; 5|] in
+    let expected = init 20 [|0; 1; 2; 3; 4; 5; 6; 7; 8; 9; 10; 11; 12; 13; 14; 15; 16; 17; 18; 19|] in
+    let r = find_all_k_distant_indices_in_an_array_array nums 5 7 in
+    arrays_equal r expected
+
+  let test_test_019 () : bool =
+    let nums = init 10 [|1000; 999; 998; 997; 996; 995; 994; 993; 992; 991|] in
+    let expected = init 7 [|1; 2; 3; 4; 5; 6; 7|] in
+    let r = find_all_k_distant_indices_in_an_array_array nums 996 3 in
+    arrays_equal r expected
+
+  let test_test_020 () : bool =
+    let nums = init 10 [|1; 2; 3; 4; 5; 6; 7; 8; 9; 10|] in
+    let expected = init 5 [|2; 3; 4; 5; 6|] in
+    let r = find_all_k_distant_indices_in_an_array_array nums 5 2 in
+    arrays_equal r expected
+
+  let test_test_021 () : bool =
+    let nums = init 10 [|5; 4; 5; 4; 5; 4; 5; 4; 5; 4|] in
+    let expected = init 10 [|0; 1; 2; 3; 4; 5; 6; 7; 8; 9|] in
+    let r = find_all_k_distant_indices_in_an_array_array nums 4 2 in
+    arrays_equal r expected
+
+  let test_test_022 () : bool =
+    let nums = init 10 [|1; 3; 5; 7; 9; 11; 13; 15; 17; 19|] in
+    let expected = init 9 [|1; 2; 3; 4; 5; 6; 7; 8; 9|] in
+    let r = find_all_k_distant_indices_in_an_array_array nums 11 4 in
+    arrays_equal r expected
+
+  let run_tests () : bool =
+    if test_test_000 () then
+    if test_test_001 () then
+    if test_test_003 () then
+    if test_test_006 () then
+    if test_test_007 () then
+    if test_test_008 () then
+    if test_test_009 () then
+    if test_test_010 () then
+    if test_test_011 () then
+    if test_test_012 () then
+    if test_test_013 () then
+    if test_test_014 () then
+    if test_test_015 () then
+    if test_test_016 () then
+    if test_test_017 () then
+    if test_test_018 () then
+    if test_test_019 () then
+    if test_test_020 () then
+    if test_test_021 () then
+    if test_test_022 () then
+      true
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+
+end

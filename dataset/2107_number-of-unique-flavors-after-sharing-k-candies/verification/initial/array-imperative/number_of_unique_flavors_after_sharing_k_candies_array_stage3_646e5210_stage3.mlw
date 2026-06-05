@@ -1,0 +1,83 @@
+module NumberOfUniqueFlavorsAfterSharingKCandies_Array_Spec
+
+  use int.Int
+  use array.Array
+  use array.Init
+  use array.NumOf as ArrayNumOf
+  use ref.Ref
+
+  predicate valid_input (candies: array int) (k: int) =
+    0 <= length candies <= 100000 /\
+    0 <= k <= length candies /\
+    forall i: int. 0 <= i < length candies -> 1 <= candies[i] <= 100000
+
+  predicate kept_flavor_after_sharing
+    (candies: array int) (k: int) (start: int) (flavor: int) =
+    0 <= start <= length candies - k /\
+    1 <= flavor <= 100000 /\
+    exists i: int.
+      0 <= i < length candies /\
+      (i < start \/ start + k <= i) /\
+      candies[i] = flavor
+
+  predicate kept_first_index_after_sharing
+    (candies: array int) (k: int) (start: int) (i: int) =
+    0 <= start <= length candies - k /\
+    0 <= i < length candies /\
+    (i < start \/ start + k <= i) /\
+    forall j: int.
+      0 <= j < i ->
+      (start <= j < start + k \/ candies[j] <> candies[i])
+
+  function unique_flavors_kept
+    (candies: array int) (k: int) (start: int) : int =
+    ArrayNumOf.numof
+      (fun i _ -> kept_first_index_after_sharing candies k start i)
+      candies 0 (length candies)
+
+  predicate optimal_kept_flavor_count
+    (candies: array int) (k: int) (answer: int) =
+    valid_input candies k /\
+    0 <= answer <= length candies /\
+    (exists start: int.
+       0 <= start <= length candies - k /\
+       answer = unique_flavors_kept candies k start) /\
+    (forall start: int.
+       0 <= start <= length candies - k ->
+       unique_flavors_kept candies k start <= answer)
+
+  let number_of_unique_flavors_after_sharing_k_candies_array
+    (candies: array int) (k: int) : int
+    requires { valid_input candies k }
+    ensures  { optimal_kept_flavor_count candies k result }
+  =
+    let n = length candies in
+    assert { n = length candies };
+    assert { 0 <= k <= n };
+    let best = ref 0 in
+    for start = 0 to n - k do
+      invariant { 0 <= start <= n - k + 1 }
+      invariant { 0 <= !best <= n }
+      let current = ref 0 in
+      for i = 0 to n - 1 do
+        invariant { 0 <= i <= n }
+        invariant { 0 <= !current <= i }
+        invariant { 0 <= !best <= n }
+        if i < start || start + k <= i then
+          let seen_before = ref false in
+          for j = 0 to i - 1 do
+            invariant { 0 <= j <= i }
+            invariant { 0 <= !current <= i }
+            invariant { 0 <= !best <= n }
+            if (j < start || start + k <= j) && candies[j] = candies[i] then
+              seen_before := true
+          done;
+          if not !seen_before then current := !current + 1
+      done;
+      assert { 0 <= !current <= n };
+      if !current > !best then best := !current
+    done;
+    assert { 0 <= !best <= n };
+    !best
+
+end

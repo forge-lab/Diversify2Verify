@@ -1,0 +1,239 @@
+module LargestDivisibleSubset_Array_Imperative
+
+  use int.Int
+  use int.EuclideanDivision
+  use array.Array
+  use array.Init
+  use ref.Ref
+
+  exception ArraysNotEqual
+
+  let arrays_equal (a: array int) (b: array int) : bool =
+    if length a <> length b then false else
+    try
+      for i = 0 to length a - 1 do
+        if a[i] <> b[i] then
+          raise ArraysNotEqual
+      done;
+      true
+    with ArraysNotEqual ->
+      false
+    end
+
+  let sort_copy (nums: array int) : array int =
+    let n = length nums in
+    let a = make n 0 in
+    if n > 0 then
+      for i = 0 to n - 1 do
+        a[i] <- nums[i]
+      done;
+    if n > 1 then
+      for i = 0 to n - 2 do
+        let min_idx = ref i in
+        for j = i + 1 to n - 1 do
+          if a[j] < a[!min_idx] then
+            min_idx := j
+        done;
+        let tmp = a[i] in
+        a[i] <- a[!min_idx];
+        a[!min_idx] <- tmp
+      done;
+    a
+
+  let largest_divisible_subset_array (nums: array int) : array int =
+    let n = length nums in
+    if n = 0 then
+      make 0 0
+    else
+      let sorted = sort_copy nums in
+      let dp = make n 1 in
+      let prev = make n (-1) in
+      let best_len = ref 1 in
+      let best_idx = ref 0 in
+      for i = 0 to n - 1 do
+        for j = 0 to i - 1 do
+          if mod sorted[i] sorted[j] = 0 then
+            if dp[j] + 1 > dp[i] then begin
+              dp[i] <- dp[j] + 1;
+              prev[i] <- j
+            end
+        done;
+        if dp[i] > !best_len then begin
+          best_len := dp[i];
+          best_idx := i
+        end
+      done;
+      let result = make !best_len 0 in
+      let pos = ref 0 in
+      let idx = ref !best_idx in
+      while !idx >= 0 do
+        result[!pos] <- sorted[!idx];
+        pos := !pos + 1;
+        idx := prev[!idx]
+      done;
+      result
+
+  let test_000 () : bool =
+    let nums = init 8 [|1; 3; 5; 7; 9; 11; 13; 15|] in
+    let expected = init 3 [|9; 3; 1|] in
+    let r = largest_divisible_subset_array nums in
+    arrays_equal r expected
+
+  let test_001 () : bool =
+    let nums = init 6 [|100; 200; 400; 800; 1600; 3200|] in
+    let expected = init 6 [|3200; 1600; 800; 400; 200; 100|] in
+    let r = largest_divisible_subset_array nums in
+    arrays_equal r expected
+
+  let test_002 () : bool =
+    let nums = init 6 [|1; 5; 10; 20; 25; 50|] in
+    let expected = init 4 [|20; 10; 5; 1|] in
+    let r = largest_divisible_subset_array nums in
+    arrays_equal r expected
+
+  let test_003 () : bool =
+    let nums = init 6 [|2; 3; 5; 7; 11; 13|] in
+    let expected = init 1 [|2|] in
+    let r = largest_divisible_subset_array nums in
+    arrays_equal r expected
+
+  let test_004 () : bool =
+    let nums = init 5 [|2; 3; 5; 7; 11|] in
+    let expected = init 1 [|2|] in
+    let r = largest_divisible_subset_array nums in
+    arrays_equal r expected
+
+  let test_005 () : bool =
+    let nums = init 5 [|3; 9; 20; 18; 15|] in
+    let expected = init 3 [|18; 9; 3|] in
+    let r = largest_divisible_subset_array nums in
+    arrays_equal r expected
+
+  let test_006 () : bool =
+    let nums = init 5 [|3; 6; 9; 12; 18|] in
+    let expected = init 3 [|12; 6; 3|] in
+    let r = largest_divisible_subset_array nums in
+    arrays_equal r expected
+
+  let test_007 () : bool =
+    let nums = init 7 [|2; 4; 8; 16; 32; 64; 128|] in
+    let expected = init 7 [|128; 64; 32; 16; 8; 4; 2|] in
+    let r = largest_divisible_subset_array nums in
+    arrays_equal r expected
+
+  let test_020 () : bool =
+    let nums = init 6 [|2; 4; 8; 16; 32; 64|] in
+    let expected = init 6 [|64; 32; 16; 8; 4; 2|] in
+    let r = largest_divisible_subset_array nums in
+    arrays_equal r expected
+
+  let test_009 () : bool =
+    let nums = init 10 [|1; 2; 3; 4; 5; 6; 7; 8; 9; 10|] in
+    let expected = init 4 [|8; 4; 2; 1|] in
+    let r = largest_divisible_subset_array nums in
+    arrays_equal r expected
+
+  let test_010 () : bool =
+    let nums = init 5 [|1; 3; 5; 7; 9|] in
+    let expected = init 3 [|9; 3; 1|] in
+    let r = largest_divisible_subset_array nums in
+    arrays_equal r expected
+
+  let test_011 () : bool =
+    let nums = init 5 [|7; 14; 28; 56; 112|] in
+    let expected = init 5 [|112; 56; 28; 14; 7|] in
+    let r = largest_divisible_subset_array nums in
+    arrays_equal r expected
+
+  let test_012 () : bool =
+    let nums = init 1 [|1|] in
+    let expected = init 1 [|1|] in
+    let r = largest_divisible_subset_array nums in
+    arrays_equal r expected
+
+  let test_013 () : bool =
+    let nums = init 4 [|1; 2; 4; 8|] in
+    let expected = init 4 [|8; 4; 2; 1|] in
+    let r = largest_divisible_subset_array nums in
+    arrays_equal r expected
+
+  let test_014 () : bool =
+    let nums = init 6 [|5; 10; 15; 20; 25; 30|] in
+    let expected = init 3 [|20; 10; 5|] in
+    let r = largest_divisible_subset_array nums in
+    arrays_equal r expected
+
+  let test_015 () : bool =
+    let nums = init 4 [|10; 5; 2; 6|] in
+    let expected = init 2 [|6; 2|] in
+    let r = largest_divisible_subset_array nums in
+    arrays_equal r expected
+
+  let test_016 () : bool =
+    let nums = init 5 [|10; 5; 3; 15; 20|] in
+    let expected = init 3 [|20; 10; 5|] in
+    let r = largest_divisible_subset_array nums in
+    arrays_equal r expected
+
+  let test_017 () : bool =
+    let nums = init 5 [|100; 200; 400; 800; 1600|] in
+    let expected = init 5 [|1600; 800; 400; 200; 100|] in
+    let r = largest_divisible_subset_array nums in
+    arrays_equal r expected
+
+  let test_018 () : bool =
+    let nums = init 6 [|3; 6; 9; 12; 18; 24|] in
+    let expected = init 4 [|24; 12; 6; 3|] in
+    let r = largest_divisible_subset_array nums in
+    arrays_equal r expected
+
+  let test_019 () : bool =
+    let nums = init 6 [|7; 14; 28; 56; 112; 224|] in
+    let expected = init 6 [|224; 112; 56; 28; 14; 7|] in
+    let r = largest_divisible_subset_array nums in
+    arrays_equal r expected
+
+  let run_tests () : bool =
+    if test_000 () then
+    if test_001 () then
+    if test_002 () then
+    if test_003 () then
+    if test_004 () then
+    if test_005 () then
+    if test_006 () then
+    if test_007 () then
+    if test_020 () then
+    if test_009 () then
+    if test_010 () then
+    if test_011 () then
+    if test_012 () then
+    if test_013 () then
+    if test_014 () then
+    if test_015 () then
+    if test_016 () then
+    if test_017 () then
+    if test_018 () then
+    if test_019 () then
+      true
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+
+end

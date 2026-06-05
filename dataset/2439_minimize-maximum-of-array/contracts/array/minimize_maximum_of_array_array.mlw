@@ -1,0 +1,208 @@
+module MinimizeMaximumOfArray_Array_Spec
+
+  use int.Int
+  use array.Array
+  use array.Init
+  use array.ArraySum
+
+  predicate nonnegative_bounded_array (nums: array int) =
+    forall i: int. 0 <= i < length nums -> 0 <= nums[i] <= 1000000000
+
+  predicate valid_input (nums: array int) =
+    2 <= length nums <= 100000 /\ nonnegative_bounded_array nums
+
+  predicate prefix_bound_at (nums: array int) (m: int) (k: int) =
+    1 <= k <= length nums -> sum nums 0 k <= m * k
+
+  predicate prefix_bounded_by (nums: array int) (m: int) =
+    forall k: int. 1 <= k <= length nums -> sum nums 0 k <= m * k
+
+  predicate minimum_possible_maximum (nums: array int) (m: int) =
+    prefix_bounded_by nums m /\
+    forall candidate: int. prefix_bounded_by nums candidate -> m <= candidate
+
+  val minimize_maximum_of_array_array (nums: array int) : int
+    requires { valid_input nums }
+    ensures  { minimum_possible_maximum nums result }
+
+  let lemma test_000_minimize_maximum_of_array () =
+    let nums = init 5 [|1; 9; 1; 9; 1|] in
+    assert { length nums = 5 };
+    assert { nums[0] = 1 };
+    assert { nums[1] = 9 };
+    assert { nums[2] = 1 };
+    assert { nums[3] = 9 };
+    assert { nums[4] = 1 };
+    assert { sum nums 0 1 = 1 };
+    assert { sum nums 0 2 = 10 };
+    assert { sum nums 0 3 = 11 };
+    assert { sum nums 0 4 = 20 };
+    assert { sum nums 0 5 = 21 };
+    assert { prefix_bound_at nums 5 1 };
+    assert { prefix_bound_at nums 5 2 };
+    assert { prefix_bound_at nums 5 3 };
+    assert { prefix_bound_at nums 5 4 };
+    assert { prefix_bound_at nums 5 5 };
+    assert {
+      forall k: int. 1 <= k <= length nums ->
+        k = 1 \/ k = 2 \/ k = 3 \/ k = 4 \/ k = 5
+    };
+    assert { prefix_bounded_by nums 5 };
+    assert { forall candidate: int. prefix_bounded_by nums candidate -> 5 <= candidate };
+    assert { minimum_possible_maximum nums 5 }
+
+  let lemma test_001_minimize_maximum_of_array () =
+    let nums = init 2 [|1; 1000000000|] in
+    assert { length nums = 2 };
+    assert { nums[0] = 1 };
+    assert { nums[1] = 1000000000 };
+    assert { sum nums 0 1 = 1 };
+    assert { sum nums 0 2 = 1000000001 };
+    assert { prefix_bound_at nums 500000001 1 };
+    assert { prefix_bound_at nums 500000001 2 };
+    assert {
+      forall k: int. 1 <= k <= length nums ->
+        k = 1 \/ k = 2
+    };
+    assert { prefix_bounded_by nums 500000001 };
+    assert { forall candidate: int. prefix_bounded_by nums candidate -> 500000001 <= candidate };
+    assert { minimum_possible_maximum nums 500000001 }
+
+  let lemma test_002_minimize_maximum_of_array () =
+    let nums = init 5 [|1000000000; 1000000000; 1000000000; 1000000000; 1000000000|] in
+    assert { length nums = 5 };
+    assert { nums[0] = 1000000000 };
+    assert { nums[1] = 1000000000 };
+    assert { nums[2] = 1000000000 };
+    assert { nums[3] = 1000000000 };
+    assert { nums[4] = 1000000000 };
+    assert { sum nums 0 1 = 1000000000 };
+    assert { sum nums 0 2 = 2000000000 };
+    assert { sum nums 0 3 = 3000000000 };
+    assert { sum nums 0 4 = 4000000000 };
+    assert { sum nums 0 5 = 5000000000 };
+    assert { prefix_bound_at nums 1000000000 1 };
+    assert { prefix_bound_at nums 1000000000 2 };
+    assert { prefix_bound_at nums 1000000000 3 };
+    assert { prefix_bound_at nums 1000000000 4 };
+    assert { prefix_bound_at nums 1000000000 5 };
+    assert {
+      forall k: int. 1 <= k <= length nums ->
+        k = 1 \/ k = 2 \/ k = 3 \/ k = 4 \/ k = 5
+    };
+    assert { prefix_bounded_by nums 1000000000 };
+    assert { forall candidate: int. prefix_bounded_by nums candidate -> 1000000000 <= candidate };
+    assert { minimum_possible_maximum nums 1000000000 }
+
+  let lemma test_003_minimize_maximum_of_array () =
+    let nums = init 5 [|9; 7; 5; 3; 1|] in
+    assert { length nums = 5 };
+    assert { nums[0] = 9 };
+    assert { nums[1] = 7 };
+    assert { nums[2] = 5 };
+    assert { nums[3] = 3 };
+    assert { nums[4] = 1 };
+    assert { sum nums 0 1 = 9 };
+    assert { sum nums 0 2 = 16 };
+    assert { sum nums 0 3 = 21 };
+    assert { sum nums 0 4 = 24 };
+    assert { sum nums 0 5 = 25 };
+    assert { prefix_bound_at nums 9 1 };
+    assert { prefix_bound_at nums 9 2 };
+    assert { prefix_bound_at nums 9 3 };
+    assert { prefix_bound_at nums 9 4 };
+    assert { prefix_bound_at nums 9 5 };
+    assert {
+      forall k: int. 1 <= k <= length nums ->
+        k = 1 \/ k = 2 \/ k = 3 \/ k = 4 \/ k = 5
+    };
+    assert { prefix_bounded_by nums 9 };
+    assert { forall candidate: int. prefix_bounded_by nums candidate -> 9 <= candidate };
+    assert { minimum_possible_maximum nums 9 }
+
+  let lemma test_004_minimize_maximum_of_array () =
+    let nums = init 10 [|10; 9; 8; 7; 6; 5; 4; 3; 2; 1|] in
+    assert { length nums = 10 };
+    assert { nums[0] = 10 };
+    assert { nums[1] = 9 };
+    assert { nums[2] = 8 };
+    assert { nums[3] = 7 };
+    assert { nums[4] = 6 };
+    assert { nums[5] = 5 };
+    assert { nums[6] = 4 };
+    assert { nums[7] = 3 };
+    assert { nums[8] = 2 };
+    assert { nums[9] = 1 };
+    assert { sum nums 0 1 = 10 };
+    assert { sum nums 0 2 = 19 };
+    assert { sum nums 0 3 = 27 };
+    assert { sum nums 0 4 = 34 };
+    assert { sum nums 0 5 = 40 };
+    assert { sum nums 0 6 = 45 };
+    assert { sum nums 0 7 = 49 };
+    assert { sum nums 0 8 = 52 };
+    assert { sum nums 0 9 = 54 };
+    assert { sum nums 0 10 = 55 };
+    assert { prefix_bound_at nums 10 1 };
+    assert { prefix_bound_at nums 10 2 };
+    assert { prefix_bound_at nums 10 3 };
+    assert { prefix_bound_at nums 10 4 };
+    assert { prefix_bound_at nums 10 5 };
+    assert { prefix_bound_at nums 10 6 };
+    assert { prefix_bound_at nums 10 7 };
+    assert { prefix_bound_at nums 10 8 };
+    assert { prefix_bound_at nums 10 9 };
+    assert { prefix_bound_at nums 10 10 };
+    assert {
+      forall k: int. 1 <= k <= length nums ->
+        k = 1 \/ k = 2 \/ k = 3 \/ k = 4 \/ k = 5 \/
+        k = 6 \/ k = 7 \/ k = 8 \/ k = 9 \/ k = 10
+    };
+    assert { prefix_bounded_by nums 10 };
+    assert { forall candidate: int. prefix_bounded_by nums candidate -> 10 <= candidate };
+    assert { minimum_possible_maximum nums 10 }
+
+  let lemma test_005_minimize_maximum_of_array () =
+    let nums = init 2 [|1000000000; 1000000000|] in
+    assert { length nums = 2 };
+    assert { nums[0] = 1000000000 };
+    assert { nums[1] = 1000000000 };
+    assert { sum nums 0 1 = 1000000000 };
+    assert { sum nums 0 2 = 2000000000 };
+    assert { prefix_bound_at nums 1000000000 1 };
+    assert { prefix_bound_at nums 1000000000 2 };
+    assert {
+      forall k: int. 1 <= k <= length nums ->
+        k = 1 \/ k = 2
+    };
+    assert { prefix_bounded_by nums 1000000000 };
+    assert { forall candidate: int. prefix_bounded_by nums candidate -> 1000000000 <= candidate };
+    assert { minimum_possible_maximum nums 1000000000 }
+
+  let lemma test_006_minimize_maximum_of_array () =
+    let nums = init 5 [|5; 5; 5; 5; 5|] in
+    assert { length nums = 5 };
+    assert { nums[0] = 5 };
+    assert { nums[1] = 5 };
+    assert { nums[2] = 5 };
+    assert { nums[3] = 5 };
+    assert { nums[4] = 5 };
+    assert { sum nums 0 1 = 5 };
+    assert { sum nums 0 2 = 10 };
+    assert { sum nums 0 3 = 15 };
+    assert { sum nums 0 4 = 20 };
+    assert { sum nums 0 5 = 25 };
+    assert { prefix_bound_at nums 5 1 };
+    assert { prefix_bound_at nums 5 2 };
+    assert { prefix_bound_at nums 5 3 };
+    assert { prefix_bound_at nums 5 4 };
+    assert { prefix_bound_at nums 5 5 };
+    assert {
+      forall k: int. 1 <= k <= length nums ->
+        k = 1 \/ k = 2 \/ k = 3 \/ k = 4 \/ k = 5
+    };
+    assert { prefix_bounded_by nums 5 };
+    assert { forall candidate: int. prefix_bounded_by nums candidate -> 5 <= candidate };
+    assert { minimum_possible_maximum nums 5 }
+
+end

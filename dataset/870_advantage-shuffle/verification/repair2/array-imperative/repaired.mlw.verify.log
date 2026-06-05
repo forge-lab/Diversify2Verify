@@ -1,0 +1,858 @@
+== Stage 1: first prover on whole file ==
+Running in /Users/rubenm/Desktop/Diversify2Verify/codex-runs/repair2-split2/stage3a-rerepair/870_advantage-shuffle/array-imperative/advantage_shuffle_array_stage3_db9a16ee_stage3/repaired/generated/why3: why3 session create -o /Users/rubenm/Desktop/Diversify2Verify/codex-runs/repair2-split2/stage3a-rerepair/870_advantage-shuffle/array-imperative/advantage_shuffle_array_stage3_db9a16ee_stage3/repaired/generated/why3/.why3_sessions/repaired_stage1 -P Z3,4.8.6 -t 10 -m 8192 repaired.mlw
+Session created successfully
+Running in /Users/rubenm/Desktop/Diversify2Verify/codex-runs/repair2-split2/stage3a-rerepair/870_advantage-shuffle/array-imperative/advantage_shuffle_array_stage3_db9a16ee_stage3/repaired/generated/why3: why3 bench /Users/rubenm/Desktop/Diversify2Verify/codex-runs/repair2-split2/stage3a-rerepair/870_advantage-shuffle/array-imperative/advantage_shuffle_array_stage3_db9a16ee_stage3/repaired/generated/why3/.why3_sessions/repaired_stage1
+Progress: 4/1/0                       Progress: 3/2/0                       Progress: 2/3/0                       Progress: 1/4/0                       Progress: 0/5/0                       Progress: 0/2/2                       Progress: 0/1/2                       Progress: 0/0/1                       
+Replay completed, saving session... done
+== Stage 1 stats ==
+= Statistics for session /Users/rubenm/Desktop/Diversify2Verify/codex-runs/repair2-split2/stage3a-rerepair/870_advantage-shuffle/array-imperative/advantage_shuffle_array_stage3_db9a16ee_stage3/repaired/generated/why3/.why3_sessions/repaired_stage1
+
+== Number of root goals ==
+  total: 5  proved: 3
+
+== Number of sub goals ==
+  total: 0  proved: 0
+
+== Goals not proved ==
+  +-- file [../../repaired.mlw]
+    +-- theory AdvantageShuffle_Array_Stage3_Imperative
+      +-- goal sort_array_ascending'vc
+      +-- goal build_advantage_result'vc
+  
+== Goals proved by only one prover ==
+  +-- file [../../repaired.mlw]
+    +-- theory AdvantageShuffle_Array_Stage3_Imperative
+      +-- goal copy_array'vc: Z3 4.8.6
+      +-- goal sort_values_with_indices'vc: Z3 4.8.6
+      +-- goal advantage_shuffle_array'vc: Z3 4.8.6
+  
+1 session(s) read, with a total of 5 proof goals.
+== Unproved root goals after first prover ==
+AdvantageShuffle_Array_Stage3_Imperative	sort_array_ascending'vc
+AdvantageShuffle_Array_Stage3_Imperative	build_advantage_result'vc
+== Stage 1: trying remaining goals with prover Alt-Ergo,2.4.0 ==
+---- stage1 | prover: Alt-Ergo,2.4.0 | theory: AdvantageShuffle_Array_Stage3_Imperative | goal: sort_array_ascending'vc ----
+File repaired.mlw:
+Goal sort_array_ascending'vc.
+Prover result is: Valid (9.61s, 61306 steps).
+Solved in stage 1 using prover: Alt-Ergo,2.4.0
+---- stage1 | prover: Alt-Ergo,2.4.0 | theory: AdvantageShuffle_Array_Stage3_Imperative | goal: build_advantage_result'vc ----
+File repaired.mlw:
+Goal build_advantage_result'vc.
+Prover result is: Timeout (10.00s, 66659 steps).
+Remaining after prover Alt-Ergo,2.4.0: 1
+== Stage 1: trying remaining goals with prover CVC4,1.8 ==
+---- stage1 | prover: CVC4,1.8 | theory: AdvantageShuffle_Array_Stage3_Imperative | goal: build_advantage_result'vc ----
+File repaired.mlw:
+Goal build_advantage_result'vc.
+Prover result is: Timeout (10.00s, 1219880 steps).
+Remaining after prover CVC4,1.8: 1
+== Goals still unproved after stage 1 ==
+AdvantageShuffle_Array_Stage3_Imperative	build_advantage_result'vc
+== Stage 2: split_vc on unproved goal ==
+Target theory: AdvantageShuffle_Array_Stage3_Imperative
+Target goal  : build_advantage_result'vc
+---- stage2 | prover: Z3,4.8.6 | theory: AdvantageShuffle_Array_Stage3_Imperative | goal: build_advantage_result'vc ----
+Transforms: split_vc
+File "repaired.mlw", line 170, characters 13-36:
+Sub-goal Assertion of goal build_advantage_result'vc.
+Prover result is: Valid (0.01s, 4154 steps).
+
+File "repaired.mlw", line 171, characters 13-36:
+Sub-goal Assertion of goal build_advantage_result'vc.
+Prover result is: Valid (0.01s, 4163 steps).
+
+File "repaired.mlw", line 172, characters 13-38:
+Sub-goal Assertion of goal build_advantage_result'vc.
+Prover result is: Valid (0.01s, 4172 steps).
+
+File "repaired.mlw", line 173, characters 13-29:
+Sub-goal Assertion of goal build_advantage_result'vc.
+Prover result is: Valid (0.01s, 4181 steps).
+
+File "repaired.mlw", line 174, characters 17-25:
+Sub-goal Array creation size of goal build_advantage_result'vc.
+Prover result is: Valid (0.01s, 55356 steps).
+
+File "repaired.mlw", line 178, characters 18-41:
+Sub-goal Loop invariant init of goal build_advantage_result'vc.
+Prover result is: Valid (0.01s, 4238 steps).
+
+File "repaired.mlw", line 179, characters 18-41:
+Sub-goal Loop invariant init of goal build_advantage_result'vc.
+Prover result is: Valid (0.01s, 4247 steps).
+
+File "repaired.mlw", line 180, characters 18-43:
+Sub-goal Loop invariant init of goal build_advantage_result'vc.
+Prover result is: Valid (0.01s, 4256 steps).
+
+File "repaired.mlw", line 181, characters 18-35:
+Sub-goal Loop invariant init of goal build_advantage_result'vc.
+Prover result is: Valid (0.01s, 4265 steps).
+
+File "repaired.mlw", line 182, characters 18-34:
+Sub-goal Loop invariant init of goal build_advantage_result'vc.
+Prover result is: Valid (0.01s, 4274 steps).
+
+File "repaired.mlw", line 183, characters 18-47:
+Sub-goal Loop invariant init of goal build_advantage_result'vc.
+Prover result is: Valid (0.01s, 4279 steps).
+
+File "repaired.mlw", line 184, characters 18-52:
+Sub-goal Loop invariant init of goal build_advantage_result'vc.
+Prover result is: Valid (0.01s, 4284 steps).
+
+File "repaired.mlw", line 185, characters 18-69:
+Sub-goal Loop invariant init of goal build_advantage_result'vc.
+Prover result is: Valid (0.01s, 4289 steps).
+
+File "repaired.mlw", line 186, characters 18-108:
+Sub-goal Loop invariant init of goal build_advantage_result'vc.
+Prover result is: Valid (0.01s, 65672 steps).
+
+File "repaired.mlw", line 187, characters 18-33:
+Sub-goal Index in array bounds of goal build_advantage_result'vc.
+Prover result is: Valid (0.01s, 67968 steps).
+
+File "repaired.mlw", line 188, characters 17-36:
+Sub-goal Index in array bounds of goal build_advantage_result'vc.
+Prover result is: Valid (0.02s, 70855 steps).
+
+File "repaired.mlw", line 189, characters 17-31:
+Sub-goal Assertion of goal build_advantage_result'vc.
+Prover result is: Valid (0.01s, 71171 steps).
+
+File "repaired.mlw", line 190, characters 17-47:
+Sub-goal Assertion of goal build_advantage_result'vc.
+Prover result is: Valid (0.02s, 74004 steps).
+
+File "repaired.mlw", line 191, characters 15-36:
+Sub-goal Index in array bounds of goal build_advantage_result'vc.
+Prover result is: Valid (0.01s, 68774 steps).
+
+File "repaired.mlw", line 191, characters 8-46:
+Sub-goal Index in array bounds of goal build_advantage_result'vc.
+Prover result is: Valid (0.01s, 68783 steps).
+
+File "repaired.mlw", line 178, characters 18-41:
+Sub-goal Loop invariant preservation of goal build_advantage_result'vc.
+Prover result is: Valid (0.01s, 5960 steps).
+
+File "repaired.mlw", line 179, characters 18-41:
+Sub-goal Loop invariant preservation of goal build_advantage_result'vc.
+Prover result is: Valid (0.01s, 5969 steps).
+
+File "repaired.mlw", line 180, characters 18-43:
+Sub-goal Loop invariant preservation of goal build_advantage_result'vc.
+Prover result is: Valid (0.01s, 5978 steps).
+
+File "repaired.mlw", line 181, characters 18-35:
+Sub-goal Loop invariant preservation of goal build_advantage_result'vc.
+Prover result is: Valid (0.02s, 96135 steps).
+
+File "repaired.mlw", line 182, characters 18-34:
+Sub-goal Loop invariant preservation of goal build_advantage_result'vc.
+Prover result is: Valid (0.01s, 5994 steps).
+
+File "repaired.mlw", line 183, characters 18-47:
+Sub-goal Loop invariant preservation of goal build_advantage_result'vc.
+Prover result is: Valid (0.01s, 5999 steps).
+
+File "repaired.mlw", line 184, characters 18-52:
+Sub-goal Loop invariant preservation of goal build_advantage_result'vc.
+Prover result is: Valid (0.01s, 6004 steps).
+
+File "repaired.mlw", line 185, characters 18-69:
+Sub-goal Loop invariant preservation of goal build_advantage_result'vc.
+Prover result is: Valid (0.01s, 6009 steps).
+
+File "repaired.mlw", line 186, characters 18-108:
+Sub-goal Loop invariant preservation of goal build_advantage_result'vc.
+Prover result is: Valid (0.02s, 151298 steps).
+
+File "repaired.mlw", line 194, characters 17-32:
+Sub-goal Assertion of goal build_advantage_result'vc.
+Prover result is: Valid (0.01s, 66996 steps).
+
+File "repaired.mlw", line 195, characters 17-48:
+Sub-goal Assertion of goal build_advantage_result'vc.
+Prover result is: Valid (0.02s, 69071 steps).
+
+File "repaired.mlw", line 196, characters 15-37:
+Sub-goal Index in array bounds of goal build_advantage_result'vc.
+Prover result is: Valid (0.01s, 64666 steps).
+
+File "repaired.mlw", line 196, characters 8-47:
+Sub-goal Index in array bounds of goal build_advantage_result'vc.
+Prover result is: Valid (0.01s, 64675 steps).
+
+File "repaired.mlw", line 178, characters 18-41:
+Sub-goal Loop invariant preservation of goal build_advantage_result'vc.
+Prover result is: Valid (0.01s, 5970 steps).
+
+File "repaired.mlw", line 179, characters 18-41:
+Sub-goal Loop invariant preservation of goal build_advantage_result'vc.
+Prover result is: Valid (0.01s, 5979 steps).
+
+File "repaired.mlw", line 180, characters 18-43:
+Sub-goal Loop invariant preservation of goal build_advantage_result'vc.
+Prover result is: Valid (0.01s, 5988 steps).
+
+File "repaired.mlw", line 181, characters 18-35:
+Sub-goal Loop invariant preservation of goal build_advantage_result'vc.
+Prover result is: Valid (0.02s, 91010 steps).
+
+File "repaired.mlw", line 182, characters 18-34:
+Sub-goal Loop invariant preservation of goal build_advantage_result'vc.
+Prover result is: Valid (0.01s, 6004 steps).
+
+File "repaired.mlw", line 183, characters 18-47:
+Sub-goal Loop invariant preservation of goal build_advantage_result'vc.
+Prover result is: Valid (0.01s, 6009 steps).
+
+File "repaired.mlw", line 184, characters 18-52:
+Sub-goal Loop invariant preservation of goal build_advantage_result'vc.
+Prover result is: Valid (0.01s, 6014 steps).
+
+File "repaired.mlw", line 185, characters 18-69:
+Sub-goal Loop invariant preservation of goal build_advantage_result'vc.
+Prover result is: Valid (0.01s, 6019 steps).
+
+File "repaired.mlw", line 186, characters 18-108:
+Sub-goal Loop invariant preservation of goal build_advantage_result'vc.
+Prover result is: Valid (0.02s, 160125 steps).
+
+File "repaired.mlw", line 200, characters 13-103:
+Sub-goal Assertion of goal build_advantage_result'vc.
+Prover result is: Valid (0.01s, 4681 steps).
+
+File "repaired.mlw", line 201, characters 13-31:
+Sub-goal Assertion of goal build_advantage_result'vc.
+Prover result is: Valid (0.01s, 66261 steps).
+
+File "repaired.mlw", line 202, characters 13-30:
+Sub-goal Assertion of goal build_advantage_result'vc.
+Prover result is: Valid (0.01s, 4695 steps).
+
+File "repaired.mlw", line 203, characters 13-40:
+Sub-goal Assertion of goal build_advantage_result'vc.
+Prover result is: Valid (0.01s, 4704 steps).
+
+File "repaired.mlw", line 204, characters 13-50:
+Sub-goal Assertion of goal build_advantage_result'vc.
+Prover result is: Timeout (10.00s, 134556036 steps).
+
+File "repaired.mlw", line 208, characters 10-73:
+Sub-goal Assertion of goal build_advantage_result'vc.
+Prover result is: Timeout (10.00s, 140370465 steps).
+
+File "repaired.mlw", line 210, characters 13-56:
+Sub-goal Assertion of goal build_advantage_result'vc.
+Prover result is: Valid (0.02s, 80710 steps).
+
+File "repaired.mlw", line 167, characters 15-58:
+Sub-goal Postcondition of goal build_advantage_result'vc.
+Prover result is: Valid (0.01s, 5174 steps).
+
+File repaired.mlw:
+Sub-goal Out of loop bounds of goal build_advantage_result'vc.
+Prover result is: Valid (0.02s, 69731 steps).
+---- stage2 | prover: Alt-Ergo,2.4.0 | theory: AdvantageShuffle_Array_Stage3_Imperative | goal: build_advantage_result'vc ----
+Transforms: split_vc
+File "repaired.mlw", line 170, characters 13-36:
+Sub-goal Assertion of goal build_advantage_result'vc.
+Prover result is: Valid (0.01s, 17 steps).
+
+File "repaired.mlw", line 171, characters 13-36:
+Sub-goal Assertion of goal build_advantage_result'vc.
+Prover result is: Valid (0.01s, 17 steps).
+
+File "repaired.mlw", line 172, characters 13-38:
+Sub-goal Assertion of goal build_advantage_result'vc.
+Prover result is: Valid (0.01s, 17 steps).
+
+File "repaired.mlw", line 173, characters 13-29:
+Sub-goal Assertion of goal build_advantage_result'vc.
+Prover result is: Valid (0.01s, 17 steps).
+
+File "repaired.mlw", line 174, characters 17-25:
+Sub-goal Array creation size of goal build_advantage_result'vc.
+Prover result is: Valid (0.01s, 17 steps).
+
+File "repaired.mlw", line 178, characters 18-41:
+Sub-goal Loop invariant init of goal build_advantage_result'vc.
+Prover result is: Valid (0.01s, 19 steps).
+
+File "repaired.mlw", line 179, characters 18-41:
+Sub-goal Loop invariant init of goal build_advantage_result'vc.
+Prover result is: Valid (0.01s, 19 steps).
+
+File "repaired.mlw", line 180, characters 18-43:
+Sub-goal Loop invariant init of goal build_advantage_result'vc.
+Prover result is: Valid (0.01s, 19 steps).
+
+File "repaired.mlw", line 181, characters 18-35:
+Sub-goal Loop invariant init of goal build_advantage_result'vc.
+Prover result is: Valid (0.01s, 19 steps).
+
+File "repaired.mlw", line 182, characters 18-34:
+Sub-goal Loop invariant init of goal build_advantage_result'vc.
+Prover result is: Valid (0.01s, 19 steps).
+
+File "repaired.mlw", line 183, characters 18-47:
+Sub-goal Loop invariant init of goal build_advantage_result'vc.
+Prover result is: Valid (0.01s, 19 steps).
+
+File "repaired.mlw", line 184, characters 18-52:
+Sub-goal Loop invariant init of goal build_advantage_result'vc.
+Prover result is: Valid (0.01s, 19 steps).
+
+File "repaired.mlw", line 185, characters 18-69:
+Sub-goal Loop invariant init of goal build_advantage_result'vc.
+Prover result is: Valid (0.01s, 19 steps).
+
+File "repaired.mlw", line 186, characters 18-108:
+Sub-goal Loop invariant init of goal build_advantage_result'vc.
+Prover result is: Valid (0.01s, 59 steps).
+
+File "repaired.mlw", line 187, characters 18-33:
+Sub-goal Index in array bounds of goal build_advantage_result'vc.
+Prover result is: Valid (0.01s, 28 steps).
+
+File "repaired.mlw", line 188, characters 17-36:
+Sub-goal Index in array bounds of goal build_advantage_result'vc.
+Prover result is: Valid (0.01s, 43 steps).
+
+File "repaired.mlw", line 189, characters 17-31:
+Sub-goal Assertion of goal build_advantage_result'vc.
+Prover result is: Valid (0.01s, 48 steps).
+
+File "repaired.mlw", line 190, characters 17-47:
+Sub-goal Assertion of goal build_advantage_result'vc.
+Prover result is: Valid (0.01s, 91 steps).
+
+File "repaired.mlw", line 191, characters 15-36:
+Sub-goal Index in array bounds of goal build_advantage_result'vc.
+Prover result is: Valid (0.01s, 38 steps).
+
+File "repaired.mlw", line 191, characters 8-46:
+Sub-goal Index in array bounds of goal build_advantage_result'vc.
+Prover result is: Valid (0.01s, 38 steps).
+
+File "repaired.mlw", line 178, characters 18-41:
+Sub-goal Loop invariant preservation of goal build_advantage_result'vc.
+Prover result is: Valid (0.01s, 46 steps).
+
+File "repaired.mlw", line 179, characters 18-41:
+Sub-goal Loop invariant preservation of goal build_advantage_result'vc.
+Prover result is: Valid (0.01s, 46 steps).
+
+File "repaired.mlw", line 180, characters 18-43:
+Sub-goal Loop invariant preservation of goal build_advantage_result'vc.
+Prover result is: Valid (0.01s, 46 steps).
+
+File "repaired.mlw", line 181, characters 18-35:
+Sub-goal Loop invariant preservation of goal build_advantage_result'vc.
+Prover result is: Valid (0.01s, 46 steps).
+
+File "repaired.mlw", line 182, characters 18-34:
+Sub-goal Loop invariant preservation of goal build_advantage_result'vc.
+Prover result is: Valid (0.01s, 47 steps).
+
+File "repaired.mlw", line 183, characters 18-47:
+Sub-goal Loop invariant preservation of goal build_advantage_result'vc.
+Prover result is: Valid (0.01s, 47 steps).
+
+File "repaired.mlw", line 184, characters 18-52:
+Sub-goal Loop invariant preservation of goal build_advantage_result'vc.
+Prover result is: Valid (0.01s, 47 steps).
+
+File "repaired.mlw", line 185, characters 18-69:
+Sub-goal Loop invariant preservation of goal build_advantage_result'vc.
+Prover result is: Valid (0.01s, 47 steps).
+
+File "repaired.mlw", line 186, characters 18-108:
+Sub-goal Loop invariant preservation of goal build_advantage_result'vc.
+Prover result is: Valid (0.03s, 414 steps).
+
+File "repaired.mlw", line 194, characters 17-32:
+Sub-goal Assertion of goal build_advantage_result'vc.
+Prover result is: Valid (0.01s, 55 steps).
+
+File "repaired.mlw", line 195, characters 17-48:
+Sub-goal Assertion of goal build_advantage_result'vc.
+Prover result is: Valid (0.01s, 90 steps).
+
+File "repaired.mlw", line 196, characters 15-37:
+Sub-goal Index in array bounds of goal build_advantage_result'vc.
+Prover result is: Valid (0.01s, 38 steps).
+
+File "repaired.mlw", line 196, characters 8-47:
+Sub-goal Index in array bounds of goal build_advantage_result'vc.
+Prover result is: Valid (0.01s, 38 steps).
+
+File "repaired.mlw", line 178, characters 18-41:
+Sub-goal Loop invariant preservation of goal build_advantage_result'vc.
+Prover result is: Valid (0.01s, 46 steps).
+
+File "repaired.mlw", line 179, characters 18-41:
+Sub-goal Loop invariant preservation of goal build_advantage_result'vc.
+Prover result is: Valid (0.01s, 46 steps).
+
+File "repaired.mlw", line 180, characters 18-43:
+Sub-goal Loop invariant preservation of goal build_advantage_result'vc.
+Prover result is: Valid (0.01s, 46 steps).
+
+File "repaired.mlw", line 181, characters 18-35:
+Sub-goal Loop invariant preservation of goal build_advantage_result'vc.
+Prover result is: Valid (0.01s, 46 steps).
+
+File "repaired.mlw", line 182, characters 18-34:
+Sub-goal Loop invariant preservation of goal build_advantage_result'vc.
+Prover result is: Valid (0.01s, 47 steps).
+
+File "repaired.mlw", line 183, characters 18-47:
+Sub-goal Loop invariant preservation of goal build_advantage_result'vc.
+Prover result is: Valid (0.01s, 47 steps).
+
+File "repaired.mlw", line 184, characters 18-52:
+Sub-goal Loop invariant preservation of goal build_advantage_result'vc.
+Prover result is: Valid (0.01s, 47 steps).
+
+File "repaired.mlw", line 185, characters 18-69:
+Sub-goal Loop invariant preservation of goal build_advantage_result'vc.
+Prover result is: Valid (0.01s, 47 steps).
+
+File "repaired.mlw", line 186, characters 18-108:
+Sub-goal Loop invariant preservation of goal build_advantage_result'vc.
+Prover result is: Valid (0.03s, 478 steps).
+
+File "repaired.mlw", line 200, characters 13-103:
+Sub-goal Assertion of goal build_advantage_result'vc.
+Prover result is: Valid (0.01s, 25 steps).
+
+File "repaired.mlw", line 201, characters 13-31:
+Sub-goal Assertion of goal build_advantage_result'vc.
+Prover result is: Valid (0.01s, 34 steps).
+
+File "repaired.mlw", line 202, characters 13-30:
+Sub-goal Assertion of goal build_advantage_result'vc.
+Prover result is: Valid (0.01s, 28 steps).
+
+File "repaired.mlw", line 203, characters 13-40:
+Sub-goal Assertion of goal build_advantage_result'vc.
+Prover result is: Valid (0.01s, 28 steps).
+
+File "repaired.mlw", line 204, characters 13-50:
+Sub-goal Assertion of goal build_advantage_result'vc.
+Prover result is: Timeout (10.00s, 47935 steps).
+
+File "repaired.mlw", line 208, characters 10-73:
+Sub-goal Assertion of goal build_advantage_result'vc.
+Prover result is: Timeout (10.00s, 99670 steps).
+
+File "repaired.mlw", line 210, characters 13-56:
+Sub-goal Assertion of goal build_advantage_result'vc.
+Prover result is: Valid (0.01s, 74 steps).
+
+File "repaired.mlw", line 167, characters 15-58:
+Sub-goal Postcondition of goal build_advantage_result'vc.
+Prover result is: Valid (0.01s, 31 steps).
+
+File repaired.mlw:
+Sub-goal Out of loop bounds of goal build_advantage_result'vc.
+Prover result is: Valid (0.01s, 19 steps).
+---- stage2 | prover: CVC4,1.8 | theory: AdvantageShuffle_Array_Stage3_Imperative | goal: build_advantage_result'vc ----
+Transforms: split_vc
+File "repaired.mlw", line 170, characters 13-36:
+Sub-goal Assertion of goal build_advantage_result'vc.
+Prover result is: Valid (0.03s, 12101 steps).
+
+File "repaired.mlw", line 171, characters 13-36:
+Sub-goal Assertion of goal build_advantage_result'vc.
+Prover result is: Valid (0.03s, 12104 steps).
+
+File "repaired.mlw", line 172, characters 13-38:
+Sub-goal Assertion of goal build_advantage_result'vc.
+Prover result is: Valid (0.03s, 12107 steps).
+
+File "repaired.mlw", line 173, characters 13-29:
+Sub-goal Assertion of goal build_advantage_result'vc.
+Prover result is: Valid (0.03s, 12110 steps).
+
+File "repaired.mlw", line 174, characters 17-25:
+Sub-goal Array creation size of goal build_advantage_result'vc.
+Prover result is: Valid (0.03s, 12220 steps).
+
+File "repaired.mlw", line 178, characters 18-41:
+Sub-goal Loop invariant init of goal build_advantage_result'vc.
+Prover result is: Valid (0.03s, 12236 steps).
+
+File "repaired.mlw", line 179, characters 18-41:
+Sub-goal Loop invariant init of goal build_advantage_result'vc.
+Prover result is: Valid (0.03s, 12239 steps).
+
+File "repaired.mlw", line 180, characters 18-43:
+Sub-goal Loop invariant init of goal build_advantage_result'vc.
+Prover result is: Valid (0.03s, 12242 steps).
+
+File "repaired.mlw", line 181, characters 18-35:
+Sub-goal Loop invariant init of goal build_advantage_result'vc.
+Prover result is: Valid (0.03s, 12245 steps).
+
+File "repaired.mlw", line 182, characters 18-34:
+Sub-goal Loop invariant init of goal build_advantage_result'vc.
+Prover result is: Valid (0.03s, 12248 steps).
+
+File "repaired.mlw", line 183, characters 18-47:
+Sub-goal Loop invariant init of goal build_advantage_result'vc.
+Prover result is: Valid (0.03s, 12248 steps).
+
+File "repaired.mlw", line 184, characters 18-52:
+Sub-goal Loop invariant init of goal build_advantage_result'vc.
+Prover result is: Valid (0.03s, 12251 steps).
+
+File "repaired.mlw", line 185, characters 18-69:
+Sub-goal Loop invariant init of goal build_advantage_result'vc.
+Prover result is: Valid (0.03s, 12254 steps).
+
+File "repaired.mlw", line 186, characters 18-108:
+Sub-goal Loop invariant init of goal build_advantage_result'vc.
+Prover result is: Valid (0.04s, 14625 steps).
+
+File "repaired.mlw", line 187, characters 18-33:
+Sub-goal Index in array bounds of goal build_advantage_result'vc.
+Prover result is: Valid (0.03s, 13421 steps).
+
+File "repaired.mlw", line 188, characters 17-36:
+Sub-goal Index in array bounds of goal build_advantage_result'vc.
+Prover result is: Valid (0.04s, 14967 steps).
+
+File "repaired.mlw", line 189, characters 17-31:
+Sub-goal Assertion of goal build_advantage_result'vc.
+Prover result is: Valid (0.04s, 15080 steps).
+
+File "repaired.mlw", line 190, characters 17-47:
+Sub-goal Assertion of goal build_advantage_result'vc.
+Prover result is: Valid (0.04s, 16739 steps).
+
+File "repaired.mlw", line 191, characters 15-36:
+Sub-goal Index in array bounds of goal build_advantage_result'vc.
+Prover result is: Valid (0.03s, 13599 steps).
+
+File "repaired.mlw", line 191, characters 8-46:
+Sub-goal Index in array bounds of goal build_advantage_result'vc.
+Prover result is: Valid (0.03s, 13598 steps).
+
+File "repaired.mlw", line 178, characters 18-41:
+Sub-goal Loop invariant preservation of goal build_advantage_result'vc.
+Prover result is: Valid (0.03s, 16755 steps).
+
+File "repaired.mlw", line 179, characters 18-41:
+Sub-goal Loop invariant preservation of goal build_advantage_result'vc.
+Prover result is: Valid (0.03s, 16758 steps).
+
+File "repaired.mlw", line 180, characters 18-43:
+Sub-goal Loop invariant preservation of goal build_advantage_result'vc.
+Prover result is: Valid (0.03s, 16761 steps).
+
+File "repaired.mlw", line 181, characters 18-35:
+Sub-goal Loop invariant preservation of goal build_advantage_result'vc.
+Prover result is: Valid (0.04s, 17084 steps).
+
+File "repaired.mlw", line 182, characters 18-34:
+Sub-goal Loop invariant preservation of goal build_advantage_result'vc.
+Prover result is: Valid (0.03s, 16780 steps).
+
+File "repaired.mlw", line 183, characters 18-47:
+Sub-goal Loop invariant preservation of goal build_advantage_result'vc.
+Prover result is: Valid (0.03s, 16780 steps).
+
+File "repaired.mlw", line 184, characters 18-52:
+Sub-goal Loop invariant preservation of goal build_advantage_result'vc.
+Prover result is: Valid (0.03s, 16783 steps).
+
+File "repaired.mlw", line 185, characters 18-69:
+Sub-goal Loop invariant preservation of goal build_advantage_result'vc.
+Prover result is: Valid (0.03s, 16786 steps).
+
+File "repaired.mlw", line 186, characters 18-108:
+Sub-goal Loop invariant preservation of goal build_advantage_result'vc.
+Prover result is: Timeout (10.00s, 829382 steps).
+
+File "repaired.mlw", line 194, characters 17-32:
+Sub-goal Assertion of goal build_advantage_result'vc.
+Prover result is: Valid (0.04s, 15077 steps).
+
+File "repaired.mlw", line 195, characters 17-48:
+Sub-goal Assertion of goal build_advantage_result'vc.
+Prover result is: Valid (0.04s, 16934 steps).
+
+File "repaired.mlw", line 196, characters 15-37:
+Sub-goal Index in array bounds of goal build_advantage_result'vc.
+Prover result is: Valid (0.03s, 13594 steps).
+
+File "repaired.mlw", line 196, characters 8-47:
+Sub-goal Index in array bounds of goal build_advantage_result'vc.
+Prover result is: Valid (0.03s, 13593 steps).
+
+File "repaired.mlw", line 178, characters 18-41:
+Sub-goal Loop invariant preservation of goal build_advantage_result'vc.
+Prover result is: Valid (0.03s, 16757 steps).
+
+File "repaired.mlw", line 179, characters 18-41:
+Sub-goal Loop invariant preservation of goal build_advantage_result'vc.
+Prover result is: Valid (0.03s, 16760 steps).
+
+File "repaired.mlw", line 180, characters 18-43:
+Sub-goal Loop invariant preservation of goal build_advantage_result'vc.
+Prover result is: Valid (0.03s, 16763 steps).
+
+File "repaired.mlw", line 181, characters 18-35:
+Sub-goal Loop invariant preservation of goal build_advantage_result'vc.
+Prover result is: Valid (0.04s, 17056 steps).
+
+File "repaired.mlw", line 182, characters 18-34:
+Sub-goal Loop invariant preservation of goal build_advantage_result'vc.
+Prover result is: Valid (0.03s, 16782 steps).
+
+File "repaired.mlw", line 183, characters 18-47:
+Sub-goal Loop invariant preservation of goal build_advantage_result'vc.
+Prover result is: Valid (0.03s, 16782 steps).
+
+File "repaired.mlw", line 184, characters 18-52:
+Sub-goal Loop invariant preservation of goal build_advantage_result'vc.
+Prover result is: Valid (0.03s, 16785 steps).
+
+File "repaired.mlw", line 185, characters 18-69:
+Sub-goal Loop invariant preservation of goal build_advantage_result'vc.
+Prover result is: Valid (0.03s, 16788 steps).
+
+File "repaired.mlw", line 186, characters 18-108:
+Sub-goal Loop invariant preservation of goal build_advantage_result'vc.
+Prover result is: Timeout (10.00s, 1050845 steps).
+
+File "repaired.mlw", line 200, characters 13-103:
+Sub-goal Assertion of goal build_advantage_result'vc.
+Prover result is: Valid (0.03s, 13232 steps).
+
+File "repaired.mlw", line 201, characters 13-31:
+Sub-goal Assertion of goal build_advantage_result'vc.
+Prover result is: Valid (0.04s, 14861 steps).
+
+File "repaired.mlw", line 202, characters 13-30:
+Sub-goal Assertion of goal build_advantage_result'vc.
+Prover result is: Valid (0.03s, 13266 steps).
+
+File "repaired.mlw", line 203, characters 13-40:
+Sub-goal Assertion of goal build_advantage_result'vc.
+Prover result is: Valid (0.03s, 13269 steps).
+Infrastructure issue in stage 2 with prover CVC4,1.8; aborting rest of stage 2.
+== Goals still unproved after stage 2 (split_vc) ==
+AdvantageShuffle_Array_Stage3_Imperative	build_advantage_result'vc
+== Stage 3: split_vc + inline_all on still-unproved goal ==
+Target theory: AdvantageShuffle_Array_Stage3_Imperative
+Target goal  : build_advantage_result'vc
+---- stage3 | prover: Z3,4.8.6 | theory: AdvantageShuffle_Array_Stage3_Imperative | goal: build_advantage_result'vc ----
+Transforms: split_vc inline_all
+File "repaired.mlw", line 170, characters 13-36:
+Sub-goal Assertion of goal build_advantage_result'vc.
+Prover result is: Valid (0.01s, 10726 steps).
+
+File "repaired.mlw", line 171, characters 13-36:
+Sub-goal Assertion of goal build_advantage_result'vc.
+Prover result is: Valid (0.01s, 10733 steps).
+
+File "repaired.mlw", line 172, characters 13-38:
+Sub-goal Assertion of goal build_advantage_result'vc.
+Prover result is: Valid (0.01s, 10738 steps).
+
+File "repaired.mlw", line 173, characters 13-29:
+Sub-goal Assertion of goal build_advantage_result'vc.
+Prover result is: Valid (0.01s, 10743 steps).
+
+File "repaired.mlw", line 174, characters 17-25:
+Sub-goal Array creation size of goal build_advantage_result'vc.
+Prover result is: Valid (0.02s, 128576 steps).
+
+File "repaired.mlw", line 178, characters 18-41:
+Sub-goal Loop invariant init of goal build_advantage_result'vc.
+Prover result is: Valid (0.01s, 10849 steps).
+
+File "repaired.mlw", line 179, characters 18-41:
+Sub-goal Loop invariant init of goal build_advantage_result'vc.
+Prover result is: Valid (0.01s, 10856 steps).
+
+File "repaired.mlw", line 180, characters 18-43:
+Sub-goal Loop invariant init of goal build_advantage_result'vc.
+Prover result is: Valid (0.01s, 10861 steps).
+
+File "repaired.mlw", line 181, characters 18-35:
+Sub-goal Loop invariant init of goal build_advantage_result'vc.
+Prover result is: Valid (0.01s, 10870 steps).
+
+File "repaired.mlw", line 182, characters 18-34:
+Sub-goal Loop invariant init of goal build_advantage_result'vc.
+Prover result is: Valid (0.01s, 10875 steps).
+
+File "repaired.mlw", line 183, characters 18-47:
+Sub-goal Loop invariant init of goal build_advantage_result'vc.
+Prover result is: Valid (0.01s, 15764 steps).
+
+File "repaired.mlw", line 184, characters 18-52:
+Sub-goal Loop invariant init of goal build_advantage_result'vc.
+Prover result is: Valid (0.02s, 131486 steps).
+
+File "repaired.mlw", line 185, characters 18-69:
+Sub-goal Loop invariant init of goal build_advantage_result'vc.
+Prover result is: Valid (0.01s, 16330 steps).
+
+File "repaired.mlw", line 186, characters 18-108:
+Sub-goal Loop invariant init of goal build_advantage_result'vc.
+Prover result is: Valid (0.02s, 133718 steps).
+
+File "repaired.mlw", line 187, characters 18-33:
+Sub-goal Index in array bounds of goal build_advantage_result'vc.
+Prover result is: Valid (0.02s, 155781 steps).
+
+File "repaired.mlw", line 188, characters 17-36:
+Sub-goal Index in array bounds of goal build_advantage_result'vc.
+Prover result is: Valid (0.02s, 155616 steps).
+
+File "repaired.mlw", line 189, characters 17-31:
+Sub-goal Assertion of goal build_advantage_result'vc.
+Prover result is: Valid (0.02s, 157528 steps).
+
+File "repaired.mlw", line 190, characters 17-47:
+Sub-goal Assertion of goal build_advantage_result'vc.
+Prover result is: Valid (0.03s, 163226 steps).
+
+File "repaired.mlw", line 191, characters 15-36:
+Sub-goal Index in array bounds of goal build_advantage_result'vc.
+Prover result is: Valid (0.02s, 156514 steps).
+
+File "repaired.mlw", line 191, characters 8-46:
+Sub-goal Index in array bounds of goal build_advantage_result'vc.
+Prover result is: Valid (0.02s, 156336 steps).
+
+File "repaired.mlw", line 178, characters 18-41:
+Sub-goal Loop invariant preservation of goal build_advantage_result'vc.
+Prover result is: Valid (0.01s, 12249 steps).
+
+File "repaired.mlw", line 179, characters 18-41:
+Sub-goal Loop invariant preservation of goal build_advantage_result'vc.
+Prover result is: Valid (0.01s, 12254 steps).
+
+File "repaired.mlw", line 180, characters 18-43:
+Sub-goal Loop invariant preservation of goal build_advantage_result'vc.
+Prover result is: Valid (0.01s, 12259 steps).
+
+File "repaired.mlw", line 181, characters 18-35:
+Sub-goal Loop invariant preservation of goal build_advantage_result'vc.
+Prover result is: Valid (0.02s, 163191 steps).
+
+File "repaired.mlw", line 182, characters 18-34:
+Sub-goal Loop invariant preservation of goal build_advantage_result'vc.
+Prover result is: Valid (0.01s, 12273 steps).
+
+File "repaired.mlw", line 183, characters 18-47:
+Sub-goal Loop invariant preservation of goal build_advantage_result'vc.
+Prover result is: Valid (0.01s, 18166 steps).
+
+File "repaired.mlw", line 184, characters 18-52:
+Sub-goal Loop invariant preservation of goal build_advantage_result'vc.
+Prover result is: Valid (0.03s, 168301 steps).
+
+File "repaired.mlw", line 185, characters 18-69:
+Sub-goal Loop invariant preservation of goal build_advantage_result'vc.
+Prover result is: Valid (0.01s, 18728 steps).
+
+File "repaired.mlw", line 186, characters 18-108:
+Sub-goal Loop invariant preservation of goal build_advantage_result'vc.
+Prover result is: Timeout (10.00s, 309054587 steps).
+
+File "repaired.mlw", line 194, characters 17-32:
+Sub-goal Assertion of goal build_advantage_result'vc.
+Prover result is: Valid (0.02s, 157503 steps).
+
+File "repaired.mlw", line 195, characters 17-48:
+Sub-goal Assertion of goal build_advantage_result'vc.
+Prover result is: Valid (0.03s, 170734 steps).
+
+File "repaired.mlw", line 196, characters 15-37:
+Sub-goal Index in array bounds of goal build_advantage_result'vc.
+Prover result is: Valid (0.02s, 156226 steps).
+
+File "repaired.mlw", line 196, characters 8-47:
+Sub-goal Index in array bounds of goal build_advantage_result'vc.
+Prover result is: Valid (0.02s, 156247 steps).
+
+File "repaired.mlw", line 178, characters 18-41:
+Sub-goal Loop invariant preservation of goal build_advantage_result'vc.
+Prover result is: Valid (0.01s, 12253 steps).
+
+File "repaired.mlw", line 179, characters 18-41:
+Sub-goal Loop invariant preservation of goal build_advantage_result'vc.
+Prover result is: Valid (0.01s, 12258 steps).
+
+File "repaired.mlw", line 180, characters 18-43:
+Sub-goal Loop invariant preservation of goal build_advantage_result'vc.
+Prover result is: Valid (0.01s, 12263 steps).
+
+File "repaired.mlw", line 181, characters 18-35:
+Sub-goal Loop invariant preservation of goal build_advantage_result'vc.
+Prover result is: Valid (0.02s, 163147 steps).
+
+File "repaired.mlw", line 182, characters 18-34:
+Sub-goal Loop invariant preservation of goal build_advantage_result'vc.
+Prover result is: Valid (0.01s, 12277 steps).
+
+File "repaired.mlw", line 183, characters 18-47:
+Sub-goal Loop invariant preservation of goal build_advantage_result'vc.
+Prover result is: Valid (0.01s, 18174 steps).
+
+File "repaired.mlw", line 184, characters 18-52:
+Sub-goal Loop invariant preservation of goal build_advantage_result'vc.
+Prover result is: Valid (0.02s, 168249 steps).
+
+File "repaired.mlw", line 185, characters 18-69:
+Sub-goal Loop invariant preservation of goal build_advantage_result'vc.
+Prover result is: Valid (0.01s, 18736 steps).
+
+File "repaired.mlw", line 186, characters 18-108:
+Sub-goal Loop invariant preservation of goal build_advantage_result'vc.
+Prover result is: Valid (1.09s, 7985997 steps).
+
+File "repaired.mlw", line 200, characters 13-103:
+Sub-goal Assertion of goal build_advantage_result'vc.
+Prover result is: Valid (0.01s, 17717 steps).
+
+File "repaired.mlw", line 201, characters 13-31:
+Sub-goal Assertion of goal build_advantage_result'vc.
+Prover result is: Valid (0.01s, 41520 steps).
+
+File "repaired.mlw", line 202, characters 13-30:
+Sub-goal Assertion of goal build_advantage_result'vc.
+Prover result is: Valid (0.01s, 12311 steps).
+
+File "repaired.mlw", line 203, characters 13-40:
+Sub-goal Assertion of goal build_advantage_result'vc.
+Prover result is: Valid (0.01s, 12318 steps).
+
+File "repaired.mlw", line 204, characters 13-50:
+Sub-goal Assertion of goal build_advantage_result'vc.
+Prover result is: Timeout (10.00s, 193674468 steps).
+Infrastructure issue in stage 3 with prover Z3,4.8.6; aborting rest of stage 3.
+== Final summary ==
+Unproved root goals after first prover : 1
+Remaining failures after split_vc      : 1
+Remaining failures after stage 3       : 1
+Detailed logs stored in                : /Users/rubenm/Desktop/Diversify2Verify/codex-runs/repair2-split2/stage3a-rerepair/870_advantage-shuffle/array-imperative/advantage_shuffle_array_stage3_db9a16ee_stage3/repaired/generated/why3/.why3_sessions/repaired_logs
+Still unproved goals:
+AdvantageShuffle_Array_Stage3_Imperative	build_advantage_result'vc
+VERIFY_RESULT: FAILURE
+VERIFY_REASON: unproved_goals_remain
+VERIFY_STAGE: stage3
+VERIFY_ROOT_TOTAL: 5
+VERIFY_ROOT_PROVED: 4
+VERIFY_ROOT_REMAINING: 1

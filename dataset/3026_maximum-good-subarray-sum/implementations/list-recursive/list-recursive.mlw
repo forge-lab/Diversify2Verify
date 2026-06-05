@@ -1,0 +1,193 @@
+module MaximumGoodSubarraySum_List_Recursive_Implementation
+
+  use int.Int
+  use int.Abs
+  use list.List
+
+  type maybe_int =
+    | NoResult
+    | Result int
+
+  let better (a: maybe_int) (b: maybe_int) : maybe_int =
+    match a with
+    | NoResult -> b
+    | Result x ->
+        match b with
+        | NoResult -> a
+        | Result y -> if x >= y then a else b
+        end
+    end
+
+  let rec best_with_first (first: int) (acc: int) (rest: list int) (k: int) : maybe_int
+    variant { rest }
+  =
+    match rest with
+    | Nil -> NoResult
+    | Cons x xs ->
+        let next_sum = acc + x in
+        let current =
+          if abs (first - x) = k then Result next_sum else NoResult
+        in
+        better current (best_with_first first next_sum xs k)
+    end
+
+  let rec best_over_starts (nums: list int) (k: int) : maybe_int
+    variant { nums }
+  =
+    match nums with
+    | Nil -> NoResult
+    | Cons _ Nil -> NoResult
+    | Cons x xs ->
+        better (best_with_first x x xs k) (best_over_starts xs k)
+    end
+
+  let maximum_good_subarray_sum_list (nums: list int) (k: int) : int =
+    match best_over_starts nums k with
+    | NoResult -> 0
+    | Result best -> best
+    end
+
+  let test_000 () : bool =
+    let nums = Cons 1000000000 (Cons (-1000000000) Nil) in
+    let r = maximum_good_subarray_sum_list nums 2000000000 in
+    r = 0
+
+  let test_001 () : bool =
+    let nums = Cons (-1) (Cons 3 (Cons 2 (Cons 4 (Cons 5 Nil)))) in
+    let r = maximum_good_subarray_sum_list nums 3 in
+    r = 11
+
+  let test_002 () : bool =
+    let nums = Cons 10 (Cons 20 (Cons 30 (Cons 40 (Cons 50 Nil)))) in
+    let r = maximum_good_subarray_sum_list nums 20 in
+    r = 120
+
+  let test_005 () : bool =
+    let nums = Cons (-1000000000) (Cons 1000000000 (Cons (-1000000000) (Cons 1000000000 Nil))) in
+    let r = maximum_good_subarray_sum_list nums 2000000000 in
+    r = 0
+
+  let test_006 () : bool =
+    let nums = Cons 1 (Cons 3 (Cons 5 (Cons 7 (Cons 9 Nil)))) in
+    let r = maximum_good_subarray_sum_list nums 8 in
+    r = 25
+
+  let test_007 () : bool =
+    let nums = Cons 1 (Cons 2 (Cons 3 (Cons 4 (Cons 5 (Cons 6 (Cons 7 (Cons 8 (Cons 9 (Cons 10 Nil))))))))) in
+    let r = maximum_good_subarray_sum_list nums 9 in
+    r = 55
+
+  let test_008 () : bool =
+    let nums = Cons 10 (Cons 20 (Cons 30 (Cons 40 (Cons 50 Nil)))) in
+    let r = maximum_good_subarray_sum_list nums 40 in
+    r = 150
+
+  let test_009 () : bool =
+    let nums = Cons (-1) (Cons (-2) (Cons (-3) (Cons (-4) Nil))) in
+    let r = maximum_good_subarray_sum_list nums 2 in
+    r = (-6)
+
+  let test_010 () : bool =
+    let nums = Cons 1 (Cons (-1) (Cons 1 (Cons (-1) (Cons 1 Nil)))) in
+    let r = maximum_good_subarray_sum_list nums 2 in
+    r = 0
+
+  let test_011 () : bool =
+    let nums = Cons 1 (Cons 2 (Cons 3 (Cons 4 (Cons 5 (Cons 6 Nil))))) in
+    let r = maximum_good_subarray_sum_list nums 1 in
+    r = 11
+
+  let test_012 () : bool =
+    let nums = Cons 1 (Cons 3 (Cons 1 (Cons 5 (Cons 4 (Cons 1 (Cons 3 (Cons 5 Nil))))))) in
+    let r = maximum_good_subarray_sum_list nums 2 in
+    r = 22
+
+  let test_013 () : bool =
+    let nums = Cons 1 (Cons 3 (Cons 1 (Cons 5 (Cons 4 (Cons 1 Nil))))) in
+    let r = maximum_good_subarray_sum_list nums 4 in
+    r = 10
+
+  let test_014 () : bool =
+    let nums = Cons 5 (Cons 4 (Cons 3 (Cons 2 (Cons 1 Nil)))) in
+    let r = maximum_good_subarray_sum_list nums 4 in
+    r = 15
+
+  let test_015 () : bool =
+    let nums = Cons 10 (Cons 9 (Cons 8 (Cons 7 (Cons 6 (Cons 5 (Cons 4 (Cons 3 (Cons 2 (Cons 1 Nil))))))))) in
+    let r = maximum_good_subarray_sum_list nums 9 in
+    r = 55
+
+  let test_016 () : bool =
+    let nums = Cons 10 (Cons 20 (Cons 30 (Cons 40 (Cons 50 Nil)))) in
+    let r = maximum_good_subarray_sum_list nums 10 in
+    r = 90
+
+  let test_020 () : bool =
+    let nums = Cons 1 (Cons 2 (Cons 3 (Cons 4 (Cons 5 (Cons 6 (Cons 7 (Cons 8 (Cons 9 (Cons 10 (Cons 11 (Cons 12 (Cons 13 (Cons 14 (Cons 15 (Cons 16 (Cons 17 (Cons 18 (Cons 19 (Cons 20 Nil))))))))))))))))))) in
+    let r = maximum_good_subarray_sum_list nums 19 in
+    r = 210
+
+  let test_021 () : bool =
+    let nums = Cons 1 (Cons 2 (Cons 3 (Cons 4 (Cons 5 (Cons 6 (Cons 7 (Cons 8 (Cons 9 (Cons 10 (Cons 11 (Cons 12 (Cons 13 (Cons 14 (Cons 15 (Cons 1 (Cons 2 (Cons 3 (Cons 4 (Cons 5 Nil))))))))))))))))))) in
+    let r = maximum_good_subarray_sum_list nums 14 in
+    r = 120
+
+  let test_022 () : bool =
+    let nums = Cons 1 (Cons 3 (Cons 1 (Cons 5 (Cons 1 (Cons 7 (Cons 1 (Cons 9 (Cons 1 (Cons 11 Nil))))))))) in
+    let r = maximum_good_subarray_sum_list nums 8 in
+    r = 39
+
+  let test_023 () : bool =
+    let nums = Cons 1 (Cons 2 (Cons 3 (Cons 4 (Cons 5 (Cons 6 (Cons 7 (Cons 8 (Cons 9 (Cons 10 (Cons 11 (Cons 12 (Cons 13 (Cons 14 (Cons 15 (Cons 16 (Cons 17 (Cons 18 (Cons 19 (Cons 20 (Cons 1 (Cons 2 (Cons 3 (Cons 4 (Cons 5 Nil)))))))))))))))))))))))) in
+    let r = maximum_good_subarray_sum_list nums 19 in
+    r = 210
+
+  let test_024 () : bool =
+    let nums = Cons (-1) (Cons 0 (Cons 1 (Cons (-2) (Cons 2 (Cons (-3) (Cons 3 (Cons (-4) (Cons 4 (Cons (-5) (Cons 5 Nil)))))))))) in
+    let r = maximum_good_subarray_sum_list nums 5 in
+    r = 1
+
+  let run_tests () : bool =
+    if test_000 () then
+    if test_001 () then
+    if test_002 () then
+    if test_005 () then
+    if test_006 () then
+    if test_007 () then
+    if test_008 () then
+    if test_009 () then
+    if test_010 () then
+    if test_011 () then
+    if test_012 () then
+    if test_013 () then
+    if test_014 () then
+    if test_015 () then
+    if test_016 () then
+    if test_020 () then
+    if test_021 () then
+    if test_022 () then
+    if test_023 () then
+    if test_024 () then
+      true
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+
+end

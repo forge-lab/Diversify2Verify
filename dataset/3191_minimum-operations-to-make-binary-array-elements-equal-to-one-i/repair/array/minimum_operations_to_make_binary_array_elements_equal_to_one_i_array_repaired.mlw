@@ -1,0 +1,362 @@
+module MinimumOperationsToMakeBinaryArrayElementsEqualToOneI_Array_Spec
+
+  use int.Int
+  use int.EuclideanDivision
+  use array.Array
+  use array.Init
+
+  predicate valid_input (nums: array int) =
+    3 <= length nums <= 100000 /\
+    forall i: int. 0 <= i < length nums -> nums[i] = 0 \/ nums[i] = 1
+
+  predicate valid_operation_plan (nums: array int) (ops: array int) =
+    length ops = length nums - 2 /\
+    forall i: int. 0 <= i < length ops -> ops[i] = 0 \/ ops[i] = 1
+
+  let function selected_operation_at (ops: array int) (i: int) : int =
+    if 0 <= i < length ops then
+      if ops[i] = 1 then 1 else 0
+    else 0
+
+  let rec function operation_count_from (ops: array int) (i: int) : int
+    requires { 0 <= i <= length ops }
+    variant  { length ops - i }
+  =
+    if i = length ops then 0
+    else selected_operation_at ops i + operation_count_from ops (i + 1)
+
+  function operation_count (ops: array int) : int =
+    operation_count_from ops 0
+
+  function affecting_flip_count (ops: array int) (i: int) : int =
+    selected_operation_at ops i +
+    selected_operation_at ops (i - 1) +
+    selected_operation_at ops (i - 2)
+
+  predicate final_one_at (nums: array int) (ops: array int) (i: int) =
+    0 <= i < length nums /\
+    ((mod (affecting_flip_count ops i) 2 = 0 -> nums[i] = 1) /\
+     (mod (affecting_flip_count ops i) 2 = 1 -> nums[i] = 0))
+
+  predicate makes_all_one (nums: array int) (ops: array int) =
+    valid_operation_plan nums ops /\
+    forall i: int. 0 <= i < length nums -> final_one_at nums ops i
+
+  predicate feasible_with_operations (nums: array int) (k: int) =
+    exists ops: array int.
+      valid_operation_plan nums ops /\
+      makes_all_one nums ops /\
+      operation_count ops = k
+
+  predicate no_feasible_operation_plan (nums: array int) =
+    forall ops: array int.
+      valid_operation_plan nums ops -> not (makes_all_one nums ops)
+
+  predicate minimum_operation_result (nums: array int) (res: int) =
+    (res = -1 /\ no_feasible_operation_plan nums) \/
+    (0 <= res /\
+     feasible_with_operations nums res /\
+     forall k: int. feasible_with_operations nums k -> res <= k)
+
+  val minimum_operations_to_make_binary_array_elements_equal_to_one_i_array
+    (nums: array int) : int
+    requires { valid_input nums }
+    ensures  { result = -1 \/ 0 <= result <= length nums - 2 }
+    ensures  { minimum_operation_result nums result }
+
+  let lemma test_000_python_assertions () =
+    let nums = init 6 [|0; 1; 0; 1; 0; 1|] in
+    let ops = init 4 [|1; 1; 1; 0|] in
+    assert { length nums = 6 };
+    assert { nums[0] = 0 };
+    assert { nums[1] = 1 };
+    assert { nums[2] = 0 };
+    assert { nums[3] = 1 };
+    assert { nums[4] = 0 };
+    assert { nums[5] = 1 };
+    assert { length ops = 4 };
+    assert { ops[0] = 1 };
+    assert { ops[1] = 1 };
+    assert { ops[2] = 1 };
+    assert { ops[3] = 0 };
+    assert { valid_input nums };
+    assert { valid_operation_plan nums ops };
+    assert { operation_count ops = 3 };
+    assert { affecting_flip_count ops 0 = 1 };
+    assert { affecting_flip_count ops 1 = 2 };
+    assert { affecting_flip_count ops 2 = 3 };
+    assert { affecting_flip_count ops 3 = 2 };
+    assert { affecting_flip_count ops 4 = 1 };
+    assert { affecting_flip_count ops 5 = 0 };
+    assert { final_one_at nums ops 0 };
+    assert { final_one_at nums ops 1 };
+    assert { final_one_at nums ops 2 };
+    assert { final_one_at nums ops 3 };
+    assert { final_one_at nums ops 4 };
+    assert { final_one_at nums ops 5 };
+    assert {
+      forall i: int. 0 <= i < length nums ->
+        i = 0 \/ i = 1 \/ i = 2 \/ i = 3 \/ i = 4 \/ i = 5
+    };
+    assert {
+      forall i: int. 0 <= i < length nums -> final_one_at nums ops i
+    };
+    assert { makes_all_one nums ops };
+    assert { feasible_with_operations nums 3 };
+    assert { minimum_operation_result nums 3 }
+
+  let lemma test_001_python_assertions () =
+    let nums = init 7 [|0; 0; 1; 1; 1; 0; 0|] in
+    let ops = init 5 [|1; 0; 1; 1; 0|] in
+    assert { length nums = 7 };
+    assert { nums[0] = 0 };
+    assert { nums[1] = 0 };
+    assert { nums[2] = 1 };
+    assert { nums[3] = 1 };
+    assert { nums[4] = 1 };
+    assert { nums[5] = 0 };
+    assert { nums[6] = 0 };
+    assert { length ops = 5 };
+    assert { ops[0] = 1 };
+    assert { ops[1] = 0 };
+    assert { ops[2] = 1 };
+    assert { ops[3] = 1 };
+    assert { ops[4] = 0 };
+    assert { valid_input nums };
+    assert { valid_operation_plan nums ops };
+    assert { operation_count ops = 3 };
+    assert { affecting_flip_count ops 6 = 0 };
+    assert { not (final_one_at nums ops 6) };
+    assert { not (makes_all_one nums ops) };
+    assert { no_feasible_operation_plan nums };
+    assert { minimum_operation_result nums (-1) }
+
+  let lemma test_002_python_assertions () =
+    let nums = init 10 [|0; 0; 1; 0; 0; 1; 0; 1; 1; 0|] in
+    let ops = init 8 [|1; 0; 1; 0; 0; 0; 1; 1|] in
+    assert { length nums = 10 };
+    assert { nums[0] = 0 };
+    assert { nums[1] = 0 };
+    assert { nums[2] = 1 };
+    assert { nums[3] = 0 };
+    assert { nums[4] = 0 };
+    assert { nums[5] = 1 };
+    assert { nums[6] = 0 };
+    assert { nums[7] = 1 };
+    assert { nums[8] = 1 };
+    assert { nums[9] = 0 };
+    assert { length ops = 8 };
+    assert { ops[0] = 1 };
+    assert { ops[1] = 0 };
+    assert { ops[2] = 1 };
+    assert { ops[3] = 0 };
+    assert { ops[4] = 0 };
+    assert { ops[5] = 0 };
+    assert { ops[6] = 1 };
+    assert { ops[7] = 1 };
+    assert { valid_input nums };
+    assert { valid_operation_plan nums ops };
+    assert { operation_count ops = 4 };
+    assert { affecting_flip_count ops 0 = 1 };
+    assert { affecting_flip_count ops 1 = 1 };
+    assert { affecting_flip_count ops 2 = 2 };
+    assert { affecting_flip_count ops 3 = 1 };
+    assert { affecting_flip_count ops 4 = 1 };
+    assert { affecting_flip_count ops 5 = 0 };
+    assert { affecting_flip_count ops 6 = 1 };
+    assert { affecting_flip_count ops 7 = 2 };
+    assert { affecting_flip_count ops 8 = 2 };
+    assert { affecting_flip_count ops 9 = 1 };
+    assert { final_one_at nums ops 0 };
+    assert { final_one_at nums ops 1 };
+    assert { final_one_at nums ops 2 };
+    assert { final_one_at nums ops 3 };
+    assert { final_one_at nums ops 4 };
+    assert { final_one_at nums ops 5 };
+    assert { final_one_at nums ops 6 };
+    assert { final_one_at nums ops 7 };
+    assert { final_one_at nums ops 8 };
+    assert { final_one_at nums ops 9 };
+    assert {
+      forall i: int. 0 <= i < length nums ->
+        i = 0 \/ i = 1 \/ i = 2 \/ i = 3 \/ i = 4 \/
+        i = 5 \/ i = 6 \/ i = 7 \/ i = 8 \/ i = 9
+    };
+    assert {
+      forall i: int. 0 <= i < length nums -> final_one_at nums ops i
+    };
+    assert { makes_all_one nums ops };
+    assert { feasible_with_operations nums 4 };
+    assert { minimum_operation_result nums 4 }
+
+  let lemma test_003_python_assertions () =
+    let nums = init 9 [|1; 0; 1; 0; 1; 0; 1; 0; 1|] in
+    let ops = init 7 [|0; 1; 1; 1; 0; 0; 0|] in
+    assert { length nums = 9 };
+    assert { nums[0] = 1 };
+    assert { nums[1] = 0 };
+    assert { nums[2] = 1 };
+    assert { nums[3] = 0 };
+    assert { nums[4] = 1 };
+    assert { nums[5] = 0 };
+    assert { nums[6] = 1 };
+    assert { nums[7] = 0 };
+    assert { nums[8] = 1 };
+    assert { length ops = 7 };
+    assert { ops[0] = 0 };
+    assert { ops[1] = 1 };
+    assert { ops[2] = 1 };
+    assert { ops[3] = 1 };
+    assert { ops[4] = 0 };
+    assert { ops[5] = 0 };
+    assert { ops[6] = 0 };
+    assert { valid_input nums };
+    assert { valid_operation_plan nums ops };
+    assert { operation_count ops = 3 };
+    assert { affecting_flip_count ops 7 = 0 };
+    assert { not (final_one_at nums ops 7) };
+    assert { not (makes_all_one nums ops) };
+    assert { no_feasible_operation_plan nums };
+    assert { minimum_operation_result nums (-1) }
+
+  let lemma test_004_python_assertions () =
+    let nums = init 9 [|0; 0; 0; 1; 1; 1; 0; 0; 0|] in
+    let ops = init 7 [|1; 0; 0; 0; 0; 0; 1|] in
+    assert { length nums = 9 };
+    assert { nums[0] = 0 };
+    assert { nums[1] = 0 };
+    assert { nums[2] = 0 };
+    assert { nums[3] = 1 };
+    assert { nums[4] = 1 };
+    assert { nums[5] = 1 };
+    assert { nums[6] = 0 };
+    assert { nums[7] = 0 };
+    assert { nums[8] = 0 };
+    assert { length ops = 7 };
+    assert { ops[0] = 1 };
+    assert { ops[1] = 0 };
+    assert { ops[2] = 0 };
+    assert { ops[3] = 0 };
+    assert { ops[4] = 0 };
+    assert { ops[5] = 0 };
+    assert { ops[6] = 1 };
+    assert { valid_input nums };
+    assert { valid_operation_plan nums ops };
+    assert { operation_count ops = 2 };
+    assert { affecting_flip_count ops 0 = 1 };
+    assert { affecting_flip_count ops 1 = 1 };
+    assert { affecting_flip_count ops 2 = 1 };
+    assert { affecting_flip_count ops 3 = 0 };
+    assert { affecting_flip_count ops 4 = 0 };
+    assert { affecting_flip_count ops 5 = 0 };
+    assert { affecting_flip_count ops 6 = 1 };
+    assert { affecting_flip_count ops 7 = 1 };
+    assert { affecting_flip_count ops 8 = 1 };
+    assert { final_one_at nums ops 0 };
+    assert { final_one_at nums ops 1 };
+    assert { final_one_at nums ops 2 };
+    assert { final_one_at nums ops 3 };
+    assert { final_one_at nums ops 4 };
+    assert { final_one_at nums ops 5 };
+    assert { final_one_at nums ops 6 };
+    assert { final_one_at nums ops 7 };
+    assert { final_one_at nums ops 8 };
+    assert {
+      forall i: int. 0 <= i < length nums ->
+        i = 0 \/ i = 1 \/ i = 2 \/ i = 3 \/ i = 4 \/
+        i = 5 \/ i = 6 \/ i = 7 \/ i = 8
+    };
+    assert {
+      forall i: int. 0 <= i < length nums -> final_one_at nums ops i
+    };
+    assert { makes_all_one nums ops };
+    assert { feasible_with_operations nums 2 };
+    assert { minimum_operation_result nums 2 }
+
+  let lemma test_005_python_assertions () =
+    let nums = init 7 [|1; 1; 1; 1; 1; 1; 1|] in
+    let ops = init 5 [|0; 0; 0; 0; 0|] in
+    assert { length nums = 7 };
+    assert { nums[0] = 1 };
+    assert { nums[1] = 1 };
+    assert { nums[2] = 1 };
+    assert { nums[3] = 1 };
+    assert { nums[4] = 1 };
+    assert { nums[5] = 1 };
+    assert { nums[6] = 1 };
+    assert { length ops = 5 };
+    assert { ops[0] = 0 };
+    assert { ops[1] = 0 };
+    assert { ops[2] = 0 };
+    assert { ops[3] = 0 };
+    assert { ops[4] = 0 };
+    assert { valid_input nums };
+    assert { valid_operation_plan nums ops };
+    assert { operation_count ops = 0 };
+    assert { affecting_flip_count ops 0 = 0 };
+    assert { affecting_flip_count ops 1 = 0 };
+    assert { affecting_flip_count ops 2 = 0 };
+    assert { affecting_flip_count ops 3 = 0 };
+    assert { affecting_flip_count ops 4 = 0 };
+    assert { affecting_flip_count ops 5 = 0 };
+    assert { affecting_flip_count ops 6 = 0 };
+    assert { final_one_at nums ops 0 };
+    assert { final_one_at nums ops 1 };
+    assert { final_one_at nums ops 2 };
+    assert { final_one_at nums ops 3 };
+    assert { final_one_at nums ops 4 };
+    assert { final_one_at nums ops 5 };
+    assert { final_one_at nums ops 6 };
+    assert {
+      forall i: int. 0 <= i < length nums ->
+        i = 0 \/ i = 1 \/ i = 2 \/ i = 3 \/ i = 4 \/ i = 5 \/ i = 6
+    };
+    assert {
+      forall i: int. 0 <= i < length nums -> final_one_at nums ops i
+    };
+    assert { makes_all_one nums ops };
+    assert { feasible_with_operations nums 0 };
+    assert { minimum_operation_result nums 0 }
+
+  let lemma test_006_python_assertions () =
+    let nums = init 6 [|1; 0; 0; 1; 0; 0|] in
+    let ops = init 4 [|0; 1; 0; 1|] in
+    assert { length nums = 6 };
+    assert { nums[0] = 1 };
+    assert { nums[1] = 0 };
+    assert { nums[2] = 0 };
+    assert { nums[3] = 1 };
+    assert { nums[4] = 0 };
+    assert { nums[5] = 0 };
+    assert { length ops = 4 };
+    assert { ops[0] = 0 };
+    assert { ops[1] = 1 };
+    assert { ops[2] = 0 };
+    assert { ops[3] = 1 };
+    assert { valid_input nums };
+    assert { valid_operation_plan nums ops };
+    assert { operation_count ops = 2 };
+    assert { affecting_flip_count ops 0 = 0 };
+    assert { affecting_flip_count ops 1 = 1 };
+    assert { affecting_flip_count ops 2 = 1 };
+    assert { affecting_flip_count ops 3 = 2 };
+    assert { affecting_flip_count ops 4 = 1 };
+    assert { affecting_flip_count ops 5 = 1 };
+    assert { final_one_at nums ops 0 };
+    assert { final_one_at nums ops 1 };
+    assert { final_one_at nums ops 2 };
+    assert { final_one_at nums ops 3 };
+    assert { final_one_at nums ops 4 };
+    assert { final_one_at nums ops 5 };
+    assert {
+      forall i: int. 0 <= i < length nums ->
+        i = 0 \/ i = 1 \/ i = 2 \/ i = 3 \/ i = 4 \/ i = 5
+    };
+    assert {
+      forall i: int. 0 <= i < length nums -> final_one_at nums ops i
+    };
+    assert { makes_all_one nums ops };
+    assert { feasible_with_operations nums 2 };
+    assert { minimum_operation_result nums 2 }
+
+end
