@@ -1,0 +1,66 @@
+module Max_Array_Recursive_Implementation
+
+  use int.Int
+  use array.Array
+  use array.Init
+
+  (* Recursive implementation of max_array.
+     The input array is expected to be non-empty, as in the Stage 1A spec. *)
+
+  let rec max_array_from (a: array int) (i: int) (current: int) : int
+    variant { length a - i }
+  =
+    if i >= length a then
+      current
+    else if a[i] > current then
+      max_array_from a (i + 1) a[i]
+    else
+      max_array_from a (i + 1) current
+
+  let max_array (a: array int) : int =
+    max_array_from a 1 a[0]
+
+  (* ---------------------------------------------------------------------- *)
+  (* Executable tests                                                        *)
+  (* ---------------------------------------------------------------------- *)
+
+  let test_ex_array_1 () : bool =
+    let a = init 4 [|3; 1; 4; 2|] in
+    max_array a = 4
+
+  let test_singleton () : bool =
+    let a = init 1 [|7|] in
+    max_array a = 7
+
+  let test_negative_values () : bool =
+    let a = init 3 [|-2; -5; -1|] in
+    max_array a = (-1)
+
+  let test_max_first () : bool =
+    let a = init 4 [|9; 3; 4; 2|] in
+    max_array a = 9
+
+  let test_max_last () : bool =
+    let a = init 4 [|1; 2; 3; 10|] in
+    max_array a = 10
+
+  let test_duplicates () : bool =
+    let a = init 4 [|5; 1; 5; 3|] in
+    max_array a = 5
+
+  let run_tests () : bool =
+    if test_ex_array_1 () then
+    if test_singleton () then
+    if test_negative_values () then
+    if test_max_first () then
+    if test_max_last () then
+    if test_duplicates () then
+      true
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+
+end

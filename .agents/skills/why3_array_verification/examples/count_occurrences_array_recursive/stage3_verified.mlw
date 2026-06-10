@@ -1,0 +1,28 @@
+module Count_Occurrences_Array_Stage3_Recursive
+
+  use int.Int
+  use array.Array
+  use array.Init
+
+  let rec function num_occ_array_from (a: array int) (x: int) (i: int) : int
+    requires { 0 <= i <= length a }
+    variant  { length a - i }
+  =
+    if i = length a then 0
+    else (if a[i] = x then 1 else 0) + num_occ_array_from a x (i + 1)
+
+  let rec count_occurrences_array_from (a: array int) (x: int) (i: int) : int
+    requires { 0 <= i <= length a }
+    variant  { length a - i }
+    ensures  { result = num_occ_array_from a x i }
+  =
+    if i = length a then 0
+    else
+      (if a[i] = x then 1 else 0) + count_occurrences_array_from a x (i + 1)
+
+  let count_occurrences_array (a: array int) (x: int) : int
+    ensures { result = num_occ_array_from a x 0 }
+  =
+    count_occurrences_array_from a x 0
+
+end

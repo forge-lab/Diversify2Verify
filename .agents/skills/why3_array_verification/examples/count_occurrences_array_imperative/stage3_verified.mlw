@@ -1,0 +1,38 @@
+module Count_Occurrences_Array_Stage3_Imperative
+
+  use int.Int
+  use array.Array
+  use array.Init
+  use ref.Ref
+
+  let rec function num_occ_array_from (a: array int) (x: int) (i: int) : int
+    requires { 0 <= i <= length a }
+    variant  { length a - i }
+  =
+    if i = length a then 0
+    else (if a[i] = x then 1 else 0) + num_occ_array_from a x (i + 1)
+
+  let count_occurrences_array (a: array int) (x: int) : int
+    ensures { result = num_occ_array_from a x 0 }
+  =
+    let count = ref 0 in
+    let i = ref (length a) in
+    while !i > 0 do
+      invariant { 0 <= !i <= length a }
+      invariant { !count = num_occ_array_from a x !i }
+      variant   { !i }
+
+      let j = !i - 1 in
+      if a[j] = x then
+        count := !count + 1
+      else
+        count := !count;
+
+      i := !i - 1
+    done;
+
+    assert { !i = 0 };
+    assert { !count = num_occ_array_from a x 0 };
+    !count
+
+end

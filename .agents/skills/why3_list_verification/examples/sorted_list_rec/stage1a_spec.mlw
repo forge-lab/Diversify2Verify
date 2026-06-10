@@ -1,0 +1,25 @@
+module Sorted_List_Spec
+
+  use int.Int
+  use list.List
+
+  let rec predicate le_all (x: int) (l: list int)
+    variant { l }
+  =
+    match l with
+    | Nil -> true
+    | Cons y ys -> x <= y /\ le_all x ys
+    end
+
+  let rec predicate sorted_list (l: list int)
+    variant { l }
+  =
+    match l with
+    | Nil -> true
+    | Cons x xs -> le_all x xs /\ sorted_list xs
+    end
+
+  val is_sorted_list (l: list int) : bool
+    ensures { result <-> sorted_list l }
+
+end

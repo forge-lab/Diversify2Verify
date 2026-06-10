@@ -1,0 +1,16 @@
+module Sorted_List_Recursive_Implementation
+
+  use int.Int
+  use list.List
+
+  let rec is_sorted_list (l: list int) : bool
+    variant { l }
+  =
+    match l with
+    | Nil -> true
+    | Cons _ Nil -> true
+    | Cons x (Cons y ys) ->
+        if x <= y then is_sorted_list (Cons y ys) else false
+    end
+
+end

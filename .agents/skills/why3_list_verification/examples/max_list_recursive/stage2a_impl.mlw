@@ -1,0 +1,59 @@
+module Max_List_Recursive_Implementation
+
+  use int.Int
+  use list.List
+
+  let rec max_from (xs: list int) (current: int) : int
+    variant { xs }
+  =
+    match xs with
+    | Nil -> current
+    | Cons y ys ->
+        if y > current then max_from ys y else max_from ys current
+    end
+
+  let max_list (l: list int) : int =
+    match l with
+    | Nil -> 0
+    | Cons h t -> max_from t h
+    end
+
+  let test_ex_list_1 () : bool =
+    let l = Cons 3 (Cons 1 (Cons 4 (Cons 2 Nil))) in
+    max_list l = 4
+
+  let test_singleton () : bool =
+    max_list (Cons 7 Nil) = 7
+
+  let test_negative_values () : bool =
+    let l = Cons (-2) (Cons (-5) (Cons (-1) Nil)) in
+    max_list l = (-1)
+
+  let test_max_first () : bool =
+    let l = Cons 9 (Cons 3 (Cons 4 (Cons 2 Nil))) in
+    max_list l = 9
+
+  let test_max_last () : bool =
+    let l = Cons 1 (Cons 2 (Cons 3 (Cons 10 Nil))) in
+    max_list l = 10
+
+  let test_duplicates () : bool =
+    let l = Cons 5 (Cons 1 (Cons 5 (Cons 3 Nil))) in
+    max_list l = 5
+
+  let run_tests () : bool =
+    if test_ex_list_1 () then
+    if test_singleton () then
+    if test_negative_values () then
+    if test_max_first () then
+    if test_max_last () then
+    if test_duplicates () then
+      true
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+
+end

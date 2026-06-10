@@ -1,0 +1,17 @@
+module Count_Occurrences_List_Stage3_Recursive
+
+  use int.Int
+  use list.List
+  use list.NumOcc
+
+  let rec count_occurrences_list (l: list int) (x: int) : int
+    ensures { result = num_occ x l }
+    variant { l }
+  =
+    match l with
+    | Nil -> 0
+    | Cons y ys ->
+        (if y = x then 1 else 0) + count_occurrences_list ys x
+    end
+
+end

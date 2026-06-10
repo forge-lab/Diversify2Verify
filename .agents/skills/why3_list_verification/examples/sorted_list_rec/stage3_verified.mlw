@@ -1,0 +1,75 @@
+module Sorted_List_Stage3_Recursive
+
+  use int.Int
+  use list.List
+
+  let rec predicate le_all (x: int) (l: list int)
+    variant { l }
+  =
+    match l with
+    | Nil -> true
+    | Cons y ys -> x <= y && le_all x ys
+    end
+
+  let rec predicate sorted_list (l: list int)
+    variant { l }
+  =
+    match l with
+    | Nil -> true
+    | Cons x xs -> le_all x xs && sorted_list xs
+    end
+
+  let rec lemma le_all_weaken (x y: int) (l: list int)
+    requires { x <= y }
+    requires { le_all y l }
+    ensures  { le_all x l }
+    variant  { l }
+  =
+    match l with
+    | Nil -> ()
+    | Cons _ ys -> le_all_weaken x y ys
+    end
+
+  let rec is_sorted_list (l: list int) : bool
+    ensures { result <-> sorted_list l }
+    variant { l }
+  =
+    match l with
+    | Nil ->
+        assert { sorted_list Nil };
+        true
+    | Cons x xs ->
+        match xs with
+        | Nil ->
+            assert { le_all x Nil };
+            assert { sorted_list Nil };
+            assert { sorted_list (Cons x Nil) };
+            true
+        | Cons y ys ->
+            if x <= y then begin
+              let r = is_sorted_list xs in
+              if r then begin
+                assert { sorted_list xs };
+                assert { le_all y ys };
+                le_all_weaken x y ys;
+                assert { le_all x ys };
+                assert { le_all x xs };
+                assert { sorted_list l };
+                true
+              end else begin
+                assert { not sorted_list xs };
+                assert { sorted_list l -> sorted_list xs };
+                assert { not sorted_list l };
+                false
+              end
+            end else begin
+              assert { x > y };
+              assert { sorted_list l -> le_all x xs };
+              assert { le_all x xs -> x <= y };
+              assert { not sorted_list l };
+              false
+            end
+        end
+    end
+
+end

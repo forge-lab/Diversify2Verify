@@ -1,0 +1,29 @@
+module Sorted_Array_Stage3_Recursive_Impl
+
+  use int.Int
+  use array.Array
+
+  let rec is_sorted_array_from (a: array int) (i: int) : bool
+    requires { 0 <= i <= length a }
+    variant  { length a - i }
+  =
+    if i + 1 >= length a then
+      true
+    else begin
+      assert { 0 <= i < length a };
+      assert { 0 <= i + 1 < length a };
+
+      if a[i] <= a[i + 1] then
+        is_sorted_array_from a (i + 1)
+      else
+        false
+    end
+
+  let is_sorted_array (a: array int) : bool
+  =
+    if length a <= 1 then
+      true
+    else
+      is_sorted_array_from a 0
+
+end

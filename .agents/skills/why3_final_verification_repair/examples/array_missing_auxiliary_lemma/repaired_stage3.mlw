@@ -1,0 +1,58 @@
+module Max_Array_Stage3
+
+  use int.Int
+  use array.Array
+  use ref.Ref
+
+  predicate is_max_prefix (a: array int) (k: int) (m: int) =
+    0 < k <= length a /\
+    (exists i:int. 0 <= i < k /\ m = a[i]) /\
+    (forall i:int. 0 <= i < k -> a[i] <= m)
+
+  let lemma extend_max_prefix_keep (a: array int) (k: int) (m: int)
+    requires { is_max_prefix a k m }
+    requires { 0 < k < length a }
+    requires { a[k] <= m }
+    ensures  { is_max_prefix a (k + 1) m }
+  =
+    assert { 0 < k + 1 <= length a };
+    assert { exists i:int. 0 <= i < k /\ m = a[i] };
+    assert { forall i:int. 0 <= i < k + 1 -> a[i] <= m }
+
+  let lemma extend_max_prefix_replace (a: array int) (k: int) (m: int)
+    requires { is_max_prefix a k m }
+    requires { 0 < k < length a }
+    requires { m < a[k] }
+    ensures  { is_max_prefix a (k + 1) a[k] }
+  =
+    assert { 0 < k + 1 <= length a };
+    assert { 0 <= k < k + 1 /\ a[k] = a[k] };
+    assert { forall i:int. 0 <= i < k + 1 -> a[i] <= a[k] }
+
+  let max_array (a: array int) : int
+    requires { 1 <= length a }
+    ensures  { is_max_prefix a (length a) result }
+  =
+    let n = length a in
+    let i = ref 1 in
+    let m = ref a[0] in
+    assert { is_max_prefix a 1 !m };
+    while !i < n do
+      invariant { n = length a }
+      invariant { 1 <= !i <= n }
+      invariant { is_max_prefix a !i !m }
+      variant { n - !i }
+      assert { 0 < !i < length a };
+      if !m < a[!i] then begin
+        extend_max_prefix_replace a !i !m;
+        m := a[!i]
+      end else begin
+        extend_max_prefix_keep a !i !m
+      end;
+      i := !i + 1;
+      assert { is_max_prefix a !i !m }
+    done;
+    assert { !i = n };
+    !m
+
+end

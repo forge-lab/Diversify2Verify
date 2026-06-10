@@ -1,0 +1,50 @@
+module Max_Array_Stage3_Imperative
+
+  use int.Int
+  use array.Array
+  use array.Init
+  use ref.Ref
+
+  predicate is_max_array (a: array int) (m: int) =
+    (exists i: int. 0 <= i < length a /\ a[i] = m) /\
+    (forall i: int. 0 <= i < length a -> a[i] <= m)
+
+  predicate upper_bound_at (a: array int) (m: int) (i: int) =
+    0 <= i < length a -> a[i] <= m
+
+  predicate max_prefix (a: array int) (i: int) (m: int) (idx: int) =
+    0 <= idx < i /\
+    a[idx] = m /\
+    (forall j: int. 0 <= j < i -> a[j] <= m)
+
+  let max_array (a: array int) : int
+    requires { length a > 0 }
+    ensures  { is_max_array a result }
+  =
+    let n = length a in
+    let max_i = ref 0 in
+    let max_val = ref a[0] in
+    let i = ref 1 in
+
+    while !i < n do
+      invariant { 1 <= !i <= n }
+      invariant { max_prefix a !i !max_val !max_i }
+      variant   { n - !i }
+
+      if a[!i] > !max_val then begin
+        max_val := a[!i];
+        max_i := !i
+      end;
+
+      i := !i + 1
+    done;
+
+    assert { !i = n };
+    assert { max_prefix a n !max_val !max_i };
+    assert { 0 <= !max_i < n };
+    assert { a[!max_i] = !max_val };
+    assert { forall j: int. 0 <= j < n -> a[j] <= !max_val };
+    assert { is_max_array a !max_val };
+    !max_val
+
+end

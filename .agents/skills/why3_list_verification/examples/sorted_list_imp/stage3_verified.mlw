@@ -1,0 +1,121 @@
+module Sorted_List_Imperative_Implementation
+
+  use int.Int
+  use list.List
+  use list.Length
+  use ref.Ref
+
+  exception NotSorted
+
+  let rec function sorted_bool (l: list int) : bool
+    variant { l }
+  =
+    match l with
+    | Nil -> true
+    | Cons _ Nil -> true
+    | Cons x (Cons y ys) ->
+        if x <= y then sorted_bool (Cons y ys) else false
+    end
+
+  predicate sorted_list (l: list int) =
+    sorted_bool l = true
+
+  let is_sorted_list (l: list int) : bool
+    ensures { result = sorted_bool l }
+    ensures { result = true <-> sorted_list l }
+  =
+    try
+      let cur = ref l in
+
+      while (match !cur with Cons _ (Cons _ _) -> true | _ -> false end) do
+        invariant { sorted_bool l = sorted_bool !cur }
+        invariant { 0 <= length !cur }
+        variant   { length !cur }
+
+        match !cur with
+        | Cons x (Cons y ys) ->
+            if x > y then begin
+              assert { not (x <= y) };
+              assert { sorted_bool !cur = false };
+              assert { sorted_bool l = false };
+              raise NotSorted
+            end else begin
+              assert { x <= y };
+              assert { sorted_bool !cur = sorted_bool (Cons y ys) };
+              cur := Cons y ys
+            end
+
+        | _ ->
+            assert { false }
+        end
+      done;
+
+      match !cur with
+      | Nil ->
+          assert { sorted_bool !cur = true }
+      | Cons _ Nil ->
+          assert { sorted_bool !cur = true }
+      | Cons _ (Cons _ _) ->
+          assert { false }
+      end;
+
+      assert { sorted_bool l = true };
+      true
+
+    with NotSorted ->
+      assert { sorted_bool l = false };
+      false
+    end
+
+  let test_sorted_list_1 () : bool
+    ensures { result = true }
+  =
+    let l = Cons 1 (Cons 2 (Cons 2 (Cons 5 Nil))) in
+    is_sorted_list l
+
+  let test_sorted_list_singleton () : bool
+    ensures { result = true }
+  =
+    is_sorted_list (Cons 7 Nil)
+
+  let test_sorted_list_empty () : bool
+    ensures { result = true }
+  =
+    is_sorted_list Nil
+
+  let test_sorted_list_duplicates () : bool
+    ensures { result = true }
+  =
+    let l = Cons 1 (Cons 1 (Cons 2 (Cons 2 (Cons 3 Nil)))) in
+    is_sorted_list l
+
+  let test_unsorted_list_middle () : bool
+    ensures { result = true }
+  =
+    let l = Cons 1 (Cons 3 (Cons 2 (Cons 5 Nil))) in
+    not (is_sorted_list l)
+
+  let test_unsorted_list_late () : bool
+    ensures { result = true }
+  =
+    let l = Cons 1 (Cons 2 (Cons 3 (Cons 5 (Cons 4 Nil)))) in
+    not (is_sorted_list l)
+
+  let run_tests () : bool
+    ensures { result = true }
+  =
+    if test_sorted_list_1 () then
+    if test_sorted_list_singleton () then
+    if test_sorted_list_empty () then
+    if test_sorted_list_duplicates () then
+    if test_unsorted_list_middle () then
+    if test_unsorted_list_late () then
+      true
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+
+end

@@ -1,0 +1,52 @@
+module Count_Positive_Array_Stage3
+
+  use int.Int
+  use array.Array
+  use ref.Ref
+
+  let rec function count_pos_between (a: array int) (lo: int) (hi: int) : int
+    requires { 0 <= lo <= hi <= length a }
+    variant  { hi - lo }
+  =
+    if lo = hi then 0
+    else (if a[lo] > 0 then 1 else 0) + count_pos_between a (lo + 1) hi
+
+  let function count_pos_from (a: array int) (i: int) : int
+    requires { 0 <= i <= length a }
+  = count_pos_between a i (length a)
+
+  predicate count_pos_spec (a: array int) (r: int) =
+    r = count_pos_from a 0
+
+  let rec lemma count_pos_between_split_last (a: array int) (lo: int) (hi: int)
+    requires { 0 <= lo <= hi < length a }
+    ensures  { count_pos_between a lo (hi + 1) =
+               count_pos_between a lo hi + (if a[hi] > 0 then 1 else 0) }
+    variant  { hi - lo }
+  =
+    if lo < hi then begin
+      count_pos_between_split_last a (lo + 1) hi
+    end
+
+  let count_positive_array (a: array int) : int
+    ensures { count_pos_spec a result }
+  =
+    let n = length a in
+    let i = ref 0 in
+    let c = ref 0 in
+    while !i < n do
+      invariant { n = length a }
+      invariant { 0 <= !i <= n }
+      invariant { !c = count_pos_between a 0 !i }
+      variant { n - !i }
+      if a[!i] > 0 then c := !c + 1;
+      assert { 0 <= !i < n };
+      count_pos_between_split_last a 0 !i;
+      i := !i + 1;
+      assert { !c = count_pos_between a 0 !i }
+    done;
+    assert { !i = n };
+    assert { count_pos_from a 0 = count_pos_between a 0 n };
+    !c
+
+end

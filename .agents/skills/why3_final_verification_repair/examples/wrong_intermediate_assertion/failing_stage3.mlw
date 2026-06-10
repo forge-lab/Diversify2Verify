@@ -1,0 +1,15 @@
+module Abs_Array_Stage3
+
+  use int.Int
+  use int.Abs
+  use array.Array
+
+  let distance_ok (a: array int) (i: int) (j: int) (d: int) : bool
+    requires { 0 <= i < length a }
+    requires { 0 <= j < length a }
+    ensures  { result <-> abs (a[i] - a[j]) <= d }
+  =
+    assert { abs (a[i] - a[j]) = a[i] - a[j] };
+    abs (a[i] - a[j]) <= d
+
+end

@@ -1,0 +1,57 @@
+module Sorted_List_Spec
+
+  use int.Int
+  use list.List
+
+  let rec predicate le_all (x: int) (l: list int)
+    variant { l }
+  =
+    match l with
+    | Nil -> true
+    | Cons y ys -> x <= y && le_all x ys
+    end
+
+  let rec predicate sorted_list (l: list int)
+    variant { l }
+  =
+    match l with
+    | Nil -> true
+    | Cons x xs -> le_all x xs && sorted_list xs
+    end
+
+  val is_sorted_list (l: list int) : bool
+    ensures { result <-> sorted_list l }
+
+  let lemma check_sorted_list_1 () =
+    let l4 = Cons 5 Nil in
+    let l3 = Cons 2 l4 in
+    let l2 = Cons 2 l3 in
+    let l1 = Cons 1 l2 in
+
+    assert { le_all 5 Nil };
+    assert { sorted_list l4 };
+
+    assert { le_all 2 l4 };
+    assert { sorted_list l3 };
+
+    assert { le_all 2 l3 };
+    assert { sorted_list l2 };
+
+    assert { le_all 1 l2 };
+    assert { sorted_list l1 }
+
+  let lemma check_sorted_list_2 () =
+    let l = Cons 7 Nil in
+    assert { le_all 7 Nil };
+    assert { sorted_list Nil };
+    assert { sorted_list l }
+
+  let lemma check_sorted_list_3 () =
+    let bad_tail = Cons 3 (Cons 2 (Cons 5 Nil)) in
+    let l = Cons 1 bad_tail in
+
+    assert { not (le_all 3 (Cons 2 (Cons 5 Nil))) };
+    assert { not (sorted_list bad_tail) };
+    assert { not (sorted_list l) }
+
+end

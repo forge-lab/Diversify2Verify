@@ -1,0 +1,75 @@
+module Max_Array_Spec
+
+  use int.Int
+  use import array.Array
+  use import array.Init
+
+  predicate is_max_array (a: array int) (m: int) =
+    (exists i: int. 0 <= i < length a /\ a[i] = m) /\
+    (forall i: int. 0 <= i < length a -> a[i] <= m)
+
+  predicate upper_bound_at (a: array int) (m: int) (i: int) =
+    0 <= i < length a -> a[i] <= m
+
+  val max_array (a: array int) : int
+    requires { length a > 0 }
+    ensures  { is_max_array a result }
+
+  let lemma check_ex_array_1 () =
+    let a = init 4 [|3; 1; 4; 2|] in
+    assert { length a = 4 };
+
+    (* Existential witness: index 2 contains the maximum. *)
+    assert { 0 <= 2 < length a /\ a[2] = 4 };
+    assert { exists i: int. 0 <= i < length a /\ a[i] = 4 };
+
+    (* Universal part: check every concrete index. *)
+    assert { upper_bound_at a 4 0 };
+    assert { upper_bound_at a 4 1 };
+    assert { upper_bound_at a 4 2 };
+    assert { upper_bound_at a 4 3 };
+
+    (* Finite-domain enumeration for the quantified index. *)
+    assert {
+      forall i: int. 0 <= i < length a ->
+        i = 0 \/ i = 1 \/ i = 2 \/ i = 3
+    };
+
+    assert { is_max_array a 4 }
+
+  let lemma check_ex_array_2 () =
+    let a = init 1 [|7|] in
+    assert { length a = 1 };
+
+    assert { 0 <= 0 < length a /\ a[0] = 7 };
+    assert { exists i: int. 0 <= i < length a /\ a[i] = 7 };
+
+    assert { upper_bound_at a 7 0 };
+
+    assert {
+      forall i: int. 0 <= i < length a ->
+        i = 0
+    };
+
+    assert { is_max_array a 7 }
+
+  let lemma check_ex_array_3 () =
+    let a = init 3 [|-2; -5; -1|] in
+    assert { length a = 3 };
+
+    (* Existential witness: index 2 contains the maximum. *)
+    assert { 0 <= 2 < length a /\ a[2] = (-1) };
+    assert { exists i: int. 0 <= i < length a /\ a[i] = (-1) };
+
+    assert { upper_bound_at a (-1) 0 };
+    assert { upper_bound_at a (-1) 1 };
+    assert { upper_bound_at a (-1) 2 };
+
+    assert {
+      forall i: int. 0 <= i < length a ->
+        i = 0 \/ i = 1 \/ i = 2
+    };
+
+    assert { is_max_array a (-1) }
+
+end

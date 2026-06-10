@@ -1,0 +1,182 @@
+module Sorted_Array_Stage3_Recursive
+
+  use int.Int
+  use array.Array
+
+  predicate sorted_array (a: array int) =
+    forall i j: int.
+      0 <= i <= j < length a -> a[i] <= a[j]
+
+  predicate adjacent_sorted (a: array int) =
+    forall i: int.
+      0 <= i < length a - 1 -> a[i] <= a[i + 1]
+
+  predicate adjacent_sorted_from (a: array int) (lo: int) =
+    forall i: int.
+      lo <= i < length a - 1 -> a[i] <= a[i + 1]
+
+  predicate bad_adjacent_from (a: array int) (lo: int) =
+    exists i: int.
+      lo <= i < length a - 1 /\ a[i] > a[i + 1]
+
+  let rec lemma adjacent_sorted_between (a: array int) (i: int) (j: int)
+    requires { adjacent_sorted a }
+    requires { 0 <= i <= j < length a }
+    ensures  { a[i] <= a[j] }
+    variant  { j - i }
+  =
+    if i < j then begin
+      assert { 0 <= i <= j - 1 < length a };
+      adjacent_sorted_between a i (j - 1);
+
+      assert { 0 <= j - 1 < length a - 1 };
+      assert { a[j - 1] <= a[j] };
+      assert { a[i] <= a[j - 1] };
+      assert { a[i] <= a[j] }
+    end else begin
+      assert { i = j };
+      assert { a[i] <= a[j] }
+    end
+
+  let lemma adjacent_sorted_implies_sorted_array (a: array int)
+    requires { adjacent_sorted a }
+    ensures  { sorted_array a }
+  =
+    assert {
+      forall i j: int.
+        0 <= i <= j < length a -> a[i] <= a[j]
+    }
+
+  let lemma sorted_array_implies_adjacent_sorted (a: array int)
+    requires { sorted_array a }
+    ensures  { adjacent_sorted a }
+  =
+    assert {
+      forall i: int.
+        0 <= i < length a - 1 -> 0 <= i <= i + 1 < length a
+    };
+    assert {
+      forall i: int.
+        0 <= i < length a - 1 -> a[i] <= a[i + 1]
+    }
+
+  let lemma adjacent_sorted_from_empty_suffix (a: array int) (i: int)
+    requires { i + 1 >= length a }
+    ensures  { adjacent_sorted_from a i }
+  =
+    assert {
+      forall k: int.
+        i <= k < length a - 1 -> false
+    }
+
+  let lemma adjacent_sorted_from_cons (a: array int) (i: int)
+    requires { 0 <= i < length a - 1 }
+    requires { a[i] <= a[i + 1] }
+    requires { adjacent_sorted_from a (i + 1) }
+    ensures  { adjacent_sorted_from a i }
+  =
+    assert {
+      forall k: int.
+        i <= k < length a - 1 -> k = i \/ i + 1 <= k
+    };
+    assert {
+      forall k: int.
+        i <= k < length a - 1 -> a[k] <= a[k + 1]
+    }
+
+  let lemma bad_adjacent_here (a: array int) (i: int)
+    requires { 0 <= i < length a - 1 }
+    requires { a[i] > a[i + 1] }
+    ensures  { bad_adjacent_from a i }
+  =
+    assert {
+      exists k: int.
+        k = i /\ i <= k < length a - 1 /\ a[k] > a[k + 1]
+    }
+
+  let lemma bad_adjacent_from_succ (a: array int) (i: int)
+    requires { bad_adjacent_from a (i + 1) }
+    ensures  { bad_adjacent_from a i }
+  =
+    assert { bad_adjacent_from a i }
+
+  let lemma adjacent_sorted_from_zero_implies_adjacent_sorted (a: array int)
+    requires { adjacent_sorted_from a 0 }
+    ensures  { adjacent_sorted a }
+  =
+    assert {
+      forall i: int.
+        0 <= i < length a - 1 -> a[i] <= a[i + 1]
+    }
+
+  let lemma bad_adjacent_from_zero_implies_not_adjacent_sorted (a: array int)
+    requires { bad_adjacent_from a 0 }
+    ensures  { not adjacent_sorted a }
+  =
+    assert { adjacent_sorted a -> false }
+
+  let rec is_sorted_array_from (a: array int) (i: int) : bool
+    requires { 0 <= i < length a }
+    ensures  { result -> adjacent_sorted_from a i }
+    ensures  { not result -> bad_adjacent_from a i }
+    variant  { length a - i }
+  =
+    if i + 1 >= length a then begin
+      adjacent_sorted_from_empty_suffix a i;
+      true
+    end else begin
+      assert { 0 <= i < length a - 1 };
+      assert { 0 <= i + 1 < length a };
+
+      if a[i] <= a[i + 1] then begin
+        let r = is_sorted_array_from a (i + 1) in
+        if r then begin
+          adjacent_sorted_from_cons a i;
+          true
+        end else begin
+          bad_adjacent_from_succ a i;
+          false
+        end
+      end else begin
+        bad_adjacent_here a i;
+        false
+      end
+    end
+
+  let is_sorted_array (a: array int) : bool
+    ensures { result <-> sorted_array a }
+  =
+    if length a <= 1 then begin
+      assert {
+        forall i j: int.
+          0 <= i <= j < length a -> i = j
+      };
+      assert {
+        forall i j: int.
+          0 <= i <= j < length a -> a[i] <= a[j]
+      };
+      assert { sorted_array a };
+      true
+    end else begin
+      assert { 0 <= 0 < length a };
+
+      let result = is_sorted_array_from a 0 in
+
+      if result then begin
+        assert { adjacent_sorted_from a 0 };
+        adjacent_sorted_from_zero_implies_adjacent_sorted a;
+        assert { adjacent_sorted a };
+        adjacent_sorted_implies_sorted_array a;
+        assert { sorted_array a }
+      end else begin
+        assert { bad_adjacent_from a 0 };
+        bad_adjacent_from_zero_implies_not_adjacent_sorted a;
+        assert { not adjacent_sorted a };
+        assert { sorted_array a -> adjacent_sorted a };
+        assert { not sorted_array a }
+      end;
+
+      result
+    end
+
+end

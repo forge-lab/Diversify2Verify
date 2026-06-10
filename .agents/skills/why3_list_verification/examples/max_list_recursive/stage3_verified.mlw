@@ -1,0 +1,46 @@
+module Max_List_Stage3_Recursive
+
+  use int.Int
+  use list.List
+  use list.Mem
+
+  predicate is_max_list (l: list int) (m: int) =
+    mem m l /\
+    (forall x: int. mem x l -> x <= m)
+
+  predicate upper_bound_member (l: list int) (m: int) (x: int) =
+    mem x l -> x <= m
+
+  let rec max_from (xs: list int) (current: int) : int
+    variant { xs }
+  =
+    match xs with
+    | Nil -> current
+    | Cons y ys ->
+        if y > current then max_from ys y else max_from ys current
+    end
+
+  let rec lemma max_from_spec (xs: list int) (current: int)
+    ensures { is_max_list (Cons current xs) (max_from xs current) }
+    variant { xs }
+  =
+    match xs with
+    | Nil ->
+        assert { is_max_list (Cons current Nil) current }
+    | Cons y ys ->
+        if y > current then
+          max_from_spec ys y
+        else
+          max_from_spec ys current
+
+  let max_list (l: list int) : int
+    requires { l <> Nil }
+    ensures { is_max_list l result }
+  =
+    match l with
+    | Nil -> 0
+    | Cons h t ->
+        max_from_spec t h;
+        max_from t h
+
+end

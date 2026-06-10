@@ -1,0 +1,29 @@
+module Max_Array_Stage3
+
+  use int.Int
+  use array.Array
+  use ref.Ref
+
+  predicate is_max_prefix (a: array int) (k: int) (m: int) =
+    0 < k <= length a /\
+    (exists i:int. 0 <= i < k /\ m = a[i]) /\
+    (forall i:int. 0 <= i < k -> a[i] <= m)
+
+  let max_array (a: array int) : int
+    requires { 1 <= length a }
+    ensures  { is_max_prefix a (length a) result }
+  =
+    let n = length a in
+    let i = ref 1 in
+    let m = ref a[0] in
+    while !i < n do
+      invariant { n = length a }
+      invariant { 1 <= !i <= n }
+      invariant { is_max_prefix a !i !m }
+      variant { n - !i }
+      if !m < a[!i] then m := a[!i];
+      i := !i + 1
+    done;
+    !m
+
+end

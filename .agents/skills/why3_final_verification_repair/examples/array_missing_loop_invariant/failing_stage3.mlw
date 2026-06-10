@@ -1,0 +1,31 @@
+module Count_Positive_Array_Stage3
+
+  use int.Int
+  use array.Array
+  use ref.Ref
+
+  let rec function count_pos_from (a: array int) (i: int) : int
+    requires { 0 <= i <= length a }
+    variant  { length a - i }
+  =
+    if i = length a then 0
+    else (if a[i] > 0 then 1 else 0) + count_pos_from a (i + 1)
+
+  predicate count_pos_spec (a: array int) (r: int) =
+    r = count_pos_from a 0
+
+  let count_positive_array (a: array int) : int
+    ensures { count_pos_spec a result }
+  =
+    let n = length a in
+    let i = ref 0 in
+    let c = ref 0 in
+    while !i < n do
+      invariant { 0 <= !i <= n }
+      variant { n - !i }
+      if a[!i] > 0 then c := !c + 1;
+      i := !i + 1
+    done;
+    !c
+
+end

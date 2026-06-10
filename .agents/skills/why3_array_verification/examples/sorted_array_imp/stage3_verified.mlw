@@ -1,0 +1,112 @@
+module Sorted_Array_Stage3_Imperative
+
+  use int.Int
+  use array.Array
+  use array.Init
+  use ref.Ref
+
+  predicate sorted_array (a: array int) =
+    forall i j: int.
+      0 <= i <= j < length a -> a[i] <= a[j]
+
+  predicate pair_ok (a: array int) (i: int) (j: int) =
+    0 <= i <= j < length a -> a[i] <= a[j]
+
+  predicate adjacent_sorted (a: array int) =
+    forall i: int.
+      0 <= i < length a - 1 -> a[i] <= a[i + 1]
+
+  (* ---------------------------------------------------------------------- *)
+  (* Lemmas connecting adjacent sortedness with full pairwise sortedness       *)
+  (* ---------------------------------------------------------------------- *)
+
+  let rec lemma adjacent_sorted_between (a: array int) (i: int) (j: int)
+    requires { adjacent_sorted a }
+    requires { 0 <= i <= j < length a }
+    ensures  { a[i] <= a[j] }
+    variant  { j - i }
+  =
+    if i < j then begin
+      assert { 0 <= i <= j - 1 < length a };
+      adjacent_sorted_between a i (j - 1);
+
+      assert { 0 <= j - 1 < length a - 1 };
+      assert { a[j - 1] <= a[j] };
+      assert { a[i] <= a[j - 1] };
+      assert { a[i] <= a[j] }
+    end
+
+  let lemma adjacent_sorted_implies_sorted_array (a: array int)
+    requires { adjacent_sorted a }
+    ensures  { sorted_array a }
+  =
+    assert {
+      forall i j: int.
+        0 <= i <= j < length a -> a[i] <= a[j]
+    }
+
+  let lemma sorted_array_implies_adjacent_sorted (a: array int)
+    ensures { sorted_array a -> adjacent_sorted a }
+  =
+    assert {
+      sorted_array a ->
+      forall i: int.
+        0 <= i < length a - 1 -> a[i] <= a[i + 1]
+    }
+
+  (* ---------------------------------------------------------------------- *)
+  (* Stage 3 imperative implementation with contract and loop invariants      *)
+  (* ---------------------------------------------------------------------- *)
+
+  let is_sorted_array (a: array int) : bool
+    ensures { result <-> sorted_array a }
+  =
+    let n = length a in
+
+    if n <= 1 then begin
+      assert { sorted_array a };
+      true
+    end else begin
+      let ok = ref true in
+      let i = ref 0 in
+
+      while !i < n - 1 do
+        invariant { 0 <= !i <= n - 1 }
+        invariant {
+          !ok <->
+            forall k: int. 0 <= k < !i -> a[k] <= a[k + 1]
+        }
+        variant { n - 1 - !i }
+
+        if a[!i] > a[!i + 1] then begin
+          ok := false
+        end;
+
+        i := !i + 1
+      done;
+
+      assert { !i = n - 1 };
+
+      assert {
+        !ok <->
+          forall k: int. 0 <= k < n - 1 -> a[k] <= a[k + 1]
+      };
+
+      assert { !ok <-> adjacent_sorted a };
+
+      if !ok then begin
+        assert { adjacent_sorted a };
+        adjacent_sorted_implies_sorted_array a;
+        assert { sorted_array a }
+      end else begin
+        assert { not adjacent_sorted a };
+        sorted_array_implies_adjacent_sorted a;
+        assert { sorted_array a -> adjacent_sorted a };
+        assert { not sorted_array a }
+      end;
+
+      assert { !ok <-> sorted_array a };
+      !ok
+    end
+
+end

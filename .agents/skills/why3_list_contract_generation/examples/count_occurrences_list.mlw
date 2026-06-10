@@ -1,0 +1,34 @@
+module Count_Occurrences_List_Spec
+
+  use int.Int
+  use list.List
+  use list.NumOcc
+
+  val count_occurrences_list (l: list int) (x: int) : int
+    ensures { result = num_occ x l }
+
+  let lemma check_ex_list_1 () =
+    let l = Cons 1 (Cons 2 (Cons 2 (Cons 3 (Cons 2 Nil)))) in
+    assert { num_occ 2 Nil = 0 };
+    assert { num_occ 2 (Cons 2 Nil) = 1 };
+    assert { num_occ 2 (Cons 3 (Cons 2 Nil)) = 1 };
+    assert { num_occ 2 (Cons 2 (Cons 3 (Cons 2 Nil))) = 2 };
+    assert { num_occ 2 (Cons 2 (Cons 2 (Cons 3 (Cons 2 Nil)))) = 3 };
+    assert { num_occ 2 l = 3 }
+
+  let lemma check_ex_list_2 () =
+    let l = Cons 4 (Cons 4 (Cons 4 (Cons 4 Nil))) in
+    assert { num_occ 4 Nil = 0 };
+    assert { num_occ 4 (Cons 4 Nil) = 1 };
+    assert { num_occ 4 (Cons 4 (Cons 4 Nil)) = 2 };
+    assert { num_occ 4 (Cons 4 (Cons 4 (Cons 4 Nil))) = 3 };
+    assert { num_occ 4 l = 4 }
+
+  let lemma check_ex_list_3 () =
+    let l = Cons 1 (Cons 3 (Cons 5 Nil)) in
+    assert { num_occ 2 Nil = 0 };
+    assert { num_occ 2 (Cons 5 Nil) = 0 };
+    assert { num_occ 2 (Cons 3 (Cons 5 Nil)) = 0 };
+    assert { num_occ 2 l = 0 }
+
+end

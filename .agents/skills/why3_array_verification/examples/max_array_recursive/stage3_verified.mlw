@@ -1,0 +1,49 @@
+module Max_Array_Stage3_Recursive
+
+  use int.Int
+  use array.Array
+  use array.Init
+
+  predicate is_max_array (a: array int) (m: int) =
+    (exists i: int. 0 <= i < length a /\
+      a[i] = m) /\
+    (forall i: int. 0 <= i < length a -> a[i] <= m)
+
+  predicate upper_bound_at (a: array int) (m: int) (i: int) =
+    0 <= i < length a -> a[i] <= m
+
+  predicate is_max_suffix (a: array int) (start: int) (m: int) =
+    (exists i: int. start <= i < length a /\
+      a[i] = m) /\
+    (forall i: int. start <= i < length a -> a[i] <= m)
+
+  let rec lemma advance_max_suffix (a: array int) (i: int) (candidate: int)
+    requires { 0 <= i < length a - 1 }
+    requires { is_max_suffix a (i + 1) candidate }
+    ensures  { is_max_suffix a i (if a[i] > candidate then a[i] else candidate) }
+  =
+    if a[i] > candidate then
+      assert { is_max_suffix a i a[i] }
+    else
+      assert { is_max_suffix a i candidate }
+
+  let rec max_array_from (a: array int) (i: int) : int
+    requires { 0 <= i < length a }
+    variant  { length a - i }
+    ensures  { is_max_suffix a i result }
+  =
+    if i = length a - 1 then
+      a[i]
+    else
+      let tail = max_array_from a (i + 1) in
+      let current = if a[i] > tail then a[i] else tail in
+      advance_max_suffix a i tail;
+      current
+
+  let max_array (a: array int) : int
+    requires { length a > 0 }
+    ensures  { is_max_array a result }
+  =
+    max_array_from a 0
+
+end

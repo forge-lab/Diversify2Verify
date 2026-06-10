@@ -1,0 +1,32 @@
+module Count_Occurrences_List_Stage3_Imperative
+
+  use int.Int
+  use list.List
+  use list.NumOcc
+  use list.Length
+  use ref.Ref
+
+  let count_occurrences_list (l: list int) (x: int) : int
+    ensures { result = num_occ x l }
+  =
+    let count = ref 0 in
+    let cur = ref l in
+    while (match !cur with Nil -> false | Cons _ _ -> true end) do
+      invariant { num_occ x !cur + !count = num_occ x l }
+      variant { length !cur }
+
+      match !cur with
+      | Nil -> ()
+      | Cons y ys ->
+          if y = x then begin
+            count := !count + 1
+          end;
+          cur := ys
+      end
+    done;
+
+    assert { !cur = Nil };
+    assert { num_occ x Nil = 0 };
+    !count
+
+end

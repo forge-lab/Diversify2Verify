@@ -1,0 +1,23 @@
+{
+  "classification": "loop_invariant_issue",
+  "confidence": 0.86,
+  "changed_spec": false,
+  "changed_public_signature": false,
+  "changed_implementation_style": false,
+  "changed_helper_contracts": true,
+  "added_invariants": true,
+  "added_variants": false,
+  "added_assertions": true,
+  "added_auxiliary_lemmas": true,
+  "removed_tests": false,
+  "root_cause_summary": "The loop lacked an invariant relating the accumulator to the processed prefix.",
+  "spec_preservation_summary": "The benchmark-facing postcondition was preserved.",
+  "implementation_preservation_summary": "The imperative loop/accumulator structure was preserved.",
+  "repair_summary": ["Added prefix-count invariant", "Added split-last lemma"],
+  "key_log_locations": ["line 20 loop invariant preservation", "line 24 postcondition"],
+  "key_source_locations": ["while loop invariants"],
+  "typecheck_command": "why3 prove --type-only repaired_stage3.mlw",
+  "typecheck_exit_code": null,
+  "offline_verification_command": "scripts/why3-verify.sh repaired_stage3.mlw",
+  "remaining_risks": ["Lemma may need extra unfolding assertions for older Why3/prover configs"]
+}

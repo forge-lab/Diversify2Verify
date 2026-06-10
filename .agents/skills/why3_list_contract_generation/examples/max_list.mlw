@@ -1,0 +1,56 @@
+module Max_List_Spec
+
+  use int.Int
+  use list.List
+  use list.Mem
+
+  predicate is_max_list (l: list int) (m: int) =
+    mem m l /\
+    (forall x: int. mem x l -> x <= m)
+
+  predicate upper_bound_member (l: list int) (m: int) (x: int) =
+    mem x l -> x <= m
+
+  val max_list (l: list int) : int
+    requires { l <> Nil }
+    ensures  { is_max_list l result }
+
+  let lemma check_ex_list_1 () =
+    let l = Cons 3 (Cons 1 (Cons 4 (Cons 2 Nil))) in
+    assert { mem 4 l };
+
+    assert { upper_bound_member l 4 3 };
+    assert { upper_bound_member l 4 1 };
+    assert { upper_bound_member l 4 4 };
+    assert { upper_bound_member l 4 2 };
+
+    assert {
+      forall x: int. mem x l ->
+        x = 3 \/ x = 1 \/ x = 4 \/ x = 2
+    };
+
+    assert { is_max_list l 4 }
+
+  let lemma check_ex_list_2 () =
+    let l = Cons 7 Nil in
+    assert { mem 7 l };
+    assert { upper_bound_member l 7 7 };
+    assert { forall x: int. mem x l -> x = 7 };
+    assert { is_max_list l 7 }
+
+  let lemma check_ex_list_3 () =
+    let l = Cons (-2) (Cons (-5) (Cons (-1) Nil)) in
+    assert { mem (-1) l };
+
+    assert { upper_bound_member l (-1) (-2) };
+    assert { upper_bound_member l (-1) (-5) };
+    assert { upper_bound_member l (-1) (-1) };
+
+    assert {
+      forall x: int. mem x l ->
+        x = (-2) \/ x = (-5) \/ x = (-1)
+    };
+
+    assert { is_max_list l (-1) }
+
+end

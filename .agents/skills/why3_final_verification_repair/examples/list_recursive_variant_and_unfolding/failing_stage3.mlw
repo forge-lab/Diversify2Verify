@@ -1,0 +1,20 @@
+module Sum_List_Stage3
+
+  use int.Int
+  use list.List
+
+  let rec function sum_list (l: list int) : int =
+    match l with
+    | Nil -> 0
+    | Cons x xs -> x + sum_list xs
+    end
+
+  let rec sum_list_impl (l: list int) : int
+    ensures { result = sum_list l }
+  =
+    match l with
+    | Nil -> 0
+    | Cons x xs -> x + sum_list_impl xs
+    end
+
+end

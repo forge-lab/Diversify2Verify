@@ -1,0 +1,62 @@
+module Sorted_List_Imperative_Implementation
+
+  use int.Int
+  use list.List
+  use ref.Ref
+
+  exception NotSorted
+
+  let is_sorted_list (l: list int) : bool =
+    try
+      let cur = ref l in
+      while (match !cur with Cons _ (Cons _ _) -> true | _ -> false end) do
+        match !cur with
+        | Cons x (Cons y ys) ->
+            if x > y then raise NotSorted;
+            cur := Cons y ys
+        | _ -> ()
+        end
+      done;
+      true
+    with NotSorted ->
+      false
+    end
+
+  let test_sorted_list_1 () : bool =
+    let l = Cons 1 (Cons 2 (Cons 2 (Cons 5 Nil))) in
+    is_sorted_list l
+
+  let test_sorted_list_singleton () : bool =
+    is_sorted_list (Cons 7 Nil)
+
+  let test_sorted_list_empty () : bool =
+    is_sorted_list Nil
+
+  let test_sorted_list_duplicates () : bool =
+    let l = Cons 1 (Cons 1 (Cons 2 (Cons 2 (Cons 3 Nil)))) in
+    is_sorted_list l
+
+  let test_unsorted_list_middle () : bool =
+    let l = Cons 1 (Cons 3 (Cons 2 (Cons 5 Nil))) in
+    not (is_sorted_list l)
+
+  let test_unsorted_list_late () : bool =
+    let l = Cons 1 (Cons 2 (Cons 3 (Cons 5 (Cons 4 Nil)))) in
+    not (is_sorted_list l)
+
+  let run_tests () : bool =
+    if test_sorted_list_1 () then
+    if test_sorted_list_singleton () then
+    if test_sorted_list_empty () then
+    if test_sorted_list_duplicates () then
+    if test_unsorted_list_middle () then
+    if test_unsorted_list_late () then
+      true
+    else false
+    else false
+    else false
+    else false
+    else false
+    else false
+
+end
